@@ -452,13 +452,16 @@ public abstract class SelectionManager {
         }
 
         List<RMNode> filteredList = new ArrayList<>();
-
+        HashSet<Permission> clientPermissions = new HashSet<>();
         for (RMNode node : freeNodes) {
             // checking the permission
             try {
-                client.checkPermission(node.getUserPermission(), client +
-                    " is not authorized to get the node " + node.getNodeURL() + " from " +
-                    node.getNodeSource().getName());
+                if (!clientPermissions.contains(node.getUserPermission())) {
+                    client.checkPermission(node.getUserPermission(), client +
+                        " is not authorized to get the node " + node.getNodeURL() + " from " +
+                        node.getNodeSource().getName());
+                    clientPermissions.add(node.getUserPermission());
+                }
             } catch (SecurityException e) {
                 // client does not have an access to this node
                 logger.debug(e.getMessage());
@@ -471,9 +474,9 @@ public abstract class SelectionManager {
                 continue;
             }
 
-            // if client has AllPermissions he sill can get a node with any token
+            // if client has AllPermissions he still can get a node with any token
             // we will avoid it here
-            if (nodeWithTokenRequested && tokenPrincipal != null) {
+            if (nodeWithTokenRequested) {
                 PrincipalPermission perm = (PrincipalPermission) node.getUserPermission();
                 // checking explicitly that node has this token identity
                 if (!perm.hasPrincipal(tokenPrincipal)) {
