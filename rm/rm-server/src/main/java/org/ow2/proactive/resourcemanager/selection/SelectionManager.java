@@ -36,8 +36,23 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
+import java.io.File;
+import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -58,22 +73,8 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 
 
 /**
@@ -242,48 +243,52 @@ public abstract class SelectionManager {
         List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(criteria.getSize(), filteredNodes,
                 client);
 
-        // checking if all scripts are authorized
-        checkAuthorizedScripts(criteria.getScripts());
+        List<Node> matchedNodes;
+        if (hasScripts) {
+            // checking if all scripts are authorized
+            checkAuthorizedScripts(criteria.getScripts());
 
-        // arranging nodes for script execution
-        List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
+            // arranging nodes for script execution
+            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes,
+                    criteria.getScripts());
 
-        List<Node> matchedNodes = null;
-        if (criteria.getTopology().isTopologyBased()) {
-            // run scripts on all available nodes
-            matchedNodes = runScripts(arrangedNodes, criteria);
-        } else {
-            // run scripts not on all nodes, but always on missing number of nodes
-            // until required node set is found
-            matchedNodes = new LinkedList<>();
-            while (matchedNodes.size() < criteria.getSize()) {
-                int requiredNodesNumber = criteria.getSize() - matchedNodes.size();
-                int numberOfNodesForScriptExecution = requiredNodesNumber;
+            if (criteria.getTopology().isTopologyBased()) {
+                // run scripts on all available nodes
+                matchedNodes = runScripts(arrangedNodes, criteria);
+            } else {
+                // run scripts not on all nodes, but always on missing number of nodes
+                // until required node set is found
+                matchedNodes = new LinkedList<>();
+                while (matchedNodes.size() < criteria.getSize()) {
+                    int numberOfNodesForScriptExecution = criteria.getSize() - matchedNodes.size();
 
-                if (numberOfNodesForScriptExecution < SELECTION_THEADS_NUMBER) {
-                    // we can run "SELECTION_THEADS_NUMBER" scripts in parallel
-                    // in case when we need less nodes it still useful to
-                    // the full capacity of the thread pool to find nodes quicker
+                    if (numberOfNodesForScriptExecution < SELECTION_THEADS_NUMBER) {
+                        // we can run "SELECTION_THEADS_NUMBER" scripts in parallel
+                        // in case when we need less nodes it still useful to
+                        // the full capacity of the thread pool to find nodes quicker
 
-                    // it is not important if we find more nodes than needed
-                    // subset will be selected later (topology handlers)
-                    numberOfNodesForScriptExecution = SELECTION_THEADS_NUMBER;
-                }
+                        // it is not important if we find more nodes than needed
+                        // subset will be selected later (topology handlers)
+                        numberOfNodesForScriptExecution = SELECTION_THEADS_NUMBER;
+                    }
 
-                List<RMNode> subset = arrangedNodes.subList(0, Math.min(numberOfNodesForScriptExecution,
-                        arrangedNodes.size()));
-                matchedNodes.addAll(runScripts(subset, criteria));
-                // removing subset of arrangedNodes
-                subset.clear();
+                    List<RMNode> subset = arrangedNodes.subList(0,
+                            Math.min(numberOfNodesForScriptExecution, arrangedNodes.size()));
+                    matchedNodes.addAll(runScripts(subset, criteria));
+                    // removing subset of arrangedNodes
+                    subset.clear();
 
-                if (arrangedNodes.size() == 0) {
-                    break;
+                    if (arrangedNodes.size() == 0) {
+                        break;
+                    }
                 }
             }
-        }
-
-        if (hasScripts) {
             logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+        } else {
+            matchedNodes = new LinkedList<>();
+            for (RMNode node : afterPolicyNodes) {
+                matchedNodes.add(node.getNode());
+            }
         }
 
         // now we have a list of nodes which match to selection scripts
@@ -303,7 +308,7 @@ public abstract class SelectionManager {
         }
 
         // the nodes are selected, now mark them as busy.
-        for (Node node : new LinkedList<>(selectedNodes)) {
+        for (Node node : selectedNodes) {
             try {
                 // Synchronous call
                 rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
@@ -400,7 +405,7 @@ public abstract class SelectionManager {
             // waiting for the results
             for (Future<Node> futureNode : matchedNodes) {
                 if (!futureNode.isCancelled()) {
-                    Node node = null;
+                    Node node;
                     try {
                         node = futureNode.get();
                         if (node != null) {
@@ -430,11 +435,6 @@ public abstract class SelectionManager {
 
     /**
      * Removes exclusion nodes and nodes not accessible for the client
-     *
-     * @param freeNodes
-     * @param exclusion
-     * @param client
-     * @return
      */
     private List<RMNode> filterOut(List<RMNode> freeNodes, Criteria criteria, Client client) {
 
