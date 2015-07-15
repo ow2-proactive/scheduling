@@ -95,7 +95,9 @@ public class InternalJobFactory {
     public static InternalJob createJob(Job job, Credentials cred) throws JobCreationException {
         InternalJob iJob;
 
-        logger.info("Create job '" + job.getName() + "' - " + job.getClass().getName());
+        if(logger.isDebugEnabled()){
+            logger.debug("Create job '" + job.getName() + "' - " + job.getClass().getName());
+        }
 
         switch (job.getType()) {
             case PARAMETER_SWEEPING:

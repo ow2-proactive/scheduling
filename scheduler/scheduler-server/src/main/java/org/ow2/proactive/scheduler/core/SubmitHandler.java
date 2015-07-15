@@ -19,7 +19,9 @@ class SubmitHandler implements Runnable {
 
     @Override
     public void run() {
-        logger.info("Submitting a new job '" + job.getName() + "'");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Submitting a new job '" + job.getName() + "'");
+        }
 
         service.jobs.jobSubmitted(job, service.infrastructure
                 .getSpacesSupport());

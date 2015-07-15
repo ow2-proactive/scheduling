@@ -528,15 +528,4 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         return selectionScripts;
     }
 
-    private String getSchedulerUrl() {
-        if (schedulerUrl == null) {
-            try {
-                SchedulerAuthenticationInterface sai = SchedulerConnection.waitAndJoin(null);
-                schedulerUrl = sai.getHostURL();
-            } catch (ConnectionException e) {
-                logger.error("Cannot determine the scheduler url", e);
-            }
-        }
-        return schedulerUrl;
-    }
 }
