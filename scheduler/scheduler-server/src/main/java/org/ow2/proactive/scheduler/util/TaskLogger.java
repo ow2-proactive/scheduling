@@ -41,8 +41,6 @@ import org.ow2.proactive.utils.appenders.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 
-import java.util.regex.Pattern;
-
 
 public class TaskLogger {
 
@@ -77,27 +75,35 @@ public class TaskLogger {
     }
 
     public void debug(TaskId id, String message) {
-        MDC.put(FileAppender.FILE_NAME, id);
-        logger.debug(format(id, message));
-        MDC.remove(FileAppender.FILE_NAME);
+        if (logger.isDebugEnabled()) {
+            MDC.put(FileAppender.FILE_NAME, id);
+            logger.debug(format(id, message));
+            MDC.remove(FileAppender.FILE_NAME);
+        }
     }
 
     public void debug(TaskId id, String message, Throwable th) {
-        MDC.put(FileAppender.FILE_NAME, id);
-        logger.debug(format(id, message), th);
-        MDC.remove(FileAppender.FILE_NAME);
+        if (logger.isDebugEnabled()) {
+            MDC.put(FileAppender.FILE_NAME, id);
+            logger.debug(format(id, message), th);
+            MDC.remove(FileAppender.FILE_NAME);
+        }
     }
 
     public void trace(TaskId id, String message) {
-        MDC.put(FileAppender.FILE_NAME, id);
-        logger.trace(format(id, message));
-        MDC.remove(FileAppender.FILE_NAME);
+        if (logger.isTraceEnabled()) {
+            MDC.put(FileAppender.FILE_NAME, id);
+            logger.trace(format(id, message));
+            MDC.remove(FileAppender.FILE_NAME);
+        }
     }
 
     public void trace(TaskId id, String message, Throwable th) {
-        MDC.put(FileAppender.FILE_NAME, id);
-        logger.trace(format(id, message), th);
-        MDC.remove(FileAppender.FILE_NAME);
+        if (logger.isTraceEnabled()) {
+            MDC.put(FileAppender.FILE_NAME, id);
+            logger.trace(format(id, message), th);
+            MDC.remove(FileAppender.FILE_NAME);
+        }
     }
 
     public void error(TaskId id, String message, Throwable th) {
