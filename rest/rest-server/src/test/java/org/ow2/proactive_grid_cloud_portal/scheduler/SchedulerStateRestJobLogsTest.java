@@ -34,12 +34,10 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Collections;
+
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
@@ -49,13 +47,14 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -118,7 +117,9 @@ public class SchedulerStateRestJobLogsTest {
     @Test
     public void job_full_logs_finished() throws Exception {
         InternalTaskFlowJob jobState = new InternalTaskFlowJob();
-        jobState.addTask(new InternalScriptTask());
+        InternalScriptTask task = new InternalScriptTask();
+        task.setPreciousLogs(true);
+        jobState.addTask(task);
 
         File logFile = tempFolder.newFile("TaskLogs-123-0.log");
         FileUtils.write(logFile, "logs");
@@ -155,6 +156,7 @@ public class SchedulerStateRestJobLogsTest {
 
     private static void addTask(InternalTaskFlowJob jobState, long finishedTime, long id) {
         InternalScriptTask task = new InternalScriptTask();
+        task.setPreciousLogs(true);
         task.setFinishedTime(finishedTime);
         jobState.addTask(task);
         task.setId(TaskIdImpl.createTaskId(new JobIdImpl(123, "job"), "task", id, false));
