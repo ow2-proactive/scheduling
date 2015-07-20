@@ -1,13 +1,14 @@
 package functionaltests.schedulerdb;
 
-import org.junit.Assert;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
-import org.hibernate.cfg.Configuration;
-import org.junit.After;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Ignore;
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -15,7 +16,11 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
@@ -25,16 +30,20 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.tests.FunctionalTest;
 import org.ow2.tests.ProActiveTest;
 import org.ow2.tests.ProcessCleaner;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.*;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+import org.hibernate.cfg.Configuration;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 
 
 @Ignore
@@ -341,11 +350,6 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
     @Before
     public void initTest() throws Exception {
-
-        if (!FunctionalTest.shouldBeExecuted(this.getClass().getName())) {
-            Assume.assumeTrue(false);
-        }
-
         cleaner.killAliveProcesses();
 
         Configuration config = new Configuration()
@@ -357,11 +361,6 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
     @After
     public void cleanup() {
-
-        if (!FunctionalTest.shouldBeExecuted(this.getClass().getName())) {
-            return;
-        }
-
         if (dbManager != null) {
             dbManager.close();
         }

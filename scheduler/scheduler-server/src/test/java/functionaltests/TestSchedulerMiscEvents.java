@@ -39,7 +39,6 @@ package functionaltests;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.tests.FunctionalTest;
 
 import static org.junit.Assert.assertTrue;
 
@@ -53,7 +52,7 @@ import static org.junit.Assert.assertTrue;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestSchedulerMiscEvents extends FunctionalTest {
+public class TestSchedulerMiscEvents extends RMFunctionalTest {
 
     /**
      * Tests starts here.

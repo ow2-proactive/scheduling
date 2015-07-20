@@ -56,9 +56,11 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.junit.Assert;
+import org.junit.Test;
+
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
-import org.junit.Assert;
 
 
 /**
@@ -66,7 +68,7 @@ import org.junit.Assert;
  * The scenario is ADD, GET, REMOVE.
  * 
  * This test requires the following prerequisites :
- *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be 
+ *  - The value of the {@link PAResourceManagerProperties#RM_ACCOUNT_REFRESH_RATE} property must be
  *  big enough to not let the {@link RMAccountsManager} refresh accounts automatically. This test 
  *  will refresh accounts manually by invoking the {@link ManagementMBean#clearAccoutingCache()}.
  *  - Only one single node must be added
@@ -78,21 +80,16 @@ public final class AddGetRemoveTest extends RMConsecutive {
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
 
-    /**
-     * Test function.
-     * @throws Exception
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        final ResourceManager r = helper.getResourceManager();
+        final ResourceManager r = rmHelper.getResourceManager();
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = RMTHelper.defaultUserName;
-        final String adminPassword = RMTHelper.defaultUserPassword;
+        final String adminLogin = RMTHelper.Users.TEST_USERNAME;
+        final String adminPassword = RMTHelper.Users.TEST_PASSWORD;
 
         // All accounting values are checked through JMX
-        final RMAuthentication auth = (RMAuthentication) helper.getRMAuth();
+        final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
                 pubKey);
@@ -112,16 +109,16 @@ public final class AddGetRemoveTest extends RMConsecutive {
 
         // ADD, GET, RELEASE
         // 1) ADD
-        Node node = helper.createNode("test").getNode();
+        Node node = rmHelper.createNode("test").getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
         //we eat the configuring to free
-        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeURL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeURL);
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();
-        node = r.getAtMostNodes(1, null).get(0);
+        r.getAtMostNodes(1, null).get(0);
 
         // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);

@@ -12,7 +12,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +33,7 @@ import org.junit.Test;
  *          |
  *          C
  */
-public class TestReplicateTaskRestore extends FunctionalTest {
+public class TestReplicateTaskRestore extends RMFunctionalTest {
 
     static final int REPLICATED_NUMBER = 5;
 

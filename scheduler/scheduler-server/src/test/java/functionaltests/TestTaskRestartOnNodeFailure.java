@@ -50,7 +50,6 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,7 +63,7 @@ import functionaltests.utils.ProActiveLock;
  * @author ProActive team
  *
  */
-public class TestTaskRestartOnNodeFailure extends FunctionalTest {
+public class TestTaskRestartOnNodeFailure extends RMFunctionalTest {
 
     private static final long TIMEOUT = 60000;
 
@@ -84,14 +83,12 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
     }
 
-    private RMTHelper rmHelper = RMTHelper.getDefaultInstance();
-
     @Test
     public void testRestart() throws Exception {
         System.out.println("Start RM");
         rmHelper.getResourceManager();
 
-        TNode node1 = startNode(rmHelper);
+        TestNode node1 = startNode(rmHelper);
 
         System.out.println("Start scheduler");
         String rmUrl = rmHelper.getLocalUrl();
@@ -106,10 +103,10 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         node1 = testTaskKillNode(communicationObject, node1, true);
     }
 
-    private TNode testTaskKillNode(ProActiveLock communicationObject, TNode node1, boolean waitBeforeKill)
+    private TestNode testTaskKillNode(ProActiveLock communicationObject, TestNode node1, boolean waitBeforeKill)
             throws Exception {
         communicationObject.lock();
-        TNode node2 = startNode(rmHelper);
+        TestNode node2 = startNode(rmHelper);
 
         System.out.println("Submit job");
         final JobId jobId = SchedulerTHelper.submitJob(createJob(PAActiveObject.getUrl(communicationObject)));
@@ -122,8 +119,8 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
         final String taskNodeUrl = event.getNodeUrl();
 
-        TNode aliveNode;
-        TNode nodeToKill;
+        TestNode aliveNode;
+        TestNode nodeToKill;
 
         if (taskNodeUrl.equals(node1.getNode().getNodeInformation().getURL())) {
             nodeToKill = node1;
@@ -173,11 +170,11 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
     private static int startedNodesCounter;
 
-    private TNode startNode(RMTHelper rmHelper) throws Exception {
+    private TestNode startNode(RMTHelper rmHelper) throws Exception {
         int nodeNumber = startedNodesCounter++;
 
         System.out.println("Start new node: node-" + nodeNumber);
-        TNode node = rmHelper.createNode("node" + nodeNumber);
+        TestNode node = rmHelper.createNode("node" + nodeNumber);
         String nodeUrl = node.getNode().getNodeInformation().getURL();
         rmHelper.getResourceManager().addNode(nodeUrl);
         rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeUrl, TIMEOUT);

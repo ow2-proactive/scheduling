@@ -59,6 +59,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.utils.Criteria;
 import org.junit.Assert;
+import org.junit.Test;
 
 import functionaltests.RMConsecutive;
 import functionaltests.RMTHelper;
@@ -69,7 +70,7 @@ import functionaltests.RMTHelper;
  * The scenario is ADD, GET, DOWN, REMOVE.
  * 
  * This test requires the following prerequisites :
- *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be 
+ *  - The value of the {@link PAResourceManagerProperties#RM_ACCOUNT_REFRESH_RATE} property must be
  *  big enough to not let the {@link RMAccountsManager} refresh accounts automatically. This test 
  *  will refresh accounts manually by invoking the {@link ManagementMBean#clearAccoutingCache()}.
  *  - Only one single node must be added
@@ -81,26 +82,21 @@ public final class AddGetDownRemoveTest extends RMConsecutive {
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
 
-    /**
-     * Test function.
-     * @throws Exception
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         // The username and thr password must be the same a used to connect to the RM
-        final ResourceManager r = helper.getResourceManager();
+        final ResourceManager r = rmHelper.getResourceManager();
         // All accounting values are checked through JMX
-        final RMAuthentication auth = (RMAuthentication) RMTHelper.getDefaultInstance().getRMAuth();
+        final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
-        final Credentials adminCreds = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
-            RMTHelper.defaultUserPassword), pubKey);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(
+          RMTHelper.Users.TEST_USERNAME, RMTHelper.Users.TEST_PASSWORD), pubKey);
 
-        final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth
-                .getJMXConnectorURL(JMXTransportProtocol.RMI));
+        final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(
+            auth.getJMXConnectorURL(JMXTransportProtocol.RMI));
         final HashMap<String, Object> env = new HashMap<>(1);
-        env.put(JMXConnector.CREDENTIALS, new Object[] { RMTHelper.defaultUserName, adminCreds });
+        env.put(JMXConnector.CREDENTIALS, new Object[] { RMTHelper.Users.TEST_USERNAME, adminCreds });
 
         // Connect to the JMX RMI Connector Server
         final ObjectName myAccountMBeanName = new ObjectName(RMJMXBeans.MYACCOUNT_MBEAN_NAME);
@@ -113,16 +109,16 @@ public final class AddGetDownRemoveTest extends RMConsecutive {
         // ADD, GET, DOWN, REMOVE
         // 1) ADD
         final String name = "AddGetDownRemoveTest";
-        Node node = RMTHelper.getDefaultInstance().createNode(name).getNode();
+        Node node = rmHelper.createNode(name).getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
 
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
         r.setNodeSourcePingFrequency(5000, NodeSource.DEFAULT);
 
         // wait for node from configuring to free
-        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeURL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeURL);
 
         // 2) GET the same node
         final long beforeGetTime = System.currentTimeMillis();

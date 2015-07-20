@@ -61,7 +61,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMFunctionalTest;
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 import org.junit.Assert;
@@ -72,7 +72,7 @@ import org.junit.Assert;
  * 
  * @author ProActive team
  */
-public final class SchedulerJMXTest extends FunctionalTest {
+public final class SchedulerJMXTest extends RMFunctionalTest {
 
     /**
      * test function
@@ -84,8 +84,8 @@ public final class SchedulerJMXTest extends FunctionalTest {
         final String userLogin = "demo";
         final String userPassword = "demo";
 
-        final String adminLogin = RMTHelper.defaultUserName;
-        final String adminPassword = RMTHelper.defaultUserPassword;
+        final String adminLogin = RMTHelper.Users.TEST_USERNAME;
+        final String adminPassword = RMTHelper.Users.TEST_PASSWORD;
 
         final SchedulerAuthenticationInterface auth = (SchedulerAuthenticationInterface) SchedulerTHelper
                 .getSchedulerAuth();

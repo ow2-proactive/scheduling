@@ -41,9 +41,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import functionaltests.SchedulerConsecutive;
 import functionaltests.SchedulerTHelper;
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMFunctionalTest;
 
 
 /**
@@ -55,7 +54,7 @@ import org.ow2.tests.FunctionalTest;
  *
  * @author The ProActive Team
  */
-public class TestSubmitJobWithUnaccessibleDataSpaces extends FunctionalTest {
+public class TestSubmitJobWithUnaccessibleDataSpaces extends RMFunctionalTest {
 
     static URL jobDescriptor = TestSubmitJobWithUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpaceUnacc.xml");

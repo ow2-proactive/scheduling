@@ -39,7 +39,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMFunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -61,7 +61,7 @@ import functionaltests.SchedulerTHelper;
  *
  * @author The ProActive Team
  */
-public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends FunctionalTest {
+public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends RMFunctionalTest {
 
     static URL jobDescriptor = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpacePartiallyUnacc.xml");

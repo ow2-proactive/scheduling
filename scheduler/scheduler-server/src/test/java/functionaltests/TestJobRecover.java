@@ -41,7 +41,6 @@ import java.net.URL;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 
 
@@ -61,7 +60,7 @@ import org.junit.Assert;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobRecover extends FunctionalTest {
+public class TestJobRecover extends RMFunctionalTest {
 
     private static URL jobDescriptor = TestJobRecover.class
             .getResource("/functionaltests/descriptors/Job_PI_recover.xml");

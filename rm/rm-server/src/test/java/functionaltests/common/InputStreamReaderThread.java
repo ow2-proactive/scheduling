@@ -67,8 +67,8 @@ public class InputStreamReaderThread extends Thread {
             while ((line = reader.readLine()) != null) {
                 System.out.println(outputPrefix + line);
             }
-        } catch (IOException e) {
-            System.out.println("Error during stream reading: " + e);
+        } catch (IOException ignored) {
+            // ignored
         } finally {
             try {
                 stream.close();

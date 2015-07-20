@@ -36,8 +36,6 @@
  */
 package functionaltests.nodestate;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
@@ -46,9 +44,13 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Test;
 
 import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+
+import static functionaltests.RMTHelper.log;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 
 
 /**
@@ -68,34 +70,28 @@ import functionaltests.RMTHelper;
  */
 public class TestNodesStates extends RMConsecutive {
 
-    /** Actions to be Perform by this test.
-     * The method is called automatically by Junit framework.
-     * @throws Exception If the test fails.
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
 
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-
-        ResourceManager resourceManager = helper.getResourceManager();
+        ResourceManager resourceManager = rmHelper.getResourceManager();
         int totalNodeNumber = 5;
-        helper.createNodeSource("TestNodesStates", totalNodeNumber);
+        rmHelper.createNodeSource("TestNodesStates", totalNodeNumber);
         //----------------------------------------------------------
         // Book all nodes deployed by descriptor (user action)
         // verify that there are no free nodes left,
         // and give back to RM
-        RMTHelper.log("Test 1");
+        log("Test 1");
 
         NodeSet nodes = resourceManager.getAtMostNodes(totalNodeNumber, null);
 
         PAFuture.waitFor(nodes);
-        Assert.assertEquals(totalNodeNumber, nodes.size());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(totalNodeNumber, nodes.size());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         for (int i = 0; i < totalNodeNumber; i++) {
-            RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodes.get(i)
-                    .getNodeInformation().getURL());
-            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+              nodes.get(i).getNodeInformation().getURL());
+            assertEquals(NodeState.BUSY, evt.getNodeState());
             checkEvent(evt, nodes.get(i));
         }
 
@@ -104,43 +100,43 @@ public class TestNodesStates extends RMConsecutive {
         resourceManager.releaseNodes(nodes);
 
         for (int i = 0; i < totalNodeNumber; i++) {
-            RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodes.get(i)
-                    .getNodeInformation().getURL());
-            Assert.assertEquals(NodeState.FREE, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+              nodes.get(i).getNodeInformation().getURL());
+            assertEquals(NodeState.FREE, evt.getNodeState());
             checkEvent(evt, nodes.get(i));
         }
 
         //----------------------------------------------------------
         //give back a node already given back (i.e; node already free)
         //this action causes nothing(nor increasing free nodes number, nor generation of any event)
-        RMTHelper.log("Test 2");
+        log("Test 2");
 
         resourceManager.releaseNode(n);
 
         boolean timeouted = false;
         try {
-            helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 4000);
+            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 4000);
         } catch (ProActiveTimeoutException e) {
             timeouted = true;
         }
 
-        Assert.assertTrue(timeouted);
-        Assert.assertEquals(totalNodeNumber, resourceManager.getState().getFreeNodesNumber());
+        assertTrue(timeouted);
+        assertEquals(totalNodeNumber, resourceManager.getState().getFreeNodesNumber());
 
         //----------------------------------------------------------
         // Book all nodes deployed by descriptor
         // Test admin action : Remove a node from the RM (non preemptively),
         // node is busy, so becomes in "toRelease" state
         // user give back to RM the "toRelease" node, node is now removed
-        RMTHelper.log("Test 3");
+        log("Test 3");
 
         nodes = resourceManager.getAtMostNodes(totalNodeNumber, null);
 
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < totalNodeNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.BUSY, evt.getNodeState());
         }
 
         n = nodes.remove(0);
@@ -149,26 +145,26 @@ public class TestNodesStates extends RMConsecutive {
         resourceManager.removeNode(n.getNodeInformation().getURL(), false);
 
         //check that node toRelease event has been thrown
-        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation()
-                .getURL());
-        Assert.assertEquals(NodeState.TO_BE_REMOVED, evt.getNodeState());
+        RMNodeEvent evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL
+          ());
+        assertEquals(NodeState.TO_BE_REMOVED, evt.getNodeState());
 
         //node is in "ToRelease" state, so always handled by RM
-        Assert.assertEquals(totalNodeNumber, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(totalNodeNumber, resourceManager.getState().getTotalNodesNumber());
 
         //user give back the node, so node is now removed
         resourceManager.releaseNode(n);
 
-        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
+        rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
 
         //----------------------------------------------------------
         // nodes are always in busy state
         // kill JVM of a node (simulate a fallen JVM or broken connection, i.e down node)
         // node must detected down by RM
-        RMTHelper.log("Test 4");
+        log("Test 4");
         n = nodes.get(0);
 
         Node n2 = nodes.get(1); //for next test
@@ -179,8 +175,8 @@ public class TestNodesStates extends RMConsecutive {
             e.printStackTrace();
         }
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+        assertEquals(NodeState.DOWN, evt.getNodeState());
         checkEvent(evt, n);
 
         resourceManager.releaseNodes(nodes);
@@ -188,53 +184,53 @@ public class TestNodesStates extends RMConsecutive {
         // we should get 5 FREE events + 1 down event for node that was down
 
         for (int i = 0; i < totalNodeNumber - 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             if (evt.getNodeUrl().equals(n.getNodeInformation().getURL())) {
                 // the down node became free
-                // wait while rm detects again that it's down
-                evt = helper
+                // wait while rmHelper detects again that it's down
+                evt = rmHelper
                         .waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-                Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
+                assertEquals(NodeState.DOWN, evt.getNodeState());
 
             } else {
-                Assert.assertEquals(NodeState.FREE, evt.getNodeState());
+                assertEquals(NodeState.FREE, evt.getNodeState());
             }
         }
 
         //two nodes killed, but the detected down is in RM down nodes list
         //( down nodes are in total nodes count)
-        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(totalNodeNumber - 2, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(totalNodeNumber - 2, resourceManager.getState().getFreeNodesNumber());
 
         //----------------------------------------------------------
         // nodes left are in free state
         // kill JVM of a free node
         // node must detected down by RM
-        RMTHelper.log("Test 5");
+        log("Test 5");
         try {
             n2.getProActiveRuntime().killRT(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n2.getNodeInformation().getURL());
-        Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n2.getNodeInformation().getURL());
+        assertEquals(NodeState.DOWN, evt.getNodeState());
 
-        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(totalNodeNumber - 3, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(totalNodeNumber - 3, resourceManager.getState().getFreeNodesNumber());
 
         //----------------------------------------------------------
         // book nodes, put one node in "toRelease" state,
         // then kill its JVM,
         // node must detected down by RM
-        RMTHelper.log("Test 6");
+        log("Test 6");
 
         nodes = resourceManager.getAtMostNodes(totalNodeNumber - 3, null);
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < totalNodeNumber - 3; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.BUSY, evt.getNodeState());
         }
 
         n = nodes.get(0);
@@ -243,10 +239,10 @@ public class TestNodesStates extends RMConsecutive {
         //put node in "To Release" state
         resourceManager.removeNode(n.getNodeInformation().getURL(), false);
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(NodeState.TO_BE_REMOVED, evt.getNodeState());
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+        assertEquals(NodeState.TO_BE_REMOVED, evt.getNodeState());
 
-        RMTHelper.log("Test 6 Bis");
+        log("Test 6 Bis");
 
         //kill the node
         try {
@@ -255,29 +251,29 @@ public class TestNodesStates extends RMConsecutive {
             e.printStackTrace();
         }
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+        assertEquals(NodeState.DOWN, evt.getNodeState());
 
-        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         for (Node node : nodes) {
-            RMTHelper.log("Taken node: " + node.getNodeInformation().getURL());
+            log("Taken node: " + node.getNodeInformation().getURL());
         }
 
         // we have 2 nodes: 11 busy and one down
         resourceManager.releaseNodes(nodes);
 
         for (int i = 0; i < 2; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.FREE, evt.getNodeState());
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        Assert.assertEquals(NodeState.DOWN, evt.getNodeState());
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+        assertEquals(NodeState.DOWN, evt.getNodeState());
 
-        Assert.assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(totalNodeNumber - 4, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(totalNodeNumber - 4, resourceManager.getState().getFreeNodesNumber());
 
         //admin removes again the node, ok he already asked this removal when node n was busy
         //choice here is advert admin that node has fallen (not hiding the down node event),
@@ -285,31 +281,31 @@ public class TestNodesStates extends RMConsecutive {
         resourceManager.removeNode(n.getNodeInformation().getURL(), false);
 
         //check that node removed event has been received
-        evt = helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
+        rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
 
-        Assert.assertEquals(totalNodeNumber - 2, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(totalNodeNumber - 4, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(totalNodeNumber - 2, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(totalNodeNumber - 4, resourceManager.getState().getFreeNodesNumber());
 
         //----------------------------------------------------------
         // Remove a free node,
         //
-        RMTHelper.log("Test 7");
+        log("Test 7");
 
         resourceManager.removeNode(n2.getNodeInformation().getURL(), false);
 
         //check that node removed event has been received
-        evt = helper.waitForNodeEvent(RMEventType.NODE_REMOVED, n2.getNodeInformation().getURL());
+        rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n2.getNodeInformation().getURL());
 
-        Assert.assertEquals(totalNodeNumber - 3, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(totalNodeNumber - 5, resourceManager.getState().getFreeNodesNumber());
-        RMTHelper.log("End of test");
+        assertEquals(totalNodeNumber - 3, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(totalNodeNumber - 5, resourceManager.getState().getFreeNodesNumber());
+        log("End of test");
 
     }
 
     private void checkEvent(RMNodeEvent event, Node node) {
-        Assert.assertEquals(node.getNodeInformation().getURL(), event.getNodeUrl());
-        Assert.assertThat(event.getNodeInfo(), CoreMatchers.containsString(event.getNodeUrl()));
-        Assert.assertThat(event.getNodeInfo(), CoreMatchers.containsString(event.getNodeProvider()));
-        Assert.assertThat(event.getNodeInfo(), CoreMatchers.containsString(event.getHostName()));
+        assertEquals(node.getNodeInformation().getURL(), event.getNodeUrl());
+        assertThat(event.getNodeInfo(), containsString(event.getNodeUrl()));
+        assertThat(event.getNodeInfo(), containsString(event.getNodeProvider()));
+        assertThat(event.getNodeInfo(), containsString(event.getHostName()));
     }
 }

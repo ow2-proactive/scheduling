@@ -51,7 +51,6 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.ClasspathUtils;
-import org.ow2.tests.FunctionalTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,7 +62,7 @@ import functionaltests.executables.PAHomeExecutable;
 /**
  * Test checks that pa.home, pa.rm.home and pa.scheduler.home is defined for all kind of tasks
  */
-public class TestJobSchedulerHome extends FunctionalTest {
+public class TestJobSchedulerHome extends RMFunctionalTest {
 
     static Script pahomeScript;
 

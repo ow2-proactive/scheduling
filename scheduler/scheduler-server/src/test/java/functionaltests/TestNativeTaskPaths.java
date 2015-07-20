@@ -51,7 +51,6 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.ow2.tests.FunctionalTest;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -66,7 +65,7 @@ import org.junit.Test;
  * @since ProActive Scheduling 3.4
  */
 @Ignore // localspace is current folder
-public class TestNativeTaskPaths extends FunctionalTest {
+public class TestNativeTaskPaths extends RMFunctionalTest {
 
     private static final String OutVarsFileC = "outvarsc";
     private static final String OutVarsFileD = "outvarsd";

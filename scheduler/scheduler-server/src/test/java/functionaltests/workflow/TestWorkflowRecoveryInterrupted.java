@@ -47,7 +47,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMFunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -65,7 +65,7 @@ import static org.junit.Assert.assertTrue;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
+public class TestWorkflowRecoveryInterrupted extends RMFunctionalTest {
 
     private static final String job_prefix = "/functionaltests/workflow/descriptors/flow_crash_int_";
 

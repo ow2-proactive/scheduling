@@ -36,11 +36,8 @@
  */
 package functionaltests.nodestate;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Set;
 
-import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -48,9 +45,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Test;
 
 import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+
+import static functionaltests.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -63,76 +63,63 @@ import functionaltests.RMTHelper;
  */
 public class TestLockNodes extends RMConsecutive {
 
-    /** Actions to be Perform by this test.
-     * The method is called automatically by Junit framework.
-     * @throws Exception If the test fails.
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        RMTHelper.log("Deployment");
+        log("Deployment");
 
-        ResourceManager resourceManager = helper.getResourceManager();
-        int nodesNumber = helper.createNodeSource("TestLockNodes");
+        ResourceManager resourceManager = rmHelper.getResourceManager();
+        int nodesNumber = rmHelper.createNodeSource("TestLockNodes");
 
-        Set<String> nodesUrls = RMTHelper.getDefaultInstance().listAliveNodesUrls();
+        Set<String> nodesUrls = rmHelper.listAliveNodesUrls();
 
-        RMTHelper.log("Test 1 - locking");
+        log("Test 1 - locking");
 
         BooleanWrapper status = resourceManager.lockNodes(nodesUrls);
         if (status.getBooleanValue()) {
 
             for (int i = 0; i < nodesNumber; i++) {
-                RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-                Assert.assertEquals(nodeEvent.getNodeState(), NodeState.LOCKED);
+                RMNodeEvent nodeEvent = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+                assertEquals(nodeEvent.getNodeState(), NodeState.LOCKED);
             }
 
-            RMTHelper.log("Test 1 - success");
+            log("Test 1 - success");
         }
 
-        RMTHelper.log("Test 2 - unlocking");
+        log("Test 2 - unlocking");
 
         status = resourceManager.unlockNodes(nodesUrls);
         if (status.getBooleanValue()) {
 
             for (int i = 0; i < nodesNumber; i++) {
-                RMNodeEvent nodeEvent = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-                Assert.assertEquals(nodeEvent.getNodeState(), NodeState.FREE);
+                RMNodeEvent nodeEvent = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+                assertEquals(nodeEvent.getNodeState(), NodeState.FREE);
             }
 
-            RMTHelper.log("Test 2 - success");
+            log("Test 2 - success");
         }
 
-        RMTHelper.log("Test 3 - locking non-free nodes");
+        log("Test 3 - locking non-free nodes");
 
         NodeSet nodes = resourceManager.getAtMostNodes(nodesNumber, null);
 
         PAFuture.waitFor(nodes);
-        assertTrue(nodes.size() == nodesNumber);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
+        assertEquals(nodes.size(), nodesNumber);
+        assertEquals(resourceManager.getState().getFreeNodesNumber(), 0);
 
         for (int i = 0; i < nodesNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
         BooleanWrapper res = resourceManager.lockNodes(nodesUrls);
-        if (res.getBooleanValue()) {
-            Assert.assertTrue("Successfully locked non-free nodes", false);
-        } else {
-            RMTHelper.log("Test 3 - success");
-        }
+        assertFalse("Successfully locked non-free nodes", res.getBooleanValue());
 
-        RMTHelper.log("Test 4 - unlocking nodes which are not locked");
+        log("Test 4 - unlocking nodes which are not locked");
 
         res = resourceManager.unlockNodes(nodesUrls);
-        if (res.getBooleanValue()) {
-            Assert.assertTrue("Successfully unlocked busy nodes", false);
-        } else {
-            RMTHelper.log("Test 4 - success");
-        }
-        RMTHelper.log("End of test");
+        assertFalse("Successfully locked non-free nodes", res.getBooleanValue());
+        log("End of test");
     }
 
 }

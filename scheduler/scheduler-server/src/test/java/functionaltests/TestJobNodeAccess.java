@@ -39,9 +39,6 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -52,6 +49,9 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 
 /**
@@ -93,7 +93,8 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
         Assert.assertEquals(JobStatus.PENDING, js.getStatus());
 
         // adding node with the token "test_token"
-        ResourceManager rm = RMTHelper.getDefaultInstance().getResourceManager();
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
+        ResourceManager rm = rmHelper.getResourceManager();
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         String nsName = "NodeSourceWithToken";
@@ -103,15 +104,15 @@ public class TestJobNodeAccess extends SchedulerConsecutive {
                 RMTHelper.defaultNodesTimeout, nsProps }, StaticPolicy.class.getName(), null);
 
         // ns created
-        RMTHelper.getDefaultInstance().waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
         // deploying
-        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         // from deploying 
-        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         // to configuring
-        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         // free
-        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         SchedulerTHelper.waitForEventJobFinished(id2);
 

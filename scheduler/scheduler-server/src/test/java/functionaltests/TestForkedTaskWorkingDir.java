@@ -55,7 +55,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.tests.FunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -65,7 +64,7 @@ import static org.junit.Assert.*;
 import static org.ow2.proactive.utils.FileUtils.createTempDirectory;
 
 
-public class TestForkedTaskWorkingDir extends FunctionalTest {
+public class TestForkedTaskWorkingDir extends RMFunctionalTest {
 
     @Test
     public void input_files_are_in_working_dir_for_forked_tasks() throws Throwable {

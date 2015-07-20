@@ -116,7 +116,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     protected String javaOptions;
 
     /** Shutdown flag */
-    protected boolean shutdown;
+    protected volatile boolean shutdown;
 
     /**
      * Internal node acquisition method
@@ -255,7 +255,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             Future<Void> deployResult = deployService.submit(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    while (!checkNodeIsAcquiredAndDo(nodeName, null, null)) {
+                    while (!shutdown && !checkNodeIsAcquiredAndDo(nodeName, null, null)) {
                         if (SSHInfrastructureV2.super.pnTimeout.get(pnURL)) {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }

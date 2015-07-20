@@ -53,7 +53,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
-import org.ow2.tests.FunctionalTest;
 import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
@@ -76,7 +75,7 @@ import org.junit.Test;
  * @author ProActive team
  *
  */
-public class TestListenJobLogs extends FunctionalTest {
+public class TestListenJobLogs extends RMFunctionalTest {
 
     static final long LOG_EVENT_TIMEOUT = 30000;
 

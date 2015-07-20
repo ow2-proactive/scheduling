@@ -36,8 +36,6 @@
  */
 package functionaltests.selectionscript;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -50,9 +48,12 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Assert;
+import org.junit.Test;
 
 import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+
+import static functionaltests.RMTHelper.log;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -85,38 +86,32 @@ public class StaticSelectionScriptTest extends RMConsecutive {
 
     private URL withoutSelectedSelectionScriptpath = this.getClass().getResource("withoutSelectedSScript.js");
 
-    private String vmPropKey = "myProperty";
-    private String vmPropValue = "myValue";
-
-    /** Actions to be Perform by this test.
-    * The method is called automatically by Junit framework.
-    * @throws Exception If the test fails.
-    */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        ResourceManager resourceManager = helper.getResourceManager();
-        int nodeNumber = helper.createNodeSource("StaticSelectionScriptTest");
+        ResourceManager resourceManager = rmHelper.getResourceManager();
+        int nodeNumber = rmHelper.createNodeSource("StaticSelectionScriptTest");
 
         String node1Name = "node1";
         String node2Name = "node2";
 
         HashMap<String, String> vmProperties = new HashMap<>();
-        vmProperties.put(this.vmPropKey, this.vmPropValue);
+        String vmPropKey = "myProperty";
+        String vmPropValue = "myValue";
+        vmProperties.put(vmPropKey, vmPropValue);
 
-        String node1URL = helper.createNode(node1Name, vmProperties).getNode().getNodeInformation().getURL();
+        String node1URL = rmHelper.createNode(node1Name, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL);
 
         //wait node adding event
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         //wait for the nodes to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //create the static selection script object
         SelectionScript sScript = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
-            new String[] { this.vmPropKey, this.vmPropValue }, false);
+            new String[] { vmPropKey, vmPropValue }, false);
 
-        RMTHelper.log("Test 1");
+        log("Test 1");
 
         NodeSet nodes = resourceManager.getAtMostNodes(1, sScript);
 
@@ -128,16 +123,16 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         assertEquals(node1URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
-        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        RMNodeEvent evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNode(nodes.get(0));
 
         //wait for node free event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         assertEquals(NodeState.FREE, evt.getNodeState());
 
-        RMTHelper.log("Test 2");
+        log("Test 2");
 
         nodes = resourceManager.getAtMostNodes(3, sScript);
 
@@ -149,26 +144,26 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         assertEquals(node1URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNode(nodes.get(0));
 
         //wait for node free event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         assertEquals(NodeState.FREE, evt.getNodeState());
 
-        RMTHelper.log("Test 3");
+        log("Test 3");
 
         //add a second with JVM env var
-        String node2URL = helper.createNode(node2Name, vmProperties).getNode().getNodeInformation().getURL();
+        String node2URL = rmHelper.createNode(node2Name, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node2URL);
 
         //wait node adding event
 
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the nodes to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nodes = resourceManager.getAtMostNodes(3, sScript);
 
         //wait node selection
@@ -178,27 +173,27 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
 
         //wait for node busy event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         assertEquals(NodeState.BUSY, evt.getNodeState());
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNodes(nodes);
 
         //wait for nodes free event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         assertEquals(NodeState.FREE, evt.getNodeState());
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         Assert.assertEquals(NodeState.FREE, evt.getNodeState());
 
-        RMTHelper.log("Test 4");
+        log("Test 4");
 
         resourceManager.removeNode(node1URL, true);
         resourceManager.removeNode(node2URL, true);
 
         //wait for node removed event
-        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
-        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node1URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, node2URL);
 
         nodes = resourceManager.getAtMostNodes(3, sScript);
 
@@ -208,7 +203,7 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         assertEquals(0, nodes.size());
         assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 5");
+        log("Test 5");
 
         //create the bad static selection script object
         SelectionScript badScript = new SelectionScript(new File(badSelectionScriptpath.toURI()),
@@ -222,7 +217,7 @@ public class StaticSelectionScriptTest extends RMConsecutive {
         assertEquals(0, nodes.size());
         assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 6");
+        log("Test 6");
 
         //create the static selection script object that doesn't define 'selected'
         SelectionScript noSelectedScript = new SelectionScript(new File(withoutSelectedSelectionScriptpath

@@ -43,10 +43,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Assert;
+import org.junit.Test;
 
 import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+
+import static functionaltests.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -56,78 +58,72 @@ import functionaltests.RMTHelper;
  */
 public class TestGetNodes extends RMConsecutive {
 
-    /** Actions to be Perform by this test.
-     * The method is called automatically by Junit framework.
-     * @throws Exception If the test fails.
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
+        log("Deployment");
 
-        RMTHelper.log("Deployment");
+        ResourceManager resourceManager = rmHelper.getResourceManager();
+        int nodesNumber = rmHelper.createNodeSource("TestGetNodes");
 
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        ResourceManager resourceManager = helper.getResourceManager();
-        int nodesNumber = helper.createNodeSource("TestGetNodes");
-
-        RMTHelper.log("Test 1 - best effort mode");
+        log("Test 1 - best effort mode");
 
         NodeSet nodes = resourceManager.getNodes(nodesNumber, TopologyDescriptor.ARBITRARY, null, null, true);
 
         PAFuture.waitFor(nodes);
-        Assert.assertEquals(nodesNumber, nodes.size());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(nodesNumber, nodes.size());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         for (int i = 0; i < nodesNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.BUSY, evt.getNodeState());
         }
         resourceManager.releaseNodes(nodes);
 
         for (int i = 0; i < nodesNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.FREE, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
         nodes = resourceManager.getNodes(nodesNumber + 1, TopologyDescriptor.ARBITRARY, null, null, true);
 
         PAFuture.waitFor(nodes);
-        Assert.assertEquals(nodesNumber, nodes.size());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(nodesNumber, nodes.size());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         for (int i = 0; i < nodesNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.BUSY, evt.getNodeState());
         }
         resourceManager.releaseNodes(nodes);
         for (int i = 0; i < nodesNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.FREE, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
-        RMTHelper.log("Test 2 - strict mode");
+        log("Test 2 - strict mode");
         nodes = resourceManager.getNodes(nodesNumber, TopologyDescriptor.ARBITRARY, null, null, false);
 
         PAFuture.waitFor(nodes);
-        Assert.assertEquals(nodesNumber, nodes.size());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(nodesNumber, nodes.size());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         for (int i = 0; i < nodesNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.BUSY, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.BUSY, evt.getNodeState());
         }
         resourceManager.releaseNodes(nodes);
         for (int i = 0; i < nodesNumber; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.FREE, evt.getNodeState());
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
         nodes = resourceManager.getNodes(nodesNumber + 1, TopologyDescriptor.ARBITRARY, null, null, false);
 
         PAFuture.waitFor(nodes);
-        Assert.assertEquals(0, nodes.size());
-        Assert.assertEquals(nodesNumber, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(0, nodes.size());
+        assertEquals(nodesNumber, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("End of test");
+        log("End of test");
     }
 
 }

@@ -51,11 +51,12 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Assert;
+import org.junit.Test;
 
 import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
 
-import static org.junit.Assert.assertEquals;
+import static functionaltests.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -88,20 +89,12 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
     private URL dummySelectionScriptPath = this.getClass().getResource("dummySelectionScript.js");
 
-    private String vmPropKey = "myProperty";
-    private String vmPropValue = "myValue";
-
-    /** Actions to be Perform by this test.
-    * The method is called automatically by Junit framework.
-    * @throws Exception If the test fails.
-    */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        ResourceManager resourceManager = helper.getResourceManager();
-        final int initialNodesNumber = helper.createNodeSource("SelectionWithNodesExclusionTest");
+        ResourceManager resourceManager = rmHelper.getResourceManager();
+        final int initialNodesNumber = rmHelper.createNodeSource("SelectionWithNodesExclusionTest");
 
-        RMTHelper.log("Test 1");
+        log("Test 1");
 
         NodeSet nodeSetWithNodeToExclude = resourceManager.getAtMostNodes(1, null);
 
@@ -112,13 +105,13 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         assertEquals( initialNodesNumber - 1, resourceManager.getState().getFreeNodesNumber());
 
         //wait for node busy event
-        RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         assertEquals(NodeState.BUSY, evt.getNodeState());
 
         resourceManager.releaseNodes(nodeSetWithNodeToExclude);
 
         //wait for node free event
-        evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         Assert.assertEquals(NodeState.FREE, evt.getNodeState());
 
         assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
@@ -131,7 +124,7 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < initialNodesNumber - 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
@@ -144,13 +137,13 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
         //wait for nodes freed event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
         assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 2");
+        log("Test 2");
 
         //create the dynamic selection script object
         SelectionScript dummyDynamicScript = new SelectionScript(new File(dummySelectionScriptPath.toURI()),
@@ -165,7 +158,7 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
         //wait for nodes busy event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             assertEquals(NodeState.BUSY, evt.getNodeState());
         }
 
@@ -178,13 +171,13 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
         //wait for nodes freed event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
         assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 3");
+        log("Test 3");
 
         //create the static selection script object
         SelectionScript dummyStaticScript = new SelectionScript(new File(dummySelectionScriptPath.toURI()),
@@ -199,7 +192,7 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
         //wait for nodes busy event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
@@ -212,39 +205,41 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
         //wait for node free event
         for (int i = 0; i < initialNodesNumber - 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
         assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 4");
+        log("Test 4");
 
         String node1Name = "node1";
         String node2Name = "node2";
 
         HashMap<String, String> vmProperties = new HashMap<>();
-        vmProperties.put(this.vmPropKey, this.vmPropValue);
+        String vmPropKey = "myProperty";
+        String vmPropValue = "myValue";
+        vmProperties.put(vmPropKey, vmPropValue);
 
-        String node1URL = helper.createNode(node1Name, vmProperties).getNode().getNodeInformation().getURL();
+        String node1URL = rmHelper.createNode(node1Name, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL);
 
-        String node2URL = helper.createNode(node2Name, vmProperties).getNode().getNodeInformation().getURL();
+        String node2URL = rmHelper.createNode(node2Name, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node2URL);
 
         Thread.sleep(5000);
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the nodes to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //wait for nodes added events
         assertEquals(initialNodesNumber + 2, resourceManager.getState().getFreeNodesNumber());
 
         //create the dynamic selection script object
         SelectionScript checkPropDynamicSScript = new SelectionScript(new File(vmPropSelectionScriptpath
-                .toURI()), new String[] { this.vmPropKey, this.vmPropValue }, true);
+                .toURI()), new String[] { vmPropKey, vmPropValue }, true);
         Node node1ToExclude = NodeFactory.getNode(node1URL);
 
         nodeSetWithNodeToExclude = new NodeSet();
@@ -258,7 +253,7 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         PAFuture.waitFor(nodes);
 
         //wait for nodes busy event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         assertEquals(NodeState.BUSY, evt.getNodeState());
 
         // booked all nodes minus the node to exclude
@@ -271,16 +266,16 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
 
         resourceManager.releaseNodes(nodes);
         //wait for node free event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         assertEquals(NodeState.FREE, evt.getNodeState());
 
         assertEquals(initialNodesNumber + 2, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 5");
+        log("Test 5");
 
         //create the static selection script object
         SelectionScript checkPropStaticSScript = new SelectionScript(new File(vmPropSelectionScriptpath
-                .toURI()), new String[] { this.vmPropKey, this.vmPropValue }, false);
+                .toURI()), new String[] { vmPropKey, vmPropValue }, false);
 
         Node node2ToExclude = NodeFactory.getNode(node2URL);
 
@@ -295,7 +290,7 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         PAFuture.waitFor(nodes);
 
         //wait for nodes busy event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         assertEquals(NodeState.BUSY, evt.getNodeState());
 
         // booked all nodes minus the node to exclude
@@ -309,12 +304,12 @@ public class SelectionWithNodesExclusionTest extends RMConsecutive {
         resourceManager.releaseNodes(nodes);
 
         //wait for node free event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
         assertEquals(NodeState.FREE, evt.getNodeState());
 
         assertEquals(initialNodesNumber + 2, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 6");
+        log("Test 6");
 
         nodeSetWithNodeToExclude.add(node1ToExclude);
 

@@ -46,7 +46,6 @@ import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.job.factories.JobComparator;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -65,7 +64,7 @@ import org.junit.Test;
  *
  * @author esalagea
  */
-public class TestXMLTransformer extends FunctionalTest {
+public class TestXMLTransformer extends RMFunctionalTest {
 
     private static URL jobDescriptorsFolder = TestXMLTransformer.class
             .getResource("/functionaltests/descriptors/");

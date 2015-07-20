@@ -157,8 +157,8 @@ public class RMMonitorsHandler {
     */
     public void handleNodesourceEvent(RMNodeSourceEvent event) {
         synchronized (this) {
-            NodeSourceEventMonitor nsem = new NodeSourceEventMonitor(event.getEventType(), event
-                    .getSourceName());
+            NodeSourceEventMonitor nsem = new NodeSourceEventMonitor(event.getEventType(),
+                event.getSourceName());
             if (!lookAndNotifyMonitor(nsem)) {
                 this.nodeSourcesEvent.add(nsem);
             }
@@ -322,5 +322,12 @@ public class RMMonitorsHandler {
         for (NodeEventMonitor e : nodesEvent) {
             RMTHelper.log(e.toString());
         }
+    }
+
+    public synchronized void flushEvents() {
+        stateEvents.clear();
+        nodeSourcesEvent.clear();
+        nodesEvent.clear();
+        eventsMonitors.clear();
     }
 }

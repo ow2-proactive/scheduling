@@ -38,82 +38,82 @@ package functionaltests.nodesource;
 
 import java.io.File;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.tests.FunctionalTest;
+import org.junit.Assert;
+import org.junit.Test;
+
+import functionaltests.RMFunctionalTest;
 import functionaltests.RMTHelper;
 import functionaltests.common.CommonTUtils;
-import org.junit.Assert;
+
+import static functionaltests.RMTHelper.log;
 
 
-public class TestNodeSourceAfterRestart extends FunctionalTest {
-
-    private RMTHelper helper = RMTHelper.getDefaultInstance();
+public class TestNodeSourceAfterRestart extends RMFunctionalTest {
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         // creating node source
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        helper.getResourceManager().createNodeSource(
+        rmHelper.getResourceManager().createNodeSource(
                 sourceName,
                 LocalInfrastructure.class.getName(),
                 new Object[] { creds, 1, RMTHelper.defaultNodesTimeout,
-                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMTHelper.PA_PNP_PORT },
-                //first parameter is empty rm url
+                        "" },
+                //first parameter is empty rmHelper url
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" });
-        helper.waitForNodeSourceCreation(sourceName, 1);
+        rmHelper.waitForNodeSourceCreation(sourceName, 1);
     }
 
     private void startRMPreservingDB() throws Exception {
         String rmconf = new File(RMTHelper.class.getResource("/functionaltests/config/rm-with-db.ini")
                 .toURI()).getAbsolutePath();
-        RMTHelper.getDefaultInstance().startRM(rmconf, RMTHelper.PA_PNP_PORT);
-        RMTHelper.getDefaultInstance().getResourceManager();
+        rmHelper.startRM(rmconf, RMTHelper.PA_PNP_PORT);
+        rmHelper.getResourceManager();
     }
 
     protected void removeNodeSource(String sourceName) throws Exception {
         // removing node source
-        helper.getResourceManager().removeNodeSource(sourceName, true);
+        rmHelper.getResourceManager().removeNodeSource(sourceName, true);
 
         //wait for the event of the node source removal
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
     }
 
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
         String source1 = "Node_source_1";
 
-        RMTHelper.log("Test 1 - creation of the node source with nodes");
+        log("Test 1 - creation of the node source with nodes");
         createDefaultNodeSource(source1);
 
-        helper.killRM();
+        rmHelper.killRM();
         CommonTUtils.cleanupActiveObjectRegistry("local-" + source1 + "-0");
 
-        RMTHelper.log("Test 1 - starting the resource manager");
+        log("Test 1 - starting the resource manager");
         startRMPreservingDB();
 
-        while (helper.getResourceManager().getState().getFreeNodesNumber() != 1) {
+        while (rmHelper.getResourceManager().getState().getFreeNodesNumber() != 1) {
             Thread.sleep(500);
         }
 
-        RMTHelper.log("Test 1 - passed");
+        log("Test 1 - passed");
 
-        RMTHelper.log("Test 2 - removing node source");
+        log("Test 2 - removing node source");
         removeNodeSource(source1);
 
-        helper.killRM();
+        rmHelper.killRM();
         CommonTUtils.cleanupActiveObjectRegistry("local-" + source1 + "-0");
 
-        RMTHelper.log("Test 2 - starting the resource manager");
+        log("Test 2 - starting the resource manager");
         startRMPreservingDB();
 
-        Thread.sleep(10000);
-        Assert.assertEquals(0, helper.getResourceManager().getState().getFreeNodesNumber());
+        Assert.assertEquals(0, rmHelper.getResourceManager().getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 2 - passed");
+        log("Test 2 - passed");
     }
 }

@@ -51,10 +51,6 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.tests.FunctionalTest;
-import functionaltests.jobs.NonTerminatingJob;
-import functionaltests.jobs.SimpleJob;
-import functionaltests.utils.RestFuncTUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -69,7 +65,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Assume;
+
+import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.SimpleJob;
+import functionaltests.utils.RestFuncTUtils;
 
 
 public abstract class AbstractRestFuncTestCase {
@@ -305,11 +304,6 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     public static void init(String name) throws Exception {
-        if (!FunctionalTest.shouldBeExecuted(name)) {
-            Assume.assumeTrue(false);
-            return;
-        }
-
         try {
             System.out.println("Starting the app");
             RestFuncTHelper.startRestfulSchedulerWebapp();

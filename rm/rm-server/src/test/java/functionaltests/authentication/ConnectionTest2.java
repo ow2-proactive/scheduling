@@ -36,76 +36,58 @@
  */
 package functionaltests.authentication;
 
-import org.ow2.proactive.resourcemanager.RMFactory;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.tests.FunctionalTest;
+import org.junit.Test;
+
+import functionaltests.RMFunctionalTest;
 import functionaltests.RMTHelper;
 
-import static org.junit.Assert.assertTrue;
+import static functionaltests.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
-/**
- *
- * test timeouts on RM's connection helpers
- *
- * @author ProActive team
- *
- */
-public class ConnectionTest2 extends FunctionalTest {
+public class ConnectionTest2 extends RMFunctionalTest {
 
-    /**
-     * test function
-     *
-     * @throws Exception
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-
-        RMTHelper.log("Test 1");
-        RMTHelper.log("Connecting to non existing resource manager with join");
+        log("Test 1");
+        log("Connecting to non existing resource manager with join");
         try {
             RMConnection.join(RMTHelper.getLocalUrl());
-            RMTHelper.log("Failed: exception should be thrown");
-            assertTrue(false);
-        } catch (Exception e) {
-            RMTHelper.log("Passed");
+            fail("Failed: exception should be thrown");
+        } catch (RMException e) {
+            log("Passed");
         }
 
-        RMTHelper.log("Test 2");
-        RMTHelper.log("Connecting to non existing resource manager with waitAndJoin and timeout");
+        log("Test 2");
+        log("Connecting to non existing resource manager with waitAndJoin and timeout");
         try {
             RMConnection.waitAndJoin(RMTHelper.getLocalUrl(), 1000);
-            RMTHelper.log("Failed: exception should be thrown");
-            assertTrue(false);
-        } catch (Exception e) {
-            RMTHelper.log("Passed");
+            fail("Failed: exception should be thrown");
+        } catch (RMException e) {
+            log("Passed");
         }
 
-        RMTHelper.log("Test 3");
-        RMTHelper.log("Connecting to initializing resource manager with waitAndJoin and timeout");
-        try {
+        log("Test 3");
+        log("Connecting to initializing resource manager with waitAndJoin and timeout");
 
-            Thread t = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1000);
-                        RMTHelper.log("Running resource manager");
-                        RMTHelper.getDefaultInstance().getRMAuth();
-                    } catch (Exception e) {
-                        assertTrue(false);
-                        RMTHelper.log("Failed: unexpected error " + e.getMessage());
-                    }
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                    log("Running resource manager");
+                    rmHelper.getRMAuth();
+                } catch (Exception e) {
+                    log("Failed: unexpected error " + e.getMessage());
                 }
-            };
-            t.start();
+            }
+        };
+        t.start();
 
-            RMConnection.waitAndJoin(RMTHelper.getLocalUrl(), 60000);
-            RMTHelper.log("Passed");
-        } catch (Exception e) {
-            RMTHelper.log("Failed: unexpected error " + e.getMessage());
-            assertTrue(false);
-        }
+        RMConnection.waitAndJoin(RMTHelper.getLocalUrl(), 60000);
+        log("Passed");
     }
 
 }

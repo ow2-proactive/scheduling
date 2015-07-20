@@ -20,7 +20,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.tests.FunctionalTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,7 +38,7 @@ import org.junit.Test;
  *<li>results for dependents task
  *</ul>
  */
-public class TestTaskRestore extends FunctionalTest {
+public class TestTaskRestore extends RMFunctionalTest {
 
     static final String TASK1_RES = "TestJavaTask1 OK";
 

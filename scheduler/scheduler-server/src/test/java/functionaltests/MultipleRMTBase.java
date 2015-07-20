@@ -14,13 +14,12 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.FileUtils;
-import org.ow2.tests.FunctionalTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
 
-public class MultipleRMTBase extends FunctionalTest {
+public class MultipleRMTBase extends RMFunctionalTest {
 
     protected File config1;
 

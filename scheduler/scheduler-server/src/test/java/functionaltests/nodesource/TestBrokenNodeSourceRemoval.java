@@ -53,14 +53,14 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 
+import functionaltests.RMFunctionalTest;
 import functionaltests.RMTHelper;
 import functionaltests.SchedulerTHelper;
 
 
-public class TestBrokenNodeSourceRemoval extends FunctionalTest {
+public class TestBrokenNodeSourceRemoval extends RMFunctionalTest {
 
     protected byte[] GCMDeploymentData;
 

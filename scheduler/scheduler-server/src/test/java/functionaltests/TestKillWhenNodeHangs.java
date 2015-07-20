@@ -13,7 +13,6 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +26,7 @@ import org.junit.Test;
  * 
  * To simulate node hanging it suspends node using java debug interface.
  */
-public class TestKillWhenNodeHangs extends FunctionalTest {
+public class TestKillWhenNodeHangs extends RMFunctionalTest {
 
     public static class SleepForeverTask extends JavaExecutable {
 

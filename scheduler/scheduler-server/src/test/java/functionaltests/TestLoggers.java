@@ -42,7 +42,6 @@ import java.net.URL;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
-import org.ow2.tests.FunctionalTest;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
@@ -52,7 +51,7 @@ import functionaltests.executables.Logging;
 import static org.junit.Assert.*;
 
 
-public class TestLoggers extends FunctionalTest {
+public class TestLoggers extends RMFunctionalTest {
 
     private static URL jobDescriptor = TestLoggers.class
             .getResource("/functionaltests/descriptors/Job_Test_Loggers.xml");

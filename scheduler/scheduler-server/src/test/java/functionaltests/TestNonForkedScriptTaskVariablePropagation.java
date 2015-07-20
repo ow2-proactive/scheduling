@@ -39,12 +39,11 @@ package functionaltests;
 import java.io.File;
 import java.net.URL;
 
-import org.ow2.tests.FunctionalTest;
 import org.junit.Before;
 import org.junit.Test;
 
 
-public class TestNonForkedScriptTaskVariablePropagation extends FunctionalTest {
+public class TestNonForkedScriptTaskVariablePropagation extends RMFunctionalTest {
     private static final long five_minutes = 5 * 60 * 1000;
 
     private String jobDescPath;

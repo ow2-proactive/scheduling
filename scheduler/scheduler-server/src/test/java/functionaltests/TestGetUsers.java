@@ -45,7 +45,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -54,7 +53,7 @@ import org.junit.Test;
  * Sanity test against method 'Scheduler.getUsers' and 'Scheduler.getUsersWithJobs'.
  *
  */
-public class TestGetUsers extends FunctionalTest {
+public class TestGetUsers extends RMFunctionalTest {
 
     public static class TestJavaTask extends JavaExecutable {
         @Override

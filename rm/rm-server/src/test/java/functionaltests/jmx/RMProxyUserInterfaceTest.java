@@ -43,11 +43,12 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.util.RMListenerProxy;
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import functionaltests.RMConsecutive;
+import functionaltests.RMTHelper;
+
+import static org.junit.Assert.*;
 
 
 public class RMProxyUserInterfaceTest extends RMConsecutive {
@@ -57,12 +58,11 @@ public class RMProxyUserInterfaceTest extends RMConsecutive {
     // SCHEDULING-1850
     @Test
     public void testGetNodeMBeanInfo_DisconnectionOfRemovedNodeSource() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
         RMListenerProxy proxyUserInterface = createRMCachingProxyUserInterface();
 
-        helper.createNodeSource("NodeSource1", 1);
+        rmHelper.createNodeSource("NodeSource1", 1);
 
-        RMInitialState state = helper.getResourceManager().getMonitoring().getState();
+        RMInitialState state = rmHelper.getResourceManager().getMonitoring().getState();
         String nodeSource1_NodeJmxUrl = state.getNodesEvents().get(0).getDefaultJMXUrl();
 
         Object mBeanFromNodeSource1 = proxyUserInterface.getNodeMBeanInfo(nodeSource1_NodeJmxUrl,
@@ -71,11 +71,11 @@ public class RMProxyUserInterfaceTest extends RMConsecutive {
         assertNotNull(mBeanFromNodeSource1);
 
         // remove nodesource and try another jmx connection
-        helper.getResourceManager().removeNodeSource("NodeSource1", true);
+        rmHelper.getResourceManager().removeNodeSource("NodeSource1", true);
 
-        helper.createNodeSource("NodeSource2", 1);
+        rmHelper.createNodeSource("NodeSource2", 1);
 
-        state = helper.getResourceManager().getMonitoring().getState();
+        state = rmHelper.getResourceManager().getMonitoring().getState();
         String nodeSource2_NodeJmxUrl = state.getNodesEvents().get(0).getDefaultJMXUrl();
 
         Object mBeanFromNodeSource2 = proxyUserInterface.getNodeMBeanInfo(nodeSource2_NodeJmxUrl,
@@ -84,15 +84,15 @@ public class RMProxyUserInterfaceTest extends RMConsecutive {
         assertNotNull(mBeanFromNodeSource2);
 
         // cleanup
-        helper.getResourceManager().removeNodeSource("NodeSource2", true);
+        rmHelper.getResourceManager().removeNodeSource("NodeSource2", true);
     }
 
     private RMListenerProxy createRMCachingProxyUserInterface() throws Exception {
         RMListenerProxy proxyUserInterface = PAActiveObject.newActive(RMListenerProxy.class, new Object[] {});
-        final RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
+        final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
-        final Credentials adminCreds = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
-            RMTHelper.defaultUserPassword), pubKey);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(
+          RMTHelper.Users.TEST_USERNAME, RMTHelper.Users.TEST_PASSWORD), pubKey);
         proxyUserInterface.init(RMTHelper.getLocalUrl(), adminCreds);
         return proxyUserInterface;
     }

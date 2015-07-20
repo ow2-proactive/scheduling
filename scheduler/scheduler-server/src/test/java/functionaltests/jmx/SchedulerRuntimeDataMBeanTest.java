@@ -23,7 +23,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBean;
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMFunctionalTest;
 import functionaltests.SchedulerTHelper;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import org.junit.Test;
  * @author ProActive team
  *
  */
-public class SchedulerRuntimeDataMBeanTest extends FunctionalTest {
+public class SchedulerRuntimeDataMBeanTest extends RMFunctionalTest {
 
     public static class FailingTestJavaTask extends JavaExecutable {
         @Override

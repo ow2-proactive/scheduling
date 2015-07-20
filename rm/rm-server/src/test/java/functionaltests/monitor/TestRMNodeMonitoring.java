@@ -52,10 +52,12 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.junit.Test;
+
 import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
-import org.junit.Assert;
+
+import static functionaltests.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -77,11 +79,10 @@ public class TestRMNodeMonitoring extends RMConsecutive {
                 "Hwaddr" });
     }
 
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
         /*
-         * prepare a Node Source with some nodes and get the JMX URL of any
-         * RMNode in it
+         * prepare a Node Source with some nodes and get the JMX URL of any RMNode in it
          */
         String jmxurl = prepareEnvAndGetRMNodeJmxUrl();
 
@@ -92,39 +93,27 @@ public class TestRMNodeMonitoring extends RMConsecutive {
         for (String mbean : mbeans.keySet()) {
             String[] atts = mbeans.get(mbean);
             for (String att : atts) {
-                Object ret = null;
-                try {
-                    RMTHelper.log("Checking MBean '" + mbean + "', attribute '" + att + "'...");
-                    ret = getJMXSigarAttribute(jmxConnector, mbean, att);
-                } catch (Exception e) {
-                    // Ignore it.
-                }
-                Assert.assertTrue("MBean " + mbean + " att " + att + " not found.", ret != null);
+                log("Checking MBean '" + mbean + "', attribute '" + att + "'...");
+                Object ret = getJMXSigarAttribute(jmxConnector, mbean, att);
+                assertNotNull("MBean " + mbean + " att " + att + " not found.", ret);
             }
         }
 
-        RMTHelper.log("End of test");
-
+        log("End of test");
     }
 
     private String prepareEnvAndGetRMNodeJmxUrl() throws Exception {
-
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-
-        helper.createNodeSource("TestRMNodeMonitoring");
-        RMTHelper.log("Checking existence of Sigar MBeans...");
+        rmHelper.createNodeSource("TestRMNodeMonitoring");
+        log("Checking existence of Sigar MBeans...");
 
         String jmxurl = null;
 
-        RMInitialState state = RMTHelper.getDefaultInstance().getResourceManager().getMonitoring().getState();
-        for (RMNodeEvent ne : state.getNodesEvents()) {
-            jmxurl = ne.getDefaultJMXUrl();
-            break;
-        }
+        RMInitialState state = rmHelper.getResourceManager().getMonitoring().getState();
+        jmxurl = state.getNodesEvents().get(0).getDefaultJMXUrl();
 
-        Assert.assertTrue("The JMX URL of a node could not be obtained.", jmxurl != null);
+        assertNotNull("The JMX URL of a node could not be obtained.", jmxurl);
 
-        RMTHelper.log("JMX URL obtained: " + jmxurl);
+        log("JMX URL obtained: " + jmxurl);
 
         return jmxurl;
 
@@ -134,9 +123,7 @@ public class TestRMNodeMonitoring extends RMConsecutive {
         Map<String, Object> env = new HashMap<>();
         String[] creds = { RM_USER_TEST, RM_PASS_TEST };
         env.put(JMXConnector.CREDENTIALS, creds);
-        JMXConnector jmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(jmxurl), env);
-
-        return jmxConnector;
+        return JMXConnectorFactory.connect(new JMXServiceURL(jmxurl), env);
     }
 
     private Object getJMXSigarAttribute(JMXConnector connector, String objname, String attribute)
@@ -145,16 +132,16 @@ public class TestRMNodeMonitoring extends RMConsecutive {
 
         ObjectName name = null;
 
-        RMTHelper.log("Looking for MBean '" + objname + "'...");
+        log("Looking for MBean '" + objname + "'...");
         Set<ObjectName> names = connector.getMBeanServerConnection()
                 .queryNames(new ObjectName(objname), null);
         for (ObjectName o : names) {
-            RMTHelper.log("  found: " + o.getCanonicalName());
+            log("  found: " + o.getCanonicalName());
             name = o;
         }
 
         if (name == null) {
-            RMTHelper.log("Not found any '" + objname + "'.");
+            log("Not found any '" + objname + "'.");
             return null;
         }
 

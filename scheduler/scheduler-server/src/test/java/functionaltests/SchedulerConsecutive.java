@@ -39,7 +39,6 @@ package functionaltests;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.tests.Consecutive;
-import org.ow2.tests.FunctionalTest;
 import org.junit.After;
 
 
@@ -49,13 +48,9 @@ import org.junit.After;
  *
  */
 @Consecutive
-public class SchedulerConsecutive extends FunctionalTest {
+public class SchedulerConsecutive extends RMFunctionalTest {
     @After
-    public void afterClass() throws Exception {
-
-        if (!shouldBeExecuted()) {
-            return;
-        }
+    public void killAllProcessesIfNeeded() throws Exception {
 
         if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
 
@@ -72,6 +67,6 @@ public class SchedulerConsecutive extends FunctionalTest {
                 System.out.println(nodeEvent);
             }
         }
-        super.afterClass();
+        super.killAllProcessesIfNeeded();
     }
 }

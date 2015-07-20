@@ -49,7 +49,6 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 
 
@@ -85,7 +84,7 @@ import org.junit.Assert;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestJobCoverage extends FunctionalTest {
+public class TestJobCoverage extends RMFunctionalTest {
 
     private static URL jobDescriptor = TestJobAborted.class
             .getResource("/functionaltests/descriptors/Job_Coverage.xml");

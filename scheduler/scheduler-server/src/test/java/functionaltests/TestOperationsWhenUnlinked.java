@@ -54,7 +54,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.tests.FunctionalTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,7 +68,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class TestOperationsWhenUnlinked extends FunctionalTest {
+public class TestOperationsWhenUnlinked extends RMFunctionalTest {
 
     static final String TASK_NAME = "Test task";
 

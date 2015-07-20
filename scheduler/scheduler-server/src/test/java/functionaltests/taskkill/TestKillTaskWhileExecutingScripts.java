@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMFunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,7 +77,7 @@ import functionaltests.executables.EndlessExecutable;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestKillTaskWhileExecutingScripts extends FunctionalTest {
+public class TestKillTaskWhileExecutingScripts extends RMFunctionalTest {
 
     static Script endlessScript;
 

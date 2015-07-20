@@ -54,7 +54,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.ow2.tests.FunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -67,7 +66,7 @@ import functionaltests.executables.EndlessExecutable;
 /**
  * Test checks that walltime parameter is correctly taken into account for various tasks
  */
-public class TestJobWalltime extends FunctionalTest {
+public class TestJobWalltime extends RMFunctionalTest {
 
     static Script endlessScript;
 

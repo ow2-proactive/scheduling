@@ -53,7 +53,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.tests.FunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -80,7 +79,7 @@ import org.junit.Assert;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestGlobalSpace extends FunctionalTest {
+public class TestGlobalSpace extends RMFunctionalTest {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
             { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },

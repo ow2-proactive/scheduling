@@ -25,7 +25,6 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,7 +37,7 @@ import functionaltests.utils.ProActiveLock;
  * Test against method Scheduler.loadJobs 
  *
  */
-public class TestLoadJobs extends FunctionalTest {
+public class TestLoadJobs extends RMFunctionalTest {
 
     public static class TestJavaTask extends JavaExecutable {
 

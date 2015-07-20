@@ -39,7 +39,6 @@ package functionaltests;
 import java.io.File;
 
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Test;
 
 /**
@@ -47,7 +46,7 @@ import org.junit.Test;
  * in {@code task} element for Jobs Schema in version 3.3 but not longer
  * in {@code javaExecutable} element.
  */
-public class TestScriptForkEnvironment extends FunctionalTest {
+public class TestScriptForkEnvironment extends RMFunctionalTest {
 
     @Test
     public void testValidForkEnvironmentPositionWithSchemaVersion3_3() throws Throwable {

@@ -6,7 +6,6 @@ import java.net.URL;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,7 +14,7 @@ import org.junit.Test;
  * Checks that if listening to jobs is disabled in the configuration 
  * file, the {@link Scheduler#listenJobLogs} method throws an exception 
  */
-public class TestDisabledListenJobLogs extends FunctionalTest {
+public class TestDisabledListenJobLogs extends RMFunctionalTest {
 
     private static URL simpleJob = TestJobNodeAccess.class
             .getResource("/functionaltests/descriptors/Job_simple.xml");

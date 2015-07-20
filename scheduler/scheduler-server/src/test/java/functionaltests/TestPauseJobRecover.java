@@ -50,7 +50,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -59,7 +58,7 @@ import functionaltests.utils.ProActiveLock;
 import static functionaltests.SchedulerTHelper.log;
 
 
-public class TestPauseJobRecover extends FunctionalTest {
+public class TestPauseJobRecover extends RMFunctionalTest {
 
     @Test
     public void runTest() throws Throwable {

@@ -51,7 +51,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.tests.FunctionalTest;
 
 import java.io.*;
 import java.net.URI;
@@ -75,7 +74,7 @@ import java.net.URI;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestUserSpace extends FunctionalTest {
+public class TestUserSpace extends RMFunctionalTest {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
             { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },

@@ -44,13 +44,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 
-public class TestNonForkedScriptTask extends FunctionalTest {
+public class TestNonForkedScriptTask extends RMFunctionalTest {
 
     private static URL nonForked_jobDescriptor = TestNonForkedScriptTask.class
             .getResource("/functionaltests/descriptors/Job_non_forked_script_task.xml");
@@ -61,8 +60,9 @@ public class TestNonForkedScriptTask extends FunctionalTest {
                 "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
         // wait nodes to be free
-        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMTHelper rmHelper = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(nonForked_jobDescriptor.toURI()).getAbsolutePath());
@@ -70,11 +70,10 @@ public class TestNonForkedScriptTask extends FunctionalTest {
         SchedulerTHelper.submitJob(job);
 
         // busy event when task is scheduler
-        RMTHelper.getDefaultInstance().waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // down event when node is killed
-        RMNodeEvent nodeKilledEvent = RMTHelper.getDefaultInstance().waitForAnyNodeEvent(
-                RMEventType.NODE_STATE_CHANGED);
+        RMNodeEvent nodeKilledEvent = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         assertEquals(NodeState.DOWN, nodeKilledEvent.getNodeState());
     }
 }

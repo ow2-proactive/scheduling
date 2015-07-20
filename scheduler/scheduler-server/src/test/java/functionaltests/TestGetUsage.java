@@ -15,7 +15,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -26,7 +25,7 @@ import static org.junit.Assert.fail;
 /**
  * Test against SchedulerUsage interface.
  */
-public class TestGetUsage extends FunctionalTest {
+public class TestGetUsage extends RMFunctionalTest {
 
     @Test
     public void testGetMyAccountUsage() throws Exception {

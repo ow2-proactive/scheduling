@@ -45,7 +45,7 @@ import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.tests.FunctionalTest;
+import functionaltests.RMFunctionalTest;
 
 import functionaltests.SchedulerTHelper;
 
@@ -57,7 +57,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowRecoveryFinished extends FunctionalTest {
+public class TestWorkflowRecoveryFinished extends RMFunctionalTest {
 
     private static final String job_prefix = "/functionaltests/workflow/descriptors/flow_crash_";
 

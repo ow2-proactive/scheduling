@@ -43,14 +43,14 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.tests.FunctionalTest;
+
 import functionaltests.utils.ProActiveLock;
 import org.junit.Test;
 
 import static functionaltests.TestPauseJobRecover.createJob;
 
 
-public class TestJobRecoverClasspathInUserSpace extends FunctionalTest {
+public class TestJobRecoverClasspathInUserSpace extends RMFunctionalTest {
 
     @Test
     // SCHEDULING-2077

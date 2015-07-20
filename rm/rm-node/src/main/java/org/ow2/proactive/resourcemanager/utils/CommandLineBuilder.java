@@ -296,8 +296,10 @@ public final class CommandLineBuilder implements Cloneable {
                 return pathname.getName().matches(".*[.]jar");
             }
         });
-        for (File file : files) {
-            classpath.append(os.ps).append(file.getAbsolutePath());
+        if (files != null) {
+            for (File file : files) {
+                classpath.append(os.ps).append(file.getAbsolutePath());
+            }
         }
         command.add(System.getProperty("java.class.path"));
         command.add(RMNodeStarter.class.getName());

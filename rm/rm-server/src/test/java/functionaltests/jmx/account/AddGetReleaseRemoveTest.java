@@ -36,9 +36,17 @@
  */
 package functionaltests.jmx.account;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
-import org.junit.Assert;
+import java.security.PublicKey;
+import java.util.HashMap;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -50,16 +58,11 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.junit.Assert;
+import org.junit.Test;
 
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-import java.security.PublicKey;
-import java.util.HashMap;
+import functionaltests.RMConsecutive;
+import functionaltests.RMTHelper.Users;
 
 
 /**
@@ -67,7 +70,7 @@ import java.util.HashMap;
  * The scenario is ADD, GET, RELEASE, REMOVE.
  * 
  * This test requires the following prerequisites :
- *  - The value of the {@link PAResourceManagerProperties.RM_ACCOUNT_REFRESH_RATE} property must be 
+ *  - The value of the {@link PAResourceManagerProperties#RM_ACCOUNT_REFRESH_RATE} property must be
  *  big enough to not let the {@link RMAccountsManager} refresh accounts automatically. This test 
  *  will refresh accounts manually by invoking the {@link ManagementMBean#clearAccoutingCache()}.
  *  - Only one single node must be added
@@ -79,21 +82,16 @@ public final class AddGetReleaseRemoveTest extends RMConsecutive {
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
 
-    /**
-     * Test function.
-     * @throws Exception
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        final ResourceManager r = helper.getResourceManager();
+        final ResourceManager r = rmHelper.getResourceManager();
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = RMTHelper.defaultUserName;
-        final String adminPassword = RMTHelper.defaultUserPassword;
+        final String adminLogin = Users.TEST_USERNAME;
+        final String adminPassword = Users.TEST_PASSWORD;
 
         // All accounting values are checked through JMX
-        final RMAuthentication auth = (RMAuthentication) helper.getRMAuth();
+        final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
                 pubKey);
@@ -120,13 +118,13 @@ public final class AddGetReleaseRemoveTest extends RMConsecutive {
         // ADD, GET, RELEASE, REMOVE
         // 1) ADD
         final long beforeAddTime = System.currentTimeMillis();
-        Node node = helper.createNode("test").getNode();
+        Node node = rmHelper.createNode("test").getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
 
         // We eat the configuring to free event
-        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeURL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeURL);
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();
         node = r.getAtMostNodes(1, null).get(0);

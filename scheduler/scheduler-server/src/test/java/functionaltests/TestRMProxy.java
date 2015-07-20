@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -54,13 +53,12 @@ import org.ow2.proactive.scheduler.core.rmproxies.SingleConnectionRMProxiesManag
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 
-public class TestRMProxy extends FunctionalTest {
+public class TestRMProxy extends RMFunctionalTest {
 
     static final int NODES_NUMBER = 3;
 

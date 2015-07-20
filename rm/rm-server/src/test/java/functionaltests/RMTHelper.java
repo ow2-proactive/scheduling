@@ -83,9 +83,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
-import org.ow2.tests.ProcessCleaner;
 
-import functionaltests.common.CommonTUtils;
 import functionaltests.common.InputStreamReaderThread;
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
@@ -100,6 +98,23 @@ import functionaltests.monitor.RMMonitorsHandler;
  *
  */
 public class RMTHelper {
+
+    public void flushEvents() {
+        if (monitorsHandler != null) {
+            monitorsHandler.flushEvents();
+        }
+    }
+
+    public static class Users {
+        public static final String DEMO_USERNAME = "demo";
+        public static final String DEMO_PASSWORD = "demo";
+
+        public static final String USER_USERNAME = "user";
+        public static final String USER_PASSWORD = "pwd";
+
+        public static final String TEST_USERNAME = "test_executor";
+        public static final String TEST_PASSWORD = "pwd";
+    }
 
     /**
      * Number of nodes deployed with default deployment descriptor
@@ -130,16 +145,6 @@ public class RMTHelper {
     private Process rmProcess;
 
     final protected static ProActiveSetup setup = new ProActiveSetup();
-
-    /**
-     * Default user name for RM's connection
-     */
-    public static String defaultUserName = "test_executor";
-
-    /**
-     * Default password for RM's connection
-     */
-    public static String defaultUserPassword = "pwd";
 
     /**
      * Currently connected user name for RM's connection
@@ -239,30 +244,30 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public TNode createNode(String nodeName) throws IOException, NodeException {
+    public TestNode createNode(String nodeName) throws IOException, NodeException {
         return createNode(nodeName, new HashMap<String, String>());
     }
 
-    public TNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
+    public TestNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
             NodeException {
         return createNode(nodeName, vmParameters, null);
     }
 
-    public TNode createNode(String nodeName, int pnpPort) throws IOException, NodeException {
+    public TestNode createNode(String nodeName, int pnpPort) throws IOException, NodeException {
         return createNode(nodeName, new HashMap<String, String>(), new ArrayList<String>(), pnpPort);
     }
 
-    public List<TNode> createNodes(final String nodeName, int number) throws IOException, NodeException,
+    public List<TestNode> createNodes(final String nodeName, int number) throws IOException, NodeException,
             ExecutionException, InterruptedException {
 
         ExecutorService executorService = Executors.newFixedThreadPool(number);
-        ArrayList<Future<TNode>> futureNodes = new ArrayList<>(number);
+        ArrayList<Future<TestNode>> futureNodes = new ArrayList<>(number);
         final List<Integer> freePNPPorts = findFreePorts(number);
         for (int i = 0; i < number; i++) {
             final int index = i;
-            futureNodes.add(executorService.submit(new Callable<TNode>() {
+            futureNodes.add(executorService.submit(new Callable<TestNode>() {
                 @Override
-                public TNode call() {
+                public TestNode call() {
                     try {
                         return createNode(nodeName + index, freePNPPorts.get(index));
                     } catch (Exception e) {
@@ -273,7 +278,7 @@ public class RMTHelper {
             }));
         }
 
-        ArrayList<TNode> nodes = new ArrayList<>(number);
+        ArrayList<TestNode> nodes = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
             nodes.add(futureNodes.get(i).get());
         }
@@ -291,7 +296,7 @@ public class RMTHelper {
         for (int i = 0; i < nodesNumber; i++) {
             String nodeName = "node-" + i;
 
-            TNode node = createNode(nodeName, map, vmOptions);
+            TestNode node = createNode(nodeName, map, vmOptions);
             getResourceManager().addNode(node.getNode().getNodeInformation().getURL());
         }
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
@@ -322,7 +327,7 @@ public class RMTHelper {
         return freePorts;
     }
 
-    private TNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions)
+    private TestNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions)
             throws IOException, NodeException {
         return createNode(nodeName, vmParameters, vmOptions, 0);
     }
@@ -339,7 +344,7 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    private TNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions,
+    private TestNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions,
             int pnpPort) throws IOException, NodeException {
 
         if (pnpPort <= 0) {
@@ -353,7 +358,7 @@ public class RMTHelper {
 
     }
 
-    public static TNode createRMNodeStarterNode(String nodeName) throws IOException, NodeException {
+    public static TestNode createRMNodeStarterNode(String nodeName) throws IOException, NodeException {
 
         int pnpPort = findFreePort();
         String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
@@ -366,7 +371,7 @@ public class RMTHelper {
 
     }
 
-    public static TNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
+    public static TestNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
             throws IOException, NodeException {
 
         if (expectedUrl == null) {
@@ -389,7 +394,7 @@ public class RMTHelper {
                     //nothing, wait another loop
                 }
                 if (newNode != null) {
-                    return new TNode(nodeProcess, newNode);
+                    return new TestNode(nodeProcess, newNode);
                 } else {
                     Thread.sleep(100);
                 }
@@ -488,7 +493,7 @@ public class RMTHelper {
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add("-Djava.awt.headless=true"); // For Mac builds
         Collections.addAll(commandLine, jvmArgs);
-        commandLine.add(RMTStarter.class.getName());
+        commandLine.add(RMStarterForFunctionalTest.class.getName());
         commandLine.add(configurationFile);
         System.out.println("Starting RM process: " + commandLine);
 
@@ -546,16 +551,17 @@ public class RMTHelper {
      */
     public void killRM() throws Exception {
         if (rmProcess != null) {
+            log("KILLING RM");
             rmProcess.destroy();
             rmProcess.waitFor();
             rmProcess = null;
 
-            // killing all rm nodes
-            ProcessCleaner cleaner = new ProcessCleaner(".*RMNodeStarter.*");
-            cleaner.killAliveProcesses();
+            // killing all rmHelper nodes
+//            ProcessCleaner cleaner = new ProcessCleaner(".*RMNodeStarter.*");
+//            cleaner.killAliveProcesses();
 
             // sometimes RM_NODE object isn't removed from the RMI registry after JVM with RM is killed (SCHEDULING-1498)
-            CommonTUtils.cleanupRMActiveObjectRegistry();
+//            CommonTUtils.cleanupRMActiveObjectRegistry();
         }
         reset();
     }
@@ -564,6 +570,18 @@ public class RMTHelper {
      * Resets the RMTHelper
      */
     public void reset() throws Exception {
+//        if(resourceManager!=null){
+//            System.out.println("Disconnecting user during reset " + connectedUserName + " from the resource manager");
+//            try {
+//                resourceManager.getMonitoring().removeRMEventListener();
+//                resourceManager.disconnect().getBooleanValue();
+//
+//                eventReceiver = null;
+//                resourceManager = null;
+//            } catch (RuntimeException ex) {
+//                ex.printStackTrace();
+//            }
+//        }
         auth = null;
         resourceManager = null;
         eventReceiver = null;
@@ -697,7 +715,7 @@ public class RMTHelper {
      * Gets the connected ResourceManager interface.
      */
     public ResourceManager getResourceManager() throws Exception {
-        return getResourceManager(null, defaultUserName, defaultUserPassword);
+        return getResourceManager(null, Users.TEST_USERNAME, Users.TEST_PASSWORD);
     }
 
     /**
@@ -708,10 +726,12 @@ public class RMTHelper {
     public ResourceManager getResourceManager(String propertyFile, String user, String pass) throws Exception {
 
         if (user == null)
-            user = defaultUserName;
+            user = Users.TEST_USERNAME;
         if (pass == null)
-            pass = defaultUserPassword;
+            pass = Users.TEST_PASSWORD;
 
+        log("GetRM as " + user + " current user is " + connectedUserName + " is connected? " +
+            resourceManager);
         if (resourceManager == null || !user.equals(connectedUserName)) {
 
             if (resourceManager != null) {

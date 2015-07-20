@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.tests.FunctionalTest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -58,7 +57,7 @@ import static functionaltests.TestPauseJobRecover.getTaskState;
  * is postponed.
  *   
  */
-public class TestPauseJob extends FunctionalTest {
+public class TestPauseJob extends RMFunctionalTest {
 
     @Test
     public void test() throws Throwable {
