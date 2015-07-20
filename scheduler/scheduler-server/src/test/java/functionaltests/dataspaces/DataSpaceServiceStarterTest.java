@@ -32,25 +32,22 @@
  *
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package unitTests;
+package functionaltests.dataspaces;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
 import org.ow2.tests.ProActiveTest;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-
-public class TestDataSpaceServiceStarter extends ProActiveTest {
+public class DataSpaceServiceStarterTest extends ProActiveTest {
 
     @Test
     // For SCHEDULING-1902, minimal test
     public void testTerminateNamingService() throws Exception {
-        TestDataSpaceServiceStarter activeObject = PAActiveObject
-                .turnActive(new TestDataSpaceServiceStarter());
+        DataSpaceServiceStarterTest activeObject = PAActiveObject
+                .turnActive(new DataSpaceServiceStarterTest());
         activeObject.doTestTerminateNamingService();
     }
 

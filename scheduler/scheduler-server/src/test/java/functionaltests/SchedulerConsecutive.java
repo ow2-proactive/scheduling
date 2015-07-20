@@ -39,7 +39,10 @@ package functionaltests;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.tests.Consecutive;
+import org.ow2.tests.ProActiveTest;
+import org.apache.log4j.Logger;
 import org.junit.After;
+import org.junit.Test;
 
 
 /**
@@ -48,25 +51,33 @@ import org.junit.After;
  *
  */
 @Consecutive
-public class SchedulerConsecutive extends RMFunctionalTest {
+public class SchedulerConsecutive extends ProActiveTest {
+
+    protected SchedulerTHelper schedulerHelper;
+    protected static final Logger logger = Logger.getLogger("SchedulerTests");
+
+    @Test
+    public void startSchedulerIfNeeded() throws Exception {
+        schedulerHelper = SchedulerTHelper.startScheduler();
+    }
+
     @After
     public void killAllProcessesIfNeeded() throws Exception {
 
-        if (shouldBeExecutedInConsecutiveMode(this.getClass())) {
+        if (RMFunctionalTest.shouldBeExecutedInConsecutiveMode(this.getClass())) {
 
             try {
-                RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT).getResourceManager().removeNodeSource("extra", true)
-                        .getBooleanValue();
+                schedulerHelper.getResourceManager().removeNodeSource("extra", true).getBooleanValue();
             } catch (IllegalArgumentException e) {
                 // ns extra not found
             }
-            RMInitialState state = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT).getResourceManager().getMonitoring()
-                    .getState();
+            RMInitialState state = RMTHelper.getDefaultInstance(SchedulerTHelper.PNP_PORT)
+                    .getResourceManager().getMonitoring().getState();
             System.out.println("RMState after the test execution");
             for (RMNodeEvent nodeEvent : state.getNodesEvents()) {
                 System.out.println(nodeEvent);
             }
         }
-        super.killAllProcessesIfNeeded();
+        // super.killAllProcessesIfNeeded();
     }
 }

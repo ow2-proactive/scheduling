@@ -1,6 +1,7 @@
-package unitTests;
+package org.ow2.proactive.scheduler.core;
 
 import java.io.Serializable;
+import java.security.KeyException;
 
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -11,8 +12,6 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.core.JobEmailNotification;
-import org.ow2.proactive.scheduler.core.JobEmailNotificationException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
@@ -24,11 +23,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import functionaltests.schedulerdb.BaseSchedulerDBTest;
-
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
@@ -37,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 
-public class TestEmailNotifications extends ProActiveTest {
+public class JobEmailNotificationTest extends ProActiveTest {
 
     public static class TestJavaTask extends JavaExecutable {
         @Override
@@ -86,8 +82,7 @@ public class TestEmailNotifications extends ProActiveTest {
         javaTask.setExecutableClassName(TestJavaTask.class.getName());
         javaTask.setName(TASK_NAME);
         job.addTask(javaTask);
-        InternalJob internalJob = InternalJobFactory.createJob(job, BaseSchedulerDBTest
-                .getDefaultCredentials());
+        InternalJob internalJob = InternalJobFactory.createJob(job, null);
         internalJob.setOwner(DEFAULT_USER_NAME);
         return internalJob;
     }
@@ -100,7 +95,8 @@ public class TestEmailNotifications extends ProActiveTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws KeyException {
+        PASchedulerProperties.JOB_FACTOR.updateProperty("1000");
         enableEmailNotifications();
         setSenderAddress(ADMIN_EMAIL);
         stubbedSender = mock(SendMail.class);

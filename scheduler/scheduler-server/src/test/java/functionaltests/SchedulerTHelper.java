@@ -167,8 +167,9 @@ public class SchedulerTHelper {
      *
      * @throws Exception if an error occurs.
      */
-    public static void startScheduler() throws Exception {
+    public static SchedulerTHelper startScheduler() throws Exception {
         startScheduler(true, null);
+        return new SchedulerTHelper();
     }
 
     /**
@@ -1237,7 +1238,7 @@ public class SchedulerTHelper {
     private static void connect() throws Exception {
         SchedulerAuthenticationInterface authInt = getSchedulerAuth();
         Credentials cred = Credentials.createCredentials(new CredData(admin_username, admin_password),
-                authInt.getPublicKey());
+          authInt.getPublicKey());
         adminSchedInterface = authInt.login(cred);
         initEventReceiver(adminSchedInterface);
     }
@@ -1311,4 +1312,7 @@ public class SchedulerTHelper {
         }
     }
 
+    public ResourceManager getResourceManager() throws Exception {
+        return RMTHelper.getDefaultInstance(PNP_PORT).getResourceManager();
+    }
 }

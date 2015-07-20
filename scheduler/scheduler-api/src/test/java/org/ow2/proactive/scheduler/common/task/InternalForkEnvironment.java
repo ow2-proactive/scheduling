@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package unitTests;
+package org.ow2.proactive.scheduler.common.task;
 
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;

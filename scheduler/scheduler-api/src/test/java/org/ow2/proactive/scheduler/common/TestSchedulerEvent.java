@@ -34,12 +34,10 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package unitTests;
+package org.ow2.proactive.scheduler.common;
 
 import org.junit.Assert;
-
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
 
 
 /**

@@ -34,20 +34,17 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package unitTests;
+package org.ow2.proactive.threading;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
-
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.ow2.proactive.threading.CallableWithTimeoutAction;
-import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 
 
 /**
@@ -56,7 +53,7 @@ import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
  * @author ProActive team
  *
  */
-public class TestTimeoutThreadPoolExecutor {
+public class TimeoutThreadPoolExecutorTest {
 
     private TimeoutThreadPoolExecutor executor;
 

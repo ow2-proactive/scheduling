@@ -34,7 +34,7 @@
  * ################################################################
  * $ACTIVEEON_INITIAL_DEV$
  */
-package functionaltests;
+package org.ow2.proactive.scheduler.common.job.factories;
 
 import java.io.Serializable;
 import java.util.ArrayList;

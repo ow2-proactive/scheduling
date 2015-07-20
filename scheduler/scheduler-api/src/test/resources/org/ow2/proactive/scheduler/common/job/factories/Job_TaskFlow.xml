@@ -5,7 +5,7 @@
 	<!-- ${jobName} is set as JVM parameter in the TestJobFactory -->
 	<variables>
 		<!-- Relative path is from Scheduler root directory for the tests -->
-		<variable name="WORK_DIR" value="${pa.scheduler.home}/samples/scripts/misc"/>
+		<variable name="WORK_DIR" value="${scripts.folder}"/>
 		<variable name="WORK_DIR2" value="${pa.scheduler.home}/scheduler-server/src/test/resources/unitTests/descriptors"/>
 		<variable name="EXCLUSION_STRING" value="paquit"/>
 		<variable name="JAVA_HOME" value="/bin/java/jdk1.5"/>
