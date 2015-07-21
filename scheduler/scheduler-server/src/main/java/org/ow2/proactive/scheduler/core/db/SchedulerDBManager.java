@@ -680,7 +680,7 @@ public class SchedulerDBManager {
                 "jobId", jobId).executeUpdate();
     }
 
-    public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
+    public synchronized void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             public Void executeWork(Session session) {
@@ -1432,7 +1432,7 @@ public class SchedulerDBManager {
         }
     }
 
-    public void newJobSubmitted(final InternalJob job) {
+    public synchronized void newJobSubmitted(final InternalJob job) {
         runWithTransaction(new SessionWork<JobData>() {
 
             @Override
