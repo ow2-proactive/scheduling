@@ -128,6 +128,10 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
     }
 
+    public SchedulerDBManager getDbManager() {
+        return dbManager;
+    }
+
     public static Credentials getDefaultCredentials() throws Exception {
         if (defaultCredentials == null) {
             defaultCredentials = Credentials.createCredentials(DEFAULT_USER_NAME, "admin",
