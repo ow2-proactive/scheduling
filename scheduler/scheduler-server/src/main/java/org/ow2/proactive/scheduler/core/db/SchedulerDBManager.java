@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import org.hibernate.criterion.Order;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -81,39 +83,28 @@ public class SchedulerDBManager {
 
     private static final Logger debugLogger = Logger.getLogger(SchedulerDBManager.class);
 
-    private static final Set<JobStatus> finishedJobStatuses;
+    private static final Set<JobStatus> FINISHED_JOB_STATUSES =
+            ImmutableSet.of(
+                    JobStatus.CANCELED,
+                    JobStatus.FAILED,
+                    JobStatus.KILLED,
+                    JobStatus.FINISHED);
 
-    static {
-        finishedJobStatuses = new HashSet<JobStatus>();
-        finishedJobStatuses.add(JobStatus.CANCELED);
-        finishedJobStatuses.add(JobStatus.FAILED);
-        finishedJobStatuses.add(JobStatus.KILLED);
-        finishedJobStatuses.add(JobStatus.FINISHED);
-    }
+    private static final Set<JobStatus> PENDING_JOB_STATUSES =
+            ImmutableSet.of(
+                    JobStatus.PENDING);
 
-    private static final Set<JobStatus> pendingJobStatuses;
+    private static final Set<JobStatus> RUNNING_JOB_STATUSES =
+            ImmutableSet.of(
+                    JobStatus.PAUSED,
+                    JobStatus.STALLED,
+                    JobStatus.RUNNING);
 
-    static {
-        pendingJobStatuses = new HashSet<JobStatus>();
-        pendingJobStatuses.add(JobStatus.PENDING);
-    }
-
-    private static final Set<JobStatus> runningJobStatuses;
-
-    static {
-        runningJobStatuses = new HashSet<JobStatus>();
-        runningJobStatuses.add(JobStatus.PAUSED);
-        runningJobStatuses.add(JobStatus.STALLED);
-        runningJobStatuses.add(JobStatus.RUNNING);
-    }
-
-    private static final Set<JobStatus> notFinishedJobStatuses;
-
-    static {
-        notFinishedJobStatuses = new HashSet<JobStatus>();
-        notFinishedJobStatuses.addAll(runningJobStatuses);
-        notFinishedJobStatuses.addAll(pendingJobStatuses);
-    }
+    private static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES =
+            ImmutableSet.copyOf(
+                    Iterables.concat(
+                        RUNNING_JOB_STATUSES,
+                        PENDING_JOB_STATUSES));
 
     private final SessionFactory sessionFactory;
 
@@ -211,13 +202,13 @@ public class SchedulerDBManager {
                 if (!allJobs) {
                     Set<JobStatus> status = new HashSet<JobStatus>();
                     if (pending) {
-                        status.addAll(pendingJobStatuses);
+                        status.addAll(PENDING_JOB_STATUSES);
                     }
                     if (runnning) {
-                        status.addAll(runningJobStatuses);
+                        status.addAll(RUNNING_JOB_STATUSES);
                     }
                     if (finished) {
-                        status.addAll(finishedJobStatuses);
+                        status.addAll(FINISHED_JOB_STATUSES);
                     }
                     criteria.add(Restrictions.in("status", status.toArray(new JobStatus[status.size()])));
                 }
@@ -322,7 +313,7 @@ public class SchedulerDBManager {
     }
 
     public long getFinishedJobsCount() {
-        return getJobsNumberWithStatus(finishedJobStatuses);
+        return getJobsNumberWithStatus(FINISHED_JOB_STATUSES);
     }
 
     public long getPendingJobsCount() {
@@ -389,7 +380,7 @@ public class SchedulerDBManager {
                 Query query = session
                         .createQuery(
                                 "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1")
-                        .setParameterList("jobStatus", notFinishedJobStatuses).setParameterList("taskStatus",
+                        .setParameterList("jobStatus", NOT_FINISHED_JOB_STATUSES).setParameterList("taskStatus",
                                 taskStatus);
 
                 Long count = (Long) query.uniqueResult();
@@ -407,7 +398,7 @@ public class SchedulerDBManager {
                 Query query = session.createQuery(
                         "select count(*) from TaskData task where taskStatus in (:taskStatus) "
                             + "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1")
-                        .setParameterList("jobStatus", notFinishedJobStatuses).setParameterList("taskStatus",
+                        .setParameterList("jobStatus", NOT_FINISHED_JOB_STATUSES).setParameterList("taskStatus",
                                 Arrays.asList(TaskStatus.RUNNING));
 
                 Long count = (Long) query.uniqueResult();
@@ -680,7 +671,7 @@ public class SchedulerDBManager {
                 "jobId", jobId).executeUpdate();
     }
 
-    public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
+    public synchronized void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             public Void executeWork(Session session) {
@@ -709,11 +700,11 @@ public class SchedulerDBManager {
     }
 
     public List<InternalJob> loadNotFinishedJobs(boolean fullState) {
-        return loadJobs(fullState, notFinishedJobStatuses, -1);
+        return loadJobs(fullState, NOT_FINISHED_JOB_STATUSES, -1);
     }
 
     public List<InternalJob> loadFinishedJobs(boolean fullState, long period) {
-        return loadJobs(fullState, finishedJobStatuses, period);
+        return loadJobs(fullState, FINISHED_JOB_STATUSES, period);
     }
 
     private List<InternalJob> loadJobs(final boolean fullState, final Collection<JobStatus> status,
@@ -930,8 +921,8 @@ public class SchedulerDBManager {
                 long jobId = jobId(job);
 
                 String jobUpdate = "update JobData set status = :status, "
-                    + "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, "
-                    + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
+                        + "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, "
+                        + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
 
                 JobInfo jobInfo = job.getJobInfo();
 
@@ -943,7 +934,7 @@ public class SchedulerDBManager {
                 if (taskStatusToPending) {
                     JobData job = (JobData) session.load(JobData.class, jobId);
                     String taskStatusUpdate = "update TaskData task set task.taskStatus = :taskStatus "
-                        + "where task.jobData = :job";
+                            + "where task.jobData = :job";
                     session.createQuery(taskStatusUpdate).setParameter("taskStatus", TaskStatus.PENDING)
                             .setParameter("job", job).executeUpdate();
                 }
@@ -951,15 +942,15 @@ public class SchedulerDBManager {
                 TaskData.DBTaskId taskId = taskId(task);
 
                 String taskUpdate = "update TaskData task set task.taskStatus = :taskStatus, "
-                    + "task.startTime = :startTime, task.finishedTime = :finishedTime, "
-                    + "task.executionHostName = :executionHostName where task.id = :taskId";
+                        + "task.startTime = :startTime, task.finishedTime = :finishedTime, "
+                        + "task.executionHostName = :executionHostName where task.id = :taskId";
 
                 TaskInfo taskInfo = task.getTaskInfo();
 
                 session.createQuery(taskUpdate).setParameter("taskStatus", taskInfo.getStatus())
                         .setParameter("startTime", taskInfo.getStartTime()).setParameter("finishedTime",
-                                taskInfo.getFinishedTime()).setParameter("executionHostName",
-                                taskInfo.getExecutionHostName()).setParameter("taskId", taskId)
+                        taskInfo.getFinishedTime()).setParameter("executionHostName",
+                        taskInfo.getExecutionHostName()).setParameter("taskId", taskId)
                         .executeUpdate();
 
                 return null;
@@ -975,8 +966,8 @@ public class SchedulerDBManager {
                 long jobId = jobId(job);
 
                 String jobUpdate = "update JobData set status = :status, "
-                    + "numberOfPendingTasks = :numberOfPendingTasks, "
-                    + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
+                        + "numberOfPendingTasks = :numberOfPendingTasks, "
+                        + "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
 
                 JobInfo jobInfo = job.getJobInfo();
 
@@ -988,9 +979,9 @@ public class SchedulerDBManager {
                 TaskData.DBTaskId taskId = taskId(task);
 
                 String taskUpdate = "update TaskData set taskStatus = :taskStatus, "
-                    + "numberOfExecutionLeft = :numberOfExecutionLeft,"
-                    + "numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft"
-                    + " where id = :taskId";
+                        + "numberOfExecutionLeft = :numberOfExecutionLeft,"
+                        + "numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft"
+                        + " where id = :taskId";
 
                 TaskInfo taskInfo = task.getTaskInfo();
 
@@ -1084,7 +1075,7 @@ public class SchedulerDBManager {
                 TaskData.DBTaskId taskId = taskId(result.getTaskId());
                 saveTaskResult(taskId, result, session);
 
-                if (finishedJobStatuses.contains(job.getStatus())) {
+                if (FINISHED_JOB_STATUSES.contains(job.getStatus())) {
                     removeJobRuntimeData(session, jobId);
                 }
 
@@ -1180,7 +1171,7 @@ public class SchedulerDBManager {
                     saveTaskResult(taskId, result, session);
                 }
 
-                if (finishedJobStatuses.contains(job.getStatus())) {
+                if (FINISHED_JOB_STATUSES.contains(job.getStatus())) {
                     session.flush();
                     session.clear();
 
@@ -1241,16 +1232,16 @@ public class SchedulerDBManager {
                 Query query = session
                         .createQuery(
                                 "select taskResult, "
-                                    + "task.id, "
-                                    + "task.taskName, "
-                                    + "task.preciousResult from TaskResultData as taskResult join taskResult.taskRuntimeData as task "
-                                    + "where task.id in (:tasksIds) order by task.id, taskResult.resultTime desc")
+                                        + "task.id, "
+                                        + "task.taskName, "
+                                        + "task.preciousResult from TaskResultData as taskResult join taskResult.taskRuntimeData as task "
+                                        + "where task.id in (:tasksIds) order by task.id, taskResult.resultTime desc")
                         .setParameterList("tasksIds", dbTaskIds);
 
                 JobResultImpl jobResult = loadJobResult(session, query, job, jobId);
                 if (jobResult == null) {
                     throw new DatabaseManagerException("Failed to load result for tasks " + taskIds +
-                        " (job: " + jobId + ")");
+                            " (job: " + jobId + ")");
                 }
 
                 Map<TaskId, TaskResult> resultsMap = new HashMap<TaskId, TaskResult>(taskIds.size());
@@ -1264,7 +1255,7 @@ public class SchedulerDBManager {
                     }
                     if (taskResult == null) {
                         throw new DatabaseManagerException("Failed to load result for task " + taskId +
-                            " (job: " + jobId + ")");
+                                " (job: " + jobId + ")");
                     } else {
                         resultsMap.put(taskId, taskResult);
                     }
@@ -1272,7 +1263,7 @@ public class SchedulerDBManager {
 
                 if (jobResult.getAllResults().size() != taskIds.size()) {
                     throw new DatabaseManagerException("Results: " + jobResult.getAllResults().size() + " " +
-                        taskIds.size());
+                            taskIds.size());
                 }
 
                 return resultsMap;
@@ -1432,7 +1423,7 @@ public class SchedulerDBManager {
         }
     }
 
-    public void newJobSubmitted(final InternalJob job) {
+    public synchronized void newJobSubmitted(final InternalJob job) {
         runWithTransaction(new SessionWork<JobData>() {
 
             @Override
