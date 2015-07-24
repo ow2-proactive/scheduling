@@ -122,7 +122,7 @@ public class TaskLauncherTest {
 
     @Test
     public void nativeTask_WorkingDir() throws Throwable {
-        String tempFolder = tmpFolder.newFolder().getAbsolutePath();
+        String tempFolder = tmpFolder.newFolder().getCanonicalPath();
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
                 new TaskScript(new SimpleScript(pwdCommand(), "native")));
 
@@ -139,7 +139,7 @@ public class TaskLauncherTest {
 
     @Test
     public void nativeTask_WorkingDir_WithVariableReplacement() throws Throwable {
-        String tempFolder = tmpFolder.newFolder().getAbsolutePath();
+        String tempFolder = tmpFolder.newFolder().getCanonicalPath();
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
                 new TaskScript(new SimpleScript(pwdCommand(), "native")));
 
