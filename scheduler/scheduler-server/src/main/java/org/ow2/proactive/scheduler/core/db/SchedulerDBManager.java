@@ -1009,12 +1009,15 @@ public class SchedulerDBManager {
                     taskIds.add(taskId(id));
                 }
 
-                List<TaskData> taskRuntimeDataList = new ArrayList<>();
-                List<InternalTask> tasks = new ArrayList<>();
-
                 Query tasksQuery = session.createQuery("from TaskData where id in (:ids)").setParameterList(
                         "ids", taskIds);
                 List<TaskData> tasksToUpdate = tasksQuery.list();
+                Set<TaskId> newTasks = changesInfo.getNewTasks();
+
+                int newListSize = tasksToUpdate.size() + newTasks.size();
+                List<TaskData> taskRuntimeDataList = new ArrayList<>(newListSize);
+                List<InternalTask> tasks = new ArrayList<>(newListSize);
+
                 for (TaskData taskData : tasksToUpdate) {
                     InternalTask task = job.getIHMTasks().get(taskData.createTaskId(job));
                     taskData.updateMutableAttributes(task);
@@ -1024,7 +1027,7 @@ public class SchedulerDBManager {
                 }
 
                 int counter = 0;
-                for (TaskId newTaskId : changesInfo.getNewTasks()) {
+                for (TaskId newTaskId : newTasks) {
                     InternalTask task = job.getIHMTasks().get(newTaskId);
                     if (task.getExecutableContainer() == null) {
                         InternalTask from = task.getReplicatedFrom();
@@ -1389,10 +1392,12 @@ public class SchedulerDBManager {
                     InternalTask task = iTasks.get(i);
                     task.setId(TaskIdImpl.createTaskId(job.getId(),
                             task.getTaskInfo().getTaskId().getReadableName(), i));
+
                     tasksWithNewIds.add(task);
                 }
 
                 job.getIHMTasks().clear();
+
                 for (InternalTask task : tasksWithNewIds) {
                     job.getIHMTasks().put(task.getId(), task);
                 }
@@ -1504,12 +1509,13 @@ public class SchedulerDBManager {
         return runWithoutTransaction(new SessionWork<List<SchedulerUserInfo>>() {
             @Override
             public List<SchedulerUserInfo> executeWork(Session session) {
-                List<SchedulerUserInfo> users = new ArrayList<>();
                 Query query = session
                         .createQuery(
                                 "select owner, count(owner), max(submittedTime) from JobData group by owner");
 
-                for (Object obj : query.list()) {
+                List list = query.list();
+                List<SchedulerUserInfo> users = new ArrayList<>(list.size());
+                for (Object obj : list) {
                     Object[] nameAndCount = (Object[]) obj;
                     users.add(new SchedulerUserInfo(null, nameAndCount[0].toString(), 0, Long
                             .parseLong(nameAndCount[2].toString()), Integer.parseInt(nameAndCount[1]
