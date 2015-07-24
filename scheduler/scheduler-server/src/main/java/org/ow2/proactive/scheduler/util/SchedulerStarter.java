@@ -68,6 +68,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
+import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -99,10 +100,11 @@ import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
  * @since ProActive Scheduling 0.9
  */
 public class SchedulerStarter {
+
     private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
-    private static final int DEFAULT_NODES_NUMBER = 4;
     private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
+
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
 
     private static BroadcastDiscovery discoveryService;
@@ -251,8 +253,15 @@ public class SchedulerStarter {
                 logger.info("Connected to the existing resource manager at " + uri);
             } catch (Exception e) {
                 int defaultNodesNumber = PAResourceManagerProperties.RM_NB_LOCAL_NODES.getValueAsInt();
+
+                // -1 means that the number of local nodes depends of the number of cores in the local machine
+                if (defaultNodesNumber == -1) {
+                    defaultNodesNumber = RMStarter.DEFAULT_NODES_NUMBER;
+                }
+
                 int numberLocalNodes = readIntOption(commandLine, "localNodes", defaultNodesNumber);
                 int nodeTimeoutValue = readIntOption(commandLine, "timeout", DEFAULT_NODES_TIMEOUT);
+
                 startResourceManager(numberLocalNodes, nodeTimeoutValue);
             }
         }
@@ -333,7 +342,7 @@ public class SchedulerStarter {
         options.addOption(policy);
 
         Option noDeploy = new Option("ln", "localNodes", true,
-            "the number of local nodes to start (can be 0; default: " + DEFAULT_NODES_NUMBER + ")");
+            "the number of local nodes to start (can be 0; default: " + RMStarter.DEFAULT_NODES_NUMBER + ")");
         noDeploy.setArgName("localNodes");
         noDeploy.setRequired(false);
         options.addOption(noDeploy);

@@ -73,7 +73,11 @@ public class RMStarter {
 
     private static Options options = new Options();
 
+    public static final int DEFAULT_NODES_NUMBER =
+            Math.max(2, Runtime.getRuntime().availableProcessors());
+
     private static final int DEFAULT_NODE_TIMEOUT = 30 * 1000;
+
     private static int nodeTimeout = DEFAULT_NODE_TIMEOUT;
 
     private static void initOptions() {
@@ -143,6 +147,12 @@ public class RMStarter {
             RMAuthentication auth = RMFactory.startLocal();
 
             int defaultNodesNumber = PAResourceManagerProperties.RM_NB_LOCAL_NODES.getValueAsInt();
+
+            // -1 means that the number of local nodes depends of the number of cores in the local machine
+            if (defaultNodesNumber == -1) {
+                defaultNodesNumber = DEFAULT_NODES_NUMBER;
+            }
+
             if (localNodes && defaultNodesNumber > 0) {
                 ResourceManager resourceManager = auth.login(Credentials
                         .getCredentials(PAResourceManagerProperties
