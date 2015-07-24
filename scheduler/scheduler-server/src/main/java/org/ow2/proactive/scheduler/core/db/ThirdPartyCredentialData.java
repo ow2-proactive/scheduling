@@ -63,6 +63,9 @@ public class ThirdPartyCredentialData implements Serializable {
     @Lob
     byte[] encryptedValue;
 
+    public ThirdPartyCredentialData() {
+    }
+
     public ThirdPartyCredentialData(String username, String key, byte[] encryptedSymmetricKey,
             byte[] encryptedValue) {
         this.username = username;

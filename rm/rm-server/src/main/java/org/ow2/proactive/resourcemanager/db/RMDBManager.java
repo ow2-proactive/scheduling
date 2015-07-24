@@ -125,9 +125,9 @@ public class RMDBManager {
 
     private static RMDBManager createInMemoryRMDBManager() {
         Configuration config = new Configuration();
-        config.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
-        config.setProperty("hibernate.connection.url", "jdbc:h2:mem:scheduler");
-        config.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        config.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbc.JDBCDriver");
+        config.setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
+        config.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         return new RMDBManager(config, true, true);
     }
 
