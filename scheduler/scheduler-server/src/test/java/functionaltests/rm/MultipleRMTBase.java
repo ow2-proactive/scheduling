@@ -1,115 +1,89 @@
 package functionaltests.rm;
 
-import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.proactive.utils.FileUtils;
 import org.ow2.tests.ProActiveTest;
-import org.junit.After;
+import functionaltests.utils.TestRM;
 import org.junit.Assert;
 import org.junit.Before;
-
-import functionaltests.utils.TestRM;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 
 public class MultipleRMTBase extends ProActiveTest {
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     protected File config1;
 
     protected File config2;
 
-    private List<File> tempFiles = new ArrayList<>();
-
     @Before
     public void initConfigs() throws Exception {
         /*
-         * Create two copies of default test RM configurations, change path to the directory used by
-         * Derby (two resource managers should use two different directories)
+         * Create two copies of default RM test configurations, and
+         * then change the path to the directory used by the database.
+         * Two resource managers should use two different directories.
          */
-
         File configurationFile = new File(TestRM.functionalTestRMProperties.toURI());
 
         Properties config = new Properties();
-        config.load(new FileInputStream(configurationFile));
 
-        String hibernateConfigFile = config.getProperty(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG
-                .getKey());
+        try (FileInputStream fis = new FileInputStream(configurationFile)) {
+            config.load(fis);
+        }
+
+        String hibernateConfigFile =
+                config.getProperty(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey());
+
         if (hibernateConfigFile == null) {
             Assert.fail("Can't find hibernate config");
         }
+
         hibernateConfigFile = PASchedulerProperties.getAbsolutePath(hibernateConfigFile);
 
-        String hibernateConfig = new String(FileToBytesConverter.convertFileToByteArray(new File(
-            hibernateConfigFile)));
-        String defaultDB = "jdbc:derby:build/TEST_RM_DB;create=true";
-        if (!hibernateConfig.contains(defaultDB)) {
+        String hibernateConfig = new String(Files.readAllBytes(Paths.get(hibernateConfigFile)));
+
+        String defaultJdbcUrl = "jdbc:hsqldb:file:build/TEST_RM_DB;create=true;hsqldb.tx=mvcc";
+
+        if (!hibernateConfig.contains(defaultJdbcUrl)) {
             Assert.fail("Hibernate config doesn't contain expected string");
         }
 
-        File derbyDir1 = new File("RM_DB1");
-        if (derbyDir1.isDirectory()) {
-            FileUtils.removeDir(derbyDir1);
-        }
-        tempFiles.add(derbyDir1);
-        File derbyDir2 = new File("RM_DB2");
-        if (derbyDir2.isDirectory()) {
-            FileUtils.removeDir(derbyDir2);
-        }
-        tempFiles.add(derbyDir2);
+        File db1 = folder.newFolder("rm1");
+        File db2 = folder.newFolder("rm2");
 
-        File hibernateConfig1 = new File(System.getProperty("java.io.tmpdir") + File.separator +
-            "dbconfig1.xml");
-        tempFiles.add(hibernateConfig1);
-        File hibernateConfig2 = new File(System.getProperty("java.io.tmpdir") + File.separator +
-            "dbconfig2.xml");
-        tempFiles.add(hibernateConfig2);
+        Path hibernateConfig1 = folder.newFile("dbconfig1.xml").toPath();
+        Path hibernateConfig2 = folder.newFile("dbconfig2.xml").toPath();
 
-        writeStringToFile(hibernateConfig1, hibernateConfig.replace(defaultDB,
-                "jdbc:derby:RM_DB1;create=true"));
-        writeStringToFile(hibernateConfig2, hibernateConfig.replace(defaultDB,
-                "jdbc:derby:RM_DB2;create=true"));
+        writeStringToFile(hibernateConfig1, hibernateConfig.replace(defaultJdbcUrl,
+                "jdbc:hsqldb:file:" + db1.getAbsolutePath() + "/rm1;create=true;hsqldb.tx=mvcc"));
+        writeStringToFile(hibernateConfig2, hibernateConfig.replace(defaultJdbcUrl,
+                "jdbc:hsqldb:file:" + db2.getAbsolutePath() + "/rm2;create=true;hsqldb.tx=mvcc"));
 
-        config1 = new File(System.getProperty("java.io.tmpdir") + File.separator + "rmconfig1.txt");
-        tempFiles.add(config1);
-        config2 = new File(System.getProperty("java.io.tmpdir") + File.separator + "rmconfig2.txt");
-        tempFiles.add(config2);
+        config1 = folder.newFile("rmconfig1.txt");
+        config2 = folder.newFile("rmconfig2.txt");
 
-        config.put(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey(), hibernateConfig1
-                .getAbsolutePath());
-        config.store(new FileOutputStream(config1), null);
+        config.put(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey(), hibernateConfig1.toString());
+        config.store(Files.newOutputStream(config1.toPath()), null);
 
-        config.put(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey(), hibernateConfig2
-                .getAbsolutePath());
-        config.store(new FileOutputStream(config2), null);
+        config.put(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getKey(), hibernateConfig2.toString());
+        config.store(Files.newOutputStream(config2.toPath()), null);
     }
 
-    @After
-    public void cleanup() {
-        for (File tmpFile : tempFiles) {
-            if (tmpFile.isDirectory()) {
-                FileUtils.removeDir(tmpFile);
-            } else {
-                tmpFile.delete();
-            }
-        }
-    }
-
-    private static void writeStringToFile(File file, String string) throws IOException {
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-        try {
-            out.write(string.getBytes());
-        } finally {
-            out.close();
+    private static void writeStringToFile(Path file, String string) throws IOException {
+        try (BufferedWriter bw = Files.newBufferedWriter(file)) {
+            bw.write(string);
         }
     }
 

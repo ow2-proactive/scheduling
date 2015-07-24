@@ -55,11 +55,11 @@ public class ThirdPartyCredentialData implements Serializable {
     @Column(name = "CREDENTIAL_KEY")
     String key;
 
-    @Column(name = "ENCRYPTED_SYMMETRIC_KEY")
+    @Column(name = "ENCRYPTED_SYMMETRIC_KEY", length = Integer.MAX_VALUE)
     @Lob
     byte[] encryptedSymmetricKey;
 
-    @Column(name = "ENCRYPTED_CREDENTIAL_VALUE")
+    @Column(name = "ENCRYPTED_CREDENTIAL_VALUE", length = Integer.MAX_VALUE)
     @Lob
     byte[] encryptedValue;
 

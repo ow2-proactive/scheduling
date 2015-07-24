@@ -49,7 +49,7 @@ public class NodeSourceData implements Serializable {
         this.name = name;
     }
 
-    @Column
+    @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public String getInfrastructureType() {
         return infrastructureType;
@@ -59,7 +59,7 @@ public class NodeSourceData implements Serializable {
         this.infrastructureType = infrastructureType;
     }
 
-    @Column
+    @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Object[] getInfrastructureParameters() {
         return infrastructureParameters;
@@ -78,7 +78,7 @@ public class NodeSourceData implements Serializable {
         this.policyType = policyType;
     }
 
-    @Column
+    @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Object[] getPolicyParameters() {
         return policyParameters;
@@ -88,7 +88,7 @@ public class NodeSourceData implements Serializable {
         this.policyParameters = policyParameters;
     }
 
-    @Column
+    @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Client getProvider() {
         return provider;

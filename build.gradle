@@ -425,7 +425,8 @@ project('scheduler:scheduler-server') {
             exclude group: 'org.javassist', module: 'javassist'
         }
 
-        runtime 'org.apache.derby:derby:10.11.1.1'
+        runtime 'org.hsqldb:hsqldb:2.3.3'
+
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
@@ -543,7 +544,7 @@ project('rm:rm-server') {
             exclude group: 'org.javassist', module: 'javassist'
         }
 
-        runtime 'org.apache.derby:derby:10.11.1.1'
+        runtime 'org.hsqldb:hsqldb:2.3.3'
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     }
 

@@ -152,7 +152,7 @@ public class ScriptData {
         this.script = script;
     }
 
-    @Column(name = "PARAMETERS")
+    @Column(name = "PARAMETERS", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public List<Serializable> getScriptParameters() {
         return scriptParameters;

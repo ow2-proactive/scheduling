@@ -6,9 +6,9 @@
 <hibernate-configuration>
 
     <session-factory>
-        <property name="hibernate.connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
-        <property name="hibernate.connection.url">jdbc:derby:build/tmp/TEST_SCHEDULER_DB;create=true</property>
-        <property name="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</property>
+        <property name="hibernate.connection.driver_class">org.hsqldb.jdbc.JDBCDriver</property>
+        <property name="hibernate.connection.url">jdbc:hsqldb:file:build/tmp/TEST_SCHEDULER_DB;create=true;hsqldb.tx=mvcc</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
 
         <!-- Username and password -->
         <property name="hibernate.connection.username">scheduler</property>
