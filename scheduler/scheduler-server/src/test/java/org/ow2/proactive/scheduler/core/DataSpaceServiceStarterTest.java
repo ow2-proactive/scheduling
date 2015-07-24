@@ -32,20 +32,29 @@
  *
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionaltests.dataspaces;
+package org.ow2.proactive.scheduler.core;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.tests.ProActiveTest;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.*;
 
+
 public class DataSpaceServiceStarterTest extends ProActiveTest {
+
+    @Rule
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @Test
     // For SCHEDULING-1902, minimal test
     public void testTerminateNamingService() throws Exception {
+        CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
+        PASchedulerProperties.SCHEDULER_HOME.updateProperty(tmpFolder.newFolder().getAbsolutePath());
         DataSpaceServiceStarterTest activeObject = PAActiveObject
                 .turnActive(new DataSpaceServiceStarterTest());
         activeObject.doTestTerminateNamingService();

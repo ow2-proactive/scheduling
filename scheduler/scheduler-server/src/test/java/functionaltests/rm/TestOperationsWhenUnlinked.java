@@ -78,7 +78,7 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTest {
 
     static final String TASK_NAME = "Test task";
 
-    static final long EVENT_TIMEOUT = 30000;
+    static final long EVENT_TIMEOUT = 60000;
 
     private File config;
     private RMTHelper rmHelper;

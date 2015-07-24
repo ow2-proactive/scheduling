@@ -61,10 +61,6 @@ public class TestNonForkedScriptTask extends SchedulerFunctionalTest {
         schedulerHelper.startScheduler(new File(TestNonForkedScriptTask.class.getResource(
                 "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
-        // wait nodes to be free
-        schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(nonForked_jobDescriptor.toURI()).getAbsolutePath());
 

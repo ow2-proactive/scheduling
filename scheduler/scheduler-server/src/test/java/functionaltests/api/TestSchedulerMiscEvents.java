@@ -130,5 +130,7 @@ public class TestSchedulerMiscEvents extends SchedulerFunctionalTest {
 
         log("waiting scheduler shutted down event");
         schedulerHelper.waitForEventSchedulerState(SchedulerEvent.SHUTDOWN);
+
+        schedulerHelper.killScheduler(); // to make sure other tests get a clean Scheduler
     }
 }

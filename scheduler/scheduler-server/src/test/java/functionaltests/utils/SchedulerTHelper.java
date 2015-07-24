@@ -834,6 +834,9 @@ public class SchedulerTHelper {
     }
 
     private RMMonitorsHandler getRMMonitorsHandler() throws Exception {
+        if (connectedRMUser.getMonitorsHandler() == null) {
+            getResourceManager();
+        }
         return connectedRMUser.getMonitorsHandler();
     }
 
