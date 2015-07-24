@@ -49,8 +49,7 @@ public class NodeSourceData implements Serializable {
         this.name = name;
     }
 
-    @Column(length = Integer.MAX_VALUE)
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Column(length = 65535)
     public String getInfrastructureType() {
         return infrastructureType;
     }
