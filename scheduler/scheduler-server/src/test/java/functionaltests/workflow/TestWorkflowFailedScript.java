@@ -39,16 +39,14 @@ package functionaltests.workflow;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 /**
@@ -60,11 +58,11 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowFailedScript extends SchedulerConsecutive {
+public class TestWorkflowFailedScript extends TRepJobs {
 
     private static final String ifScriptContent = "throw new java.lang.Exception(\"test exception\");";
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         testIf();
     }
@@ -102,9 +100,9 @@ public class TestWorkflowFailedScript extends SchedulerConsecutive {
         C.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
         job.addTask(C);
 
-        JobId id = SchedulerTHelper.submitJob(job);
-        SchedulerTHelper.waitForEventJobFinished(id);
-        JobResult res = SchedulerTHelper.getJobResult(id);
+        JobId id = schedulerHelper.submitJob(job);
+        schedulerHelper.waitForEventJobFinished(id);
+        JobResult res = schedulerHelper.getJobResult(id);
 
         Map<String, TaskResult> results = res.getAllResults();
 

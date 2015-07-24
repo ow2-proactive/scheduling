@@ -55,10 +55,10 @@ import org.ow2.proactive.utils.NodeSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -67,7 +67,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class TestConcurrentUsers extends RMConsecutive {
+public class TestConcurrentUsers extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
@@ -178,7 +178,7 @@ public class TestConcurrentUsers extends RMConsecutive {
                 try {
                     RMAuthentication auth = rmHelper.getRMAuth();
                     Credentials cred = Credentials.createCredentials(new CredData(
-                        RMTHelper.Users.TEST_USERNAME, RMTHelper.Users.TEST_PASSWORD), auth.getPublicKey());
+                        TestUsers.TEST.username, TestUsers.TEST.password), auth.getPublicKey());
                     ResourceManager rm = auth.login(cred);
                     rm.disconnect().getBooleanValue();
                 } catch (Exception e) {

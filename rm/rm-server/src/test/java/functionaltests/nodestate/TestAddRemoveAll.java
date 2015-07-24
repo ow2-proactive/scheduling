@@ -43,9 +43,9 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 
 
 /**
@@ -53,7 +53,7 @@ import static functionaltests.RMTHelper.log;
  * exists and that lead to dead lock in the past.
  * Running this test ensure that at least the dead lock doesn't occur.
  */
-public class TestAddRemoveAll extends RMConsecutive {
+public class TestAddRemoveAll extends RMFunctionalTest {
 
     private String nodeName = "nodeDeadLock";
     private String nsName = "TestAddRemoveAll";

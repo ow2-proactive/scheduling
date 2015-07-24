@@ -50,9 +50,9 @@ import org.ow2.proactive.utils.NodeSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 /**
@@ -78,7 +78,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class StaticSelectionScriptTest extends RMConsecutive {
+public class StaticSelectionScriptTest extends RMFunctionalTest {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 

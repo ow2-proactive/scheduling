@@ -59,8 +59,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.junit.Assert;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -75,7 +75,7 @@ import functionaltests.RMTHelper;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetRemoveTest extends RMConsecutive {
+public final class AddGetRemoveTest extends RMFunctionalTest {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -85,8 +85,8 @@ public final class AddGetRemoveTest extends RMConsecutive {
 
         final ResourceManager r = rmHelper.getResourceManager();
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = RMTHelper.Users.TEST_USERNAME;
-        final String adminPassword = RMTHelper.Users.TEST_PASSWORD;
+        final String adminLogin = TestUsers.TEST.username;
+        final String adminPassword = TestUsers.TEST.password;
 
         // All accounting values are checked through JMX
         final RMAuthentication auth = rmHelper.getRMAuth();

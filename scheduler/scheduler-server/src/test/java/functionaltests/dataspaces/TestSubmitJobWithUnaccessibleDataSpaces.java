@@ -37,12 +37,9 @@ package functionaltests.dataspaces;
 import java.io.File;
 import java.net.URL;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import functionaltests.SchedulerTHelper;
-import functionaltests.RMFunctionalTest;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 
 /**
@@ -54,7 +51,7 @@ import functionaltests.RMFunctionalTest;
  *
  * @author The ProActive Team
  */
-public class TestSubmitJobWithUnaccessibleDataSpaces extends RMFunctionalTest {
+public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerFunctionalTest {
 
     static URL jobDescriptor = TestSubmitJobWithUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpaceUnacc.xml");
@@ -62,34 +59,11 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends RMFunctionalTest {
     static URL configFile = TestSubmitJobWithUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/schedulerPropertiesWrongSpaces.ini");
 
-    static String HOSTNAME = null;
-
-    static {
-        try {
-            HOSTNAME = java.net.InetAddress.getLocalHost().getHostName();
-
-        } catch (Exception e) {
-        }
-    }
-
-    public TestSubmitJobWithUnaccessibleDataSpaces() {
-
-    }
-
-    @Before
-    public void before() throws Throwable {
-        SchedulerTHelper.startScheduler(true, (new File(configFile.toURI())).getAbsolutePath());
-    }
-
     @Test
     public void run() throws Throwable {
-        SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+        schedulerHelper.startScheduler((new File(configFile.toURI())).getAbsolutePath());
+        schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
-    }
-
-    @After
-    public void after() throws Throwable {
-        SchedulerTHelper.killScheduler();
     }
 
 }

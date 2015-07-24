@@ -2,6 +2,7 @@ package functionaltests.jmx;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.management.JMX;
 import javax.management.MBeanServerConnection;
@@ -11,10 +12,12 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -23,10 +26,13 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBean;
-import functionaltests.RMFunctionalTest;
-import functionaltests.SchedulerTHelper;
 import org.junit.Assert;
 import org.junit.Test;
+
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.TestUsers;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -38,7 +44,7 @@ import org.junit.Test;
  * @author ProActive team
  *
  */
-public class SchedulerRuntimeDataMBeanTest extends RMFunctionalTest {
+public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTest {
 
     public static class FailingTestJavaTask extends JavaExecutable {
         @Override
@@ -54,12 +60,21 @@ public class SchedulerRuntimeDataMBeanTest extends RMFunctionalTest {
     }
 
     private void testAsAdmin() throws Exception {
-        final SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
+        final SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
         final HashMap<String, Object> env = new HashMap<>(1);
-        env.put(JMXConnector.CREDENTIALS, new Object[] { SchedulerTHelper.admin_username,
-                SchedulerTHelper.admin_password });
-        JMXConnector adminJmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth
-                .getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
+        env.put(JMXConnector.CREDENTIALS, new Object[] { TestUsers.DEMO.username, TestUsers.DEMO.password });
+        JMXConnector adminJmxConnector = JMXConnectorFactory.connect(
+                new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
+
+        List<JobInfo> existingFinishedJobs = schedulerHelper.getSchedulerInterface().getJobs(0, 1000,
+                new JobFilterCriteria(false, false, true, true), null);
+
+        int nbFinishedTasks = 0;
+        int nbTotalTasks = 0;
+        for (JobInfo existingFinishedJob : existingFinishedJobs) {
+            nbFinishedTasks += existingFinishedJob.getNumberOfFinishedTasks();
+            nbTotalTasks += existingFinishedJob.getTotalNumberOfTasks();
+        }
 
         try {
             MBeanServerConnection connection = adminJmxConnector.getMBeanServerConnection();
@@ -69,40 +84,39 @@ public class SchedulerRuntimeDataMBeanTest extends RMFunctionalTest {
 
             JobId jobId;
 
-            jobId = SchedulerTHelper.submitJob(createJobWithFailingTask());
+            jobId = schedulerHelper.submitJob(createJobWithFailingTask());
 
-            SchedulerTHelper.waitForEventTaskWaitingForRestart(jobId, "task1");
+            schedulerHelper.waitForEventTaskWaitingForRestart(jobId, "task1");
             checkDataConsistent(bean);
 
-            SchedulerTHelper.waitForEventTaskWaitingForRestart(jobId, "task1");
+            schedulerHelper.waitForEventTaskWaitingForRestart(jobId, "task1");
             checkDataConsistent(bean);
 
-            SchedulerTHelper.waitForEventJobFinished(jobId, 60000);
+            schedulerHelper.waitForEventJobFinished(jobId, 60000);
             checkDataConsistent(bean);
 
-            checkTasksData(bean, 0, 0, 1, 1);
+            checkTasksData(bean, 0, 0, 1 + nbFinishedTasks, 1 + nbTotalTasks);
             checkJobData(bean, jobId);
 
-            jobId = SchedulerTHelper.submitJob(createJobWithMultinodeTask(100));
+            jobId = schedulerHelper.submitJob(createJobWithMultinodeTask(100));
             Thread.sleep(5000);
             checkDataConsistent(bean);
-            checkTasksData(bean, 1, 0, 1, 2);
+            checkTasksData(bean, 1, 0, 1 + nbFinishedTasks, 2 + nbTotalTasks);
 
-            SchedulerTHelper.getSchedulerInterface().killJob(jobId);
+            schedulerHelper.getSchedulerInterface().killJob(jobId);
             checkDataConsistent(bean);
-            checkTasksData(bean, 0, 0, 1, 2);
+            checkTasksData(bean, 0, 0, 1 + nbFinishedTasks, 2 + nbTotalTasks);
         } finally {
             adminJmxConnector.close();
         }
     }
 
     private void testAsUser() throws Exception {
-        final SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
+        final SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
         final HashMap<String, Object> env = new HashMap<>(1);
-        env.put(JMXConnector.CREDENTIALS, new Object[] { SchedulerTHelper.user_username,
-                SchedulerTHelper.user_password });
-        JMXConnector userJmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth
-                .getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
+        env.put(JMXConnector.CREDENTIALS, new Object[] { TestUsers.USER.username, TestUsers.USER.password });
+        JMXConnector userJmxConnector = JMXConnectorFactory.connect(
+                new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
 
         try {
             MBeanServerConnection connection = userJmxConnector.getMBeanServerConnection();
@@ -115,14 +129,14 @@ public class SchedulerRuntimeDataMBeanTest extends RMFunctionalTest {
     }
 
     private void checkJobData(RuntimeDataMBean bean, JobId jobId) throws Exception {
-        JobState jobState = SchedulerTHelper.getSchedulerInterface().getJobState(jobId);
+        JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
         long pendingTime = bean.getJobPendingTime(jobId.value());
         long runningTime = bean.getJobRunningTime(jobId.value());
-        Assert.assertEquals("Unexpected pending time", jobState.getStartTime() - jobState.getSubmittedTime(),
+        assertEquals("Unexpected pending time", jobState.getStartTime() - jobState.getSubmittedTime(),
                 pendingTime);
-        Assert.assertEquals("Unexpected running time", jobState.getFinishedTime() - jobState.getStartTime(),
+        assertEquals("Unexpected running time", jobState.getFinishedTime() - jobState.getStartTime(),
                 runningTime);
-        Assert.assertEquals("Unexpected nodes number", 1, bean.getTotalNumberOfNodesUsed(jobId.value()));
+        assertEquals("Unexpected nodes number", 1, bean.getTotalNumberOfNodesUsed(jobId.value()));
 
         bean.getMeanTaskPendingTime(jobId.value());
         bean.getMeanTaskRunningTime(jobId.value());
@@ -134,14 +148,14 @@ public class SchedulerRuntimeDataMBeanTest extends RMFunctionalTest {
         int running = bean.getRunningTasksCount();
         int finished = bean.getFinishedTasksCount();
         int total = bean.getTotalTasksCount();
-        Assert.assertEquals("Invalid pending tasks", pendingTasks, pending);
-        Assert.assertEquals("Invalid running tasks", runningTasks, running);
-        Assert.assertEquals("Invalid finished tasks", finishedTasks, finished);
-        Assert.assertEquals("Invalid total tasks", totalTasks, total);
+        assertEquals("Invalid pending tasks", pendingTasks, pending);
+        assertEquals("Invalid running tasks", runningTasks, running);
+        assertEquals("Invalid finished tasks", finishedTasks, finished);
+        assertEquals("Invalid total tasks", totalTasks, total);
     }
 
     private void checkDataConsistent(RuntimeDataMBean bean) throws Exception {
-        Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
         int pendingJobs = bean.getPendingJobsCount();
         int runningJobs = bean.getRunningJobsCount();
@@ -160,11 +174,11 @@ public class SchedulerRuntimeDataMBeanTest extends RMFunctionalTest {
 
         SchedulerState state = scheduler.getState();
 
-        Assert.assertEquals(state.getPendingJobs().size(), bean.getPendingJobsCount());
-        Assert.assertEquals(state.getRunningJobs().size(), bean.getRunningJobsCount());
-        Assert.assertEquals(state.getFinishedJobs().size(), bean.getFinishedJobsCount());
-        Assert.assertEquals(bean.getPendingJobsCount() + bean.getRunningJobsCount() +
-            bean.getFinishedJobsCount(), bean.getTotalJobsCount());
+        assertEquals(state.getPendingJobs().size(), bean.getPendingJobsCount());
+        assertEquals(state.getRunningJobs().size(), bean.getRunningJobsCount());
+        assertEquals(state.getFinishedJobs().size(), bean.getFinishedJobsCount());
+        assertEquals(bean.getPendingJobsCount() + bean.getRunningJobsCount() + bean.getFinishedJobsCount(),
+                bean.getTotalJobsCount());
 
         Assert.assertTrue("Invalid pending tasks: " + pendingTasks, pendingTasks >= 0);
         Assert.assertTrue("Invalid running tasks: " + runningTasks, runningTasks >= 0);

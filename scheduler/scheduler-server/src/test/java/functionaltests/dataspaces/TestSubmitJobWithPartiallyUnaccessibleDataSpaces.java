@@ -39,16 +39,16 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
-import functionaltests.RMFunctionalTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import functionaltests.SchedulerTHelper;
+import functionaltests.utils.SchedulerFunctionalTest;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -61,24 +61,24 @@ import functionaltests.SchedulerTHelper;
  *
  * @author The ProActive Team
  */
-public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends RMFunctionalTest {
+public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerFunctionalTest {
 
-    static URL jobDescriptor = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
+    URL jobDescriptor = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpacePartiallyUnacc.xml");
 
-    static URL configFile = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
+    URL configFile = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/schedulerPropertiesPartiallyUnaccessibleSpaces.ini");
-    static File spaceRoot;
-    static File spaceRootUser;
+    File spaceRoot;
+    File spaceRootUser;
 
     @Rule
-    public org.junit.rules.TemporaryFolder folder = new TemporaryFolder();
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     FileSystemServerDeployer deployer;
 
     @Before
     public void before() throws Throwable {
-        spaceRoot = folder.newFolder("space");
+        spaceRoot = tmpFolder.newFolder("space");
         spaceRootUser = new File(spaceRoot, "demo");
         spaceRootUser.mkdirs();
         deployer = new FileSystemServerDeployer(spaceRoot.getAbsolutePath(), false);
@@ -89,23 +89,22 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends RMFunction
         String newContent = propContent.replace("$$TOREPLACE$$", deployer.getVFSRootURL());
         FileUtils.writeStringToFile(propertiesfile, newContent);
 
-        SchedulerTHelper.startScheduler(true, propertiesfile.getAbsolutePath());
-
+        schedulerHelper.startScheduler(propertiesfile.getAbsolutePath());
     }
 
     @Test
     public void run() throws Throwable {
 
-        SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+        schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
 
         File lastoutputFile = new File(spaceRootUser, "myfileout4");
-        Assert.assertTrue(lastoutputFile + " exists", lastoutputFile.exists());
+        assertTrue(lastoutputFile + " exists", lastoutputFile.exists());
     }
 
     @After
     public void after() throws Throwable {
-        SchedulerTHelper.killScheduler();
+        schedulerHelper.killScheduler();
         if (deployer != null) {
             deployer.terminate();
         }

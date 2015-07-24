@@ -46,14 +46,14 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
-import functionaltests.RMTHelper.Users;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
-public class AuthenticationTest extends RMConsecutive {
+public class AuthenticationTest extends RMFunctionalTest {
 
     @Test
     public void loginScenarios() throws Exception {
@@ -68,68 +68,68 @@ public class AuthenticationTest extends RMConsecutive {
     }
 
     private void loginAsAdmin(RMAuthentication auth) throws LoginException, KeyException {
-        RMTHelper.log("Test 1");
-        RMTHelper.log("Trying to authorized with correct admin name and password");
+        log("Test 1");
+        log("Trying to authorized with correct admin name and password");
 
-        Credentials cred = Credentials.createCredentials(new CredData(Users.DEMO_PASSWORD,
-            Users.DEMO_PASSWORD), auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(TestUsers.DEMO.username,
+            TestUsers.DEMO.password), auth.getPublicKey());
         ResourceManager admin = auth.login(cred);
         admin.disconnect().getBooleanValue();
-        RMTHelper.log("Passed: successful authentication");
+        log("Passed: successful authentication");
     }
 
     private void loginAsUser(RMAuthentication auth) throws LoginException, KeyException {
-        RMTHelper.log("Test 2");
-        RMTHelper.log("Trying to authorized with correct user name and password");
+        log("Test 2");
+        log("Trying to authorized with correct user name and password");
 
-        Credentials cred = Credentials.createCredentials(new CredData(Users.USER_USERNAME,
-            Users.USER_PASSWORD), auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(TestUsers.USER.username,
+            TestUsers.USER.password), auth.getPublicKey());
         ResourceManager user = auth.login(cred);
         user.disconnect().getBooleanValue();
-        RMTHelper.log("Passed: successful authentication");
+        log("Passed: successful authentication");
     }
 
     private void loginIncorrectAdminPassword(RMAuthentication auth) throws KeyException {
         // negative
-        RMTHelper.log("Test 3");
-        RMTHelper.log("Trying to authorized with incorrect user name and password");
+        log("Test 3");
+        log("Trying to authorized with incorrect user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(Users.DEMO_USERNAME, "b"),
+            Credentials cred = Credentials.createCredentials(new CredData(TestUsers.DEMO.username, "b"),
                     auth.getPublicKey());
             auth.login(cred);
             fail("Error: successful authentication");
         } catch (LoginException e) {
-            RMTHelper.log("Passed: expected error " + e.getMessage());
+            log("Passed: expected error " + e.getMessage());
         }
     }
 
     private void loginIncorrectUserPassword(RMAuthentication auth) throws KeyException {
-        RMTHelper.log("Test 4");
-        RMTHelper.log("Trying to authorized with incorrect user name and password");
+        log("Test 4");
+        log("Trying to authorized with incorrect user name and password");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(Users.USER_USERNAME, "b"),
+            Credentials cred = Credentials.createCredentials(new CredData(TestUsers.USER.username, "b"),
                     auth.getPublicKey());
             auth.login(cred);
             fail("Error: successful authentication");
         } catch (LoginException e) {
-            RMTHelper.log("Passed: expected error " + e.getMessage());
+            log("Passed: expected error " + e.getMessage());
         }
     }
 
     private void loginTwice(RMAuthentication auth) throws KeyException {
-        RMTHelper.log("Test 5");
-        RMTHelper.log("Trying to connect twice from one active object");
+        log("Test 5");
+        log("Trying to connect twice from one active object");
 
         try {
-            Credentials cred = Credentials.createCredentials(new CredData(Users.DEMO_USERNAME,
-                Users.DEMO_PASSWORD), auth.getPublicKey());
+            Credentials cred = Credentials.createCredentials(new CredData(TestUsers.DEMO.username,
+                TestUsers.DEMO.password), auth.getPublicKey());
             auth.login(cred);
             auth.login(cred);
             fail("Error: second authentication was successful");
         } catch (LoginException e) {
-            RMTHelper.log("Passed: expected error " + e.getMessage());
+            log("Passed: expected error " + e.getMessage());
         }
     }
 }

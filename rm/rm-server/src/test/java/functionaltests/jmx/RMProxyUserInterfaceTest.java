@@ -45,13 +45,14 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.util.RMListenerProxy;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
 
 import static org.junit.Assert.*;
 
 
-public class RMProxyUserInterfaceTest extends RMConsecutive {
+public class RMProxyUserInterfaceTest extends RMFunctionalTest {
 
     private static final String EXISTING_OBJECT_NAME = "java.lang:type=Runtime";
 
@@ -92,7 +93,7 @@ public class RMProxyUserInterfaceTest extends RMConsecutive {
         final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(
-          RMTHelper.Users.TEST_USERNAME, RMTHelper.Users.TEST_PASSWORD), pubKey);
+          TestUsers.TEST.username, TestUsers.TEST.password), pubKey);
         proxyUserInterface.init(RMTHelper.getLocalUrl(), adminCreds);
         return proxyUserInterface;
     }

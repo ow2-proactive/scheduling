@@ -43,12 +43,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
-import functionaltests.TestNode;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestNode;
+import functionaltests.utils.TestUsers;
 
 import static org.junit.Assert.*;
 
@@ -73,14 +73,14 @@ import static org.junit.Assert.*;
  *  admin and nsadmin are in the same group ("nsadmins")
  *
  */
-public class TestNSProviderPermissions extends RMConsecutive {
+public class TestNSProviderPermissions extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
         String nsName = "ns";
         RMTHelper.log("Test1 - node providers = ME");
 
-        ResourceManager nsadmin = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        ResourceManager nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ME" });
 
@@ -94,7 +94,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
 
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
-        ResourceManager user = rmHelper.getResourceManager(null, "radmin", "pwd");
+        ResourceManager user = rmHelper.getResourceManager(TestUsers.RADMIN);
         try {
             // user does not allow to add nodes
             user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -110,7 +110,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         }
 
         // AllPermission user
-        ResourceManager admin = rmHelper.getResourceManager(null, "admin", "admin");
+        ResourceManager admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         // user does not allow to add nodes
         admin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -135,12 +135,12 @@ public class TestNSProviderPermissions extends RMConsecutive {
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
-        nsadmin = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         // nsadmin is in the same group as admin
         nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
-        user = rmHelper.getResourceManager(null, "radmin", "pwd");
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
         try {
             // user does not allow to add nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -155,7 +155,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         } catch (Exception expected) {
         }
 
-        nsadmin = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         try {
             // nsadmin cannot remove foreign node
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -168,7 +168,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         nsadmin.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
-        admin = rmHelper.getResourceManager(null, "admin", "admin");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         // admin can remove foreign node
         admin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
@@ -176,7 +176,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test3 - node providers = ALL");
-        nsadmin = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
@@ -187,7 +187,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
-        user = rmHelper.getResourceManager(null, "radmin", "pwd");
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
         // user can add new nodes
         user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -204,13 +204,13 @@ public class TestNSProviderPermissions extends RMConsecutive {
         user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
-        nsadmin = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         // nsadmin can remove node3 as ns admin
         nsadmin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
         RMTHelper.log("Test4 - admin priveleges");
-        admin = rmHelper.getResourceManager(null, "admin", "admin");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         // admin can remove anything
         admin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
@@ -227,7 +227,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         node3 = nodePool.remove(0).getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        nsadmin = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -236,7 +236,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         }
         nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        user = rmHelper.getResourceManager(null, "radmin", "pwd");
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
         try {
             // user cannot add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -250,7 +250,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         } catch (Exception expected) {
         }
 
-        admin = rmHelper.getResourceManager(null, "admin", "admin");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         try {
             // user does not allow to remove nodes
             admin.removeNodeSource(nsName, true).getBooleanValue();
@@ -271,7 +271,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         node3 = nodePool.remove(0).getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        nsadmin = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -280,7 +280,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         }
         nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        user = rmHelper.getResourceManager(null, "radmin", "pwd");
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
         try {
             // user cannot add new nodes
             user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -294,7 +294,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         } catch (Exception expected) {
         }
 
-        admin = rmHelper.getResourceManager(null, "admin", "admin");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         // user does not allow to remove nodes
         admin.removeNodeSource(nsName, true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
@@ -311,7 +311,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         node3 = nodePool.remove(0).getNode();
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        nsadmin = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         try {
             // nsadmin cannot remove node as he is not a node owner
             nsadmin.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
@@ -320,7 +320,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         }
         nsadmin.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        user = rmHelper.getResourceManager(null, "radmin", "pwd");
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
         // user can add new nodes
         user.addNode(node3.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -331,7 +331,7 @@ public class TestNSProviderPermissions extends RMConsecutive {
         } catch (Exception expected) {
         }
 
-        admin = rmHelper.getResourceManager(null, "admin", "admin");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         // user does not allow to remove nodes
         admin.removeNodeSource(nsName, true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);

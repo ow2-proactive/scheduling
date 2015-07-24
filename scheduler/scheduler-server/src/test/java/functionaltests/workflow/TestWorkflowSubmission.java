@@ -39,13 +39,13 @@ package functionaltests.workflow;
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.junit.Assert;
+import org.junit.Test;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
+import functionaltests.utils.SchedulerTHelper;
 
 
 /**
@@ -55,7 +55,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowSubmission extends SchedulerConsecutive {
+public class TestWorkflowSubmission extends TRepJobs {
 
     private static final URL jobs_path = TestWorkflowSubmission.class
             .getResource("/functionaltests/workflow/descriptors/");
@@ -64,7 +64,7 @@ public class TestWorkflowSubmission extends SchedulerConsecutive {
 
     private static final int jobs_fail = 44;
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         testFail();
         testValid();
@@ -74,10 +74,9 @@ public class TestWorkflowSubmission extends SchedulerConsecutive {
      * Submits a batch of illegal workflow jobs,
      * checks for failure at the job creation
      * 
-     * @throws Throwable
      */
-    private static void testFail() throws Throwable {
-        Scheduler userInt = SchedulerTHelper.getSchedulerInterface();
+    private void testFail() throws Throwable {
+        Scheduler userInt = schedulerHelper.getSchedulerInterface();
 
         for (int i = 0; i < jobs_fail; i++) {
             String job_path = new File(jobs_path.toURI()).getAbsolutePath() + "/flow_fail_" + (i + 1) +
@@ -102,10 +101,9 @@ public class TestWorkflowSubmission extends SchedulerConsecutive {
      * Submits a batch of valid workflow jobs,
      * checks for success at the job creation
      * 
-     * @throws Throwable
      */
-    private static void testValid() throws Throwable {
-        Scheduler userInt = SchedulerTHelper.getSchedulerInterface();
+    private void testValid() throws Throwable {
+        Scheduler userInt = schedulerHelper.getSchedulerInterface();
 
         for (int i = 0; i < jobs_valid; i++) {
             String job_path = new File(jobs_path.toURI()).getAbsolutePath() + "/flow_valid_" + (i + 1) +

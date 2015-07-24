@@ -54,9 +54,10 @@ import javax.management.remote.JMXServiceURL;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -64,7 +65,7 @@ import static org.junit.Assert.*;
  * Test checks that the correct RMNode monitoring MBeans with certain attributes
  * are exposed.
  */
-public class TestRMNodeMonitoring extends RMConsecutive {
+public class TestRMNodeMonitoring extends RMFunctionalTest {
 
     public static Map<String, String[]> mbeans = new HashMap<>();
 
@@ -121,7 +122,7 @@ public class TestRMNodeMonitoring extends RMConsecutive {
 
     private JMXConnector connectToRMNode(String jmxurl) throws Exception {
         Map<String, Object> env = new HashMap<>();
-        String[] creds = { RM_USER_TEST, RM_PASS_TEST };
+        String[] creds = { TestUsers.ADMIN.username, TestUsers.ADMIN.password };
         env.put(JMXConnector.CREDENTIALS, creds);
         return JMXConnectorFactory.connect(new JMXServiceURL(jmxurl), env);
     }

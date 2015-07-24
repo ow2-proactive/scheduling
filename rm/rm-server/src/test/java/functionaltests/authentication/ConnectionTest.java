@@ -39,11 +39,11 @@ package functionaltests.authentication;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 
-public class ConnectionTest extends RMConsecutive {
+public class ConnectionTest extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

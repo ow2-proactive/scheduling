@@ -46,9 +46,9 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
@@ -68,7 +68,7 @@ import static org.junit.Assert.*;
  *
  * It tests 'node added' event too, during deployment
  */
-public class TestNodesStates extends RMConsecutive {
+public class TestNodesStates extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

@@ -47,9 +47,9 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -66,7 +66,7 @@ import static org.junit.Assert.*;
  * @author ProActice team
  *
  */
-public class SelectionScriptTimeOutTest extends RMConsecutive {
+public class SelectionScriptTimeOutTest extends RMFunctionalTest {
 
     private URL selectionScriptWithtimeOutPath = this.getClass().getResource(
             "selectionScriptWithtimeOut.groovy");

@@ -61,8 +61,9 @@ import org.ow2.proactive.utils.Criteria;
 import org.junit.Assert;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -77,7 +78,7 @@ import functionaltests.RMTHelper;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetDownRemoveTest extends RMConsecutive {
+public final class AddGetDownRemoveTest extends RMFunctionalTest {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -91,12 +92,12 @@ public final class AddGetDownRemoveTest extends RMConsecutive {
         final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(
-          RMTHelper.Users.TEST_USERNAME, RMTHelper.Users.TEST_PASSWORD), pubKey);
+          TestUsers.TEST.username, TestUsers.TEST.password), pubKey);
 
         final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(
             auth.getJMXConnectorURL(JMXTransportProtocol.RMI));
         final HashMap<String, Object> env = new HashMap<>(1);
-        env.put(JMXConnector.CREDENTIALS, new Object[] { RMTHelper.Users.TEST_USERNAME, adminCreds });
+        env.put(JMXConnector.CREDENTIALS, new Object[] { TestUsers.TEST.username, adminCreds });
 
         // Connect to the JMX RMI Connector Server
         final ObjectName myAccountMBeanName = new ObjectName(RMJMXBeans.MYACCOUNT_MBEAN_NAME);

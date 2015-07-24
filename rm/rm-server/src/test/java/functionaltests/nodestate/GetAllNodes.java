@@ -44,8 +44,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
-import functionaltests.RMTHelper;
-import functionaltests.RMTHelper.Users;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
 
 
 public class GetAllNodes {
@@ -53,7 +53,7 @@ public class GetAllNodes {
         RMAuthentication auth;
         try {
             auth = RMConnection.join(RMTHelper.getLocalUrl());
-            Credentials cred = Credentials.createCredentials(new CredData(Users.DEMO_USERNAME, Users.DEMO_PASSWORD), auth
+            Credentials cred = Credentials.createCredentials(new CredData(TestUsers.DEMO.username, TestUsers.DEMO.password), auth
                     .getPublicKey());
             ResourceManager rm = auth.login(cred);
             NodeSet nodes = rm.getNodes(new Criteria(rm.getState().getFreeNodesNumber()));

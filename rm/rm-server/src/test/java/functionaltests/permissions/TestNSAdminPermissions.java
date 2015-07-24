@@ -45,8 +45,9 @@ import org.ow2.proactive.utils.NodeSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
 
 import static org.junit.Assert.fail;
 
@@ -67,12 +68,12 @@ import static org.junit.Assert.fail;
  *  admin and nsadmin are in the same group ("nsadmins")
  *
  */
-public class TestNSAdminPermissions extends RMConsecutive {
+public class TestNSAdminPermissions extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
         String nsName = "ns";
-        ResourceManager adminRMAccess = rmHelper.getResourceManager(null, "admin", "admin");
+        ResourceManager adminRMAccess = rmHelper.getResourceManager(TestUsers.ADMIN);
 
         RMTHelper.log("Test1 - node source removal");
         adminRMAccess.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
@@ -81,7 +82,7 @@ public class TestNSAdminPermissions extends RMConsecutive {
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         // user does not have an access to change the node source
-        ResourceManager userRMAccess = rmHelper.getResourceManager(null, "radmin", "pwd");
+        ResourceManager userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
         try {
             userRMAccess.removeNodeSource(nsName, true).getBooleanValue();
             fail();
@@ -89,26 +90,26 @@ public class TestNSAdminPermissions extends RMConsecutive {
         }
 
         // admin and provider are in "nsadmins" group
-        ResourceManager providerRMAccess = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        ResourceManager providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
         try {
             providerRMAccess.removeNodeSource(nsName, true).getBooleanValue();
             fail();
         } catch (Exception e) {
         }
 
-        adminRMAccess = rmHelper.getResourceManager(null, "admin", "admin");
+        adminRMAccess = rmHelper.getResourceManager(TestUsers.ADMIN);
 
         adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
 
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test2 - ns admin can remove foreign nodes");
-        userRMAccess = rmHelper.getResourceManager(null, "radmin", "pwd");
+        userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
         userRMAccess.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "PROVIDER", "ALL" });
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        providerRMAccess = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
         Node node = rmHelper.createNode("node1").getNode();
 
         // adding the node as provider
@@ -117,13 +118,13 @@ public class TestNSAdminPermissions extends RMConsecutive {
         // node becomes free
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        userRMAccess = rmHelper.getResourceManager(null, "radmin", "pwd");
+        userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
         // this is an administrator of the node source, so it can remove the foreign node
         userRMAccess.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
         RMTHelper.log("Test3 - ns admin cannot get the foreign node");
-        providerRMAccess = rmHelper.getResourceManager(null, "nsadmin", "pwd");
+        providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
         Node node2 = rmHelper.createNode("node2").getNode();
         // adding the node as provider
         providerRMAccess.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -131,14 +132,14 @@ public class TestNSAdminPermissions extends RMConsecutive {
         // node becomes free
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        userRMAccess = rmHelper.getResourceManager(null, "radmin", "pwd");
+        userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
         // this is an administrator of the node source, so it can remove the foreign node
         NodeSet nodes = userRMAccess.getAtMostNodes(1, null);
         Assert.assertEquals("NS admin cannot get nodes as the get level is set to PROVIDER", 0, nodes.size());
 
         RMTHelper.log("Test4 - user with AllPermisssion can remove any node sources");
 
-        adminRMAccess = rmHelper.getResourceManager(null, "admin", "admin");
+        adminRMAccess = rmHelper.getResourceManager(TestUsers.ADMIN);
         adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
 
         RMTHelper.log("Success");

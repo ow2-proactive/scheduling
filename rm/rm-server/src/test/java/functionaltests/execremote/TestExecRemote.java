@@ -59,13 +59,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 import static org.junit.Assert.*;
 
 
-public final class TestExecRemote extends RMConsecutive {
+public final class TestExecRemote extends RMFunctionalTest {
     private static final String simpleScriptContent = "";
     private static final String erroneousSimpleScriptContent = "var a = null; a.toString();";
     private static final String selectionScriptContent = "selected = true; print(selected);";

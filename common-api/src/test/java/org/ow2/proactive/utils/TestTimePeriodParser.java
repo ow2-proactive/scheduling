@@ -1,9 +1,7 @@
 package org.ow2.proactive.utils;
 
-import org.junit.Test;
-import org.ow2.proactive.utils.Tools;
-
 import org.junit.Assert;
+import org.junit.Test;
 
 
 public class TestTimePeriodParser {

@@ -52,9 +52,11 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.junit.Assert;
+import org.junit.Test;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
+import functionaltests.utils.SchedulerFunctionalTest;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -64,7 +66,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
+public class TestWorkflowIterationAwareness extends SchedulerFunctionalTest {
 
     private static final URL java_job = TestWorkflowIterationAwareness.class
             .getResource("/functionaltests/workflow/descriptors/flow_it_1.xml");
@@ -89,7 +91,7 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
      * 
      * @throws Throwable
      */
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
         testJavaJob();
         testNativeJob();
@@ -98,16 +100,16 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
     /**
      * java task through xml
      */
-    private static void testJavaJob() throws Throwable {
+    private void testJavaJob() throws Throwable {
 
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(java_job.toURI()).getAbsolutePath());
         ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
         ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
 
-        JobId id = TWorkflowJobs.testJobSubmission(job, null);
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
+        JobId id = TWorkflowJobs.testJobSubmission(schedulerHelper, job, null);
+        JobResult res = schedulerHelper.getJobResult(id);
+        Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
         int n = 4;
         for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
@@ -125,15 +127,15 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 checkResult(result.getValue().toString(), "T1#1*1", "1", "1");
             }
         }
-        Assert.assertTrue("Expected 4 tasks, misses " + n, n == 0);
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
+        assertTrue("Expected 4 tasks, misses " + n, n == 0);
+        schedulerHelper.removeJob(id);
+        schedulerHelper.waitForEventJobRemoved(id);
     }
 
     /**
      * native task through xml
      */
-    private static void testNativeJob() throws Throwable {
+    private void testNativeJob() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(native_job.toURI()).getAbsolutePath());
         switch (OperatingSystem.getOperatingSystem()) {
@@ -146,16 +148,16 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 ((NativeTask) job.getTask("T1")).setCommandLine(tab);
                 break;
             case unix:
-                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
-                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
+                job.getTask("T1").setPreScript(new SimpleScript(preScript, "groovy"));
+                job.getTask("T1").setPostScript(new SimpleScript(postScript, "groovy"));
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }
 
-        JobId id = TWorkflowJobs.testJobSubmission(job, null);
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
+        JobId id = TWorkflowJobs.testJobSubmission(schedulerHelper, job, null);
+        JobResult res = schedulerHelper.getJobResult(id);
+        Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
         int n = 4;
         for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
@@ -203,10 +205,10 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 f.delete();
             }
         }
-        Assert.assertTrue("Expected 4 tasks, misses " + n, n == 0);
+        assertTrue("Expected 4 tasks, misses " + n, n == 0);
 
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
+        schedulerHelper.removeJob(id);
+        schedulerHelper.waitForEventJobRemoved(id);
     }
 
     private static void checkResult(String res, String name, String it, String dup) throws Throwable {
@@ -243,8 +245,8 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 throw new IllegalStateException("Operating system not supported");
         }
 
-        Assert.assertTrue("Could not find PRE file: " + pre.getAbsolutePath(), pre.exists());
-        Assert.assertTrue("Could not find POST file: " + post.getAbsolutePath(), post.exists());
+        assertTrue("Could not find PRE file: " + pre.getAbsolutePath(), pre.exists());
+        assertTrue("Could not find POST file: " + post.getAbsolutePath(), post.exists());
         pre.delete();
         post.delete();
     }

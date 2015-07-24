@@ -61,8 +61,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.junit.Assert;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper.Users;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -77,7 +77,7 @@ import functionaltests.RMTHelper.Users;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetReleaseRemoveTest extends RMConsecutive {
+public final class AddGetReleaseRemoveTest extends RMFunctionalTest {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -87,8 +87,8 @@ public final class AddGetReleaseRemoveTest extends RMConsecutive {
 
         final ResourceManager r = rmHelper.getResourceManager();
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = Users.TEST_USERNAME;
-        final String adminPassword = Users.TEST_PASSWORD;
+        final String adminLogin = TestUsers.TEST.username;
+        final String adminPassword = TestUsers.TEST.password;
 
         // All accounting values are checked through JMX
         final RMAuthentication auth = rmHelper.getRMAuth();
@@ -156,9 +156,5 @@ public final class AddGetReleaseRemoveTest extends RMConsecutive {
             getReleaseMaxDuration + ")", (usedNodeTime <= getReleaseMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
                 (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
-        if (!shouldBeExecutedInConsecutiveMode(this.getClass())) {
-            // in consecutive mode if user already provided this node before this value does not change
-            Assert.assertEquals("Invalid value of the providedNodesCount attribute", 1, providedNodesCount);
-        }
     }
 }

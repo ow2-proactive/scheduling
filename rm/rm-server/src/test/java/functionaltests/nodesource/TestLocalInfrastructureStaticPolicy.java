@@ -49,10 +49,10 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -62,7 +62,7 @@ import static org.junit.Assert.*;
  * and static acquisition policy.
  *
  */
-public class TestLocalInfrastructureStaticPolicy extends RMConsecutive {
+public class TestLocalInfrastructureStaticPolicy extends RMFunctionalTest {
 
     protected int defaultDescriptorNodesNb = 2;
 
@@ -71,7 +71,7 @@ public class TestLocalInfrastructureStaticPolicy extends RMConsecutive {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rmHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { creds, 0, RMTHelper.defaultNodesTimeout, "" }, StaticPolicy.class.getName(),
+                new Object[] { creds, 0, RMTHelper.DEFAULT_NODES_TIMEOUT, "" }, StaticPolicy.class.getName(),
                 null);
 
         rmHelper.waitForNodeSourceCreation(sourceName);
@@ -83,7 +83,7 @@ public class TestLocalInfrastructureStaticPolicy extends RMConsecutive {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rmHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout, "" },
+                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                 StaticPolicy.class.getName(), null);
 
         rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);

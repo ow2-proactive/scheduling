@@ -40,10 +40,10 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.junit.Test;
 
-import functionaltests.RMFunctionalTest;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -51,6 +51,8 @@ public class ConnectionTest2 extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
+        rmHelper.killRM();
+
         log("Test 1");
         log("Connecting to non existing resource manager with join");
         try {

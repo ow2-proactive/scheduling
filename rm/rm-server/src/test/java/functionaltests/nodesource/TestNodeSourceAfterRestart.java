@@ -46,11 +46,11 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import org.junit.Assert;
 import org.junit.Test;
 
-import functionaltests.RMFunctionalTest;
-import functionaltests.RMTHelper;
-import functionaltests.common.CommonTUtils;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.CommonTUtils;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 
 
 public class TestNodeSourceAfterRestart extends RMFunctionalTest {
@@ -62,7 +62,7 @@ public class TestNodeSourceAfterRestart extends RMFunctionalTest {
         rmHelper.getResourceManager().createNodeSource(
                 sourceName,
                 LocalInfrastructure.class.getName(),
-                new Object[] { creds, 1, RMTHelper.defaultNodesTimeout,
+                new Object[] { creds, 1, RMTHelper.DEFAULT_NODES_TIMEOUT,
                         "" },
                 //first parameter is empty rmHelper url
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" });
@@ -72,7 +72,7 @@ public class TestNodeSourceAfterRestart extends RMFunctionalTest {
     private void startRMPreservingDB() throws Exception {
         String rmconf = new File(RMTHelper.class.getResource("/functionaltests/config/rm-with-db.ini")
                 .toURI()).getAbsolutePath();
-        rmHelper.startRM(rmconf, RMTHelper.PA_PNP_PORT);
+        rmHelper.startRM(rmconf);
         rmHelper.getResourceManager();
     }
 

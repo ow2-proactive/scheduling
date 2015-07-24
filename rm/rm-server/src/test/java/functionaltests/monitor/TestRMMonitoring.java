@@ -45,9 +45,9 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
 
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -57,11 +57,11 @@ import static org.junit.Assert.*;
  * only events of this type.
  *
  */
-public class TestRMMonitoring extends RMConsecutive {
+public class TestRMMonitoring extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
-        RMTHelper.log("Deployment");
+        log("Deployment");
 
         ResourceManager resourceManager = rmHelper.getResourceManager();
         rmHelper.createNodeSource("TestRMMonitoring");
@@ -69,7 +69,7 @@ public class TestRMMonitoring extends RMConsecutive {
         Set<String> nodesUrls = rmHelper.listAliveNodesUrls();
 
         // we received all event as we are here
-        RMTHelper.log("Test 1 - subscribing only to 'node remove' event");
+        log("Test 1 - subscribing only to 'node remove' event");
         resourceManager.getMonitoring().removeRMEventListener();
         resourceManager.getMonitoring().addRMEventListener(rmHelper.getEventReceiver(), RMEventType.NODE_REMOVED);
 
@@ -77,18 +77,18 @@ public class TestRMMonitoring extends RMConsecutive {
         BooleanWrapper status = resourceManager.removeNode(url, true);
         if (status.getBooleanValue()) {
             rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED, 10000);
-            RMTHelper.log("Test 1 - success");
+            log("Test 1 - success");
         }
 
         NodeSet ns = resourceManager.getAtMostNodes(5, null);
-        RMTHelper.log("Got " + ns.size() + " nodes");
+        log("Got " + ns.size() + " nodes");
 
         // must not receive "node busy" event
         try {
             rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 2000);
             fail("Must not receive this type of event");
         } catch (ProActiveTimeoutException ex) {
-            RMTHelper.log("Test 2 - success");
+            log("Test 2 - success");
         }
 
         resourceManager.releaseNodes(ns).getBooleanValue();

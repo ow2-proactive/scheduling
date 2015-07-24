@@ -52,11 +52,11 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -67,7 +67,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class NonBlockingCoreTest extends RMConsecutive {
+public class NonBlockingCoreTest extends RMFunctionalTest {
 
     private URL selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class
             .getResource("selectionScriptWithtimeOut.groovy");
@@ -91,8 +91,8 @@ public class NonBlockingCoreTest extends RMConsecutive {
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
         final RMAuthentication auth = rmHelper.getRMAuth();
 
-        final Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.Users.TEST_USERNAME,
-            RMTHelper.Users.TEST_PASSWORD), auth.getPublicKey());
+        final Credentials cred = Credentials.createCredentials(new CredData(TestUsers.TEST.username,
+            TestUsers.TEST.password), auth.getPublicKey());
 
         // cannot connect twice from the same active object
         // so creating another thread

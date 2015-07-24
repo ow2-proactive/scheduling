@@ -48,10 +48,9 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMFunctionalTest;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -66,7 +65,7 @@ public class UnauthorizedSelectionScriptTest extends RMFunctionalTest {
         String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
                 "/functionaltests/config/rm-authorized-selection-script.ini").getFile())).getAbsolutePath();
 
-        rmHelper.startRM(rmconf, RMTHelper.PA_PNP_PORT);
+        rmHelper.startRM(rmconf);
         ResourceManager rm = this.rmHelper.getResourceManager();
 
         this.rmHelper.createNodeSource("Dummy", 1);
@@ -86,7 +85,7 @@ public class UnauthorizedSelectionScriptTest extends RMFunctionalTest {
             log("Test 1 - passed");
         }
 
-        log("Test 2 - autorized script");
+        log("Test 2 - authorized script");
 
         String authorizedScriptPath = PAResourceManagerProperties.RM_HOME.getValueAsString() +
             "/samples/scripts/selection/checkPhysicalFreeMem.js";

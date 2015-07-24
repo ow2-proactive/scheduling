@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -61,9 +60,13 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.junit.Assert;
+import org.junit.Before;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
+
+import static functionaltests.utils.SchedulerTHelper.log;
 
 
 /**
@@ -72,7 +75,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public abstract class TWorkflowJobs extends SchedulerConsecutive {
+public abstract class TWorkflowJobs extends SchedulerFunctionalTest {
 
     protected final String jobSuffix = ".xml";
 
@@ -96,6 +99,12 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
      */
     public abstract String getJobPrefix();
 
+    @Before
+    public void startScheduleCustomConfigIfNeeded() throws Exception {
+        schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+
+    }
     /**
      * For each job described in {@link #jobs}, submit the job,
      * wait for finished state, and compare expected result for each task with the actual result
@@ -149,7 +158,7 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
 
             String path = new File(TWorkflowJobs.class.getResource(getJobPrefix() + (i + 1) + jobSuffix)
                     .toURI()).getAbsolutePath();
-            SchedulerTHelper.log("Testing job: " + path);
+            log("Testing job: " + path);
             testJob(path, tasks, dependences);
         }
     }
@@ -164,17 +173,17 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
      * @return
      * @throws Exception
      */
-    public static JobId testJobSubmission(Job jobToSubmit, List<String> skip) throws Exception {
-        JobId id = SchedulerTHelper.submitJob(jobToSubmit);
+    public static JobId testJobSubmission(SchedulerTHelper schedulerHelper, Job jobToSubmit, List<String> skip) throws Exception {
+        JobId id = schedulerHelper.submitJob(jobToSubmit);
 
-        SchedulerTHelper.log("Job submitted, id " + id.toString());
+        log("Job submitted, id " + id.toString());
 
-        SchedulerTHelper.log("Waiting for jobSubmitted");
-        JobState receivedstate = SchedulerTHelper.waitForEventJobSubmitted(id);
+        log("Waiting for jobSubmitted");
+        JobState receivedstate = schedulerHelper.waitForEventJobSubmitted(id);
         Assert.assertEquals(id, receivedstate.getId());
 
-        SchedulerTHelper.log("Waiting for job running");
-        JobInfo jInfo = SchedulerTHelper.waitForEventJobRunning(id);
+        log("Waiting for job running");
+        JobInfo jInfo = schedulerHelper.waitForEventJobRunning(id);
 
         Assert.assertEquals(jInfo.getJobId(), id);
         Assert.assertEquals(JobStatus.RUNNING, jInfo.getStatus());
@@ -184,7 +193,7 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
                 if (skip != null && skip.contains(t.getName())) {
                     continue;
                 }
-                TaskInfo ti = SchedulerTHelper.waitForEventTaskRunning(id, t.getName());
+                TaskInfo ti = schedulerHelper.waitForEventTaskRunning(id, t.getName());
                 Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
                 Assert.assertEquals(TaskStatus.RUNNING, ti.getStatus());
             }
@@ -192,17 +201,17 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
                 if (skip != null && skip.contains(t.getName())) {
                     continue;
                 }
-                TaskInfo ti = SchedulerTHelper.waitForEventTaskFinished(id, t.getName());
+                TaskInfo ti = schedulerHelper.waitForEventTaskFinished(id, t.getName());
                 Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
                 Assert.assertTrue(TaskStatus.FINISHED.equals(ti.getStatus()));
             }
         }
 
-        SchedulerTHelper.log("Waiting for job finished");
-        jInfo = SchedulerTHelper.waitForEventJobFinished(id);
+        log("Waiting for job finished");
+        jInfo = schedulerHelper.waitForEventJobFinished(id);
         Assert.assertEquals(JobStatus.FINISHED, jInfo.getStatus());
 
-        SchedulerTHelper.log("Job finished");
+        log("Job finished");
         return id;
     }
 
@@ -223,8 +232,8 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
     public void testJob(String jobPath, Map<String, Long> expectedResults,
             Map<String, Set<String>> expectedDependences) throws Throwable {
 
-        SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
-          "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+        schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
         List<String> skip = new ArrayList<>();
         for (Entry<String, Long> er : expectedResults.entrySet()) {
@@ -233,18 +242,18 @@ public abstract class TWorkflowJobs extends SchedulerConsecutive {
             }
         }
         Job jobToTest = JobFactory.getFactory().createJob(jobPath);
-        JobId id = testJobSubmission(jobToTest, skip);
+        JobId id = testJobSubmission(schedulerHelper, jobToTest, skip);
 
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
+        JobResult res = schedulerHelper.getJobResult(id);
+        Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
         compareResults(jobPath, expectedResults, res);
 
-        JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+        JobState js = schedulerHelper.getSchedulerInterface().getJobState(id);
         compareDependences(js, expectedDependences);
 
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
+        schedulerHelper.removeJob(id);
+        schedulerHelper.waitForEventJobRemoved(id);
     }
 
     public void compareResults(String prefix, Map<String, Long> expectedResults, JobResult jobResult)

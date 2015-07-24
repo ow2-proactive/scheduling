@@ -66,13 +66,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 import static org.junit.Assert.*;
 
 
-public class TestSSHInfrastructureV2 extends RMConsecutive {
+public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

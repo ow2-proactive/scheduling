@@ -45,7 +45,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMTHelper;
 
 
 public class RMMonitorsHandler {

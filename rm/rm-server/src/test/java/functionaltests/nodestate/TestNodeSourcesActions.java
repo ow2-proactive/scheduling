@@ -51,8 +51,8 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 import static org.junit.Assert.*;
 
@@ -71,7 +71,7 @@ import static org.junit.Assert.*;
  *
  * @author ProActive team
  */
-public class TestNodeSourcesActions extends RMConsecutive {
+public class TestNodeSourcesActions extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
@@ -87,7 +87,7 @@ public class TestNodeSourcesActions extends RMConsecutive {
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
 
         resourceManager.createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(), new Object[] {
-                creds, nodeNumber, RMTHelper.defaultNodesTimeout, "" }, StaticPolicy.class.getName(), null);
+                creds, nodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT, "" }, StaticPolicy.class.getName(), null);
 
         //wait for creation of GCM Node Source event, and deployment of its nodes
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);

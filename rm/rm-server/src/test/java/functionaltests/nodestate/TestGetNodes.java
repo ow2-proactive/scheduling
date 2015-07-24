@@ -45,9 +45,9 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -56,7 +56,7 @@ import static org.junit.Assert.*;
  * in best effort mode and in strict mode 
  * 
  */
-public class TestGetNodes extends RMConsecutive {
+public class TestGetNodes extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

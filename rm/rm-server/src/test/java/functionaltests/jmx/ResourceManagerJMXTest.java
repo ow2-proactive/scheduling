@@ -65,9 +65,9 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
-import functionaltests.RMTHelper.Users;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
 
 import static org.junit.Assert.*;
 
@@ -79,14 +79,14 @@ import static org.junit.Assert.*;
  * 
  * @author ProActive team
  */
-public final class ResourceManagerJMXTest extends RMConsecutive {
+public final class ResourceManagerJMXTest extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
         final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
-        final Credentials adminCreds = Credentials.createCredentials(new CredData(Users.TEST_USERNAME,
-            Users.TEST_PASSWORD), pubKey);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(TestUsers.TEST.username,
+            TestUsers.TEST.password), pubKey);
 
         final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(
             auth.getJMXConnectorURL(JMXTransportProtocol.RMI));
@@ -134,7 +134,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         RMTHelper.log("Test as admin 1, auth with login/creds over RO and check connection");
         // Create the environment
         final HashMap<String, Object> env = new HashMap<>(1);
-        env.put(JMXConnector.CREDENTIALS, new Object[] { Users.TEST_USERNAME, adminCreds });
+        env.put(JMXConnector.CREDENTIALS, new Object[] { TestUsers.TEST.username, adminCreds });
         env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, JMXProviderUtils.RO_PROVIDER_PKGS);
         // Connect to the JMX RO Connector Server
         final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRoServiceURL, env);
@@ -159,7 +159,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         RMTHelper.log("Test as admin 4 - Check AllAccountsMBean Username attribute");
         final String username = "Username";
         try {
-            conn.setAttribute(allAccountsMBeanName, new Attribute(username, Users.TEST_USERNAME));
+            conn.setAttribute(allAccountsMBeanName, new Attribute(username, TestUsers.TEST.username));
         } catch (Exception e) {
             fail("Setting Username attribute of the AllAccountsMBean must not throw " + e);
         }
@@ -171,7 +171,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         }
 
         assertTrue("The attribute " + username + " of returns incorrect value",
-                res.equals(Users.TEST_USERNAME));
+                res.equals(TestUsers.TEST.username));
 
         jmxConnector.close();
     }
@@ -224,7 +224,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         RMTHelper.log("Test as user 1 - Auth with login/pass over RMI and check connection");
         // Create the environment
         final HashMap<String, Object> env = new HashMap<>(1);
-        env.put(JMXConnector.CREDENTIALS, new Object[] { Users.DEMO_USERNAME, Users.DEMO_USERNAME });
+        env.put(JMXConnector.CREDENTIALS, new Object[] { TestUsers.DEMO.username, TestUsers.DEMO.password });
         // Connect to the JMX RMI Connector Server
         final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
@@ -308,7 +308,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
         // Test simultaneous RMI and RO connections
         RMTHelper.log("Test simultaneous JMX-RMI and JMX-RO connections as admin");
         final HashMap<String, Object> env = new HashMap<>(1);
-        env.put(JMXConnector.CREDENTIALS, new Object[] { Users.TEST_USERNAME, adminCreds });
+        env.put(JMXConnector.CREDENTIALS, new Object[] { TestUsers.TEST.username, adminCreds });
         // Connect to the JMX-RMI Connector Server
         final JMXConnector jmxRmiConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
         final MBeanServerConnection conRmi = jmxRmiConnector.getMBeanServerConnection();
@@ -342,7 +342,7 @@ public final class ResourceManagerJMXTest extends RMConsecutive {
     private void jmxClientHelper(RMAuthentication auth, Credentials adminCreds) throws IOException {
         // Test Helper class
         RMTHelper.log("Test JMXClientHelper as admin over RMI with connect() method");
-        final JMXClientHelper client = new JMXClientHelper(auth, new Object[] { Users.TEST_USERNAME,
+        final JMXClientHelper client = new JMXClientHelper(auth, new Object[] { TestUsers.TEST.username,
                 adminCreds });
         final boolean isConnected1 = client.connect(); // default is over
         // RMI

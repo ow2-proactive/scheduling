@@ -36,7 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.frontend.topology.clustering;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 import java.net.InetAddress;

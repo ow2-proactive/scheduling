@@ -52,9 +52,9 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -74,7 +74,7 @@ import static org.junit.Assert.*;
  * As a result second node should be selected.
  *
  */
-public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
+public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 

@@ -46,9 +46,9 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -70,7 +70,7 @@ import static org.junit.Assert.*;
  *
  * @author ProActive team
  */
-public class TestPreemptiveRemoval extends RMConsecutive {
+public class TestPreemptiveRemoval extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

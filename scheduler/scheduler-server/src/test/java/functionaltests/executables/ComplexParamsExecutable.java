@@ -42,7 +42,7 @@ import java.util.Map;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
-import functionaltests.ComplexTypeArgsTest.UserTypeA;
+import functionaltests.workflow.javatask.ComplexTypeArgsTest.UserTypeA;
 
 
 public class ComplexParamsExecutable extends JavaExecutable {

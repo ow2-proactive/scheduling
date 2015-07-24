@@ -51,10 +51,10 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.TestNode;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestNode;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -77,7 +77,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class TestAdminAddingNodes extends RMConsecutive {
+public class TestAdminAddingNodes extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

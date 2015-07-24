@@ -111,14 +111,9 @@ configure(javaSubprojects) {
 
 def functionalTestConfiguration = {
 
-    //forkEvery 1
     include 'functionaltests/**'
-    include 'unittests/**'
-    include 'unitTests/**'
-    systemProperties << ['url': System.getProperty("url")]
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
-    systemProperties << ['pa.tests.consecutive': System.getProperty("os.name").toLowerCase().indexOf('win') != -1 ? 'false' : 'true']
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
     systemProperties << ['java.library.path': project.nativeLibsDir]
@@ -131,7 +126,6 @@ def functionalTestConfiguration = {
     }
 
     def clean = {
-        logger.lifecycle("Killing all proactive processes")
         project.javaexec {
             main = "org.ow2.tests.ProcessCleaner"
             classpath = project.sourceSets.test.runtimeClasspath

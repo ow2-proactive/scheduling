@@ -47,9 +47,9 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
+import functionaltests.utils.RMFunctionalTest;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
 
 
@@ -61,7 +61,7 @@ import static org.junit.Assert.*;
  * Unlock changes node states to "free".
  *
  */
-public class TestLockNodes extends RMConsecutive {
+public class TestLockNodes extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

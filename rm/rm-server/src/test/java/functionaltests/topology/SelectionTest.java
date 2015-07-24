@@ -59,8 +59,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 
 /**
@@ -80,7 +80,7 @@ import functionaltests.RMTHelper;
  */
 //build -DdistantHost="bound.inria.fr" -DneighborHost="eon1.inria.fr" -Dtest="**/*SelectionTest*" junit.rmHelper
 @Ignore("requires several machines")
-public class SelectionTest extends RMConsecutive {
+public class SelectionTest extends RMFunctionalTest {
 
     private String vmPropSelectionScriptpath = this.getClass().getResource(
             "/functionaltests/selectionscript/vmPropertySelectionScript.groovy").getPath();

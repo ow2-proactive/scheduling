@@ -38,7 +38,6 @@ package functionaltests.nodesource;
 
 import java.io.File;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -53,8 +52,8 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 import static org.junit.Assert.*;
 
@@ -64,7 +63,7 @@ import static org.junit.Assert.*;
  * and static acquisition policy.
  *
  */
-public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive {
+public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalTest {
 
     protected int defaultDescriptorNodesNb = 3;
 
@@ -77,8 +76,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
         rmHelper.getResourceManager().createNodeSource(
                 sourceName,
                 LocalInfrastructure.class.getName(),
-                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout,
-                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMTHelper.PA_PNP_PORT },
+                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                 RestartDownNodesPolicy.class.getName(), policyParameters);
 
         rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);

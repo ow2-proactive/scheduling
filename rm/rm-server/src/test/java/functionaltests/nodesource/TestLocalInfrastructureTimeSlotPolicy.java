@@ -45,10 +45,10 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
-import static functionaltests.RMTHelper.log;
+import static functionaltests.utils.RMTHelper.log;
 
 
 /**
@@ -59,7 +59,7 @@ import static functionaltests.RMTHelper.log;
  * This test may failed by timeout if the machine is too slow, so gcm deployment takes more than 15 secs
  *
  */
-public class TestLocalInfrastructureTimeSlotPolicy extends RMConsecutive {
+public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
 
     protected int descriptorNodeNumber = 1;
 
@@ -73,7 +73,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMConsecutive {
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first null parameter is the rmHelper url
         rmHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-                new Object[] { creds, 0, RMTHelper.defaultNodesTimeout, "" }, TimeSlotPolicy.class.getName(),
+                new Object[] { creds, 0, RMTHelper.DEFAULT_NODES_TIMEOUT, "" }, TimeSlotPolicy.class.getName(),
                 getPolicyParams());
 
         rmHelper.waitForNodeSourceCreation(sourceName);
@@ -84,7 +84,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMConsecutive {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rmHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-          new Object[] { creds, descriptorNodeNumber, RMTHelper.defaultNodesTimeout, "" },
+          new Object[] { creds, descriptorNodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
           //first parameter is empty rmHelper url
           TimeSlotPolicy.class.getName(), getPolicyParams());
 
