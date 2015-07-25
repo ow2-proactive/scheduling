@@ -55,17 +55,13 @@ project(':rest:rest-server') {
         output {
             formats {
                 'html' {
-                    hideIssuesTab = true
-                    hideLogoOnTop = true
                     initialCollapseLevel = 2
-                    intro = file('doc_header.html')
-                    location = file("src/main/webapp/doc/")
                 }
             }
             title = 'ProActive Workflows & Scheduling - REST API v' + version
         }
         // expires friday june 16th, 2017
-        licence = 'cHJvamVjdHxvcmcub3cyLnByb2FjdGl2ZV9ncmlkX2Nsb3VkX3BvcnRhbC5yZXN0LXNlcnZlcnwyMDE3LTA2LTE2fHRydWV8LTEjTUMwQ0ZRQ0hRb08zcDNWb080Z05mZkNscnRHZ3IzM09xQUlVZTBCbkYrR2ZKenJzNUtaRFI3dlhoc3hQaDNVPQ=='
+        licence = 'UHJvamVjdHxvcmcub3cyLnByb2FjdGl2ZV9ncmlkX2Nsb3VkX3BvcnRhbC5yZXN0LXNlcnZlcnwyMDE2LTA2LTE3fGZhbHNlI01Dd0NGQmRGVWVDcDBjUEFNRUtHUGQ5Mis2VUhWdCtDQWhSdWpOdE0wcGRxUGdUMVNZdUREZ3lyTEJvb3FBPT0='
         restModel{
             restFramework {
                 name = 'jax-rs'
@@ -141,6 +137,14 @@ project(':rest:rest-server') {
             it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
         }
     }
+
+    task copyMiredotDoc(type: Copy) {
+        from "${buildDir}/miredot"
+        into "$rootDir/dist/war/rest/doc"
+    }
+
+    proActiveWar.finalizedBy(copyMiredotDoc)
+
     clean.dependsOn cleanProActiveWar
 
     rootProject.dist.dependsOn project.proActiveWar
