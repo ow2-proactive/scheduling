@@ -26,7 +26,9 @@ buildscript {
         classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
         classpath 'org.ow2.proactive:gradle-serialver:2.0'
-        classpath 'org.gradle.api.plugins:gradle-format-plugin:1.1'
+        classpath('org.gradle.api.plugins:gradle-format-plugin:1.1') {
+                    exclude group: 'javassist', module: 'javassist'
+        }
     }
 }
 
