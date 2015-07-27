@@ -1,4 +1,4 @@
-package functionaltests.schedulerdb;
+package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import java.util.ArrayList;
 import java.util.Arrays;
