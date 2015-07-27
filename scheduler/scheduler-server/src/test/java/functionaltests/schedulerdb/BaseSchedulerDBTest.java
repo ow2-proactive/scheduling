@@ -412,7 +412,6 @@ public class BaseSchedulerDBTest extends ProActiveTest {
     public InternalJob defaultSubmitJobAndLoadInternal(boolean fullState, TaskFlowJob jobDef, String userName)
             throws Exception {
         InternalJob job = defaultSubmitJob(jobDef, userName);
-        System.out.println("Load internal job");
         return loadInternalJob(fullState, job.getId());
     }
 

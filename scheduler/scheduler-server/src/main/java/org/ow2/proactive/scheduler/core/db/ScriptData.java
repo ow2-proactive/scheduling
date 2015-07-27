@@ -22,7 +22,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Parameter;
@@ -43,8 +42,6 @@ public class ScriptData {
 
     private List<Serializable> scriptParameters;
 
-    private boolean selectionScriptDynamic;
-
     private String flowScriptActionType;
 
     private String flowScriptTarget;
@@ -54,14 +51,6 @@ public class ScriptData {
     private String flowScriptTargetContinuation;
 
     private TaskData taskData;
-
-    static ScriptData createForSelectionScript(SelectionScript script, TaskData taskData) {
-        ScriptData scriptData = new ScriptData();
-        initCommonAttributes(scriptData, script);
-        scriptData.setSelectionScriptDynamic(script.isDynamic());
-        scriptData.setTaskData(taskData);
-        return scriptData;
-    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
@@ -74,19 +63,21 @@ public class ScriptData {
         this.taskData = taskData;
     }
 
-    static ScriptData createForScript(Script<?> script) {
+    static ScriptData createForScript(Script<?> script, TaskData taskData) {
         ScriptData scriptData = new ScriptData();
         initCommonAttributes(scriptData, script);
+        scriptData.setTaskData(taskData);
         return scriptData;
     }
 
-    static ScriptData createForFlowScript(FlowScript script) {
+    static ScriptData createForFlowScript(FlowScript script, TaskData taskData) {
         ScriptData scriptData = new ScriptData();
         initCommonAttributes(scriptData, script);
         scriptData.setFlowScriptActionType(script.getActionType());
         scriptData.setFlowScriptTarget(script.getActionTarget());
         scriptData.setFlowScriptTargetContinuation(script.getActionContinuation());
         scriptData.setFlowScriptTargetElse(script.getActionTargetElse());
+        scriptData.setTaskData(taskData);
         return scriptData;
     }
 
@@ -108,10 +99,6 @@ public class ScriptData {
         } else {
             throw new DatabaseManagerException("Invalid flow script action: " + flowScriptActionType);
         }
-    }
-
-    SelectionScript createSelectionScript() throws InvalidScriptException {
-        return new SelectionScript(getScript(), getScriptEngine(), parameters(), isSelectionScriptDynamic());
     }
 
     SimpleScript createSimpleScript() throws InvalidScriptException {
@@ -173,15 +160,6 @@ public class ScriptData {
 
     public void setScriptParameters(List<Serializable> scriptParameters) {
         this.scriptParameters = scriptParameters;
-    }
-
-    @Column(name = "IS_DYNAMIC")
-    public boolean isSelectionScriptDynamic() {
-        return selectionScriptDynamic;
-    }
-
-    public void setSelectionScriptDynamic(boolean selectionScriptDynamic) {
-        this.selectionScriptDynamic = selectionScriptDynamic;
     }
 
     @Column(name = "FLOW_ACTION_TYPE")

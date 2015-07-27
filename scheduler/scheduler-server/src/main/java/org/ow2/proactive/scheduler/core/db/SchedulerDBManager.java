@@ -44,7 +44,6 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -143,8 +142,8 @@ public class SchedulerDBManager {
             configuration.addAnnotatedClass(JobData.class);
             configuration.addAnnotatedClass(TaskData.class);
             configuration.addAnnotatedClass(TaskResultData.class);
-            configuration.addAnnotatedClass(ScriptTaskData.class);
             configuration.addAnnotatedClass(ScriptData.class);
+            configuration.addAnnotatedClass(SelectionScriptData.class);
             configuration.addAnnotatedClass(EnvironmentModifierData.class);
             configuration.addAnnotatedClass(SelectorData.class);
             configuration.addAnnotatedClass(ThirdPartyCredentialData.class);
@@ -632,14 +631,13 @@ public class SchedulerDBManager {
 
     private void removeJobScripts(Session session, long jobId) {
         session.createQuery(
-                "delete from ScriptData where"
-                    + " id in (select envScript from TaskData td where td.id.jobId = :jobId)"
-                    + " or id in (select preScript from TaskData td where td.id.jobId = :jobId)"
-                    + " or id in (select postScript from TaskData td where td.id.jobId = :jobId)"
-                    + " or id in (select cleanScript from TaskData td where td.id.jobId = :jobId)"
-                    + " or id in (select flowScript from TaskData td where td.id.jobId = :jobId)"
-                    + " or id in (select td.script from ScriptTaskData td where td.taskData.id.jobId = :jobId)"
-                    + " or taskData.id.jobId = :jobId").setParameter("jobId", jobId).executeUpdate();
+                "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null,"
+                    + "cleanScript = null  where id.jobId = :jobId").setParameter("jobId", jobId)
+                .executeUpdate();
+        session.createQuery("delete from ScriptData where taskData.id.jobId = :jobId")
+                .setParameter("jobId", jobId).executeUpdate();
+        session.createQuery("delete from SelectionScriptData where taskData.id.jobId = :jobId")
+                .setParameter("jobId", jobId).executeUpdate();
     }
 
     private void removeJobRuntimeData(Session session, long jobId) {
@@ -647,9 +645,6 @@ public class SchedulerDBManager {
 
         session.createQuery("delete from EnvironmentModifierData where taskData.id.jobId = :jobId").setParameter(
           "jobId", jobId).executeUpdate();
-
-        session.createQuery("delete from ScriptTaskData where taskData.id.jobId = :jobId").setParameter(
-                "jobId", jobId).executeUpdate();
 
         session.createQuery("delete from SelectorData where taskData.id.jobId = :jobId").setParameter(
                 "jobId", jobId).executeUpdate();
@@ -822,7 +817,7 @@ public class SchedulerDBManager {
                 if (loadFullState) {
                     internalTask.setParallelEnvironment(taskData.getParallelEnvironment());
                     internalTask.setGenericInformations(taskData.getGenericInformation());
-                    for (ScriptData scriptData : taskData.getSelectionScripts()) {
+                    for (SelectionScriptData scriptData : taskData.getSelectionScripts()) {
                         internalTask.addSelectionScript(scriptData.createSelectionScript());
                     }
                     if (taskData.getCleanScript() != null) {
@@ -1450,33 +1445,22 @@ public class SchedulerDBManager {
     }
 
     private TaskData saveNewTask(Session session, JobData jobRuntimeData, InternalTask task) {
-        TaskData taskRuntimeData = TaskData.createTaskData(jobRuntimeData, task);
-        session.save(taskRuntimeData);      
-
         // TODO: use double dispatch to prevent branching
-       if (task.getClass().equals(InternalForkedScriptTask.class) || task.getClass().equals(InternalScriptTask.class)) {
-            ScriptExecutableContainer container = (ScriptExecutableContainer) task.getExecutableContainer();
-            ScriptTaskData scriptTaskData = ScriptTaskData.createScriptTaskData(taskRuntimeData, container);
-            session.save(scriptTaskData);
+        if (isScriptTask(task)) {
+            TaskData taskRuntimeData = TaskData.createTaskData(jobRuntimeData, (InternalScriptTask) task);
+            session.save(taskRuntimeData);
+            return taskRuntimeData;
         } else {
             throw new IllegalArgumentException("Unexpected task class: " + task.getClass());
         }
-
-        return taskRuntimeData;
     }
 
     private ExecutableContainer loadExecutableContainer(Session session, InternalTask task) {
         try {
             ExecutableContainer container = null;
 
-            if (task.getClass().equals(InternalForkedScriptTask.class)) {
-                ScriptTaskData taskData = queryScriptTaskData(session, task);
-
-                if (taskData != null) {
-                    container = taskData.createExecutableContainer();
-                }
-            } else if (task.getClass().equals(InternalScriptTask.class)) {
-                ScriptTaskData taskData = queryScriptTaskData(session, task);
+            if (isScriptTask(task)) {
+                TaskData taskData = queryScriptTaskData(session, task);
 
                 if (taskData != null) {
                     container = taskData.createExecutableContainer();
@@ -1495,8 +1479,13 @@ public class SchedulerDBManager {
         }
     }
 
-    private ScriptTaskData queryScriptTaskData(Session session, InternalTask task) {
-        return (ScriptTaskData) session.createQuery("from ScriptTaskData td where td.taskData.id = :taskId")
+    private boolean isScriptTask(InternalTask task) {
+        return task.getClass().equals(InternalForkedScriptTask.class) ||
+            task.getClass().equals(InternalScriptTask.class);
+    }
+
+    private TaskData queryScriptTaskData(Session session, InternalTask task) {
+        return (TaskData) session.createQuery("from TaskData td where td.id = :taskId")
                 .setParameter("taskId", taskId(task)).uniqueResult();
     }
 
