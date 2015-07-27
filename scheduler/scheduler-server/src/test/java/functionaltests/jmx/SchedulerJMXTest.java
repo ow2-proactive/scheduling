@@ -81,6 +81,7 @@ public final class SchedulerJMXTest extends SchedulerFunctionalTest {
 
     @Test
     public void action() throws Exception {
+        schedulerHelper.killScheduler();
 
         final String userLogin = TestUsers.DEMO.username;
         final String userPassword = TestUsers.DEMO.password;

@@ -55,6 +55,7 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTest {
 
     @Test
     public void test() throws Exception {
+        schedulerHelper.killScheduler();
         testAsAdmin();
         testAsUser();
     }
