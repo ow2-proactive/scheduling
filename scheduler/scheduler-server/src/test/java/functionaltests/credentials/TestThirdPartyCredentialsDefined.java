@@ -73,7 +73,7 @@ public class TestThirdPartyCredentialsDefined extends SchedulerFunctionalTest {
 
         TaskResult result = jobResult.getResult(scriptTask.getName());
 
-        return result.getOutput().getStdoutLogs(false).replaceAll("\n", "");
+        return result.getOutput().getStdoutLogs(false).replaceAll("\n|\r", "");
     }
 
 }
