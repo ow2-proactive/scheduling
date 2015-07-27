@@ -36,11 +36,16 @@
  */
 package functionaltests.utils;
 
+import java.util.concurrent.TimeUnit;
+
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.tests.ProActiveTest;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.Timeout;
 
 
 /**
@@ -53,6 +58,10 @@ public class SchedulerFunctionalTest extends ProActiveTest {
     protected static final Logger logger = Logger.getLogger("SchedulerTests");
 
     protected SchedulerTHelper schedulerHelper;
+
+    @Rule
+    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
+      TimeUnit.MILLISECONDS);
 
     @Before
     public void startSchedulerIfNeeded() throws Exception {
