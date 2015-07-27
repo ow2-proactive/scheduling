@@ -36,7 +36,6 @@ package functionaltests.utils;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.KeyException;
 import java.util.ArrayList;
@@ -51,13 +50,11 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.FileUtils;
 
@@ -77,7 +74,7 @@ public class TestScheduler {
         "TEST");
     private SchedulerTestConfiguration startedConfiguration = SchedulerTestConfiguration.defaultConfiguration();
 
-    public synchronized void start(SchedulerTestConfiguration configuration) throws InterruptedException, URISyntaxException, IOException, ConnectionException, RMException, LoginException, KeyException {
+    public synchronized void start(SchedulerTestConfiguration configuration) throws Exception {
         kill();
         cleanTMP();
 
@@ -182,10 +179,11 @@ public class TestScheduler {
         }
     }
 
-    public void kill() throws InterruptedException {
+    public void kill() throws Exception {
         if (schedulerProcess != null) {
             schedulerProcess.destroy();
             schedulerProcess.waitFor();
+            CommonTUtils.cleanupRMActiveObjectRegistry();
             schedulerProcess = null;
         }
     }

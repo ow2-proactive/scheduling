@@ -103,7 +103,6 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
         log("Crashing scheduler before the job can finish");
         schedulerHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
           "/functionaltests/config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
-        schedulerHelper.getSchedulerInterface();
 
         FileUtils.touch(lockFile);
 
@@ -121,7 +120,6 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
         log("Crashing scheduler before the job can start");
         schedulerHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
           "/functionaltests/config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
-        schedulerHelper.getSchedulerInterface();
 
         log("Job should run successfully after restart");
         schedulerHelper.waitForEventJobFinished(jobId);
@@ -141,7 +139,6 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
         log("Task A finished, crashing scheduler...");
         schedulerHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
           "/functionaltests/config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
-        schedulerHelper.getSchedulerInterface();
 
         schedulerHelper.getSchedulerInterface().getJobState(id);
 
@@ -186,7 +183,6 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
         log("Task T1#1 finished, crashing scheduler...");
         schedulerHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
           "/functionaltests/config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
-        schedulerHelper.getSchedulerInterface();
 
         schedulerHelper.waitForEventJobFinished(id);
         log("Job finished: " + path);
@@ -222,7 +218,6 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
         log("Task T1#1 finished, crashing scheduler...");
         schedulerHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
                 "/functionaltests/config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
-        schedulerHelper.getSchedulerInterface();
 
         schedulerHelper.getSchedulerInterface().getJobState(id);
 

@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
-import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -71,8 +70,6 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 
 import functionaltests.monitor.RMMonitorsHandler;
@@ -154,9 +151,7 @@ public class SchedulerTHelper {
     }
 
     private void startScheduler(SchedulerTestConfiguration configuration) throws Exception {
-        if (scheduler.isStartedWithSameConfiguration(configuration)) {
-            // log("Scheduler already started with same configuration, keeping started instance");
-        } else {
+        if (!scheduler.isStartedWithSameConfiguration(configuration)) {
             log("Starting Scheduler");
             scheduler.start(configuration);
         }
@@ -173,14 +168,6 @@ public class SchedulerTHelper {
     }
 
     /**
-     * Kill the forked Scheduler and all nodes.
-     */
-    public void killSchedulerAndNodes() throws Exception {
-        Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
-        killScheduler();
-    }
-
-    /**
      * Restart the scheduler using a forked JVM and all children Nodes.
      * User or administrator interface is not reconnected automatically.
      *
@@ -190,7 +177,7 @@ public class SchedulerTHelper {
      * @throws Exception
      */
     public void killSchedulerAndNodesAndRestart(String configuration) throws Exception {
-        killSchedulerAndNodes();
+        killScheduler();
         startScheduler(configuration);
     }
 
@@ -264,7 +251,7 @@ public class SchedulerTHelper {
             connectedSchedulerUser.connect(scheduler.getAuth());
         }
 
-        if (connectedSchedulerUser.isConnected()) {
+        if (!connectedSchedulerUser.isConnected()) {
             connectedSchedulerUser.connect(scheduler.getAuth());
         }
 
@@ -895,7 +882,10 @@ public class SchedulerTHelper {
     public void removeExtraNodes() {
         // do not start Scheduler if not yet started
         if (connectedRMUser.isConnected()) {
-            connectedRMUser.getResourceManager().removeNodeSource("extra", true).getBooleanValue();
+            try {
+                connectedRMUser.getResourceManager().removeNodeSource("extra", true).getBooleanValue();
+            } catch (Throwable ignored) {
+            }
         }
     }
 }
