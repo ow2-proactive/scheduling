@@ -37,7 +37,6 @@
 package functionaltests.utils;
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -61,15 +60,12 @@ public class CommonTUtils {
             for (URI uri : factory.list(new URI(RMTHelper.getLocalUrl()))) {
                 for (String name : namesToRemove) {
                     if (uri.getPath().endsWith(name)) {
-                        System.out.println("Unregistering object with URI: " + uri);
                         factory.unregister(uri);
                         break;
                     }
                 }
             }
-        } catch (ProActiveException e) {
-            System.err.println("Failed to cleanup active object registry for " +
-                Arrays.toString(namesToRemove));
+        } catch (ProActiveException ignored) {
         }
     }
 
