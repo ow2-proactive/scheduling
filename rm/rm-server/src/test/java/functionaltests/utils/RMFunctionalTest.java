@@ -11,7 +11,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.tests.Consecutive;
 import org.ow2.tests.ProActiveTest;
 import org.ow2.tests.ProcessCleaner;
 import org.apache.log4j.Logger;
@@ -22,7 +21,6 @@ import org.junit.Rule;
 import org.junit.rules.Timeout;
 
 
-@Consecutive
 public class RMFunctionalTest extends ProActiveTest {
 
     static {

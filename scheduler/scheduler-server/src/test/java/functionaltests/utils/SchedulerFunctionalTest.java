@@ -37,7 +37,6 @@
 package functionaltests.utils;
 
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.tests.Consecutive;
 import org.ow2.tests.ProActiveTest;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -49,7 +48,6 @@ import org.junit.Before;
  * The parent class for all consecutive functional tests.
  *
  */
-@Consecutive
 public class SchedulerFunctionalTest extends ProActiveTest {
 
     protected static final Logger logger = Logger.getLogger("SchedulerTests");
