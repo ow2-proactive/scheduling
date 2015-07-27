@@ -61,7 +61,7 @@ public class TestJobMultiNodesWalltime extends SchedulerFunctionalTest {
         //submit job
         JobId id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //connect to RM
-        schedulerHelper.createNodeSource("extra", 3);
+        schedulerHelper.addExtraNodes(3);
 
         //wait job is running
         schedulerHelper.waitForEventJobRunning(id);

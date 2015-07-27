@@ -39,6 +39,8 @@ package functionaltests.rm.nodesource;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.junit.After;
+import org.junit.Before;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -66,10 +68,11 @@ import static org.junit.Assert.*;
 public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTest {
 
     protected int defaultDescriptorNodesNb = 1;
+    private RMTHelper rmHelper;
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
-          .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         schedulerHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
           new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
           ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
@@ -80,21 +83,31 @@ public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTest {
     protected Object[] getPolicyParams() throws Exception {
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(SchedulerTHelper.getLocalUrl());
         Credentials creds = Credentials.createCredentials(
-          new CredData(TestUsers.DEMO.username, TestUsers.DEMO.password), auth.getPublicKey());
+                new CredData(TestUsers.DEMO.username, TestUsers.DEMO.password), auth.getPublicKey());
         return new Object[] { "ALL", "ME", SchedulerTHelper.getLocalUrl(), creds.getBase64(), "30000" };
     }
 
     private ResourceManager startRMPreservingDB() throws Exception {
         String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
           "/functionaltests/config/rm-with-db.ini").getFile())).getAbsolutePath();
-        schedulerHelper.startScheduler(false, null, rmconf, null);
-        return schedulerHelper.getResourceManager();
+        rmHelper.startRM(rmconf);
+        return rmHelper.getResourceManager();
     }
 
     protected boolean removeNodeSource(String sourceName) throws Exception {
         // removing node source
-        BooleanWrapper res = schedulerHelper.getResourceManager().removeNodeSource(sourceName, true);
+        BooleanWrapper res = rmHelper.getResourceManager().removeNodeSource(sourceName, true);
         return res.getBooleanValue();
+    }
+
+    @Before
+    public void createRMHelper() throws Exception {
+        rmHelper = new RMTHelper();
+    }
+
+    @After
+    public void killStartedRM() throws Exception {
+        rmHelper.killRM();
     }
 
     @Test

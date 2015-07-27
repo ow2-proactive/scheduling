@@ -65,7 +65,7 @@ public class SchedulerFunctionalTest extends ProActiveTest {
     public void killAllProcessesIfNeeded() throws Exception {
         try {
             schedulerHelper.disconnect(); // in case user has changed during test
-            schedulerHelper.getResourceManager().removeNodeSource("extra", true).getBooleanValue();
+            schedulerHelper.removeExtraNodes();
         } catch (Throwable ignored) {
             // ns extra not found
         }

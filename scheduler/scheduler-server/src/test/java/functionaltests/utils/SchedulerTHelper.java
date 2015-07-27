@@ -827,10 +827,6 @@ public class SchedulerTHelper {
         return scheduler.getUrl();
     }
 
-    public void createNodeSource(String nodeSourceName, int nbNodes) throws Exception {
-        RMTHelper.createNodeSource(nodeSourceName, nbNodes, getResourceManager(), getRMMonitorsHandler());
-    }
-
     private RMMonitorsHandler getRMMonitorsHandler() throws Exception {
         if (connectedRMUser.getMonitorsHandler() == null) {
             getResourceManager();
@@ -890,5 +886,16 @@ public class SchedulerTHelper {
 
     public void waitForNodeSourceEvent(RMEventType nodesourceCreated, String nsName) throws Exception {
         RMTHelper.waitForNodeSourceEvent(nodesourceCreated, nsName, getRMMonitorsHandler());
+    }
+
+    public void addExtraNodes(int nbNodes) throws Exception {
+        RMTHelper.createNodeSource("extra", nbNodes, getResourceManager(), getRMMonitorsHandler());
+    }
+
+    public void removeExtraNodes() {
+        // do not start Scheduler if not yet started
+        if (connectedRMUser.isConnected()) {
+            connectedRMUser.getResourceManager().removeNodeSource("extra", true).getBooleanValue();
+        }
     }
 }

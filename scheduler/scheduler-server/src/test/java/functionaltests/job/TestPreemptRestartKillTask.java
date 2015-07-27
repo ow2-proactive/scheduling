@@ -88,7 +88,7 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTest {
 
         log("Submitting job");
 
-        schedulerHelper.createNodeSource("extra", 3);
+        schedulerHelper.addExtraNodes(3);
 
         JobId id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         log("Wait for event job submitted");

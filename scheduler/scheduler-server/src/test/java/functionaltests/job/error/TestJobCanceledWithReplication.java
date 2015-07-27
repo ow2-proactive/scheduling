@@ -76,7 +76,7 @@ public class TestJobCanceledWithReplication extends SchedulerFunctionalTest {
 
     @Test
     public void run() throws Throwable {
-        schedulerHelper.createNodeSource("extra", 3);
+        schedulerHelper.addExtraNodes(3);
 
         String faultyTaskName = "task2*1";
 

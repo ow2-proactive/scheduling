@@ -101,7 +101,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTest {
 
     @Test
     public void run() throws Throwable {
-        schedulerHelper.createNodeSource("extra", 2);
+        schedulerHelper.addExtraNodes(2);
 
         Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
         Logger.getLogger(TaskLauncher.class).setLevel(Level.DEBUG);

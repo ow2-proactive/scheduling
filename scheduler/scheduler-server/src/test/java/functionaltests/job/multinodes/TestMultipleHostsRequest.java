@@ -120,7 +120,7 @@ public class TestMultipleHostsRequest extends SchedulerFunctionalTest {
         }
 
         JobId id = schedulerHelper.submitJob(job);
-        schedulerHelper.createNodeSource("extra", 3);
+        schedulerHelper.addExtraNodes(3);
 
         log("Job submitted, id " + id.toString());
 
