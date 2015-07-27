@@ -264,7 +264,7 @@ public class SchedulerTHelper {
             connectedSchedulerUser.connect(scheduler.getAuth());
         }
 
-        if (connectedSchedulerUser.isDisconnected()) {
+        if (connectedSchedulerUser.isConnected()) {
             connectedSchedulerUser.connect(scheduler.getAuth());
         }
 
@@ -349,7 +349,6 @@ public class SchedulerTHelper {
      * helper and check events sequence with waitForEvent**() functions.
      *
      * @param jobDescPath path to an XML job descriptor to submit
-     * @param user Type of user
      * @return JobId, the job's identifier.
      * @throws Exception if an error occurs at job creation/submission, or during
      * verification of events sequence.
@@ -374,7 +373,6 @@ public class SchedulerTHelper {
      * helper and check events sequence with waitForEvent**() functions.
      *
      * @param jobToSubmit job object to schedule.
-     * @param mode true if the mode is forked, false if normal mode
      * @return JobId, the job's identifier.
      * @throws Exception if an error occurs at job submission, or during
      * verification of events sequence.
@@ -818,7 +816,7 @@ public class SchedulerTHelper {
             connectedRMUser.connect(scheduler.getRMAuth());
         }
 
-        if (connectedRMUser.isDisconnected()) {
+        if (!connectedRMUser.isConnected()) {
             connectedRMUser.connect(scheduler.getRMAuth());
         }
 

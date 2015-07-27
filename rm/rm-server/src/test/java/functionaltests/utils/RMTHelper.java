@@ -542,9 +542,7 @@ public class RMTHelper {
      * @throws Exception if an error occurs.
      */
     public String startRM(String configurationFile, int pnpPort, String... jvmArgs) throws Exception {
-        if (rm.isStartedWithSameConfiguration(configurationFile)) {
-            log("RM already started with same configuration, keeping started instance");
-        } else {
+        if (!rm.isStartedWithSameConfiguration(configurationFile)) {
             log("Starting RM");
             rm.start(configurationFile, pnpPort, jvmArgs);
             currentTestConfiguration = configurationFile;
@@ -572,7 +570,7 @@ public class RMTHelper {
             connectedUser.connect(rm.getAuth());
         }
 
-        if (connectedUser.isDisconnected()) {
+        if (!connectedUser.isConnected()) {
             connectedUser.connect(rm.getAuth());
         }
 

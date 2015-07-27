@@ -96,8 +96,8 @@ public class SchedulerTestUser {
         return scheduler;
     }
 
-    public boolean isDisconnected() {
-        return scheduler == null;
+    public boolean isConnected() {
+        return scheduler != null;
     }
 
     public void disconnect() throws NotConnectedException, PermissionException {

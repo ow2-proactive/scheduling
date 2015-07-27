@@ -89,8 +89,8 @@ public class RMTestUser {
         return resourceManager;
     }
 
-    public boolean isDisconnected() {
-        return resourceManager == null;
+    public boolean isConnected() {
+        return resourceManager != null;
     }
 
     public void disconnect() throws RMException {
