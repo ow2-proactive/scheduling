@@ -86,7 +86,7 @@ public class RMTHelper {
     /**
      * Timeout for local infrastructure
      */
-    public static final int DEFAULT_NODES_TIMEOUT = 60 * 1000; //60s
+    public static final int DEFAULT_NODES_TIMEOUT = 120 * 1000; //120s
 
     /**
      * Number of nodes deployed with default deployment descriptor
@@ -287,7 +287,7 @@ public class RMTHelper {
             throws IOException, NodeException, InterruptedException {
         Node newNode = null;
 
-        final long NODE_START_TIMEOUT_IN_MS = 60000;
+        final long NODE_START_TIMEOUT_IN_MS = 120000;
         long startTimeStamp = System.currentTimeMillis();
 
         NodeException toThrow = null;
