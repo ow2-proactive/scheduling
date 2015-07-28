@@ -45,7 +45,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -123,7 +122,6 @@ public class NodeSource implements InitActive, RunActive {
     private Map<String, Node> nodes;
     private Map<String, Node> downNodes;
 
-    private static AtomicInteger instanceCount = new AtomicInteger(0);
     private static ThreadPoolHolder threadPoolHolder;
 
     private NodeSource stub;
@@ -221,7 +219,6 @@ public class NodeSource implements InitActive, RunActive {
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
         Thread.currentThread().setName("Node Source \"" + name + "\"");
-        instanceCount.incrementAndGet();
     }
 
     public void runActivity(Body body) {
@@ -600,14 +597,6 @@ public class NodeSource implements InitActive, RunActive {
                     .getAdministrator().getName())));
 
         PAActiveObject.terminateActiveObject(false);
-
-        if (instanceCount.decrementAndGet() == 0) {
-            try {
-                NodeSource.threadPoolHolder.shutdown();
-            } catch (InterruptedException e) {
-                logger.warn("", e);
-            }
-        }
     }
 
     /**
