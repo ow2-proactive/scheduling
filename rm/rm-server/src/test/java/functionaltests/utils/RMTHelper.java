@@ -46,11 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -218,30 +214,10 @@ public class RMTHelper {
 
     public List<TestNode> createNodes(final String nodeName, int number) throws IOException, NodeException,
             ExecutionException, InterruptedException {
-
-        ExecutorService executorService = Executors.newFixedThreadPool(number);
-        ArrayList<Future<TestNode>> futureNodes = new ArrayList<>(number);
-        final List<Integer> freePNPPorts = findFreePorts(number);
-        for (int i = 0; i < number; i++) {
-            final int index = i;
-            futureNodes.add(executorService.submit(new Callable<TestNode>() {
-                @Override
-                public TestNode call() {
-                    try {
-                        return createNode(nodeName + index, freePNPPorts.get(index));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            }));
-        }
-
         ArrayList<TestNode> nodes = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
-            nodes.add(futureNodes.get(i).get());
+            nodes.add(createNode(nodeName + i, findFreePort()));
         }
-
         return nodes;
     }
 
@@ -274,21 +250,6 @@ public class RMTHelper {
         int port = server.getLocalPort();
         server.close();
         return port;
-    }
-
-    private static List<Integer> findFreePorts(int nbOfFreePorts) throws IOException {
-        List<Integer> freePorts = new ArrayList<>();
-        List<ServerSocket> socketsToClose = new ArrayList<>();
-        for (int i = 0; i < nbOfFreePorts; i++) {
-            ServerSocket server = new ServerSocket(0);
-            int port = server.getLocalPort();
-            freePorts.add(port);
-            socketsToClose.add(server);
-        }
-        for (ServerSocket socket : socketsToClose) {
-            socket.close();
-        }
-        return freePorts;
     }
 
     private static TestNode createNode(String nodeName, Map<String, String> vmParameters,
