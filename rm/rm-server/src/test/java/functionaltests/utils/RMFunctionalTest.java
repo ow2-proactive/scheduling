@@ -1,6 +1,5 @@
 package functionaltests.utils;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -12,7 +11,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.tests.ProActiveTest;
-import org.ow2.tests.ProcessCleaner;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
@@ -36,22 +34,17 @@ public class RMFunctionalTest extends ProActiveTest {
 
     protected RMTHelper rmHelper;
 
-    static {
-        //        try {
-        //            new ProcessCleaner(".*proactive.test=true.*").killAliveProcesses();
-        //            new ProcessCleaner(".*RMNodeStarter.*").killAliveProcesses();
-        //            new ProcessCleaner(".*RMStarterForFunctionalTest.*").killAliveProcesses();
-        //        } catch (IOException e) {
-        //            throw new RuntimeException(e);
-        //        }
-    }
-
     @Before
     public void prepareForTest() throws Exception {
         CentralPAPropertyRepository.PA_TEST.setValue(true);
         CentralPAPropertyRepository.PA_RUNTIME_PING.setValue(false);
 
         rmHelper = new RMTHelper();
+        try {
+            cleanState();
+        } catch (IllegalArgumentException | NotConnectedException ignored) {
+            // ns extra not found
+        }
     }
 
     @After
@@ -77,7 +70,7 @@ public class RMFunctionalTest extends ProActiveTest {
     }
 
     private void cleanState() throws Exception {
-        rmHelper.disconnect();
+        rmHelper.disconnect(); // force reconnection
         ResourceManager rm = rmHelper.getResourceManager();
         int nodeNumber = rm.getState().getTotalNodesNumber();
 
@@ -91,13 +84,6 @@ public class RMFunctionalTest extends ProActiveTest {
         for (int i = 0; i < nodeNumber; i++) {
             rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
-    }
-
-    private static void killAliveProcesses() throws IOException {
-        new ProcessCleaner(".*proactive.test=true.*").killAliveProcesses();
-        new ProcessCleaner(".*RMNodeStarter.*").killAliveProcesses();
-        new ProcessCleaner(".*SchedulerTStarter.*").killAliveProcesses();
-        new ProcessCleaner(".*RMTStarter.*").killAliveProcesses();
     }
 
 }

@@ -102,8 +102,7 @@ public class RMTHelper {
             public void run() {
                 try {
                     rm.kill();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception ignored) {
                 }
             }
         }));
@@ -505,6 +504,7 @@ public class RMTHelper {
     public String startRM(String configurationFile, int pnpPort, String... jvmArgs) throws Exception {
         if (!rm.isStartedWithSameConfiguration(configurationFile)) {
             log("Starting RM");
+            connectedUser = new RMTestUser(TestUsers.TEST);
             rm.start(configurationFile, pnpPort, jvmArgs);
             currentTestConfiguration = configurationFile;
         }
