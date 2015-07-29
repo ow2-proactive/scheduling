@@ -78,6 +78,7 @@ public class TestJobInstantGetTaskResult extends SchedulerFunctionalTest {
         client.setJobId(id);
 
         schedulerHelper.waitForEventJobRemoved(id);
+        PAActiveObject.terminateActiveObject(client, true);
     }
 
 }

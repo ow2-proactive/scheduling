@@ -56,11 +56,12 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.junit.Assert;
 import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.TestUsers;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -132,7 +133,7 @@ public final class AddGetRemoveTest extends RMFunctionalTest {
 
         // Check account values validity
         usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime") - usedNodeTime;
-        Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
-            (usedNodeTime <= getRemoveMaxDuration));
+        assertTrue("Invalid value of the usedNodeTime attribute", usedNodeTime >= GR_DURATION);
+        assertTrue("Invalid value of the usedNodeTime attribute", usedNodeTime <= getRemoveMaxDuration);
     }
 }

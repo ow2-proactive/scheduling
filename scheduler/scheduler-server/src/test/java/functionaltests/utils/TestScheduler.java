@@ -71,7 +71,7 @@ public class TestScheduler {
     private RMAuthentication rmAuth;
 
     private EnvironmentCookieBasedChildProcessKiller childProcessKiller = new EnvironmentCookieBasedChildProcessKiller(
-        "TEST");
+        "TEST_SCHEDULER");
     private SchedulerTestConfiguration startedConfiguration = SchedulerTestConfiguration.defaultConfiguration();
 
     public synchronized void start(SchedulerTestConfiguration configuration) throws Exception {
@@ -152,10 +152,10 @@ public class TestScheduler {
 
         System.out.println("Waiting for the Scheduler using URL: " + schedulerUrl);
 
-        rmAuth = RMConnection.waitAndJoin(rmToConnectTo);
+        rmAuth = RMConnection.waitAndJoin(rmToConnectTo, 120000);
         startLocalNodes(configuration);
 
-        schedulerAuth = SchedulerConnection.waitAndJoin(schedulerUrl);
+        schedulerAuth = SchedulerConnection.waitAndJoin(schedulerUrl, 120000);
         System.out.println("The Scheduler is up and running");
     }
 
@@ -183,7 +183,8 @@ public class TestScheduler {
         if (schedulerProcess != null) {
             schedulerProcess.destroy();
             schedulerProcess.waitFor();
-            CommonTUtils.cleanupRMActiveObjectRegistry();
+            childProcessKiller.killChildProcesses();
+            CommonTUtils.cleanupRMActiveObjectRegistry(getUrl());
             schedulerProcess = null;
         }
     }

@@ -100,12 +100,13 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTest {
     }
 
     @After
-    public void killRM() throws Exception {
+    public void killRMAndScheduler() throws Exception {
         rmHelper.killRM();
+        schedulerHelper.killScheduler();
     }
 
     @Test
-    public void test() throws Throwable {
+    public void testKillJob() throws Throwable {
         schedulerHelper.killScheduler();
 
         rmHelper = new RMTHelper();
@@ -113,12 +114,10 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTest {
 
         schedulerHelper.startScheduler(false, config.getAbsolutePath(), null, rmUrl);
 
-        testSubmitAndPause(rmUrl);
+        String nodeUrl = RMTHelper.createNode("test-node").getNode().getNodeInformation().getURL();
+        schedulerHelper.getResourceManager().addNode(nodeUrl);
+        schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
-        testKillJob();
-    }
-
-    private void testKillJob() throws Throwable {
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
         log("Submitting job1");
@@ -152,7 +151,15 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTest {
         checkJobResult(scheduler, jobId2, 0);
     }
 
-    private void testSubmitAndPause(String rmUrl) throws Throwable {
+    @Test
+    public void testSubmitAndPause() throws Throwable {
+        schedulerHelper.killScheduler();
+
+        rmHelper = new RMTHelper();
+        String rmUrl = rmHelper.startRM(null, 1299);
+
+        schedulerHelper.startScheduler(false, config.getAbsolutePath(), null, rmUrl);
+
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
         log("Submitting job");

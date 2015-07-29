@@ -47,6 +47,7 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
 
 
 public class TestRM {
@@ -58,6 +59,9 @@ public class TestRM {
     // do not use the one from proactive config to be able to
     // keep the RM running after the test with rmi registry is killed
     public static int PA_PNP_PORT = 1199;
+
+    private EnvironmentCookieBasedChildProcessKiller childProcessKiller = new EnvironmentCookieBasedChildProcessKiller(
+      "TEST_RM");
 
     private static String DEFAULT_CONFIGURATION;
     static {
@@ -132,6 +136,8 @@ public class TestRM {
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
+        processBuilder.environment().put(childProcessKiller.getCookieName(),
+                childProcessKiller.getCookieValue());
         rmProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(),
@@ -139,13 +145,15 @@ public class TestRM {
         outputReader.start();
 
         String url = getUrl();
-        rmAuth = RMConnection.waitAndJoin(url);
+        rmAuth = RMConnection.waitAndJoin(url, 120000);
     }
 
-    public void kill() throws InterruptedException {
+    public void kill() throws Exception {
         if (rmProcess != null) {
             rmProcess.destroy();
             rmProcess.waitFor();
+            childProcessKiller.killChildProcesses();
+            CommonTUtils.cleanupRMActiveObjectRegistry(getUrl());
             rmProcess = null;
         }
     }

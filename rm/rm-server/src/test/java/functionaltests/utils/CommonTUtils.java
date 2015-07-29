@@ -47,17 +47,17 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 
 public class CommonTUtils {
 
-    public static void cleanupRMActiveObjectRegistry() throws Exception {
-        cleanupActiveObjectRegistry(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(),
+    public static void cleanupRMActiveObjectRegistry(String url) throws Exception {
+        cleanupActiveObjectRegistry(url, PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(),
                 RMConstants.NAME_ACTIVE_OBJECT_RMCORE, RMConstants.NAME_ACTIVE_OBJECT_RMADMIN,
                 RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION, RMConstants.NAME_ACTIVE_OBJECT_RMUSER,
                 RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
     }
 
-    public static void cleanupActiveObjectRegistry(String... namesToRemove) throws Exception {
+    public static void cleanupActiveObjectRegistry(String url, String... namesToRemove) throws Exception {
         try {
             RemoteObjectFactory factory = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
-            for (URI uri : factory.list(new URI(RMTHelper.getLocalUrl()))) {
+            for (URI uri : factory.list(new URI(url))) {
                 for (String name : namesToRemove) {
                     if (uri.getPath().endsWith(name)) {
                         factory.unregister(uri);
