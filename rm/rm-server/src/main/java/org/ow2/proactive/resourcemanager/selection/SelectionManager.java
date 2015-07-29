@@ -208,8 +208,11 @@ public abstract class SelectionManager {
 
     private NodeSet doSelectNodes(Criteria criteria, Client client) {
         boolean hasScripts = criteria.getScripts() != null && criteria.getScripts().size() > 0;
-        logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
-        if (logger.isDebugEnabled()) {
+        if(logger.isInfoEnabled()){
+            logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
+        }
+        boolean loggerIsDebugEnabled = logger.isDebugEnabled();
+        if (loggerIsDebugEnabled) {
             if (hasScripts) {
                 logger.debug("Selection scripts:");
                 for (SelectionScript s : criteria.getScripts()) {
@@ -234,7 +237,9 @@ public abstract class SelectionManager {
         List<RMNode> filteredNodes = filterOut(freeNodes, criteria, client);
 
         if (filteredNodes.size() == 0) {
-            logger.debug(client + " will get 0 nodes");
+            if (loggerIsDebugEnabled) {
+                logger.debug(client + " will get 0 nodes");
+            }
             return new NodeSet();
         }
 
@@ -283,7 +288,9 @@ public abstract class SelectionManager {
                     }
                 }
             }
-            logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+            if (loggerIsDebugEnabled) {
+                logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+            }
         } else {
             matchedNodes = new LinkedList<>();
             for (RMNode node : afterPolicyNodes) {
@@ -295,7 +302,7 @@ public abstract class SelectionManager {
         // selecting subset according to topology requirements
         // TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
 
-        if (criteria.getTopology().isTopologyBased()) {
+        if (criteria.getTopology().isTopologyBased() && loggerIsDebugEnabled) {
             logger.debug("Filtering nodes with topology " + criteria.getTopology());
         }
         NodeSet selectedNodes = handler.select(criteria.getSize(), matchedNodes);
@@ -332,12 +339,14 @@ public abstract class SelectionManager {
             }
         }
 
-        String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0 ? "and " +
-            selectedNodes.getExtraNodes().size() + " extra nodes"
-                : "";
-        logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+        if (logger.isInfoEnabled()) {
+            String extraNodes = selectedNodes.getExtraNodes() != null &&
+                selectedNodes.getExtraNodes().size() > 0 ? "and " + selectedNodes.getExtraNodes().size() +
+                " extra nodes" : "";
+            logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+        }
 
-        if (logger.isDebugEnabled()) {
+        if (loggerIsDebugEnabled) {
             for (Node n : selectedNodes) {
                 logger.debug(n.getNodeInformation().getURL());
             }
@@ -480,8 +489,10 @@ public abstract class SelectionManager {
                 PrincipalPermission perm = (PrincipalPermission) node.getUserPermission();
                 // checking explicitly that node has this token identity
                 if (!perm.hasPrincipal(tokenPrincipal)) {
-                    logger.debug(client + " does not have required token to get the node " +
-                        node.getNodeURL() + " from " + node.getNodeSource().getName());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(client + " does not have required token to get the node " +
+                            node.getNodeURL() + " from " + node.getNodeSource().getName());
+                    }
                     continue;
                 }
             }
