@@ -36,8 +36,23 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
+import java.io.File;
+import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -58,22 +73,8 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 
 
 /**
@@ -207,8 +208,11 @@ public abstract class SelectionManager {
 
     private NodeSet doSelectNodes(Criteria criteria, Client client) {
         boolean hasScripts = criteria.getScripts() != null && criteria.getScripts().size() > 0;
-        logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
-        if (logger.isDebugEnabled()) {
+        if(logger.isInfoEnabled()){
+            logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
+        }
+        boolean loggerIsDebugEnabled = logger.isDebugEnabled();
+        if (loggerIsDebugEnabled) {
             if (hasScripts) {
                 logger.debug("Selection scripts:");
                 for (SelectionScript s : criteria.getScripts()) {
@@ -233,7 +237,9 @@ public abstract class SelectionManager {
         List<RMNode> filteredNodes = filterOut(freeNodes, criteria, client);
 
         if (filteredNodes.size() == 0) {
-            logger.debug(client + " will get 0 nodes");
+            if (loggerIsDebugEnabled) {
+                logger.debug(client + " will get 0 nodes");
+            }
             return new NodeSet();
         }
 
@@ -242,55 +248,61 @@ public abstract class SelectionManager {
         List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(criteria.getSize(), filteredNodes,
                 client);
 
-        // checking if all scripts are authorized
-        checkAuthorizedScripts(criteria.getScripts());
+        List<Node> matchedNodes;
+        if (hasScripts) {
+            // checking if all scripts are authorized
+            checkAuthorizedScripts(criteria.getScripts());
 
-        // arranging nodes for script execution
-        List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
+            // arranging nodes for script execution
+            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes,
+                    criteria.getScripts());
 
-        List<Node> matchedNodes = null;
-        if (criteria.getTopology().isTopologyBased()) {
-            // run scripts on all available nodes
-            matchedNodes = runScripts(arrangedNodes, criteria);
-        } else {
-            // run scripts not on all nodes, but always on missing number of nodes
-            // until required node set is found
-            matchedNodes = new LinkedList<>();
-            while (matchedNodes.size() < criteria.getSize()) {
-                int requiredNodesNumber = criteria.getSize() - matchedNodes.size();
-                int numberOfNodesForScriptExecution = requiredNodesNumber;
+            if (criteria.getTopology().isTopologyBased()) {
+                // run scripts on all available nodes
+                matchedNodes = runScripts(arrangedNodes, criteria);
+            } else {
+                // run scripts not on all nodes, but always on missing number of nodes
+                // until required node set is found
+                matchedNodes = new LinkedList<>();
+                while (matchedNodes.size() < criteria.getSize()) {
+                    int numberOfNodesForScriptExecution = criteria.getSize() - matchedNodes.size();
 
-                if (numberOfNodesForScriptExecution < SELECTION_THEADS_NUMBER) {
-                    // we can run "SELECTION_THEADS_NUMBER" scripts in parallel
-                    // in case when we need less nodes it still useful to
-                    // the full capacity of the thread pool to find nodes quicker
+                    if (numberOfNodesForScriptExecution < SELECTION_THEADS_NUMBER) {
+                        // we can run "SELECTION_THEADS_NUMBER" scripts in parallel
+                        // in case when we need less nodes it still useful to
+                        // the full capacity of the thread pool to find nodes quicker
 
-                    // it is not important if we find more nodes than needed
-                    // subset will be selected later (topology handlers)
-                    numberOfNodesForScriptExecution = SELECTION_THEADS_NUMBER;
-                }
+                        // it is not important if we find more nodes than needed
+                        // subset will be selected later (topology handlers)
+                        numberOfNodesForScriptExecution = SELECTION_THEADS_NUMBER;
+                    }
 
-                List<RMNode> subset = arrangedNodes.subList(0, Math.min(numberOfNodesForScriptExecution,
-                        arrangedNodes.size()));
-                matchedNodes.addAll(runScripts(subset, criteria));
-                // removing subset of arrangedNodes
-                subset.clear();
+                    List<RMNode> subset = arrangedNodes.subList(0,
+                            Math.min(numberOfNodesForScriptExecution, arrangedNodes.size()));
+                    matchedNodes.addAll(runScripts(subset, criteria));
+                    // removing subset of arrangedNodes
+                    subset.clear();
 
-                if (arrangedNodes.size() == 0) {
-                    break;
+                    if (arrangedNodes.size() == 0) {
+                        break;
+                    }
                 }
             }
-        }
-
-        if (hasScripts) {
-            logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+            if (loggerIsDebugEnabled) {
+                logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+            }
+        } else {
+            matchedNodes = new LinkedList<>();
+            for (RMNode node : afterPolicyNodes) {
+                matchedNodes.add(node.getNode());
+            }
         }
 
         // now we have a list of nodes which match to selection scripts
         // selecting subset according to topology requirements
         // TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
 
-        if (criteria.getTopology().isTopologyBased()) {
+        if (criteria.getTopology().isTopologyBased() && loggerIsDebugEnabled) {
             logger.debug("Filtering nodes with topology " + criteria.getTopology());
         }
         NodeSet selectedNodes = handler.select(criteria.getSize(), matchedNodes);
@@ -303,7 +315,7 @@ public abstract class SelectionManager {
         }
 
         // the nodes are selected, now mark them as busy.
-        for (Node node : new LinkedList<>(selectedNodes)) {
+        for (Node node : selectedNodes) {
             try {
                 // Synchronous call
                 rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
@@ -327,12 +339,14 @@ public abstract class SelectionManager {
             }
         }
 
-        String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0 ? "and " +
-            selectedNodes.getExtraNodes().size() + " extra nodes"
-                : "";
-        logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+        if (logger.isInfoEnabled()) {
+            String extraNodes = selectedNodes.getExtraNodes() != null &&
+                selectedNodes.getExtraNodes().size() > 0 ? "and " + selectedNodes.getExtraNodes().size() +
+                " extra nodes" : "";
+            logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+        }
 
-        if (logger.isDebugEnabled()) {
+        if (loggerIsDebugEnabled) {
             for (Node n : selectedNodes) {
                 logger.debug(n.getNodeInformation().getURL());
             }
@@ -400,7 +414,7 @@ public abstract class SelectionManager {
             // waiting for the results
             for (Future<Node> futureNode : matchedNodes) {
                 if (!futureNode.isCancelled()) {
-                    Node node = null;
+                    Node node;
                     try {
                         node = futureNode.get();
                         if (node != null) {
@@ -430,11 +444,6 @@ public abstract class SelectionManager {
 
     /**
      * Removes exclusion nodes and nodes not accessible for the client
-     *
-     * @param freeNodes
-     * @param exclusion
-     * @param client
-     * @return
      */
     private List<RMNode> filterOut(List<RMNode> freeNodes, Criteria criteria, Client client) {
 
@@ -452,13 +461,16 @@ public abstract class SelectionManager {
         }
 
         List<RMNode> filteredList = new ArrayList<>();
-
+        HashSet<Permission> clientPermissions = new HashSet<>();
         for (RMNode node : freeNodes) {
             // checking the permission
             try {
-                client.checkPermission(node.getUserPermission(), client +
-                    " is not authorized to get the node " + node.getNodeURL() + " from " +
-                    node.getNodeSource().getName());
+                if (!clientPermissions.contains(node.getUserPermission())) {
+                    client.checkPermission(node.getUserPermission(), client +
+                        " is not authorized to get the node " + node.getNodeURL() + " from " +
+                        node.getNodeSource().getName());
+                    clientPermissions.add(node.getUserPermission());
+                }
             } catch (SecurityException e) {
                 // client does not have an access to this node
                 logger.debug(e.getMessage());
@@ -471,14 +483,16 @@ public abstract class SelectionManager {
                 continue;
             }
 
-            // if client has AllPermissions he sill can get a node with any token
+            // if client has AllPermissions he still can get a node with any token
             // we will avoid it here
-            if (nodeWithTokenRequested && tokenPrincipal != null) {
+            if (nodeWithTokenRequested) {
                 PrincipalPermission perm = (PrincipalPermission) node.getUserPermission();
                 // checking explicitly that node has this token identity
                 if (!perm.hasPrincipal(tokenPrincipal)) {
-                    logger.debug(client + " does not have required token to get the node " +
-                        node.getNodeURL() + " from " + node.getNodeSource().getName());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(client + " does not have required token to get the node " +
+                            node.getNodeURL() + " from " + node.getNodeSource().getName());
+                    }
                     continue;
                 }
             }
