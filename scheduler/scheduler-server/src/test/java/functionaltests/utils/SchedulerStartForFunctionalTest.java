@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  *
  * @author The ProActive Team
  */
-public class SchedulerTStarter implements Serializable {
+public class SchedulerStartForFunctionalTest implements Serializable {
 
     public static final int RM_NODE_NUMBER = 2;
     public static final String RM_NODE_NAME = "TEST";

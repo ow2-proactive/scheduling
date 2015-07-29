@@ -52,10 +52,10 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.FileUtils;
 
 
@@ -70,7 +70,7 @@ public class TestScheduler {
     private SchedulerAuthenticationInterface schedulerAuth;
     private RMAuthentication rmAuth;
 
-    private EnvironmentCookieBasedChildProcessKiller childProcessKiller = new EnvironmentCookieBasedChildProcessKiller(
+    private CookieBasedProcessTreeKiller processTreeKiller = new CookieBasedProcessTreeKiller(
         "TEST_SCHEDULER");
     private SchedulerTestConfiguration startedConfiguration = SchedulerTestConfiguration.defaultConfiguration();
 
@@ -126,7 +126,7 @@ public class TestScheduler {
         commandLine.add(testClasspath());
         commandLine.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
-        commandLine.add(SchedulerTStarter.class.getName());
+        commandLine.add(SchedulerStartForFunctionalTest.class.getName());
         commandLine.add(String.valueOf(configuration.hasLocalNodes()));
         commandLine.add(configuration.getSchedulerConfigFile());
         commandLine.add(configuration.getRMConfigFile());
@@ -142,8 +142,7 @@ public class TestScheduler {
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
-        processBuilder.environment().put(childProcessKiller.getCookieName(),
-                childProcessKiller.getCookieValue());
+        processTreeKiller.tagEnvironment(processBuilder.environment());
         schedulerProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(),
@@ -171,7 +170,7 @@ public class TestScheduler {
                             .parseDomain(TestUsers.DEMO.username), TestUsers.DEMO.password), rmAuth
                             .getPublicKey());
             ResourceManager rm = rmAuth.login(creds);
-            while (rm.getState().getTotalAliveNodesNumber() < SchedulerTStarter.RM_NODE_NUMBER) {
+            while (rm.getState().getTotalAliveNodesNumber() < SchedulerStartForFunctionalTest.RM_NODE_NUMBER) {
                 Thread.sleep(50);
             }
             rm.disconnect();
@@ -183,7 +182,7 @@ public class TestScheduler {
         if (schedulerProcess != null) {
             schedulerProcess.destroy();
             schedulerProcess.waitFor();
-            childProcessKiller.killChildProcesses();
+            processTreeKiller.kill();
             CommonTUtils.cleanupRMActiveObjectRegistry(getUrl());
             schedulerProcess = null;
         }
@@ -206,10 +205,6 @@ public class TestScheduler {
         }
     }
 
-    public void killChildProcesses() {
-        childProcessKiller.killChildProcesses();
-    }
-
     public synchronized SchedulerAuthenticationInterface getAuth() {
         return schedulerAuth;
     }
@@ -227,7 +222,4 @@ public class TestScheduler {
         return schedulerUrl;
     }
 
-    public SchedulerTestConfiguration currentConfiguration() {
-        return startedConfiguration;
-    }
 }

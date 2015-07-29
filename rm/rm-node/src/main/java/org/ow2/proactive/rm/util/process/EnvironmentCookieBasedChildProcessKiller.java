@@ -1,15 +1,18 @@
 package org.ow2.proactive.rm.util.process;
 
-import org.apache.log4j.Logger;
-
-import org.ow2.proactive.process_tree_killer.ProcessTree;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+import org.ow2.proactive.process_tree_killer.ProcessTree;
+import org.apache.log4j.Logger;
+
 
 /**
- * Utility class to use the ProcessTreeKiller with Environment cookies
+ * Utility class to use the ProcessTreeKiller with Environment cookies.
+ * <p>
+ * Differs from {@link org.ow2.proactive.utils.CookieBasedProcessTreeKiller} as it will
+ * change the current environment, allowing everything forked process to be killed.
  */
 public class EnvironmentCookieBasedChildProcessKiller {
 

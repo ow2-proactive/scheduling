@@ -32,26 +32,26 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task.utils;
+package org.ow2.proactive.utils;
 
-import org.apache.log4j.Logger;
-
-import org.ow2.proactive.process_tree_killer.ProcessTree;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+import org.ow2.proactive.process_tree_killer.ProcessTree;
+import org.apache.log4j.Logger;
 
-public class TaskProcessTreeKiller {
 
-    private static final Logger logger = Logger.getLogger(TaskProcessTreeKiller.class);
+public class CookieBasedProcessTreeKiller {
+
+    private static final Logger logger = Logger.getLogger(CookieBasedProcessTreeKiller.class);
 
     private static final String PROCESS_KILLER_COOKIE = "PROCESS_KILLER_COOKIE";
 
     private String cookieName;
 
-    public TaskProcessTreeKiller(String taskId) {
-        cookieName = taskId + "_" + UUID.randomUUID().toString();
+    public CookieBasedProcessTreeKiller(String cookiePrefix) {
+        cookieName = cookiePrefix + "_" + UUID.randomUUID().toString();
     }
 
     public void tagEnvironment(Map<String, String> env) {

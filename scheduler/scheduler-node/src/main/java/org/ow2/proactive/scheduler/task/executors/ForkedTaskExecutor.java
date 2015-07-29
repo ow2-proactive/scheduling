@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
-import org.ow2.proactive.scheduler.task.utils.TaskProcessTreeKiller;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -96,7 +96,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
     }
 
     public TaskResultImpl execute(TaskContext context, PrintStream outputSink, PrintStream errorSink) {
-        TaskProcessTreeKiller taskProcessTreeKiller = new TaskProcessTreeKiller(context.getTaskId().value());
+        CookieBasedProcessTreeKiller taskProcessTreeKiller = new CookieBasedProcessTreeKiller(context.getTaskId().value());
 
         Process process = null;
         ProcessStreamsReader processStreamsReader = null;

@@ -51,7 +51,7 @@ import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTStarter;
+import functionaltests.utils.SchedulerStartForFunctionalTest;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
@@ -122,7 +122,7 @@ public class TestScriptTask extends SchedulerFunctionalTest {
         TaskResult multiNodeTaskResult = jobResult.getResult("multi-node");
         String mnLogs = multiNodeTaskResult.getOutput().getAllLogs(false);
         assertTrue("Invalid binding for nodesurl", mnLogs.contains("nodesurl=" +
-            (SchedulerTStarter.RM_NODE_NUMBER - 1)));
+            (SchedulerStartForFunctionalTest.RM_NODE_NUMBER - 1)));
 
         // script task should be forked by default, ie it will not kill the scheduler on system.exit
         JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(id);

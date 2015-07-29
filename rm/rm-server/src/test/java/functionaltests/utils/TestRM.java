@@ -47,7 +47,7 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 
 
 public class TestRM {
@@ -60,8 +60,7 @@ public class TestRM {
     // keep the RM running after the test with rmi registry is killed
     public static int PA_PNP_PORT = 1199;
 
-    private EnvironmentCookieBasedChildProcessKiller childProcessKiller = new EnvironmentCookieBasedChildProcessKiller(
-      "TEST_RM");
+    private CookieBasedProcessTreeKiller processTreeKiller = new CookieBasedProcessTreeKiller("TEST_RM");
 
     private static String DEFAULT_CONFIGURATION;
     static {
@@ -136,8 +135,7 @@ public class TestRM {
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
-        processBuilder.environment().put(childProcessKiller.getCookieName(),
-                childProcessKiller.getCookieValue());
+        processTreeKiller.tagEnvironment(processBuilder.environment());
         rmProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(),
@@ -152,7 +150,7 @@ public class TestRM {
         if (rmProcess != null) {
             rmProcess.destroy();
             rmProcess.waitFor();
-            childProcessKiller.killChildProcesses();
+            processTreeKiller.kill();
             CommonTUtils.cleanupRMActiveObjectRegistry(getUrl());
             rmProcess = null;
         }
