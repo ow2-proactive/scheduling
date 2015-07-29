@@ -97,6 +97,27 @@ public class PrincipalPermission extends ClientPermission {
         return false;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
+
+        PrincipalPermission that = (PrincipalPermission) o;
+
+        return !(principals != null ? !principals.equals(that.principals) : that.principals != null);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (principals != null ? principals.hashCode() : 0);
+        return result;
+    }
+
     public String toString() {
         return this.getClass().getName() + " of " + principals;
     }

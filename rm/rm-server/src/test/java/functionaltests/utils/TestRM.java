@@ -119,6 +119,8 @@ public class TestRM {
         }
         commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + log4jConfiguration);
 
+        // commandLine.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8765");
+
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
             PAResourceManagerProperties.RM_HOME.getValueAsString());
         commandLine.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false);
