@@ -118,32 +118,6 @@ public class KillTaskLauncherTest {
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }
 
-//    @Test(timeout = 5000)
-//    public void normal() throws Throwable {
-//
-//        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
-//          new SimpleScript("result='done'", "javascript")));
-//
-//        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-//        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
-//
-//        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
-//          new Semaphore(0)));
-//        final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
-//
-//        TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
-//        WaitForResultNotification waitForResultNotification = new WaitForResultNotification(taskResultWaiter);
-//        waitForResultNotification = PAActiveObject.turnActive(waitForResultNotification);
-//        taskLauncherPA.doTask(executableContainer, null, waitForResultNotification);
-//
-//        assertEquals("done", taskResultWaiter.getTaskResult().value());
-//
-//        Thread.sleep(1000);
-//        taskLauncherPA.terminate(true);
-//
-//        assertTaskLauncherIsTerminated(taskLauncherPA);
-//    }
-
     @Test(timeout = 5000)
     public void kill_when_copying() throws Throwable {
 

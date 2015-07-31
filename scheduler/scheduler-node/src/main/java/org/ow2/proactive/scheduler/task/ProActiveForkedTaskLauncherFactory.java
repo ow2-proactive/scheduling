@@ -49,7 +49,7 @@ import org.ow2.proactive.scheduler.task.data.TaskProActiveDataspaces;
 public class ProActiveForkedTaskLauncherFactory implements TaskLauncherFactory {
 
     @Override
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception {
         return new TaskProActiveDataspaces(taskId, namingService);
     }
 
