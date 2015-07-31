@@ -36,9 +36,6 @@
  */
 package functionaltests.job.taskkill;
 
-import java.util.List;
-
-import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -51,13 +48,12 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.executables.EmptyExecutable;
 import functionaltests.executables.EndlessExecutable;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.*;
@@ -228,21 +224,6 @@ public class TestKillTaskWhileExecutingScripts extends SchedulerFunctionalTest {
         log("Kill job");
         assertTrue(schedulerHelper.killJob(id.toString()));
 
-
-        List<Node> nodes = schedulerHelper.listAliveNodes();
-        // We wait until no active object remain on the nodes.
-        // If AO remains the test will fail with a timeout.
-        boolean remainingAO = true;
-
-        long wait = 0;
-        while (remainingAO && wait < 5000) {
-            Thread.sleep(50);
-            wait += 50;
-            remainingAO = false;
-            for (Node node : nodes) {
-                remainingAO = remainingAO || (node.getNumberOfActiveObjects() > 0);
-            }
-        }
-        Assert.assertFalse("No Active Objects should remain", remainingAO);
+        schedulerHelper.checkNodesAreClean();
     }
 }

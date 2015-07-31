@@ -75,6 +75,8 @@ import org.junit.Assert;
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 
+import static org.junit.Assert.assertFalse;
+
 
 /**
  * Static helpers that provide main operations for Scheduler functional test.
@@ -306,12 +308,12 @@ public class SchedulerTHelper {
         JobId id = testJobSubmission(testJob);
         // check result are not null
         JobResult res = getJobResult(id);
-        Assert.assertFalse("Had Exception : " + jobDesc, getJobResult(id).hadException());
+        assertFalse("Had Exception : " + jobDesc, getJobResult(id).hadException());
 
         for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
 
-            Assert.assertFalse("Had Exception (" + jobDesc + ") : " + entry.getKey(), entry.getValue()
-                    .hadException());
+            assertFalse("Had Exception (" + jobDesc + ") : " + entry.getKey(),
+              entry.getValue().hadException());
 
             Assert.assertNotNull("Result not null (" + jobDesc + ") : " + entry.getKey(), entry.getValue()
                     .value());
@@ -887,5 +889,29 @@ public class SchedulerTHelper {
             } catch (Throwable ignored) {
             }
         }
+    }
+
+    public void checkNodesAreClean() throws Exception {
+        List<Node> nodes = listAliveNodes();
+        // We wait until no active object remain on the nodes.
+        // If AO remains the test will fail with a timeout.
+        boolean remainingAO = true;
+
+        long wait = 0;
+        while (remainingAO && wait < 5000) {
+            Thread.sleep(50);
+            wait += 50;
+            remainingAO = false;
+            for (Node node : nodes) {
+                remainingAO = remainingAO || (node.getNumberOfActiveObjects() > 0);
+            }
+        }
+        if (remainingAO) {
+            for (Node node : nodes) {
+                log("Found remaining AOs on node " + node.getNodeInformation().getURL() + " " +
+                    Arrays.toString(node.getActiveObjects()));
+            }
+        }
+        assertFalse("No Active Objects should remain", remainingAO);
     }
 }

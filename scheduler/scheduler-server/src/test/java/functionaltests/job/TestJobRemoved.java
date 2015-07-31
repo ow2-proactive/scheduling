@@ -109,5 +109,7 @@ public class TestJobRemoved extends SchedulerFunctionalTest {
             state.getRunningJobs().size() - jobsNumber;
 
         assertEquals(0, jobsDelta);
+
+        schedulerHelper.checkNodesAreClean();
     }
 }

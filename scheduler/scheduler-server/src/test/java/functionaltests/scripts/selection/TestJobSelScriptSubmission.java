@@ -53,5 +53,7 @@ public class TestJobSelScriptSubmission extends SchedulerFunctionalTest {
     public void run() throws Throwable {
         schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
+        schedulerHelper.checkNodesAreClean();
     }
+
 }

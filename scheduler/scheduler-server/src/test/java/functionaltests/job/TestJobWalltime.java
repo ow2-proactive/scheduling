@@ -36,9 +36,6 @@
  */
 package functionaltests.job;
 
-import java.util.List;
-
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -55,8 +52,8 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.executables.EndlessExecutable;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.*;
@@ -81,7 +78,7 @@ public class TestJobWalltime extends SchedulerFunctionalTest {
         checkJobRanAndWalltimed("walltimeNativeTask", walltimeNativeTask);
         checkJobRanAndWalltimed("walltimeScriptTask", walltimeScriptTask);
 
-        checkNodesAreClean();
+        schedulerHelper.checkNodesAreClean();
     }
 
     public JobId walltimeJavaTask() throws Throwable {
@@ -184,23 +181,4 @@ public class TestJobWalltime extends SchedulerFunctionalTest {
         assertTrue(tres.getException() instanceof WalltimeExceededException);
     }
 
-    private void checkNodesAreClean() throws Exception {
-        // Make sure that the task has been properly killed
-
-        List<Node> nodes = schedulerHelper.listAliveNodes();
-        // We wait until no active object remain on the nodes.
-        // If AO remains the test will fail with a timeout.
-        boolean remainingAO = true;
-
-        long wait = 0;
-        while (remainingAO && wait < 5000) {
-            Thread.sleep(50);
-            wait += 50;
-            remainingAO = false;
-            for (Node node : nodes) {
-                remainingAO = remainingAO || (node.getNumberOfActiveObjects() > 0);
-            }
-        }
-        assertFalse("No Active Objects should remain", remainingAO);
-    }
 }
