@@ -145,6 +145,9 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
 
         log("Stop task node process (node " + nodeToKill.getNode().getNodeInformation().getURL() + ")");
         nodeToKill.getNodeProcess().stopProcess();
+        RMNodeEvent nodeDownEvent = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+          nodeToKill.getNodeURL(), TIMEOUT);
+        assertEquals(NodeState.DOWN, nodeDownEvent.getNodeState());
 
         log("Let task finish");
         communicationObject.unlock();
