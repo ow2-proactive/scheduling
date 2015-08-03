@@ -146,21 +146,27 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
         log("Job finished: " + path);
 
         JobState js = schedulerHelper.getSchedulerInterface().getJobState(id);
-        Assert.assertEquals(4, js.getTasks().size());
+        assertEquals(4, js.getTasks().size());
 
         for (int i = 0; i < 4; i++) {
             TaskState ts = js.getTasks().get(i);
             String name = ts.getName();
-            if (name.equals("A")) {
-                Assert.assertEquals(TaskStatus.FINISHED, ts.getStatus());
-            } else if (name.equals("B")) {
-                Assert.assertEquals(TaskStatus.FINISHED, ts.getStatus());
-            } else if (name.equals("C")) {
-                Assert.assertEquals(TaskStatus.SKIPPED, ts.getStatus());
-            } else if (name.equals("D")) {
-                Assert.assertEquals(TaskStatus.FINISHED, ts.getStatus());
-            } else {
-                Assert.fail();
+            switch (name) {
+                case "A":
+                    assertEquals(TaskStatus.FINISHED, ts.getStatus());
+                    break;
+                case "B":
+                    assertEquals(TaskStatus.FINISHED, ts.getStatus());
+                    break;
+                case "C":
+                    assertEquals(TaskStatus.SKIPPED, ts.getStatus());
+                    break;
+                case "D":
+                    assertEquals(TaskStatus.FINISHED, ts.getStatus());
+                    break;
+                default:
+                    fail();
+                    break;
             }
         }
 
@@ -200,7 +206,7 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
                 expected);
             assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long",
               result.getValue().value() instanceof Long);
-            Assert.assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
+            assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
               result.getValue().value());
 
         }
@@ -237,7 +243,7 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
                       expected);
             assertTrue(path + ": Result for task '" + result.getKey() + "' is not an Long",
               result.getValue().value() instanceof Long);
-            Assert.assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
+            assertEquals(path + ": Invalid result for task '" + result.getKey() + "'", expected,
               result.getValue().value());
 
         }
