@@ -144,14 +144,14 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             SCRATCH = PADataSpaces.resolveScratchForAO();
             logger.debug("SCRATCH space is " + SCRATCH.getRealURI());
 
-        } catch (Throwable t) {
-            logger.error("There was a problem while initializing dataSpaces, they are not activated", t);
+        } catch (FileSystemException fse) {
+            logger.error("There was a problem while initializing dataSpaces, they are not activated", fse);
             this.logDataspacesStatus(
               "There was a problem while initializing dataSpaces, they are not activated",
               DataspacesStatusLevel.ERROR);
-            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
-            throw t;
+            this.logDataspacesStatus(Formatter.stackTraceToString(fse), DataspacesStatusLevel.ERROR);
         }
+
 
         INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
@@ -189,12 +189,12 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             result = resolveToExisting(result, dataSpaceName, input);
             result = createTaskIdFolder(result, dataSpaceName);
             return result;
-        } catch (Throwable t) {
-            logger.warn(dataSpaceName + " space is disabled", t);
+        } catch (FileSystemException fse) {
+            logger.warn(dataSpaceName + " space is disabled", fse);
             this.logDataspacesStatus(dataSpaceName + " space is disabled", DataspacesStatusLevel.WARNING);
-            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
-            throw t;
+            this.logDataspacesStatus(Formatter.stackTraceToString(fse), DataspacesStatusLevel.WARNING);
         }
+        return null;
     }
 
     @Override
