@@ -62,6 +62,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.PermissionChecker;
@@ -620,7 +621,11 @@ public class RMNodeStarter {
         try {
             DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
                     .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-            conf.configureNode();
+            boolean dataspaceConfigured = conf.configureNode();
+            if (!dataspaceConfigured) {
+                throw new NotConfiguredException(
+                    "Failed to configure dataspaces, check the logs for more details");
+            }
             closeDataSpaceOnShutdown(node);
             node.setProperty(DATASPACES_STATUS_PROP_NAME, Boolean.TRUE.toString());
         } catch (Throwable t) {
