@@ -115,6 +115,7 @@ public class SchedulerTHelper {
             }
         }));
     }
+
     private static SchedulerTestUser connectedSchedulerUser = new SchedulerTestUser(TestUsers.DEMO);
     private static RMTestUser connectedRMUser = new RMTestUser(TestUsers.DEMO);
 

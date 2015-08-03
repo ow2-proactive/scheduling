@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
@@ -73,6 +72,7 @@ public class RMTestUser {
 
     public ResourceManager connect(RMAuthentication rmAuth) throws LoginException, KeyException,
             ActiveObjectCreationException, NodeException {
+        disconnect();
         Credentials connectedUserCreds = Credentials.createCredentials(
                 new CredData(CredData.parseLogin(connectedUserName), CredData.parseDomain(connectedUserName),
                     connectedUserPassword), rmAuth.getPublicKey());
@@ -93,7 +93,7 @@ public class RMTestUser {
         return resourceManager != null;
     }
 
-    public void disconnect() throws RMException {
+    public void disconnect() {
         try {
             if (resourceManager != null) {
                 resourceManager.getMonitoring().removeRMEventListener();

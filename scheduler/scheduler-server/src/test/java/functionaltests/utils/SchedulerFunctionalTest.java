@@ -61,7 +61,7 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
-      TimeUnit.MILLISECONDS);
+        TimeUnit.MILLISECONDS);
 
     @Before
     public void startSchedulerIfNeeded() throws Exception {
@@ -70,13 +70,11 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     @After
     public void killAllProcessesIfNeeded() throws Exception {
-            schedulerHelper.removeExtraNodes();
-            schedulerHelper.disconnect(); // in case user has changed during test
+        schedulerHelper.removeExtraNodes();
 
         try {
-            schedulerHelper.disconnect();
+            schedulerHelper.disconnect(); // in case user has changed during test
         } catch (NotConnectedException alreadyDisconnected) {
-
         }
     }
 }

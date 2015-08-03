@@ -76,6 +76,7 @@ public class SchedulerTestUser {
     public Scheduler connect(SchedulerAuthenticationInterface schedulerAuthentication) throws LoginException,
             KeyException, ActiveObjectCreationException, NodeException, AlreadyConnectedException,
             NotConnectedException, PermissionException {
+        disconnect();
         Credentials connectedUserCreds = Credentials.createCredentials(
                 new CredData(CredData.parseLogin(connectedUserName), CredData.parseDomain(connectedUserName),
                     connectedUserPassword), schedulerAuthentication.getPublicKey());
