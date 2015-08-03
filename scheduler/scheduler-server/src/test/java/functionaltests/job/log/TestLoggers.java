@@ -38,6 +38,7 @@ package functionaltests.job.log;
 
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -46,10 +47,10 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.executables.Logging;
+import functionaltests.utils.SchedulerFunctionalTest;
 
-import static org.junit.Assert.*;
+import static com.jayway.awaitility.Awaitility.await;
 
 
 public class TestLoggers extends SchedulerFunctionalTest {
@@ -57,47 +58,52 @@ public class TestLoggers extends SchedulerFunctionalTest {
     private static URL jobDescriptor = TestLoggers.class
             .getResource("/functionaltests/descriptors/Job_Test_Loggers.xml");
 
-    private final static int TEST_TIMEOUT = 10000;
-
     @Test
-    public void run() throws Throwable {
-
-        // socket loggers
+    public void logBasedOnProActive() throws Throwable {
         LogForwardingService lfsPA = new LogForwardingService(
             "org.ow2.proactive.scheduler.common.util.logforwarder.providers.ProActiveBasedForwardingProvider");
         lfsPA.initialize();
+
+        JobId id1 = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+
+        final AppenderTester test1 = new AppenderTester();
+        lfsPA.addAppender(Log4JTaskLogs.JOB_LOGGER_PREFIX + id1, test1);
+
+        schedulerHelper.getSchedulerInterface().listenJobLogs(id1, lfsPA.getAppenderProvider());
+
+        schedulerHelper.waitForEventJobFinished(id1);
+
+        await().until(logEventsReceived(test1));
+
+        lfsPA.terminate();
+    }
+
+    @Test
+    public void logBasedOnSocket() throws Throwable {
         LogForwardingService lfsSocket = new LogForwardingService(
             "org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider");
         lfsSocket.initialize();
 
-        JobId id1 = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         JobId id2 = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-
-        AppenderTester test1 = new AppenderTester();
-        lfsPA.addAppender(Log4JTaskLogs.JOB_LOGGER_PREFIX + id1, test1);
 
         AppenderTester test2 = new AppenderTester();
         lfsSocket.addAppender(Log4JTaskLogs.JOB_LOGGER_PREFIX + id2, test2);
 
-        schedulerHelper.getSchedulerInterface().listenJobLogs(id1, lfsPA.getAppenderProvider());
         schedulerHelper.getSchedulerInterface().listenJobLogs(id2, lfsSocket.getAppenderProvider());
-
-        schedulerHelper.waitForEventJobFinished(id1);
         schedulerHelper.waitForEventJobFinished(id2);
 
-        // waiting for the end of the job is not enough ... :(
-        // listenLog is asynchronous, i.e. "eventually" semantic
-        Thread.sleep(TEST_TIMEOUT);
+        await().until(logEventsReceived(test2));
 
-        assertTrue(test1.receivedOnlyAwaitedEvents());
-        assertEquals(2, test1.getNumberOfAppendedLogs());
-        assertTrue(test2.receivedOnlyAwaitedEvents());
-        assertEquals(2, test2.getNumberOfAppendedLogs());
-
-        lfsPA.terminate();
         lfsSocket.terminate();
-        schedulerHelper.killScheduler();
+    }
 
+    private Callable<Boolean> logEventsReceived(final AppenderTester test1) {
+        return new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return test1.receivedOnlyAwaitedEvents() && test1.getNumberOfAppendedLogs() == 2;
+            }
+        };
     }
 
     public class AppenderTester extends AppenderSkeleton {

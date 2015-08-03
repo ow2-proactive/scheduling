@@ -2,14 +2,6 @@
 <job xmlns="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
 	name="job_Test_Logger">
-	<variables>
-		<variable name="executables" value="functionaltests.executables"/>
-		<variable name="javaCmd" value="${java.home}/bin/java"/>
-		<variable name="classPath" value="${pa.scheduler.home}/scheduler/scheduler-server/build/classes/test"/>
-	</variables>
-	<jobClasspath>
-		<pathElement path="${classPath}" />
-	</jobClasspath>
 	<taskFlow>
 		<task name="task1">
 			<javaExecutable class="functionaltests.executables.Logging">
