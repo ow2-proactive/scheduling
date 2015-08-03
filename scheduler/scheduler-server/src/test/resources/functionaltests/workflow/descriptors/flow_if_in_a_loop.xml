@@ -90,7 +90,7 @@ print('Loop block end ' + java.lang.System.getProperty('pas.task.iteration'))
                     <script>
                         <code language="javascript">
                             <![CDATA[
-if($IT < 2) {
+if(variables.get('PA_TASK_ITERATION') < 2) {
 						loop = true;
 					} else {
 						loop = false;
