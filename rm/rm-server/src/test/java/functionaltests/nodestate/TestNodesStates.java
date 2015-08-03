@@ -181,20 +181,11 @@ public class TestNodesStates extends RMFunctionalTest {
 
         resourceManager.releaseNodes(nodes);
 
-        // we should get 5 FREE events + 1 down event for node that was down
+        // we should get 4 FREE events
 
-        for (int i = 0; i < totalNodeNumber - 1; i++) {
+        for (int i = 0; i < totalNodeNumber - 2; i++) {
             evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            if (evt.getNodeUrl().equals(n.getNodeInformation().getURL())) {
-                // the down node became free
-                // wait while rmHelper detects again that it's down
-                evt = rmHelper
-                        .waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-                assertEquals(NodeState.DOWN, evt.getNodeState());
-
-            } else {
-                assertEquals(NodeState.FREE, evt.getNodeState());
-            }
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
 
         //two nodes killed, but the detected down is in RM down nodes list
@@ -261,16 +252,13 @@ public class TestNodesStates extends RMFunctionalTest {
             log("Taken node: " + node.getNodeInformation().getURL());
         }
 
-        // we have 2 nodes: 11 busy and one down
+        // we have 2 nodes: 11 busy and one still down
         resourceManager.releaseNodes(nodes);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 1; i++) {
             evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
             assertEquals(NodeState.FREE, evt.getNodeState());
         }
-
-        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
-        assertEquals(NodeState.DOWN, evt.getNodeState());
 
         assertEquals(totalNodeNumber - 1, resourceManager.getState().getTotalNodesNumber());
         assertEquals(totalNodeNumber - 4, resourceManager.getState().getFreeNodesNumber());

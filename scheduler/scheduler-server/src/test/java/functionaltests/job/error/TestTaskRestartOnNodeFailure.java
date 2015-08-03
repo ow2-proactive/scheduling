@@ -91,20 +91,19 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
     @Test
     public void testRestart() throws Exception {
         schedulerHelper.startScheduler(false, new File(SchedulerTHelper.class.getResource(
-          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath(), null, null);
-
-        TestNode node1 = startNode();
+          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath(), null,
+          null);
 
         ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 
-        node1 = testTaskKillNode(communicationObject, node1, false);
-        node1 = testTaskKillNode(communicationObject, node1, true);
+        testTaskKillNode(communicationObject, false);
+        testTaskKillNode(communicationObject, true);
     }
 
-    private TestNode testTaskKillNode(ProActiveLock communicationObject, TestNode node1,
+    private void testTaskKillNode(ProActiveLock communicationObject,
             boolean waitBeforeKill) throws Exception {
         communicationObject.lock();
-        TestNode node2 = startNode();
+        TestNode nodeToKill = startNode();
 
         log("Submit job");
         final JobId jobId = schedulerHelper.submitJob(createJob(PAActiveObject.getUrl(communicationObject)));
@@ -114,21 +113,6 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
         do {
             event = schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, TIMEOUT);
         } while (!event.getNodeState().equals(NodeState.BUSY));
-
-        final String taskNodeUrl = event.getNodeUrl();
-
-        TestNode aliveNode;
-        TestNode nodeToKill;
-
-        if (taskNodeUrl.equals(node1.getNode().getNodeInformation().getURL())) {
-            nodeToKill = node1;
-            aliveNode = node2;
-        } else if (taskNodeUrl.equals(node2.getNode().getNodeInformation().getURL())) {
-            nodeToKill = node2;
-            aliveNode = node1;
-        } else {
-            throw new Exception("Can't detect node by URL: " + event.getNodeUrl());
-        }
 
         log("Wait when task starts");
         schedulerHelper.waitForEventTaskRunning(jobId, "Test task");
@@ -149,23 +133,25 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
           nodeToKill.getNodeURL(), TIMEOUT);
         assertEquals(NodeState.DOWN, nodeDownEvent.getNodeState());
 
+        TestNode newNode = startNode();
+
         log("Let task finish");
         communicationObject.unlock();
 
         log("Wait when job finish");
         schedulerHelper.waitForEventJobFinished(jobId, TIMEOUT);
 
-        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, aliveNode.getNode()
+        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, newNode.getNode()
                 .getNodeInformation().getURL(), TIMEOUT);
         assertEquals(NodeState.BUSY, event.getNodeState());
-        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, aliveNode.getNode()
+        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, newNode.getNode()
                 .getNodeInformation().getURL(), TIMEOUT);
         assertEquals(NodeState.FREE, event.getNodeState());
 
         log("Check job result");
         checkJobResult(schedulerHelper.getSchedulerInterface(), jobId);
 
-        return aliveNode;
+        schedulerHelper.getResourceManager().removeNode(newNode.getNodeURL(), true);
     }
 
     private static int startedNodesCounter;

@@ -1017,9 +1017,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 // free
                 if (rmnode.isFree()) {
                     logger.warn("Client " + caller + " tries to release the already free node " + nodeURL);
+                } else if (rmnode.isDown()) {
+                    logger.warn("Node was down, it cannot be released");
                 } else {
-                    boolean wasDown = rmnode.isDown();
-
                     Set<? extends IdentityPrincipal> userPrincipal = rmnode.getOwner().getSubject()
                             .getPrincipals(UserNamePrincipal.class);
                     Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
@@ -1036,10 +1036,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     } catch (SecurityException ex) {
                         logger.error(ex.getMessage(), ex);
                         exception = ex;
-                    }
-
-                    if (wasDown) {
-                        rmnode.getNodeSource().pingNode(rmnode.getNode());
                     }
                 }
             } else {
