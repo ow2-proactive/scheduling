@@ -96,6 +96,7 @@ public class TaskLauncher implements InitActive {
     private TaskKiller taskKiller;
     private Decrypter decrypter;
     private ProgressFileReader progressFileReader;
+    private Thread nodeShutdownHook;
 
     /**
      * Needed for ProActive but should never be used manually to create an instance of the object.
@@ -118,6 +119,12 @@ public class TaskLauncher implements InitActive {
         this.taskLogger = new TaskLogger(taskId, getHostname());
         this.progressFileReader = new ProgressFileReader();
         this.taskKiller = new TaskKiller(Thread.currentThread());
+        nodeShutdownHook = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                kill();
+            }
+        });
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
@@ -131,6 +138,7 @@ public class TaskLauncher implements InitActive {
         TaskResultImpl taskResult;
 
         try {
+            addShutdownHook();
             TaskDataspaces dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService());
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
@@ -202,6 +210,24 @@ public class TaskLauncher implements InitActive {
         } finally {
             progressFileReader.stop();
             taskLogger.close();
+            removeShutdownHook();
+            terminate();
+        }
+    }
+
+    private void addShutdownHook() {
+        try {
+            Runtime.getRuntime().addShutdownHook(nodeShutdownHook);
+        } catch (IllegalStateException ignored) {
+            // ignore
+        }
+    }
+
+    private void removeShutdownHook() {
+        try {
+            Runtime.getRuntime().removeShutdownHook(nodeShutdownHook);
+        } catch (IllegalStateException ignored) {
+            // ignored
         }
     }
 
@@ -253,7 +279,11 @@ public class TaskLauncher implements InitActive {
     }
 
     private void sendResultToScheduler(TaskTerminateNotification terminateNotification,
-      TaskResultImpl taskResult) {
+            TaskResultImpl taskResult) {
+        if (isNodeShuttingDown()) {
+            terminate();
+            return;
+        }
         int pingAttempts = initializer.getPingAttempts();
         int pingPeriodMs = initializer.getPingPeriod() * 1000;
 
@@ -275,7 +305,15 @@ public class TaskLauncher implements InitActive {
         }
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
             " attempts, terminating task launcher now");
-        terminate();
+    }
+
+    private boolean isNodeShuttingDown() {
+        try {
+            Runtime.getRuntime().addShutdownHook(new Thread());
+        } catch (IllegalStateException e) {
+            return true;
+        }
+        return false;
     }
 
     @ImmediateService
@@ -304,7 +342,6 @@ public class TaskLauncher implements InitActive {
         taskLogger.resetLogContextForImmediateService();
         logger.info("Kill received for task");
         taskKiller.kill(TaskKiller.Status.KILLED_MANUALLY);
-        terminate();
     }
 
     private void terminate() {
