@@ -42,8 +42,8 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.ow2.proactive.process_tree_killer.ProcessTree;
-import org.ow2.proactive.rm.util.process.OperatingSystem;
-import org.ow2.proactive.rm.util.process.OperatingSystemFamily;
+import org.ow2.proactive.utils.OperatingSystem;
+import org.ow2.proactive.utils.OperatingSystemFamily;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.task.utils.ThreadReader;

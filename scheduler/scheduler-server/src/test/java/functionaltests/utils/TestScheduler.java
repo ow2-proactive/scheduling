@@ -70,8 +70,7 @@ public class TestScheduler {
     private SchedulerAuthenticationInterface schedulerAuth;
     private RMAuthentication rmAuth;
 
-    private CookieBasedProcessTreeKiller processTreeKiller = new CookieBasedProcessTreeKiller(
-        "TEST_SCHEDULER");
+    private CookieBasedProcessTreeKiller processTreeKiller;
     private SchedulerTestConfiguration startedConfiguration = SchedulerTestConfiguration.defaultConfiguration();
 
     public synchronized void start(SchedulerTestConfiguration configuration) throws Exception {
@@ -143,7 +142,8 @@ public class TestScheduler {
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
-        processTreeKiller.tagEnvironment(processBuilder.environment());
+        processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller("TEST_SCHED",
+                processBuilder.environment());
         schedulerProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(),

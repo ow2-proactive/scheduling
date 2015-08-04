@@ -32,14 +32,14 @@
  *
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.rm.util.process;
-
-import com.sun.jna.Library;
-import com.sun.jna.Native;
+package org.ow2.proactive.utils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.sun.jna.Library;
+import com.sun.jna.Native;
 
 
 /**

@@ -76,7 +76,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
-import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.Tools;
 import org.apache.commons.cli.CommandLine;
@@ -328,7 +328,7 @@ public class RMNodeStarter {
     public static void main(String[] args) {
         try {
             args = JVMPropertiesPreloader.overrideJVMProperties(args);
-            EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown("node");
+            CookieBasedProcessTreeKiller.registerKillChildProcessesOnShutdown("node");
             RMNodeStarter starter = new RMNodeStarter();
             starter.doMain(args);
         } catch (Throwable t) {

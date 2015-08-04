@@ -60,7 +60,7 @@ public class TestRM {
     // keep the RM running after the test with rmi registry is killed
     public static int PA_PNP_PORT = 1199;
 
-    private CookieBasedProcessTreeKiller processTreeKiller = new CookieBasedProcessTreeKiller("TEST_RM");
+    private CookieBasedProcessTreeKiller processTreeKiller;
 
     private static String DEFAULT_CONFIGURATION;
     static {
@@ -137,7 +137,8 @@ public class TestRM {
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
-        processTreeKiller.tagEnvironment(processBuilder.environment());
+        processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller("TEST_RM",
+                processBuilder.environment());
         rmProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(),

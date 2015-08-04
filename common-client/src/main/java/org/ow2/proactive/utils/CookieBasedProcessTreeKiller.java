@@ -48,23 +48,53 @@ public class CookieBasedProcessTreeKiller {
 
     private static final String PROCESS_KILLER_COOKIE = "PROCESS_KILLER_COOKIE";
 
-    private String cookieName;
+    private final String cookieName;
+    private final String cookieValue;
 
-    public CookieBasedProcessTreeKiller(String cookiePrefix) {
-        cookieName = cookiePrefix + "_" + UUID.randomUUID().toString();
+    private CookieBasedProcessTreeKiller(String cookieNameSuffix) {
+        cookieName = PROCESS_KILLER_COOKIE + cookieNameSuffix;
+        cookieValue = UUID.randomUUID().toString();
     }
 
-    public void tagEnvironment(Map<String, String> env) {
-        env.put(PROCESS_KILLER_COOKIE, cookieName);
+    /**
+     * A subsequent kill will terminate all children of the current process.
+     */
+    public static CookieBasedProcessTreeKiller createAllChildrenKiller(String cookieNameSuffix) {
+        CookieBasedProcessTreeKiller killer = new CookieBasedProcessTreeKiller(cookieNameSuffix);
+        Environment.setenv(killer.cookieName, killer.cookieValue, true);
+        return killer;
+    }
+
+    /**
+     * A subsequent kill will terminate only children of the process whose environment is passed as a parameter.
+     */
+    public static CookieBasedProcessTreeKiller createProcessChildrenKiller(String cookieNameSuffix,
+            Map<String, String> processEnvironment) {
+        CookieBasedProcessTreeKiller killer = new CookieBasedProcessTreeKiller(cookieNameSuffix);
+        processEnvironment.put(killer.cookieName, killer.cookieValue);
+        return killer;
     }
 
     public void kill() {
+        Environment.unsetenv(cookieName); // avoid suicide
         try {
-            ProcessTree.get().killAll(Collections.singletonMap(PROCESS_KILLER_COOKIE, cookieName));
+            ProcessTree.get().killAll(Collections.singletonMap(cookieName, cookieValue));
         } catch (Exception e) {
             logger.warn("Failed to kill child processes using cookie: " + cookieName, e);
         }
+    }
 
+    /**
+     * Register a shutdown hook to kill children processes
+     */
+    public static void registerKillChildProcessesOnShutdown(String cookieNameSuffix) {
+        final CookieBasedProcessTreeKiller processKiller = createAllChildrenKiller(cookieNameSuffix);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                processKiller.kill();
+            }
+        });
     }
 
 }
