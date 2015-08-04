@@ -62,4 +62,9 @@ public class TestNode {
     public String getNodeURL() {
         return node.getNodeInformation().getURL();
     }
+
+    public void kill() throws InterruptedException {
+        nodeProcess.stopProcess();
+        nodeProcess.waitFor();
+    }
 }

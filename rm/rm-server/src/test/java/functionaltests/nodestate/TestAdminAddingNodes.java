@@ -52,6 +52,7 @@ import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestNode;
 
 import static functionaltests.utils.RMTHelper.log;
@@ -94,7 +95,7 @@ public class TestAdminAddingNodes extends RMFunctionalTest {
 
         log("Test 1");
         String node1Name = "node1";
-        String node1URL = rmHelper.createNode(node1Name).getNodeURL();
+        String node1URL = RMTHelper.createNode(node1Name).getNodeURL();
 
         resourceManager.addNode(node1URL, NS_NAME);
 
@@ -119,7 +120,8 @@ public class TestAdminAddingNodes extends RMFunctionalTest {
 
         log("Test 3");
         String node2Name = "node2";
-        String node2URL = rmHelper.createNode(node2Name).getNodeURL();
+        TestNode node2 = RMTHelper.createNode(node2Name);
+        String node2URL = node2.getNodeURL();
 
         resourceManager.addNode(node2URL, NS_NAME);
 
@@ -131,8 +133,7 @@ public class TestAdminAddingNodes extends RMFunctionalTest {
         assertEquals(1, resourceManager.getState().getFreeNodesNumber());
         assertEquals(1, resourceManager.getState().getTotalAliveNodesNumber());
 
-        //kill the node
-        rmHelper.killNode(node2URL);
+        node2.kill();
 
         RMNodeEvent evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
 
@@ -143,7 +144,7 @@ public class TestAdminAddingNodes extends RMFunctionalTest {
         assertEquals(0, resourceManager.getState().getTotalAliveNodesNumber());
 
         //create another node with the same URL, and add it to Resource manager
-        TestNode node = rmHelper.createNode(node2Name);
+        TestNode node = RMTHelper.createNode(node2Name);
         node2URL = node.getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
 
@@ -165,10 +166,11 @@ public class TestAdminAddingNodes extends RMFunctionalTest {
         Thread.sleep(10000);
 
         //node2 is free, kill the node
-        rmHelper.killNode(node2URL);
+        node.kill();
 
         //create another node with the same URL, and add it to Resource manager
-        node2URL = rmHelper.createNode(node2Name, new URI(node2URL).getPort()).getNodeURL();
+        node2 = RMTHelper.createNode(node2Name, new URI(node2URL).getPort());
+        node2URL = node2.getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
 
         NodeFactory.getNode(node2URL);
@@ -194,10 +196,11 @@ public class TestAdminAddingNodes extends RMFunctionalTest {
         assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         //node2 is busy, kill the node
-        rmHelper.killNode(node2URL);
+        node2.kill();
 
         //create another node with the same URL, and add it to Resource manager
-        node2URL = rmHelper.createNode(node2Name).getNodeURL();
+        node2 = RMTHelper.createNode(node2Name);
+        node2URL = node2.getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
 
         NodeFactory.getNode(node2URL);
@@ -232,11 +235,10 @@ public class TestAdminAddingNodes extends RMFunctionalTest {
         assertEquals(3, resourceManager.getState().getTotalNodesNumber());
         assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
-        //node2 is to release, kill the node
-        rmHelper.killNode(node2URL);
+        node2.kill();
 
         //create another node with the same URL, and add it to Resource manager
-        node2URL = rmHelper.createNode(node2Name).getNodeURL();
+        node2URL = RMTHelper.createNode(node2Name).getNodeURL();
         resourceManager.addNode(node2URL, NS_NAME);
 
         NodeFactory.getNode(node2URL);
