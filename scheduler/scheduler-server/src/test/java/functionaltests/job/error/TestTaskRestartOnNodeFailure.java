@@ -128,9 +128,15 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
         }
 
         log("Stop task node process (node " + nodeToKill.getNode().getNodeInformation().getURL() + ")");
-        nodeToKill.getNodeProcess().stopProcess();
+        nodeToKill.kill();
         RMNodeEvent nodeDownEvent = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
-          nodeToKill.getNodeURL(), TIMEOUT);
+                nodeToKill.getNodeURL(), TIMEOUT);
+        if (nodeDownEvent.getNodeState().equals(NodeState.FREE)) {
+            // if the Scheduler detects the task launcher is down before the RM detects the node is down
+            // then the node will be free before being marked as down
+            nodeDownEvent = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                    nodeToKill.getNodeURL(), TIMEOUT);
+        }
         assertEquals(NodeState.DOWN, nodeDownEvent.getNodeState());
 
         TestNode newNode = startNode();
