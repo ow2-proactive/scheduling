@@ -70,19 +70,21 @@ public class RMFunctionalTest extends ProActiveTest {
     }
 
     private void cleanState() throws Exception {
-        rmHelper.disconnect(); // force reconnection
-        ResourceManager rm = rmHelper.getResourceManager();
-        int nodeNumber = rm.getState().getTotalNodesNumber();
+        if (rmHelper.isRMStarted()) {
+            rmHelper.disconnect(); // force reconnection
+            ResourceManager rm = rmHelper.getResourceManager();
+            int nodeNumber = rm.getState().getTotalNodesNumber();
 
-        RMInitialState state = rm.getMonitoring().getState();
-        for (RMNodeSourceEvent sourceEvent : state.getNodeSource()) {
-            String nodeSource = sourceEvent.getSourceName();
-            rm.removeNodeSource(nodeSource, true);
-            rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nodeSource);
-        }
+            RMInitialState state = rm.getMonitoring().getState();
+            for (RMNodeSourceEvent sourceEvent : state.getNodeSource()) {
+                String nodeSource = sourceEvent.getSourceName();
+                rm.removeNodeSource(nodeSource, true);
+                rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nodeSource);
+            }
 
-        for (int i = 0; i < nodeNumber; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            for (int i = 0; i < nodeNumber; i++) {
+                rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            }
         }
     }
 

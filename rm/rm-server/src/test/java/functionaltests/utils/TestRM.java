@@ -77,7 +77,7 @@ public class TestRM {
     private RMAuthentication rmAuth;
 
     public boolean isStartedWithSameConfiguration(String configurationFile) {
-        return rmProcess != null &&
+        return isStarted() &&
             (startedConfiguration.equals(configurationFile) || configurationFile == null &&
                 startedConfiguration.equals(DEFAULT_CONFIGURATION));
     }
@@ -175,5 +175,9 @@ public class TestRM {
 
     public synchronized RMAuthentication getAuth() {
         return rmAuth;
+    }
+
+    public boolean isStarted() {
+        return rmProcess != null;
     }
 }

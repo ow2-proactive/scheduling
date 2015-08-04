@@ -558,4 +558,7 @@ public class RMTHelper {
         connectedUser.disconnect();
     }
 
+    public boolean isRMStarted() {
+        return rm.isStarted();
+    }
 }

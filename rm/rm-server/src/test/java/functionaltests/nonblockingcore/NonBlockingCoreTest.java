@@ -53,6 +53,7 @@ import org.ow2.proactive.utils.NodeSet;
 import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestUsers;
 import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 
@@ -76,6 +77,10 @@ public class NonBlockingCoreTest extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
+        String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
+          "/functionaltests/config/functionalTRMProperties-long-selection-script-timeout.ini").getFile())).getAbsolutePath();
+        rmHelper.startRM(rmconf);
+
         ResourceManager resourceManager = rmHelper.getResourceManager();
         int initialNodeNumber = 2;
         rmHelper.createNodeSource("NonBlockingCoreTest1", initialNodeNumber);
@@ -109,7 +114,7 @@ public class NonBlockingCoreTest extends RMFunctionalTest {
         t.start();
 
         String nodeName = "node_non_blocking_test";
-        String nodeUrl = rmHelper.createNode(nodeName).getNode().getNodeInformation().getURL();
+        String nodeUrl = RMTHelper.createNode(nodeName).getNode().getNodeInformation().getURL();
 
         log("Adding node " + nodeUrl);
         resourceManager.addNode(nodeUrl);
@@ -154,5 +159,6 @@ public class NonBlockingCoreTest extends RMFunctionalTest {
         } else {
             log("No blocking inside RMCore");
         }
+        t.interrupt();
     }
 }
