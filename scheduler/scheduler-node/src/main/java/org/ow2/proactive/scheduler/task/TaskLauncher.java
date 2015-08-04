@@ -281,7 +281,6 @@ public class TaskLauncher implements InitActive {
     private void sendResultToScheduler(TaskTerminateNotification terminateNotification,
             TaskResultImpl taskResult) {
         if (isNodeShuttingDown()) {
-            terminate();
             return;
         }
         int pingAttempts = initializer.getPingAttempts();
@@ -291,7 +290,6 @@ public class TaskLauncher implements InitActive {
             try {
                 terminateNotification.terminate(taskId, taskResult);
                 logger.debug("Successfully notified task termination " + taskId);
-                terminate();
                 return;
             } catch (Throwable th) {
                 logger.warn("Cannot notify task termination " + taskId + ", will try again in " +
