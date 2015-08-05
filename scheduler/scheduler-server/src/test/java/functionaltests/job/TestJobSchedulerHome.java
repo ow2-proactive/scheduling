@@ -36,28 +36,19 @@
  */
 package functionaltests.job;
 
-import java.io.File;
-
+import functionaltests.executables.PAHomeExecutable;
+import functionaltests.utils.SchedulerFunctionalTest;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.ScriptTask;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.ow2.proactive.utils.ClasspathUtils;
-import org.junit.Before;
-import org.junit.Test;
 
-import functionaltests.executables.PAHomeExecutable;
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.*;
@@ -74,7 +65,7 @@ public class TestJobSchedulerHome extends SchedulerFunctionalTest {
 
     @Before
     public void init() throws Throwable {
-        schedulerHomePath = ClasspathUtils.findSchedulerHome();
+        schedulerHomePath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
     }
 
     @Test
