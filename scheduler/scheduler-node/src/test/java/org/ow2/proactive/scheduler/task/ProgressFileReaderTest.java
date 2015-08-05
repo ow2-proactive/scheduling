@@ -1,21 +1,23 @@
 package org.ow2.proactive.scheduler.task;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.ow2.proactive.scripting.helper.progress.ProgressFile;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.ow2.proactive.scripting.helper.progress.ProgressFile;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
+
 
 /**
  * Test cases associated to {@link ProgressFileReader}.
@@ -37,6 +39,7 @@ public class ProgressFileReaderTest {
 
     @Before
     public void setup() throws IOException {
+        assumeTrue(System.getProperty("os.name").contains("Linux")); // too slow on Mac JDK7 and Windows
         String progressFileName = "test";
         progressFileReader.register(listener);
         progressFileReader.start(folder.getRoot(), progressFileName);

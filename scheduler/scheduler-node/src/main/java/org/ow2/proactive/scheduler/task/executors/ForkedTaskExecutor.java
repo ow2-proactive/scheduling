@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
-import org.ow2.proactive.scheduler.task.utils.TaskProcessTreeKiller;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -96,8 +96,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
     }
 
     public TaskResultImpl execute(TaskContext context, PrintStream outputSink, PrintStream errorSink) {
-        TaskProcessTreeKiller taskProcessTreeKiller = new TaskProcessTreeKiller(context.getTaskId().value());
-
+        CookieBasedProcessTreeKiller taskProcessTreeKiller = null;
         Process process = null;
         ProcessStreamsReader processStreamsReader = null;
         File serializedContext = null;
@@ -109,7 +108,8 @@ public class ForkedTaskExecutor implements TaskExecutor {
                     errorSink);
 
             try {
-                taskProcessTreeKiller.tagEnvironment(processBuilder.environment());
+                taskProcessTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller(context
+                        .getTaskId().value(), processBuilder.environment());
             } catch (NotImplementedException e) {
                 // SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
             }
@@ -144,7 +144,9 @@ public class ForkedTaskExecutor implements TaskExecutor {
             if (process != null) {
                 process.destroy();
             }
-            taskProcessTreeKiller.kill();
+            if (taskProcessTreeKiller != null) {
+                taskProcessTreeKiller.kill();
+            }
             if (processStreamsReader != null) {
                 processStreamsReader.close();
             }

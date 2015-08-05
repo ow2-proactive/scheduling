@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import com.jayway.awaitility.Duration;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
@@ -104,8 +105,7 @@ public class RestFuncTHelper {
     public static void startRestfulSchedulerWebapp() throws Exception {
         // Kill all children processes on exit
         org.apache.log4j.BasicConfigurator.configure(new org.apache.log4j.varia.NullAppender());
-        org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller
-                .registerKillChildProcessesOnShutdown("rest_tests");
+        CookieBasedProcessTreeKiller.registerKillChildProcessesOnShutdown("rest_tests");
 
         List<String> cmd = new ArrayList<>();
         String javaPath = RestFuncTUtils.getJavaPathFromSystemProperties();

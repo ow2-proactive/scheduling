@@ -36,7 +36,22 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import org.apache.log4j.Logger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -108,22 +123,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.Permission;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -1017,9 +1017,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 // free
                 if (rmnode.isFree()) {
                     logger.warn("Client " + caller + " tries to release the already free node " + nodeURL);
+                } else if (rmnode.isDown()) {
+                    logger.warn("Node was down, it cannot be released");
                 } else {
-                    boolean wasDown = rmnode.isDown();
-
                     Set<? extends IdentityPrincipal> userPrincipal = rmnode.getOwner().getSubject()
                             .getPrincipals(UserNamePrincipal.class);
                     Permission ownerPermission = new PrincipalPermission(rmnode.getOwner().getName(),
@@ -1036,10 +1036,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     } catch (SecurityException ex) {
                         logger.error(ex.getMessage(), ex);
                         exception = ex;
-                    }
-
-                    if (wasDown) {
-                        rmnode.getNodeSource().pingNode(rmnode.getNode());
                     }
                 }
             } else {
@@ -1432,7 +1428,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (client != null) {
             List<RMNode> nodesToRelease = new LinkedList<>();
             // expensive but relatively rare operation
-            for (RMNode rmnode : allNodes.values()) {
+            for (RMNode rmnode : new ArrayList<>(allNodes.values())) {
                 // checking that it is not only the same client but also 
                 // the same connection
                 if (client.equals(rmnode.getOwner()) && clientId.equals(rmnode.getOwner().getId())) {

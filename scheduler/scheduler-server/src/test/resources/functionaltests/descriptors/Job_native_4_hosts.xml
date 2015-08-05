@@ -17,7 +17,8 @@
 			<nativeExecutable>
 				<staticCommand 	value="${EXEC_PATH}">
 					<arguments>
-						<argument value="${BOOKED_HOSTS_NB}"/>
+						<argument value="${PA_NODESNUMBER}"/>
+						<argument value="${PA_NODESFILE}"/>
 					</arguments>
 				</staticCommand>
 			</nativeExecutable>

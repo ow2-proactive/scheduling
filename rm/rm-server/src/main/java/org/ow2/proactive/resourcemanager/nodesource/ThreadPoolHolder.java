@@ -40,7 +40,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.utils.NamedThreadFactory;
 
@@ -49,12 +48,10 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
  * 
  * Class to hold a number of independent thread pools.
  * Provides a synchronous access to pools allowing to submit tasks to them. 
- * Reinitializes all the pools after shutdown automatically. 
  *
  */
 public class ThreadPoolHolder {
 
-    private int[] poolSizes;
     private ExecutorService[] pools;
 
     /**
@@ -65,21 +62,13 @@ public class ThreadPoolHolder {
             throw new NullPointerException("poolSizes cannot be null");
         }
         if (poolSizes.length == 0) {
-            throw new IllegalArgumentException("poolSizes must contain al least one element");
+            throw new IllegalArgumentException("poolSizes must contain at least one element");
         }
 
-        this.poolSizes = poolSizes;
-    }
-
-    /**
-     * Reinitializes all the pools
-     */
-    private synchronized void init() {
         this.pools = new ExecutorService[poolSizes.length];
-
         for (int i = 0; i < poolSizes.length; i++) {
-            pools[i] = Executors.newFixedThreadPool(poolSizes[i], new NamedThreadFactory(
-                "Node Source threadpool # " + i));
+            pools[i] = Executors.newFixedThreadPool(poolSizes[i],
+              new NamedThreadFactory("Node Source threadpool # " + i));
         }
     }
 
@@ -91,50 +80,27 @@ public class ThreadPoolHolder {
      * @return the future result of the task
      */
     public synchronized <T> Future<T> submit(int num, Callable<T> task) {
-        if (num > poolSizes.length) {
-            throw new IllegalArgumentException("Incorrect thread pool number " + num);
-        }
-
-        if (pools == null) {
-            init();
-        }
+        checkPoolNumber(num);
 
         return pools[num].submit(task);
     }
 
     /**
      * Executes a task in the specified thread pool
-     * 
+     *
      * @param number of the thread pool
      * @param task to be executed
      */
     public synchronized void execute(int num, Runnable task) {
-        if (num > poolSizes.length) {
-            throw new IllegalArgumentException("Incorrect thread pool number " + num);
-        }
-
-        if (pools == null) {
-            init();
-        }
+        checkPoolNumber(num);
 
         pools[num].execute(task);
     }
 
-    /**
-     * Shutdown all the thread pools
-     * 
-     * @throws InterruptedException if interrupted while waiting
-     */
-    public synchronized void shutdown() throws InterruptedException {
-
-        if (pools != null) {
-            for (ExecutorService es : pools) {
-                es.shutdown();
-            }
-            for (ExecutorService es : pools) {
-                es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-            }
-            pools = null;
+    private void checkPoolNumber(int num) {
+        if (num > pools.length) {
+            throw new IllegalArgumentException("Incorrect thread pool number " + num);
         }
     }
+
 }

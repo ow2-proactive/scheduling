@@ -61,10 +61,15 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
-import org.ow2.tests.FunctionalTest;
-import functionaltests.RMTHelper;
-import functionaltests.SchedulerTHelper;
 import org.junit.Assert;
+import org.junit.Test;
+
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.TestUsers;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -72,23 +77,19 @@ import org.junit.Assert;
  * 
  * @author ProActive team
  */
-public final class SchedulerJMXTest extends FunctionalTest {
+public final class SchedulerJMXTest extends SchedulerFunctionalTest {
 
-    /**
-     * test function
-     * @throws Exception
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
+        schedulerHelper.killScheduler();
 
-        final String userLogin = "demo";
-        final String userPassword = "demo";
+        final String userLogin = TestUsers.DEMO.username;
+        final String userPassword = TestUsers.DEMO.password;
 
-        final String adminLogin = RMTHelper.defaultUserName;
-        final String adminPassword = RMTHelper.defaultUserPassword;
+        final String adminLogin = TestUsers.TEST.username;
+        final String adminPassword = TestUsers.TEST.password;
 
-        final SchedulerAuthenticationInterface auth = (SchedulerAuthenticationInterface) SchedulerTHelper
-                .getSchedulerAuth();
+        final SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
         final PublicKey pubKey = auth.getPublicKey();
 
         // final Credentials userCreds =
@@ -108,72 +109,70 @@ public final class SchedulerJMXTest extends FunctionalTest {
 
         {
             RMTHelper.log("Test jmxRmiServiceURL is well formed");
-            Assert.assertTrue("The jmxRmiServiceURL protocol must be rmi", jmxRmiServiceURL.getProtocol()
-                    .equals("rmi"));
-            Assert.assertTrue("The jmxRmiServiceURL URLPath must end with " + suffix, jmxRmiServiceURL
-                    .getURLPath().endsWith(suffix));
+            assertTrue("The jmxRmiServiceURL protocol must be rmi",
+              jmxRmiServiceURL.getProtocol().equals("rmi"));
+            assertTrue("The jmxRmiServiceURL URLPath must end with " + suffix,
+              jmxRmiServiceURL.getURLPath().endsWith(suffix));
         }
 
         {
             RMTHelper.log("Test jmxRoServiceURL is well formed");
-            Assert.assertTrue("The jmxRoServiceURL protocol must be ro", jmxRoServiceURL.getProtocol()
-                    .equals("ro"));
-            Assert.assertTrue("The jmxRoServiceURL URLPath must end with " + suffix, jmxRoServiceURL
-                    .getURLPath().endsWith(suffix));
+            assertTrue("The jmxRoServiceURL protocol must be ro", jmxRoServiceURL.getProtocol().equals("ro"));
+            assertTrue("The jmxRoServiceURL URLPath must end with " + suffix,
+              jmxRoServiceURL.getURLPath().endsWith(suffix));
         }
 
         {
-            SchedulerTHelper.log("Test jmxRmiServiceURL and jmxRoServiceURL are not equal");
+            log("Test jmxRmiServiceURL and jmxRoServiceURL are not equal");
             Assert.assertFalse("The jmxRmiServiceURL and jmxRoServiceURL must not be equal", jmxRmiServiceURL
                     .equals(jmxRoServiceURL));
         }
 
         {
-            SchedulerTHelper.log("Test invalid JMX auth without creds (expect SecurityException)");
+            log("Test invalid JMX auth without creds (expect SecurityException)");
             try {
                 JMXConnectorFactory.connect(jmxRmiServiceURL, new HashMap<String, Object>(0));
             } catch (Exception e) {
-                Assert
-                        .assertTrue(
-                                "JMX auth must throw SecurityException if a client tries to connect without creds in the env",
-                                e instanceof SecurityException);
+                assertTrue(
+                  "JMX auth must throw SecurityException if a client tries to connect without creds in the " +
+                    "env",
+                  e instanceof SecurityException);
             }
         }
 
         {
-            SchedulerTHelper
-                    .log("Test invalid JMX auth with null login/password creds (expect SecurityException)");
+            log("Test invalid JMX auth with null login/password creds (expect SecurityException)");
             // Create the environment
             final HashMap<String, Object> env = new HashMap<String, Object>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { null, null });
             try {
                 JMXConnectorFactory.connect(jmxRmiServiceURL, env);
             } catch (Exception e) {
-                Assert
-                        .assertTrue(
-                                "JMX auth must throw SecurityException if a client tries to connect with null credentials the env",
-                                e instanceof SecurityException);
+                assertTrue(
+                  "JMX auth must throw SecurityException if a client tries to connect with null credentials" +
+                    " the env",
+                  e instanceof SecurityException);
             }
         }
 
         {
-            SchedulerTHelper.log("Test invalid JMX auth with bad login/password creds");
+            log("Test invalid JMX auth with bad login/password creds");
             // Create the environment
             final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { "abra", "cadabra" });
             try {
                 JMXConnectorFactory.connect(jmxRmiServiceURL, env);
             } catch (Exception e) {
-                Assert
-                        .assertTrue(
-                                "JMX auth must throw SecurityException if a client tries to connect with bad login/password credentials the env",
-                                e instanceof SecurityException);
+                assertTrue(
+                  "JMX auth must throw SecurityException if a client tries to connect with bad " +
+                    "login/password credentials the env",
+                  e instanceof SecurityException);
             }
         }
 
         // Tests as user over RMI
         {
-            SchedulerTHelper.log("Test as user 1 - Auth with login/pass over RMI and check connection");
+            log("Test as user 1 - Auth with login/pass over RMI and check connection");
             // Create the environment
             final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { userLogin, userPassword });
@@ -181,26 +180,26 @@ public final class SchedulerJMXTest extends FunctionalTest {
             final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
             final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
             // Check that the MBean Server connection is not null
-            Assert.assertNotNull("Unable to obtain the MBean server connection over RMI", conn);
+            assertNotNull("Unable to obtain the MBean server connection over RMI", conn);
 
-            SchedulerTHelper.log("Test as user 2 - Check all mbeans are registered in the server");
-            Assert.assertTrue("AllAccountsMBean is not registered", conn.isRegistered(allAccountsMBeanName));
-            Assert.assertTrue("MyAccountMBean is not registered", conn.isRegistered(myAccountMBeanName));
-            Assert.assertTrue("RuntimeDataMBean is not registered", conn.isRegistered(runtimeDataMBeanName));
-            Assert.assertTrue("ManagementMBean is not registered", conn.isRegistered(managementMBeanName));
+            log("Test as user 2 - Check all mbeans are registered in the server");
+            assertTrue("AllAccountsMBean is not registered", conn.isRegistered(allAccountsMBeanName));
+            assertTrue("MyAccountMBean is not registered", conn.isRegistered(myAccountMBeanName));
+            assertTrue("RuntimeDataMBean is not registered", conn.isRegistered(runtimeDataMBeanName));
+            assertTrue("ManagementMBean is not registered", conn.isRegistered(managementMBeanName));
 
-            SchedulerTHelper.log("Test as user 3 - Check MyAccountMBean attributes do not throw exceptions");
+            log("Test as user 3 - Check MyAccountMBean attributes do not throw exceptions");
             final MBeanInfo info = conn.getMBeanInfo(myAccountMBeanName);
             for (final MBeanAttributeInfo att : info.getAttributes()) {
                 final String attName = att.getName();
                 try {
                     conn.getAttribute(myAccountMBeanName, attName);
                 } catch (Exception e) {
-                    Assert.fail("The attribute " + attName + " of MyAccountMBean must not throw " + e);
+                    fail("The attribute " + attName + " of MyAccountMBean must not throw " + e);
                 }
             }
 
-            SchedulerTHelper.log("Test as user 4 - Check RuntimeDataMBeanName attributes are correct");
+            log("Test as user 4 - Check RuntimeDataMBeanName attributes are correct");
 
             final String[] attributesToCheck = new String[] { "Status", "TotalJobsCount",
                     "FinishedJobsCount", "TotalTasksCount", "FinishedTasksCount" };
@@ -231,8 +230,8 @@ public final class SchedulerJMXTest extends FunctionalTest {
             }
 
             // log as admin since its creds are already available
-            final JobId id = SchedulerTHelper.submitJob(job);
-            SchedulerTHelper.waitForEventJobFinished(id);
+            final JobId id = schedulerHelper.submitJob(job);
+            schedulerHelper.waitForEventJobFinished(id);
 
             // Get all attributes to test AFTER JOB EXECUTION
             list = conn.getAttributes(runtimeDataMBeanName, attributesToCheck);
@@ -260,7 +259,7 @@ public final class SchedulerJMXTest extends FunctionalTest {
 
         // Test as admin over RO
         {
-            SchedulerTHelper.log("Test as admin 1, auth with login/creds over RO and check connection");
+            log("Test as admin 1, auth with login/creds over RO and check connection");
             // Create the environment
             final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
@@ -269,10 +268,10 @@ public final class SchedulerJMXTest extends FunctionalTest {
             final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRoServiceURL, env);
             final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
             // Check that the MBean Server connection is not null
-            Assert.assertNotNull("Unable to obtain the MBean server connection over RO", conn);
+            assertNotNull("Unable to obtain the MBean server connection over RO", conn);
 
-            SchedulerTHelper.log("Test as admin 2 - Check ManagementMBean is registered in the MBean server");
-            Assert.assertTrue("ManagementMBean is not registered", conn.isRegistered(managementMBeanName));
+            log("Test as admin 2 - Check ManagementMBean is registered in the MBean server");
+            assertTrue("ManagementMBean is not registered", conn.isRegistered(managementMBeanName));
 
             RMTHelper.log("Test as admin 3 - Check ManagementMBean attributes do not throw exception");
             final MBeanInfo mInfo = conn.getMBeanInfo(managementMBeanName);
@@ -281,7 +280,7 @@ public final class SchedulerJMXTest extends FunctionalTest {
                 try {
                     conn.getAttribute(managementMBeanName, attName);
                 } catch (Exception e) {
-                    Assert.fail("The attribute " + attName + " of ManagementMBean must not throw " + e);
+                    fail("The attribute " + attName + " of ManagementMBean must not throw " + e);
                 }
             }
 
@@ -290,24 +289,23 @@ public final class SchedulerJMXTest extends FunctionalTest {
             try {
                 conn.setAttribute(allAccountsMBeanName, new Attribute(username, adminLogin));
             } catch (Exception e) {
-                Assert.fail("Setting Username attribute of the AllAccountsMBean must not throw " + e);
+                fail("Setting Username attribute of the AllAccountsMBean must not throw " + e);
             }
             String res = "";
             try {
                 res = (String) conn.getAttribute(allAccountsMBeanName, username);
             } catch (Exception e) {
-                Assert.fail("The attribute " + username + " of AllAccountsMBean must not throw " + e);
+                fail("The attribute " + username + " of AllAccountsMBean must not throw " + e);
             }
 
-            Assert.assertTrue("The attribute " + username + " of returns incorrect value", res
-                    .equals(adminLogin));
+            assertTrue("The attribute " + username + " of returns incorrect value", res.equals(adminLogin));
 
             jmxConnector.close();
         }
 
         // Test simultaneous RMI and RO connections
         {
-            SchedulerTHelper.log("Test simultaneous JMX-RMI and JMX-RO connections as admin");
+            log("Test simultaneous JMX-RMI and JMX-RO connections as admin");
             final HashMap<String, Object> env = new HashMap<>(1);
             env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
             // Connect to the JMX-RMI Connector Server
@@ -327,8 +325,7 @@ public final class SchedulerJMXTest extends FunctionalTest {
                             "In case of simultaneous RMI and RO JMX connections the connectors must not provide the same connection ids",
                             jmxRmiConnector.getConnectionId().equals(jmxRoConnector1.getConnectionId()));
 
-            SchedulerTHelper
-                    .log("Test JMX-RO connection unicity (two connections over RO must not have the same id)");
+            log("Test JMX-RO connection unicity (two connections over RO must not have the same id)");
             final JMXConnector jmxRoConnector2 = JMXConnectorFactory.connect(jmxRoServiceURL, env);
             Assert
                     .assertFalse(
@@ -343,21 +340,21 @@ public final class SchedulerJMXTest extends FunctionalTest {
 
         // Test Helper class
         {
-            SchedulerTHelper.log("Test JMXClientHelper as admin over RMI with connect() method");
+            log("Test JMXClientHelper as admin over RMI with connect() method");
             final JMXClientHelper client = new JMXClientHelper(auth, new Object[] { adminLogin, adminCreds });
             final boolean isConnected1 = client.connect(); // default is over
             // RMI
-            Assert.assertTrue("Unable to connect, exception is " + client.getLastException(), isConnected1);
-            Assert.assertTrue("Incorrect default behavior of connect() method it must use RMI protocol",
-                    client.getConnector().getConnectionId().startsWith("rmi"));
+            assertTrue("Unable to connect, exception is " + client.getLastException(), isConnected1);
+            assertTrue("Incorrect default behavior of connect() method it must use RMI protocol",
+              client.getConnector().getConnectionId().startsWith("rmi"));
             client.disconnect();
             Assert.assertFalse("The helper disconnect() must set the helper as disconnected", client
                     .isConnected());
 
             final boolean isConnected2 = client.connect(JMXTransportProtocol.RO);
-            Assert.assertTrue("Unable to connect, exception is " + client.getLastException(), isConnected2);
-            Assert.assertTrue("The helper connect(JMXTransportProtocol.RO) method must use RO protocol",
-                    client.getConnector().getConnectionId().startsWith("ro"));
+            assertTrue("Unable to connect, exception is " + client.getLastException(), isConnected2);
+            assertTrue("The helper connect(JMXTransportProtocol.RO) method must use RO protocol",
+              client.getConnector().getConnectionId().startsWith("ro"));
             client.disconnect();
             Assert.assertFalse("The helper disconnect() must set the helper as disconnected", client
                     .isConnected());

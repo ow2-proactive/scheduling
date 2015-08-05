@@ -44,6 +44,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+
 
 /**
  * Scheduler event receiver for functional tests
@@ -79,6 +81,7 @@ public class MonitorEventReceiver implements SchedulerEventListener {
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
      */
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
+        log("SchedulerEvent: " + eventType);
         switch (eventType) {
             case STARTED:
             case STOPPED:
@@ -101,6 +104,7 @@ public class MonitorEventReceiver implements SchedulerEventListener {
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        log("NotificationData: " + notification);
         switch (notification.getEventType()) {
             case JOB_PENDING_TO_RUNNING:
             case JOB_PENDING_TO_FINISHED:
@@ -121,6 +125,7 @@ public class MonitorEventReceiver implements SchedulerEventListener {
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+        log("NotificationData: " + notification);
         switch (notification.getEventType()) {
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
@@ -134,6 +139,7 @@ public class MonitorEventReceiver implements SchedulerEventListener {
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
      */
     public void jobSubmittedEvent(JobState jState) {
+        log("JobState: " + jState);
         monitorsHandler.handleJobEvent(SchedulerEvent.JOB_SUBMITTED, jState);
     }
 
@@ -141,6 +147,7 @@ public class MonitorEventReceiver implements SchedulerEventListener {
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
      */
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
+        log("NotificationData: " + notification);
         monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.USERS_UPDATE);
     }
 

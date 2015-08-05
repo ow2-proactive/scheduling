@@ -144,11 +144,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
                         pushUrl, outputLocalFolder.getAbsolutePath(), pullUrl,
                         isolateTaskOutput, automaticTransfer);
 
-        Thread.sleep(ONE_SECOND);
-
-        restSmartProxy.disconnect();
-        restSmartProxy.reconnect();
-
         JobState jobState = restSmartProxy.getJobState(id.toString());
         while (!jobState.isFinished()) {
             Thread.sleep(ONE_SECOND);

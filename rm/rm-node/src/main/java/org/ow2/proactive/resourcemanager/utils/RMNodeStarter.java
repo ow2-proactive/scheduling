@@ -62,6 +62,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.PermissionChecker;
@@ -75,7 +76,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
-import org.ow2.proactive.rm.util.process.EnvironmentCookieBasedChildProcessKiller;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.Tools;
 import org.apache.commons.cli.CommandLine;
@@ -327,7 +328,7 @@ public class RMNodeStarter {
     public static void main(String[] args) {
         try {
             args = JVMPropertiesPreloader.overrideJVMProperties(args);
-            EnvironmentCookieBasedChildProcessKiller.registerKillChildProcessesOnShutdown("node");
+            CookieBasedProcessTreeKiller.registerKillChildProcessesOnShutdown("node");
             RMNodeStarter starter = new RMNodeStarter();
             starter.doMain(args);
         } catch (Throwable t) {
@@ -620,7 +621,11 @@ public class RMNodeStarter {
         try {
             DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
                     .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-            conf.configureNode();
+            boolean dataspaceConfigured = conf.configureNode();
+            if (!dataspaceConfigured) {
+                throw new NotConfiguredException(
+                    "Failed to configure dataspaces, check the logs for more details");
+            }
             closeDataSpaceOnShutdown(node);
             node.setProperty(DATASPACES_STATUS_PROP_NAME, Boolean.TRUE.toString());
         } catch (Throwable t) {

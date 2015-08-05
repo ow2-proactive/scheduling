@@ -58,10 +58,11 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
 import org.junit.Assert;
 import org.junit.Ignore;
+
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -77,7 +78,7 @@ import org.junit.Ignore;
  * @author The ProActive Team 
  */
 @Ignore
-public final class AddGetTest extends RMConsecutive {
+public final class AddGetTest extends RMFunctionalTest {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -88,15 +89,14 @@ public final class AddGetTest extends RMConsecutive {
      */
     @org.junit.Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        final ResourceManager r = helper.getResourceManager();
+        final ResourceManager r = rmHelper.getResourceManager();
         // The username and thr password must be the same a used to connect to the RM
-        final String adminLogin = RMTHelper.defaultUserName;
-        final String adminPassword = RMTHelper.defaultUserPassword;
+        final String adminLogin = TestUsers.TEST.username;
+        final String adminPassword = TestUsers.TEST.password;
 
         // All accounting values are checked through JMX
-        final RMAuthentication auth = (RMAuthentication) helper.getRMAuth();
+        final RMAuthentication auth = (RMAuthentication) rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
                 pubKey);
@@ -134,12 +134,12 @@ public final class AddGetTest extends RMConsecutive {
         // ADD, GET
         // 1) ADD
         final long beforeAddTime = System.currentTimeMillis();
-        Node node = helper.createNode("test").getNode();
+        Node node = rmHelper.createNode("test").getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
         //we eat the configuring to free
-        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();

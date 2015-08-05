@@ -36,12 +36,12 @@
  */
 package functionaltests.workflow;
 
-import org.apache.commons.io.FileUtils;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
 import java.io.File;
 import java.io.Serializable;
+
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.apache.commons.io.FileUtils;
 
 
 public class JobWorkflowDataspace extends JavaExecutable {
@@ -49,9 +49,7 @@ public class JobWorkflowDataspace extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
 
-        String filename = getVariables().get("PA_TASK_ITERATION")
-                + "_" +
-                getVariables().get("PA_TASK_REPLICATION");
+        String filename = getIterationIndex() + "_" + getReplicationIndex();
         FileUtils.copyFile(new File(filename + ".in"), new File(filename + ".out"));
         return null;
     }

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.2/schedulerjob.xsd"
+	name="${jobName}" cancelJobOnError="true" maxNumberOfExecution="2" projectName="${PROJECT}" restartTaskOnError="elsewhere">
+	<!-- ${jobName} is set as JVM parameter in the TestJobFactory -->
+	<variables>
+		<!-- Relative path is from Scheduler root directory for the tests -->
+		<variable name="WORK_DIR" value="${scripts.folder}"/>
+		<variable name="WORK_DIR2" value="${pa.scheduler.home}/scheduler-server/src/test/resources/unitTests/descriptors"/>
+		<variable name="EXCLUSION_STRING" value="paquit"/>
+		<variable name="JAVA_HOME" value="/bin/java/jdk1.5"/>
+		<variable name="PROJECT" value="My_project"/>
+	</variables>
+	<description>No ${EXCLUSION_STRING} in its HostName.</description>
+	<inputSpace url="input/space"/>
+	<outputSpace url="output/space"/>
+	<taskFlow>
+		<task name="task1" cancelJobOnError="false" preciousResult="false" maxNumberOfExecution="1" restartTaskOnError="anywhere" walltime="12">
+			<description>Parallel Tasks - Task 1</description>
+			<selection>
+				<script type="static">
+					<file path="${WORK_DIR}/host_selection.js">
+						<arguments>
+							<argument value="${EXCLUSION_STRING}"/>
+						</arguments>
+					</file>
+				</script>
+				<script type="dynamic">
+					<file path="${WORK_DIR}/host_selection.js">
+						<arguments>
+							<argument value="test1"/>
+							<argument value="test2"/>
+						</arguments>
+					</file>
+				</script>
+			</selection>
+			<pre>
+				<script>
+					<file path="${WORK_DIR}/set.js"/>
+				</script>
+			</pre>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="1"/>
+					<parameter name="number" value="1"/>
+				</parameters>
+			</javaExecutable>
+			<post>
+				<script>
+					<code language="javascript">
+						print("Content is equals to ${WORK_DIR}/unset.js\n");
+						print("Beginning of Post-Script\n");
+						java.lang.System.clearProperty("user.property1");
+						print("Unsetting system property user.property1\n");
+						print("End of Post-Script\n");
+					</code>
+				</script>
+			</post>
+			<cleaning>
+				<script>
+					<file path="${WORK_DIR}/clean.js"/>
+				</script>
+			</cleaning>
+		</task>
+		<task name="task2" maxNumberOfExecution="2" restartTaskOnError="elsewhere">
+			<description>Parallel Tasks - Task 2</description>
+			<inputFiles>
+				<files includes="tata*" excludes="tata*1" accessMode="transferFromInputSpace"/>
+				<files includes="toto*.txt" excludes="toto*2.txt" accessMode="transferFromOutputSpace"/>
+			</inputFiles>
+			<pre>
+				<script>
+					<file path="${WORK_DIR}/set.js"/>
+				</script>
+			</pre>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<forkEnvironment javaHome="${JAVA_HOME}" workingDir="${JAVA_HOME}/toto">
+					<SystemEnvironment>
+						<variable name="toto" value="ioi"/>
+						<variable name="tata" value="456"/>
+					</SystemEnvironment>
+					<jvmArgs>
+						<jvmArg value="-dparam=12"/>
+						<jvmArg value="-djhome=${JAVA_HOME}"/>
+					</jvmArgs>
+					<additionalClasspath>
+						<pathElement path="a"/>
+						<pathElement path="b"/>
+					</additionalClasspath>
+					<envScript>
+						<script>
+						<file path="${WORK_DIR}/unset.js"/>
+						</script>
+					</envScript>
+				</forkEnvironment>
+				<parameters>
+					<parameter name="sleepTime" value="12"/>
+					<parameter name="number" value="21"/>
+					<parameter name="test" value="${JAVA_HOME}"/>
+				</parameters>
+			</javaExecutable>
+			<outputFiles>
+				<files includes="titi*" excludes="titi*1" accessMode="transferToOutputSpace"/>
+				<files includes="titi*.txt" excludes="titi*3.txt" accessMode="transferToOutputSpace"/>
+			</outputFiles>
+		</task>
+		<task name="task3" walltime="10:53" numberOfNodes="3">
+			<description>Dependent Tasks - Task 3</description>
+			<depends>
+				<task ref="task1"/>
+				<task ref="task2"/>
+			</depends>
+			<inputFiles>
+				<files includes="tata*" accessMode="none"/>
+			</inputFiles>
+			<nativeExecutable>
+				<staticCommand value="${WORK_DIR2}/nativTask" workingDir="task3workingDir">
+					<arguments>
+						<argument value="1"/>
+						<argument value="2 2"/>
+						<argument value="3"/>
+						<argument value="12"/>
+					</arguments>
+				</staticCommand>
+			</nativeExecutable>
+			<post>
+				<script>
+					<file path="${WORK_DIR}/unset.js"/>
+				</script>
+			</post>
+		</task>
+		<task name="task4" numberOfNodes="10" preciousResult="true" maxNumberOfExecution="3" restartTaskOnError="anywhere" cancelJobOnError="true" resultPreviewClass="tadzaam">
+			<genericInformation>
+				<info name="n11" value="v11"/>
+				<info name="n22" value="v22"/>
+			</genericInformation>
+			<depends>
+				<task ref="task3"/>
+			</depends>
+			<nativeExecutable>
+				<staticCommand value="true" workingDir="task4workingDir"/>
+			</nativeExecutable>
+			<outputFiles>
+				<files includes="a" excludes="f" accessMode="transferToOutputSpace"/>
+				<files includes="b" excludes="g" accessMode="none"/>
+				<files includes="c" accessMode="none"/>
+				<files includes="d" excludes="h" accessMode="transferToOutputSpace"/>
+				<files includes="e" excludes="i" accessMode="none"/>
+			</outputFiles>
+		</task>
+	</taskFlow>
+</job>

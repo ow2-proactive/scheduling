@@ -19,6 +19,8 @@ public class BroadcastDiscoveryTest {
         broadcaster.start();
 
         assertEquals("pnp://localhost:64738", new BroadcastDiscoveryClient(broadcaster.getPort()).discover(5000));
+
+        broadcaster.stop();
     }
 
     @Test(expected = SocketTimeoutException.class)

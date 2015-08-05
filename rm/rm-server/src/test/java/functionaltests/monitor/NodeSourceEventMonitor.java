@@ -56,6 +56,11 @@ public class NodeSourceEventMonitor extends RMEventMonitor {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return nodeSourceName.hashCode();
+    }
+
     public String getNodeSourceName() {
         return nodeSourceName;
     }

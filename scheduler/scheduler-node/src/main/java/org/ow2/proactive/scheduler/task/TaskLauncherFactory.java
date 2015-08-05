@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
 public interface TaskLauncherFactory extends Serializable {
 
-    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService);
+    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception;
 
     TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter);
 

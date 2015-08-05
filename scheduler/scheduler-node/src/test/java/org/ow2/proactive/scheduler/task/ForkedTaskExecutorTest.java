@@ -126,10 +126,10 @@ public class ForkedTaskExecutorTest {
 
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
             "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); " +
-              "println new File('.').getAbsolutePath()", "groovy"))), initializer), taskOutput.outputStream,
+              "println new File('.').getCanonicalPath()", "groovy"))), initializer), taskOutput.outputStream,
           taskOutput.error);
 
-        assertEquals(String.format("envValue%njvmValue%n%s%n", new File(workingDir, ".").getAbsolutePath()),
+        assertEquals(String.format("envValue%njvmValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
           taskOutput.output());
     }
 
@@ -152,10 +152,10 @@ public class ForkedTaskExecutorTest {
 
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
             "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
-              + "println new File('.').getAbsolutePath()", "groovy"))), initializer),
+              + "println new File('.').getCanonicalPath()", "groovy"))), initializer),
           taskOutput.outputStream, taskOutput.error);
 
-        assertEquals(String.format("aValue%naValue%n%s%n", new File(workingDir, ".").getAbsolutePath()),
+        assertEquals(String.format("aValue%naValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
           taskOutput.output());
     }
 

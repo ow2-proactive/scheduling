@@ -5,11 +5,7 @@
 	<description>The second task of this job will try to get a node with an invalid selection script</description>
 	<taskFlow>
 		<task name="task1">
-			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
-				<parameters>
-					<parameter name="sleepTime" value="1"/>
-					<parameter name="number" value="1"/>
-				</parameters>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
 			</javaExecutable>
 		</task>
 		<task name="task2" preciousResult="true">

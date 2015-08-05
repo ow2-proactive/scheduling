@@ -76,7 +76,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     private TaskId taskId;
     private NamingService namingService;
 
-    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService) {
+    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService) throws Exception {
         this.taskId = taskId;
         this.namingService = namingService;
         initDataSpaces();
@@ -132,7 +132,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         return space;
     }
 
-    protected void initDataSpaces() {
+    protected void initDataSpaces() throws Exception {
         // configure node for application
         long id = taskId.getJobId().hashCode();
 
@@ -144,14 +144,14 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             SCRATCH = PADataSpaces.resolveScratchForAO();
             logger.debug("SCRATCH space is " + SCRATCH.getRealURI());
 
-        } catch (Throwable t) {
-            logger.error("There was a problem while initializing dataSpaces, they are not activated", t);
+        } catch (FileSystemException fse) {
+            logger.error("There was a problem while initializing dataSpaces, they are not activated", fse);
             this.logDataspacesStatus(
-                    "There was a problem while initializing dataSpaces, they are not activated",
-                    DataspacesStatusLevel.ERROR);
-            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.ERROR);
-            return;
+              "There was a problem while initializing dataSpaces, they are not activated",
+              DataspacesStatusLevel.ERROR);
+            this.logDataspacesStatus(Formatter.stackTraceToString(fse), DataspacesStatusLevel.ERROR);
         }
+
 
         INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
@@ -183,21 +183,18 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     }
 
-    private DataSpacesFileObject initDataSpace(Callable<DataSpacesFileObject> dataSpaceBuilder, String dataSpaceName, boolean input) {
-
-        DataSpacesFileObject result = null;
-
+    private DataSpacesFileObject initDataSpace(Callable<DataSpacesFileObject> dataSpaceBuilder, String dataSpaceName, boolean input) throws Exception {
         try {
-            result = dataSpaceBuilder.call();
+            DataSpacesFileObject result = dataSpaceBuilder.call();
             result = resolveToExisting(result, dataSpaceName, input);
             result = createTaskIdFolder(result, dataSpaceName);
-        } catch (Throwable t) {
-            logger.warn(dataSpaceName + " space is disabled", t);
+            return result;
+        } catch (FileSystemException fse) {
+            logger.warn(dataSpaceName + " space is disabled", fse);
             this.logDataspacesStatus(dataSpaceName + " space is disabled", DataspacesStatusLevel.WARNING);
-            this.logDataspacesStatus(Formatter.stackTraceToString(t), DataspacesStatusLevel.WARNING);
+            this.logDataspacesStatus(Formatter.stackTraceToString(fse), DataspacesStatusLevel.WARNING);
         }
-
-        return result;
+        return null;
     }
 
     @Override

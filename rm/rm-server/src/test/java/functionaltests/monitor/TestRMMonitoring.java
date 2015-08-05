@@ -38,15 +38,17 @@ package functionaltests.monitor;
 
 import java.util.Set;
 
-import org.junit.Assert;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -55,50 +57,41 @@ import functionaltests.RMTHelper;
  * only events of this type.
  *
  */
-public class TestRMMonitoring extends RMConsecutive {
+public class TestRMMonitoring extends RMFunctionalTest {
 
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
+        log("Deployment");
 
-        RMTHelper.log("Deployment");
+        ResourceManager resourceManager = rmHelper.getResourceManager();
+        rmHelper.createNodeSource("TestRMMonitoring");
 
-        ResourceManager resourceManager = helper.getResourceManager();
-        helper.createNodeSource("TestRMMonitoring");
-
-        Set<String> nodesUrls = RMTHelper.getDefaultInstance().listAliveNodesUrls();
+        Set<String> nodesUrls = rmHelper.listAliveNodesUrls();
 
         // we received all event as we are here
-        RMTHelper.log("Test 1 - subscribing only to 'node remove' event");
+        log("Test 1 - subscribing only to 'node remove' event");
         resourceManager.getMonitoring().removeRMEventListener();
-        resourceManager.getMonitoring().addRMEventListener(helper.getEventReceiver(),
-                RMEventType.NODE_REMOVED);
+        resourceManager.getMonitoring().addRMEventListener(rmHelper.getEventReceiver(), RMEventType.NODE_REMOVED);
 
         String url = nodesUrls.iterator().next();
         BooleanWrapper status = resourceManager.removeNode(url, true);
         if (status.getBooleanValue()) {
-            try {
-                helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED, 10000);
-            } catch (ProActiveTimeoutException ex) {
-                Assert.assertTrue("Did not receive NODE_REMOVE event", false);
-            }
-            RMTHelper.log("Test 1 - success");
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED, 10000);
+            log("Test 1 - success");
         }
 
         NodeSet ns = resourceManager.getAtMostNodes(5, null);
-        RMTHelper.log("Got " + ns.size() + " nodes");
+        log("Got " + ns.size() + " nodes");
 
         // must not receive "node busy" event
         try {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 5000);
-            Assert.assertTrue("Must not recive this type of event", false);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 2000);
+            fail("Must not receive this type of event");
         } catch (ProActiveTimeoutException ex) {
-            RMTHelper.log("Test 2 - success");
+            log("Test 2 - success");
         }
 
         resourceManager.releaseNodes(ns).getBooleanValue();
-        RMTHelper.log("End of test");
-
     }
 
 }

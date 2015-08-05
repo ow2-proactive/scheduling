@@ -36,6 +36,8 @@
  */
 package functionaltests.nodestate;
 
+import java.util.Collections;
+
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
@@ -45,17 +47,19 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 import org.junit.Assert;
+import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -63,41 +67,36 @@ import static org.junit.Assert.fail;
  * @author ProActive team
  *
  */
-public class TestConcurrentUsers extends RMConsecutive {
+public class TestConcurrentUsers extends RMFunctionalTest {
 
-    /** Actions to be Perform by this test.
-     * The method is called automatically by Junit framework.
-     * @throws Exception If the test fails.
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        final RMTHelper helper = RMTHelper.getDefaultInstance();
 
-        ResourceManager resourceManager = helper.getResourceManager();
+        ResourceManager resourceManager = rmHelper.getResourceManager();
         String nsName = "TestConcurrentUsers";
         String node1Name = "node1";
-        String node1URL = helper.createNode(node1Name).getNode().getNodeInformation().getURL();
+        String node1URL = rmHelper.createNode(node1Name).getNode().getNodeInformation().getURL();
         resourceManager.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), null);
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
         resourceManager.addNode(node1URL, nsName);
 
         // waiting for node adding event
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         // waiting for the node to be free
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 1);
 
-        RMTHelper.log("Test 1 - releasing of the foreign node");
+        log("Test 1 - releasing of the foreign node");
         // acquiring a node
         final NodeSet ns = resourceManager.getAtMostNodes(1, null);
 
         // waiting for node busy event
-        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
-        assertTrue(ns.size() == 1);
+        RMNodeEvent evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        assertEquals(evt.getNodeState(), NodeState.BUSY);
+        assertEquals(ns.size(), 1);
         assertTrue(resourceManager.getState().getTotalNodesNumber() == 1);
         assertTrue(resourceManager.getState().getFreeNodesNumber() == 0);
 
@@ -106,78 +105,80 @@ public class TestConcurrentUsers extends RMConsecutive {
             public void run() {
                 try {
                     Credentials cred = Credentials.createCredentials(new CredData(
-                        CredData.parseLogin("user"), CredData.parseDomain("user"), "pwd"), helper.getRMAuth()
-                            .getPublicKey());
+                        CredData.parseLogin("user"), CredData.parseDomain("user"), "pwd"),
+                            TestConcurrentUsers.this.rmHelper.getRMAuth().getPublicKey());
 
-                    ResourceManager rm2 = helper.getRMAuth().login(cred);
+                    ResourceManager rm2 = TestConcurrentUsers.this.rmHelper.getRMAuth().login(cred);
                     rm2.releaseNode(ns.get(0)).getBooleanValue();
                     Assert.assertTrue("Should not be able to release foreign node", false);
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    log(e.getMessage());
                 }
             }
         };
         t.start();
         t.join();
 
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(ns);
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
-        Assert.assertEquals(evt.getNodeState(), NodeState.FREE);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node1URL);
+        assertEquals(evt.getNodeState(), NodeState.FREE);
 
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 2 - releasing node twice");
+        log("Test 2 - releasing node twice");
         resourceManager.releaseNodes(ns);
 
         // to make sure everything has been processed
         Thread.sleep(1000);
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 3 - client crash detection");
+        log("Test 3 - client crash detection");
         JVMProcessImpl nodeProcess = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
-        nodeProcess.setClassname("functionaltests.nodestate.GetAllNodes");
+        nodeProcess.setJvmOptions(Collections.singletonList(PAResourceManagerProperties.RM_HOME.getCmdLine() +
+            PAResourceManagerProperties.RM_HOME.getValueAsString()));
+        nodeProcess.setClassname(GetAllNodes.class.getName());
         nodeProcess.startProcess();
 
         // node busy event
         for (int i = 0; i < 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         // client does not exist anymore
-        RMTHelper.log("Client does not exist anymore. Waiting for client crash detection.");
+        log("Client does not exist anymore. Waiting for client crash detection.");
         // it should be detected by RM
         // waiting for node free event
         for (int i = 0; i < 1; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(NodeState.FREE, evt.getNodeState());
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(NodeState.FREE, evt.getNodeState());
         }
-        Assert.assertEquals(1, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(1, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
-        RMTHelper.log("Test 4 - disconnecting");
+        log("Test 4 - disconnecting");
 
         NodeSet ns2 = resourceManager.getAtMostNodes(1, null);
-        RMNodeEvent event = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
+        RMNodeEvent event = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
         Assert.assertTrue(event.getNodeState() == NodeState.BUSY);
         PAFuture.waitFor(ns2);
-        System.out.println("Number of found nodes " + ns2.size());
-        Assert.assertEquals(1, ns2.size());
+        log("Number of found nodes " + ns2.size());
+        assertEquals(1, ns2.size());
 
         t = new Thread() {
             public void run() {
                 try {
-                    RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
-                    Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
-                        RMTHelper.defaultUserPassword), auth.getPublicKey());
+                    RMAuthentication auth = rmHelper.getRMAuth();
+                    Credentials cred = Credentials.createCredentials(new CredData(
+                        TestUsers.TEST.username, TestUsers.TEST.password), auth.getPublicKey());
                     ResourceManager rm = auth.login(cred);
                     rm.disconnect().getBooleanValue();
                 } catch (Exception e) {
@@ -189,7 +190,7 @@ public class TestConcurrentUsers extends RMConsecutive {
         t.join();
 
         try {
-            event = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
+            event = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, 10000);
             fail("Unexpected event: " + event);
         } catch (ProActiveTimeoutException e) {
         }

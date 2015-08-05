@@ -1,29 +1,7 @@
 #!/bin/sh
-# $1 number of booked cores
 
-function check_node_file {
-return 0 # TODO : this line causes the test to end without checking file content as it is not suitable today.
-# this function should be rewritten when test will be distributed
-HOST_IP=`hostname -f`
-for i in `cat $PA_NODEFILE`
-do
-	NODE_IP=$i
-	if [ "$NODE_IP" != "$HOST_IP" ]
-	then
-		echo "Error booked host ip is invalid : $NODE_IP, awaited : $HOST_IP"
-		return 1
-	fi
-done
-return 0
-}
-
-#if we are on Linux in runAsMe mode, $# must be equals 3
-# $2 and $3 replaced environment variables
-if [ "$#" = "3" ]
-then
-    PA_CORE_NB=$2
-    PA_NODEFILE=$3
-fi
+PA_CORE_NB=$1
+PA_NODEFILE=$2
 
 TEST_RES=0
 
@@ -56,9 +34,6 @@ else
 		echo "Error 'PA_NODEFILE' must have $1 lines, it has $NBS_LINES"
 		cat $PA_NODEFILE
 		TEST_RES=1
-	else
-		check_node_file
-		TEST_RES=$?
 	fi
 fi
 

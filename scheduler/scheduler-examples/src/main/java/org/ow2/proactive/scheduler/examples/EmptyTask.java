@@ -36,9 +36,10 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
+import java.io.Serializable;
+
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import java.io.Serializable;
 
 
 /**
@@ -48,8 +49,6 @@ public class EmptyTask extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) {
-        getOut().println(System.getenv());
-        getOut().println(System.getProperties());
         return "Nothing";
     }
 
