@@ -151,18 +151,19 @@ public class TestWorkflowRecoveryInterrupted extends SchedulerFunctionalTest {
         for (int i = 0; i < 4; i++) {
             TaskState ts = js.getTasks().get(i);
             String name = ts.getName();
+            TaskStatus status = ts.getStatus();
             switch (name) {
                 case "A":
-                    assertEquals(TaskStatus.FINISHED, ts.getStatus());
+                    assertEquals(TaskStatus.FINISHED, status);
                     break;
                 case "B":
-                    assertEquals(TaskStatus.FINISHED, ts.getStatus());
+                    assertEquals(TaskStatus.FINISHED, status);
                     break;
                 case "C":
-                    assertEquals(TaskStatus.SKIPPED, ts.getStatus());
+                    assertEquals(TaskStatus.SKIPPED, status);
                     break;
                 case "D":
-                    assertEquals(TaskStatus.FINISHED, ts.getStatus());
+                    assertEquals(TaskStatus.FINISHED, status);
                     break;
                 default:
                     fail();
