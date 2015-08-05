@@ -184,7 +184,6 @@ public class TestScheduler {
             schedulerProcess.destroy();
             schedulerProcess.waitFor();
             processTreeKiller.kill();
-            CommonTUtils.cleanupRMActiveObjectRegistry(getUrl());
             schedulerProcess = null;
         }
     }

@@ -154,7 +154,6 @@ public class TestRM {
             rmProcess.destroy();
             rmProcess.waitFor();
             processTreeKiller.kill();
-            CommonTUtils.cleanupRMActiveObjectRegistry(getUrl());
             rmProcess = null;
         }
     }

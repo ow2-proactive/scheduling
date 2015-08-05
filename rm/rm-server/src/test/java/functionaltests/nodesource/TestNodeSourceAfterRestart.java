@@ -48,7 +48,6 @@ import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
-import functionaltests.utils.CommonTUtils;
 
 import static functionaltests.utils.RMTHelper.log;
 
@@ -92,7 +91,6 @@ public class TestNodeSourceAfterRestart extends RMFunctionalTest {
         createDefaultNodeSource(source1);
 
         rmHelper.killRM();
-        CommonTUtils.cleanupActiveObjectRegistry("local-" + source1 + "-0");
 
         log("Test 1 - starting the resource manager");
         startRMPreservingDB();
@@ -107,7 +105,6 @@ public class TestNodeSourceAfterRestart extends RMFunctionalTest {
         removeNodeSource(source1);
 
         rmHelper.killRM();
-        CommonTUtils.cleanupActiveObjectRegistry("local-" + source1 + "-0");
 
         log("Test 2 - starting the resource manager");
         startRMPreservingDB();
