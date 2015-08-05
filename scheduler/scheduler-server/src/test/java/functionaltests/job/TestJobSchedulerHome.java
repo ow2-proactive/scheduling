@@ -36,6 +36,8 @@
  */
 package functionaltests.job;
 
+import java.io.File;
+
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -54,8 +56,8 @@ import org.ow2.proactive.utils.ClasspathUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.executables.PAHomeExecutable;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.*;
@@ -174,7 +176,7 @@ public class TestJobSchedulerHome extends SchedulerFunctionalTest {
         log("Task logs:");
         log(logs);
         if (nativ) {
-            assertTrue(logs.contains(schedulerHomePath));
+            assertTrue(logs.contains(new File(schedulerHomePath).getCanonicalPath()));
         }
 
         assertFalse(tres.hadException());
