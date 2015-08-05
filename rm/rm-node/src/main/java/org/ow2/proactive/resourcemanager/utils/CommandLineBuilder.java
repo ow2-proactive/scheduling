@@ -301,7 +301,7 @@ public final class CommandLineBuilder implements Cloneable {
                 classpath.append(os.ps).append(file.getAbsolutePath());
             }
         }
-        command.add(System.getProperty("java.class.path"));
+        command.add(classpath.toString());
         command.add(RMNodeStarter.class.getName());
 
         //appending options

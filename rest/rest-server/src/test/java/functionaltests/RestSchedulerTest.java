@@ -51,7 +51,7 @@ public class RestSchedulerTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(RestSchedulerTest.class.getSimpleName());
+        init();
     }
 
     @Before

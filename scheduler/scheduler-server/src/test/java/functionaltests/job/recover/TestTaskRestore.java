@@ -85,7 +85,7 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
             if (!val.equals(TASK1_RES)) {
                 return "Unexpected parent res: " + val;
             }
-            log("OK " + val);
+            getOut().println("OK " + val);
             return TASK2_RES;
         }
 

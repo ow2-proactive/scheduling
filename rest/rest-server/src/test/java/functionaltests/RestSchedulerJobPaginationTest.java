@@ -72,7 +72,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(RestSchedulerJobPaginationTest.class.getSimpleName());
+        init();
     }
 
     @Before

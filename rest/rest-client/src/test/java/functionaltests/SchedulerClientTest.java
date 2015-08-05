@@ -73,7 +73,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(SchedulerClientTest.class.getSimpleName());
+        init();
     }
 
     @Test(timeout = MAX_WAIT_TIME)

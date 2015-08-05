@@ -213,8 +213,19 @@ project(':rest:rest-smartproxy') {
         exclude 'functionaltests/**'
     }
 
+    task testJar(type: Jar) {
+        classifier = 'tests'
+        from sourceSets.test.output
+    }
+    rootProject.dist.dependsOn testJar
+
+    task dist(type: Copy) {
+        from testJar
+        into file("$rootDir/dist/lib")
+    }
+
     task('functionalTest', type:Test).configure functionalTestConfiguration
 
-    functionalTest.dependsOn rootProject.dist
+    functionalTest.dependsOn rootProject.dist, dist
     clean.dependsOn rootProject.cleanDist
 }
