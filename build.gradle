@@ -291,16 +291,6 @@ project(':rm:rm-node') {
         runtime 'jsr223:jsr223-nativeshell:0.3'
     }
 
-    task stub(type: StubTask) {
-        classes = [
-                'java.lang.Object',
-                'java.util.ArrayList',
-                'java.util.Collection',
-                'java.util.HashMap',
-                'java.util.LinkedList'
-        ]
-    }
-    serialver.dependsOn stub
 }
 
 project(':rm:rm-node-updater') {
@@ -375,11 +365,6 @@ project('scheduler:scheduler-server') {
 
     task stub(type: StubTask) {
         classes = [
-                'java.lang.Object',
-                'java.util.ArrayList',
-                'java.util.Collection',
-                'java.util.HashMap',
-                'java.util.LinkedList',
                 'org.ow2.proactive.scheduler.authentication.SchedulerAuthentication',
                 'org.ow2.proactive.scheduler.core.rmproxies.RMProxyActiveObject',
                 'org.ow2.proactive.scheduler.core.SchedulerFrontend',
