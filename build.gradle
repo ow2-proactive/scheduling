@@ -129,7 +129,7 @@ def functionalTestConfiguration = {
     def clean = {
         project.javaexec {
             main = "org.ow2.tests.ProcessCleaner"
-            classpath = project.sourceSets.test.runtimeClasspath
+            classpath = files("${rootDir.absolutePath}/dist/lib/*")
             systemProperty "java.library.path", project.nativeLibsDir
         }
     }
