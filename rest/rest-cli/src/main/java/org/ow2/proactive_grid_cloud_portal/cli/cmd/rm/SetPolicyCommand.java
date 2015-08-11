@@ -66,7 +66,7 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
     private String policyType;
     private String[] policyArgs;
 
-    public SetPolicyCommand(String... args) {
+    public SetPolicyCommand(String[] args) {
         if (!(args.length > 0)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, "At least one argument required.");
         }
