@@ -31,7 +31,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private int maxNodes = 4;
     private AtomicInteger atomicMaxNodes;
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
-    private int nodeTimeout = 5000;
+    private int nodeTimeout = 10000;
     @Configurable(description = "Additional ProActive properties")
     private String paProperties = "";
 
