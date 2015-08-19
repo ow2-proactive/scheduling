@@ -112,6 +112,12 @@ configure(javaSubprojects) {
     }
 }
 
+ext.encoding = {
+    Properties props = new Properties()
+    props.load(new FileInputStream("config/scheduler/settings.ini"))
+    props.getProperty('pa.scheduler.job.file.encoding')
+}
+
 def functionalTestConfiguration = {
 
     forkEvery 1
@@ -127,6 +133,7 @@ def functionalTestConfiguration = {
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
     systemProperties << ['java.library.path': project.nativeLibsDir]
+    systemProperties << ['file.encoding': encoding]
 
     testLogging {
         exceptionFormat = 'full'
@@ -156,6 +163,7 @@ project(':scheduler:scheduler-api') {
         compile 'isorelax:isorelax:20030108'
         compile 'commons-collections:commons-collections:3.2'
         compile 'msv:msv:20050913'
+        compile 'commons-io:commons-io:2.4'
 
         compile project(':common-api')
 
@@ -609,10 +617,15 @@ class CustomCreateStartScripts extends CreateStartScripts {
             }
         }
 
+        Properties props = new Properties()
+        props.load(new FileInputStream("config/scheduler/settings.ini"))
+
+        String encoding = props.getProperty('pa.scheduler.job.file.encoding')
+
         def generator = new org.gradle.api.internal.plugins.StartScriptGenerator()
         generator.applicationName = getApplicationName()
         generator.mainClassName = getMainClassName()
-        generator.defaultJvmOpts = ["-server"]
+        generator.defaultJvmOpts = ["-server", "-Dfile.encoding=" + encoding]
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
         generator.exitEnvironmentVar = getExitEnvironmentVar()
         generator.classpath = ["dist/lib/*", "addons", "addons/*"]

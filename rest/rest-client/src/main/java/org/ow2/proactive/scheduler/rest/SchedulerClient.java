@@ -38,9 +38,9 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
-import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -595,9 +595,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
         try {
-            String jobXml = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
-            jobIdData = restApiClient().submitXml(sid,
-                    IOUtils.toInputStream(jobXml, String.valueOf(Charset.defaultCharset())));
+            InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
+            jobIdData = restApiClient().submitXml(sid, is);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }

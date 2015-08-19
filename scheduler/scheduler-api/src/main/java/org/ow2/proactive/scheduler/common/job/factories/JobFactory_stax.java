@@ -36,6 +36,22 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
+
 import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
@@ -47,8 +63,13 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scripting.GenerationScript;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.scheduler.common.util.ZipUtils;
-import org.ow2.proactive.scripting.*;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
@@ -229,7 +250,14 @@ public class JobFactory_stax extends JobFactory {
             //set relative path
             relativePathRoot = f.getParentFile().getAbsolutePath();
             //create and get XML STAX reader
-            XMLStreamReader xmlsr = xmlif.createXMLStreamReader(new FileReader(f));
+            XMLStreamReader xmlsr;
+            // use the server side property to accept encoding
+            if (PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.isSet()) {
+                xmlsr = xmlif.createXMLStreamReader(new FileInputStream(f),
+                        PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.getValueAsString());
+            } else {
+                xmlsr = xmlif.createXMLStreamReader(new FileInputStream(f));
+            }
             //Create the job starting at the first cursor position of the XML Stream reader
             createJob(xmlsr, updatedVariables);
             //Close the stream
@@ -267,7 +295,7 @@ public class JobFactory_stax extends JobFactory {
     }
 
     private String findSchemaByNamespaceUsed(File file) throws FileNotFoundException, XMLStreamException {
-        XMLStreamReader cursorRoot = xmlif.createXMLStreamReader(new FileReader(file));
+        XMLStreamReader cursorRoot = xmlif.createXMLStreamReader(new FileInputStream(file));
         String current;
         try {
             int eventType;
