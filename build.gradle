@@ -1,8 +1,23 @@
 apply plugin: 'java'
+apply plugin: "sonar-runner"
+
 
 archivesBaseName = 'scheduling' // in case current folder is not named scheduling
 
 project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
+
+
+
+sonarRunner {
+    sonarProperties {    
+        property "sonar.jdbc.driverClassName", "org.postgresql.Driver"
+        property "sonar.language", "java"
+        property "sonar.sources", "src/main"
+        property 'sonar.jacoco.reportPath', "${buildDir}/jacoco/testDebug.exec"
+        property 'sonar.junit.reportsPath', "${buildDir}/test-results"
+    }
+}
+
 
 configurations {
     nativeBundle
@@ -26,6 +41,8 @@ buildscript {
         classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
         classpath 'org.ow2.proactive:gradle-serialver:2.0'
+        classpath 'org.postgresql:postgresql:9.3-1102-jdbc41'  
+        classpath 'org.ajoberstar:gradle-jacoco:0.3.0'
         classpath('org.gradle.api.plugins:gradle-format-plugin:1.1') {
                     exclude group: 'javassist', module: 'javassist'
         }
@@ -34,7 +51,12 @@ buildscript {
 
 allprojects {
     apply plugin: 'maven'
-
+    apply plugin: 'jacoco'
+    
+    jacoco {
+        toolVersion = '0.7.1.201405082137'
+    }
+    
     group = 'org.ow2.proactive'
     version = schedulingVersion
 
@@ -73,6 +95,38 @@ configure(javaSubprojects) {
 
     sourceCompatibility = 1.7
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
+    
+    jacocoTestReport {
+        additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
+        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+        classDirectories =  files(sourceSets.main.output)
+        reports {
+            html.enabled = true
+            xml.enabled = true
+            csv.enabled = false
+        }
+    }
+		
+	task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+	    dependsOn = subprojects.test
+	    additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
+	    sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+	    classDirectories = files(sourceSets.main.output)
+	    executionData = files(jacocoTestReport.executionData)
+	    reports {
+	        html.enabled = true
+	        xml.enabled = true
+	        csv.enabled = false
+	    }
+	    onlyIf = {
+	        true
+	    }
+	    doFirst {
+	        executionData = files(executionData.findAll {
+	            it.exists()
+	        })
+	    }
+	}
 
     dependencies {
         compile 'log4j:log4j:1.2.14'
@@ -185,6 +239,12 @@ project(':scheduler:scheduler-api') {
 }
 
 project('common-api') {
+
+	
+
+    
+
+
     dependencies {
         compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
         compile "org.objectweb.proactive:programming-util:${programmingVersion}"
@@ -193,6 +253,7 @@ project('common-api') {
         testRuntime 'org.python:jython-jline:2.5.4-rc1'
         testRuntime 'org.codehaus.groovy:groovy-all:2.1.6'
         testRuntime 'jsr223:jsr223-nativeshell:0.3'
+        testCompile 'junit:junit:4.11'
     }
 
     task stub(type: StubTask) {
@@ -200,6 +261,9 @@ project('common-api') {
     }
     serialver.dependsOn stub
 }
+
+
+
 
 
 project(':scheduler:scheduler-client') {
