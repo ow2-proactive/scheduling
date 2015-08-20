@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -88,9 +89,10 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     protected static final String TASK_NAME = "TestJavaTask";
 
-    public final static String INPUT_FILE_BASE_NAME = "input";
+    // we add special characters to ensure they are supported
+    public final static String INPUT_FILE_BASE_NAME = "input é";
     public final static String INPUT_FILE_EXT = ".txt";
-    public final static String OUTPUT_FILE_BASE_NAME = "output";
+    public final static String OUTPUT_FILE_BASE_NAME = "output é";
     public final static String OUTPUT_FILE_EXT = ".out";
 
     protected RestSmartProxyImpl restSmartProxy;
@@ -125,8 +127,9 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         pushUrl = userspace;
         pullUrl = userspace;
 
-        inputLocalFolder = tempDir.newFolder("input");
-        outputLocalFolder = tempDir.newFolder("output");
+        // we add special characters and space to the folders to make sure transfer occurs normally
+        inputLocalFolder = tempDir.newFolder("input é");
+        outputLocalFolder = tempDir.newFolder("output é");
     }
 
     @Test(timeout = TEN_MINUTES)
@@ -141,6 +144,10 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private void testJobSubmission(boolean isolateTaskOutput, boolean automaticTransfer) throws Exception {
         TaskFlowJob job = createTestJob(isolateTaskOutput);
+
+        // debugging the job produced
+        String jobXml = new Job2XMLTransformer().jobToxmlString(job);
+        System.out.println(jobXml);
 
         DataTransferNotifier notifier = new DataTransferNotifier();
 
@@ -188,7 +195,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private TaskFlowJob createTestJob(boolean isolateOutputs) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName());
+        // add a special character to the job name to ensure the job is parsed correctly by the server
+        job.setName(this.getClass().getSimpleName() + " é");
 
         for (int i = 0; i < NB_TASKS; i++) {
             JavaTask testTask = new JavaTask();

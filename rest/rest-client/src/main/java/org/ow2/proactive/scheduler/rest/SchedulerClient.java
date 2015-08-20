@@ -37,9 +37,9 @@ package org.ow2.proactive.scheduler.rest;
 import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
-import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -97,7 +97,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -591,9 +590,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
         try {
-            String jobXml = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
-            jobIdData = restApiClient().submitXml(sid,
-                    IOUtils.toInputStream(jobXml, String.valueOf(Charset.defaultCharset())));
+            InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
+            jobIdData = restApiClient().submitXml(sid, is);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
