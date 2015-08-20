@@ -616,9 +616,10 @@ class CustomCreateStartScripts extends CreateStartScripts {
                 println "Should not be here"
             }
         }
-
-        Properties props = new Properties()
-        props.load(new FileInputStream("$rootDir/config/scheduler/settings.ini"))
+		
+		
+	    Properties props = new Properties()
+        props.load(new FileInputStream(new File(project.rootDir, "config/scheduler/settings.ini")))
 
         String encoding = props.getProperty('pa.scheduler.job.file.encoding')
 
