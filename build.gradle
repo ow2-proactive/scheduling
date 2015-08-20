@@ -133,7 +133,7 @@ def functionalTestConfiguration = {
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
     systemProperties << ['java.library.path': project.nativeLibsDir]
-    systemProperties << ['file.encoding': encoding]
+    systemProperties << ['file.encoding': encoding.toString()]
 
     testLogging {
         exceptionFormat = 'full'
