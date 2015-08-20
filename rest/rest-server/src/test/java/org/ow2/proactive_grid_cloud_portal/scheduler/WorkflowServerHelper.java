@@ -44,6 +44,8 @@ import javax.ws.rs.Produces;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -52,12 +54,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Produces(APPLICATION_JSON)
 public class WorkflowServerHelper {
 
-    private final static String DEFAULT_JOB_XML = AbstractRestFuncTestCase.class.getResource("config/test-job-with-variables.xml").getFile();
+    private final static URL DEFAULT_JOB_XML = AbstractRestFuncTestCase.class.getResource("config/test-job-with-variables.xml");
 
     @GET
     @Path("/workflow")
-    public String validWorkflow() throws IOException {
-        return readFile(new File(DEFAULT_JOB_XML));
+    public String validWorkflow() throws IOException, URISyntaxException {
+        return readFile(new File(DEFAULT_JOB_XML.toURI().getPath()));
     }
 
     @GET

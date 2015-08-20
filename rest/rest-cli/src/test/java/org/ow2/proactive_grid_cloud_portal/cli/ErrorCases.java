@@ -29,7 +29,7 @@ public class ErrorCases {
     public static void startHttpsServer() throws Exception {
         server = new Server();
         SslContextFactory httpsConfiguration = new SslContextFactory();
-        httpsConfiguration.setKeyStorePath(ErrorCases.class.getResource("keystore").getPath());
+        httpsConfiguration.setKeyStorePath(ErrorCases.class.getResource("keystore").toURI().getPath());
         httpsConfiguration.setKeyStorePassword("activeeon");
         SslSelectChannelConnector ssl = new SslSelectChannelConnector(httpsConfiguration);
         server.addConnector(ssl);
