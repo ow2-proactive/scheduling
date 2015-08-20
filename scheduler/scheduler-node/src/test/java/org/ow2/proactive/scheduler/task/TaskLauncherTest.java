@@ -214,6 +214,29 @@ public class TaskLauncherTest {
     }
 
     @Test
+    public void scratchDirDeletedAfterTaskCompleted() throws Throwable {
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
+                new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+
+        final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
+        when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
+
+        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
+
+            @Override
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+                return dataspacesMock;
+            }
+        });
+        runTaskLauncher(taskLauncher, executableContainer);
+
+        verify(dataspacesMock).cleanScratchSpace();
+    }
+
+    @Test
     public void testProgressFileReaderIntegration() throws Throwable {
         int nbIterations = 3;
 
