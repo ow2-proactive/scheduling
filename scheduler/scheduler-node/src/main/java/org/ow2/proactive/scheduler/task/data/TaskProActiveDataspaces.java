@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.task.data;
 
+import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -531,6 +532,11 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             // display dataspaces error and warns if any
             displayDataspacesStatus();
         }
+    }
+
+    @Override
+    public void cleanScratchSpace() {
+        FileUtils.deleteQuietly(getScratchFolder());
     }
 
     private FileSystemException copyScratchDataToOutput(DataSpacesFileObject space, String spaceName, OutputSelector outputSelector,

@@ -69,6 +69,13 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
     }
 
     @Test
+    public void testLoadNoJob() throws Exception {
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+        List<JobInfo> jobs = scheduler.getJobs(0, 0, criteria(true, true, true, true), null);
+        assertTrue(jobs.isEmpty());
+    }
+
+    @Test
     public void testLoadJobs() throws Exception {
         long time = System.currentTimeMillis();
 

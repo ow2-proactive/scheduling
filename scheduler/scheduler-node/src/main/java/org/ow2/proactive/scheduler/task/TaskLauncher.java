@@ -137,9 +137,11 @@ public class TaskLauncher implements InitActive {
 
         TaskResultImpl taskResult;
 
+        TaskDataspaces dataspaces = null;
+
         try {
             addShutdownHook();
-            TaskDataspaces dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService());
+            dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService());
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
@@ -212,6 +214,10 @@ public class TaskLauncher implements InitActive {
             taskLogger.close();
             removeShutdownHook();
             terminate();
+
+            if (dataspaces != null) {
+                dataspaces.cleanScratchSpace();
+            }
         }
     }
 
