@@ -10,6 +10,8 @@ project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
 
 sonarRunner {
     sonarProperties {    
+    	property "sonar.projectKey", "$project.group:$project.name"
+    	property "sonar.projectName", "$project.name" 
         property "sonar.jdbc.driverClassName", "org.postgresql.Driver"
         property "sonar.language", "java"
         property "sonar.sources", "src/main"
