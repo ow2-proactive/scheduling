@@ -24,4 +24,7 @@ build/
 /TEST_SCHEDULER_DB
 /.nb-gradle/private/
 
+*.DS_Store
+
+*.log
 
