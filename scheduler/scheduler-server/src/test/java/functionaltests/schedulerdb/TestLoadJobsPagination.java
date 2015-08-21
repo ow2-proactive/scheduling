@@ -187,11 +187,8 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         jobs = dbManager.getJobs(2, -1, null, true, true, true, sortParameters);
         checkJobs(jobs, 3, 4, 5, 6, 7);
 
-        try {
-            jobs = dbManager.getJobs(0, 0, null, true, true, true, sortParameters);
-            Assert.fail();
-        } catch (IllegalArgumentException e) {
-        }
+        jobs = dbManager.getJobs(0, 0, null, true, true, true, sortParameters);
+        checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
         jobs = dbManager.getJobs(0, 1, null, true, true, true, sortParameters);
         checkJobs(jobs, 1);

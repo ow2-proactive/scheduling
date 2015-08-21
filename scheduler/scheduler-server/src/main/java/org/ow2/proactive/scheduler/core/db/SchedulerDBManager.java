@@ -189,9 +189,6 @@ public class SchedulerDBManager {
     public List<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
             final boolean runnning, final boolean finished,
             final List<SortParameter<JobSortParameter>> sortParameters) {
-        if (limit == 0) {
-            throw new IllegalArgumentException("Range can't be 0");
-        }
 
         if (!pending && !runnning && !finished) {
             return Collections.emptyList();

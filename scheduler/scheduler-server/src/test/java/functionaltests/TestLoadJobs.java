@@ -33,6 +33,8 @@ import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 import functionaltests.utils.ProActiveLock;
 
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * Test against method Scheduler.loadJobs 
@@ -53,6 +55,13 @@ public class TestLoadJobs extends FunctionalTest {
             return "OK";
         }
 
+    }
+
+    @Test
+    public void testLoadNoJob() throws Exception {
+        Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
+        List<JobInfo> jobs = scheduler.getJobs(0, 0, criteria(true, true, true, true), null);
+        assertTrue(jobs.isEmpty());
     }
 
     @Test
@@ -83,10 +92,10 @@ public class TestLoadJobs extends FunctionalTest {
         Assert.assertEquals(0, job.getNumberOfPendingTasks());
         Assert.assertEquals(1, job.getNumberOfRunningTasks());
         Assert.assertEquals(JobStatus.RUNNING, job.getStatus());
-        Assert.assertTrue("Unexpected submit time: " + job.getSubmittedTime(),
+        assertTrue("Unexpected submit time: " + job.getSubmittedTime(),
                 job.getSubmittedTime() > time && job.getSubmittedTime() < System.currentTimeMillis());
-        Assert.assertTrue("Unexpected start time: " + job.getStartTime(), job.getStartTime() > time &&
-            job.getStartTime() < System.currentTimeMillis());
+        assertTrue("Unexpected start time: " + job.getStartTime(), job.getStartTime() > time &&
+                job.getStartTime() < System.currentTimeMillis());
         Assert.assertEquals(-1, job.getFinishedTime());
         Assert.assertEquals(-1, job.getRemovedTime());
         Assert.assertEquals(SchedulerTHelper.admin_username, job.getJobOwner());
