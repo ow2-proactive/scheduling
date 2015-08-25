@@ -1,10 +1,26 @@
 package org.ow2.proactive.scheduler.task;
 
+import static java.util.Collections.singletonMap;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Matchers;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -16,26 +32,18 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mockito.Matchers;
-
-import static java.util.Collections.singletonMap;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 public class TaskLauncherTest {
+	
+	private final static String HEADLESS_JAVA_LOG = "Picked up _JAVA_OPTIONS: -Djava.awt.headless=true";
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -59,8 +67,8 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals("hello", taskResult.value());
-        assertEquals(String.format("prehellopost%n"), taskResult.getOutput().getAllLogs(false));
+        assertThat(taskResult.value(), is("hello"));
+        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("prehellopost%n")));
     }
 
     @Test
@@ -78,9 +86,9 @@ public class TaskLauncherTest {
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
-
-        assertNotEquals("", taskResult.value());
-        assertTrue(taskResult.getOutput().getAllLogs(false).contains("123"));
+        
+        assertThat(taskResult.value(), is(not("")));
+        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,"").contains("123"), is(true));
     }
 
     @Test
@@ -96,7 +104,7 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertNotNull(taskResult.getException());
-        assertNotEquals("", taskResult.getOutput().getStderrLogs(false));
+        assertNotEquals("", taskResult.getOutput().getStderrLogs(false).replace(HEADLESS_JAVA_LOG,""));
     }
 
     @Test
@@ -117,7 +125,8 @@ public class TaskLauncherTest {
 
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals(String.format("r00t%n"), taskResult.getOutput().getAllLogs(false));
+        
+        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("r00t%n")));
     }
 
     @Test
@@ -134,7 +143,8 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals(String.format("%s%n", tempFolder), taskResult.getOutput().getAllLogs(false));
+    
+        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("%s%n", tempFolder)));
     }
 
     @Test
@@ -152,7 +162,8 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertEquals(String.format("%s%n", tempFolder), taskResult.getOutput().getAllLogs(false));
+  
+        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("%s%n", tempFolder)));
     }
 
     private String pwdCommand() {
