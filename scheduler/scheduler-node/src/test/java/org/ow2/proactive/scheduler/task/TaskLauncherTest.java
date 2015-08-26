@@ -67,7 +67,7 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertThat(taskResult.value(), is("hello"));
+        assertThat((String)taskResult.value(), is("hello"));
         assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("prehellopost%n")));
     }
 
@@ -87,7 +87,7 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
         
-        assertThat(taskResult.value(), is(not("")));
+        assertThat((String)taskResult.value(), is(not("")));
         assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,"").contains("123"), is(true));
     }
 
