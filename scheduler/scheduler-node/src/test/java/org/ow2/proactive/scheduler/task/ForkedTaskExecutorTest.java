@@ -12,6 +12,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
@@ -19,12 +20,15 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class ForkedTaskExecutorTest {
@@ -32,6 +36,29 @@ public class ForkedTaskExecutorTest {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
     private String oldJavaHome;
+
+    @Test
+    public void ensureForkedJvmContainTaskForkProperty() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "sample", 1000L, false)));
+
+        ForkedTaskExecutor forkedTaskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder());
+
+        TaskResultImpl result =
+                forkedTaskExecutor.execute(
+                        new TaskContext(
+                                new ScriptExecutableContainer(
+                                new TaskScript(
+                                        new SimpleScript(
+                                                "result=System.getProperty('"
+                                                        + PASchedulerProperties.TASK_FORK.getKey() + "')"
+                                                , "groovy"))), initializer),
+                        taskOutput.outputStream, taskOutput.error);
+
+        Assert.assertEquals("true", result.value());
+    }
 
     @Test
     public void result_and_variables() throws Throwable {
