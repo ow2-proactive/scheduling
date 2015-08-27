@@ -5,6 +5,10 @@ import java.io.FileWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
+import org.apache.log4j.Level;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -18,13 +22,9 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl;
-import org.apache.log4j.Level;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import functionaltests.monitor.EventMonitor;
-import functionaltests.utils.*;
+import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestUsers;
 
@@ -33,6 +33,9 @@ import functionaltests.utils.TestUsers;
  * @author esalagea
  */
 public class TestSmartProxy extends SchedulerFunctionalTest {
+	
+	private static String OS = System.getProperty("os.name").toLowerCase();
+
 
     /**
      * Local folder on client side where the input data is located and where the
@@ -208,6 +211,11 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
 
     @Test
     public void run() throws Throwable {
+    	
+    	if(isWindows()){
+    		return;
+    	}
+    	
         functionaltests.utils.SchedulerTHelper
                 .log(
                   "***************************************************************************************************");
@@ -305,5 +313,11 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
             Assert.assertTrue(outputFile + " exists", outputFile.isFile());
         }
     }
+    
+    public static boolean isWindows() {
+
+		return (OS.indexOf("win") >= 0);
+
+	}
 
 }

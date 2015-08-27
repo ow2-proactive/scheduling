@@ -36,16 +36,22 @@
  */
 package functionaltests.dataspaces;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import junit.framework.Assert;
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.process_tree_killer.ProcessTree;
+import static org.junit.Assume.assumeTrue;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static org.junit.Assume.assumeTrue;
+import org.junit.Ignore;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.process_tree_killer.ProcessTree;
+
+import functionaltests.utils.SchedulerFunctionalTest;
+import junit.framework.Assert;
 
 
 /**
@@ -108,8 +114,10 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
      *
      * @throws Throwable any exception that can be thrown during the test.
      */
+    @Ignore
     @org.junit.Test
     public void run() throws Throwable {
+    	
 
         // Now we launch the scheduler from the generated script, to consider the -Dfile.encoding parameter
         schedulerHelper.killScheduler();
