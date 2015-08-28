@@ -625,7 +625,10 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                                 FileSelector.SELECT_SELF);
                         if (!finalout.resolveFile(finalRelativePath).exists()) {
                             logger.error("There was a problem during the copy of " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() +
-                                    "/" + finalRelativePath +" ");
+                                    "/" + finalRelativePath + ". File not present after copy.");
+                            logDataspacesStatus("There was a problem during the copy of " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() +
+                                            "/" + finalRelativePath + ". File not present after copy.",
+                                    DataspacesStatusLevel.ERROR);
                         }
                         return true;
                     }

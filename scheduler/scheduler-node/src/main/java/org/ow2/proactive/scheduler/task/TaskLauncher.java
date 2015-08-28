@@ -150,11 +150,11 @@ public class TaskLauncher implements InitActive {
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
-            logger.info("Task working dir : " + workingDir);
-            logger.info("Input space : " + context.getInputURI());
-            logger.info("Output space : " + context.getOutputURI());
-            logger.info("User space : " + context.getUserURI());
-            logger.info("Global space : " + context.getGlobalURI());
+            logger.info("Task working dir: " + workingDir);
+            logger.info("Input space: " + context.getInputURI());
+            logger.info("Output space: " + context.getOutputURI());
+            logger.info("User space: " + context.getUserURI());
+            logger.info("Global space: " + context.getGlobalURI());
 
             wallTimer.start();
 
