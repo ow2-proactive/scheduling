@@ -1,5 +1,7 @@
 package functionaltests;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.net.MalformedURLException;
@@ -12,6 +14,7 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.objectweb.proactive.utils.TimeoutAccounter;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -84,6 +87,8 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
 
     @Before
     public void init() throws Exception {
+    	
+    	assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
 
         // log all data transfer related events
         ProActiveLogger.getLogger(SchedulerProxyUserInterface.class).setLevel(Level.DEBUG);
@@ -212,9 +217,6 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
     @Test
     public void run() throws Throwable {
     	
-    	if(isWindows()){
-    		return;
-    	}
     	
         functionaltests.utils.SchedulerTHelper
                 .log(
@@ -314,10 +316,5 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
         }
     }
     
-    public static boolean isWindows() {
-
-		return (OS.indexOf("win") >= 0);
-
-	}
 
 }
