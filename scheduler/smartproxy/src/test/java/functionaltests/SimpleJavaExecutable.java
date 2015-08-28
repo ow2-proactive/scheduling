@@ -7,6 +7,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.Serializable;
+import java.util.Arrays;
 
 
 /**
@@ -19,8 +20,8 @@ public class SimpleJavaExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         File localSpaceFolder = new File(".");
-        System.out.println("Using localspace folder " + localSpaceFolder.getAbsolutePath());
-        System.out.println(localSpaceFolder.listFiles());
+        System.out.println("Using current space folder " + localSpaceFolder.getAbsolutePath());
+        System.out.println(Arrays.toString(localSpaceFolder.listFiles()));
         File[] inputFiles = localSpaceFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
