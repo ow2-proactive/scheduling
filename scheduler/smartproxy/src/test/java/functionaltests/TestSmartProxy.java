@@ -28,13 +28,10 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
 
-
 /**
  * @author esalagea
  */
 public class TestSmartProxy extends SchedulerFunctionalTest {
-	
-	private static String OS = System.getProperty("os.name").toLowerCase();
 
     /**
      * Local folder on client side where the input data is located and where the
@@ -83,7 +80,7 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
 
     @Before
     public void init() throws Exception {
-        
+
         // log all data transfer related events
         ProActiveLogger.getLogger(SchedulerProxyUserInterface.class).setLevel(Level.DEBUG);
 
@@ -211,7 +208,6 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
     @Test
     public void run() throws Throwable {
     	
-    	
         functionaltests.utils.SchedulerTHelper
                 .log(
                         "***************************************************************************************************");
@@ -312,6 +308,5 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
             Assert.assertTrue(outputFile + " exists", outputFile.isFile());
         }
     }
-    
 
 }
