@@ -105,7 +105,9 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
 
         File inputSpaceDir = new File(inputSpace);
-        fileWithAccentIn = new File(inputSpaceDir.getAbsolutePath() + File.separator + fileNameWithAccent);
+        inputSpaceDir.mkdirs();
+        String inputSpaceDirPath = inputSpaceDir.getAbsolutePath();
+        fileWithAccentIn = new File(inputSpaceDirPath + File.separator + fileNameWithAccent);
         fileWithAccentIn.createNewFile();
     }
 
@@ -114,7 +116,6 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
      *
      * @throws Throwable any exception that can be thrown during the test.
      */
-    @Ignore
     @org.junit.Test
     public void run() throws Throwable {
     	
