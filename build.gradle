@@ -53,11 +53,7 @@ buildscript {
 
 allprojects {
     apply plugin: 'maven'
-    apply plugin: 'jacoco'
     
-    jacoco {
-        toolVersion = '0.7.1.201405082137'
-    }
     
     group = 'org.ow2.proactive'
     version = schedulingVersion
@@ -94,6 +90,11 @@ ext.serialver = schedulingSerialver
 configure(javaSubprojects) {
     apply plugin: 'java'
     apply plugin: 'format'
+    apply plugin: 'jacoco'
+    
+    jacoco {
+        toolVersion = '0.7.1.201405082137'
+    }
 
     sourceCompatibility = 1.7
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
@@ -109,26 +110,7 @@ configure(javaSubprojects) {
         }
     }
 		
-	task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
-	    dependsOn = subprojects.test
-	    additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
-	    sourceDirectories = files(sourceSets.main.allSource.srcDirs)
-	    classDirectories = files(sourceSets.main.output)
-	    executionData = files(jacocoTestReport.executionData)
-	    reports {
-	        html.enabled = true
-	        xml.enabled = true
-	        csv.enabled = false
-	    }
-	    onlyIf = {
-	        true
-	    }
-	    doFirst {
-	        executionData = files(executionData.findAll {
-	            it.exists()
-	        })
-	    }
-	}
+	
 
     dependencies {
         compile 'log4j:log4j:1.2.14'
