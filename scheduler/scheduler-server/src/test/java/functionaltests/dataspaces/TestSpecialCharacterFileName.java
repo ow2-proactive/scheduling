@@ -36,8 +36,6 @@
  */
 package functionaltests.dataspaces;
 
-import static org.junit.Assume.assumeTrue;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -46,20 +44,19 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.junit.Ignore;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
-
 import functionaltests.utils.SchedulerFunctionalTest;
 import junit.framework.Assert;
 
+import static org.junit.Assume.assumeTrue;
+
 
 /**
- * This class tests a job submission using Dataspaces. It verifies that the transfer to and from all dataspaces are functional,
- * for Java and native tasks
+ * This class tests a job submission using Dataspaces. It verifies that the transfer to and from dataspaces are functional with special characters.
  *
  * @author The ProActive Team
- * @date 2 jun 08
+ * @date 31 aug 15
  * @since ProActive Scheduling 1.0
  */
 public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
@@ -84,7 +81,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
             long startTime = System.currentTimeMillis();
             while ((line = br.readLine()) != null &&
                     (System.currentTimeMillis() - startTime) / 1000 < timeout) {
-                System.out.println("** "+ line +" **");
+                // System.out.println("** "+ line +" **");
                 sb.append(line + System.getProperty("line.separator"));
                 if (line.contains(expr)) {
                     br.close();
@@ -124,6 +121,13 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         schedulerHelper.killScheduler();
 
         // Start the scheduler
+        logger.info("IAMHERE " + new File(".").getAbsolutePath());
+        System.out.println("IAMHERE " + new File(".").getAbsolutePath());
+
+        logger.info("IAMHERE2 " + new File(schedulerStarterBatPath).exists());
+        System.out.println("IAMHERE2 " + new File(schedulerStarterBatPath).exists());
+
+
         ArrayList<String> schedulerCommand = new ArrayList<>();
         schedulerCommand.add(schedulerStarterBatPath);
         ProcessBuilder schedulerProcessBuilder = new ProcessBuilder(schedulerCommand);
