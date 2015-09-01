@@ -68,7 +68,7 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertThat((String)taskResult.value(), is("hello"));
-        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("prehellopost%n")));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("prehellopost%n")), is(true));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
         
         assertThat((String)taskResult.value(), is(not("")));
-        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,"").contains("123"), is(true));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains("123"), is(true));
     }
 
     @Test
@@ -126,7 +126,7 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         
-        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("r00t%n")));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("r00t%n")), is(true));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
     
-        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("%s%n", tempFolder)));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)), is(true));
     }
 
     @Test
@@ -163,7 +163,7 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
   
-        assertThat(taskResult.getOutput().getAllLogs(false).replace(HEADLESS_JAVA_LOG,""), is(String.format("%s%n", tempFolder)));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)), is(true));
     }
 
     private String pwdCommand() {
