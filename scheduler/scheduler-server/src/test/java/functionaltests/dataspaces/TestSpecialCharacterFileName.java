@@ -101,8 +101,19 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
     public void OnlyOnWindows() throws IOException {
         assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
 
+        // In some cases, the current directory can be scheduler-server/.
+        // So we have to set it to the project root dir
+        if(new File(".").getAbsolutePath().contains("scheduler-server"))
+        {
+            String pathCorrector = ".." + File.separator + ".." + File.separator;
+            inputSpace = pathCorrector + inputSpace;
+            schedulerStarterBatPath = pathCorrector + schedulerStarterBatPath;
+            clientBatPath = pathCorrector + clientBatPath;
+            jobXmlPath = pathCorrector + jobXmlPath;
+            outputSpace = pathCorrector + outputSpace;
+        }
+
         File inputSpaceDir = new File(inputSpace);
-        inputSpaceDir.mkdirs();
         String inputSpaceDirPath = inputSpaceDir.getAbsolutePath();
         fileWithAccentIn = new File(inputSpaceDirPath + File.separator + fileNameWithAccent);
         fileWithAccentIn.createNewFile();
@@ -121,12 +132,11 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         schedulerHelper.killScheduler();
 
         // Start the scheduler
-        logger.info("IAMHERE " + new File(".").getAbsolutePath());
-        System.out.println("IAMHERE " + new File(".").getAbsolutePath());
+        logger.info("IAMHERE1 " + new File(".").getAbsolutePath());
+        System.out.println("IAMHERE1 " + new File(".").getAbsolutePath());
 
         logger.info("IAMHERE2 " + new File(schedulerStarterBatPath).exists());
         System.out.println("IAMHERE2 " + new File(schedulerStarterBatPath).exists());
-
 
         ArrayList<String> schedulerCommand = new ArrayList<>();
         schedulerCommand.add(schedulerStarterBatPath);
