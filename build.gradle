@@ -162,11 +162,7 @@ ext.encoding = {
 def functionalTestConfiguration = {
 
     include 'functionaltests/**'
-    
-    if(System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0){
-       	exclude 'functionaltests/scripts/nonforked/**'
-    }
-    
+   
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['proactive.test.timeout': 600000]

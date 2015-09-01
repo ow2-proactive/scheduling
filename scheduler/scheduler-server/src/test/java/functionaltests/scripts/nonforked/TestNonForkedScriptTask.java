@@ -41,6 +41,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -56,6 +57,7 @@ public class TestNonForkedScriptTask extends SchedulerFunctionalTest {
     private static URL nonForked_jobDescriptor = TestNonForkedScriptTask.class
             .getResource("/functionaltests/descriptors/Job_non_forked_script_task.xml");
 
+    @Ignore
     @Test
     public void nonForkedTasks_SystemExitScript_KillsANode() throws Throwable {
         schedulerHelper.startScheduler(new File(TestNonForkedScriptTask.class.getResource(
