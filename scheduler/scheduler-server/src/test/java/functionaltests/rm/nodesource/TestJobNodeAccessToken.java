@@ -65,20 +65,13 @@ import functionaltests.utils.SchedulerTHelper;
  */
 public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
 	
-	private static String OS = System.getProperty("os.name").toLowerCase();
-
-
-    private static URL simpleJob = TestJobNodeAccessToken.class
+	private static URL simpleJob = TestJobNodeAccessToken.class
             .getResource("/functionaltests/descriptors/Job_simple.xml");
     private static URL simpleJobWithToken = TestJobNodeAccessToken.class
             .getResource("/functionaltests/descriptors/Job_simple_with_token.xml");
     
     @Test
     public void run() throws Throwable {
-    	
-    	if(isMac()){
-    		return;
-    	}
     	
         JobId id = schedulerHelper.submitJob(new File(simpleJob.toURI()).getAbsolutePath());
         SchedulerTHelper.log("Job submitted, id " + id.toString());
@@ -120,11 +113,4 @@ public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
         
         
     }
-    
-    public static boolean isMac() {
-
-		return (OS.indexOf("mac") >= 0);
-
-	}
-
 }
