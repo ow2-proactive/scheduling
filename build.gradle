@@ -90,7 +90,6 @@ ext.serialver = schedulingSerialver
 configure(javaSubprojects) {
     apply plugin: 'java'
     apply plugin: 'format'
-    /*
     apply plugin: 'jacoco'
     
     jacoco {
@@ -107,7 +106,6 @@ configure(javaSubprojects) {
             csv.enabled = false
         }
     }
-    */
 
     sourceCompatibility = 1.7
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
@@ -130,6 +128,9 @@ configure(javaSubprojects) {
         exclude 'functionaltests/**'
         exclude 'unittests/**'
         exclude 'unitTests/**'
+        if(Boolean.valueOf(System.getProperty("java.awt.headless"))){
+        	exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
+        }
     }
 
     task serialver(type: serialver.InsertSerialVersionUIDTask) {
