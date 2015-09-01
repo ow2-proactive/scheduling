@@ -90,14 +90,12 @@ ext.serialver = schedulingSerialver
 configure(javaSubprojects) {
     apply plugin: 'java'
     apply plugin: 'format'
+    /*
     apply plugin: 'jacoco'
     
     jacoco {
         toolVersion = '0.7.1.201405082137'
     }
-
-    sourceCompatibility = 1.7
-    compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
     
     jacocoTestReport {
         additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
@@ -109,6 +107,12 @@ configure(javaSubprojects) {
             csv.enabled = false
         }
     }
+    */
+
+    sourceCompatibility = 1.7
+    compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
+    
+    
 		
 	
 
