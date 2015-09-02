@@ -1294,7 +1294,7 @@ public class SchedulerDBManager {
 
             boolean nextTask = !dbTaskId.equals(currentTaskId);
             if (nextTask) {
-                TaskId taskId = TaskIdImpl.createTaskId(jobId, taskName, dbTaskId.getTaskId(), false);
+                TaskId taskId = TaskIdImpl.createTaskId(jobId, taskName, dbTaskId.getTaskId());
                 jobResult.addTaskResult(taskName, resultData.toTaskResult(taskId),
                         preciousResult);
                 currentTaskId = dbTaskId;
@@ -1332,7 +1332,7 @@ public class SchedulerDBManager {
 
                 DBTaskId dbTaskId = (DBTaskId) taskSearchResult[0];
                 String taskName = (String) taskSearchResult[1];
-                TaskId taskId = TaskIdImpl.createTaskId(jobId, taskName, dbTaskId.getTaskId(), false);
+                TaskId taskId = TaskIdImpl.createTaskId(jobId, taskName, dbTaskId.getTaskId());
 
                 return loadTaskResult(session, taskId, index);
             }
@@ -1384,7 +1384,7 @@ public class SchedulerDBManager {
                 for (int i = 0; i < job.getITasks().size(); i++) {
                     InternalTask task = job.getITasks().get(i);
                     task.setId(TaskIdImpl.createTaskId(job.getId(), task.getTaskInfo().getTaskId()
-                            .getReadableName(), i, true));
+                            .getReadableName(), i));
                     tasksWithNewIds.add(task);
                 }
                 job.getIHMTasks().clear();

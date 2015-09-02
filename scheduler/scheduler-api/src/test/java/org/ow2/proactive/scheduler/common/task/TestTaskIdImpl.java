@@ -48,39 +48,12 @@ import static org.junit.Assert.*;
 
 public class TestTaskIdImpl {
 
-    /**
-     * Test related to issue ow2-proactive/scheduling#1993
-     * <p/>
-     * Integer overflow can occur if scaleFactor or jobId is not a long.
-     */
-    @Test
-    public void testIntegerOverflowWithTaskId() {
-        long jobIdValue = 4;
-        int scaleFactorValue = 1073741823;
-
-        PASchedulerProperties.JOB_FACTOR.updateProperty(Integer.toString(scaleFactorValue));
-
-        JobId jobId =
-                new JobIdImpl(jobIdValue, "job");
-
-        TaskId taskId = TaskIdImpl.createTaskId(jobId, "task", 1, true);
-
-        long expectedValue = jobIdValue * scaleFactorValue + 1;
-
-        Assert.assertTrue(expectedValue > 0);
-        Assert.assertTrue(Long.parseLong(taskId.value()) > 0);
-        Assert.assertEquals(Long.toString(expectedValue), taskId.value());
-    }
-
     @Test
     public void testGetIterationIndex() throws Exception {
-        TaskId taskNoIterationIndex = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task", 1, false);
-        TaskId taskIterationIndexSmallerThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#1",
-          1, false);
-        TaskId taskIterationIndexGreaterThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10",
-          1, false);
-        TaskId taskReplicatedAndIterated = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10*10", 1,
-          false);
+        TaskId taskNoIterationIndex = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task", 1);
+        TaskId taskIterationIndexSmallerThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#1", 1);
+        TaskId taskIterationIndexGreaterThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10", 1);
+        TaskId taskReplicatedAndIterated = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10*10", 1);
 
         assertEquals(0, taskNoIterationIndex.getIterationIndex());
         assertEquals(1, taskIterationIndexSmallerThan9.getIterationIndex());
@@ -90,17 +63,15 @@ public class TestTaskIdImpl {
 
     @Test
     public void testGetReplicationIndex() throws Exception {
-        TaskId taskNoReplicationIndex = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task", 1, false);
-        TaskId taskReplicationIndexSmallerThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task*1",
-          1, false);
-        TaskId taskReplicationIndexGreaterThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"),
-          "task*10", 1, false);
-        TaskId taskReplicatedAndIterated = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10*10", 1,
-          false);
+        TaskId taskNoReplicationIndex = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task", 1);
+        TaskId taskReplicationIndexSmallerThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task*1", 1);
+        TaskId taskReplicationIndexGreaterThan9 = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task*10", 1);
+        TaskId taskReplicatedAndIterated = TaskIdImpl.createTaskId(new JobIdImpl(1L, "job"), "task#10*10", 1);
 
         assertEquals(0, taskNoReplicationIndex.getReplicationIndex());
         assertEquals(1, taskReplicationIndexSmallerThan9.getReplicationIndex());
         assertEquals(10, taskReplicationIndexGreaterThan9.getReplicationIndex());
         assertEquals(10, taskReplicatedAndIterated.getReplicationIndex());
     }
+
 }

@@ -472,7 +472,7 @@ public class TaskData {
     }
 
     TaskId createTaskId(InternalJob internalJob) {
-        return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId(), false);
+        return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId());
     }
 
     InternalTask toInternalTask(InternalJob internalJob) throws InvalidScriptException {
@@ -961,7 +961,7 @@ public class TaskData {
     }
 
     TaskUsage toTaskUsage(JobIdImpl jobId) {
-        TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId(), false);
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
 
         return new TaskUsage(taskId.value(), getTaskName(), getStartTime(), getFinishedTime(),
             getExecutionDuration(), getParallelEnvironment() == null ? 1 : getParallelEnvironment()

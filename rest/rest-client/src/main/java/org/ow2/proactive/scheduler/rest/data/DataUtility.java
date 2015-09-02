@@ -185,7 +185,7 @@ public class DataUtility {
     }
 
     private static TaskId taskId(JobId jobId, TaskIdData taskIdData) {
-        return createTaskId(jobId, taskIdData.getReadableName(), taskIdData.getId(), false);
+        return createTaskId(jobId, taskIdData.getReadableName(), taskIdData.getId());
     }
 
 }

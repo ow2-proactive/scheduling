@@ -61,17 +61,13 @@ public final class TaskIdImpl implements TaskId {
 
     private JobId jobId;
 
-    private TaskIdImpl(JobId jobId, long taskId, boolean applyJobFactor) {
+    private TaskIdImpl(JobId jobId, long taskId) {
         this.jobId = jobId;
         this.id = taskId;
     }
 
-    public static long getJobFactor() {
-        return PASchedulerProperties.JOB_FACTOR.getValueAsInt();
-    }
-
-    private TaskIdImpl(JobId jobId, String name, long taskId, boolean applyJobFactor) {
-        this(jobId, taskId, applyJobFactor);
+    private TaskIdImpl(JobId jobId, String name, long taskId) {
+        this(jobId, taskId);
         this.readableName = name;
     }
 
@@ -83,8 +79,8 @@ public final class TaskIdImpl implements TaskId {
      * @param taskId       the task identifier value.
      * @return new TaskId instance.
      */
-    public static TaskId createTaskId(JobId jobId, String readableName, long taskId, boolean applyJobFactor) {
-        return new TaskIdImpl(jobId, readableName, taskId, applyJobFactor);
+    public static TaskId createTaskId(JobId jobId, String readableName, long taskId) {
+        return new TaskIdImpl(jobId, readableName, taskId);
     }
 
     /**

@@ -349,7 +349,6 @@ public class BaseSchedulerDBTest extends ProActiveTest {
     @Before
     public void initTest() throws Exception {
         PASchedulerProperties.SCHEDULER_HOME.updateProperty(ClasspathUtils.findSchedulerHome());
-        PASchedulerProperties.JOB_FACTOR.updateProperty("1000");
         PASchedulerProperties.TASK_FORK.updateProperty("true");
         CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
         Configuration config = new Configuration()

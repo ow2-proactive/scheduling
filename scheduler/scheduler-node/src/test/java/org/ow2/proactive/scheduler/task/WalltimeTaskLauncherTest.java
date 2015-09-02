@@ -31,7 +31,7 @@ public class WalltimeTaskLauncherTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setWalltime(500);
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new ForkingTaskLauncherFactory());
 
@@ -47,7 +47,7 @@ public class WalltimeTaskLauncherTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setWalltime(500);
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
 
@@ -63,7 +63,7 @@ public class WalltimeTaskLauncherTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setWalltime(500);
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new SlowDataspacesTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);

@@ -62,7 +62,7 @@ public class TaskLauncherTest {
 
         initializer.setPreScript(new SimpleScript("print('pre')", "groovy"));
         initializer.setPostScript(new SimpleScript("print('post')", "groovy"));
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
@@ -82,7 +82,7 @@ public class TaskLauncherTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job*1", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job*1", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
@@ -98,7 +98,7 @@ public class TaskLauncherTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
@@ -113,7 +113,7 @@ public class TaskLauncherTest {
           new TaskScript(new SimpleScript("print(credentials.get('password'))", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
 
@@ -138,7 +138,7 @@ public class TaskLauncherTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setForkEnvironment(new ForkEnvironment(tempFolder));
 
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
@@ -157,7 +157,7 @@ public class TaskLauncherTest {
         initializer.setVariables(singletonMap("folder", tempFolder));
         initializer.setForkEnvironment(new ForkEnvironment("$folder"));
 
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
@@ -182,7 +182,7 @@ public class TaskLauncherTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
         initializer.setPreciousLogs(true);
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
         when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
@@ -207,7 +207,7 @@ public class TaskLauncherTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
         initializer.setPreciousLogs(false);
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
         when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
@@ -230,7 +230,7 @@ public class TaskLauncherTest {
                 new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
         when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
@@ -259,7 +259,7 @@ public class TaskLauncherTest {
                         new String [] {Integer.toString(nbIterations)})));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "job", 1000L));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);

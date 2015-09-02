@@ -135,12 +135,6 @@ public class InternalJobFactory {
             throw new JobCreationException("This job must contains tasks !");
         }
 
-        int maxTask = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
-        if (userJob.getTasks().size() > maxTask) {
-            logger.info("Job '" + userJob.getName() + "' cannot contain more than " + maxTask + " tasks !");
-            throw new JobCreationException("Job cannot contain more than " + maxTask + " tasks !");
-        }
-
         // validate taskflow
         List<FlowChecker.Block> blocks = new ArrayList<>();
         FlowError err = FlowChecker.validate(userJob, blocks);

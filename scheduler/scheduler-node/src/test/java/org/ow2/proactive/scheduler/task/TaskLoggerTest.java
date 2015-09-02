@@ -21,7 +21,7 @@ public class TaskLoggerTest {
     public void printAndGetLogs() throws Exception {
 
         TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task",
-                42L, false), "myhost");
+                42L), "myhost");
 
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
@@ -37,7 +37,7 @@ public class TaskLoggerTest {
     @Test
     public void logStreaming() throws Exception {
         TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task",
-                42L, false), "myhost");
+                42L), "myhost");
 
         final StringWriter stringAppender = new StringWriter();
         AppenderProvider stringAppenderProvider = new AppenderProvider() {
@@ -65,7 +65,7 @@ public class TaskLoggerTest {
     @Test
     public void getStoredLogs() throws Exception {
         TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task",
-                42L, false), "myhost");
+                42L), "myhost");
 
         final StringWriter stringAppender = new StringWriter();
         AppenderProvider stringAppenderProvider = new AppenderProvider() {
@@ -87,7 +87,7 @@ public class TaskLoggerTest {
     @Test
     public void logPattern() throws Exception {
         TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task",
-                42L, false), "myhost");
+                42L), "myhost");
 
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 

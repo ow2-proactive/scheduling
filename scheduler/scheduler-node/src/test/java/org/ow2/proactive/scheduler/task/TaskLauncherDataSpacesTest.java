@@ -47,7 +47,7 @@ public class TaskLauncherDataSpacesTest {
             new TaskScript(new SimpleScript("println new File('.').listFiles();", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
         initializer.setTaskInputFiles(singletonList(
           new InputSelector(new FileSelector("input_$PA_JOB_ID.txt"),
             InputAccessMode.TransferFromInputSpace)));
@@ -69,7 +69,7 @@ public class TaskLauncherDataSpacesTest {
                 "new File('output_' + variables.get('PA_TASK_ID') + '.txt').text = 'hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
         initializer.setTaskOutputFiles(singletonList(
           new OutputSelector(new FileSelector("output_${PA_TASK_ID}.txt"),
             OutputAccessMode.TransferToGlobalSpace)));
@@ -88,7 +88,7 @@ public class TaskLauncherDataSpacesTest {
             new TaskScript(new SimpleScript("println new File('.').listFiles();", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
         initializer.setVariables(singletonMap("aVar", "foo"));
         initializer.setTaskInputFiles(singletonList(
           new InputSelector(new FileSelector("input_${aVar}_${aResultVar}.txt"),
@@ -113,7 +113,7 @@ public class TaskLauncherDataSpacesTest {
                 "new File('output_foo_bar.txt').text = 'hello'; variables.put('aVar', 'foo')", "groovy")));
 
         TaskLauncherInitializer copyOutputFile = new TaskLauncherInitializer();
-        copyOutputFile.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        copyOutputFile.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
         copyOutputFile.setTaskOutputFiles(singletonList(
           new OutputSelector(new FileSelector("output_${aVar}_${aResultVar}.txt"),
             OutputAccessMode.TransferToGlobalSpace)));
@@ -157,7 +157,7 @@ public class TaskLauncherDataSpacesTest {
     }
     private TaskResultImpl taskResult(Map<String, Serializable> variables) {
         TaskResultImpl previousTaskResult = new TaskResultImpl(TaskIdImpl.createTaskId(
-          JobIdImpl.makeJobId("1001"), "job", 1000L, false), null);
+          JobIdImpl.makeJobId("1001"), "job", 1000L), null);
         previousTaskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
         return previousTaskResult;
     }

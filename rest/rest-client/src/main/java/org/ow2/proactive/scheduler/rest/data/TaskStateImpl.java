@@ -58,7 +58,7 @@ public class TaskStateImpl extends TaskState {
     @Override
     public TaskId getId() {
         TaskIdData idData = d.getTaskInfo().getTaskId();
-        return createTaskId(null, idData.getReadableName(), idData.getId(), false);
+        return createTaskId(null, idData.getReadableName(), idData.getId());
     }
 
     @Override

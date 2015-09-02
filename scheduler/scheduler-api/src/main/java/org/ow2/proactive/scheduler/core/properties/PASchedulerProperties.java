@@ -161,9 +161,6 @@ public enum PASchedulerProperties {
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
 
-    /** Multiplicative factor for job id (taskId will be : this_factor*jobID+taskID) */
-    JOB_FACTOR("pa.scheduler.job.factor", PropertyType.INTEGER),
-
     /** Delay to wait between getting a job result and removing the job concerned (0 = infinite) */
     SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PropertyType.INTEGER),
 
