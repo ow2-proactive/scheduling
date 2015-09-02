@@ -48,6 +48,7 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import functionaltests.utils.SchedulerFunctionalTest;
 import junit.framework.Assert;
+import org.junit.Ignore;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -124,6 +125,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
      *
      * @throws Throwable any exception that can be thrown during the test.
      */
+    @Ignore
     @org.junit.Test
     public void run() throws Throwable {
 
