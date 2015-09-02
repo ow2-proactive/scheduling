@@ -36,19 +36,17 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
-
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 
 /**
- * Definition of a task identification. For the moment, it is represented by an
- * integer.
+ * Definition of a task identification.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -56,60 +54,41 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class TaskIdImpl implements TaskId {
 
-    /** Task id */
+    // Task identifier
     private long id;
 
-    /** Human readable name */
     private String readableName = SchedulerConstants.TASK_DEFAULT_NAME;
 
-    /** Job id */
-    @XmlTransient
-    private JobId jobId = null;
+    private JobId jobId;
 
-    /**
-     * Default constructor. Just set the id of the task.
-     *
-     * @param jobId the task id to set.
-     */
-    private TaskIdImpl(JobId jobId, long id, boolean applyJobFactor) {
+    private TaskIdImpl(JobId jobId, long taskId, boolean applyJobFactor) {
         this.jobId = jobId;
-        if (applyJobFactor) {
-            this.id = (jobId.hashCode() * getJobFactor()) + id;
-        } else {
-            this.id = id;
-        }
+        this.id = taskId;
     }
 
     public static long getJobFactor() {
         return PASchedulerProperties.JOB_FACTOR.getValueAsInt();
     }
 
-    /**
-     * Set id and name.
-     *
-     * @param jobId the task id to set.
-     * @param name the human readable task name.
-     */
-    private TaskIdImpl(JobId jobId, String name, long id, boolean applyJobFactor) {
-        this(jobId, id, applyJobFactor);
+    private TaskIdImpl(JobId jobId, String name, long taskId, boolean applyJobFactor) {
+        this(jobId, taskId, applyJobFactor);
         this.readableName = name;
     }
 
     /**
      * Create task id, and set task name.
      *
-     * @param jobId the id of the enclosing job. Permit a generation of a task id based on the jobId.
-     * @param readableName Set the task name in the returned task id as well.
-     * @return new task id with task name set.
+     * @param jobId        the id of the enclosing job.
+     * @param readableName the human readable name of the task.
+     * @param taskId       the task identifier value.
+     * @return new TaskId instance.
      */
-    public static TaskId createTaskId(JobId jobId, String readableName, long id, boolean applyJobFactor) {
-        return new TaskIdImpl(jobId, readableName, id, applyJobFactor);
+    public static TaskId createTaskId(JobId jobId, String readableName, long taskId, boolean applyJobFactor) {
+        return new TaskIdImpl(jobId, readableName, taskId, applyJobFactor);
     }
 
     /**
-     * Returns the jobId.
-     *
-     * @return the jobId.
+     * {@inheritDoc}
      */
     public JobId getJobId() {
         return jobId;
@@ -129,61 +108,57 @@ public final class TaskIdImpl implements TaskId {
     }
 
     /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     * @param taskId the taskId to be compared.
-     * @return  a negative integer, zero, or a positive integer as this object
-     *		is less than, equal to, or greater than the specified object.
-     */
-    public int compareTo(TaskId taskId) {
-        return Long.valueOf(id).compareTo(((TaskIdImpl) taskId).id);
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object o) {
-        if ((o != null) && o instanceof TaskIdImpl) {
-            return ((TaskIdImpl) o).id == id;
-        }
-        return false;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return (int) (id % Integer.MAX_VALUE);
-    }
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return value();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String value() {
-        return "" + this.id;
-    }
-
-    /**
-     * Set readable name of this TaskId
-     * 
-     * @param readableName new name
+     * Set readable name of this TaskId.
+     *
+     * @param readableName the new human readable name.
      */
     public void setReadableName(String readableName) {
         this.readableName = readableName;
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(TaskId that) {
+        return Long.compare(this.id, ((TaskIdImpl) that).id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TaskIdImpl taskId = (TaskIdImpl) o;
+
+        return id == taskId.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id % Integer.MAX_VALUE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String value() {
+        return Long.toString(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long longValue() {
+        return id;
+    }
+
+    /**
      * @see TaskId#getIterationIndex()
      */
+    @Override
     public int getIterationIndex() {
         // implementation note :
         // this has to match what is done in InternalTask#setName(String)
@@ -202,6 +177,7 @@ public final class TaskIdImpl implements TaskId {
     /**
      * @see TaskId#getReplicationIndex()
      */
+    @Override
     public int getReplicationIndex() {
         // implementation note :
         // this has to match what is done in InternalTask#setName(String)
@@ -212,4 +188,13 @@ public final class TaskIdImpl implements TaskId {
         }
         return 0;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return jobId.value() + 't' + value();
+    }
+
 }

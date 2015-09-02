@@ -261,7 +261,10 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
     // 1 called by forker
     private static File serializeContext(TaskContext context, File directory) throws IOException {
-        File file = File.createTempFile(context.getTaskId().value(), null, directory);
+        // prefix must be at least 3 characters long
+        String tmpFilePrefix = Strings.padStart(context.getTaskId().value(), 3, '0');
+
+        File file = File.createTempFile(tmpFilePrefix, null, directory);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             objectOutputStream.writeObject(context);
         }

@@ -53,28 +53,37 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 public interface TaskId extends Comparable<TaskId>, Serializable {
 
     /**
-     * Returns the jobId.
+     * Returns the job identifier associated with this task.
      *
-     * @return the jobId.
+     * @return the job identifier associated with this task.
      */
     JobId getJobId();
 
     /**
-     * Return the human readable name associated to this id.
+     * Return the human readable name associated with this id.
      *
-     * @return the human readable name associated to this id.
+     * @return the human readable name associated with this id.
      */
     String getReadableName();
 
     /**
-     * Get the value of the TaskId.<br />
-     * As the internal implementation of this class can change, It is strongly recommended to use this method
-     * to get a literal value of the ID.<br />
-     * Use this value if you lost the TaskId Object returned by the scheduler.
+     * Returns a String representation that is unique for the job
+     * it is related to. Please look at {@link #toString} for a String
+     * representation unique for the scheduler instance it was built for.
      *
-     * @return the textual representation of this TaskId
+     * @return a String representation that is unique for the job
+     * it is related to only.
      */
     String value();
+
+    /**
+     * Returns a long representation that is unique for the job
+     * it is related to.
+     *
+     * @return a long representation that is unique for the job
+     * it is related to.
+     */
+    long longValue();
 
     /**
      * When Control Flow actions are performed on Tasks, some tasks are replicated. 
@@ -103,4 +112,14 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
 
     /** string separator in the task name for indicating the iteration index */
     String ITERATION_SEPARATOR = "#";
+
+    /**
+     * Returns a String representation that is unique for
+     * the scheduler instance it was built for.
+     *
+     * @return a String representation that is unique for
+     * the scheduler instance it was built for.
+     */
+    String toString();
+
 }
