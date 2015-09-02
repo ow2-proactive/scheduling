@@ -99,8 +99,8 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
     int getReplicationIndex();
 
     /** string separator in the task name for indicating the replication index */
-    String replicationSeparator = "*";
+    String REPLICATION_SEPARATOR = "*";
 
     /** string separator in the task name for indicating the iteration index */
-    String iterationSeparator = "#";
+    String ITERATION_SEPARATOR = "#";
 }

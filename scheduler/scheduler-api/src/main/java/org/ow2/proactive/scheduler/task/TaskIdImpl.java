@@ -188,8 +188,8 @@ public final class TaskIdImpl implements TaskId {
         // implementation note :
         // this has to match what is done in InternalTask#setName(String)
         int iterationPos;
-        if ((iterationPos = this.readableName.indexOf(TaskId.iterationSeparator)) != -1) {
-            int replicationPos = this.readableName.indexOf(TaskId.replicationSeparator);
+        if ((iterationPos = this.readableName.indexOf(TaskId.ITERATION_SEPARATOR)) != -1) {
+            int replicationPos = this.readableName.indexOf(TaskId.REPLICATION_SEPARATOR);
             if (replicationPos == -1) {
                 replicationPos = readableName.length();
             }
@@ -206,7 +206,7 @@ public final class TaskIdImpl implements TaskId {
         // implementation note :
         // this has to match what is done in InternalTask#setName(String)
         int pos;
-        if ((pos = this.readableName.indexOf(TaskId.replicationSeparator)) != -1) {
+        if ((pos = this.readableName.indexOf(TaskId.REPLICATION_SEPARATOR)) != -1) {
             int read = Integer.parseInt(this.readableName.substring(pos + 1));
             return Math.max(0, read);
         }
