@@ -80,7 +80,7 @@ public class TestScheduler {
         startedConfiguration = configuration;
 
         List<String> commandLine = new ArrayList<>();
-        commandLine.add("java");
+        commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
         //commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,address=9009,suspend=y");
         String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
@@ -141,7 +141,6 @@ public class TestScheduler {
         System.out.println("Starting Scheduler process: " + commandLine);
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
-        processBuilder.directory(new File(System.getProperty("java.home") + File.separator + "bin"));
         processBuilder.redirectErrorStream(true);
         processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller("TEST_SCHED",
                 processBuilder.environment());
