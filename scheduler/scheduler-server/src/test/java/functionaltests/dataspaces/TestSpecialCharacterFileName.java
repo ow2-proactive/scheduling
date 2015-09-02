@@ -75,22 +75,22 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
     private static String outputResultOrThrow(InputStream inputStream, String expr, int timeout) throws Exception {
         StringBuilder sb = new StringBuilder();
         BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(inputStream));
-            String line = null;
-            long startTime = System.currentTimeMillis();
-            while ((line = br.readLine()) != null &&
-                    (System.currentTimeMillis() - startTime) / 1000 < timeout) {
-                // System.out.println("** "+ line +" **");
-                sb.append(line + System.getProperty("line.separator"));
-                if (line.contains(expr)) {
-                    br.close();
-                    return sb.toString();
-                }
+        br = new BufferedReader(new InputStreamReader(inputStream));
+        String line = null;
+        long startTime = System.currentTimeMillis();
+
+        while ((line = br.readLine()) != null && (System.currentTimeMillis() - startTime) / 1000 < timeout) {
+            System.out.println("^^ "+ line +" ^^");
+            logger.info("^^ "+ line +" ^^");
+            sb.append(line + System.getProperty("line.separator"));
+
+            if (line.contains(expr)) {
+                br.close();
+                return sb.toString();
             }
-        } finally {
-            br.close();
         }
+        br.close();
+
         throw new Exception(ERROR_COMMAND_EXECUTION);
     }
 
@@ -126,7 +126,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
      */
     @org.junit.Test
     public void run() throws Throwable {
-    	
+
 
         // Now we launch the scheduler from the generated script, to consider the -Dfile.encoding parameter
         schedulerHelper.killScheduler();
