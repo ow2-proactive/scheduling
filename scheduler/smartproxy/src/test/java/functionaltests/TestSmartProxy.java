@@ -152,7 +152,7 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
             testTask.addInputFiles("DUMMY", InputAccessMode.TransferFromInputSpace);
             testTask.addInputFiles(inputFile.getName(), InputAccessMode.TransferFromInputSpace);
             if (isolateOutputs) {
-                testTask.addOutputFiles("*.out", OutputAccessMode.TransferToOutputSpace);
+                testTask.addOutputFiles("*"+outputFileExt, OutputAccessMode.TransferToOutputSpace);
             } else {
                 testTask.addOutputFiles(outputFileName, OutputAccessMode.TransferToOutputSpace);
             }
