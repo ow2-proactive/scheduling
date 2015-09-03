@@ -1380,13 +1380,16 @@ public class SchedulerDBManager {
 
                 job.setId(new JobIdImpl(jobRuntimeData.getId(), job.getName()));
 
-                List<InternalTask> tasksWithNewIds = new ArrayList<>();
-                for (int i = 0; i < job.getITasks().size(); i++) {
-                    InternalTask task = job.getITasks().get(i);
-                    task.setId(TaskIdImpl.createTaskId(job.getId(), task.getTaskInfo().getTaskId()
-                            .getReadableName(), i));
+                ArrayList<InternalTask> iTasks = job.getITasks();
+                List<InternalTask> tasksWithNewIds = new ArrayList<>(iTasks.size());
+
+                for (int i = 0; i < iTasks.size(); i++) {
+                    InternalTask task = iTasks.get(i);
+                    task.setId(TaskIdImpl.createTaskId(job.getId(),
+                            task.getTaskInfo().getTaskId().getReadableName(), i));
                     tasksWithNewIds.add(task);
                 }
+
                 job.getIHMTasks().clear();
                 for (InternalTask task : tasksWithNewIds) {
                     job.getIHMTasks().put(task.getId(), task);
