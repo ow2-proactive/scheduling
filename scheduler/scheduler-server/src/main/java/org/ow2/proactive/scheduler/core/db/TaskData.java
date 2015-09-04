@@ -382,7 +382,7 @@ public class TaskData {
 
         TaskData.DBTaskId taskId = new DBTaskId();
         taskId.setJobId(jobRuntimeData.getId());
-        taskId.setTaskId(Long.valueOf(task.getTaskInfo().getTaskId().value()));
+        taskId.setTaskId(task.getTaskInfo().getTaskId().longValue());
 
         taskData.setId(taskId);
         taskData.setDescription(task.getDescription());

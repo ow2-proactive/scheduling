@@ -1538,7 +1538,7 @@ public class SchedulerDBManager {
     private static TaskData.DBTaskId taskId(TaskId taskId) {
         TaskData.DBTaskId id = new TaskData.DBTaskId();
         id.setJobId(jobId(taskId.getJobId()));
-        id.setTaskId(Long.valueOf(taskId.value()));
+        id.setTaskId(taskId.longValue());
         return id;
     }
 
@@ -1547,7 +1547,7 @@ public class SchedulerDBManager {
     }
 
     private static long jobId(JobId jobId) {
-        return Long.valueOf(jobId.value());
+        return jobId.longValue();
     }
 
     private static Configuration createConfiguration(File configFile, Map<String, String> propertiesToReplace) {

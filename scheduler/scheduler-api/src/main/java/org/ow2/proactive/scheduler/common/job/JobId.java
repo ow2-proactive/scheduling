@@ -67,4 +67,11 @@ public interface JobId extends Comparable<JobId>, Serializable {
      */
     String value();
 
+    /**
+     * Returns the current value of the JobId.
+     *
+     * @return the current value of the JobId as a long.
+     */
+    long longValue();
+
 }
