@@ -346,6 +346,6 @@ public class TaskInfoImpl implements TaskInfo {
      */
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[" + taskId + "]";
+        return getClass().getSimpleName() + "[Job=" + taskId.getJobId().value() + ", TaskId=" + taskId.value() + "]";
     }
 }
