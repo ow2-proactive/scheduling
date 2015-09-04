@@ -55,6 +55,7 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskContext;
@@ -109,8 +110,13 @@ public class ForkedTaskExecutor implements TaskExecutor {
                     errorSink);
 
             try {
-                taskProcessTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller(context
-                        .getTaskId().value(), processBuilder.environment());
+                TaskId taskId = context.getTaskId();
+
+                String cookieNameSuffix = "Job" + taskId.getJobId().value() + "Task" + taskId.value();
+
+                taskProcessTreeKiller =
+                        CookieBasedProcessTreeKiller.createProcessChildrenKiller(
+                                cookieNameSuffix, processBuilder.environment());
             } catch (NotImplementedException e) {
                 // SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
             }
