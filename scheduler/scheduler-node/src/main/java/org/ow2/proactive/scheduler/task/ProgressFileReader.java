@@ -57,7 +57,7 @@ public class ProgressFileReader {
 
     public boolean start(File workingDir, TaskId taskId) {
         String progressFileName =
-                "job-" + taskId.getJobId() + "-task-" + taskId.toString()
+                "job-" + taskId.getJobId().value() + "-task-" + taskId.value()
                         + "-" + UUID.randomUUID() + ".progress";
 
         return start(workingDir, progressFileName);
@@ -134,6 +134,11 @@ public class ProgressFileReader {
     }
 
     private void removeProgressFileDir() {
+        if (progressFileDir == null
+                || !Files.exists(progressFileDir)) {
+            return;
+        }
+
         try {
             FileUtils.deleteRecursively(progressFileDir);
         } catch (IOException e) {
