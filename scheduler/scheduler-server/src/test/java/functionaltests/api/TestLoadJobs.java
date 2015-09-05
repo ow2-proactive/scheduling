@@ -38,7 +38,6 @@ import static org.junit.Assert.*;
 
 /**
  * Test against method Scheduler.loadJobs 
- *
  */
 public class TestLoadJobs extends SchedulerFunctionalTest {
 
