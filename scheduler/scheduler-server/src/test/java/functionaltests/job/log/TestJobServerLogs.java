@@ -50,7 +50,9 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.SelectionScript;
 
 import java.io.File;
@@ -180,9 +182,9 @@ public class TestJobServerLogs extends SchedulerFunctionalTest {
 
     private void checkJobAndTaskLogFiles(JobId jobId, List<TaskState> tasks, boolean shouldExist)
             throws Exception {
-        checkFile(shouldExist, new File(logsLocation, jobId.toString()));
+        checkFile(shouldExist, new File(logsLocation, JobLogger.getJobLogFilename(jobId)));
         for (TaskState taskState : tasks) {
-            checkFile(shouldExist, new File(logsLocation, taskState.getId().toString()));
+            checkFile(shouldExist, new File(logsLocation, TaskLogger.getTaskLogFilename(taskState.getId())));
         }
     }
 

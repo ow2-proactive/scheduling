@@ -23,11 +23,13 @@ import static org.junit.Assert.assertTrue;
 
 
 public class ServerJobAndTaskLogsTest {
+
     @Rule
     public TemporaryFolder fakeSchedulerHome = new TemporaryFolder();
 
     private JobLogger jobLogger;
     private TaskLogger taskLogger;
+
     private JobId jobId;
     private TaskId taskId;
 
@@ -71,10 +73,11 @@ public class ServerJobAndTaskLogsTest {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), jobId.toString()).exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), jobId.toString() + ".1").exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), taskId.toString()).exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), taskId.toString() + ".1").exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogFilename(jobId)).exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogFilename(jobId) + ".1").exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogFilename(taskId)).exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogFilename(taskId) + ".1").exists());
+
         assertEquals(4, new File(ServerJobAndTaskLogs.getLogsLocation()).list().length);
 
         ServerJobAndTaskLogs.remove(jobId, Collections.singleton(taskId));
