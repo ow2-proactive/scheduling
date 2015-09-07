@@ -44,12 +44,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import functionaltests.utils.SchedulerFunctionalTest;
 import junit.framework.Assert;
-
-import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -79,7 +76,8 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         long startTime = System.currentTimeMillis();
 
         while ((line = br.readLine()) != null && (System.currentTimeMillis() - startTime) / 1000 < timeout) {
-            System.out.println("^^ " + line + " ^^");
+            System.out.println(line);
+            logger.info(">> " + line);
             sb.append(line + System.getProperty("line.separator"));
 
             if (line.contains(expr)) {
@@ -96,7 +94,8 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
 
     @org.junit.Before
     public void OnlyOnWindows() throws IOException {
-        assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
+//        assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
+//        assumeTrue(!System.getProperty("os.name").equalsIgnoreCase("windows 7"));
 
         // In some cases, the current directory can be scheduler-server/.
         // So we have to set it to the project root dir
@@ -131,9 +130,6 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         schedulerHelper.killScheduler();
 
         // Start the scheduler
-        System.out.println("IAMHERE1 " + new File(".").getAbsolutePath());
-        System.out.println("IAMHERE2 " + new File(schedulerStarterBatPath).exists());
-
         ArrayList<String> schedulerCommand = new ArrayList<>();
         schedulerCommand.add(schedulerStarterBatPath);
         ProcessBuilder schedulerProcessBuilder = new ProcessBuilder(schedulerCommand);
@@ -158,6 +154,11 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         clientCommand.add(jobXmlPath);
         ProcessBuilder jobSubmissionProcessBuilder = new ProcessBuilder(clientCommand);
         String jobSubmissionStr;
+
+        logger.info(">> here " + new File(".").getAbsolutePath());
+        logger.info(">> clientBatPath " + new File(clientBatPath).exists());
+        logger.info(">> jobXmlPath " + new File(jobXmlPath).exists());
+
         if ((jobSubmissionStr= returnExprInResultBeforeTimeout(
                 jobSubmissionProcessBuilder.start().getInputStream(), "submitted", TIMEOUT))==null)
         {
@@ -201,11 +202,14 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         //Assert.assertTrue(new File(IOSPACE + OUT + File.separator + out).exists());
         File outputSpaceDir = new File(outputSpace);
         fileWithAccentOut = new File(outputSpaceDir.getAbsolutePath() + File.separator + fileNameWithAccent);
-        Assert.assertTrue(fileWithAccentOut.exists());
 
-        // Kill & Clean
-        ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
-        fileWithAccentIn.delete();
-        fileWithAccentOut.delete();
+        try {
+            Assert.assertTrue(fileWithAccentOut.exists());
+        }finally {
+            // Kill & Clean
+            ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
+            fileWithAccentIn.delete();
+            fileWithAccentOut.delete();
+        }
     }
 }
