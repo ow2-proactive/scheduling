@@ -38,8 +38,8 @@ package functionaltests.job.error;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Path;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -50,15 +50,16 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.junit.Test;
-
-import functionaltests.utils.ProActiveLock;
+import org.ow2.proactive.scheduler.util.FileLock;
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestNode;
+import org.junit.Test;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -74,15 +75,12 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
 
     public static class TestJavaTask extends JavaExecutable {
 
-        private String communicationObjectUrl;
+        private String fileLockPath;
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
             getOut().println("OK");
-            ProActiveLock communicationObject = PAActiveObject.lookupActive(ProActiveLock.class,
-                    communicationObjectUrl);
-
-            ProActiveLock.waitUntilUnlocked(communicationObject);
+            FileLock.waitUntilUnlocked(fileLockPath);
             return "OK";
         }
 
@@ -91,22 +89,22 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
     @Test
     public void testRestart() throws Exception {
         schedulerHelper.startScheduler(false, new File(SchedulerTHelper.class.getResource(
-          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath(), null,
-          null);
+                        "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath(),
+                null,
+                null);
 
-        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
-
-        testTaskKillNode(communicationObject, false);
-        testTaskKillNode(communicationObject, true);
+        FileLock fileLock = new FileLock();
+        testTaskKillNode(fileLock, false);
+        testTaskKillNode(fileLock, true);
     }
 
-    private void testTaskKillNode(ProActiveLock communicationObject,
+    private void testTaskKillNode(FileLock fileLock,
             boolean waitBeforeKill) throws Exception {
-        communicationObject.lock();
+        Path fileLockPath = fileLock.lock();
         TestNode nodeToKill = startNode();
 
         log("Submit job");
-        final JobId jobId = schedulerHelper.submitJob(createJob(PAActiveObject.getUrl(communicationObject)));
+        final JobId jobId = schedulerHelper.submitJob(createJob(fileLockPath.toString()));
 
         log("Wait when node becomes busy");
         RMNodeEvent event;
@@ -133,7 +131,7 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
         TestNode newNode = startNode();
 
         log("Let task finish");
-        communicationObject.unlock();
+        fileLock.unlock();
 
         log("Wait when job finish");
         schedulerHelper.waitForEventJobFinished(jobId, TIMEOUT);
@@ -177,7 +175,7 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
         javaTask.setMaxNumberOfExecution(1);
         javaTask.setCancelJobOnError(true);
         javaTask.setName("Test task");
-        javaTask.addArgument("communicationObjectUrl", communicationObjectUrl);
+        javaTask.addArgument("fileLockPath", communicationObjectUrl);
         job.addTask(javaTask);
 
         return job;
