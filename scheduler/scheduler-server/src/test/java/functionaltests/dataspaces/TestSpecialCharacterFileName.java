@@ -84,10 +84,14 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
 
             if (line.contains(expr)) {
                 br.close();
+                logger.debug("HERE0 " + sb);
+                logger.info("HERE0 " + sb);
                 return sb.toString();
             }
         }
         br.close();
+        logger.debug("HERE1 " + sb);
+        logger.info("HERE1 " + sb);
         return null;
     }
 
