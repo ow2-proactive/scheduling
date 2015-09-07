@@ -44,9 +44,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import functionaltests.utils.SchedulerFunctionalTest;
 import junit.framework.Assert;
+
+import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -58,6 +61,7 @@ import junit.framework.Assert;
  */
 public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
 
+    private static String wrongFileNameWithAccent = "myfile-Ã©";
     private static String fileNameWithAccent = "myfile-é";
     private static String inputSpace = "data\\defaultinput\\user";
     private static String outputSpace = "data\\defaultoutput\\user";
@@ -76,8 +80,6 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         long startTime = System.currentTimeMillis();
 
         while ((line = br.readLine()) != null && (System.currentTimeMillis() - startTime) / 1000 < timeout) {
-            System.out.println(line);
-            logger.info(">> " + line);
             sb.append(line + System.getProperty("line.separator"));
 
             if (line.contains(expr)) {
@@ -91,10 +93,11 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
 
     File fileWithAccentIn;
     File fileWithAccentOut;
+    File wrongFileWithAccentOut;
 
     @org.junit.Before
     public void OnlyOnWindows() throws IOException {
-//        assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
+        assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
 //        assumeTrue(!System.getProperty("os.name").equalsIgnoreCase("windows 7"));
 
         // In some cases, the current directory can be scheduler-server/.
@@ -155,10 +158,6 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         ProcessBuilder jobSubmissionProcessBuilder = new ProcessBuilder(clientCommand);
         String jobSubmissionStr;
 
-        logger.info(">> here " + new File(".").getAbsolutePath());
-        logger.info(">> clientBatPath " + new File(clientBatPath).exists());
-        logger.info(">> jobXmlPath " + new File(jobXmlPath).exists());
-
         if ((jobSubmissionStr= returnExprInResultBeforeTimeout(
                 jobSubmissionProcessBuilder.start().getInputStream(), "submitted", TIMEOUT))==null)
         {
@@ -183,7 +182,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         long startTime = System.currentTimeMillis();
         boolean jobFinished = false;
 
-        while (!jobFinished && ((System.currentTimeMillis() - startTime) / 1000) < 12 * TIMEOUT) {
+        while (!jobFinished && ((System.currentTimeMillis() - startTime) / 1000) < 5 * TIMEOUT) {
             System.out.println("SLEEP");
             Thread.sleep(5000);
             jobFinished = (returnExprInResultBeforeTimeout(jobStatusProcessBuilder.start().getInputStream(),"FINISHED", TIMEOUT) != null);
@@ -202,8 +201,10 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         //Assert.assertTrue(new File(IOSPACE + OUT + File.separator + out).exists());
         File outputSpaceDir = new File(outputSpace);
         fileWithAccentOut = new File(outputSpaceDir.getAbsolutePath() + File.separator + fileNameWithAccent);
+        wrongFileWithAccentOut = new File(outputSpaceDir.getAbsolutePath() + File.separator + wrongFileNameWithAccent);
 
         try {
+            Assert.assertTrue(wrongFileWithAccentOut.exists());
             Assert.assertTrue(fileWithAccentOut.exists());
         }finally {
             // Kill & Clean
