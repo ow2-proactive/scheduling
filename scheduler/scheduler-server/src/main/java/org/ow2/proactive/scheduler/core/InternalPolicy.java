@@ -45,10 +45,11 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.utils.TaskIdWrapper;
 
 
 /**
- * Implementation of the policy according that :
+ * Implementation of the policy according that:
  * <ul>
  * 	<li>We try to keep scheduling policy order while it's not leading to starvation
  * 	(if first tasks to be started are finally not started because of bad selection script, we must go on next tasks but
@@ -56,7 +57,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
  * 	<li>A specified number of tasks can be returned by this policy (NB_TASKS_PER_LOOP setting)</li>
  *  <li>This policy returns groups of tasks sequentially taken in the whole queue.
  *  Tasks that have just been returned are not returned by the next call to the policy until a predefined
- *  number of calls is reached. (for example, if their are X tasks to schedule, the policy returns Y tasks, and there is Z nodes available,
+ *  number of calls is reached (for example, if their are X tasks to schedule, the policy returns Y tasks, and there is Z nodes available,
  *  the policy will return X/Z groups of Y tasks AND THEN restart to get task from beginning of the queue.
  *  This will avoid starvation.</li>
  * </ul>
@@ -69,7 +70,7 @@ class InternalPolicy {
     /** Maximum number of tasks returned by the policy in each loop */
     private int NB_TASKS_PER_LOOP = PASchedulerProperties.SCHEDULER_POLICY_NBTASKPERLOOP.getValueAsInt();
 
-    private Set<TaskId> ids = new HashSet<>();
+    private Set<TaskIdWrapper> ids = new HashSet<>();
     private int previousFreeNodeNumber = 0;
     RMState RMState = null;
 
@@ -77,8 +78,8 @@ class InternalPolicy {
      * Filter tasks by splitting them into group of configurable number of tasks.
      * This method just controls what is provided by scheduling policy
      *
-     * @param orderedTasks the list of ordered task provide by the scheduling policy
-     * @return a filtered and splited list of task to be scheduled
+     * @param orderedTasks the list of ordered task provided by the scheduling policy
+     * @return a filtered and split list of task to be scheduled
      */
     public LinkedList<EligibleTaskDescriptor> filter(Vector<EligibleTaskDescriptor> orderedTasks) {
         //safety branch
@@ -100,9 +101,10 @@ class InternalPolicy {
         //max number of returned tasks will be the number of tasks per loop
         int i = 0;
         for (EligibleTaskDescriptor etd : orderedTasks) {
-            if (!ids.contains(etd.getTaskId())) {
+            TaskIdWrapper taskId = TaskIdWrapper.wrap(etd.getTaskId());
+            if (!ids.contains(taskId)) {
                 toReturn.add(etd);
-                ids.add(etd.getTaskId());
+                ids.add(taskId);
                 if (++i == NB_TASKS_PER_LOOP) {
                     break;
                 }
