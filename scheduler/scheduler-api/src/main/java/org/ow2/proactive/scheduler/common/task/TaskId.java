@@ -67,6 +67,12 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
     String getReadableName();
 
     /**
+     * Return the tag of the task.
+     * @return the tag of the task.
+     */
+    String getTag();
+
+    /**
      * Returns a String representation that is unique for the job
      * it is related to. Please look at {@link #toString} for a String
      * representation unique for the scheduler instance it was built for.
