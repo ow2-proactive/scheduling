@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -34,44 +34,50 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.job;
+package org.ow2.proactive.utils;
 
-import java.io.Serializable;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-
+import org.ow2.proactive.scheduler.common.task.TaskId;
 
 /**
- * Definition of a job identification, this will be used during scheduling to identify your job.
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9
+ * TaskId wrapper mainly used to return an implementation that
+ * takes into account job id + task id for hashcode ans equals.
  */
-@PublicAPI
-public interface JobId extends Comparable<JobId>, Serializable {
+public final class TaskIdWrapper {
 
-    /**
-     * Return the human readable name associated to this id.
-     *
-     * @return the human readable name associated to this id.
-     */
-    String getReadableName();
+    // TODO: this class could probably be removed once next issue is fixed
+    // https://github.com/ow2-proactive/scheduling/issues/2306
 
-    /**
-     * Get the value of the JobId.<br />
-     * As the internal implementation of this class can change, It is strongly recommended to use this method
-     * to get a literal value of the ID.<br />
-     * Use this value if you lost the jobId Object returned by the scheduler.
-     * 
-     * @return the textual representation of this jobId
-     */
-    String value();
+    private final TaskId taskId;
 
-    /**
-     * Returns the current value of the JobId.
-     *
-     * @return the current value of the JobId as a long.
-     */
-    long longValue();
+    private TaskIdWrapper(TaskId taskId) {
+        this.taskId = taskId;
+    }
+
+    public static TaskIdWrapper wrap(TaskId taskId) {
+        return new TaskIdWrapper(taskId);
+    }
+
+    public TaskId getTaskId() {
+        return taskId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TaskIdWrapper that = (TaskIdWrapper) o;
+
+        if (taskId.longValue() != that.taskId.longValue()) return false;
+        return taskId.getJobId().equals(that.taskId.getJobId());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = taskId.getJobId().hashCode();
+        result = 31 * result + (int) (taskId.longValue() ^ (taskId.longValue() >>> 32));
+        return result;
+    }
 
 }

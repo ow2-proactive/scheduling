@@ -56,7 +56,7 @@ public final class ForkerUtils {
     private static final Logger logger = Logger.getLogger(ForkerUtils.class);
 
     /** System property Key of the fork method */
-    private static final String FORK_METHOD_KEY = "pas.launcher.forkas.method";
+    public static final String FORK_METHOD_KEY = "pas.launcher.forkas.method";
     /** System property value of the fork method */
     private static final ForkMethod FORK_METHOD_VALUE;
     /** OS Process builder factory */

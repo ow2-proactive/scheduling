@@ -38,8 +38,9 @@ package functionaltests.job.recover;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -50,14 +51,13 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.junit.Test;
-
+import org.ow2.proactive.scheduler.util.FileLock;
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.ProActiveLock;
+import org.junit.Test;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class TestPauseJobRecover extends SchedulerFunctionalTest {
@@ -78,9 +78,10 @@ public class TestPauseJobRecover extends SchedulerFunctionalTest {
      */
     public void pause_resume_recover() throws Throwable {
 
-        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
+        FileLock fileLock = new FileLock();
+        Path fileLockPath = fileLock.lock();
 
-        TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));
+        TaskFlowJob job = createJob(fileLockPath.toString());
 
         log("Submit job");
         JobId jobId = schedulerHelper.submitJob(job);
@@ -110,7 +111,7 @@ public class TestPauseJobRecover extends SchedulerFunctionalTest {
         assertEquals(TaskStatus.PENDING, getTaskState("task2", js).getStatus());
 
         //let the task1 finish
-        communicationObject.unlock();
+        fileLock.unlock();
 
         log("Waiting for task1 to finish");
         schedulerHelper.waitForEventTaskFinished(jobId, "task1");
@@ -135,11 +136,15 @@ public class TestPauseJobRecover extends SchedulerFunctionalTest {
     // SCHEDULING-1924 SCHEDULING-2030
     public void recover_paused_job_with_finished_tasks() throws Throwable {
 
-        ProActiveLock controlTask2 = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
-        ProActiveLock controlTask3 = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
+        FileLock controlTask2 = new FileLock();
+        Path controlTask2Path = controlTask2.lock();
 
-        TaskFlowJob job = createJob3TasksPauseTask2AndTask3(PAActiveObject.getUrl(controlTask2),
-                PAActiveObject.getUrl(controlTask3));
+        FileLock controlTask3 = new FileLock();
+        Path controlTask3Path = controlTask3.lock();
+
+        TaskFlowJob job =
+                createJob3TasksPauseTask2AndTask3(
+                        controlTask2Path.toString(), controlTask3Path.toString());
 
         log("Submit job");
         JobId jobId = schedulerHelper.submitJob(job);
@@ -198,13 +203,13 @@ public class TestPauseJobRecover extends SchedulerFunctionalTest {
         return null;
     }
 
-    public static TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
+    public static TaskFlowJob createJob(String fileLockPath) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
 
         JavaTask task1 = new JavaTask();
         task1.setName("task1");
         task1.setExecutableClassName(TestJavaTask.class.getName());
-        task1.addArgument("communicationObjectUrl", communicationObjectUrl);
+        task1.addArgument("fileLockPath", fileLockPath);
 
         JavaTask task2 = new JavaTask();
         task2.setName("task2");
@@ -216,8 +221,8 @@ public class TestPauseJobRecover extends SchedulerFunctionalTest {
         return job;
     }
 
-    protected TaskFlowJob createJob3TasksPauseTask2AndTask3(String communicationObjectUrlTask2,
-            String communicationObjectUrlTask3) throws Exception {
+    protected TaskFlowJob createJob3TasksPauseTask2AndTask3(String fileLockPathTask2,
+            String fileLockPathTask3) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
 
         JavaTask task1 = new JavaTask();
@@ -227,12 +232,12 @@ public class TestPauseJobRecover extends SchedulerFunctionalTest {
         JavaTask task2 = new JavaTask();
         task2.setName("task2");
         task2.setExecutableClassName(TestJavaTask.class.getName());
-        task2.addArgument("communicationObjectUrl", communicationObjectUrlTask2);
+        task2.addArgument("fileLockPath", fileLockPathTask2);
 
         JavaTask task3 = new JavaTask();
         task3.setName("task3");
         task3.setExecutableClassName(TestJavaTask.class.getName());
-        task3.addArgument("communicationObjectUrl", communicationObjectUrlTask3);
+        task3.addArgument("fileLockPath", fileLockPathTask3);
 
         task2.addDependence(task1);
         task3.addDependence(task2);
@@ -246,22 +251,19 @@ public class TestPauseJobRecover extends SchedulerFunctionalTest {
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
-            Thread.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(1);
             return "OK";
         }
     }
 
     public static class TestJavaTask extends JavaExecutable {
 
-        private String communicationObjectUrl;
+        private String fileLockPath;
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
             System.out.println("OK");
-            ProActiveLock communicationObject = PAActiveObject.lookupActive(ProActiveLock.class,
-                    communicationObjectUrl);
-
-            ProActiveLock.waitUntilUnlocked(communicationObject);
+            FileLock.waitUntilUnlocked(fileLockPath);
             return "OK";
         }
     }

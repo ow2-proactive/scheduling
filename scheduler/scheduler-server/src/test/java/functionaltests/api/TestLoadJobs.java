@@ -1,9 +1,12 @@
 package functionaltests.api;
 
 import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -24,34 +27,30 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.util.FileLock;
+import functionaltests.monitor.MonitorEventReceiver;
+import functionaltests.monitor.SchedulerMonitorsHandler;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.TestUsers;
 import org.junit.Before;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.monitor.MonitorEventReceiver;
-import functionaltests.monitor.SchedulerMonitorsHandler;
-import functionaltests.utils.ProActiveLock;
-import functionaltests.utils.TestUsers;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
- * Test against method Scheduler.loadJobs 
- *
+ * Test against method Scheduler.loadJobs
  */
 public class TestLoadJobs extends SchedulerFunctionalTest {
 
     public static class TestJavaTask extends JavaExecutable {
 
-        private String communicationObjectUrl;
+        private String fileLockPath;
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
-            ProActiveLock communicationObject = PAActiveObject.lookupActive(ProActiveLock.class,
-                    communicationObjectUrl);
-
-            ProActiveLock.waitUntilUnlocked(communicationObject);
+            FileLock.waitUntilUnlocked(Paths.get(fileLockPath));
             return "OK";
         }
 
@@ -81,18 +80,19 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
-        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
-        String communicationObjectUrl = PAActiveObject.getUrl(communicationObject);
+        FileLock fileLock = new FileLock();
+        Path lock = fileLock.lock();
+        String fileLockPath = lock.toString();
 
-        JobId jobId;
-        List<JobInfo> jobs;
         JobInfo job;
+
+        List<JobInfo> jobs;
 
         jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), null);
         checkJobs(jobs);
 
-        JobId firstJob = scheduler.submit(createJob(communicationObjectUrl));
-        schedulerHelper.waitForEventTaskRunning(firstJob, "Test task");
+        JobId firstJob = scheduler.submit(createJob(fileLockPath));
+        schedulerHelper.waitForEventTaskRunning(firstJob, "Test");
 
         jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), null);
         checkJobs(jobs, firstJob);
@@ -112,8 +112,8 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         assertEquals(TestUsers.DEMO.username, job.getJobOwner());
         assertEquals(JobPriority.NORMAL, job.getPriority());
 
-        JobId secondJob = scheduler.submit(createJob(communicationObjectUrl));
-        JobId thirdJob = scheduler.submit(createJob(communicationObjectUrl));
+        JobId secondJob = scheduler.submit(createJob(fileLockPath));
+        JobId thirdJob = scheduler.submit(createJob(fileLockPath));
 
         jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), null);
         checkJobs(jobs);
@@ -138,7 +138,7 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), sortParameters);
         checkJobs(jobs, thirdJob, secondJob, firstJob);
 
-        communicationObject.unlock();
+        fileLock.unlock();
 
         for (JobInfo jobInfo : jobs) {
             schedulerHelper.waitForEventJobFinished(jobInfo.getJobId(), 30000);
@@ -158,7 +158,7 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
         SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
         Credentials cred = Credentials.createCredentials(new CredData(TestUsers.USER.username,
-          TestUsers.USER.password), auth.getPublicKey());
+                TestUsers.USER.password), auth.getPublicKey());
         scheduler = auth.login(cred);
 
         MonitorEventReceiver eventReceiver = new MonitorEventReceiver(monitorsHandler);
@@ -172,10 +172,10 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
         checkJobs(jobs);
 
-        communicationObject.lock();
+        fileLockPath = fileLock.lock().toString();
 
-        JobId fourthJob = scheduler.submit(createJob(communicationObjectUrl));
-        monitorsHandler.waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING, fourthJob, "Test task", 30000);
+        JobId fourthJob = scheduler.submit(createJob(fileLockPath));
+        monitorsHandler.waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING, fourthJob, "Test", 30000);
 
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
         checkJobs(jobs, fourthJob);
@@ -189,7 +189,7 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         jobs = scheduler.getJobs(2, 10, criteria(false, true, true, true), null);
         checkJobs(jobs, thirdJob, fourthJob);
 
-        communicationObject.unlock();
+        fileLock.unlock();
         monitorsHandler.waitForFinishedJob(fourthJob, 30000);
 
         jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), null);
@@ -222,7 +222,7 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         state = scheduler.addEventListener(eventReceiver, true, true);
         monitorsHandler.init(state);
 
-        JobId myjob = scheduler.submit(createJob(communicationObjectUrl));
+        JobId myjob = scheduler.submit(createJob(fileLockPath));
 
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), null);
         checkJobs(jobs, myjob);
@@ -231,15 +231,18 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         checkJobs(jobs, myjob);
 
         scheduler.disconnect();
-
     }
 
     private void checkJobs(List<JobInfo> jobs, JobId... expectedIds) {
-        List<JobId> ids = new ArrayList<>(jobs.size());
+        Set<JobId> jobIds = new HashSet<>(jobs.size());
+
         for (JobInfo job : jobs) {
-            ids.add(job.getJobId());
+            jobIds.add(job.getJobId());
         }
-        assertEquals(Arrays.asList(expectedIds), ids);
+
+        for (JobId expectedId : expectedIds) {
+            assertTrue(jobIds.contains(expectedId));
+        }
     }
 
     private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
@@ -248,15 +251,16 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());
-        javaTask.addArgument("communicationObjectUrl", communicationObjectUrl);
-        javaTask.setName("Test task");
+        javaTask.addArgument("fileLockPath", communicationObjectUrl);
+        javaTask.setName("Test");
 
         job.addTask(javaTask);
 
         return job;
     }
 
-    private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished) {
+    private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running,
+            boolean finished) {
         return new JobFilterCriteria(myJobsOnly, pending, running, finished);
     }
 

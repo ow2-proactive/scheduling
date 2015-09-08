@@ -391,7 +391,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 Collection<String> computationDescriptors = new ArrayList<>(tasksToSchedule.size());
                 for (EligibleTaskDescriptor task : tasksToSchedule) {
-                    computationDescriptors.add(task.getTaskId().toString());
+                    computationDescriptors.add(TaskLogger.getTaskLogFilename(task.getTaskId()));
                 }
 
                 criteria.setComputationDescriptors(computationDescriptors);

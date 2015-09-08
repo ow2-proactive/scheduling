@@ -55,6 +55,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.FileUtils;
 
@@ -82,7 +83,8 @@ public class TestScheduler {
         List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
-        //commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,address=9009,suspend=y");
+        // commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
+
         String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
         if (!CentralPAPropertyRepository.PA_HOME.isSet()) {
             proactiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
@@ -111,10 +113,12 @@ public class TestScheduler {
         commandLine.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
             PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
-            PAResourceManagerProperties.RM_HOME.getValueAsString());
-        if (System.getProperty("pas.launcher.forkas.method") != null) {
-            commandLine.add("-Dpas.launcher.forkas.method=" +
-                System.getProperty("pas.launcher.forkas.method"));
+                PAResourceManagerProperties.RM_HOME.getValueAsString());
+
+        String forkMethodKeyValue = System.getProperty(ForkerUtils.FORK_METHOD_KEY);
+        if (forkMethodKeyValue != null) {
+            commandLine.add("-D" + ForkerUtils.FORK_METHOD_KEY + "=" +
+                System.getProperty(forkMethodKeyValue));
         }
         if (System.getProperty("proactive.test.runAsMe") != null) {
             commandLine.add("-Dproactive.test.runAsMe=true");
