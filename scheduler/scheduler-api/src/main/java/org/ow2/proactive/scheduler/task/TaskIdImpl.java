@@ -62,6 +62,9 @@ public final class TaskIdImpl implements TaskId {
     /** Human readable name */
     private String readableName = SchedulerConstants.TASK_DEFAULT_NAME;
 
+    /** tag of the task */
+    private String tag;
+
     /** Job id */
     @XmlTransient
     private JobId jobId = null;
@@ -119,6 +122,14 @@ public final class TaskIdImpl implements TaskId {
         this.jobId = jobId;
     }
 
+    @Override
+    public String getTag() {
+        return this.tag;
+    }
+
+    public void setTag(String tag){this.tag = tag;}
+
+
     /**
      * Return the human readable name associated to this id.
      *
@@ -127,6 +138,7 @@ public final class TaskIdImpl implements TaskId {
     public String getReadableName() {
         return this.readableName;
     }
+
 
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)

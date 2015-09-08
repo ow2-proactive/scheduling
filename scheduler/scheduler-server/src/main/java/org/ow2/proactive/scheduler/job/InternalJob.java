@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,6 +68,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
@@ -236,7 +238,7 @@ public abstract class InternalJob extends JobState {
         td.setStartTime(System.currentTimeMillis());
         td.setFinishedTime(-1);
         td.setExecutionHostName(td.getExecuterInformation().getHostName() + " (" +
-            td.getExecuterInformation().getNodeName() + ")");
+                td.getExecuterInformation().getNodeName() + ")");
     }
 
     /**
@@ -394,7 +396,7 @@ public abstract class InternalJob extends JobState {
         } else {
             target = findTaskUp(action.getTarget(), initiator);
         }
-        didAction = replicateForNextLoopIteration(initiator, target, changesInfo, frontend);
+        didAction = replicateForNextLoopIteration(initiator, target, changesInfo, frontend, action);
         if (didAction && action.getCronExpr() != null) {
             for (TaskId tid : changesInfo.getNewTasks()) {
                 InternalTask newTask = tasks.get(tid);
@@ -639,6 +641,7 @@ public abstract class InternalJob extends JobState {
                     target.replicateTree(dup, todup.getId(), false, initiator
                             .getReplicationIndex() *
                         runs, 0);
+
                 } catch (Exception e) {
                     logger.error("REPLICATE: could not replicate tree", e);
                     break;
@@ -661,6 +664,7 @@ public abstract class InternalJob extends JobState {
                             .getName()), nt.getIterationIndex());
                     this.addTask(nt);
                     nt.setReplicationIndex(dupIndex);
+                    assignReplicationTag(nt, initiator, false, action);
                 }
                 changesInfo.newTasksAdded(dup.values());
 
@@ -721,10 +725,56 @@ public abstract class InternalJob extends JobState {
         
         return true;
     }
-    
+
+    /**
+     * Assign a tag to new duplicated task because of a REPLICATE or LOOP.
+     * @param replicatedTask the new duplicated task.
+     * @param initiator the initiator of the duplication.
+     * @param loopAction true if the duplication if after a loop or, false if it is a replicate.
+     * @param action the duplication action.
+     */
+    private void assignReplicationTag(InternalTask replicatedTask, InternalTask initiator, boolean loopAction, FlowAction action){
+        StringBuffer buf = new StringBuffer();
+
+        if(loopAction){
+            buf.append("LOOP-");
+            buf.append(InternalTask.getInitialName(initiator.getName()));
+            if(initiator.getReplicationIndex() > 0){
+                buf.append("*");
+                buf.append(initiator.getReplicationIndex());
+            }
+        }
+        else {
+            buf.append("REPLICATE-");
+            buf.append(initiator.getName());
+        }
+
+
+        buf.append("-");
+
+        if(loopAction){
+            FlowScript flow = initiator.getFlowScript();
+            String cronExpr = action.getCronExpr();
+            if(cronExpr.equals("")){
+                buf.append(replicatedTask.getIterationIndex());
+            }
+            else{
+                //cron task: the replication index is the next date that matches the cron expression
+                Date resolvedCron = (new Predictor(cronExpr)).nextMatchingDate();
+                SimpleDateFormat dt = new SimpleDateFormat("dd_MM_YY_HH_mm");
+                buf.append(dt.format(resolvedCron));
+            }
+        }
+        else{
+            buf.append(replicatedTask.getReplicationIndex());
+        }
+
+        replicatedTask.setTag(buf.toString());
+    }
+
 
     private boolean replicateForNextLoopIteration(InternalTask initiator, InternalTask target,
-            ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend) {
+            ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, FlowAction action) {
 
         logger.info("LOOP (init:" + initiator.getId() + ";target:" + target.getId() + ")");
 
@@ -771,6 +821,7 @@ public abstract class InternalJob extends JobState {
             }
             nt.setJobInfo(getJobInfo());
             this.addTask(nt);
+            assignReplicationTag(nt, initiator, true, action);
         }
         changesInfo.newTasksAdded(dup.values());
 
