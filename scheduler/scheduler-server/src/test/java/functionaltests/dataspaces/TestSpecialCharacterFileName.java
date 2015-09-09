@@ -36,18 +36,14 @@
  */
 package functionaltests.dataspaces;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.process_tree_killer.ProcessTree;
 import functionaltests.utils.SchedulerFunctionalTest;
 import junit.framework.Assert;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.process_tree_killer.ProcessTree;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -61,7 +57,6 @@ import static org.junit.Assume.assumeTrue;
  */
 public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
 
-    private static String wrongFileNameWithAccent = "myfile-Ã©";
     private static String fileNameWithAccent = "myfile-é";
     private static String inputSpace = "data\\defaultinput\\user";
     private static String outputSpace = "data\\defaultoutput\\user";
@@ -81,17 +76,14 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
 
         while ((line = br.readLine()) != null && (System.currentTimeMillis() - startTime) / 1000 < timeout) {
             sb.append(line + System.getProperty("line.separator"));
+            System.out.println(line);
 
             if (line.contains(expr)) {
                 br.close();
-                logger.debug("HERE0 " + sb);
-                logger.info("HERE0 " + sb);
                 return sb.toString();
             }
         }
         br.close();
-        logger.debug("HERE1 " + sb);
-        logger.info("HERE1 " + sb);
         return null;
     }
 
@@ -102,7 +94,6 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
     @org.junit.Before
     public void OnlyOnWindows() throws IOException {
         assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
-//        assumeTrue(!System.getProperty("os.name").equalsIgnoreCase("windows 7"));
 
         // In some cases, the current directory can be scheduler-server/.
         // So we have to set it to the project root dir
@@ -128,10 +119,8 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
      *
      * @throws Throwable any exception that can be thrown during the test.
      */
-//    @Ignore
     @org.junit.Test
     public void run() throws Throwable {
-
 
         // Now we launch the scheduler from the generated script, to consider the -Dfile.encoding parameter
         schedulerHelper.killScheduler();
@@ -150,7 +139,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
             fileWithAccentIn.delete();
             throw new Exception(ERROR_COMMAND_EXECUTION + " after " + duration + "s");
         }
-        System.out.println("FINISHED0");
+        System.out.println("scheduler started!");
 
         // Start the proactive client to submit the job
         ArrayList<String> clientCommand = new ArrayList<>();
@@ -173,7 +162,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
             fileWithAccentIn.delete();
             throw new Exception(ERROR_COMMAND_EXECUTION + " after " + duration + "s");
         }
-        System.out.println("FINISHED1");
+        System.out.println("job submitted!");
 
         // Retrieve the jobId
         String[] result = jobSubmissionStr.split("'");
@@ -202,15 +191,13 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
             fileWithAccentIn.delete();
             throw new Exception(ERROR_COMMAND_EXECUTION);
         }
-        System.out.println("FINISHED2");
+        System.out.println("job finished!");
 
         // Assertion
         File outputSpaceDir = new File(outputSpace);
         fileWithAccentOut = new File(outputSpaceDir.getAbsolutePath() + File.separator + fileNameWithAccent);
-        wrongFileWithAccentOut = new File(outputSpaceDir.getAbsolutePath() + File.separator + wrongFileNameWithAccent);
 
         try {
-            //Assert.assertTrue(wrongFileWithAccentOut.exists());
             Assert.assertTrue(fileWithAccentOut.exists());
         }finally {
             // Kill & Clean
