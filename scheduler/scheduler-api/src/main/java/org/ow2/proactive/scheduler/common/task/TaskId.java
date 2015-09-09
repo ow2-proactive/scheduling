@@ -66,11 +66,6 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      */
     String getReadableName();
 
-    /**
-     * Return the tag of the task.
-     * @return the tag of the task.
-     */
-    String getTag();
 
     /**
      * Get the value of the TaskId.<br />

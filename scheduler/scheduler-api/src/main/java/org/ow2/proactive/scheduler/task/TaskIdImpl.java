@@ -122,13 +122,6 @@ public final class TaskIdImpl implements TaskId {
         this.jobId = jobId;
     }
 
-    @Override
-    public String getTag() {
-        return this.tag;
-    }
-
-    public void setTag(String tag){this.tag = tag;}
-
 
     /**
      * Return the human readable name associated to this id.
