@@ -141,25 +141,6 @@ public abstract class InternalTask extends TaskState {
     }
 
 
-    /**
-     * Get the tag of this task.
-     * Return null if this task has no tag.
-     *
-     * @return the tag of this task
-     */
-    public String getTag() {
-        return this.taskInfo.getTaskId().getTag();
-    }
-
-
-    /**
-     * Set the tag of this task.
-     * @param the tag value
-     */
-    public void setTag(String tag) {
-        ((TaskIdImpl) this.taskInfo.getTaskId()).setTag(tag);
-    }
-
 
     /**
      * {@inheritDoc}

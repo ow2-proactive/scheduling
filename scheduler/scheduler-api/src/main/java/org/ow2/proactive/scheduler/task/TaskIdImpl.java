@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -114,6 +115,7 @@ public final class TaskIdImpl implements TaskId {
     public String getReadableName() {
         return this.readableName;
     }
+
 
     /**
      * Set readable name of this TaskId.

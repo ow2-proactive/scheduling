@@ -90,6 +90,9 @@ public abstract class Task extends CommonAttribute {
     /** Description of the task. */
     protected String description = null;
 
+    /** tag of the task */
+    protected String tag = null;
+
     /** DataSpace inputFiles */
     protected List<InputSelector> inputFiles = null;
 
@@ -278,6 +281,26 @@ public abstract class Task extends CommonAttribute {
                 name);
         }
         this.name = name;
+    }
+
+
+    /**
+     * Get the tag of this task.
+     * Return null if this task has no tag.
+     *
+     * @return the tag of this task
+     */
+    public String getTag() {
+        return this.tag;
+    }
+
+
+    /**
+     * Set the tag of this task.
+     * @param the tag value
+     */
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     /**
