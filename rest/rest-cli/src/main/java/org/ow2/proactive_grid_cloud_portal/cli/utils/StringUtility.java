@@ -233,6 +233,7 @@ public class StringUtility {
         List<String> list = new ArrayList<>();
         list.add("ID");
         list.add("NAME");
+        list.add("TAG");
         list.add("ITER");
         list.add("DUP");
         list.add("STATUS");
@@ -256,6 +257,7 @@ public class StringUtility {
 
             list.add(String.valueOf(taskId.getId()));
             list.add(taskId.getReadableName());
+            list.add((taskState.getTag() != null) ? taskState.getTag(): "");
             list.add((taskState.getIterationIndex() > 0) ? "" + taskState.getIterationIndex() : "");
             list.add((taskState.getReplicationIndex() > 0) ? "" + taskState.getReplicationIndex() : "");
             list.add(taskInfo.getTaskStatus().toString());
