@@ -100,6 +100,8 @@ public class TaskData {
 
     private String taskName;
 
+    private String tag;
+
     private String description;
 
     private long startTime;
@@ -386,6 +388,7 @@ public class TaskData {
 
         taskData.setId(taskId);
         taskData.setDescription(task.getDescription());
+        taskData.setTag(task.getTag());
         taskData.setParallelEnvironment(task.getParallelEnvironment());
         taskData.setFlowBlock(task.getFlowBlock());
         taskData.setRestartMode(task.getRestartTaskOnError());
@@ -490,6 +493,7 @@ public class TaskData {
 
         internalTask.setId(taskId);
         internalTask.setDescription(getDescription());
+        internalTask.setTag(this.getTag());
         internalTask.setStatus(getTaskStatus());
         internalTask.setJobInfo(internalJob.getJobInfo());
         internalTask.setName(getTaskName());
@@ -721,6 +725,12 @@ public class TaskData {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Column(name = "TAG", updatable = false)
+    public String getTag(){ return this.tag; }
+
+    public void setTag(String tag) { this.tag = tag; }
+
 
     @Column(name = "MAX_NUMBER_OF_EXEC", updatable = false)
     public int getMaxNumberOfExecution() {
