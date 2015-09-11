@@ -71,10 +71,10 @@
 				<script>
 					<code language="groovy">
 						<![CDATA[
-						print('user=' + userspace)
-						print('global=' + globalspace)
-						print('input=' + inputspace)
-						print('output=' + outputspace)
+						println('user=' + userspace)
+						println('global=' + globalspace)
+						println('input=' + inputspace)
+						println('output=' + outputspace)
 						assert new File(localspace).exists()
 						]]>
 					</code>
