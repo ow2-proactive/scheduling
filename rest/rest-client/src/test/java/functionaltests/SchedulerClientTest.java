@@ -125,19 +125,19 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
         // Delete the local file
         Assert.assertTrue(
-                "Unable to delete the local file after push, maybe there are still some open streams ?",
+                "Unable to delete the local file after push, maybe there are still some open streams?",
                 emptyFile.delete());
 
         // Pull it from the userspace to be sure that it was pushed
         client.pullFile("USERSPACE", "", emptyFile.getCanonicalPath());
 
         // Check the file was pulled
-        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken ?",
+        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken?",
                 emptyFile.exists());
 
         // Delete the local file
         Assert.assertTrue(
-                "Unable to delete the local file after pull, maybe there are still some open streams ?",
+                "Unable to delete the local file after pull, maybe there are still some open streams?",
                 emptyFile.delete());
 
         // Delete the file in the user space
