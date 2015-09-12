@@ -99,7 +99,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Job job = defaultJob();
         JobId jobId = submitJob(job, client);
         // should return immediately
-        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
+        client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
     }
 
     @Test(timeout = MAX_WAIT_TIME, expected = TimeoutException.class)

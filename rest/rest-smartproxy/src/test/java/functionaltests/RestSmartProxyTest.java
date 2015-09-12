@@ -152,9 +152,11 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
                         isolateTaskOutput, automaticTransfer);
 
         JobState jobState = restSmartProxy.getJobState(id.toString());
+
+        Thread.sleep(ONE_SECOND);
         while (!jobState.isFinished()) {
-            Thread.sleep(ONE_SECOND);
             jobState = restSmartProxy.getJobState(id.toString());
+            Thread.sleep(ONE_SECOND);
         }
 
         assertEquals(JobStatus.FINISHED, jobState.getStatus());
