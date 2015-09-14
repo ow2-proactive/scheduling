@@ -354,6 +354,17 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return getTaskResult(jobId.value(), taskName);
     }
 
+
+    @Override
+    public List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag) throws NotConnectedException, UnknownJobException, PermissionException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<TaskResult> getTaskResultByTag(String jobId, String taskTag) throws NotConnectedException, UnknownJobException, PermissionException {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public String getTaskServerLogs(String arg0, String arg1) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException {
@@ -365,6 +376,20 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
         return taskLogs;
     }
+
+
+    @Override
+    public String getTaskServerLogsByTag(String arg0, String arg1) throws UnknownJobException,
+             NotConnectedException, PermissionException {
+        String taskLogs = "";
+        try {
+            taskLogs = restApi().tasklogByTag(sid, arg0, arg1);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return taskLogs;
+    }
+
 
     @Override
     public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {

@@ -314,6 +314,27 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getTaskResult(jobId, taskName);
     }
 
+
+    @Override
+    public List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+
+        return uischeduler.getTaskResultByTag(jobId, taskTag);
+    }
+
+    @Override
+    public List<TaskResult> getTaskResultByTag(String jobId, String taskTag)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        if (uischeduler == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+
+        return uischeduler.getTaskResultByTag(jobId, taskTag);
+    }
+
     @Override
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
@@ -576,6 +597,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException {
         return uischeduler.getTaskServerLogs(id, taskName);
+    }
+
+
+    @Override
+    public String getTaskServerLogsByTag(String id, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
+        return uischeduler.getTaskServerLogsByTag(id, taskTag);
     }
 
     @Override

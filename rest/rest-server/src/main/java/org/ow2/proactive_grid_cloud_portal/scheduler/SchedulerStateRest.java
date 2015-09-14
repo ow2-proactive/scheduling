@@ -45,6 +45,7 @@ import org.apache.log4j.Logger;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
 import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.BroadcasterFactory;
 import org.atmosphere.websocket.WebSocketEventListenerAdapter;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
@@ -53,6 +54,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.jboss.resteasy.util.GenericType;
+import org.apache.commons.collections.CollectionUtils;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -87,11 +89,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -100,6 +97,11 @@ import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.Map.Entry;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -743,6 +745,48 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+
+    /**
+     * Returns a list of the name of the tasks belonging to job and filtered by a given tag.
+     * <code>jobId</code>
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            jobid one wants to list the tasks' name
+     * @param taskTag
+     *            the tag used to filter the tasks.
+     * @return a list of tasks' name
+     */
+    @Override
+    @GET
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}")
+    @Produces("application/json")
+    public List<String> getJobTasksIdsByTag(@HeaderParam("sessionid")
+                                       String sessionId, @PathParam("jobid")
+                                       String jobId, @PathParam("tasktag")
+                                       String taskTag) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
+
+            JobState jobState = s.getJobState(jobId);
+            List<TaskState> tasks = jobState.getTaskByTag(taskTag);
+            List<String> tasksName = new ArrayList<>(tasks.size());
+            for (TaskState ts : tasks) {
+                tasksName.add(ts.getId().getReadableName());
+            }
+
+            return tasksName;
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -792,6 +836,43 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         }
     }
+
+
+
+    /**
+     * Returns a list of taskState of the tasks filtered by a given tag.
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the job id
+     * @param taskTag
+     *             the tag used to filter the tasks
+     * @return a list of task' states of the job <code>jobId</code> filtered by a given tag.
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/{tasktag}")
+    @Produces("application/json")
+    public List<TaskStateData> getJobTaskStatesByTag(@HeaderParam("sessionid")
+                                                String sessionId, @PathParam("jobid")
+                                                String jobId, @PathParam("tasktag")
+                                                String taskTag) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag);
+            JobState jobState = s.getJobState(jobId);
+            return map(jobState.getTaskByTag(taskTag), TaskStateData.class);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+
 
     @Override
     @GET
@@ -939,6 +1020,37 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
     }
 
+
+    /**
+     * Returns the value of the task result for a set of tasks of the job <code>jobId</code> filtered by a given tag.
+     * <strong>the result is deserialized before sending to the client, if the class is
+     * not found the content is replaced by the string 'Unknown value type' </strong>. To get the serialized form of a given result,
+     * one has to call the following restful service
+     * jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskTag the tag used to filter the tasks.
+     * @return the value of the task result
+     */
+
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/value")
+    @Produces("application/json")
+    public Map<String, String> valueOftaskresultByTag(@HeaderParam("sessionid")
+                                        String sessionId, @PathParam("jobid")
+                                        String jobId, @PathParam("tasktag")
+                                        String taskTag) throws Throwable{
+        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/value");
+        List<TaskResult> taskResults = s.getTaskResultByTag(jobId, taskTag);
+        Map<String, String> result = new HashMap<String, String>(taskResults.size());
+        for(TaskResult currentTaskResult: taskResults) {
+            result.put(currentTaskResult.getTaskId().getReadableName(), getTaskResultValueAsStringOrExceptionStackTrace(currentTaskResult));
+        }
+        return result;
+    }
+
+
     private String getTaskResultValueAsStringOrExceptionStackTrace(TaskResult taskResult) {
         if (taskResult == null) {
             // task is not finished yet
@@ -992,6 +1104,38 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return tr.getSerializedValue();
     }
 
+
+    /**
+     * Returns the values of a set of tasks of the job <code>jobId</code> filtered by a given tag.
+     * This method returns the result as a byte array whatever the result is.
+     * @param sessionId
+     *          a valid session id
+     * @param jobId
+     *          the id of the job
+     * @param taskTag
+     *          the tag used to filter the tasks.
+     * @return
+     *          the values of the set of tasks result as a byte array, indexed by the readable name of the task.
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue")
+    @Produces("application/json")
+    public Map<String, byte[]> serializedValueOftaskresultByTag(@HeaderParam("sessionid")
+                                                         String sessionId, @PathParam("jobid")
+                                                         String jobId, @PathParam("tasktag")
+                                                         String taskTag) throws Throwable{
+        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
+        List<TaskResult> trs = s.getTaskResultByTag(jobId, taskTag);
+        Map<String, byte[]> result = new HashMap<>(trs.size());
+        for(TaskResult currentResult: trs){
+            TaskResult r = PAFuture.getFutureValue(currentResult);
+            result.put(r.getTaskId().getReadableName(), r.getSerializedValue());
+        }
+        return result;
+    }
+
+
     /**
      * Returns the task result of the task <code>taskName</code> of the job
      * <code>jobId</code>
@@ -1035,6 +1179,50 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new UnknownTaskRestException(e);
         }
     }
+
+
+    /**
+     * Returns the task results of the set of task filtered by a given tag
+     * and owned by the job <code>jobId</code>
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskTag the tag used to filter the tasks.
+     * @return the task results of the set of tasks filtered by the given tag.
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result")
+    @Produces("application/json")
+    public List<TaskResultData> taskresultByTag(@HeaderParam("sessionid")
+                                                String sessionId, @PathParam("jobid")
+                                                String jobId, @PathParam("tasktag")
+                                                String taskTag) throws NotConnectedRestException, UnknownJobRestException,
+            PermissionRestException{
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskTag + "/result");
+            List<TaskResult> taskResults = s.getTaskResultByTag(jobId, taskTag);
+            ArrayList<TaskResultData> results = new ArrayList<TaskResultData>(taskResults.size());
+            for(TaskResult current: taskResults){
+                TaskResultData r = mapper.map(PAFuture.getFutureValue(current), TaskResultData.class);
+                results.add(r);
+            }
+
+            return results;
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+
+
+
+
+
+
 
     /**
      * Returns all the logs generated by the task (either stdout and stderr)
@@ -1084,6 +1272,44 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return "";
     }
 
+
+    /**
+     *  Returns all the logs generated by a set of the tasks (either stdout and stderr) filtered by a tag.
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskTag the tag used to filter the tasks.
+     * @return  the list of logs generated by each filtered task (either stdout and stderr) or an empty string if the result is not yet available
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/all")
+    @Produces("application/json")
+    public String tasklogByTag(@HeaderParam("sessionid")
+                                     String sessionId, @PathParam("jobid")
+                                     String jobId, @PathParam("tasktag")
+                                     String taskTag) throws NotConnectedRestException, UnknownJobRestException,
+            PermissionRestException{
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/log/err");
+            List<TaskResult> trs = s.getTaskResultByTag(jobId, taskTag);
+            StringBuffer buf = new StringBuffer();
+            for(TaskResult tr: trs) {
+                if (tr.getOutput() != null) {
+                    buf.append(tr.getOutput().getAllLogs(true));
+                }
+            }
+            return buf.toString();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+
+
     /**
      * Returns all the logs generated by the job (either stdout and stderr)
      *
@@ -1109,6 +1335,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if (jobResult == null) {
                 return "";
             }
+
             StringBuilder jobOutput = new StringBuilder();
             for (TaskResult tr : jobResult.getAllResults().values()) {
                 if ((tr != null) && (tr.getOutput() != null)) {
@@ -1166,6 +1393,43 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+
+    /**
+     *  Returns the list of standard error outputs (stderr) generated by a set of tasks filtered by a given tag.
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskTag the tag used to filter the tasks
+     * @return  the list of stderr generated by the set of tasks filtered by the given tag or an empty string if the result is not yet available
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/err")
+    @Produces("application/json")
+    public String tasklogErrByTag(@HeaderParam("sessionid")
+                                                   String sessionId, @PathParam("jobid")
+                                                    String jobId, @PathParam("tasktag")
+                                                    String taskTag)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/log/err");
+            List<TaskResult> trs = s.getTaskResultByTag(jobId, taskTag);
+            StringBuffer buf = new StringBuffer();
+            for(TaskResult tr: trs) {
+                if (tr.getOutput() != null) {
+                    buf.append(tr.getOutput().getStderrLogs(true));
+                }
+            }
+            return buf.toString();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
     /**
      * Returns the standard output (stderr) generated by the task
      *
@@ -1206,6 +1470,44 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new UnknownTaskRestException(e);
         }
     }
+
+
+    /**
+     *  Returns the standard output (stdout) generated by a set of tasks filtered by a given tag.
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskTag the tag used to filter the tasks.
+     * @return  the stdout generated by the task or an empty string if the result is not yet available
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/out")
+    @Produces("application/json")
+    public String tasklogoutByTag(@HeaderParam("sessionid")
+                                        String sessionId, @PathParam("jobid")
+                                        String jobId, @PathParam("tasktag")
+                                        String taskTag) throws NotConnectedRestException, UnknownJobRestException,
+            PermissionRestException{
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/log/out");
+            List<TaskResult> trs = s.getTaskResultByTag(jobId, taskTag);
+            StringBuffer result = new StringBuffer();
+            for(TaskResult tr: trs) {
+                if (tr.getOutput() != null) {
+                    result.append(tr.getOutput().getStdoutLogs(true));
+                }
+            }
+            return result.toString();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+
 
     /**
      * Returns full logs generated by the task from user data spaces if task was run using the precious
@@ -1301,6 +1603,37 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new UnknownTaskRestException(e);
         }
     }
+
+
+
+    /**
+     * Returns server logs for a set of tasks filtered by a given tag.
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @param taskTag the tag used to filter the tasks in the job.
+     * @return task traces from the scheduler and resource manager
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}/log/server")
+    @Produces("application/json")
+    public String taskServerLogByTag(@HeaderParam("sessionid")
+                              String sessionId, @PathParam("jobid")
+                              String jobId, @PathParam("tasktag")
+                              String taskTag) throws NotConnectedRestException, UnknownJobRestException,
+            PermissionRestException{
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/log/server");
+            return s.getTaskServerLogsByTag(jobId, taskTag);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
 
     /**
      * the method check is the session id is valid i.e. a scheduler client is

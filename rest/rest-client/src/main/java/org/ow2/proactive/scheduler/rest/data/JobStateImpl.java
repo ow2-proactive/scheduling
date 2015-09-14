@@ -37,8 +37,11 @@ package org.ow2.proactive.scheduler.rest.data;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfo;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -80,6 +83,19 @@ public class JobStateImpl extends JobState {
         Map<String, TaskStateData> taskStateMap = d.getTasks();
         for (TaskStateData ts : taskStateMap.values()) {
             taskStateList.add(DataUtility.taskState(ts));
+        }
+        return taskStateList;
+    }
+
+    @Override
+    public List<TaskState> getTaskByTag(String tag) {
+        ArrayList<TaskState> taskStateList = new ArrayList<>();
+        Map<String, TaskStateData> taskStateMap = d.getTasks();
+        for (TaskStateData ts : taskStateMap.values()) {
+            String taskTag = ts.getTag();
+            if(taskTag != null && taskTag.equals(tag)) {
+                taskStateList.add(DataUtility.taskState(ts));
+            }
         }
         return taskStateList;
     }

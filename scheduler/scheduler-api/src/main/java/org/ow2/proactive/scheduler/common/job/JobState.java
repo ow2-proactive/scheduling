@@ -37,8 +37,11 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -192,6 +195,23 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return the tasks as a hash map
      */
     public abstract Map<TaskId, TaskState> getHMTasks();
+
+
+    /**
+     * To get the task as an array list and filtered by a given tag.
+     * @param tag the used to filter the tasks.
+     * @return the set of filtered task states.
+     */
+    public List<TaskState> getTaskByTag(final String tag){
+        List<TaskState> tasks = this.getTasks();
+        return (List<TaskState>) CollectionUtils.select(tasks, new Predicate() {
+            @Override
+            public boolean evaluate(Object object) {
+                String taskTag = ((TaskState) object).getTag();
+                return (taskTag != null) && (taskTag.equals(tag));
+            }
+        });
+    }
 
     /**
      * To get the numberOfFinishedTask

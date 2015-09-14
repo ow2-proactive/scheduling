@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.SchedulerUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
@@ -448,6 +449,44 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
+     * Get the results for a set of tasks in the given jobId and filtered by a given tag.
+     * A user can only get HIS result back.<br>
+     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
+     * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,
+     * so you will receive the result. In any other cases a schedulerException will be thrown.<br>
+     *
+     * @param jobId the job in which the task result is.
+     * @param taskTag the tag used to filter the tasks in which the result is.
+     * @return a job Result containing information about the result.
+     * 		If the task result is not yet available, null is returned.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
+     */
+    List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag) throws NotConnectedException,
+            UnknownJobException, PermissionException;
+
+
+    /**
+     * Get the results for a set of tasks in the given jobId and filtered by a given tag. <br >
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
+     * A user can only get HIS result back.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.<br>
+     * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,
+     * so you will receive the result of these tasks. In any other cases a schedulerException will be thrown.<br>
+     *
+     * @param jobId the job in which the task result is.
+     * @param taskTag the tag used to filter the tasks in which the result is.
+     * @return the list of task result containing information about the result.
+     * 		If null is returned, this task is not yet terminated or not available.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
+     */
+    List<TaskResult> getTaskResultByTag(String jobId, String taskTag) throws NotConnectedException,
+            UnknownJobException, PermissionException;
+
+    /**
      * Get the result for the given task name in the given jobId.
      * A user can only get HIS result back.<br>
      * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
@@ -672,6 +711,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException;
 
+
+
     /**
      * Get the current status of the Scheduler
      *
@@ -832,6 +873,26 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     String getTaskServerLogs(String id, String taskName) throws UnknownJobException,
             UnknownTaskException, NotConnectedException, PermissionException;
+
+
+    /**
+     * Retrieves server logs for a set of tasks filtered by the given tag.
+     * Only the job owner of admin if the scheduler can request
+     * these logs.
+     *
+     * It's a combination of corresponding tasks logs belonging to this job
+     * plus some extra job specific information.
+     *
+     * @param id of the job where the task is.
+     * @param taskTag the tag used to filter tasks.
+     *
+     * @return tasks's logs
+     * @throws UnknownJobException if the job does not exist.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you have not enough permission to access this method.
+     */
+    String getTaskServerLogsByTag(String id, String taskTag) throws UnknownJobException,
+             NotConnectedException, PermissionException;
 
     /**
      * Retrieves a job list of the scheduler.

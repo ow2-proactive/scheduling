@@ -29,6 +29,7 @@ buildscript {
 
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
         maven { url "http://nexus.qmino.com/content/repositories/miredot" }
+        maven { url 'https://github.com/sandrineBeauche/mavenRepository/raw/master/' }
     }
 
     dependencies {
@@ -120,7 +121,7 @@ configure(javaSubprojects) {
         	exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
         }
     }
-      
+
     task serialver(type: serialver.InsertSerialVersionUIDTask) {
         serialver = rootProject.serialver
     }
@@ -176,7 +177,7 @@ ext.schedulingFunctionalTestConfiguration = {
     beforeTest { descriptor ->
         logger.lifecycle("Running: " + descriptor)
     }
-    
+
     def clean = {
     	println project.nativeLibsDir
     	   	
@@ -240,7 +241,6 @@ task dist(type: Sync) {
 
 defaultTasks 'dist'
 build.dependsOn 'dist'
-
 
 task scripts
 dist.dependsOn scripts
