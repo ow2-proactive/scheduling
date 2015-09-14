@@ -39,9 +39,7 @@ package org.ow2.proactive.scheduler.core;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -407,6 +405,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);
+    }
+
+
+    @Override
+    public List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        List<TaskState> taskStates = getJobState(jobId).getTaskByTag(taskTag);
+        ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
+        for(TaskState currentState: taskStates){
+            String taskName = currentState.getTaskInfo().getName();
+            try {
+                TaskResult currentResult = getTaskResult(jobId, taskName);
+                results.add(currentResult);
+            }
+            catch(UnknownTaskException ex){
+                ex.printStackTrace();
+            }
+        }
+        return results;
+    }
+
+    @Override
+    public List<TaskResult> getTaskResultByTag(String jobId, String taskTag)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return this.getTaskResultByTag(JobIdImpl.makeJobId(jobId), taskTag);
     }
 
     /**
@@ -796,6 +819,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return frontendState.getJobState(jobId);
     }
 
+
+
+
+
     /**
      * {@inheritDoc}
      */
@@ -950,6 +977,22 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         }
 
         throw new UnknownTaskException("Unknown task " + taskName + " in job " + jobId);
+    }
+
+
+    @Override
+    @ImmediateService
+    public String getTaskServerLogsByTag(String jobId, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
+        JobId id = JobIdImpl.makeJobId(jobId);
+        frontendState.checkJobOwner("getTaskServerLogs", id,
+                "You do not have permission to get the task logs of this job");
+
+        Set<TaskId> tasksIds = new HashSet<>();
+        for (TaskState taskState : frontendState.getJobState(id).getTaskByTag(taskTag)) {
+            tasksIds.add(taskState.getId());
+        }
+
+        return ServerJobAndTaskLogs.getJobLog(id, tasksIds);
     }
 
     /**
