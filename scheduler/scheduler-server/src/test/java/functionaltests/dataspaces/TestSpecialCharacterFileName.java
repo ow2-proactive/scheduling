@@ -65,7 +65,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
     private static String clientBatPath = "bin\\proactive-client.bat";
     private static String jobXmlPath = "scheduler\\scheduler-server\\src\\test\\resources\\functionaltests\\dataspaces\\Job_SpecialCharacterFileName.xml";
 
-    private static int TIMEOUT = 60; // in seconds
+    private static int TIMEOUT = 300; // in seconds
     private static final String ERROR_COMMAND_EXECUTION = "Error command execution";
 
     private static String returnExprInResultBeforeTimeout(InputStream inputStream, String expr, int timeout) throws Exception {
