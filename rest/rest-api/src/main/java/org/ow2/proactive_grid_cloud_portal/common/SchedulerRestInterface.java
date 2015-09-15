@@ -293,6 +293,24 @@ public interface SchedulerRestInterface {
                                 String jobId, @PathParam("tasktag")
                                 String taskTag) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+
+
+    /**
+     * Returns a list of the tags of the tasks belonging to job <code>jobId</code>
+     * @param sessionId a valid session id
+     * @param jobId jobid one wants to list the tasks' tags
+     * @return a list of tasks' name
+     */
+    @GET
+    @Path("jobs/{jobid}/tasks/tags")
+    @Produces("application/json")
+    List<String> getJobTaskTags(@HeaderParam("sessionid")
+                                     String sessionId, @PathParam("jobid")
+                                     String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+
+
+
     /**
      * Returns a base64 utf-8 encoded html visualization corresponding to the jobid.
      * This visualization exists when job is created in the web studio

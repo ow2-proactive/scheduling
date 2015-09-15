@@ -324,4 +324,18 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(0, jsonObject.size());
     }
 
+
+    @Test
+    public void testJobTags() throws Exception {
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tags");
+        JSONArray jsonArray = toJsonArray(response);
+
+        System.out.println(jsonArray.toJSONString());
+
+        assertTrue(jsonArray.contains("LOOP-T2-1"));
+        assertTrue(jsonArray.contains("LOOP-T2-2"));
+        assertTrue(jsonArray.contains("LOOP-T2-3"));
+        assertEquals(3, jsonArray.size());
+    }
+
 }
