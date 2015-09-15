@@ -787,6 +787,33 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
 
+
+    /**
+     * Returns a list of the tags of the tasks belonging to job <code>jobId</code>
+     * @param sessionId a valid session id
+     * @param jobId jobid one wants to list the tasks' tags
+     * @return a list of tasks' name
+     */
+    @GET
+    @Path("jobs/{jobid}/tasks/tags")
+    @Produces("application/json")
+    public List<String> getJobTaskTags(@HeaderParam("sessionid")
+                                String sessionId, @PathParam("jobid")
+                                String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException{
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates");
+            JobState jobState = s.getJobState(jobId);
+            return jobState.getTags();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+
     /**
      * {@inheritDoc}
      */

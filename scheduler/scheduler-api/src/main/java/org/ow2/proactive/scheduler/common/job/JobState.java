@@ -36,9 +36,7 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -212,6 +210,24 @@ public abstract class JobState extends Job implements Comparable<JobState> {
             }
         });
     }
+
+
+    /**
+     * To get the list of available tags in a job.
+     * @return the list of tags.
+     */
+    public List<String> getTags(){
+        Set<String> result = new HashSet<>();
+        String tag = null;
+        for(TaskState task: this.getTasks()){
+            tag = task.getTag();
+            if(tag != null) {
+                result.add(task.getTag());
+            }
+        }
+        return new ArrayList<>(result);
+    }
+
 
     /**
      * To get the numberOfFinishedTask
