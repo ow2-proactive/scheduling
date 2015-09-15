@@ -1,7 +1,9 @@
 package org.ow2.proactive.scheduler.core;
 
-import org.apache.log4j.*;
-import org.apache.log4j.spi.LoggingEvent;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -16,17 +18,18 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+import org.apache.log4j.spi.LoggingEvent;
 
 
 class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
 
     private static final JobLogger jlogger = JobLogger.getInstance();
     private static final TaskLogger tlogger = TaskLogger.getInstance();
-    private final Set<JobId> jobsToBeLogged = new HashSet<JobId>();
+    private final Set<JobId> jobsToBeLogged = new HashSet<>();
 
     private final SchedulerDBManager dbManager;
 
@@ -56,7 +59,7 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     @Override
     synchronized void cleanLoggers(JobId jobId) {
         jobsToBeLogged.remove(jobId);
-        jlogger.info(jobId, "cleaning loggers");
+        jlogger.debug(jobId, "cleaning loggers");
         lfs.removeAllAppenders(Log4JTaskLogs.getLoggerName(jobId));
     }
 

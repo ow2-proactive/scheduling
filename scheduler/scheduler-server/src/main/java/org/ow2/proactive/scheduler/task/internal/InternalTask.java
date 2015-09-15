@@ -65,18 +65,18 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.utils.NodeSet;
 
 
 /**
  * Internal and global description of a task.
- * This class contains all informations about the task to launch.
+ * This class contains all information about the task to launch.
  * It also provides methods to create its own launcher and manage the content regarding the scheduling order.<br/>
  * Specific internal task may extend this abstract class.
  *
@@ -86,13 +86,13 @@ import org.ow2.proactive.utils.NodeSet;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class InternalTask extends TaskState {
 
-    /** Parents list : null if no dependences */
+    /** Parents list: null if no dependency */
     @XmlTransient
     private transient List<InternalTask> ideps = null;
 
     /** Information about the launcher and node, mutable can change overtime, in case of restart for instance */
     // These information are not required during task process
-    private transient ExecuterInformations executerInformations;
+    private transient ExecuterInformation executerInformation;
 
     /** Task information : this is the information that can change during process. */
     private TaskInfoImpl taskInfo = new TaskInfoImpl();
@@ -220,13 +220,13 @@ public abstract class InternalTask extends TaskState {
     public void replicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
             int itIndex) throws ExecutableCreationException {
 
-        Map<TaskId, InternalTask> tmp = new HashMap<TaskId, InternalTask>();
+        Map<TaskId, InternalTask> tmp = new HashMap<>();
 
         // replicate the tasks
         internalReplicateTree(tmp, target, loopAction, dupIndex, itIndex);
 
         // remove replicates from nested LOOP action
-        Map<String, Entry<TaskId, InternalTask>> map = new HashMap<String, Entry<TaskId, InternalTask>>();
+        Map<String, Entry<TaskId, InternalTask>> map = new HashMap<>();
         for (Entry<TaskId, InternalTask> it : tmp.entrySet()) {
             String name = it.getValue().getAmbiguousName();
             if (map.containsKey(name)) {
@@ -253,7 +253,7 @@ public abstract class InternalTask extends TaskState {
      * @param acc accumulator
      * @param target end condition
      * @param loopAction true if the action performed is a LOOP, false is it is a replicate
-     * @param initDupIndex replication index threshold if <code>ifAction == true</code>
+     * @param dupIndex replication index threshold if <code>ifAction == true</code>
      *                 replication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *
@@ -276,7 +276,7 @@ public abstract class InternalTask extends TaskState {
             // recursive call
             if (!this.getTaskInfo().getTaskId().equals(target)) {
                 if (this.getIDependences() != null) {
-                    Map<String, InternalTask> deps = new HashMap<String, InternalTask>();
+                    Map<String, InternalTask> deps = new HashMap<>();
                     for (InternalTask parent : this.getIDependences()) {
                         // filter out replicated tasks
                         if (deps.containsKey(parent.getAmbiguousName())) {
@@ -310,7 +310,7 @@ public abstract class InternalTask extends TaskState {
      * @param acc accumulator
      * @param target end condition
      * @param loopAction true if the action performed is an if, false is it is a replicate
-     * @param initDupIndex replication index threshold if <code>ifAction == true</code>
+     * @param dupIndex replication index threshold if <code>ifAction == true</code>
      *                 replication index to set to the old tasks if <code>ifAction == false</code>
      * @param itIndex iteration index threshold it <code>ifAction == true</code>
      *
@@ -324,7 +324,7 @@ public abstract class InternalTask extends TaskState {
 
         InternalTask nt = acc.get(this.getId());
 
-        Map<String, InternalTask> ideps = new HashMap<String, InternalTask>();
+        Map<String, InternalTask> ideps = new HashMap<>();
         int deptype = 0;
         if (this.getIfBranch() != null) {
             deptype = 1;
@@ -394,7 +394,7 @@ public abstract class InternalTask extends TaskState {
                         break;
                     case 2:
                         if (nt.getJoinedBranches() == null) {
-                            List<InternalTask> jb = new ArrayList<InternalTask>();
+                            List<InternalTask> jb = new ArrayList<>();
                             nt.setJoinedBranches(jb);
                         }
                         for (InternalTask it : nt.getJoinedBranches()) {
@@ -497,7 +497,7 @@ public abstract class InternalTask extends TaskState {
      */
     public void addDependence(InternalTask task) {
         if (ideps == null) {
-            ideps = new ArrayList<InternalTask>();
+            ideps = new ArrayList<>();
         }
         ideps.add(task);
     }
@@ -642,7 +642,7 @@ public abstract class InternalTask extends TaskState {
             ideps = null;
             return null;
         }
-        List<TaskState> tmp = new ArrayList<TaskState>(ideps.size());
+        List<TaskState> tmp = new ArrayList<>(ideps.size());
         for (TaskState ts : ideps) {
             tmp.add(ts);
         }
@@ -661,19 +661,19 @@ public abstract class InternalTask extends TaskState {
     /**
      * To get the executer informations
      *
-     * @return the executerInformations
+     * @return the executerInformation
      */
-    public ExecuterInformations getExecuterInformations() {
-        return executerInformations;
+    public ExecuterInformation getExecuterInformation() {
+        return executerInformation;
     }
 
     /**
      * To set the executer informations.
      *
-     * @param executerInformations the executerInformations to set
+     * @param executerInformation the executerInformation to set
      */
-    public void setExecuterInformations(ExecuterInformations executerInformations) {
-        this.executerInformations = executerInformations;
+    public void setExecuterInformation(ExecuterInformation executerInformation) {
+        this.executerInformation = executerInformation;
     }
 
     /**
@@ -841,18 +841,18 @@ public abstract class InternalTask extends TaskState {
      * @param fullTaskName name with the iteration and replication suffixes
      * @return the original task name, without the added suffixes for iteration and replication
      */
-    public static String getInitialName(String fullTaskname) {
+    public static String getInitialName(String fullTaskName) {
         String taskName = null;
 
         Matcher matcher = null;
         for (Pattern pat : namePatterns) {
-            matcher = pat.matcher(fullTaskname);
+            matcher = pat.matcher(fullTaskName);
             if (matcher.find()) {
                 taskName = matcher.group(1);
                 return taskName;
             }
         }
-        throw new RuntimeException("Could not extract task name: " + fullTaskname);
+        throw new RuntimeException("Could not extract task name: " + fullTaskName);
     }
 
     /**
@@ -1014,7 +1014,6 @@ public abstract class InternalTask extends TaskState {
      */
     protected TaskLauncherInitializer getDefaultTaskLauncherInitializer(InternalJob job) {
         TaskLauncherInitializer tli = new TaskLauncherInitializer();
-        tli.setOwner(job.getOwner());
         tli.setTaskId(getId());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
@@ -1024,6 +1023,8 @@ public abstract class InternalTask extends TaskState {
         tli.setNamingService(job.getJobDataSpaceApplication().getNamingServiceStub());
         tli.setIterationIndex(getIterationIndex());
         tli.setReplicationIndex(getReplicationIndex());
+
+        tli.setForkEnvironment(getForkEnvironment());
         if (isWallTimeSet()) {
             tli.setWalltime(wallTime);
         }
@@ -1053,30 +1054,30 @@ public abstract class InternalTask extends TaskState {
 
     /**
      *
-     * Return generic info replacing $PAS_JOB_NAME, $PAS_JOB_ID, $PAS_TASK_NAME, $PAS_TASK_ID, $PAS_TASK_ITERATION
-     * $PAS_TASK_REPLICATION by it's actual value
+     * Return generic info replacing $PA_JOB_NAME, $PA_JOB_ID, $PA_TASK_NAME, $PA_TASK_ID, $PA_TASK_ITERATION
+     * $PA_TASK_REPLICATION by it's actual value
      *
      */
     public Map<String, String> getGenericInformations() {
 
         if (taskInfo == null || genericInformations == null) {
             // task is not yet properly initialized
-            return new HashMap<String, String>();
+            return new HashMap<>();
         }
 
-        Map<String, String> replacements = new HashMap<String, String>();
+        Map<String, String> replacements = new HashMap<>();
         JobId jobId = taskInfo.getJobId();
         if (jobId != null) {
-            replacements.put(SchedulerVars.JAVAENV_JOB_ID_VARNAME.toString(), jobId.toString());
-            replacements.put(SchedulerVars.JAVAENV_JOB_NAME_VARNAME.toString(), jobId.getReadableName());
+            replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());
+            replacements.put(SchedulerVars.PA_JOB_NAME.toString(), jobId.getReadableName());
         }
         TaskId taskId = taskInfo.getTaskId();
         if (taskId != null) {
-            replacements.put(SchedulerVars.JAVAENV_TASK_ID_VARNAME.toString(), taskId.toString());
-            replacements.put(SchedulerVars.JAVAENV_TASK_NAME_VARNAME.toString(), taskId.getReadableName());
+            replacements.put(SchedulerVars.PA_TASK_ID.toString(), taskId.toString());
+            replacements.put(SchedulerVars.PA_TASK_NAME.toString(), taskId.getReadableName());
         }
-        replacements.put(SchedulerVars.JAVAENV_TASK_ITERATION.toString(), String.valueOf(iteration));
-        replacements.put(SchedulerVars.JAVAENV_TASK_REPLICATION.toString(), String.valueOf(replication));
+        replacements.put(SchedulerVars.PA_TASK_ITERATION.toString(), String.valueOf(iteration));
+        replacements.put(SchedulerVars.PA_TASK_REPLICATION.toString(), String.valueOf(replication));
 
         return applyReplacementsOnGenericInformation(replacements);
     }

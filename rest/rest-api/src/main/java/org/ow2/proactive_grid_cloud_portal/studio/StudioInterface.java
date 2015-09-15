@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -53,6 +52,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
@@ -85,7 +85,7 @@ public interface StudioInterface {
 
     @PUT
     @Path("logout")
-    public void logout(@HeaderParam("sessionid")
+    void logout(@HeaderParam("sessionid")
     final String sessionId) throws PermissionRestException, NotConnectedRestException;
 
     @GET
@@ -95,7 +95,7 @@ public interface StudioInterface {
 
     @GET
     @Path("workflows")
-    public List<Workflow> getWorkflows(@HeaderParam("sessionid")
+    List<Workflow> getWorkflows(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedRestException, IOException;
 
     @POST
@@ -131,7 +131,7 @@ public interface StudioInterface {
 
     @GET
     @Path("templates")
-    public List<Workflow> getTemplates(@HeaderParam("sessionid")
+    List<Workflow> getTemplates(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedRestException, IOException;
 
     @POST
@@ -192,19 +192,18 @@ public interface StudioInterface {
     @POST
     @Path("classes")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public String createClass(@HeaderParam("sessionid")
+    String createClass(@HeaderParam("sessionid")
     String sessionId, MultipartFormDataInput multipart) throws NotConnectedRestException, IOException;
 
     /**
      * Validates a job.
-     * @param multipart a HTTP multipart form which contains the job-descriptor or the job archive file
+     * @param multipart a HTTP multipart form which contains the job-descriptor
      * @return the result of job validation
-     *
      */
     @POST
     @Path("validate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public abstract JobValidationData validate(MultipartFormDataInput multipart);
+    JobValidationData validate(MultipartFormDataInput multipart);
 
     /**
      * Submits a job to the scheduler
@@ -215,7 +214,7 @@ public interface StudioInterface {
     @POST
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public JobIdData submit(@HeaderParam("sessionid")
+    JobIdData submit(@HeaderParam("sessionid")
     String sessionId, @PathParam("path")
     PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;

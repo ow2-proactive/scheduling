@@ -63,7 +63,7 @@ public class TaskStateDataCustomConverter extends DozerConverter<Map, Map> imple
             return null;
         }
 
-        Map<String, TaskStateData> converted = new HashMap<String, TaskStateData>();
+        Map<String, TaskStateData> converted = new HashMap<>();
         for (Map.Entry<TaskId, TaskState> entry : ((Map<TaskId, TaskState>) source).entrySet()) {
             converted.put(entry.getKey().value(), mapper.map(entry.getValue(), TaskStateData.class));
         }

@@ -36,8 +36,21 @@
  */
 package functionaltests;
 
-import functionaltests.utils.RestFuncTUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.MediaType;
+
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import functionaltests.utils.RestFuncTUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -52,33 +65,19 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-
-import javax.ws.rs.core.MediaType;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(RestSchedulerJobTaskTest.class.getSimpleName());
+        init();
     }
 
     @Before
     public void setUp() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<JobState>();
+        List<JobState> jobStates = new ArrayList<>();
         jobStates.addAll(state.getPendingJobs());
         jobStates.addAll(state.getRunningJobs());
         jobStates.addAll(state.getFinishedJobs());
@@ -177,8 +176,19 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONObject jsonObject = toJsonObject(response);
-        String taskResult = getTaskResult(jsonObject, "Test-Job-Task");
+        String taskResult = getTaskResult(jsonObject, getDefaultTaskName());
         assertNotNull(taskResult);
+    }
+
+    @Test
+    public void testGetNoJob() throws Exception {
+        String resourceUrl = getResourceUrl("jobs");
+        HttpGet httpGet = new HttpGet(resourceUrl);
+        setSessionHeader(httpGet);
+        HttpResponse response = executeUriRequest(httpGet);
+        assertHttpStatusOK(response);
+        JSONArray jsonArray = toJsonArray(response);
+        assertTrue(jsonArray.isEmpty());
     }
 
     @Test
@@ -190,7 +200,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONObject jsonObject = toJsonObject(response);
-        assertEquals("TEST-JOB", jsonObject.get("Test-Job-Task").toString());
+        assertEquals("TEST-JOB", jsonObject.get(getDefaultTaskName()).toString());
     }
 
     @Test(expected = UnknownJobException.class)
@@ -230,7 +240,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONArray jsonArray = toJsonArray(response);
-        assertEquals("Test-Job-Task", jsonArray.get(0).toString());
+        assertEquals(getDefaultTaskName(), jsonArray.get(0).toString());
     }
 
     @Test

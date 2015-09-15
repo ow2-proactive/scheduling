@@ -48,7 +48,7 @@ public class RestSchedulerKillTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(RestSchedulerKillTest.class.getSimpleName());
+        init();
     }
 
     @Test

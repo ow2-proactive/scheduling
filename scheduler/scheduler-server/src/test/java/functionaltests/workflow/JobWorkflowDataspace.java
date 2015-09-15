@@ -36,48 +36,21 @@
  */
 package functionaltests.workflow;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.File;
 import java.io.Serializable;
 
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.apache.commons.io.FileUtils;
 
 
-/**
- * Tests the correctness of dataspace workflow jobs
- * 
- * @author The ProActive Team
- * @since ProActive Scheduling 2.2
- */
 public class JobWorkflowDataspace extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
 
-        DataSpacesFileObject dsf = getLocalFile(getVariables().get("pas.task.iteration") + "_" +
-            getVariables().get("pas.task.replication") + ".in");
-
-        InputStream in = dsf.getContent().getInputStream();
-
-        int i = -1;
-        String line = "";
-        while ((i = in.read()) != -1) {
-            line += (char) i;
-        }
-
-        line = line.toUpperCase();
-
-        getLocalFile(
-                getVariables().get("pas.task.iteration") + "_" + getVariables().get("pas.task.replication") +
-                    ".out").createFile();
-        DataSpacesFileObject dsfOut = getLocalFile(getVariables().get("pas.task.iteration") + "_" +
-            getVariables().get("pas.task.replication") + ".out");
-        OutputStream out = dsfOut.getContent().getOutputStream();
-        out.write(line.getBytes());
-        out.close();
-
+        String filename = getIterationIndex() + "_" + getReplicationIndex();
+        FileUtils.copyFile(new File(filename + ".in"), new File(filename + ".out"));
         return null;
     }
 }

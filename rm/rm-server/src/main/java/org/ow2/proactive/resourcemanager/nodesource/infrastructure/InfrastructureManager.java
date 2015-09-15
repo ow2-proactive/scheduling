@@ -86,11 +86,11 @@ public abstract class InfrastructureManager implements Serializable {
     protected NodeSource nodeSource;
 
     /** deploying nodes list */
-    private Map<String, RMDeployingNode> deployingNodes = new ConcurrentHashMap<String, RMDeployingNode>();
-    private Map<String, RMDeployingNode> lostNodes = new ConcurrentHashMap<String, RMDeployingNode>();
+    private Map<String, RMDeployingNode> deployingNodes = new ConcurrentHashMap<>();
+    private Map<String, RMDeployingNode> lostNodes = new ConcurrentHashMap<>();
 
     /** node list, miror of nodesource.getAliveNodes(), to implement random access */
-    private Hashtable<String, Node> acquiredNodes = new Hashtable<String, Node>();
+    private Hashtable<String, Node> acquiredNodes = new Hashtable<>();
 
     private final ReentrantLock nodeAcquisitionLock = new ReentrantLock();
 
@@ -121,7 +121,7 @@ public abstract class InfrastructureManager implements Serializable {
      * @return nodes whose registration status is deploying or lost.
      */
     public ArrayList<RMDeployingNode> getDeployingNodes() {
-        ArrayList<RMDeployingNode> result = new ArrayList<RMDeployingNode>();
+        ArrayList<RMDeployingNode> result = new ArrayList<>();
         synchronized (deployingNodes) {
             result.addAll(this.deployingNodes.values());
             result.addAll(this.lostNodes.values());
@@ -346,9 +346,7 @@ public abstract class InfrastructureManager implements Serializable {
      */
     protected final CommandLineBuilder getDefaultCommandLineBuilder(OperatingSystem targetOS) {
         CommandLineBuilder result = new CommandLineBuilder();
-        String javaPath = (System.getenv("JAVA_HOME") != null ? System.getenv("JAVA_HOME") : System
-                .getProperty("java.home")) +
-            targetOS.fs + "bin" + targetOS.fs + "java";
+        String javaPath = System.getProperty("java.home") + targetOS.fs + "bin" + targetOS.fs + "java";
         result.setJavaPath(javaPath);
         result.setTargetOS(targetOS);
         if (CentralPAPropertyRepository.PA_CONFIGURATION_FILE.isSet()) {

@@ -1,3 +1,9 @@
+ext.encoding = {
+    Properties props = new Properties()
+    props.load(new FileInputStream("$rootDir/config/scheduler/settings.ini"))
+    props.getProperty('pa.scheduler.job.file.encoding')
+}
+
 def functionalTestConfiguration = {
     forkEvery 1
     include 'functionaltests/**'
@@ -10,6 +16,7 @@ def functionalTestConfiguration = {
     systemProperties << ['test_slice': System.getProperty("test_slice")]
     systemProperties << ['max_test_slice': System.getProperty("max_test_slice")]
     systemProperties << ['proactive.runtime.ping': false]
+    systemProperties << ['file.encoding': encoding.toString()]
     testLogging {
         exceptionFormat = 'full'
     }
@@ -77,9 +84,6 @@ project(':rest:rest-server') {
         runtime 'org.eclipse.jetty.aggregate:jetty-webapp:8.1.15.v20140411'
         runtime 'javax.servlet:javax.servlet-api:3.0.1'
 
-        runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-amqp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
@@ -207,7 +211,6 @@ project(':rest:rest-smartproxy') {
     }
 
     task bundle(type: Zip) {
-        print configurations
         from configurations.runtime.allArtifacts.files
         from configurations.runtime
         into (project.name + '-' + project.version + '-bundle')
@@ -217,8 +220,19 @@ project(':rest:rest-smartproxy') {
         exclude 'functionaltests/**'
     }
 
+    task testJar(type: Jar) {
+        classifier = 'tests'
+        from sourceSets.test.output
+    }
+    rootProject.dist.dependsOn testJar
+
+    task dist(type: Copy) {
+        from testJar
+        into file("$rootDir/dist/lib")
+    }
+
     task('functionalTest', type:Test).configure functionalTestConfiguration
 
-    functionalTest.dependsOn rootProject.dist
+    functionalTest.dependsOn rootProject.dist, dist
     clean.dependsOn rootProject.cleanDist
 }

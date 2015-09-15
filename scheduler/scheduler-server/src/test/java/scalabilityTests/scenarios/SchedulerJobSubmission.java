@@ -402,7 +402,7 @@ public class SchedulerJobSubmission {
         }
 
         private List<Credentials> loadCredentials(PublicKey pubKey) {
-            List<Credentials> credentialsList = new ArrayList<Credentials>();
+            List<Credentials> credentialsList = new ArrayList<>();
             try {
                 File loginFile = new File(loginPath);
                 // routine checks of the path

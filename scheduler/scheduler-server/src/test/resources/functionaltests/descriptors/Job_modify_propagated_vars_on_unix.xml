@@ -4,6 +4,7 @@
     name="job_propagate_vars_on_unix" cancelJobOnError="false" priority="normal">
     <variables>
         <variable name="var" value="var-value" />
+        <variable name="home" value="${pa.scheduler.home}" />
     </variables>
     <description>PropagateVariablesOnUnix</description>
     <taskFlow>
@@ -11,9 +12,6 @@
             <pre>
                 <script>
                     <code language="javascript">
-                        if ('var-value' != '${var}') {
-                            throw 'Incorrect variable value (\'var\'): \'${var}\', expected \'var-value\'.';
-                        }
                         if ('var-value' != variables.get('var')) {
                             throw 'Incorrect variable value (\'var\') in variables map: \'' + variables.get('var') + '\', expected \'var-value\'.'; 
                         }
@@ -22,7 +20,7 @@
                 </script>
             </pre>
             <nativeExecutable>
-                <staticCommand value="${pa.scheduler.home}/scheduler/scheduler-server/build/resources/test/functionaltests/vars/test-vars.sh" />
+                <staticCommand value="${home}/scheduler/scheduler-server/build/resources/test/functionaltests/vars/test-vars.sh" />
             </nativeExecutable>
         </task>
     </taskFlow>

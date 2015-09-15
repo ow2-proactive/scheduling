@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="urn:proactive:jobdescriptor:3.2" xmlns:jd="urn:proactive:jobdescriptor:3.2" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="urn:proactive:jobdescriptor:3.2" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:jd="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <ref name="job"/>
   </start>
@@ -51,12 +51,7 @@
           <data type="anyURI"/>
         </attribute>
       </optional>
-      <choice>
-        <ref name="taskFlow"/>
-        <oneOrMore>
-          <ref name="task"/>
-        </oneOrMore>
-      </choice>
+      <ref name="taskFlow"/>
     </element>
   </define>
   <define name="jobName">
@@ -324,7 +319,7 @@
   </define>
   <define name="preciousLogs">
     <attribute name="preciousLogs">
-      <doc:documentation>Do we keep the logs as file on LOCALSPACE</doc:documentation>
+      <doc:documentation>Do we keep the logs as file on USERSPACE</doc:documentation>
       <choice>
         <data type="boolean"/>
         <ref name="variableRefType"/>

@@ -188,7 +188,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
     }
 
     private List<String> retrievePaRemoteConnectionLines(String logs) {
-        List<String> lines = new ArrayList<String>();
+        List<String> lines = new ArrayList<>();
         for (String line : lineByLine(logs)) {
             if (line.contains(PA_REMOTE_CONNECTION)) {
                 lines.add(line);
@@ -204,7 +204,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
             paramString = pathAndParams[1];
         }
         String[] params = paramString.split("&");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         for (String param : params) {
             String name = param.split("=")[0];
             String value = param.split("=")[1];

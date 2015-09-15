@@ -38,12 +38,12 @@
 			<scriptExecutable>
 				<script>
 					<code language="groovy">
-						print('pas.job.id=' + variables.get("pas.job.id"));
-						print('pas.job.name=' + variables.get("pas.job.name"));
-						print('pas.task.id=' + variables.get("pas.task.id"));
-						print('pas.task.name=' + variables.get("pas.task.name"));
-						print('pas.task.iteration=' + variables.get("pas.task.iteration"));
-						print('pas.task.replication=' + variables.get("pas.task.replication"));
+						print('PA_JOB_ID=' + variables.get("PA_JOB_ID"));
+						print('PA_JOB_NAME=' + variables.get("PA_JOB_NAME"));
+						print('PA_TASK_ID=' + variables.get("PA_TASK_ID"));
+						print('PA_TASK_NAME=' + variables.get("PA_TASK_NAME"));
+						print('PA_TASK_ITERATION=' + variables.get("PA_TASK_ITERATION"));
+						print('PA_TASK_REPLICATION=' + variables.get("PA_TASK_REPLICATION"));
 					</code>
 				</script>
 			</scriptExecutable>
@@ -66,16 +66,16 @@
 				</script>
 			</scriptExecutable>
 		</task>
-		<task name="dataspaces">
+		<task name="dataspaces" cancelJobOnError="true">
 			<scriptExecutable>
 				<script>
 					<code language="groovy">
 						<![CDATA[
-						print('user=' + user.getVirtualURI())
-						print('global=' + global.getVirtualURI())
-						print('input=' + input.getVirtualURI())
-						print('output=' + output.getVirtualURI())
-						print('localspace=' + localspace.getVirtualURI())
+						println('user=' + userspace)
+						println('global=' + globalspace)
+						println('input=' + inputspace)
+						println('output=' + outputspace)
+						assert new File(localspace).exists()
 						]]>
 					</code>
 				</script>
@@ -85,7 +85,6 @@
 			<scriptExecutable>
 				<script>
 					<code language="groovy">
-						print 'nodeset='+nodeset.size()
 						print 'nodesurl='+nodesurl.size()
 					</code>
 				</script>

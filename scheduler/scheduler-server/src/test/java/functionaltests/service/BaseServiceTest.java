@@ -15,7 +15,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
-import org.ow2.proactive.scheduler.task.internal.ExecuterInformations;
+import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.tests.ProActiveTest;
@@ -49,7 +49,7 @@ public class BaseServiceTest extends ProActiveTest {
     void taskStarted(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) throws Exception {
         InternalTask task = taskDesc.getInternal();
         TaskLauncher launcher = Mockito.mock(TaskLauncher.class);
-        task.setExecuterInformations(new ExecuterInformations(launcher, NodeFactory.getDefaultNode()));
+        task.setExecuterInformation(new ExecuterInformation(launcher, NodeFactory.getDefaultNode()));
         service.taskStarted(jobDesc.getInternal(), task, launcher);
     }
 
@@ -74,7 +74,7 @@ public class BaseServiceTest extends ProActiveTest {
 
     static ExecutorService executorService = Executors.newCachedThreadPool();
 
-    static interface TestRunnable {
+    interface TestRunnable {
         void run() throws Exception;
     }
 

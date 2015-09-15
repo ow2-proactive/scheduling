@@ -38,7 +38,6 @@ package functionaltests;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -48,7 +47,7 @@ import org.ow2.proactive.scheduler.common.SchedulerStatus;
 public class RestfulSchedulerFreezeTest extends AbstractRestFuncTestCase {
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(RestfulSchedulerFreezeTest.class.getSimpleName());
+        init();
     }
 
     @Test

@@ -44,10 +44,10 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.ProActiveNonForkedTaskLauncherFactory;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
-import org.ow2.proactive.scheduler.task.script.ScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.script.ScriptTaskLauncher;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 
@@ -77,10 +77,10 @@ public class InternalScriptTask extends InternalTask {
     @Override
     public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
             NodeException {
-        logger.info(getTaskInfo().getTaskId(), "creating script task launcher");
-        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(ScriptTaskLauncher.class.getName(),
-                new Object[] { getDefaultTaskLauncherInitializer(job) }, node);
-        setExecuterInformations(new ExecuterInformations(launcher, node));
+        logger.info(getTaskInfo().getTaskId(), "creating non forked task launcher");
+        TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
+                new Object[] { getDefaultTaskLauncherInitializer(job), new ProActiveNonForkedTaskLauncherFactory()}, node);
+        setExecuterInformation(new ExecuterInformation(launcher, node));
 
         return launcher;
     }
@@ -94,7 +94,7 @@ public class InternalScriptTask extends InternalTask {
 
     @Override
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
         String answer = super.display();
         Script tscript = ((ScriptExecutableContainer) executableContainer).getScript();
         return answer + nl + "\tScript = " + ((tscript != null) ? tscript.display() : null);

@@ -10,40 +10,12 @@
 		<variable name="DS" value="${pa.rm.home}/scheduler/scheduler-server/build/JobLegacySchemas_dataspace"/>
     </variables>
     <description>Tests various descriptor syntax. </description>
-    <jobClasspath>
-        <pathElement path="${HOME}/TestJobClasspath.jar"/>
-    </jobClasspath>
     <genericInformation>
         <info name="myinfo" value="myvalue"/>
     </genericInformation>
     <inputSpace url="${HOME}"/>
     <outputSpace url="${DS}"/>
 	<taskFlow>
-
-        <!-- Tests jobClassPath and preciousLog -->
-        <task name="JobClassPath" preciousLogs="true">
-            <description>Run a jobClasspath-defined class</description>
-            <javaExecutable class="test.TestJobClassPath">
-            </javaExecutable>
-        </task>
-        <task name="CheckPreciousLog">
-            <description>Checks that the log file exists</description>
-            <depends>
-                <task ref="JobClassPath"/>
-            </depends>
-            <inputFiles>
-                <files includes="TaskLogs-*.log" accessMode="transferFromOutputSpace"/>
-            </inputFiles>
-            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
-                <parameters>
-                    <parameter name="inputFile" value="TaskLogs-*.log"/>
-                    <parameter name="outputFile" value="CheckPreciousLogOut"/>
-                </parameters>
-            </javaExecutable>
-            <outputFiles>
-                <files includes="CheckPreciousLogOut" accessMode="transferToOutputSpace"/>
-            </outputFiles>
-        </task>
 
         <!-- Tests JavaTask with ForkEnv and dependencies -->
 
@@ -88,6 +60,7 @@
                 <files includes="myfilein1" accessMode="transferFromInputSpace"/>
             </inputFiles>
             <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
+                <forkEnvironment></forkEnvironment>
                 <parameters>
                     <parameter name="inputFile" value="myfilein1"/>
                     <parameter name="outputFile" value="myfileout1"/>
@@ -106,6 +79,7 @@
                 <files includes="myfileout1" accessMode="transferFromOutputSpace"/>
             </inputFiles>
             <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
+                <forkEnvironment></forkEnvironment>
                 <parameters>
                     <parameter name="inputFile" value="myfileout1"/>
                     <parameter name="outputFile" value="myfileout2"/>
@@ -127,9 +101,6 @@
             </parallel>
             <javaExecutable
                     class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
-                <parameters>
-                    <parameter name="numberToFind" value="10"/>
-                </parameters>
             </javaExecutable>
         </task>
         <task name="Topology2" preciousResult="true">
@@ -141,9 +112,6 @@
             </parallel>
             <javaExecutable
                     class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
-                <parameters>
-                    <parameter name="numberToFind" value="10"/>
-                </parameters>
             </javaExecutable>
         </task>
         <task name="Topology3" preciousResult="true">
@@ -155,9 +123,6 @@
             </parallel>
             <javaExecutable
                     class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
-                <parameters>
-                    <parameter name="numberToFind" value="10"/>
-                </parameters>
             </javaExecutable>
         </task>
         <task name="Topology4" preciousResult="true">
@@ -169,9 +134,6 @@
             </parallel>
             <javaExecutable
                     class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
-                <parameters>
-                    <parameter name="numberToFind" value="10"/>
-                </parameters>
             </javaExecutable>
         </task>
         <task name="Topology5" preciousResult="true">
@@ -232,27 +194,11 @@
             </cleaning>
         </task>
 
-        <!-- Tests static and dynamic commands -->
+        <!-- Tests dynamic commands -->
 
-        <task name="Dynamic">
-            <nativeExecutable>
-                <dynamicCommand workingDir="$PROACTIVE_HOME">
-                    <generation>
-                        <script> <code language="groovy">
-                            if(org.objectweb.proactive.utils.OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.windows){
-                            command="ping localhost";
-                            } else {
-                            command="ping -c 3 localhost";
-                            }
-                        </code>
-                        </script>
-                    </generation>
-                </dynamicCommand>
-            </nativeExecutable>
-        </task>
         <task name="Static">
             <nativeExecutable>
-                <staticCommand 	value="hostname" workingDir="$PROACTIVE_HOME">
+                <staticCommand 	value="hostname" workingDir="$PA_SCHEDULER_HOME">
                 </staticCommand>
             </nativeExecutable>
         </task>

@@ -1,12 +1,7 @@
 package functionaltests.service;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Map;
 
-import org.junit.Assert;
-
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -17,6 +12,10 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
 public class SchedulingServiceTest2 extends BaseServiceTest {
@@ -83,7 +82,7 @@ public class SchedulingServiceTest2 extends BaseServiceTest {
             InternalTask nativeTask = jobDesc.getInternal().getTask("nativeTask");
             // native task terminates with code 1, flag 'cancelJobOnError' was set so job should be cancelled
             service.taskTerminatedWithResult(nativeTask.getId(), new TaskResultImpl(nativeTask.getId(),
-                Integer.valueOf(1), null, 0));
+                new RuntimeException(), null, 0));
         } else {
             InternalTask javaTask = jobDesc.getInternal().getTask("javaTask");
             // java task terminates with exception, flag 'cancelJobOnError' was set so job should be cancelled

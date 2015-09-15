@@ -12,9 +12,9 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 
 public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
 
-    private final Map<URI, RMAuthentication> rmAuthentifications = new HashMap<URI, RMAuthentication>(2);
+    private final Map<URI, RMAuthentication> rmAuthentifications = new HashMap<>(2);
 
-    private final Map<String, RMProxy> userProxiesMap = new HashMap<String, RMProxy>();
+    private final Map<String, RMProxy> userProxiesMap = new HashMap<>();
 
     private final RMProxy schedulerRMProxy;
 

@@ -94,7 +94,7 @@ public class ROConnector implements JMXConnector, NotificationListener, Serializ
         }
         this.roServerStub = roServer;
         this.jmxServiceURL = address;
-        this.listeners = new Vector<NotificationListener>();
+        this.listeners = new Vector<>();
     }
 
     /**

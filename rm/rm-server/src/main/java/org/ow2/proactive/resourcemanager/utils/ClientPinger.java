@@ -90,7 +90,7 @@ public class ClientPinger implements InitActive, RunActive {
 
             // copy all the clients from core to local list
             // in order not to hold the lock while iterating
-            List<Client> clients = new LinkedList<Client>();
+            List<Client> clients = new LinkedList<>();
             synchronized (RMCore.clients) {
                 logger.debug("Number of registered clients " + RMCore.clients.size());
                 clients.addAll(RMCore.clients.values());

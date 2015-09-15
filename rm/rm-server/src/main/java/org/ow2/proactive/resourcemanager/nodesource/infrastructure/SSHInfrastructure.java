@@ -239,7 +239,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             throw new RMException("Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions, e1);
         }
 
-        String lf = System.getProperty("line.separator");
+        String lf = System.lineSeparator();
 
         int circuitBreakerThreshold = 5;
         while (!this.pnTimeout.get(pnURL) && circuitBreakerThreshold > 0) {

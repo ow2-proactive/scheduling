@@ -71,7 +71,7 @@ public class SimpleLoggerServer implements Runnable {
      * @throws IOException
      */
     public SimpleLoggerServer(int port, LoggingEventProcessor eventProcessor) throws IOException {
-        this.connections = new Vector<ConnectionHandler>();
+        this.connections = new Vector<>();
         this.serverSocket = new ServerSocket(port);
         this.port = this.serverSocket.getLocalPort();
         this.eventProcessor = eventProcessor;

@@ -122,7 +122,7 @@ public class ScriptTest {
         }
 
         @Override
-        protected ScriptResult<Object> getResult(Bindings bindings) {
+        protected ScriptResult<Object> getResult(Object evalResult, Bindings bindings) {
             return null;
         }
     }

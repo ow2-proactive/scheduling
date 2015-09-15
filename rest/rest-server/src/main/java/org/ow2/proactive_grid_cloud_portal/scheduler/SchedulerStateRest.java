@@ -36,12 +36,131 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.SequenceInputStream;
+import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.utils.StackTraceUtil;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.exception.ConnectionException;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
+import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
+import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 import com.google.common.collect.Maps;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.Selectors;
 import org.apache.log4j.Logger;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
@@ -55,56 +174,8 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.jboss.resteasy.util.GenericType;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
-import org.objectweb.proactive.utils.StackTraceUtil;
-import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.SortOrder;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
-import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
-import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
-import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
-import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
@@ -140,8 +211,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @SuppressWarnings("unchecked")
     private static final List<SortParameter<JobSortParameter>> DEFAULT_JOB_SORT_PARAMS = Arrays.asList(
-            new SortParameter<JobSortParameter>(JobSortParameter.STATE, SortOrder.ASC),
-            new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.DESC));
+            new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
+            new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
 
     private static final Mapper mapper = new DozerBeanMapper(Collections
             .singletonList("org/ow2/proactive_grid_cloud_portal/scheduler/dozer-mappings.xml"));
@@ -174,7 +245,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             List<JobInfo> jobs = s.getJobs(index, range, new JobFilterCriteria(false, true, true, true),
                     DEFAULT_JOB_SORT_PARAMS);
-            List<String> ids = new ArrayList<String>(jobs.size());
+            List<String> ids = new ArrayList<>(jobs.size());
             for (JobInfo jobInfo : jobs) {
                 ids.add(jobInfo.getJobId().value());
             }
@@ -231,7 +302,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             List<JobInfo> jobInfoList = s.getJobs(index, range,
                     new JobFilterCriteria(false, true, true, true), DEFAULT_JOB_SORT_PARAMS);
-            List<UserJobData> userJobInfoList = new ArrayList<UserJobData>(jobInfoList.size());
+            List<UserJobData> userJobInfoList = new ArrayList<>(jobInfoList.size());
             for (JobInfo jobInfo : jobInfoList) {
                 userJobInfoList.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
@@ -295,12 +366,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             List<JobInfo> jobsInfo = s.getJobs(index, range, new JobFilterCriteria(onlyUserJobs, pending,
                 running, finished), DEFAULT_JOB_SORT_PARAMS);
-            List<UserJobData> jobs = new ArrayList<UserJobData>(jobsInfo.size());
+            List<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
             for (JobInfo jobInfo : jobsInfo) {
                 jobs.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
 
-            HashMap<Long, List<UserJobData>> map = new HashMap<Long, List<UserJobData>>(1);
+            HashMap<Long, List<UserJobData>> map = new HashMap<>(1);
             map.put(SchedulerStateListener.getInstance().getSchedulerStateRevision(), jobs);
             return map;
         } catch (PermissionException e) {
@@ -506,7 +577,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 return null;
             }
             Map<String, TaskResult> allResults = jobResult.getAllResults();
-            Map<String, String> res = new HashMap<String, String>(allResults.size());
+            Map<String, String> res = new HashMap<>(allResults.size());
             for (final Entry<String, TaskResult> entry : allResults.entrySet()) {
                 TaskResult taskResult = entry.getValue();
                 String value = getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
@@ -727,7 +798,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
 
             JobState jobState = s.getJobState(jobId);
-            List<String> tasksName = new ArrayList<String>(jobState.getTasks().size());
+            List<String> tasksName = new ArrayList<>(jobState.getTasks().size());
             for (TaskState ts : jobState.getTasks()) {
                 tasksName.add(ts.getId().getReadableName());
             }
@@ -740,70 +811,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @GET
-    @Path("jobs/{jobid}/image")
-    @Produces("application/json;charset=" + ENCODING)
-    public String getJobImage(@HeaderParam("sessionid")
-    String sessionId, @PathParam("jobid")
-    String jobId) throws IOException, NotConnectedRestException {
-        checkAccess(sessionId);
-
-        ZipFile jobArchive = new ZipFile(PortalConfiguration.jobIdToPath(jobId));
-        ZipEntry imageEntry = jobArchive.getEntry("JOB-INF/image.png");
-        if (imageEntry == null) {
-            throw new IOException("the file JOB-INF/image.png was not found in the job archive");
-        }
-        InputStream ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
-        // Encode in Base64
-        return new String(Base64.encodeBase64(IOUtils.toByteArray(ips)), ENCODING);
-    }
-
-    /**
-     * The job map is a XML file generated by the Studio describing the
-     * visual representation of a workflow.
-     *
-     * @throws IOException
-     *             when the job archive is not found
-     * @param sessionId
-     *            a valid session id
-     * @param jobId
-     *            the job id
-     * @return the map corresponding to the <code>jobId</code>
-     */
-    @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/map")
-    @Produces( { "application/json", "application/xml" })
-    public String getJobMap(@HeaderParam("sessionid")
-    String sessionId, @PathParam("jobid")
-    String jobId) throws IOException, NotConnectedRestException {
-        checkAccess(sessionId);
-
-        String map = "";
-        InputStream ips;
-
-        ZipFile jobArchive = new ZipFile(PortalConfiguration.jobIdToPath(jobId));
-        ZipEntry imageEntry = jobArchive.getEntry("JOB-INF/map.xml");
-        if (imageEntry == null) {
-            throw new IOException("the file JOB-INF/map.xml was not found in the job archive");
-        }
-        ips = new BufferedInputStream(jobArchive.getInputStream(imageEntry));
-        InputStreamReader ipsr = new InputStreamReader(ips);
-        BufferedReader br = new BufferedReader(ipsr);
-        String ligne;
-        while ((ligne = br.readLine()) != null) {
-            map += ligne + "\n";
-        }
-        br.close();
-
-        return map;
     }
 
     /**
@@ -871,21 +878,42 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/log/full");
+            Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/log/full");
 
-            JobState jobState = s.getJobState(jobId);
+            JobState jobState = scheduler.getJobState(jobId);
 
-            List<InputStream> streams = new ArrayList<InputStream>();
             List<TaskState> tasks = jobState.getTasks();
+            List<InputStream> streams = new ArrayList<>(tasks.size());
+
             Collections.sort(tasks, TaskState.COMPARE_BY_FINISHED_TIME_ASC);
-            for (TaskState ts : tasks) {
-                String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + ts.getId() + ".log";
+
+            for (TaskState taskState : tasks) {
+
+                InputStream inputStream = null;
+
                 try {
-                    InputStream logFileAsStream = pullFile(sessionId, SchedulerConstants.USERSPACE_NAME,
-                            fullTaskLogsFile);
-                    streams.add(logFileAsStream);
+                    if (taskState.isPreciousLogs()) {
+                        inputStream =
+                                retrieveTaskLogsUsingDataspaces(sessionId, jobId, taskState.getId());
+                    } else {
+                        String taskLogs = retrieveTaskLogsUsingDatabase(sessionId, jobId,
+                                taskState.getName());
+
+                        if (!taskLogs.isEmpty()) {
+                            inputStream =
+                                    IOUtils.toInputStream(taskLogs);
+                        }
+
+                        logger.warn("Retrieving truncated logs for task '" + taskState.getId() + "'");
+                    }
                 } catch (Exception e) {
-                    logger.info("Could not retrieve task log (could be a non finished or killed task)", e);
+                    logger.info(
+                            "Could not retrieve logs for task " + taskState.getId()
+                                    + " (could be a non finished or killed task)", e);
+                }
+
+                if (inputStream != null) {
+                    streams.add(inputStream);
                 }
             }
 
@@ -901,6 +929,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
+    }
+
+    public InputStream retrieveTaskLogsUsingDataspaces(String sessionId, String jobId, TaskId taskId) throws PermissionRestException, IOException, NotConnectedRestException {
+        String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + taskId + ".log";
+        return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME, fullTaskLogsFile);
     }
 
     /**
@@ -1096,13 +1129,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/all");
-            TaskResult tr = s.getTaskResult(jobId, taskname);
-            if ((tr != null) && (tr.getOutput() != null)) {
-                return tr.getOutput().getAllLogs(true);
-            } else {
-                return "";
-            }
+            return retrieveTaskLogsUsingDatabase(sessionId, jobId, taskname);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1112,6 +1139,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (UnknownTaskException e) {
             throw new UnknownTaskRestException(e);
         }
+    }
+
+    private String retrieveTaskLogsUsingDatabase(String sessionId, String jobId, String taskName) throws NotConnectedRestException, UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException, PermissionRestException {
+        Scheduler scheduler = checkAccess(sessionId,
+                "jobs/" + jobId + "/tasks/" + taskName + "/result/log/all");
+
+        TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
+
+        if (taskResult != null && taskResult.getOutput() != null) {
+            return taskResult.getOutput().getAllLogs(true);
+        }
+
+        return "";
     }
 
     /**
@@ -1238,8 +1278,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * Returns full logs generated by the task from user data spaces.
-     *
+     * Returns full logs generated by the task from user data spaces if task was run using the precious
+     * logs option. Otherwise, logs are retrieved from the database. In this last case they may be truncated.
      *
      * @param sessionId
      *            a valid session id
@@ -1267,12 +1307,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 sessionId = session;
             }
 
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/all");
-            TaskResult tr = s.getTaskResult(jobId, taskname);
+            Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/all");
+            TaskResult taskResult = scheduler.getTaskResult(jobId, taskname);
 
-            if (tr != null) {
-                String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + tr.getTaskId() + ".log";
-                return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME, fullTaskLogsFile);
+            if (taskResult != null) {
+                JobState jobState = scheduler.getJobState(taskResult.getTaskId().getJobId());
+
+                boolean hasPreciousLogs = false;
+                for (Task task : jobState.getTasks()) {
+                    if (task.getName().equals(taskname)) {
+                        hasPreciousLogs = task.isPreciousLogs();
+                        break;
+                    }
+                }
+
+                if (hasPreciousLogs) {
+                    return retrieveTaskLogsUsingDataspaces(sessionId, jobId, taskResult.getTaskId());
+                } else {
+                    logger.warn("Retrieving truncated logs for task '" + taskname + "'");
+                    return IOUtils.toInputStream(retrieveTaskLogsUsingDatabase(sessionId, jobId, taskname));
+                }
             } else {
                 return null;
             }
@@ -1542,7 +1596,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
         try {
-            Scheduler s = checkAccess(sessionId, "submit");
+            Scheduler scheduler = checkAccess(sessionId, "submit");
 
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
 
@@ -1551,6 +1605,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             try {
 
                 InputPart part1 = multipart.getFormDataMap().get(name).get(0); // "file"
+
+                String fileType = part1.getMediaType().toString().toLowerCase();
+                if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase())) {
+                    throw new JobCreationRestException("Unknown job descriptor type: " + fileType);
+                }
+
                 // is the name of the browser's input field
                 InputStream is = part1.getBody(new GenericType<InputStream>() {});
                 tmpJobFile = File.createTempFile("job", "d");
@@ -1558,11 +1618,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 IOUtils.copy(is, new FileOutputStream(tmpJobFile));
 
                 Map<String, String> jobVariables = getWorkflowVariablesFromPathSegment(pathSegment);
-                Boolean isXml = isXmlWorkflow(part1);
 
-                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
+                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
 
-                JobId jobId = workflowSubmitter.submit(tmpJobFile, isXml, jobVariables);
+                JobId jobId = workflowSubmitter.submit(tmpJobFile, jobVariables);
 
                 return mapper.map(jobId, JobIdData.class);
 
@@ -1672,7 +1731,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         return true;
-
     }
 
     /**
@@ -1713,7 +1771,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             logger.info("[pullFile] reading directory content from " + sourcefo.getURL());
             // if it's a folder we return an InputStream listing its content
             StringBuilder sb = new StringBuilder();
-            String nl = System.getProperty("line.separator");
+            String nl = System.lineSeparator();
             for (FileObject fo : sourcefo.getChildren()) {
                 sb.append(fo.getName().getBaseName() + nl);
 
@@ -2301,7 +2359,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     private static <T> List<T> map(List<?> toMaps, Class<T> type) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (Object toMap : toMaps) {
             result.add(mapper.map(toMap, type));
         }
@@ -2361,8 +2419,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public List<JobUsageData> getUsageOnMyAccount(@HeaderParam("sessionid")
     String sessionId, @QueryParam("startdate")
-    @DateFormatter.DateFormat()
-    Date startDate, @QueryParam("enddate")
+    @DateFormatter.DateFormat() Date startDate, @QueryParam("enddate")
     @DateFormatter.DateFormat()
     Date endDate) throws NotConnectedRestException, PermissionRestException {
         try {
@@ -2425,8 +2482,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             tmpFile = File.createTempFile("valid-job", "d");
             IOUtils.copy(is, new FileOutputStream(tmpFile));
 
-            return (APPLICATION_XML_TYPE.equals(part1.getMediaType())) ? validateJobDescriptor(tmpFile)
-                    : ValidationUtil.validateJobArchive(tmpFile);
+            return validateJobDescriptor(tmpFile);
         } catch (IOException e) {
             JobValidationData validation = new JobValidationData();
             validation.setErrorMessage("Cannot read from the job validation request.");
@@ -2519,8 +2575,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @POST
     @Path("/events")
     @Produces("application/json")
-    public EventNotification publish(@Context
-    HttpServletRequest req, EventSubscription subscription) throws NotConnectedRestException,
+    public EventNotification publish(@Context HttpServletRequest req, EventSubscription subscription) throws NotConnectedRestException,
             PermissionRestException {
         HttpSession session = req.getSession();
         String broadcasterId = (String) session.getAttribute(ATM_BROADCASTER_ID);

@@ -301,7 +301,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public JobId submit(Job userJob) throws NotConnectedException, PermissionException,
             SubmissionClosedException, JobCreationException {
-        logger.info("New job submission requested : " + userJob.getName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("New job submission requested : " + userJob.getName());
+        }
 
         //check if the scheduler is stopped
         if (!schedulingService.isSubmitPossible()) {

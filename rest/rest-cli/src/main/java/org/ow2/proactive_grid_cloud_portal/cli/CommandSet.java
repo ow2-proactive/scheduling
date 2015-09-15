@@ -121,12 +121,6 @@ public class CommandSet {
             "submit(job-descriptor,[var1=value1,var2=value2,...]").commandClass(SubmitJobCommand.class)
             .entry();
 
-    public static final CommandSet.Entry SUBMIT_ARCH = CommandSetEntryBuilder.newInstance().opt("sa")
-            .longOpt("submitarchive").description("Submit the specified job archive (JAR|ZIP) file").hasArgs(
-                    true).argNames("job-archive [var1=value1 var2=value2 ...]").jsCommand(
-                    "submitarchive(job-archive,[var1=value1,var2=value2,...])").commandClass(
-                    SubmitJobCommand.class).entry();
-
     public static final CommandSet.Entry SCHED_START = CommandSetEntryBuilder.newInstance().opt("start")
             .longOpt("startscheduler").description("Start the Scheduler").jsCommand("start()").commandClass(
                     StartCommand.class).entry();
@@ -382,7 +376,7 @@ public class CommandSet {
     /** CommandSet.Entry objects which are specific to Scheduler CLI */
     public static final CommandSet.Entry[] SCHED_ONLY = new CommandSet.Entry[] { SCHED_START, SCHED_STOP,
             SCHED_PAUSE, SCHED_RESUME, SCHED_FREEZE, SCHED_KILL, LINK_RM, SCHED_STATS, JOB_LIST, SUBMIT_DESC,
-            SUBMIT_ARCH, JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL,
+            JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL,
             JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE, DOWNLOAD_FILE,
             PUT_THIRD_PARTY_CREDENTIAL, REMOVE_THIRD_PARTY_CREDENTIAL, THIRD_PARTY_CREDENTIAL_KEY_SET,
             SCHED_HELP, LIVE_LOG };

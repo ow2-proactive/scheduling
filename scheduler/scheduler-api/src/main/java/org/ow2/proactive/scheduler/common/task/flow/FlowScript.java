@@ -40,8 +40,6 @@ import java.io.Reader;
 import java.io.StringReader;
 
 import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -63,7 +61,7 @@ import it.sauronsoftware.cron4j.Predictor;
  * to determine which {@link FlowAction} is attached to this script
  * <p>
  * Available after the execution of the script with {@link FlowScript#execute()}, 
- * the method {@link FlowScript#getResult(Bindings)} returns the {@link FlowAction} which is enabled
+ * the method {@link org.ow2.proactive.scripting.Script#getResult(Object, javax.script.Bindings)} returns the {@link FlowAction} which is enabled
  * or disabled depending the value of the {@link FlowScript#enabledVariable} variable set in the script.
  * <p>
  * When using the action type {@link FlowActionType#REPLICATE}, the value of the 
@@ -481,7 +479,7 @@ public class FlowScript extends Script<FlowAction> {
     }
 
     @Override
-    protected ScriptResult<FlowAction> getResult(Bindings bindings) {
+    protected ScriptResult<FlowAction> getResult(Object evalResult, Bindings bindings) {
         try {
             FlowAction act = new FlowAction();
 

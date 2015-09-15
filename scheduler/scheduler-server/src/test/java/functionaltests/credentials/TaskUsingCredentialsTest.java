@@ -36,7 +36,6 @@ package functionaltests.credentials;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Set;
 
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -44,18 +43,17 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.junit.Test;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 import static org.junit.Assert.*;
 
 
-public class TaskUsingCredentialsTest extends SchedulerConsecutive {
+public class TaskUsingCredentialsTest extends SchedulerFunctionalTest {
     private static URL jobDescriptor = TaskUsingCredentialsTest.class
             .getResource("/functionaltests/descriptors/Job_UsingCredentials.xml");
 
@@ -66,24 +64,24 @@ public class TaskUsingCredentialsTest extends SchedulerConsecutive {
     }
 
     private void jobs_using_third_party_credentials() throws Exception {
-        Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
         scheduler.putThirdPartyCredential("MY_APP_PASSWORD", "superpassword");
 
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
 
         if (OperatingSystem.getOperatingSystem() == org.objectweb.proactive.utils.OperatingSystem.unix) {
             NativeTask nativeTask = new NativeTask();
-            nativeTask.setCommandLine("echo", "$CREDENTIALS_MY_APP_PASSWORD");
+            nativeTask.setCommandLine("echo", "$credentials_MY_APP_PASSWORD");
             job.addTask(nativeTask);
         }
 
         JobId jobId = scheduler.submit(job);
 
-        SchedulerTHelper.waitForEventJobFinished(jobId);
+        schedulerHelper.waitForEventJobFinished(jobId);
 
-        JobResult jobResult = SchedulerTHelper.getJobResult(jobId);
+        JobResult jobResult = schedulerHelper.getJobResult(jobId);
         for (TaskResult taskResult : jobResult.getAllResults().values()) {
             assertTrue("task " + taskResult.getTaskId().getReadableName() + " did not print the credential", taskResult
                     .getOutput().getAllLogs(false).contains("superpassword"));
@@ -91,7 +89,7 @@ public class TaskUsingCredentialsTest extends SchedulerConsecutive {
     }
 
     public void third_party_credentials_api() throws Exception {
-        Scheduler scheduler = SchedulerTHelper.getSchedulerInterface();
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
         String longPassword = "-----BEGIN RSA PRIVATE KEY-----\n"
             + "MIIEowIBAAKCAQEAxO0WhOyc4qv5aSNi8MMrDJOo3qmkpbkcOSvy4FJPOq4ZfnJ3\n"
@@ -122,11 +120,12 @@ public class TaskUsingCredentialsTest extends SchedulerConsecutive {
         scheduler.putThirdPartyCredential("MY_APP_PASSWORD", longPassword);
 
         Set<String> credentialsKeySet = scheduler.thirdPartyCredentialsKeySet();
-        assertEquals(Collections.singleton("MY_APP_PASSWORD"), credentialsKeySet);
+        assertTrue(credentialsKeySet.contains("MY_APP_PASSWORD"));
 
         scheduler.removeThirdPartyCredential("MY_APP_PASSWORD");
 
         Set<String> emptyCredentialsKeySet = scheduler.thirdPartyCredentialsKeySet();
-        assertTrue(emptyCredentialsKeySet.isEmpty());
+        assertFalse(emptyCredentialsKeySet.contains("MY_APP_PASSWORD"));
+
     }
 }

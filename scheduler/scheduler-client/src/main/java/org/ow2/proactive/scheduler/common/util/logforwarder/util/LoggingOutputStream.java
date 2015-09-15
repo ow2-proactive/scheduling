@@ -54,7 +54,7 @@ public class LoggingOutputStream extends OutputStream {
     /**
      * System dependent line return char(s).
      */
-    static final byte[] lineSepBytes = System.getProperty("line.separator").getBytes();
+    static final byte[] lineSepBytes = System.lineSeparator().getBytes();
 
     /**
      * The default number of bytes in the buffer. =2048
@@ -204,6 +204,7 @@ public class LoggingOutputStream extends OutputStream {
 
         System.arraycopy(buf, 0, theBytes, 0, count);
 
+        //logger.log(level, (new String(theBytes)).trim());
         logger.log(level, new String(theBytes));
 
         reset();

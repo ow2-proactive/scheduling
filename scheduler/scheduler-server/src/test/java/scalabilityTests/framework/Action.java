@@ -45,5 +45,5 @@ package scalabilityTests.framework;
  */
 public interface Action<Arg, Res> {
 
-    public Res execute(Arg arg) throws Exception;
+    Res execute(Arg arg) throws Exception;
 }

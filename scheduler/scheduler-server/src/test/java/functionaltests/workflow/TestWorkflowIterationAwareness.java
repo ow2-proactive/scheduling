@@ -46,15 +46,17 @@ import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.junit.Assert;
+import org.junit.Test;
 
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
+import functionaltests.utils.SchedulerFunctionalTest;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -64,9 +66,7 @@ import functionaltests.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
-
-    private static final String tmp_dir_Windows = "C:\\tmp\\";
+public class TestWorkflowIterationAwareness extends SchedulerFunctionalTest {
 
     private static final URL java_job = TestWorkflowIterationAwareness.class
             .getResource("/functionaltests/workflow/descriptors/flow_it_1.xml");
@@ -74,49 +74,15 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
     private static final URL native_job = TestWorkflowIterationAwareness.class
             .getResource("/functionaltests/workflow/descriptors/flow_it_2.xml");
 
+    private static final String tmpFolder = System.getProperty("java.io.tmpdir");
+
     private static final String preScript = //
-    "def f = new File(\"" + System.getProperty("java.io.tmpdir") + "/PRE_$IT_$REP\"); \n" + //
-        "f.createNewFile(); \n";
-
-    private static final String preScriptWindows = //
-    "def f = new File(\"" + tmp_dir_Windows.replace("\\", "\\\\") + "PRE_$IT_$REP\"); \n" + //
-
+    "def f = new File(System.getProperty(\"java.io.tmpdir\")+\"" + "/PRE_" + "\"+ variables.get('PA_TASK_ITERATION') + \"" + "_" + "\"+ variables.get('PA_TASK_REPLICATION') +\"" + "\"); \n" + //
         "f.createNewFile(); \n";
 
     private static final String postScript = //
-    "def f = new File(\"" //
-        +
-        System.getProperty("java.io.tmpdir") + "/POST_$IT_$REP\"); \n" //
-        + "f.createNewFile(); \n";
-
-    private static final String postScriptWindows = //
-    "def f = new File(\"" //
-        +
-        tmp_dir_Windows.replace("\\", "\\\\") + "POST_$IT_$REP\"); \n" //
-        + "f.createNewFile(); \n";
-
-    private static final String dupScript = "enabled = true; \n" + "runs = 2; \n";
-
-    private static final String loopScript = //
-    "defID   = 3; \n" //
-        + "defRUNS = 2; \n" //
-        + "def f = new File(java.lang.System.getProperty(\"java.io.tmpdir\"), \"test_flow_lock_\" + ID); \n" //
-        + "defit = 0; \n" //
-        + "if (f.exists()) { \n" //
-        + "definput = new BufferedReader(new FileReader(f)); \n" //
-        + "it = java.lang.Integer.parseInt(input.readLine()); \n" + "input.close(); \n" //
-        + "f[\"delete\"](); \n" //
-        + "} \n" //
-        + "it++;\n" //
-        + "if (it < RUNS) { \n" //
-        + "loop = true; \n" //
-        + "f.createNewFile(); \n" //
-        + "defoutput = new BufferedWriter(new FileWriter(f)); \n" //
-        + "output.write(\"\" + it); \n" //
-        + "output.close(); \n" //
-        + "} else { \n" //
-        + "loop = false; \n" //
-        + "} \n";
+      "def f = new File(System.getProperty(\"java.io.tmpdir\")+\"" + "/POST_" + "\"+ variables.get('PA_TASK_ITERATION') + \"" + "_" + "\"+ variables.get('PA_TASK_REPLICATION') +\"" + "\"); \n" + //
+        "f.createNewFile(); \n";
 
     /**
      * Checks Java and Native executables
@@ -125,14 +91,8 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
      * 
      * @throws Throwable
      */
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
-
-        File tmpDir = new File(tmp_dir_Windows);
-        if (!tmpDir.exists()) {
-            tmpDir.mkdir();
-        }
-
         testJavaJob();
         testNativeJob();
     }
@@ -140,26 +100,16 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
     /**
      * java task through xml
      */
-    private static void testJavaJob() throws Throwable {
+    private void testJavaJob() throws Throwable {
 
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(java_job.toURI()).getAbsolutePath());
-        switch (OperatingSystem.getOperatingSystem()) {
-            case windows:
-                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "groovy"));
-                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "groovy"));
-                break;
-            case unix:
-                ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
-                ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
-                break;
-            default:
-                throw new IllegalStateException("Unsupported operating system");
-        }
+        ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
+        ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
 
-        JobId id = TWorkflowJobs.testJobSubmission(job, null);
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
+        JobId id = TWorkflowJobs.testJobSubmission(schedulerHelper, job, null);
+        JobResult res = schedulerHelper.getJobResult(id);
+        Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
         int n = 4;
         for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
@@ -177,44 +127,44 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 checkResult(result.getValue().toString(), "T1#1*1", "1", "1");
             }
         }
-        Assert.assertTrue("Expected 4 tasks, misses " + n, n == 0);
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
+        assertTrue("Expected 4 tasks, misses " + n, n == 0);
+        schedulerHelper.removeJob(id);
+        schedulerHelper.waitForEventJobRemoved(id);
     }
 
     /**
      * native task through xml
      */
-    private static void testNativeJob() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) JobFactory_stax.getFactory().createJob(
+    private void testNativeJob() throws Throwable {
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(native_job.toURI()).getAbsolutePath());
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScriptWindows, "groovy"));
-                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScriptWindows, "groovy"));
+                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
+                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
                 String[] tab = ((NativeTask) job.getTask("T1")).getCommandLine();
                 tab[0] = "\"" + tab[0].replace("it.sh", "it.bat") + "\"";
-                tab[1] = tmp_dir_Windows;
+                tab[1] = tmpFolder;
                 ((NativeTask) job.getTask("T1")).setCommandLine(tab);
                 break;
             case unix:
-                ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
-                ((NativeTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
+                job.getTask("T1").setPreScript(new SimpleScript(preScript, "groovy"));
+                job.getTask("T1").setPostScript(new SimpleScript(postScript, "groovy"));
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }
 
-        JobId id = TWorkflowJobs.testJobSubmission(job, null);
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
+        JobId id = TWorkflowJobs.testJobSubmission(schedulerHelper, job, null);
+        JobResult res = schedulerHelper.getJobResult(id);
+        Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
         int n = 4;
         for (Entry<String, TaskResult> result : res.getAllResults().entrySet()) {
             String path = "";
             switch (OperatingSystem.getOperatingSystem()) {
                 case windows:
-                    File tmpdir = new File(tmp_dir_Windows, "native_result_");
+                    File tmpdir = new File(tmpFolder, "native_result_");
                     path = tmpdir.getAbsolutePath();
                     break;
 
@@ -255,10 +205,10 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 f.delete();
             }
         }
-        Assert.assertTrue("Expected 4 tasks, misses " + n, n == 0);
+        assertTrue("Expected 4 tasks, misses " + n, n == 0);
 
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
+        schedulerHelper.removeJob(id);
+        schedulerHelper.waitForEventJobRemoved(id);
     }
 
     private static void checkResult(String res, String name, String it, String dup) throws Throwable {
@@ -284,8 +234,8 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
         File post = null;
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                pre = new File(tmp_dir_Windows, "PRE_" + it + "_" + dup);
-                post = new File(tmp_dir_Windows, "POST_" + it + "_" + dup);
+                pre = new File(tmpFolder, "PRE_" + it + "_" + dup);
+                post = new File(tmpFolder, "POST_" + it + "_" + dup);
                 break;
             case unix:
                 pre = new File(System.getProperty("java.io.tmpdir"), "PRE_" + it + "_" + dup);
@@ -295,8 +245,8 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
                 throw new IllegalStateException("Operating system not supported");
         }
 
-        Assert.assertTrue("Could not find PRE file: " + pre.getAbsolutePath(), pre.exists());
-        Assert.assertTrue("Could not find POST file: " + post.getAbsolutePath(), post.exists());
+        assertTrue("Could not find PRE file: " + pre.getAbsolutePath(), pre.exists());
+        assertTrue("Could not find POST file: " + post.getAbsolutePath(), post.exists());
         pre.delete();
         post.delete();
     }

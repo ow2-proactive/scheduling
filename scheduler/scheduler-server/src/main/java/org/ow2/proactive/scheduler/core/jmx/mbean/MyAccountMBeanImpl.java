@@ -66,7 +66,7 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
             throws NotCompliantMBeanException {
         super(MyAccountMBean.class);
         this.accountsManager = accountsManager;
-        this.perThreadAccount = new ThreadLocal<SchedulerAccount>();
+        this.perThreadAccount = new ThreadLocal<>();
     }
 
     /**
@@ -82,7 +82,7 @@ public class MyAccountMBeanImpl extends StandardMBean implements MyAccountMBean 
             throws NotCompliantMBeanException {
         super(mbeanInterface);
         this.accountsManager = accountsManager;
-        this.perThreadAccount = new ThreadLocal<SchedulerAccount>();
+        this.perThreadAccount = new ThreadLocal<>();
     }
 
     public int getTotalTaskCount() {

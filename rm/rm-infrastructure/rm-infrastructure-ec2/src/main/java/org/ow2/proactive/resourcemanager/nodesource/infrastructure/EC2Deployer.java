@@ -106,8 +106,8 @@ public class EC2Deployer implements java.io.Serializable {
     /**
      * Once an image descriptor is retrieved, cache it 
      */
-    private Map<String, ImageDescription> cachedImageDescriptors = Collections
-            .synchronizedMap(new HashMap<String, ImageDescription>());
+    private Map<String, ImageDescription> cachedImageDescriptors =
+            Collections.synchronizedMap(new HashMap<String, ImageDescription>());
 
     /**
      * EC2 server URL - the EC2 zone used depends on this url
@@ -127,7 +127,7 @@ public class EC2Deployer implements java.io.Serializable {
      * Constructs a new node deployer for Amazon EC2
      */
     public EC2Deployer() {
-        this.instanceIds = new ArrayList<String>();
+        this.instanceIds = new ArrayList<>();
         this.active = false;
         this.minInstances = 1;
         this.maxInstances = 1;
@@ -206,7 +206,7 @@ public class EC2Deployer implements java.io.Serializable {
         if (ec2req == null)
             return null;
 
-        List<String> params = new ArrayList<String>();
+        List<String> params = new ArrayList<>();
 
         if (!all)
             params.add(AWS_USER);
@@ -268,9 +268,9 @@ public class EC2Deployer implements java.io.Serializable {
         if (ec2req == null)
             return null;
 
-        List<String> params = new ArrayList<String>();
+        List<String> params = new ArrayList<>();
         List<ReservationDescription> res = null;
-        List<Instance> instances = new ArrayList<Instance>();
+        List<Instance> instances = new ArrayList<>();
 
         try {
             res = ec2req.describeInstances(params);

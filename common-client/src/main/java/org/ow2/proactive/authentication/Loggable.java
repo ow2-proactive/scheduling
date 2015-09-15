@@ -51,5 +51,5 @@ public interface Loggable {
      *
      * @return a logger for further utilization
      */
-    public Logger getLogger();
+    Logger getLogger();
 }

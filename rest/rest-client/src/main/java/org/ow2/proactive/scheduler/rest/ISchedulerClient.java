@@ -34,24 +34,16 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
-import javax.ws.rs.core.StreamingOutput;
-
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -71,7 +63,7 @@ public interface ISchedulerClient extends Scheduler {
      * @throws Exception
      *             if an error occurs during the initialization
      */
-    public void init(String url, String login, String password) throws Exception;
+    void init(String url, String login, String password) throws Exception;
 
     /**
      * Initialize this instance.
@@ -86,21 +78,21 @@ public interface ISchedulerClient extends Scheduler {
      * @throws Exception
      *             if an error occurs during the initialization
      */
-    public void initInsecure(String url, String login, String password) throws Exception;
+    void initInsecure(String url, String login, String password) throws Exception;
 
     /**
      * Sets the session identifier explicitly.
      *
      * @param sid session identifier
      */
-    public void setSession(String sid);
+    void setSession(String sid);
 
     /**
      * Retrieves the current session identifier.
      *
      * @return the current session identifier
      */
-    public String getSession();
+    String getSession();
 
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the
@@ -117,7 +109,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the user does not have permission to view the state of the
      *             specified job
      */
-    public boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException,
+    boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException,
             PermissionException;
 
     /**
@@ -129,7 +121,7 @@ public interface ISchedulerClient extends Scheduler {
      *
      * @see #isJobFinished(JobId)
      */
-    public boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException,
+    boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException;
 
     /**
@@ -146,7 +138,7 @@ public interface ISchedulerClient extends Scheduler {
      *
      * @param timeout
      *            the maximum amount of time to wait
-     * @return
+     * @return the result associated to the job which has been executed
      * @throws NotConnectedException
      *             if the client is not logged in or the session has expired
      * @throws UnknownJobException
@@ -158,7 +150,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the job execution does not finish before the elapse of
      *             wait time
      */
-    public JobResult waitForJob(JobId jobId, long timeout) throws NotConnectedException, UnknownJobException,
+    JobResult waitForJob(JobId jobId, long timeout) throws NotConnectedException, UnknownJobException,
             PermissionException, TimeoutException;
 
     /**
@@ -174,7 +166,7 @@ public interface ISchedulerClient extends Scheduler {
      *            the job identifier string
      * @see #waitForJob(JobId, long)
      */
-    public JobResult waitForJob(String jobId, long timeout) throws NotConnectedException,
+    JobResult waitForJob(String jobId, long timeout) throws NotConnectedException,
             UnknownJobException, PermissionException, TimeoutException;
 
     /**
@@ -196,7 +188,7 @@ public interface ISchedulerClient extends Scheduler {
      * @throws UnknownTaskException
      *             if the task name is invalid
      */
-    public boolean isTaskFinished(String jobId, String taskName) throws UnknownJobException,
+    boolean isTaskFinished(String jobId, String taskName) throws UnknownJobException,
             NotConnectedException, PermissionException, UnknownTaskException;
 
     /**
@@ -224,7 +216,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the task execution does not finish before the elapse of
      *             wait time
      */
-    public TaskResult waitForTask(String jobId, String taskName, long timeout) throws UnknownJobException,
+    TaskResult waitForTask(String jobId, String taskName, long timeout) throws UnknownJobException,
             NotConnectedException, PermissionException, UnknownTaskException, TimeoutException;
 
     /**
@@ -251,7 +243,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the execution of all jobs specified does not finish before
      *             the elapse of specified wait time
      */
-    public List<JobResult> waitForAllJobs(List<String> jobIds, long timeout) throws NotConnectedException,
+    List<JobResult> waitForAllJobs(List<String> jobIds, long timeout) throws NotConnectedException,
             UnknownJobException, PermissionException, TimeoutException;
 
     /**
@@ -277,7 +269,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if none of the executions of jobs finishes before the elapse
      *             of wait time
      */
-    public Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds, long timeout)
+    Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds, long timeout)
             throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException;
 
     /**
@@ -308,7 +300,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if none of the executions of tasks finish before the elapse
      *             of wait time
      */
-    public Entry<String, TaskResult> waitForAnyTask(String jobId, List<String> taskNames, long timeout)
+    Entry<String, TaskResult> waitForAnyTask(String jobId, List<String> taskNames, long timeout)
             throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
             TimeoutException;
 
@@ -341,7 +333,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if all the executions of the tasks do not finish before the
      *             elapse of maximum wait time
      */
-    public List<Entry<String, TaskResult>> waitForAllTasks(String jobId, List<String> taskNames, long timeout)
+    List<Entry<String, TaskResult>> waitForAllTasks(String jobId, List<String> taskNames, long timeout)
             throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
             TimeoutException;
 
@@ -364,7 +356,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the user does not have permission to upload the file to
      *             the specified dataspace
      */
-    public boolean pushFile(String spacename, String pathname, String filename, String file)
+    boolean pushFile(String spacename, String pathname, String filename, String file)
             throws NotConnectedException, PermissionException;
 
     /**
@@ -382,7 +374,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the user does not have permission to retrieve the
      *             specified file from the server
      */
-    public void pullFile(String space, String pathname, String outputFile) throws NotConnectedException,
+    void pullFile(String space, String pathname, String outputFile) throws NotConnectedException,
             PermissionException;
 
     /**
@@ -399,29 +391,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the user does not have permission to delete the file from
      *             the server
      */
-    public boolean deleteFile(String space, String pathname) throws NotConnectedException,
+    boolean deleteFile(String space, String pathname) throws NotConnectedException,
             PermissionException;
 
-    /**
-     * Creates a job archive with self contained job classpath elements and submits to the scheduler.
-     *
-     * A user can only managed their jobs.
-     * <p>
-     * It will execute the tasks of the jobs as soon as resources are available.
-     * The job will be considered as finished once every tasks have finished (error or success).
-     * </p>
-     * Thus, user could get the job result according to the precious result.
-     * <br /><br />
-     * It is possible to get a listener on the scheduler.
-     * (see {@link Scheduler#addEventListener(SchedulerEventListener, boolean, SchedulerEvent...)} for more details)
-     *
-     * @param job the new job to submit.
-     * @return the generated new job ID.
-     * @throws NotConnectedException if you are not authenticated.
-     * @throws PermissionException if you can't access to this particular method.
-     * @throws SubmissionClosedException if the submit action could not be performed.
-     * @throws JobCreationException if Their was a problem while creation the job
-     */
-    public JobId submitAsJobArchive(Job job) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException;
 }

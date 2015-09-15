@@ -111,7 +111,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @param rmcore Stub of the RMCore active object.
      */
     public RMMonitoringImpl(RMCore rmcore) {
-        this.dispatchers = new HashMap<UniqueID, EventDispatcher>();
+        this.dispatchers = new HashMap<>();
         this.rmcore = rmcore;
     }
 
@@ -174,7 +174,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                 this.eventTypes = Arrays.asList(eventTypes);
             }
 
-            this.events = new LinkedList<RMEvent>();
+            this.events = new LinkedList<>();
         }
 
         public void run() {
@@ -289,7 +289,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             }
 
             while (true) {
-                LinkedList<RMEvent> toDeliver = new LinkedList<RMEvent>();
+                LinkedList<RMEvent> toDeliver = new LinkedList<>();
                 synchronized (events) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(events.size() + " pending events for the client '" + client + "'");

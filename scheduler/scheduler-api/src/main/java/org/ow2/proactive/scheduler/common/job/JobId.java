@@ -55,7 +55,7 @@ public interface JobId extends Comparable<JobId>, Serializable {
      *
      * @return the human readable name associated to this id.
      */
-    public String getReadableName();
+    String getReadableName();
 
     /**
      * Get the value of the JobId.<br />
@@ -65,6 +65,6 @@ public interface JobId extends Comparable<JobId>, Serializable {
      * 
      * @return the textual representation of this jobId
      */
-    public String value();
+    String value();
 
 }

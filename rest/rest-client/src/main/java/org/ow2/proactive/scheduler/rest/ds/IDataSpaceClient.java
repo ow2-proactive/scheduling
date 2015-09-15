@@ -51,7 +51,7 @@ import java.util.Map;
 
 public interface IDataSpaceClient {
 
-    public enum Dataspace {
+    enum Dataspace {
         USER("user"), GLOBAL("global");
 
         private String value;
@@ -75,12 +75,12 @@ public interface IDataSpaceClient {
      * @throws PermissionException   if the user does not have permission to upload the file to
      *                               the specified location in the server
      */
-    public boolean create(IRemoteSource source) throws NotConnectedException, PermissionException;
+    boolean create(IRemoteSource source) throws NotConnectedException, PermissionException;
 
-    public boolean download(IRemoteSource source, ILocalDestination destination)
+    boolean download(IRemoteSource source, ILocalDestination destination)
             throws NotConnectedException, PermissionException;
 
-    public boolean upload(ILocalSource source, IRemoteDestination destination) throws NotConnectedException,
+    boolean upload(ILocalSource source, IRemoteDestination destination) throws NotConnectedException,
             PermissionException;
 
     /**
@@ -93,7 +93,7 @@ public interface IDataSpaceClient {
      *             if the user does not have permission to upload the file to
      *             the specified location in the server
      */
-    public ListFile list(IRemoteSource source) throws NotConnectedException, PermissionException;
+    ListFile list(IRemoteSource source) throws NotConnectedException, PermissionException;
 
     /**
      * Deletes the specified directory or the file from the <i>dataspace</i>.
@@ -104,7 +104,7 @@ public interface IDataSpaceClient {
      *             if the user does not have permission to upload the file to
      *             the specified location in the server
      */
-    public boolean delete(IRemoteSource source) throws NotConnectedException, PermissionException;
+    boolean delete(IRemoteSource source) throws NotConnectedException, PermissionException;
 
     /**
      * Returns the metadata map of the specified file in the <i>dataspace</i>.
@@ -116,7 +116,7 @@ public interface IDataSpaceClient {
      *             if the user does not have permission to upload the file to
      *             the specified location in the server
      */
-    public Map<String, String> metadata(IRemoteSource source) throws NotConnectedException,
+    Map<String, String> metadata(IRemoteSource source) throws NotConnectedException,
             PermissionException;
 
     /**
@@ -125,7 +125,7 @@ public interface IDataSpaceClient {
      *
      * @return an instance of {@link RemoteSpace}
      */
-    public RemoteSpace getGlobalSpace();
+    RemoteSpace getGlobalSpace();
 
     /**
      * Returns a {@link RemoteSpace} implementation instance which represents
@@ -133,34 +133,34 @@ public interface IDataSpaceClient {
      *
      * @return an instance of {@link RemoteSpace}
      */
-    public RemoteSpace getUserSpace();
+    RemoteSpace getUserSpace();
 
-    public interface IRemoteSource {
-        public Dataspace getDataspace();
+    interface IRemoteSource {
+        Dataspace getDataspace();
 
-        public String getPath();
+        String getPath();
 
-        public List<String> getIncludes();
+        List<String> getIncludes();
 
-        public List<String> getExcludes();
+        List<String> getExcludes();
 
-        public FileType getType();
+        FileType getType();
     }
 
-    public interface ILocalDestination {
-        public void readFrom(InputStream is, String encoding) throws IOException;
+    interface ILocalDestination {
+        void readFrom(InputStream is, String encoding) throws IOException;
     }
 
-    public interface ILocalSource {
-        public void writeTo(OutputStream outputStream) throws IOException;
+    interface ILocalSource {
+        void writeTo(OutputStream outputStream) throws IOException;
 
-        public String getEncoding() throws IOException;
+        String getEncoding() throws IOException;
     }
 
-    public interface IRemoteDestination {
-        public Dataspace getDataspace();
+    interface IRemoteDestination {
+        Dataspace getDataspace();
 
-        public String getPath();
+        String getPath();
     }
 
 }

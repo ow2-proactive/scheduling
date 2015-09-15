@@ -48,5 +48,5 @@ public interface Account {
      * Returns the name of this account.
      * @return The name of this account
      */
-    public String getName();
+    String getName();
 }

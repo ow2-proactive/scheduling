@@ -75,10 +75,11 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     public static final int DESC_ORDER = 2;
     protected static int currentSort = SORT_BY_ID;
     protected static int currentOrder = ASC_ORDER;
+
     public static final Comparator<TaskState> COMPARE_BY_FINISHED_TIME_ASC = new Comparator<TaskState>() {
         @Override
         public int compare(TaskState task1, TaskState task2) {
-            return Long.valueOf(task1.getFinishedTime()).compareTo(task2.getFinishedTime());
+            return Long.compare(task1.getFinishedTime(), task2.getFinishedTime());
         }
     };
 

@@ -69,5 +69,5 @@ public interface SchedulerAuthenticationInterface extends Authentication {
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws AlreadyConnectedException thrown if this client is already connected to the Scheduler.
      */
-    public Scheduler login(Credentials cred) throws LoginException, AlreadyConnectedException;
+    Scheduler login(Credentials cred) throws LoginException, AlreadyConnectedException;
 }

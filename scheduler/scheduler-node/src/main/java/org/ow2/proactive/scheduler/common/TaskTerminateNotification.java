@@ -36,26 +36,29 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 
 /**
- *
  * Interface that can be notified of a task termination
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1
  */
 @PublicAPI
-public interface TaskTerminateNotification {
+public interface TaskTerminateNotification extends Serializable {
 
     /**
      * Invoke by a task when it is about to finish.
      *
      * @param taskId the identification of the executed task.
      */
-    public void terminate(TaskId taskId, TaskResult taskResult);
+    void terminate(TaskId taskId, TaskResult taskResult) throws TerminateTaskException;
 
+    class TerminateTaskException extends Exception {
+    }
 }

@@ -71,15 +71,6 @@ public enum PASchedulerProperties {
     /** Defines the maximum number of tasks to be scheduled in each scheduling loop. */
     SCHEDULER_POLICY_NBTASKPERLOOP("pa.scheduler.policy.nbtaskperloop", PropertyType.INTEGER),
 
-    /** Forked java task default policy path */
-    SCHEDULER_DEFAULT_FJT_SECURITY_POLICY("pa.scheduler.forkedtask.security.policy", PropertyType.STRING),
-
-    /** Log4J forked java task default file path */
-    SCHEDULER_DEFAULT_FJT_LOG4J("pa.scheduler.forkedtask.log4j", PropertyType.STRING),
-
-    /** ProActiveConfiguration forked java task default file path */
-    SCHEDULER_DEFAULT_FJT_PAConfig("pa.scheduler.forkedtask.paconfig", PropertyType.STRING),
-
     /** Scheduler main loop time out */
     SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PropertyType.INTEGER),
 
@@ -167,16 +158,6 @@ public enum PASchedulerProperties {
     SCHEDULER_LOGIN_METHOD("pa.scheduler.core.authentication.loginMethod", PropertyType.STRING),
 
     /* ***************************************************************** */
-    /* ******************** CLASSLOADING PROPERTIES ******************** */
-    /* ***************************************************************** */
-
-    /** Cache classes definition in task class servers  */
-    SCHEDULER_CLASSSERVER_USECACHE("pa.scheduler.classserver.usecache", PropertyType.BOOLEAN),
-
-    /** Temporary directory for jobclasspathes  */
-    SCHEDULER_CLASSSERVER_TMPDIR("pa.scheduler.classserver.tmpdir", PropertyType.STRING),
-
-    /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
 
@@ -192,6 +173,9 @@ public enum PASchedulerProperties {
     /** Remove job in dataBase when removing it from scheduler. */
     JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PropertyType.BOOLEAN),
 
+    /** Specific character encoding when parsing the job xml file */
+    SCHEDULER_JOB_FILE_ENCODING("pa.scheduler.job.file.encoding", PropertyType.STRING),
+
     /* ***************************************************************** */
     /* ************************ TASKS PROPERTIES *********************** */
     /* ***************************************************************** */
@@ -202,11 +186,8 @@ public enum PASchedulerProperties {
     /** Maximum number of execution for a task in case of failure (node down) */
     NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PropertyType.INTEGER),
 
-    /** If false user cannot execute java tasks in nodes and must use either forked java tasks of native tasks */
-    ALLOW_JAVA_TASKS("pa.scheduler.task.allowjavatasks", PropertyType.BOOLEAN),
-
     /** If true script tasks are ran in a forked JVM, if false they are ran in the node's JVM */
-    FORKED_SCRIPT_TASKS("pa.scheduler.task.scripttasks.fork", PropertyType.BOOLEAN),
+    TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN),
 
     /* ***************************************************************** */
     /* ********************** DATASPACES PROPERTIES ******************** */
@@ -466,7 +447,7 @@ public enum PASchedulerProperties {
      */
     public List<String> getValueAsList(String separator) {
         Properties prop = propertiesLoader.getProperties();
-        ArrayList<String> valueList = new ArrayList<String>();
+        ArrayList<String> valueList = new ArrayList<>();
         if (prop.containsKey(key)) {
             String value = prop.getProperty(key);
             for (String val : value.split(Pattern.quote(separator))) {

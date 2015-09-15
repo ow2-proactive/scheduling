@@ -109,7 +109,7 @@ public class SchedulerStateRestSecurityTest {
         return params;
     }
 
-    private final static Map<Class<?>, Object> defaultValues = new HashMap<Class<?>, Object>();
+    private final static Map<Class<?>, Object> defaultValues = new HashMap<>();
 
     static {
         defaultValues.put(String.class, "");

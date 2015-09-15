@@ -36,7 +36,14 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import org.apache.log4j.Logger;
+import java.security.PrivateKey;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -51,7 +58,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.util.VariablesUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
@@ -62,23 +69,17 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
-import org.ow2.proactive.scheduler.task.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.ExecutableContainerInitializer;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
-import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.NodeSet;
-
-import java.security.PrivateKey;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -137,6 +138,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         getRMProxiesManager().getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(nodeSet);
     }
 
+    private long s = System.currentTimeMillis();
+
     /**
      * Scheduling process. For this implementation, steps are :<br>
      * <ul>
@@ -165,7 +168,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         //get job Descriptor list with eligible jobs (running and pending)
         Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
         try {
-            List<JobDescriptor> descriptors = new ArrayList<JobDescriptor>(jobMap.size());
+            List<JobDescriptor> descriptors = new ArrayList<>(jobMap.size());
             descriptors.addAll(jobMap.values());
 
             //ask the policy all the tasks to be schedule according to the jobs list.
@@ -193,7 +196,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
 
                 //get the next compatible tasks from the whole returned policy tasks
-                LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<EligibleTaskDescriptor>();
+                LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
@@ -318,7 +321,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 } else {
                     //check if the task is compatible with the other previous one
                     if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
-                        tlogger.info(internalTask.getId(), "scheduling");
+                        tlogger.debug(internalTask.getId(), "scheduling");
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);
@@ -386,7 +389,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             SchedulerConstants.NODE_ACCESS_TOKEN));
                 }
 
-                Collection<String> computationDescriptors = new ArrayList<String>(tasksToSchedule.size());
+                Collection<String> computationDescriptors = new ArrayList<>(tasksToSchedule.size());
                 for (EligibleTaskDescriptor task : tasksToSchedule) {
                     computationDescriptors.add(task.getTaskId().toString());
                 }
@@ -426,12 +429,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         tlogger.debug(task.getId(), "initializing the executable container");
         ExecutableContainer container = getDBManager().loadExecutableContainer(task);
         task.setExecutableContainer(container);
-
-        ExecutableContainerInitializer eci = new ExecutableContainerInitializer();
-        // TCS can be null for non-java task
-        SchedulerClassServers classServers = schedulingService.getInfrastructure().getTaskClassServer();
-        eci.setClassServer(classServers.getTaskClassServer(task.getJobId()));
-        task.getExecutableContainer().init(eci);
     }
 
     /**
@@ -468,14 +465,14 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 // we will need to update this code once topology will be allowed for single-node task
                 if (task.isParallel()) {
                     nodes = new NodeSet(nodeSet);
-                    task.getExecuterInformations().addNodes(nodes);
+                    task.getExecuterInformation().addNodes(nodes);
                     nodeSet.clear();
                 }
 
                 //set nodes in the executable container
                 task.getExecutableContainer().setNodes(nodes);
 
-                tlogger.info(task.getId(), "deploying");
+                tlogger.debug(task.getId(), "deploying");
 
                 finalizeStarting(job, task, node, launcher);
 
@@ -526,20 +523,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             return null;
         }
         for (SelectionScript script : selectionScripts) {
-            VariablesUtil.filterAndUpdate(script, variables);
+            VariableSubstitutor.filterAndUpdate(script, variables);
         }
         return selectionScripts;
     }
 
-    private String getSchedulerUrl() {
-        if (schedulerUrl == null) {
-            try {
-                SchedulerAuthenticationInterface sai = SchedulerConnection.waitAndJoin(null);
-                schedulerUrl = sai.getHostURL();
-            } catch (ConnectionException e) {
-                logger.error("Cannot determine the scheduler url", e);
-            }
-        }
-        return schedulerUrl;
-    }
 }

@@ -1,11 +1,12 @@
 package functionaltests;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
-import java.io.*;
-import java.net.URI;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.Serializable;
 
 
 /**
@@ -17,45 +18,26 @@ import java.net.URI;
  */
 public class SimpleJavaExecutable extends JavaExecutable {
 
-    private static final Logger log = Logger.getLogger(SimpleJavaExecutable.class.getName());
-
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
-        log.info("local space real uri: " + this.getLocalSpace().getRealURI());
-        log.info("local space virtual uri: " + this.getLocalSpace().getVirtualURI());
-
-        File localSpaceFolder = new File(URI.create(this.getLocalSpace().getRealURI()));
-        log.info("Using localspace folder " + localSpaceFolder.getAbsolutePath());
-        File[] files = localSpaceFolder.listFiles();
-
-        for (File file : files) {
-            if (file.isFile()) {
-                log.info("Treating input file " + file.getAbsolutePath());
-
-            } else {
-                log.info(file.getAbsolutePath() + " is not a file. ");
+        File localSpaceFolder = new File(".");
+        System.out.println("Using localspace folder " + localSpaceFolder.getAbsolutePath());
+        System.out.println(localSpaceFolder.listFiles());
+        File[] inputFiles = localSpaceFolder.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(RestSmartProxyTest.INPUT_FILE_EXT);
             }
+        });
 
-            String new_name = file.getName().replace("input", "output");
-            new_name = new_name.replace(RestSmartProxyTest.INPUT_FILE_EXT, RestSmartProxyTest.OUTPUT_FILE_EXT);
-            File fout = new File(file.getCanonicalFile().getParent(), new_name);
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fout));
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                bw.write(line);
-                bw.newLine();
-            }
-            bw.close();
-            br.close();
-
-            log.info("Written file " + fout.getAbsolutePath());
+        for (File inputFile : inputFiles) {
+            String outputFileName = inputFile.getName()
+                    .replace("input", "output")
+                    .replace(RestSmartProxyTest.INPUT_FILE_EXT, RestSmartProxyTest.OUTPUT_FILE_EXT);
+            File outputFile = new File(outputFileName);
+            FileUtils.copyFile(inputFile, outputFile);
+            System.out.println("Written file " + outputFile.getAbsolutePath());
         }
-
-        log.info("Task End");
-
         return "OK";
     }
 

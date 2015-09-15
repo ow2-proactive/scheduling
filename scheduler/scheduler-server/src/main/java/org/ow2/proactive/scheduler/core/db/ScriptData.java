@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,18 +17,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.ow2.proactive.db.DatabaseManagerException;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.SimpleScript;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
-import org.ow2.proactive.db.DatabaseManagerException;
-import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
-import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scripting.GenerationScript;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.scripting.SimpleScript;
 
 
 @Entity
@@ -41,9 +40,7 @@ public class ScriptData {
 
     private String script;
 
-    private List<String> scriptParameters;
-
-    private boolean selectionScriptDynamic;
+    private List<Serializable> scriptParameters;
 
     private String flowScriptActionType;
 
@@ -54,14 +51,6 @@ public class ScriptData {
     private String flowScriptTargetContinuation;
 
     private TaskData taskData;
-
-    static ScriptData createForSelectionScript(SelectionScript script, TaskData taskData) {
-        ScriptData scriptData = new ScriptData();
-        initCommonAttributes(scriptData, script);
-        scriptData.setSelectionScriptDynamic(script.isDynamic());
-        scriptData.setTaskData(taskData);
-        return scriptData;
-    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
@@ -74,19 +63,21 @@ public class ScriptData {
         this.taskData = taskData;
     }
 
-    static ScriptData createForScript(Script<?> script) {
+    static ScriptData createForScript(Script<?> script, TaskData taskData) {
         ScriptData scriptData = new ScriptData();
         initCommonAttributes(scriptData, script);
+        scriptData.setTaskData(taskData);
         return scriptData;
     }
 
-    static ScriptData createForFlowScript(FlowScript script) {
+    static ScriptData createForFlowScript(FlowScript script, TaskData taskData) {
         ScriptData scriptData = new ScriptData();
         initCommonAttributes(scriptData, script);
         scriptData.setFlowScriptActionType(script.getActionType());
         scriptData.setFlowScriptTarget(script.getActionTarget());
         scriptData.setFlowScriptTargetContinuation(script.getActionContinuation());
         scriptData.setFlowScriptTargetElse(script.getActionTargetElse());
+        scriptData.setTaskData(taskData);
         return scriptData;
     }
 
@@ -110,21 +101,13 @@ public class ScriptData {
         }
     }
 
-    SelectionScript createSelectionScript() throws InvalidScriptException {
-        return new SelectionScript(getScript(), getScriptEngine(), parameters(), isSelectionScriptDynamic());
-    }
-
-    GenerationScript createGenerationScript() throws InvalidScriptException {
-        return new GenerationScript(script, scriptEngine, parameters());
-    }
-
     SimpleScript createSimpleScript() throws InvalidScriptException {
         return new SimpleScript(script, scriptEngine, parameters());
     }
 
-    private String[] parameters() {
+    private Serializable[] parameters() {
         if (scriptParameters != null) {
-            return scriptParameters.toArray(new String[scriptParameters.size()]);
+            return scriptParameters.toArray(new Serializable[scriptParameters.size()]);
         } else {
             return new String[] {};
         }
@@ -171,21 +154,12 @@ public class ScriptData {
 
     @Column(name = "PARAMETERS")
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public List<String> getScriptParameters() {
+    public List<Serializable> getScriptParameters() {
         return scriptParameters;
     }
 
-    public void setScriptParameters(List<String> scriptParameters) {
+    public void setScriptParameters(List<Serializable> scriptParameters) {
         this.scriptParameters = scriptParameters;
-    }
-
-    @Column(name = "IS_DYNAMIC")
-    public boolean isSelectionScriptDynamic() {
-        return selectionScriptDynamic;
-    }
-
-    public void setSelectionScriptDynamic(boolean selectionScriptDynamic) {
-        this.selectionScriptDynamic = selectionScriptDynamic;
     }
 
     @Column(name = "FLOW_ACTION_TYPE")

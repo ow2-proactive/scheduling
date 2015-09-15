@@ -87,4 +87,11 @@ public class NotificationData<T extends Object> implements Serializable {
         return data;
     }
 
+    @Override
+    public String toString() {
+        return "NotificationData{" +
+          "eventType=" + eventType +
+          ", data=" + data +
+          '}';
+    }
 }

@@ -107,7 +107,7 @@ public class TransactionHelper implements FilteredExceptionCallback {
         }
     }
 
-    public static interface SessionWork<T> {
+    public interface SessionWork<T> {
 
         T executeWork(Session session);
 

@@ -57,8 +57,8 @@ final class TerminationData {
 
     static TerminationData newTerminationData() {
         return new TerminationData(new HashSet<JobId>(),
-            new HashMap<TaskId, TerminationData.TaskTerminationData>(),
-            new HashMap<TaskId, TerminationData.TaskRestartData>());
+                new HashMap<TaskId, TaskTerminationData>(),
+                new HashMap<TaskId, TaskRestartData>());
     }
 
     private TerminationData(Set<JobId> jobsToTerminate, Map<TaskId, TaskTerminationData> tasksToTerminate,
@@ -102,7 +102,9 @@ final class TerminationData {
         for (TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
             RunningTaskData taskData = taskToTerminate.taskData;
             try {
-                taskData.getLauncher().terminate(taskToTerminate.normalTermination);
+                if(!taskToTerminate.normalTermination){
+                    taskData.getLauncher().kill();
+                }
             } catch (Throwable t) {
                 logger
                         .info("Cannot terminate task launcher for task '" + taskData.getTask().getId() + "'",

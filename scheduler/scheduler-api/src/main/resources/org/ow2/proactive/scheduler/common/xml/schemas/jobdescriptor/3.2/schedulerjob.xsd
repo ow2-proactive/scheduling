@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jd="urn:proactive:jobdescriptor:3.2">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.2" xmlns:jd="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <xs:import namespace="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="xsi.xsd"/>
   <xs:element name="job">
     <xs:annotation>
@@ -55,7 +55,6 @@
           <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute ref="xsi:schemaLocation"/>
       <xs:attribute ref="xsi:schemaLocation"/>
     </xs:complexType>
   </xs:element>
@@ -294,7 +293,7 @@
           </xs:attribute>
           <xs:attribute name="preciousLogs">
             <xs:annotation>
-              <xs:documentation>Do we keep the logs as file on LOCALSPACE</xs:documentation>
+              <xs:documentation>Do we keep the logs as file on USERSPACE</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:union memberTypes="xs:boolean jd:variableRefType"/>
@@ -388,7 +387,7 @@
   <xs:attributeGroup name="preciousLogs">
     <xs:attribute name="preciousLogs" use="required">
       <xs:annotation>
-        <xs:documentation>Do we keep the logs as file on LOCALSPACE</xs:documentation>
+        <xs:documentation>Do we keep the logs as file on USERSPACE</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="xs:boolean jd:variableRefType"/>

@@ -111,7 +111,7 @@ public class JobTrackerImpl extends JobTracker {
             }
         }
 
-        Set<FileObject> foldersToDelete = new HashSet<FileObject>();
+        Set<FileObject> foldersToDelete = new HashSet<>();
         try {
             foldersToDelete.add(remotePullFolder.getParent());
             if (!remotePullFolder.getParent().equals(remotePushFolder.getParent()))

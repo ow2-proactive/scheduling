@@ -289,7 +289,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("node/script")
     @Produces("application/json")
-    public ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid")
+    ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid")
     String sessionId, @FormParam("nodeurl")
     String nodeUrl, @FormParam("script")
     String script, @FormParam("scriptEngine")
@@ -299,7 +299,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
-    public List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid")
+    List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid")
     String sessionId, @FormParam("nodesource")
     String nodeSource, @FormParam("script")
     String script, @FormParam("scriptEngine")
@@ -309,7 +309,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("host/script")
     @Produces("application/json")
-    public List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid")
+    List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid")
     String sessionId, @FormParam("host")
     String host, @FormParam("script")
     String script, @FormParam("scriptEngine")

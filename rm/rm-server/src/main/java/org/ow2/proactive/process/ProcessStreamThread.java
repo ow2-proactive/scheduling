@@ -68,7 +68,7 @@ public class ProcessStreamThread extends Thread {
         this.printOutput = printOutput;
         this.saveOutput = saveOutput;
         if (saveOutput) {
-            output = new ArrayList<String>();
+            output = new ArrayList<>();
         }
     }
 
@@ -100,7 +100,7 @@ public class ProcessStreamThread extends Thread {
 
     public List<String> getOutput() {
         synchronized (output) {
-            return new ArrayList<String>(output);
+            return new ArrayList<>(output);
         }
     }
 }

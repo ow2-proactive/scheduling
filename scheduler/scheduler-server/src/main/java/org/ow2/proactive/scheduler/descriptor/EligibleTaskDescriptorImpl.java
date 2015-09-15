@@ -95,7 +95,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     @XmlTransient
     public Vector<TaskDescriptor> getChildren() {
         if (children == null) {
-            return new Vector<TaskDescriptor>();
+            return new Vector<>();
         }
 
         return children;
@@ -116,7 +116,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     @XmlTransient
     public Vector<TaskDescriptor> getParents() {
         if (parents == null) {
-            return new Vector<TaskDescriptor>();
+            return new Vector<>();
         }
 
         return parents;
@@ -195,7 +195,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      */
     public void addParent(TaskDescriptor task) {
         if (parents == null) {
-            parents = new Vector<TaskDescriptor>();
+            parents = new Vector<>();
         }
 
         parents.add(task);
@@ -209,7 +209,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      */
     public void addChild(TaskDescriptor task) {
         if (children == null) {
-            children = new Vector<TaskDescriptor>();
+            children = new Vector<>();
         }
 
         children.add(task);
@@ -249,7 +249,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      */
     public void clearChildren() {
         if (children == null) {
-            children = new Vector<TaskDescriptor>();
+            children = new Vector<>();
         }
 
         children.clear();

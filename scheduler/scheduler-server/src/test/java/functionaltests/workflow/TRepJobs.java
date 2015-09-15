@@ -52,9 +52,11 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
 import org.junit.Assert;
+import org.junit.Before;
+
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
 
 
 /**
@@ -64,9 +66,9 @@ import org.junit.Assert;
  * @author mschnoor
  *
  */
-public class TRepJobs extends SchedulerConsecutive {
+public class TRepJobs extends SchedulerFunctionalTest {
 
-    static class TRepCase {
+    public static class TRepCase {
         String jobPath;
 
         // total number of tasks
@@ -88,7 +90,7 @@ public class TRepJobs extends SchedulerConsecutive {
          * 	base name when finished, and sum of all results
          *  ie: "T1,1,3 T2,2,5 T3,1,2 ..."
          */
-        TRepCase(String jobPath, int total, String t) {
+        public TRepCase(String jobPath, int total, String t) {
             this.jobPath = jobPath;
             this.total = total;
             readArg(t);
@@ -97,8 +99,8 @@ public class TRepJobs extends SchedulerConsecutive {
         private void readArg(String param) {
             String[] arr = param.split(" ");
 
-            this.tasks = new HashMap<String, Long>(arr.length);
-            this.results = new HashMap<String, Long>(arr.length);
+            this.tasks = new HashMap<>(arr.length);
+            this.results = new HashMap<>(arr.length);
 
             for (String str : arr) {
                 String[] split = str.split(",");
@@ -111,34 +113,41 @@ public class TRepJobs extends SchedulerConsecutive {
         }
     }
 
-    void testJobs(TRepCase... testCases) throws Throwable {
+    @Before
+    public void startScheduleCustomConfigIfNeeded() throws Exception {
+        schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
+              "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+    }
+
+    public void testJobs(TRepCase... testCases) throws Throwable {
+
         for (TRepCase tcase : testCases) {
             String path = new File(TWorkflowJobs.class.getResource(tcase.jobPath).toURI()).getAbsolutePath();
             Job job = JobFactory.getFactory().createJob(path);
-            JobId id = SchedulerTHelper.submitJob(job);
+            JobId id = schedulerHelper.submitJob(job);
             SchedulerTHelper.log("Job submitted, id " + id.toString());
 
-            JobState receivedstate = SchedulerTHelper.waitForEventJobSubmitted(id);
+            JobState receivedstate = schedulerHelper.waitForEventJobSubmitted(id);
             Assert.assertEquals(id, receivedstate.getId());
-            JobInfo jInfo = SchedulerTHelper.waitForEventJobRunning(id);
+            JobInfo jInfo = schedulerHelper.waitForEventJobRunning(id);
             Assert.assertEquals(jInfo.getJobId(), id);
             Assert.assertEquals(JobStatus.RUNNING, jInfo.getStatus());
-            jInfo = SchedulerTHelper.waitForEventJobFinished(id);
+            jInfo = schedulerHelper.waitForEventJobFinished(id);
             Assert.assertEquals(JobStatus.FINISHED, jInfo.getStatus());
             SchedulerTHelper.log("Job finished");
 
-            JobResult res = SchedulerTHelper.getJobResult(id);
-            Assert.assertFalse(SchedulerTHelper.getJobResult(id).hadException());
+            JobResult res = schedulerHelper.getJobResult(id);
+            Assert.assertFalse(schedulerHelper.getJobResult(id).hadException());
 
-            JobState js = SchedulerTHelper.getSchedulerInterface().getJobState(id);
+            JobState js = schedulerHelper.getSchedulerInterface().getJobState(id);
 
             // final number of tasks
             Assert.assertEquals(tcase.total, js.getTasks().size());
 
             // to be checked against this.tasks
-            HashMap<String, Long> finalTaskCount = new HashMap<String, Long>();
+            HashMap<String, Long> finalTaskCount = new HashMap<>();
             // to be checked against this.results
-            HashMap<String, Long> finalResSum = new HashMap<String, Long>();
+            HashMap<String, Long> finalResSum = new HashMap<>();
             for (TaskState ts : js.getTasks()) {
                 String baseName = InternalTask.getInitialName(ts.getName());
                 long count = 0;
@@ -177,8 +186,8 @@ public class TRepJobs extends SchedulerConsecutive {
                 Assert.assertEquals(val, entry.getValue().longValue());
             }
 
-            SchedulerTHelper.removeJob(id);
-            SchedulerTHelper.waitForEventJobRemoved(id);
+            schedulerHelper.removeJob(id);
+            schedulerHelper.waitForEventJobRemoved(id);
         }
 
     }

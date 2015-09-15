@@ -37,21 +37,18 @@
 package functionaltests;
 
 import java.security.Policy;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.tests.FunctionalTest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -66,7 +63,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Assume;
 
 import functionaltests.jobs.NonTerminatingJob;
 import functionaltests.jobs.SimpleJob;
@@ -199,25 +195,14 @@ public abstract class AbstractRestFuncTestCase {
 
     protected JobId submitDefaultJob() throws Exception {
         Job job = defaultJob();
-        JobId jobId = getScheduler().submit(job);
-        return jobId;
+        return getScheduler().submit(job);
     }
 
     protected String submitFinishedJob() throws Exception {
         Scheduler scheduler = getScheduler();
         Job job = defaultJob();
         JobId jobId = scheduler.submit(job);
-        JobState jobState = scheduler.getJobState(jobId);
-        for (int i = 0; i < 5; i++) {
-            if (JobStatus.FINISHED.equals(jobState.getStatus())) {
-                break;
-            }
-            TimeUnit.SECONDS.sleep(2);
-            jobState = scheduler.getJobState(jobId);
-        }
-        if (!JobStatus.FINISHED.equals(jobState.getStatus())) {
-            throw new RuntimeException(String.format("Job(%s) did not finish properly.", jobId));
-        }
+        waitJobState(jobId, JobStatus.FINISHED, 30000);
         return jobId.value();
     }
 
@@ -235,7 +220,7 @@ public abstract class AbstractRestFuncTestCase {
             } else if (!currentStatus.isJobAlive()) {
                 break;
             } else {
-                Thread.sleep(1000);
+                Thread.sleep(300);
             }
         }
 
@@ -250,49 +235,43 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected Job defaultJob() throws Exception {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName("Test-Job");
-        job.setPriority(JobPriority.NORMAL);
-        job.setCancelJobOnError(true);
-        job.setDescription("Simple test job");
-        job.setMaxNumberOfExecution(1);
+        return createJob(SimpleJob.class);
+    }
 
-        JobEnvironment jobEnv = new JobEnvironment();
-        String classpath = RestFuncTUtils.getClassPath(SimpleJob.class);
-        jobEnv.setJobClasspath(new String[] { classpath });
-        job.setEnvironment(jobEnv);
-
-        JavaTask task = new JavaTask();
-        task.setName("Test-Job-Task");
-        task.setExecutableClassName(SimpleJob.class.getName());
-        task.setMaxNumberOfExecution(1);
-        task.setCancelJobOnError(true);
-
-        job.addTask(task);
-        return job;
+    protected String getDefaultTaskName() {
+        return getTaskName(SimpleJob.class);
     }
 
     protected Job pendingJob() throws Exception {
+        return createJob(NonTerminatingJob.class);
+    }
+
+    protected Job createJob(Class<?> clazz) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Nonterminating-Job");
+        job.setName(clazz.getSimpleName());
         job.setPriority(JobPriority.NORMAL);
         job.setCancelJobOnError(true);
-        job.setDescription("Simple nonterminating job");
+        job.setDescription("Test " + clazz.getSimpleName());
         job.setMaxNumberOfExecution(1);
 
-        JobEnvironment jobEnv = new JobEnvironment();
-        String classpath = RestFuncTUtils.getClassPath(NonTerminatingJob.class);
-        jobEnv.setJobClasspath(new String[] { classpath });
-        job.setEnvironment(jobEnv);
-
         JavaTask task = new JavaTask();
-        task.setName("Nonterminating-Job-Task");
-        task.setExecutableClassName(NonTerminatingJob.class.getName());
+        task.setName(clazz.getSimpleName() + "Task");
+        task.setExecutableClassName(clazz.getName());
         task.setMaxNumberOfExecution(1);
         task.setCancelJobOnError(true);
 
+        String classpath = RestFuncTUtils.getClassPath(clazz);
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath(classpath);
+        task.setForkEnvironment(forkEnvironment);
+
         job.addTask(task);
+
         return job;
+    }
+
+    protected String getTaskName(Class<?> clazz) {
+        return clazz.getSimpleName() + "Task";
     }
 
     private String getSession(String schedulerUrl, String username, String password) throws Exception {
@@ -312,15 +291,9 @@ public abstract class AbstractRestFuncTestCase {
         }
     }
 
-    public static void init(String name) throws Exception {
-
-        if (!FunctionalTest.shouldBeExecuted(name)) {
-            Assume.assumeTrue(false);
-            return;
-        }
-
+    public static void init() throws Exception {
         try {
-            System.out.println("Starting the app");
+            System.out.println("Starting the Scheduler & REST server");
             RestFuncTHelper.startRestfulSchedulerWebapp();
         } catch (Exception e) {
             e.printStackTrace();
@@ -333,4 +306,5 @@ public abstract class AbstractRestFuncTestCase {
     public static void afterClass() {
         RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
+
 }

@@ -6,21 +6,11 @@
 	<taskFlow>
 		<task name="task1">
 			<description>Task 1</description>
-			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
-				<parameters>
-					<parameter name="sleepTime" value="1"/>
-					<parameter name="number" value="1"/>
-				</parameters>
-			</javaExecutable>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
 		</task>
 		<task name="task2">
 			<description>Task 2</description>
-			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
-				<parameters>
-					<parameter name="sleepTime" value="1"/>
-					<parameter name="number" value="1"/>
-				</parameters>
-			</javaExecutable>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
 		</task>
 	</taskFlow>
 </job>

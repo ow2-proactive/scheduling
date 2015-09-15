@@ -55,14 +55,14 @@ public abstract class AbstractJsHelpCommand extends AbstractCommand implements C
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(100);
         formatter.setSpace(2);
-        ArrayList<String> titles = new ArrayList<String>();
+        ArrayList<String> titles = new ArrayList<>();
         titles.add("Command");
         titles.add("Description");
         formatter.setTitle(titles);
         formatter.addEmptyLine();
         ArrayList<String> line;
 
-        List<CommandSet.Entry> entries = new ArrayList<CommandSet.Entry>();
+        List<CommandSet.Entry> entries = new ArrayList<>();
         for (CommandSet.Entry[] es : entrySet) {
             Collections.addAll(entries, es);
         }
@@ -70,7 +70,7 @@ public abstract class AbstractJsHelpCommand extends AbstractCommand implements C
 
         for (CommandSet.Entry entry : entries) {
             if (entry.jsCommand() != null) {
-                line = new ArrayList<String>();
+                line = new ArrayList<>();
                 line.add(entry.jsCommand());
                 line.add(entry.description());
                 formatter.addLine(line);

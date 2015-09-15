@@ -88,7 +88,7 @@ public class NodesCleaner implements RunActive {
      * @return true if all the nodes were freed, false if error occurs on one of the node (it will be marked as down in this case)
      */
     public BooleanWrapper cleanAndRelease(List<RMNode> nodes) {
-        List<Callable<Boolean>> cleaners = new LinkedList<Callable<Boolean>>();
+        List<Callable<Boolean>> cleaners = new LinkedList<>();
         for (RMNode node : nodes) {
             logger.debug("Cleaning the node " + node.getNodeURL());
             cleaners.add(new NodeCleaner(node));

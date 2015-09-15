@@ -263,7 +263,7 @@ public class RestDataspaceImpl {
             if (!fo.exists()) {
                 return notFoundRes();
             }
-            MultivaluedMap<String, Object> headers = new MultivaluedHashMap<String, Object>(FileSystem
+            MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>(FileSystem
                     .metadata(fo));
             return Response.ok().replaceAll(headers).build();
         } catch (Throwable error) {

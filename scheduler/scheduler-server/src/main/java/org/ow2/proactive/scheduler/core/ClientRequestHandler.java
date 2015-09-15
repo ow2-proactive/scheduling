@@ -110,7 +110,7 @@ public class ClientRequestHandler {
         this.client = client;
         this.frontend = frontend;
         this.clientId = clientId;
-        this.eventCallsToStore = new LinkedList<ReifiedMethodCall>();
+        this.eventCallsToStore = new LinkedList<>();
     }
 
     /**

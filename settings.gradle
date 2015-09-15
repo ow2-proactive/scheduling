@@ -8,6 +8,7 @@ include 'scheduler:scheduler-server'
 include 'scheduler:scheduler-node'
 include 'scheduler:smartproxy'
 include 'scheduler:smartproxy-common'
+include 'scheduler:scheduler-examples'
 
 include 'rm:rm-client'
 include 'rm:rm-node'

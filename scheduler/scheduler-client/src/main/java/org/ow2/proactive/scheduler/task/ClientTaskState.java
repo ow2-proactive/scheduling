@@ -33,8 +33,8 @@ public final class ClientTaskState extends TaskState {
 
     private TaskInfo taskInfo;
     private int maxNumberOfExecutionOnFailure;
-    private List<TaskId> dependenceIds = new ArrayList<TaskId>();
-    private List<TaskState> dependences = new ArrayList<TaskState>();
+    private List<TaskId> dependenceIds = new ArrayList<>();
+    private List<TaskState> dependences = new ArrayList<>();
 
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
@@ -46,7 +46,6 @@ public final class ClientTaskState extends TaskState {
         this.setName(taskState.getName());
 
         this.setDescription(taskState.getDescription());
-        this.setResultPreview(taskState.getResultPreview());
         this.setRunAsMe(taskState.isRunAsMe());
 
         this.setWallTime(taskState.getWallTime());

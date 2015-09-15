@@ -61,7 +61,7 @@ public interface RMMonitoring {
      * @return true if the RM is still alive
      */
     @Deprecated
-    public boolean isAlive();
+    boolean isAlive();
 
     /** Register a new Resource manager listener.
      * Way to a monitor object to ask at RMMonitoring to throw
@@ -71,12 +71,12 @@ public interface RMMonitoring {
      * @param events list of wanted events that must be received.
      * @return RMInitialState snapshot of RM's current state : nodes and node sources.
      */
-    public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events);
+    RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events);
 
     /**
      * Removes a listener from RMMonitoring. Only listener itself must call this method
      */
-    public void removeRMEventListener() throws RMException;
+    void removeRMEventListener() throws RMException;
 
     /**
      * Gets the current snapshot of the resource manager state providing
@@ -86,6 +86,6 @@ public interface RMMonitoring {
      *
      * @return the current state of the resource manager
      */
-    public RMInitialState getState();
+    RMInitialState getState();
 
 }

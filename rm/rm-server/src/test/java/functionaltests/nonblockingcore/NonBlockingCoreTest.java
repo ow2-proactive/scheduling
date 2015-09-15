@@ -42,66 +42,62 @@ import java.net.URL;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
-import functionaltests.selectionscript.SelectionScriptTimeOutTest;
-import org.junit.Assert;
+import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
+import functionaltests.selectionscript.SelectionScriptTimeOutTest;
+
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
  * Test starts node selection using timeout script. At the same time adds and removes node source and nodes to the RM.
  * Checks that blocking in the node selection mechanism does not prevent usage of RMAdmin interface.
  *
- * @author ProActice team
+ * @author ProActive team
  *
  */
-public class NonBlockingCoreTest extends RMConsecutive {
+public class NonBlockingCoreTest extends RMFunctionalTest {
 
     private URL selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class
             .getResource("selectionScriptWithtimeOut.groovy");
 
     private NodeSet nodes;
 
-    /** Actions to be Perform by this test.
-     * The method is called automatically by Junit framework.
-     * @throws Exception If the test fails.
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        String rmconf = new File(RMTHelper.class.getResource(
-                "/functionaltests/config/rm-default-script-timeout.ini").toURI()).getAbsolutePath();
-        RMTHelper.getDefaultInstance().startRM(rmconf, RMTHelper.PA_RMI_PORT);
-        RMTHelper helper = RMTHelper.getDefaultInstance();
+        String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
+          "/functionaltests/config/functionalTRMProperties-long-selection-script-timeout.ini").getFile())).getAbsolutePath();
+        rmHelper.startRM(rmconf);
 
-        ResourceManager resourceManager = helper.getResourceManager();
+        ResourceManager resourceManager = rmHelper.getResourceManager();
         int initialNodeNumber = 2;
-        helper.createNodeSource("NonBlockingCoreTest1", initialNodeNumber);
+        rmHelper.createNodeSource("NonBlockingCoreTest1", initialNodeNumber);
         int coreScriptExecutionTimeout = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
         int scriptSleepingTime = coreScriptExecutionTimeout * 2;
 
-        RMTHelper.log("Selecting node with timeout script");
+        log("Selecting node with timeout script");
 
         //create the static selection script object
         final SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()),
             new String[] { Integer.toString(scriptSleepingTime) }, false);
 
         //mandatory to use RMUser AO, otherwise, getAtMostNode we be send in RMAdmin request queue
-        final RMAuthentication auth = RMTHelper.getDefaultInstance().getRMAuth();
+        final RMAuthentication auth = rmHelper.getRMAuth();
 
-        final Credentials cred = Credentials.createCredentials(new CredData(RMTHelper.defaultUserName,
-            RMTHelper.defaultUserPassword), auth.getPublicKey());
+        final Credentials cred = Credentials.createCredentials(new CredData(TestUsers.TEST.username,
+            TestUsers.TEST.password), auth.getPublicKey());
 
         // cannot connect twice from the same active object
         // so creating another thread
@@ -118,36 +114,36 @@ public class NonBlockingCoreTest extends RMConsecutive {
         t.start();
 
         String nodeName = "node_non_blocking_test";
-        String nodeUrl = helper.createNode(nodeName).getNode().getNodeInformation().getURL();
+        String nodeUrl = RMTHelper.createNode(nodeName).getNode().getNodeInformation().getURL();
 
-        RMTHelper.log("Adding node " + nodeUrl);
+        log("Adding node " + nodeUrl);
         resourceManager.addNode(nodeUrl);
 
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeUrl);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeUrl);
         //waiting for node to be in free state, it is in configuring state when added...
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == initialNodeNumber + 1);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodeNumber + 1);
+        assertEquals(resourceManager.getState().getTotalNodesNumber(), initialNodeNumber + 1);
+        assertEquals(resourceManager.getState().getFreeNodesNumber(), initialNodeNumber + 1);
 
         //preemptive removal is useless for this case, because node is free
-        RMTHelper.log("Removing node " + nodeUrl);
+        log("Removing node " + nodeUrl);
         resourceManager.removeNode(nodeUrl, false);
 
-        helper.waitForNodeEvent(RMEventType.NODE_REMOVED, nodeUrl);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, nodeUrl);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == initialNodeNumber);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == initialNodeNumber);
+        assertEquals(resourceManager.getState().getTotalNodesNumber(), initialNodeNumber);
+        assertEquals(resourceManager.getState().getFreeNodesNumber(), initialNodeNumber);
 
         String nsName = "NonBlockingCoreTest";
-        RMTHelper.log("Creating a node source " + nsName);
+        log("Creating a node source " + nsName);
         int nsNodesNumber = 1;
-        helper.createNodeSource(nsName, nsNodesNumber);
+        rmHelper.createNodeSource(nsName, nsNodesNumber);
 
-        assertTrue(resourceManager.getState().getTotalNodesNumber() == nsNodesNumber + initialNodeNumber);
-        assertTrue(resourceManager.getState().getFreeNodesNumber() == nsNodesNumber + initialNodeNumber);
+        assertEquals(resourceManager.getState().getTotalNodesNumber(), nsNodesNumber + initialNodeNumber);
+        assertEquals(resourceManager.getState().getFreeNodesNumber(), nsNodesNumber + initialNodeNumber);
 
-        RMTHelper.log("Removing node source " + nsName);
+        log("Removing node source " + nsName);
         resourceManager.removeNodeSource(nsName, true);
 
         boolean selectionInProgress = PAFuture.isAwaited(nodes);
@@ -159,9 +155,10 @@ public class NonBlockingCoreTest extends RMConsecutive {
             // it should be sufficient to perform all admin operations concurrently
             //
             // if the core is blocked admin operations will be performed after selection
-            Assert.assertTrue("Blocked inside RMCore", false);
+            fail("Blocked inside RMCore");
         } else {
-            RMTHelper.log("No blocking inside RMCore");
+            log("No blocking inside RMCore");
         }
+        t.interrupt();
     }
 }

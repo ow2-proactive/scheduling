@@ -57,7 +57,7 @@ public interface TaskDescriptor extends Serializable {
      *
      * @return the children
      */
-    public Vector<TaskDescriptor> getChildren();
+    Vector<TaskDescriptor> getChildren();
 
     /**
      * Return the internal representation of the task.
@@ -65,41 +65,41 @@ public interface TaskDescriptor extends Serializable {
      *
      * @return the internal representation of the task.
      */
-    public InternalTask getInternal();
+    InternalTask getInternal();
 
     /**
      * To get the id of the corresponding task
      *
      * @return the id of the corresponding task
      */
-    public TaskId getTaskId();
+    TaskId getTaskId();
 
     /**
      * To get the parents
      *
      * @return the parents
      */
-    public Vector<TaskDescriptor> getParents();
+    Vector<TaskDescriptor> getParents();
 
     /**
      * To get the jobId
      *
      * @return the jobId
      */
-    public JobId getJobId();
+    JobId getJobId();
 
     /**
      * Return the number of children remaining.
      *
      * @return the number of children remaining.
      */
-    public int getChildrenCount();
+    int getChildrenCount();
 
     /**
      * Get the number of attempt the core has made to start this task.
      *
      * @return the number of attempt the core has made to start this task.
      */
-    public int getAttempt();
+    int getAttempt();
 
 }

@@ -41,60 +41,61 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.ow2.tests.FunctionalTest;
-import functionaltests.RMTHelper;
-import org.junit.Assert;
+import org.junit.Test;
+
+import functionaltests.utils.RMFunctionalTest;
+
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
  * Test checks that only authorized scripts can be executed in the resource manager
- * if property pa.rm.select.script.authorized.dir is set
+ * if property pa.rmHelper.select.script.authorized.dir is set
  */
-public class UnauthorizedSelectionScriptTest extends FunctionalTest {
+public class UnauthorizedSelectionScriptTest extends RMFunctionalTest {
 
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
         String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
                 "/functionaltests/config/rm-authorized-selection-script.ini").getFile())).getAbsolutePath();
 
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        helper.startRM(rmconf, CentralPAPropertyRepository.PA_RMI_PORT.getValue());
-        ResourceManager rm = helper.getResourceManager();
+        rmHelper.startRM(rmconf);
+        ResourceManager rm = this.rmHelper.getResourceManager();
 
-        helper.createNodeSource("Dummy", 1);
+        this.rmHelper.createNodeSource("Dummy", 1);
 
-        RMTHelper.log("Test 1 - unautorized script");
+        log("Test 1 - unautorized script");
         Criteria criteria = new Criteria(1);
 
         URL vmPropSelectionScriptpath = this.getClass().getResource("dummySelectionScript.js");
-        List<SelectionScript> scripts = new ArrayList<SelectionScript>();
+        List<SelectionScript> scripts = new ArrayList<>();
         scripts.add(new SelectionScript(new File(vmPropSelectionScriptpath.toURI()), null, true));
         criteria.setScripts(scripts);
         try {
             NodeSet ns = rm.getNodes(criteria);
             System.out.println("Number of nodes matched " + ns.size());
-            Assert.fail("Executed unauthorized selection script");
+            fail("Executed unauthorized selection script");
         } catch (SecurityException ex) {
-            RMTHelper.log("Test 1 - passed");
+            log("Test 1 - passed");
         }
 
-        RMTHelper.log("Test 2 - autorized script");
+        log("Test 2 - authorized script");
 
         String authorizedScriptPath = PAResourceManagerProperties.RM_HOME.getValueAsString() +
             "/samples/scripts/selection/checkPhysicalFreeMem.js";
-        scripts = new ArrayList<SelectionScript>();
+        scripts = new ArrayList<>();
         scripts.add(new SelectionScript(new File(authorizedScriptPath), new String[] { "1" }, true));
         criteria.setScripts(scripts);
         NodeSet ns = rm.getNodes(criteria);
         System.out.println("Number of nodes matched " + ns.size());
-        Assert.assertEquals(1, ns.size());
+        assertEquals(1, ns.size());
 
-        RMTHelper.log("Test 2 - passed");
+        log("Test 2 - passed");
     }
 }

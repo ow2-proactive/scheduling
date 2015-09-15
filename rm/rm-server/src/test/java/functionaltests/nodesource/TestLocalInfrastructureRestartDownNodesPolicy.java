@@ -38,7 +38,6 @@ package functionaltests.nodesource;
 
 import java.io.File;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -51,59 +50,49 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolic
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
-import org.junit.Assert;
+import org.junit.Test;
+
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+
+import static org.junit.Assert.*;
 
 
 /**
- *
  * Test checks the correct behavior of node source consisted of Local infrastructure manager
  * and static acquisition policy.
  *
  */
-public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive {
+public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalTest {
 
     protected int defaultDescriptorNodesNb = 3;
 
     protected void createNodeSourceWithNodes(String sourceName, Object[] policyParameters) throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         // creating node source
-        // first parameter of im is empty default rm url
+        // first parameter of im is empty default rmHelper url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        helper.getResourceManager().createNodeSource(
+        rmHelper.getResourceManager().createNodeSource(
                 sourceName,
                 LocalInfrastructure.class.getName(),
-                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.defaultNodesTimeout,
-                        CentralPAPropertyRepository.PA_RMI_PORT.getCmdLine() + RMTHelper.PA_RMI_PORT },
+                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                 RestartDownNodesPolicy.class.getName(), policyParameters);
 
-        helper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
+        rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }
 
-    protected void init() throws Exception {
-    }
-
-    /** Actions to be Perform by this test.
-     * The method is called automatically by Junit framework.
-     * @throws Exception If the test fails.
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-
-        init();
         String source1 = "Node_source_1";
 
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        ResourceManager resourceManager = helper.getResourceManager();
+        ResourceManager resourceManager = rmHelper.getResourceManager();
         RMTHelper.log("Test 0 - create down nodes policy with null parameters (null is a valid input)");
         createNodeSourceWithNodes("Node_source_0", null);
 
         RMState stateTest0 = resourceManager.getState();
-        Assert.assertEquals(defaultDescriptorNodesNb, stateTest0.getTotalNodesNumber());
-        Assert.assertEquals(defaultDescriptorNodesNb, stateTest0.getFreeNodesNumber());
+        assertEquals(defaultDescriptorNodesNb, stateTest0.getTotalNodesNumber());
+        assertEquals(defaultDescriptorNodesNb, stateTest0.getFreeNodesNumber());
 
         resourceManager.removeNodeSource("Node_source_0", true);
 
@@ -111,27 +100,27 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMConsecutive
         createNodeSourceWithNodes(source1, new Object[] { "ALL", "ALL", "10000" });
 
         RMState stateTest1 = resourceManager.getState();
-        Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
-        Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getFreeNodesNumber());
+        assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
+        assertEquals(defaultDescriptorNodesNb, stateTest1.getFreeNodesNumber());
 
         NodeSet ns = resourceManager.getNodes(new Criteria(defaultDescriptorNodesNb));
 
         for (Node n : ns) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
         }
 
         String nodeUrl = ns.get(0).getNodeInformation().getURL();
-        helper.killNode(nodeUrl);
+        rmHelper.killNode(nodeUrl);
 
-        RMNodeEvent ev = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeUrl);
 
-        Assert.assertEquals(NodeState.DOWN, ev.getNodeState());
+        assertEquals(NodeState.DOWN, ev.getNodeState());
 
         // one node is down - the policy should detect it and redeploy
-        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
-        Assert.assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalAliveNodesNumber());
+        assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
+        assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalAliveNodesNumber());
     }
 }

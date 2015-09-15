@@ -36,13 +36,14 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
 
 /**
@@ -54,11 +55,6 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class TaskIdImpl implements TaskId {
-
-    /**
-     * Multiplicative factor for job id (taskId will be set to {@code JOB_FACTOR * jobID + taskID})
-     */
-    public static final long JOB_FACTOR = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
 
     /** Task id */
     private long id;
@@ -78,10 +74,14 @@ public final class TaskIdImpl implements TaskId {
     private TaskIdImpl(JobId jobId, long id, boolean applyJobFactor) {
         this.jobId = jobId;
         if (applyJobFactor) {
-            this.id = (jobId.hashCode() * JOB_FACTOR) + id;
+            this.id = (jobId.hashCode() * getJobFactor()) + id;
         } else {
             this.id = id;
         }
+    }
+
+    public static long getJobFactor() {
+        return PASchedulerProperties.JOB_FACTOR.getValueAsInt();
     }
 
     /**

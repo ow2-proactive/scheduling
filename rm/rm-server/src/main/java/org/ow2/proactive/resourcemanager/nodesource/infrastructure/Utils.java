@@ -169,7 +169,7 @@ public class Utils {
         StringBuilder sb = new StringBuilder();
         String line = null;
         try {
-            String lf = System.getProperty("line.separator");
+            String lf = System.lineSeparator();
             while (br.ready()) {
                 if ((line = br.readLine()) != null) {
                     sb.append(line);
@@ -198,7 +198,7 @@ public class Utils {
         StringBuilder sb = new StringBuilder();
         String line = null;
         try {
-            String lf = System.getProperty("line.separator");
+            String lf = System.lineSeparator();
             while (br.ready()) {
                 if ((line = br.readLine()) != null) {
                     sb.append(line);

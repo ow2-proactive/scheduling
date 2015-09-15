@@ -53,7 +53,7 @@ public interface TaskLogs extends java.io.Serializable {
      * 
      * @return a String containing the logs generated on standard output.
      */
-    public String getStdoutLogs(boolean timeStamp);
+    String getStdoutLogs(boolean timeStamp);
 
     /**
      * Return the logs generated on error output.
@@ -61,7 +61,7 @@ public interface TaskLogs extends java.io.Serializable {
      * 
      * @return a String containing the logs generated on error output.
      */
-    public String getStderrLogs(boolean timeStamp);
+    String getStderrLogs(boolean timeStamp);
 
     /**
      * Return all the logs generated on standard and error output.
@@ -69,5 +69,5 @@ public interface TaskLogs extends java.io.Serializable {
      * 
      * @return a String containing stored logs, or null if any.
      */
-    public String getAllLogs(boolean timeStamp);
+    String getAllLogs(boolean timeStamp);
 }

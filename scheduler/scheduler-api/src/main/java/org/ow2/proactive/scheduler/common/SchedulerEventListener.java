@@ -60,14 +60,14 @@ public interface SchedulerEventListener {
      *
      * @param eventType the type of the event received.
      */
-    public void schedulerStateUpdatedEvent(SchedulerEvent eventType);
+    void schedulerStateUpdatedEvent(SchedulerEvent eventType);
 
     /**
      * Invoked each time a new job has been submitted to the Scheduler and validated.
      *
      * @param job the newly submitted job.
      */
-    public void jobSubmittedEvent(JobState job);
+    void jobSubmittedEvent(JobState job);
 
     /**
      * Invoked each time the state of a job has changed.<br>
@@ -77,7 +77,7 @@ public interface SchedulerEventListener {
      *
      * @param notification the data composed of the type of the event and the information that have change in the job.
      */
-    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification);
+    void jobStateUpdatedEvent(NotificationData<JobInfo> notification);
 
     /**
      * Invoked each time the state of a task has changed.<br>
@@ -87,13 +87,13 @@ public interface SchedulerEventListener {
      *
      * @param notification the data composed of the type of the event and the information that have change in the task.
      */
-    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification);
+    void taskStateUpdatedEvent(NotificationData<TaskInfo> notification);
 
     /**
      * Invoked each time something change about users.
      *
      * @param notification the data composed of the type of the event and the data linked to the change.
      */
-    public void usersUpdatedEvent(NotificationData<UserIdentification> notification);
+    void usersUpdatedEvent(NotificationData<UserIdentification> notification);
 
 }

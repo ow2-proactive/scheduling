@@ -8,6 +8,7 @@
         <variable name="prescript_variable" value="value_of_prescript_variable" />
         <variable name="script_variable" value="value_of_script_variable" />
         <variable name="postscript_variable" value="value_of_postscript_vsariable" />
+        <variable name="from_create_job_parameter" value="${from_create_job_parameter}" />
     </variables>
     <description>UpdateVariablesTestJob</description>
     <taskFlow>

@@ -36,62 +36,32 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.job.ClientJobState;
-import org.ow2.proactive.scheduler.job.IdentifiedJob;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.job.InternalJobFactory;
-import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
+import org.ow2.proactive.scheduler.job.*;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
-import org.ow2.proactive.scheduler.task.internal.InternalJavaTask;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.apache.log4j.Logger;
+
+import java.lang.reflect.Method;
+import java.util.*;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
@@ -111,7 +81,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /** Stores methods that will be called on clients */
     private static final Map<String, Method> eventMethods;
     static {
-        eventMethods = new HashMap<String, Method>();
+        eventMethods = new HashMap<>();
         for (Method m : SchedulerEventListener.class.getMethods()) {
             eventMethods.put(m.getName(), m);
         }
@@ -141,12 +111,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     private final Map<JobId, JobState> jobsMap;
 
     SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper) {
-        this.identifications = new HashMap<UniqueID, ListeningUser>();
-        this.credentials = new HashMap<UniqueID, Credentials>();
-        this.dirtyList = new HashSet<UniqueID>();
+        this.identifications = new HashMap<>();
+        this.credentials = new HashMap<>();
+        this.dirtyList = new HashSet<>();
         this.jmxHelper = jmxHelper;
-        this.jobsMap = new HashMap<JobId, JobState>();
-        this.jobs = new HashMap<JobId, IdentifiedJob>();
+        this.jobsMap = new HashMap<>();
+        this.jobs = new HashMap<>();
         this.sessionTimer = new Timer("SessionTimer");
         this.sState = sState;
         recover(sState);
@@ -159,7 +129,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     private void recover(SchedulerStateImpl sState) {
         //default state = started
-        Set<JobState> jobStates = new HashSet<JobState>();
+        Set<JobState> jobStates = new HashSet<>();
         if (logger.isInfoEnabled()) {
             logger.info("#Pending jobs: " + sState.getPendingJobs().size() + " #Running jobs: " +
                 sState.getRunningJobs().size() + " #Finished jobs: " + sState.getFinishedJobs().size());
@@ -358,18 +328,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         //get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob, this.credentials.get(id));
 
-        if (!PASchedulerProperties.ALLOW_JAVA_TASKS.getValueAsBoolean()) {
-            // java tasks that are executed in nodes are prohibited
-            // reject the submission of jobs with java tasks
-            for (InternalTask it : job.getITasks()) {
-                if (it.getClass().equals(InternalJavaTask.class)) {
-                    logger.warn("Attempt to submit a java task when it's disactivated");
-                    throw new JobCreationException("Usage of java tasks is prohibited (please replace task " +
-                        it.getName() + " by forked java task)");
-                }
-            }
-        }
-
         //setting job informations
         if (job.getTasks().size() == 0) {
             String msg = "This job does not contain Tasks !! Insert tasks before submitting job";
@@ -528,7 +486,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         if (jobState == null) {
             return Collections.emptySet();
         } else {
-            Set<TaskId> tasks = new HashSet<TaskId>(jobState.getTasks().size());
+            Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
             for (TaskState task : jobState.getTasks()) {
                 tasks.add(task.getId());
             }
@@ -642,7 +600,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             if (dirtyList.isEmpty()) {
                 return;
             }
-            toRemove = new HashSet<UniqueID>(dirtyList);
+            toRemove = new HashSet<>(dirtyList);
             dirtyList.clear();
         }
 
@@ -969,7 +927,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized List<SchedulerUserInfo> getUsers() {
-        List<SchedulerUserInfo> users = new ArrayList<SchedulerUserInfo>(identifications.size());
+        List<SchedulerUserInfo> users = new ArrayList<>(identifications.size());
         for (ListeningUser listeningUser : identifications.values()) {
             UserIdentificationImpl user = listeningUser.getUser();
             users.add(new SchedulerUserInfo(user.getHostName(), user.getUsername(), user.getConnectionTime(),

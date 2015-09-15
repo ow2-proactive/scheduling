@@ -1,6 +1,9 @@
 package functionaltests;
 
 import functionaltests.monitor.EventMonitor;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestUsers;
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,11 +11,12 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.objectweb.proactive.utils.TimeoutAccounter;
 import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -21,29 +25,30 @@ import org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+
+import static org.junit.Assume.assumeTrue;
 
 
 /**
  * @author esalagea
  */
-public class TestSmartProxy extends SchedulerConsecutive {
+public class TestSmartProxy extends SchedulerFunctionalTest {
 
     /**
      * Local folder on client side where the input data is located and where the
      * output data is to be downloaded
      */
     public static final String workFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
-        "testDS_LocalFolder";
+            "testDS_LocalFolder";
 
     /**
      * Intermediary folder accessible (via file transfer protocol supported by
      * VFS) both from client side and from computing node side
      */
     public static final String dataServerFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
-        "testDS_remoteFolder";
+            "testDS_remoteFolder";
 
     public static long TIMEOUT = 120000;
 
@@ -63,7 +68,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
     protected static final String TASK_NAME = "TestJavaTask";
 
     public final static String inputFileBaseName = "input";
-    public final static String inputFileExt = ".txt";
+    public final static String inputFileExt = ".in";
     public final static String outputFileBaseName = "output";
     public final static String outputFileExt = ".out";
 
@@ -78,6 +83,9 @@ public class TestSmartProxy extends SchedulerConsecutive {
 
     @Before
     public void init() throws Exception {
+
+        // because of https://issues.jenkins-ci.org/browse/JENKINS-29285, test is unstable on windows
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
 
         // log all data transfer related events
         ProActiveLogger.getLogger(SchedulerProxyUserInterface.class).setLevel(Level.DEBUG);
@@ -96,16 +104,16 @@ public class TestSmartProxy extends SchedulerConsecutive {
         dataServerURI = (new File(dataServerFolderPath)).toURI().toURL().toExternalForm();
 
         // start scheduler and nodes
-        SchedulerTHelper.init();
+        schedulerHelper.getSchedulerAuth();
 
         schedProxy = SmartProxyImpl.getActiveInstance();
 
         schedProxy.cleanDatabase();
 
-        String schedulerUrl = SchedulerTHelper.schedulerUrl;
+        String schedulerUrl = SchedulerTHelper.getLocalUrl();
         schedProxy.setSessionName(TEST_SESSION_NAME);
 
-        schedProxy.init(schedulerUrl, SchedulerTHelper.admin_username, SchedulerTHelper.admin_password);
+        schedProxy.init(schedulerUrl, functionaltests.utils.TestUsers.DEMO.username, TestUsers.DEMO.password);
 
         eventListener = new MyEventListener();
         MyEventListener myListenerRemoteReference = PAActiveObject.turnActive(eventListener);
@@ -116,10 +124,15 @@ public class TestSmartProxy extends SchedulerConsecutive {
     protected TaskFlowJob createTestJob(boolean isolateOutputs) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
+
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.addAdditionalClasspath(getClasspath(job));
+
         for (int i = 0; i < NB_TASKS; i++) {
             JavaTask testTask = new JavaTask();
             testTask.setName(TASK_NAME + i);
             testTask.setExecutableClassName(SimpleJavaExecutable.class.getName());
+            testTask.setForkEnvironment(forkEnvironment);
             // testTask.
             // ------------- create an input File ------------
             File inputFile = new File(inputLocalFolder, inputFileBaseName + "_" + i + inputFileExt);
@@ -139,7 +152,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
             testTask.addInputFiles("DUMMY", InputAccessMode.TransferFromInputSpace);
             testTask.addInputFiles(inputFile.getName(), InputAccessMode.TransferFromInputSpace);
             if (isolateOutputs) {
-                testTask.addOutputFiles("*.out", OutputAccessMode.TransferToOutputSpace);
+                testTask.addOutputFiles("*"+outputFileExt, OutputAccessMode.TransferToOutputSpace);
             } else {
                 testTask.addOutputFiles(outputFileName, OutputAccessMode.TransferToOutputSpace);
             }
@@ -148,7 +161,6 @@ public class TestSmartProxy extends SchedulerConsecutive {
         job.setInputSpace(dataServerURI);
         job.setOutputSpace(dataServerURI);
 
-        setJobClassPath(job);
         return job;
     }
 
@@ -157,31 +169,24 @@ public class TestSmartProxy extends SchedulerConsecutive {
      *
      * @param job
      */
-    protected void setJobClassPath(Job job) {
+    protected String getClasspath(Job job) {
         String appClassPath = "";
         try {
             File appMainFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
                     .toURI());
-            appClassPath = appMainFolder.getAbsolutePath();
 
+            return appMainFolder.getAbsolutePath();
         } catch (URISyntaxException e1) {
-            SchedulerTHelper
-                    .log("Preview of the partial results will not be possible as some resources could not be found by the system. \nThis will not alterate your results in any way. ");
-            SchedulerTHelper
-                    .log("JobCreator: The bin folder of the project is null. It is needed to set the job environment. ");
-            SchedulerTHelper.log(e1);
+            functionaltests.utils.SchedulerTHelper
+                    .log(
+                            "Preview of the partial results will not be possible as some resources could not be " +
+                                    "found by the system. \nThis will not alterate your results in any way. ");
+            functionaltests.utils.SchedulerTHelper
+                    .log(
+                            "JobCreator: The bin folder of the project is null. It is needed to set the job environment. ");
+            functionaltests.utils.SchedulerTHelper.log(e1);
         }
-
-        JobEnvironment je = new JobEnvironment();
-        try {
-            je.setJobClasspath(new String[] { appClassPath });
-        } catch (IOException e) {
-            SchedulerTHelper
-                    .log("Preview of the partial results will not be possible as the job classpath could not be loaded. \nThis will not alterate your results in any way.");
-            SchedulerTHelper.log("Could not add classpath to the job. ");
-            SchedulerTHelper.log(e);
-        }
-        job.setEnvironment(je);
+        return appClassPath;
     }
 
     protected void waitWithMonitor(EventMonitor monitor, long timeout) throws ProActiveTimeoutException {
@@ -192,7 +197,7 @@ public class TestSmartProxy extends SchedulerConsecutive {
                 if (monitor.eventOccured())
                     return;
                 try {
-                    SchedulerTHelper.log("waiting for event monitor " + monitor);
+                    functionaltests.utils.SchedulerTHelper.log("waiting for event monitor " + monitor);
                     monitor.wait(counter.getRemainingTimeout());
                 } catch (InterruptedException e) {
                     // spurious wake-up, nothing to do
@@ -208,43 +213,57 @@ public class TestSmartProxy extends SchedulerConsecutive {
 
     @Test
     public void run() throws Throwable {
-        SchedulerTHelper
-                .log("***************************************************************************************************");
-        SchedulerTHelper
-                .log("********************** Testing isolateTaskOutputs = false automaticTransfer = false ***************");
-        SchedulerTHelper
-                .log("***************************************************************************************************");
+    	
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "********************** Testing isolateTaskOutputs = false automaticTransfer = false " +
+                                "***************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "***************************************************************************************************");
         submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(), outputLocalFolder
                 .getAbsolutePath(), false, false);
-        SchedulerTHelper
-                .log("***************************************************************************************************");
-        SchedulerTHelper
-                .log("********************** Testing isolateTaskOutputs = true automaticTransfer = false ****************");
-        SchedulerTHelper
-                .log("***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "********************** Testing isolateTaskOutputs = true automaticTransfer = false ****************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "***************************************************************************************************");
         submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(), outputLocalFolder
                 .getAbsolutePath(), true, false);
-        SchedulerTHelper
-                .log("***************************************************************************************************");
-        SchedulerTHelper
-                .log("********************** Testing isolateTaskOutputs = false automaticTransfer = true ****************");
-        SchedulerTHelper
-                .log("***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "********************** Testing isolateTaskOutputs = false automaticTransfer = true ****************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "***************************************************************************************************");
         submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(), outputLocalFolder
                 .getAbsolutePath(), false, true);
-        SchedulerTHelper
-                .log("***************************************************************************************************");
-        SchedulerTHelper
-                .log("********************** Testing isolateTaskOutputs = true automaticTransfer = true *****************");
-        SchedulerTHelper
-                .log("***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "********************** Testing isolateTaskOutputs = true automaticTransfer = true *****************");
+        functionaltests.utils.SchedulerTHelper
+                .log(
+                        "***************************************************************************************************");
         submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(), outputLocalFolder
                 .getAbsolutePath(), true, true);
 
     }
 
     protected void submitJobWithDataAndWaitToFinish(String localInputFolderPath,
-            String localOutputFolderPath, boolean isolateTaskOutputs, boolean automaticTransfer)
+                                                    String localOutputFolderPath, boolean isolateTaskOutputs, boolean automaticTransfer)
             throws Exception {
 
         TaskFlowJob job = createTestJob(isolateTaskOutputs);
@@ -284,8 +303,11 @@ public class TestSmartProxy extends SchedulerConsecutive {
             }
         }
 
+
         // check the presence of output files
         for (int i = 0; i < NB_TASKS; i++) {
+            functionaltests.utils.SchedulerTHelper
+                    .log(schedProxy.getTaskResult(id.toString(), TASK_NAME + i).getOutput().getAllLogs(true));
             String outputFileName = outputFileBaseName + "_" + i + outputFileExt;
             File outputFile = new File(outputLocalFolder, outputFileName);
             SchedulerTHelper.log("Checking file exists : " + outputFile);

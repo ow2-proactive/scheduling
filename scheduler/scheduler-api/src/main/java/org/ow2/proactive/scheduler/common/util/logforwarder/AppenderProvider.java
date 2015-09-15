@@ -53,6 +53,6 @@ public interface AppenderProvider extends Serializable {
      * @return an instance of the contained log appender.
      * @throws LogForwardingException if the appender cannot be created or activated.
      */
-    public Appender getAppender() throws LogForwardingException;
+    Appender getAppender() throws LogForwardingException;
 
 }

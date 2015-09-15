@@ -36,14 +36,10 @@
  */
 package functionaltests.selectionscript;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.junit.Assert;
 
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -54,9 +50,12 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -75,29 +74,18 @@ import functionaltests.RMTHelper;
  * As a result second node should be selected.
  *
  */
-public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
+public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
-    private String vmPropKey1 = "myProperty1";
-    private String vmPropValue1 = "myValue1";
-
-    private String vmPropKey2 = "myProperty2";
-    private String vmPropValue2 = "myValue2";
-
-    /** Actions to be Perform by this test.
-    * The method is called automatically by Junit framework.
-    * @throws Exception If the test fails.
-    */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        ResourceManager resourceManager = helper.getResourceManager();
+        ResourceManager resourceManager = rmHelper.getResourceManager();
 
         String nodeSourceName = "SelectionWithSeveralScriptsTest2";
         resourceManager.createNodeSource(nodeSourceName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).getBooleanValue();
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);
 
         String node1Name = "node-sel2-1";
         String node2Name = "node-sel2-2";
@@ -106,45 +94,49 @@ public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
         //create a first node with one VM property
         //---------------------------------------------------
 
-        HashMap<String, String> vmProp1 = new HashMap<String, String>();
-        vmProp1.put(this.vmPropKey1, this.vmPropValue1);
+        HashMap<String, String> vmProp1 = new HashMap<>();
+        String vmPropKey1 = "myProperty1";
+        String vmPropValue1 = "myValue1";
+        vmProp1.put(vmPropKey1, vmPropValue1);
 
-        String node1URL = helper.createNode(node1Name, vmProp1).getNode().getNodeInformation().getURL();
+        String node1URL = rmHelper.createNode(node1Name, vmProp1).getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL, nodeSourceName);
 
         //wait node adding event
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);
         //wait for the node to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //--------------------------------------------------
         //create a second node with two VM properties
         //---------------------------------------------------
 
-        HashMap<String, String> vmTwoProperties = new HashMap<String, String>();
-        vmTwoProperties.put(this.vmPropKey1, this.vmPropValue1);
-        vmTwoProperties.put(this.vmPropKey2, this.vmPropValue2);
+        HashMap<String, String> vmTwoProperties = new HashMap<>();
+        vmTwoProperties.put(vmPropKey1, vmPropValue1);
+        String vmPropKey2 = "myProperty2";
+        String vmPropValue2 = "myValue2";
+        vmTwoProperties.put(vmPropKey2, vmPropValue2);
 
-        String node2URL = helper.createNode(node2Name, vmTwoProperties).getNode().getNodeInformation()
+        String node2URL = rmHelper.createNode(node2Name, vmTwoProperties).getNode().getNodeInformation()
                 .getURL();
         resourceManager.addNode(node2URL, nodeSourceName);
 
         //wait node adding event
-        helper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
+        rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node2URL);
         //wait for the node to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         //create the static selection script object that check vm prop1
         SelectionScript sScript1 = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
-            new String[] { this.vmPropKey1, this.vmPropValue1 }, true);
+            new String[] { vmPropKey1, vmPropValue1 }, true);
 
         //create the static selection script object prop2
         SelectionScript sScript2 = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
-            new String[] { this.vmPropKey2, this.vmPropValue2 }, false);
+            new String[] { vmPropKey2, vmPropValue2 }, false);
 
-        RMTHelper.log("Test 1");
+        log("Test 1");
 
-        ArrayList<SelectionScript> scriptsList = new ArrayList<SelectionScript>();
+        ArrayList<SelectionScript> scriptsList = new ArrayList<>();
 
         scriptsList.add(sScript1);
         scriptsList.add(sScript2);
@@ -158,13 +150,13 @@ public class SelectionWithSeveralScriptsTest2 extends RMConsecutive {
         assertEquals(node2URL, nodes.get(0).getNodeInformation().getURL());
 
         //wait for node busy event
-        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        RMNodeEvent evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         assertEquals(NodeState.BUSY, evt.getNodeState());
         assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(nodes);
         //wait for node free event
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, node2URL);
         assertEquals(NodeState.FREE, evt.getNodeState());
 
         assertEquals(2, resourceManager.getState().getFreeNodesNumber());

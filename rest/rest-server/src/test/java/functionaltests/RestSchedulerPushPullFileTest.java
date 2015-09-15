@@ -53,22 +53,17 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.log4j.Level;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.core.SchedulerFrontend;
-import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 
 
 /**
@@ -85,14 +80,14 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(RestSchedulerPushPullFileTest.class.getSimpleName());
+        init();
     }
 
     @Before
     public void setUp() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<JobState>();
+        List<JobState> jobStates = new ArrayList<>();
         jobStates.addAll(state.getPendingJobs());
         jobStates.addAll(state.getRunningJobs());
         jobStates.addAll(state.getFinishedJobs());
@@ -173,7 +168,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
         InputStream is = response2.getEntity().getContent();
         List<String> lines = IOUtils.readLines(is);
-        HashSet<String> content = new HashSet<String>(lines);
+        HashSet<String> content = new HashSet<>(lines);
         System.out.println(lines);
         Assert.assertTrue("Pushed file correctly listed", content.contains(testPushFile.getName()));
 

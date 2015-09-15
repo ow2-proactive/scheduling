@@ -36,15 +36,14 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.net.MalformedURLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.common.base.Joiner;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
+
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -52,12 +51,11 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
  * You can create a job by using this class. Job will be used to set some properties,
  * and give it the different tasks to run.
  * <p>
- * Here's a definition of the different parts of a job :<br>
+ * Here's a definition of the different parts of a job:<br>
  * {@link #setName(String)} will be used to identified the job.<br>
  * {@link #setDescription(String)} to set a short description of your job.<br>
  * {@link #setPriority(JobPriority)} to set the priority for the job, see {@link JobPriority} for more details.<br>
  * {@link #setCancelJobOnError(boolean)} used if you want to abort the job if an exception occurred in at least one of the task.<br>
- * {@link #setLogFile(String)} allow you to save the output of the job tasks in a specific file.<br>
  * <p>
  * Once the job created, you can submit it to the scheduler using the UserSchedulerInterface.
  *
@@ -69,9 +67,6 @@ public abstract class Job extends CommonAttribute {
 
     /** Name of the job */
     protected String name = SchedulerConstants.JOB_DEFAULT_NAME;
-
-    /** Execution environment for this job */
-    protected JobEnvironment environment = new JobEnvironment();
 
     /** Short description of this job */
     protected String description = "No description";
@@ -88,7 +83,7 @@ public abstract class Job extends CommonAttribute {
     protected String userSpace = null;
 
     /** A map to holds job descriptor variables */
-    protected Map<String, String> variables = new HashMap<String, String>();
+    protected Map<String, String> variables = new HashMap<>();
 
     /** ProActive Empty Constructor */
     public Job() {
@@ -181,24 +176,6 @@ public abstract class Job extends CommonAttribute {
     }
 
     /**
-     * Return the environment for this job
-     *
-     * @see JobEnvironment
-     * @return the environment for this job
-     */
-    public JobEnvironment getEnvironment() {
-        return environment;
-    }
-
-    /**
-     * Set the environment for this job.
-     * @param environment the environment to set
-     */
-    public void setEnvironment(JobEnvironment environment) {
-        this.environment = environment;
-    }
-
-    /**
      * Get the input Space
      *
      * @return the input Space
@@ -285,34 +262,31 @@ public abstract class Job extends CommonAttribute {
     }
 
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
 
         return "Job '" +
-            name +
-            "' : " +
-            nl +
-            "\tEnvironment = " +
-            environment +
-            nl +
-            "\tDescription = '" +
-            description +
-            '\'' +
-            nl +
-            "\tProjectName = '" +
-            projectName +
-            '\'' +
-            nl +
-            (cancelJobOnError.isSet() ? "\tcancelJobOnError = '" +
-                cancelJobOnError.getValue().getBooleanValue() + '\'' + nl : "") +
-            (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' +
-                nl : "") +
-            (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
-                maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
-            "\tgenericInformations = {" + nl +
-            Joiner.on('\n').withKeyValueSeparator("=").join(genericInformations) + nl + "}" + nl +
-            "\tPriority = " + priority + nl + "\tInputSpace = '" + inputSpace + '\'' + nl +
-            "\tOutputSpace = '" + outputSpace + '\'' + nl + "\tGlobalSpace = '" + globalSpace + '\'' + nl +
-            "\tUserSpace = '" + userSpace + '\'' + nl + "\tVariables = {" + nl +
-            Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}";
+                name +
+                "' : " +
+                nl +
+                "\tDescription = '" +
+                description +
+                '\'' +
+                nl +
+                "\tProjectName = '" +
+                projectName +
+                '\'' +
+                nl +
+                (cancelJobOnError.isSet() ? "\tcancelJobOnError = '" +
+                        cancelJobOnError.getValue().getBooleanValue() + '\'' + nl : "") +
+                (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' +
+                        nl : "") +
+                (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
+                        maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
+                "\tgenericInformations = {" + nl +
+                Joiner.on('\n').withKeyValueSeparator("=").join(genericInformations) + nl + "}" + nl +
+                "\tPriority = " + priority + nl + "\tInputSpace = '" + inputSpace + '\'' + nl +
+                "\tOutputSpace = '" + outputSpace + '\'' + nl + "\tGlobalSpace = '" + globalSpace + '\'' + nl +
+                "\tUserSpace = '" + userSpace + '\'' + nl + "\tVariables = {" + nl +
+                Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}";
     }
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -20,7 +19,6 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 
 
 /**
- * 
  * This class is a client view of a {@link JobState}. A client will receive an
  * instance of this class when connecting to the scheduler front-end and ask for
  * a JobState (for instance by using {@link Scheduler#getJobState(String)}).
@@ -30,14 +28,13 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
  * RuntimeException. See the public method's javadoc for more details.
  * 
  * @author esalagea
- * 
  */
 public final class ClientJobState extends JobState {
 
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;
-    private Map<TaskId, TaskState> tasks = new HashMap<TaskId, TaskState>();
+    private Map<TaskId, TaskState> tasks = new HashMap<>();
 
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
@@ -60,9 +57,9 @@ public final class ClientJobState extends JobState {
         this.cancelJobOnError = jobState.isCancelJobOnError();
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
-        this.genericInformations = new HashMap<String, String>(jobState.getGenericInformations());
+        this.genericInformations = new HashMap<>(jobState.getGenericInformations());
 
-        List<ClientTaskState> taskStates = new ArrayList<ClientTaskState>();
+        List<ClientTaskState> taskStates = new ArrayList<>();
         for (TaskState ts : jobState.getTasks()) {
             taskStates.add(new ClientTaskState(ts));
         }
@@ -137,7 +134,7 @@ public final class ClientJobState extends JobState {
 
     @Override
     public ArrayList<TaskState> getTasks() {
-        return new ArrayList<TaskState>(tasks.values());
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
@@ -162,15 +159,6 @@ public final class ClientJobState extends JobState {
         for (ClientTaskState ts : newTasks) {
             ts.restoreDependences(tasks);
         }
-    }
-
-    /**
-     * This property is not available for this implementation. Calling this
-     * method will throw a RuntimeException
-     */
-    @Override
-    public JobEnvironment getEnvironment() {
-        throw new RuntimeException("Not implemented: the job environment is not available on client side.");
     }
 
     /**

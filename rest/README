@@ -77,6 +77,8 @@ some command-line usage :
 # login
 curl -d "username=demo&password=demo" http://localhost:8080/rest/scheduler/login
 
+curl -d "username=demo&password=demo" http://localhost:8080/rest/scheduler/login
+
 #submit a job
 curl -H "sessionid:1" -F 'file=@Job_2_tasks.xml' http://localhost:8080/rest/scheduler/submit
 
@@ -100,5 +102,5 @@ curl -d "username=admin&password=admin" http://localhost:8080/rest/rm/login
 
 curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/rm/state
 
-curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/rm/monitoring
+curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080curl -H "sessionid:1" -H "Accept: application/json" http://localhost:8080/rest/rm/monitoring
 

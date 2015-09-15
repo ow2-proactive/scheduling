@@ -65,7 +65,7 @@ public class CredData implements Serializable {
     // Optional ssh key
     private byte[] key = null;
 
-    private Map<String, String> thirdPartyCredentials = new HashMap<String, String>();
+    private Map<String, String> thirdPartyCredentials = new HashMap<>();
 
     /**
      * Extract the Windows domain name from the full login

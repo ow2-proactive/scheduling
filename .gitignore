@@ -4,9 +4,9 @@ build/
 *.iml
 
 # /
-/.classpath
-/.project
-/.settings
+*.classpath
+*.project
+*.settings
 /.classpath*
 
 /dist/
@@ -16,9 +16,15 @@ build/
 /logs
 /lib
 /bin
+**/bin
+
 /tools
 !/tools/startup.groovy
 
 /TEST_SCHEDULER_DB
 /.nb-gradle/private/
+
+*.DS_Store
+
+*.log
 

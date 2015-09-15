@@ -45,7 +45,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.task.internal.InternalNativeTask;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -106,7 +106,7 @@ public class SchedulerStateRestJobLogsTest {
     @Test
     public void job_full_logs_not_finished() throws Exception {
         InternalTaskFlowJob jobState = new InternalTaskFlowJob();
-        jobState.addTask(new InternalNativeTask());
+        jobState.addTask(new InternalScriptTask());
         when(mockScheduler.getJobState("123")).thenReturn(jobState);
 
         InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
@@ -117,7 +117,9 @@ public class SchedulerStateRestJobLogsTest {
     @Test
     public void job_full_logs_finished() throws Exception {
         InternalTaskFlowJob jobState = new InternalTaskFlowJob();
-        jobState.addTask(new InternalNativeTask());
+        InternalScriptTask task = new InternalScriptTask();
+        task.setPreciousLogs(true);
+        jobState.addTask(task);
 
         File logFile = tempFolder.newFile("TaskLogs-123-0.log");
         FileUtils.write(logFile, "logs");
@@ -153,7 +155,8 @@ public class SchedulerStateRestJobLogsTest {
     }
 
     private static void addTask(InternalTaskFlowJob jobState, long finishedTime, long id) {
-        InternalNativeTask task = new InternalNativeTask();
+        InternalScriptTask task = new InternalScriptTask();
+        task.setPreciousLogs(true);
         task.setFinishedTime(finishedTime);
         jobState.addTask(task);
         task.setId(TaskIdImpl.createTaskId(new JobIdImpl(123, "job"), "task", id, false));

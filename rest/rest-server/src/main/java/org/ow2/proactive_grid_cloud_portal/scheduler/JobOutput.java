@@ -45,8 +45,8 @@ public class JobOutput {
     private CircularArrayList<String> allLogs;
 
     public JobOutput() {
-        currentLogs = new CircularArrayList<String>(50);
-        allLogs = new CircularArrayList<String>(50);
+        currentLogs = new CircularArrayList<>(50);
+        allLogs = new CircularArrayList<>(50);
     }
 
     public synchronized void log(String message) {

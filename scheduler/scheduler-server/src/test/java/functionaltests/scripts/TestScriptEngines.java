@@ -41,9 +41,13 @@ import java.util.Map;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import functionaltests.SchedulerConsecutive;
-import functionaltests.SchedulerTHelper;
 import org.junit.Assert;
+import org.junit.Test;
+
+import functionaltests.utils.SchedulerFunctionalTest;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -53,35 +57,35 @@ import org.junit.Assert;
  *
  * @author The ProActive Team
  */
-public class TestScriptEngines extends SchedulerConsecutive {
+public class TestScriptEngines extends SchedulerFunctionalTest {
 
     private static String jobDescriptorsLoc = "JobScriptEngines.xml";
 
     private URL jobDescriptor = TestScriptEngines.class.getResource("/functionaltests/scripts/" +
         jobDescriptorsLoc);
 
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
-        logger.info("Testing submission of job descriptor : " + jobDescriptor);
-        JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
+        log("Testing submission of job descriptor : " + jobDescriptor);
+        JobId id = schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         // check result are not null
-        JobResult res = SchedulerTHelper.getJobResult(id);
-        Assert.assertFalse("Had Exception : " + jobDescriptor.toString(), SchedulerTHelper.getJobResult(id)
+        JobResult res = schedulerHelper.getJobResult(id);
+        assertFalse("Had Exception : " + jobDescriptor.toString(), schedulerHelper.getJobResult(id)
                 .hadException());
 
         Assert.assertEquals(4, res.getAllResults().size());
         for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
 
-            Assert.assertFalse("Had Exception : " + entry.getKey(), entry.getValue().hadException());
+            assertFalse("Had Exception : " + entry.getKey(), entry.getValue().hadException());
 
-            Assert.assertNotNull("Result not null : " + entry.getKey(), entry.getValue().value());
+            assertNotNull("Result not null : " + entry.getKey(), entry.getValue().value());
 
-            Assert.assertTrue("Hello World in Output : " + entry.getKey(), entry.getValue().getOutput()
-                    .getAllLogs(false).contains("Hello World"));
+            assertTrue("Hello World in Output : " + entry.getKey(),
+                    entry.getValue().getOutput().getAllLogs(false).contains("Hello World"));
         }
 
-        SchedulerTHelper.removeJob(id);
-        SchedulerTHelper.waitForEventJobRemoved(id);
+        schedulerHelper.removeJob(id);
+        schedulerHelper.waitForEventJobRemoved(id);
     }
 }

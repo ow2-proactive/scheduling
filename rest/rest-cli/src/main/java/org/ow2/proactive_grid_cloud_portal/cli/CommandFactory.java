@@ -88,14 +88,14 @@ public abstract class CommandFactory {
     private static final Map<String, CommandSet.Entry> commonCmdMap;
 
     static {
-        commonCmdMap = new HashMap<String, CommandSet.Entry>();
+        commonCmdMap = new HashMap<>();
         for (CommandSet.Entry entry : CommandSet.COMMON_COMMANDS) {
             commonCmdMap.put(opt(entry), entry);
         }
     }
 
-    protected final Map<String, CommandSet.Entry> cmdMap = new HierarchicalMap<String, CommandSet.Entry>(
-        CommandFactory.supportedCommandMap());
+    protected final Map<String, CommandSet.Entry> cmdMap = new HierarchicalMap<>(
+            CommandFactory.supportedCommandMap());
 
     public static CommandFactory getCommandFactory(Type type) {
         switch (type) {
@@ -153,7 +153,7 @@ public abstract class CommandFactory {
      */
     protected List<Command> getCommandList(CommandLine cli, Map<String, Command> map,
             ApplicationContext currentContext) {
-        LinkedList<Command> list = new LinkedList<Command>();
+        LinkedList<Command> list = new LinkedList<>();
 
         if (map.containsKey(opt(COMMON_HELP))) {
             list.add(map.remove(opt(COMMON_HELP)));
@@ -249,7 +249,7 @@ public abstract class CommandFactory {
 
     protected Map<String, Command> commandMapInstance(CommandLine cli,
             final Map<String, CommandSet.Entry> supportedCommandEntryMap) {
-        Map<String, Command> cliCommands = new HashMap<String, Command>();
+        Map<String, Command> cliCommands = new HashMap<>();
         for (Option o : cli.getOptions()) {
             cliCommands.put(o.getOpt(), getCommandForOption(o, supportedCommandEntryMap));
         }

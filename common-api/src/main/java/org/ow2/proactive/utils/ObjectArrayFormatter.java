@@ -49,7 +49,7 @@ import java.util.List;
 public class ObjectArrayFormatter {
 
     private List<String> title;
-    private List<List<String>> lines = new ArrayList<List<String>>();
+    private List<List<String>> lines = new ArrayList<>();
     private int spaces;
     private int maxColumnLength = 20;
 
@@ -154,17 +154,17 @@ public class ObjectArrayFormatter {
             sb.append(String
                     .format(" %1$-" + columnLengths[i] + "s", cutNchar(title.get(i), maxColumnLength)));
         }
-        sb.append(System.getProperty("line.separator"));
+        sb.append(System.lineSeparator());
         for (List<String> l : lines) {
             if (l == null) {
-                sb.append(System.getProperty("line.separator"));
+                sb.append(System.lineSeparator());
             } else {
                 sb.append("\t");
                 for (int i = 0; i < l.size(); i++) {
                     sb.append(String.format(" %1$-" + columnLengths[i] + "s", cutNchar(l.get(i),
                             maxColumnLength)));
                 }
-                sb.append(System.getProperty("line.separator"));
+                sb.append(System.lineSeparator());
             }
         }
         return sb.toString();

@@ -40,10 +40,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
@@ -60,24 +62,27 @@ import org.apache.sshd.server.command.ScpCommandFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.shell.ProcessShellFactory;
-import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+
+import static org.junit.Assert.*;
 
 
-public class TestSSHInfrastructureV2 extends RMConsecutive {
+public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        ResourceManager rm = helper.getResourceManager();
+        ResourceManager resourceManager = this.rmHelper.getResourceManager();
 
         RMTHelper.log("Test - Create SSH infrastructure on ssh://localhost on port " + this.port);
 
         String javaExePath = System.getProperty("java.home") + File.separator + "bin" + File.separator +
             (OsUtils.isWin32() ? "java.exe" : "java");
+        javaExePath = "\"" + javaExePath + "\"";
 
         Object[] infraParams = new Object[] { "localhost 1\n".getBytes(), //hosts
                 60000, //timeout
@@ -85,29 +90,29 @@ public class TestSSHInfrastructureV2 extends RMConsecutive {
                 this.port, //ssh server port
                 "toto", //ssh username
                 "toto", //ssh password
-                new byte[0], // optinal ssh private key
+                new byte[0], // optional ssh private key
                 new byte[0], // optional ssh options file
                 javaExePath, //java path on the remote machines
-                CentralPAPropertyRepository.PA_HOME.getValue(), //Scheduling path on remote machines
+                PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
                 OperatingSystem.getOperatingSystem(), "" }; // extra java options
 
         final Object[] policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString() };
 
         String nsname = "testSSHInfra";
-        rm.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams, StaticPolicy.class
-                .getName(), policyParameters);
-        helper.waitForNodeSourceCreation(nsname, 1);
+        resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
+                StaticPolicy.class.getName(), policyParameters);
+        this.rmHelper.waitForNodeSourceCreation(nsname, 1);
 
-        RMState s = rm.getState();
-        Assert.assertEquals(1, s.getTotalNodesNumber());
-        Assert.assertEquals(1, s.getFreeNodesNumber());
+        RMState s = resourceManager.getState();
+        assertEquals(1, s.getTotalNodesNumber());
+        assertEquals(1, s.getFreeNodesNumber());
     }
 
     private int port;
     private SshServer sshd;
 
-    @org.junit.Before
-    public void setUp() throws Exception {
+    @Before
+    public void startSSHServer() throws Exception {
         // Disable bouncy castle to avoid versions conflict
         System.setProperty("org.apache.sshd.registerBouncyCastle", "false");
 
@@ -124,7 +129,7 @@ public class TestSSHInfrastructureV2 extends RMConsecutive {
                     ProcessShellFactory.TtyOptions.ONlCr)));
         }
 
-        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<NamedFactory<UserAuth>>();
+        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
         userAuthFactories.add(new UserAuthPassword.Factory());
         sshd.setUserAuthFactories(userAuthFactories);
 
@@ -145,7 +150,7 @@ public class TestSSHInfrastructureV2 extends RMConsecutive {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
                             ProcessShellFactory.TtyOptions.ICrNl, ProcessShellFactory.TtyOptions.ONlCr);
                 }
-                return new ProcessShellFactory(command.split(" "), ttyOptions).create();
+                return new ProcessShellFactory(splitCommand(command), ttyOptions).create();
             }
         }));
 
@@ -154,10 +159,19 @@ public class TestSSHInfrastructureV2 extends RMConsecutive {
         this.port = sshd.getPort();
     }
 
-    @org.junit.After
-    public void tearDown() throws Exception {
+    @After
+    public void stopSSHServer() throws Exception {
         if (sshd != null) {
             sshd.stop(true);
         }
+    }
+
+    private static String[] splitCommand(String command) {
+        List<String> list = new ArrayList<>();
+        Matcher m = Pattern.compile("([^\\\\\"]\\S*|\\\\\".+?\\\\\")\\s*").matcher(command);
+        while (m.find()) {
+            list.add(m.group(1).replaceAll("\\\\\"", ""));
+        }
+        return list.toArray(new String[list.size()]);
     }
 }

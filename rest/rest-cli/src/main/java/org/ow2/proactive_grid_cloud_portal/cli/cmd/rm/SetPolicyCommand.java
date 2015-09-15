@@ -66,7 +66,7 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
     private String policyType;
     private String[] policyArgs;
 
-    public SetPolicyCommand(String... args) {
+    public SetPolicyCommand(String[] args) {
         if (!(args.length > 0)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, "At least one argument required.");
         }
@@ -85,7 +85,7 @@ public class SetPolicyCommand extends AbstractCommand implements Command {
             HttpGet request = new HttpGet(currentContext.getResourceUrl("policies"));
             HttpResponseWrapper response = execute(request, currentContext);
             if (statusCode(OK) == statusCode(response)) {
-                knownPolicies = new HashMap<String, PluginView>();
+                knownPolicies = new HashMap<>();
                 List<PluginView> pluginViewList = readValue(response, new TypeReference<List<PluginView>>() {
                 }, currentContext);
                 for (PluginView pluginView : pluginViewList) {

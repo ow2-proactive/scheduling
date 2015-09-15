@@ -124,7 +124,7 @@ public class EC2Infrastructure extends InfrastructureManager {
      * they deployed.
      * Essentially used as safe check if the terminate by DNS name doesn't work...
      */
-    private Hashtable<String, Instance> nodeNameToInstance = new Hashtable<String, Instance>();
+    private Hashtable<String, Instance> nodeNameToInstance = new Hashtable<>();
 
     /** delay after which a requested EC2 instance is considered lost in ms */
     private static final long TIMEOUT_DELAY = 60000 * 45; // 45mn
@@ -133,7 +133,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     private static final int RETRY_THRESHOLD = 5;
 
     /** Hashtable to be able to associate a deploying node to a given ec2 instance */
-    private final Hashtable<String, Instance> deployingNodeToInstance = new Hashtable<String, Instance>();
+    private final Hashtable<String, Instance> deployingNodeToInstance = new Hashtable<>();
 
     /** Image descriptor to use will try the first available if null */
     private String imgd;
@@ -235,7 +235,7 @@ public class EC2Infrastructure extends InfrastructureManager {
                                 " with ip " + this.ec2d.getInstanceHostname(toDestroy.getInstanceId()) +
                                 ", started whereas not expected. Terminate it by yourself.");
                             lostDescription = "An EC2 instance started but wasn't required and we weren't able to terminate it." +
-                                System.getProperty("line.separator");
+                                System.lineSeparator();
                             lostDescription += "Terminate the instance " + toDestroy.getInstanceId() +
                                 " with ip " + this.ec2d.getInstanceHostname(toDestroy.getInstanceId()) +
                                 " by yourself";
@@ -268,7 +268,7 @@ public class EC2Infrastructure extends InfrastructureManager {
     private void handledStartInstanceException(Throwable e, String deployingNodeURL) throws RMException {
         logger.error("Unable to acquire EC2 instance", e);
         if (deployingNodeURL != null) {
-            String lf = System.getProperty("line.separator");
+            String lf = System.lineSeparator();
             super.declareDeployingNodeLost(deployingNodeURL,
                     "Cannot deploy a new EC2 instance because of an Exception" + lf +
                         "Be sure that the instance is effectively powered off" + lf + Utils.getStacktrace(e));
@@ -287,7 +287,7 @@ public class EC2Infrastructure extends InfrastructureManager {
         result.setRmURL(this.rmUrl);
         result.setCredentialsValueAndNullOthers(this.creds64);
         result.setJavaPath(REMOTE_JAVA_EXE);
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties
                 .put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), communicationProtocol);
         result.setPaProperties(properties);

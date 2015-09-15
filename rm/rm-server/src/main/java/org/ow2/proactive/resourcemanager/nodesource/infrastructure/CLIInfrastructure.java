@@ -106,7 +106,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             throw new RMException("Cannot run command: " + commandLine, e1);
         }
 
-        String lf = System.getProperty("line.separator");
+        String lf = System.lineSeparator();
 
         int circuitBreakerThreshold = 5;
         while (!this.pnTimeout.get(pnURL) && circuitBreakerThreshold > 0) {
@@ -189,7 +189,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                         int exitCode = p.waitFor();
                         String pOutPut = Utils.extractProcessOutput(p);
                         String pErrPut = Utils.extractProcessErrput(p);
-                        String lf = System.getProperty("line.separator");
+                        String lf = System.lineSeparator();
                         final String description = "Removal script ouput" + lf + "   >Error code: " +
                             exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
                         if (exitCode != 0) {

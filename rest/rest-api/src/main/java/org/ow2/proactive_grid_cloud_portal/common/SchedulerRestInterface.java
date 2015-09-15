@@ -101,7 +101,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs")
     @Produces("application/json")
-    public abstract List<String> jobs(@HeaderParam("sessionid")
+    List<String> jobs(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
     int index, @QueryParam("range")
@@ -123,7 +123,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobsinfo")
     @Produces( { "application/json", "application/xml" })
-    public abstract List<UserJobData> jobsinfo(@HeaderParam("sessionid")
+    List<UserJobData> jobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
     int index, @QueryParam("range")
@@ -151,7 +151,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("revisionjobsinfo")
     @Produces( { "application/json", "application/xml" })
-    public abstract Map<Long, List<UserJobData>> revisionAndjobsinfo(@HeaderParam("sessionid")
+    Map<Long, List<UserJobData>> revisionAndjobsinfo(@HeaderParam("sessionid")
     String sessionId, @QueryParam("index")
     @DefaultValue("-1")
     int index, @QueryParam("range")
@@ -174,7 +174,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("state/revision")
     @Produces( { "application/json", "application/xml" })
-    public abstract long schedulerStateRevision(@HeaderParam("sessionid")
+    long schedulerStateRevision(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedRestException;
 
     /**
@@ -185,7 +185,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}")
     @Produces( { "application/json", "application/xml" })
-    public abstract JobStateData listJobs(@HeaderParam("sessionid")
+    JobStateData listJobs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -199,7 +199,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/result")
     @Produces("application/json")
-    public abstract JobResultData jobResult(@HeaderParam("sessionid")
+    JobResultData jobResult(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 
@@ -217,7 +217,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/result/value")
     @Produces("application/json")
-    public abstract Map<String, String> jobResultValue(@HeaderParam("sessionid")
+    Map<String, String> jobResultValue(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 
@@ -232,7 +232,7 @@ public interface SchedulerRestInterface {
     @DELETE
     @Path("jobs/{jobid}")
     @Produces("application/json")
-    public abstract boolean removeJob(@HeaderParam("sessionid")
+    boolean removeJob(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -246,7 +246,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/log/server")
     @Produces("application/json")
-    public abstract String jobServerLog(@HeaderParam("sessionid")
+    String jobServerLog(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -260,7 +260,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("jobs/{jobid}/kill")
     @Produces("application/json")
-    public abstract boolean killJob(@HeaderParam("sessionid")
+    boolean killJob(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -273,42 +273,9 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    public abstract List<String> getJobTasksIds(@HeaderParam("sessionid")
+    List<String> getJobTasksIds(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
-
-    /**
-     * Returns a map corresponding of a jobid
-     * @param sessionId a valid session id
-     * @param jobId the job id
-     * @return a map corresponding of a <code>jobId</code>
-     * @throws IOException when the job archive is not found 
-     */
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/map")
-    @Produces("application/xml")
-    public String getJobMap(@HeaderParam("sessionid")
-    String sessionId, @PathParam("jobid")
-    String jobId) throws IOException, NotConnectedRestException;
-
-    /**
-     * Returns a base64 utf-8 encoded png image corresponding to the jobid
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param jobId
-     *            the job id
-     * @return Returns a base64 encoded png image corresponding to the jobid
-     * @throws IOException
-     *             when it is not possible to access to the archive
-     */
-    @GET
-    @Path("jobs/{jobid}/image")
-    @Produces("application/json;charset=" + ENCODING)
-    public String getJobImage(@HeaderParam("sessionid")
-    String sessionId, @PathParam("jobid")
-    String jobId) throws IOException, NotConnectedRestException;
 
     /**
      * Returns a base64 utf-8 encoded html visualization corresponding to the jobid.
@@ -325,7 +292,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/html")
     @Produces("application/json;charset=" + ENCODING)
-    public String getJobHtml(@HeaderParam("sessionid")
+    String getJobHtml(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws IOException, NotConnectedRestException;
 
@@ -339,7 +306,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates")
     @Produces("application/json")
-    public abstract List<TaskStateData> getJobTaskStates(@HeaderParam("sessionid")
+    List<TaskStateData> getJobTaskStates(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -354,7 +321,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/log/full")
     @Produces("application/json")
-    public abstract InputStream jobFullLogs(@HeaderParam("sessionid")
+    InputStream jobFullLogs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @QueryParam("sessionid")
     String session) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
@@ -374,7 +341,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/result/log/all")
     @Produces("application/json")
-    public String jobLogs(@HeaderParam("sessionid")
+    String jobLogs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException;
@@ -389,7 +356,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}")
     @Produces("application/json")
-    public abstract TaskStateData jobtasks(@HeaderParam("sessionid")
+    TaskStateData jobtasks(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
@@ -410,7 +377,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/value")
     @Produces("*/*")
-    public abstract Serializable valueOftaskresult(@HeaderParam("sessionid")
+    Serializable valueOftaskresult(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws Throwable;
@@ -427,7 +394,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
     @Produces("*/*")
-    public abstract byte[] serializedValueOftaskresult(@HeaderParam("sessionid")
+    byte[] serializedValueOftaskresult(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws Throwable;
@@ -444,7 +411,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result")
     @Produces("application/json")
-    public abstract TaskResultData taskresult(@HeaderParam("sessionid")
+    TaskResultData taskresult(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
@@ -461,7 +428,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
     @Produces("application/json")
-    public abstract String tasklog(@HeaderParam("sessionid")
+    String tasklog(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
@@ -478,7 +445,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
     @Produces("application/json")
-    public abstract String tasklogErr(@HeaderParam("sessionid")
+    String tasklogErr(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
@@ -495,7 +462,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
     @Produces("application/json")
-    public abstract String tasklogout(@HeaderParam("sessionid")
+    String tasklogout(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
@@ -513,7 +480,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/full")
     @Produces("application/json")
-    public abstract InputStream taskFullLogs(@HeaderParam("sessionid")
+    InputStream taskFullLogs(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname, @QueryParam("sessionid")
@@ -531,7 +498,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/log/server")
     @Produces("application/json")
-    public abstract String taskServerLog(@HeaderParam("sessionid")
+    String taskServerLog(@HeaderParam("sessionid")
     String sessionId, @PathParam("jobid")
     String jobId, @PathParam("taskname")
     String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
@@ -546,7 +513,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("jobs/{jobid}/pause")
     @Produces("application/json")
-    public abstract boolean pauseJob(@HeaderParam("sessionid")
+    boolean pauseJob(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -559,7 +526,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("jobs/{jobid}/resume")
     @Produces("application/json")
-    public abstract boolean resumeJob(@HeaderParam("sessionid")
+    boolean resumeJob(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -579,7 +546,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("submitflat")
     @Produces("application/json")
-    public abstract JobIdData submitFlat(@HeaderParam("sessionid")
+    JobIdData submitFlat(@HeaderParam("sessionid")
     String sessionId, @FormParam("commandFileContent")
     String commandFileContent, @FormParam("jobName")
     String jobName, @FormParam("selectionScriptContent")
@@ -597,7 +564,7 @@ public interface SchedulerRestInterface {
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public JobIdData submit(@HeaderParam("sessionid")
+    JobIdData submit(@HeaderParam("sessionid")
     String sessionId, @PathParam("path")
     PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
@@ -640,7 +607,7 @@ public interface SchedulerRestInterface {
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public abstract boolean pushFile(@HeaderParam("sessionid")
+    boolean pushFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
     String spaceName, @PathParam("filePath")
     String filePath, MultipartFormDataInput multipart) throws IOException, NotConnectedRestException,
@@ -659,7 +626,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public abstract InputStream pullFile(@HeaderParam("sessionid")
+    InputStream pullFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
     String spaceName, @PathParam("filePath")
     String filePath) throws IOException, NotConnectedRestException, PermissionRestException;
@@ -673,7 +640,7 @@ public interface SchedulerRestInterface {
     @DELETE
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
     @Produces("application/json")
-    public abstract boolean deleteFile(@HeaderParam("sessionid")
+    boolean deleteFile(@HeaderParam("sessionid")
     String sessionId, @PathParam("spaceName")
     String spaceName, @PathParam("filePath")
     String filePath) throws IOException, NotConnectedRestException, PermissionRestException;
@@ -687,7 +654,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("disconnect")
     @Produces("application/json")
-    public abstract void disconnect(@HeaderParam("sessionid")
+    void disconnect(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -700,7 +667,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("pause")
     @Produces("application/json")
-    public abstract boolean pauseScheduler(@HeaderParam("sessionid")
+    boolean pauseScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -713,7 +680,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("stop")
     @Produces("application/json")
-    public abstract boolean stopScheduler(@HeaderParam("sessionid")
+    boolean stopScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -726,7 +693,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("resume")
     @Produces("application/json")
-    public abstract boolean resumeScheduler(@HeaderParam("sessionid")
+    boolean resumeScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -741,7 +708,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/priority/byname/{name}")
-    public abstract void schedulerChangeJobPriorityByName(@HeaderParam("sessionid")
+    void schedulerChangeJobPriorityByName(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId, @PathParam("name")
     String priorityName) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
@@ -760,7 +727,7 @@ public interface SchedulerRestInterface {
      */
     @PUT
     @Path("jobs/{jobid}/priority/byvalue/{value}")
-    public abstract void schedulerChangeJobPriorityByValue(@HeaderParam("sessionid")
+    void schedulerChangeJobPriorityByValue(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId, @PathParam("value")
     String priorityValue) throws NumberFormatException, NotConnectedRestException, UnknownJobRestException,
@@ -776,7 +743,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("freeze")
     @Produces("application/json")
-    public abstract boolean freezeScheduler(@HeaderParam("sessionid")
+    boolean freezeScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -789,7 +756,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("status")
     @Produces("application/json")
-    public abstract SchedulerStatusData getSchedulerStatus(@HeaderParam("sessionid")
+    SchedulerStatusData getSchedulerStatus(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -802,7 +769,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("start")
     @Produces("application/json")
-    public abstract boolean startScheduler(@HeaderParam("sessionid")
+    boolean startScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -815,7 +782,7 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("kill")
     @Produces("application/json")
-    public abstract boolean killScheduler(@HeaderParam("sessionid")
+    boolean killScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -830,7 +797,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("linkrm")
     @Produces("application/json")
-    public abstract boolean linkRm(@HeaderParam("sessionid")
+    boolean linkRm(@HeaderParam("sessionid")
     final String sessionId, @FormParam("rmurl")
     String rmURL) throws NotConnectedRestException, PermissionRestException;
 
@@ -843,7 +810,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("isconnected")
     @Produces("application/json")
-    public abstract boolean isConnected(@HeaderParam("sessionid")
+    boolean isConnected(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException;
 
     /**
@@ -859,7 +826,7 @@ public interface SchedulerRestInterface {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("login")
     @Produces("application/json")
-    public abstract String login(@FormParam("username")
+    String login(@FormParam("username")
     String username, @FormParam("password")
     String password) throws LoginException, SchedulerRestException;
 
@@ -877,7 +844,7 @@ public interface SchedulerRestInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
     @Produces("application/json")
-    public abstract String loginWithCredential(@MultipartForm
+    String loginWithCredential(@MultipartForm
     LoginForm multipart) throws KeyException, LoginException, SchedulerRestException;
 
     /**
@@ -892,13 +859,13 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("users")
     @Produces("application/json")
-    public List<SchedulerUserData> getUsers(@HeaderParam("sessionid")
+    List<SchedulerUserData> getUsers(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     @GET
     @Path("userspace")
     @Produces("application/json")
-    public List<String> userspaceURIs(@HeaderParam("sessionid")
+    List<String> userspaceURIs(@HeaderParam("sessionid")
     String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -913,7 +880,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("userswithjobs")
     @Produces("application/json")
-    public List<SchedulerUserData> getUsersWithJobs(@HeaderParam("sessionid")
+    List<SchedulerUserData> getUsersWithJobs(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -926,7 +893,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("stats")
     @Produces("application/json")
-    public abstract Map<String, String> getStatistics(@HeaderParam("sessionid")
+    Map<String, String> getStatistics(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -939,7 +906,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("stats/myaccount")
     @Produces("application/json")
-    public abstract Map<String, String> getStatisticsOnMyAccount(@HeaderParam("sessionid")
+    Map<String, String> getStatisticsOnMyAccount(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -952,7 +919,7 @@ public interface SchedulerRestInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("createcredential")
     @Produces("*/*")
-    public byte[] getCreateCredential(@MultipartForm
+    byte[] getCreateCredential(@MultipartForm
     LoginForm multipart) throws LoginException, SchedulerRestException;
 
     /**
@@ -1047,23 +1014,22 @@ public interface SchedulerRestInterface {
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/kill")
     @Produces("application/json")
-    public boolean killTask(@HeaderParam("sessionid")
-                            String sessionId, @PathParam("jobid")
-                            String jobid, @PathParam("taskname")
-                            String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+    boolean killTask(@HeaderParam("sessionid")
+    String sessionId, @PathParam("jobid")
+    String jobid, @PathParam("taskname")
+    String taskname) throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException;
 
     /**
      * Validates a job.
-     * @param multipart a HTTP multipart form which contains the job-descriptor or the job archive file
+     * @param multipart a HTTP multipart form which contains the job-descriptor
      * @return the result of job validation 
-     * 
      */
     @POST
     @Path("validate")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public abstract JobValidationData validate(MultipartFormDataInput multipart);
+    JobValidationData validate(MultipartFormDataInput multipart);
 
     @POST
     @Path("/credentials/{key}")

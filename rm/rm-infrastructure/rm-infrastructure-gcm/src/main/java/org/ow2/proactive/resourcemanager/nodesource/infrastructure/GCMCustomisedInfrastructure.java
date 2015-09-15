@@ -65,7 +65,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 public class GCMCustomisedInfrastructure extends GCMInfrastructure {
 
     /** hosts list */
-    HashMap<String, DeploymentData> hosts = new HashMap<String, DeploymentData>();
+    HashMap<String, DeploymentData> hosts = new HashMap<>();
     /** path to the file with host names */
     @Configurable(fileBrowser = true, description = "List of host to use\nfor the deployment")
     protected File hostsList;
@@ -213,7 +213,7 @@ public class GCMCustomisedInfrastructure extends GCMInfrastructure {
      */
     private void handleExceptionAtDeployment(String dnURL, Throwable t) {
         if (dnURL != null) {
-            String lf = System.getProperty("line.separator");
+            String lf = System.lineSeparator();
             super.declareDeployingNodeLost(dnURL, "An exception occurred during node deployment:" + lf +
                 Utils.getStacktrace(t));
         } else {

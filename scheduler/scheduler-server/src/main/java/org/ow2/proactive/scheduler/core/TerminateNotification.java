@@ -18,8 +18,10 @@ public class TerminateNotification implements TaskTerminateNotification {
         this.schedulingService = schedulingService;
     }
 
+    // We need this method to be synchronous, hence the checked exception
     @Override
-    public void terminate(TaskId taskId, TaskResult taskResult) {
+    public void terminate(TaskId taskId, TaskResult taskResult) throws TerminateTaskException {
         schedulingService.taskTerminatedWithResult(taskId, taskResult);
     }
+
 }

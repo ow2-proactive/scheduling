@@ -45,10 +45,12 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Assert;
+import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -64,24 +66,19 @@ import functionaltests.RMTHelper;
  * @author ProActice team
  *
  */
-public class SelectionScriptTimeOutTest extends RMConsecutive {
+public class SelectionScriptTimeOutTest extends RMFunctionalTest {
 
     private URL selectionScriptWithtimeOutPath = this.getClass().getResource(
             "selectionScriptWithtimeOut.groovy");
 
-    /** Actions to be Perform by this test.
-     * The method is called automatically by Junit framework.
-     * @throws Exception If the test fails.
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        ResourceManager resourceManager = helper.getResourceManager();
-        helper.createNodeSource();
+        ResourceManager resourceManager = rmHelper.getResourceManager();
+        rmHelper.createNodeSource();
         int nodesNumber = resourceManager.getState().getTotalNodesNumber();
-        int scriptSleepingTime = 35 * 1000;
+        int scriptSleepingTime = 10 * 1000;
 
-        RMTHelper.log("Test 1 - selecting nodes with timeout script");
+        log("Test 1 - selecting nodes with timeout script");
 
         //create the static selection script object
         SelectionScript script = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()),
@@ -91,22 +88,22 @@ public class SelectionScriptTimeOutTest extends RMConsecutive {
 
         //wait node selection
         PAFuture.waitFor(nodes);
-        System.out.println("Number of found nodes " + nodes.size());
-        Assert.assertEquals(0, nodes.size());
 
-        Assert.assertEquals(nodesNumber, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(0, nodes.size());
 
-        RMTHelper.log("Test 2 - selecting nodes with script which is timed out only on some hosts");
+        assertEquals(nodesNumber, resourceManager.getState().getFreeNodesNumber());
+
+        log("Test 2 - selecting nodes with script which is timed out only on some hosts");
         String nodeName = "timeoutNode";
 
-        HashMap<String, String> vmProperties = new HashMap<String, String>();
+        HashMap<String, String> vmProperties = new HashMap<>();
         vmProperties.put(nodeName, "dummy");
 
-        String nodeURL = helper.createNode(nodeName, vmProperties).getNode().getNodeInformation().getURL();
+        String nodeURL = rmHelper.createNode(nodeName, vmProperties).getNode().getNodeInformation().getURL();
         resourceManager.addNode(nodeURL);
-        helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //wait for the nodes to be in free state
-        helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // now we have nodesNumber + 1 nodes
         script = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()), new String[] {
@@ -115,23 +112,23 @@ public class SelectionScriptTimeOutTest extends RMConsecutive {
         // selecting all nodes
         nodes = resourceManager.getAtMostNodes(nodesNumber + 1, script);
         // have to get nodesNumber due to the script timeout on one node
-        Assert.assertEquals(nodesNumber, nodes.size());
-        Assert.assertEquals(1, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(nodesNumber, nodes.size());
+        assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         // waiting until selection manager finishes script execution for node "timeout"
         // as we don't know how long should we wait roughly estimate it as scriptSleepingTime/2  
         Thread.sleep(scriptSleepingTime / 2);
 
         NodeSet nodes2 = resourceManager.getAtMostNodes(1, null);
-        Assert.assertEquals(1, nodes2.size());
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(1, nodes2.size());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         resourceManager.releaseNodes(nodes).getBooleanValue();
         resourceManager.releaseNodes(nodes2).getBooleanValue();
 
         nodes = resourceManager.getAtMostNodes(2, script);
-        Assert.assertEquals(2, nodes.size());
-        Assert.assertEquals(nodesNumber - 1, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(2, nodes.size());
+        assertEquals(nodesNumber - 1, resourceManager.getState().getFreeNodesNumber());
         resourceManager.releaseNodes(nodes);
     }
 }

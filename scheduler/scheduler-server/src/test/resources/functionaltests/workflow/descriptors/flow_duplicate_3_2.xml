@@ -30,7 +30,7 @@
           <script>
             <code language="javascript">
               // <![CDATA[
-              var r = parseInt($REP);
+              var r = parseInt(variables.get('PA_TASK_REPLICATION'));
               if (r === 0) {
               	runs = 3;
               } else if (r === 1) {

@@ -47,7 +47,7 @@ import java.util.Set;
 
 public class HierarchicalMap<K, V> implements Map<K, V> {
 
-    private Map<K, V> child = new HashMap<K, V>();
+    private Map<K, V> child = new HashMap<>();
     private Map<K, V> parent = null;
 
     public HierarchicalMap(Map<K, V> parent) {
@@ -55,7 +55,7 @@ public class HierarchicalMap<K, V> implements Map<K, V> {
     }
 
     public HierarchicalMap() {
-        parent = new HashMap<K, V>();
+        parent = new HashMap<>();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class HierarchicalMap<K, V> implements Map<K, V> {
 
     @Override
     public Collection<V> values() {
-        List<V> values = new ArrayList<V>();
+        List<V> values = new ArrayList<>();
         values.addAll(child.values());
         values.addAll(parent.values());
         return values;

@@ -53,5 +53,5 @@ public interface DistanceFunction extends Serializable {
      * @param d2 second distance
      * @return result distance
      */
-    public long distance(long d1, long d2);
+    long distance(long d1, long d2);
 }

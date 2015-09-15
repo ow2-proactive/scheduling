@@ -38,8 +38,6 @@ package functionaltests.nodestate;
 
 import java.io.File;
 
-import org.junit.Assert;
-
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -51,9 +49,12 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
+import org.junit.Test;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -70,19 +71,14 @@ import functionaltests.RMTHelper;
  *
  * @author ProActive team
  */
-public class TestNodeSourcesActions extends RMConsecutive {
+public class TestNodeSourcesActions extends RMFunctionalTest {
 
-    /** Actions to be Perform by this test.
-     * The method is called automatically by Junit framework.
-     * @throws Exception If the test fails.
-     */
-    @org.junit.Test
+    @Test
     public void action() throws Exception {
-        RMTHelper helper = RMTHelper.getDefaultInstance();
 
         String nodeSourceName = "TestNodeSourcesActions";
 
-        ResourceManager resourceManager = helper.getResourceManager();
+        ResourceManager resourceManager = rmHelper.getResourceManager();
         int nodeNumber = 5;
 
         int pingFrequency = 5000;
@@ -91,42 +87,42 @@ public class TestNodeSourcesActions extends RMConsecutive {
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
 
         resourceManager.createNodeSource(nodeSourceName, LocalInfrastructure.class.getName(), new Object[] {
-                creds, nodeNumber, RMTHelper.defaultNodesTimeout, "" }, StaticPolicy.class.getName(), null);
+                creds, nodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT, "" }, StaticPolicy.class.getName(), null);
 
         //wait for creation of GCM Node Source event, and deployment of its nodes
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);
         resourceManager.setNodeSourcePingFrequency(pingFrequency, nodeSourceName);
 
         RMTHelper.log("Test 1");
         for (int i = 0; i < nodeNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             //wait for the nodes to be in free state
-            helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
-        Assert.assertEquals(nodeNumber, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(nodeNumber, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(nodeNumber, resourceManager.getState().getFreeNodesNumber());
 
         //book 3 nodes
         NodeSet nodes = resourceManager.getAtMostNodes(3, null);
         PAFuture.waitFor(nodes);
 
-        Assert.assertEquals(3, nodes.size());
-        Assert.assertEquals(nodeNumber - 3, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(nodeNumber, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(3, nodes.size());
+        assertEquals(nodeNumber - 3, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(nodeNumber, resourceManager.getState().getTotalNodesNumber());
 
         for (int i = 0; i < 3; i++) {
-            RMNodeEvent evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
         //put one of the busy node in 'to release' state
         Node n1 = nodes.remove(0);
         resourceManager.removeNode(n1.getNodeInformation().getURL(), false);
 
-        RMNodeEvent evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n1.getNodeInformation()
-                .getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
+        RMNodeEvent evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+          n1.getNodeInformation().getURL());
+        assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         //put one of the busy node in 'down' state
         Node n2 = nodes.remove(0);
@@ -137,53 +133,53 @@ public class TestNodeSourcesActions extends RMConsecutive {
             e.printStackTrace();
         }
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n2.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n2.getNodeInformation().getURL());
+        assertEquals(evt.getNodeState(), NodeState.DOWN);
 
         //kill preemptively the node source
         resourceManager.removeNodeSource(nodeSourceName, true);
 
         for (int i = 0; i < nodeNumber; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
 
         //wait for the event of the node source removal
-        helper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nodeSourceName);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nodeSourceName);
 
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(0, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(0, resourceManager.getState().getTotalNodesNumber());
 
         //test the non preemptive node source removal
         RMTHelper.log("Test 2");
 
         String nodeSourceName2 = "TestNodeSourcesActions2";
-        //first im parameter is default rm url
+        //first im parameter is default rmHelper url
         int expectedNodeNumber = 3;
-        helper.createNodeSource(nodeSourceName2, expectedNodeNumber);
+        rmHelper.createNodeSource(nodeSourceName2, expectedNodeNumber);
         resourceManager.setNodeSourcePingFrequency(pingFrequency, nodeSourceName2);
 
-        Assert.assertEquals(expectedNodeNumber, resourceManager.getState().getTotalNodesNumber());
-        Assert.assertEquals(expectedNodeNumber, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(expectedNodeNumber, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(expectedNodeNumber, resourceManager.getState().getFreeNodesNumber());
 
         //book 3 nodes
         nodes = resourceManager.getAtMostNodes(3, null);
         PAFuture.waitFor(nodes);
 
         for (int i = 0; i < 3; i++) {
-            evt = helper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-            Assert.assertEquals(evt.getNodeState(), NodeState.BUSY);
+            evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            assertEquals(evt.getNodeState(), NodeState.BUSY);
         }
 
-        Assert.assertEquals(3, nodes.size());
-        Assert.assertEquals(expectedNodeNumber - 3, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(expectedNodeNumber, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(3, nodes.size());
+        assertEquals(expectedNodeNumber - 3, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(expectedNodeNumber, resourceManager.getState().getTotalNodesNumber());
 
         //put one of the busy node in 'to release' state
         n1 = nodes.remove(0);
         resourceManager.removeNode(n1.getNodeInformation().getURL(), false);
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n1.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n1.getNodeInformation().getURL());
+        assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
         //put one of the busy node in 'down' state
         n2 = nodes.remove(0);
@@ -196,8 +192,8 @@ public class TestNodeSourcesActions extends RMConsecutive {
             e.printStackTrace();
         }
 
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n2.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.DOWN);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n2.getNodeInformation().getURL());
+        assertEquals(evt.getNodeState(), NodeState.DOWN);
 
         //kill non preemptively the node source
         resourceManager.removeNodeSource(nodeSourceName2, false);
@@ -207,26 +203,26 @@ public class TestNodeSourcesActions extends RMConsecutive {
 
         //the two free nodes and the down node (n2) are removed immediately
         for (int i = 0; i < expectedNodeNumber - 2; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
 
         //the 'to release' node (n1) keeps the same state
 
         //the busy node (n3) becomes a 'to release' node
-        evt = helper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n3.getNodeInformation().getURL());
-        Assert.assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
+        evt = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n3.getNodeInformation().getURL());
+        assertEquals(evt.getNodeState(), NodeState.TO_BE_REMOVED);
 
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(2, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(2, resourceManager.getState().getTotalNodesNumber());
 
         //give back the two nodes in 'to release' state, they are directly removed
         resourceManager.releaseNode(n1);
         resourceManager.releaseNode(n3);
 
         for (int i = 0; i < 2; i++) {
-            helper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
-        Assert.assertEquals(0, resourceManager.getState().getFreeNodesNumber());
-        Assert.assertEquals(0, resourceManager.getState().getTotalNodesNumber());
+        assertEquals(0, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(0, resourceManager.getState().getTotalNodesNumber());
     }
 }

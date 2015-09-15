@@ -100,7 +100,7 @@ public class Log4JTaskLogs implements TaskLogs {
     private String loggerName;
 
     /** New line **/
-    private static final String nl = System.getProperty("line.separator");
+    private static final String nl = System.lineSeparator();
 
     /** Hibernate constructor */
     public Log4JTaskLogs() {

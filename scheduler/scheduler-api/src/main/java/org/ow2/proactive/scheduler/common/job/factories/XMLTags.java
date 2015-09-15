@@ -57,8 +57,8 @@ public enum XMLTags {
     // TASKS
     TASK("task"), JAVA_EXECUTABLE("javaExecutable"), NATIVE_EXECUTABLE("nativeExecutable"), SCRIPT_EXECUTABLE(
             "scriptExecutable"), TASK_DEPENDENCES("depends"), TASK_DEPENDENCES_TASK("task"), TASK_PARAMETERS(
-            "parameters"), TASK_PARAMETER("parameter"), NATIVE_TASK_STATICCOMMAND("staticCommand"), NATIVE_EXECUTABLE_DYNAMICCOMMAND(
-            "dynamicCommand"), NATIVE_TASK_ARGUMENTS("arguments"), NATIVE_TASK_ARGUMENT("argument"),
+            "parameters"), TASK_PARAMETER("parameter"), NATIVE_TASK_STATICCOMMAND("staticCommand"),
+            NATIVE_TASK_ARGUMENTS("arguments"), NATIVE_TASK_ARGUMENT("argument"),
     // TOPOLOGY
     PARALLEL_ENV("parallel"), TOPOLOGY("topology"), TOPOLOGY_ARBITRARY("arbitrary"), TOPOLOGY_BEST_PROXIMITY(
             "bestProximity"), TOPOLOGY_THRESHOLD_PROXIMITY("thresholdProximity"), TOPOLOGY_SINGLE_HOST(
@@ -68,7 +68,7 @@ public enum XMLTags {
     // SCRIPTS
     SCRIPT_SELECTION("selection"), SCRIPT_PRE("pre"), SCRIPT_POST("post"), SCRIPT_CLEANING("cleaning"), SCRIPT_SCRIPT(
             "script"), SCRIPT_ARGUMENTS("arguments"), SCRIPT_ARGUMENT("argument"), SCRIPT_FILE("file"), SCRIPT_CODE(
-            "code"), SCRIPT_GENERATION("generation"),
+            "code"),
     // FORK ENVIRONMENT
     FORK_ENVIRONMENT("forkEnvironment"), FORK_SYSTEM_PROPERTIES("SystemEnvironment"), FORK_SYSTEM_PROPERTY(
             "variable"), FORK_JVM_ARGS("jvmArgs"), FORK_JVM_ARG("jvmArg"), FORK_ADDITIONAL_CLASSPATH(
@@ -81,7 +81,7 @@ public enum XMLTags {
 
     private String xmlName;
 
-    private XMLTags(String xmlName) {
+    XMLTags(String xmlName) {
         this.xmlName = xmlName;
     }
 
@@ -112,7 +112,7 @@ public enum XMLTags {
         }
         String toCheck = xmlName.toUpperCase();
         if (namesToEnum == null) {
-            namesToEnum = new HashMap<String, XMLTags>();
+            namesToEnum = new HashMap<>();
             for (XMLTags tag : values()) {
                 namesToEnum.put(tag.getXMLName().toUpperCase(), tag);
             }

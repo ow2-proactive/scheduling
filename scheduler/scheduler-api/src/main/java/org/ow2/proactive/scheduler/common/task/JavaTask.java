@@ -48,8 +48,6 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 
 
-//import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-
 /**
  * Use this class to build a java task that will use a {@link JavaExecutable} and be integrated in a {@link TaskFlowJob}.<br>
  * A java task includes an {@link JavaExecutable} that can be set as a .class file or instance.<br>
@@ -65,14 +63,11 @@ public class JavaTask extends Task {
     protected String executableClassName = null;
 
     /** Arguments of the task as a map */
-    // WARNING : this field is accessed by reflection from InternalJobFactory
-    private final Map<String, byte[]> serializedArguments = new HashMap<String, byte[]>();
+    // WARNING: this field is accessed by reflection from InternalJobFactory
+    private final HashMap<String, byte[]> serializedArguments = new HashMap<>();
 
-    /** For internal use : name of the field that stores task arguments */
+    /** For internal use: name of the field that stores task arguments */
     public static final String ARGS_FIELD_NAME = "serializedArguments";
-
-    /** Environment of a new dedicated JVM */
-    private ForkEnvironment forkEnvironment = null;
 
     /**
      * Empty constructor.
@@ -97,12 +92,12 @@ public class JavaTask extends Task {
      */
     public void setExecutableClassName(String executableClassName) {
         if (executableClassName == null) {
-            throw new IllegalArgumentException("Executable class name must be set for JavaTask : " +
+            throw new IllegalArgumentException("Executable class name must be set for JavaTask: " +
                 this.name);
         }
         if (executableClassName.length() > 255) {
             throw new IllegalArgumentException(
-                "Class name is too long, it must have 255 chars length max : " + executableClassName);
+                "Class name is too long, it must have 255 chars length max: " + executableClassName);
         }
         this.executableClassName = executableClassName;
     }
@@ -123,6 +118,10 @@ public class JavaTask extends Task {
         return Collections.unmodifiableMap(deserialized);
     }
 
+    public HashMap<String, byte[]> getSerializedArguments() {
+        return new HashMap<>(serializedArguments);
+    }
+
     /**
      * Add an argument to the list of arguments. Note that the value is serialized and stored
      * in the JavaTask.
@@ -133,7 +132,7 @@ public class JavaTask extends Task {
      */
     public void addArgument(String name, Serializable value) {
         if (name != null && name.length() > 255) {
-            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + name);
+            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max: " + name);
         } else {
             byte[] serialized = null;
             try {
@@ -184,27 +183,9 @@ public class JavaTask extends Task {
         return this.forkEnvironment != null || super.isWallTimeSet() || super.isRunAsMe();
     }
 
-    /**
-     * Returns the forkEnvironment.
-     *
-     * @return the forkEnvironment.
-     */
-    public ForkEnvironment getForkEnvironment() {
-        return forkEnvironment;
-    }
-
-    /**
-     * Sets the forkEnvironment to the given forkEnvironment value.
-     *
-     * @param forkEnvironment the forkEnvironment to set.
-     */
-    public void setForkEnvironment(ForkEnvironment forkEnvironment) {
-        this.forkEnvironment = forkEnvironment;
-    }
-
     @Override
     public String display() {
-        String nl = System.getProperty("line.separator");
+        String nl = System.lineSeparator();
         String answer = super.display();
         return answer + nl + "\tExecutableClassName = '" + executableClassName + '\'' + nl +
             "\tArguments = " + serializedArguments.keySet() + nl + "\tForkEnvironment = " + forkEnvironment;

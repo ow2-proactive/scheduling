@@ -65,7 +65,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(DataTransferTest.class.getSimpleName());
+        init();
     }
 
     @Test

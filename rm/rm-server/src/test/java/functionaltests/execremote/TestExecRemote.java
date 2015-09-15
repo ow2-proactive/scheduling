@@ -36,9 +36,7 @@
  */
 package functionaltests.execremote;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -49,184 +47,187 @@ import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDeployer;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.junit.Assert;
+import org.apache.commons.io.FileUtils;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import functionaltests.RMConsecutive;
-import functionaltests.RMTHelper;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+
+import static org.junit.Assert.*;
 
 
-public final class TestExecRemote extends RMConsecutive {
+public final class TestExecRemote extends RMFunctionalTest {
     private static final String simpleScriptContent = "";
     private static final String erroneousSimpleScriptContent = "var a = null; a.toString();";
     private static final String selectionScriptContent = "selected = true; print(selected);";
 
-    //@org.junit.Ignore("SCHEDULING-1587")
-    @org.junit.Test
+    @Rule
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
+
+    @Test
     public void action() throws Exception {
-        try {
-            internalAction();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+        final String miscDir = System.getProperty("pa.rm.home") + File.separator + "samples" +
+            File.separator + "scripts" + File.separator + "misc" + File.separator;
+        boolean isLinux = OperatingSystem.getOperatingSystem().equals(OperatingSystem.unix);
+        final String valueToEcho = "111";
+        String nsName = "TestExecRemote";
+
+        rmHelper.createNodeSource(nsName);
+
+        RMInitialState state = rmHelper.getResourceManager().getMonitoring().getState();
+        String hostname = state.getNodesEvents().get(0).getHostName();
+        HashSet<String> nodesUrls = new HashSet<>();
+        for (RMNodeEvent ne : state.getNodesEvents()) {
+            nodesUrls.add(ne.getNodeUrl());
+        }
+
+        simpleScript(nodesUrls);
+        selectionScript(nodesUrls);
+        processBuilderScript(miscDir, isLinux, valueToEcho, nodesUrls);
+        processBuilderWithDSScript(miscDir, isLinux, valueToEcho, nodesUrls);
+        scriptOnNodeSource(nsName, nodesUrls);
+        scriptOnHost(hostname);
+    }
+
+    private void scriptOnNodeSource(String nsName, HashSet<String> nodesUrls) throws Exception {
+        RMTHelper.log("Test 6 - Execute script on a specified nodesource name");
+        SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
+        HashSet<String> targets = new HashSet<>(1);
+        targets.add(nsName);
+
+        List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
+                TargetType.NODESOURCE_NAME.toString(), targets);
+
+        assertEquals("The size of result list must equal to size of nodesource", nodesUrls.size(),
+                results.size());
+        for (ScriptResult<Object> res : results) {
+            Throwable exception = res.getException();
+            if (exception != null) {
+                RMTHelper.log("An exception occured while executing the script remotely:");
+                exception.printStackTrace(System.out);
+            }
+            assertNull("No exception must occur", exception);
         }
     }
 
-    private void internalAction() throws Exception {
-        final String miscDir = System.getProperty("pa.rm.home") + File.separator + "samples" +
-            File.separator + "scripts" + File.separator + "misc" + File.separator;
-        boolean isLinux = System.getProperty("os.name").toLowerCase().startsWith("linux") ||
-            System.getProperty("os.name").toLowerCase().startsWith("mac");
-        final String valueToEcho = "111";
+    private void simpleScript(HashSet<String> nodesUrls) throws Exception {
+        RMTHelper.log("Test 1 - Execute SimpleScript");
+        SimpleScript script = new SimpleScript(TestExecRemote.erroneousSimpleScriptContent, "javascript");
 
-        RMTHelper helper = RMTHelper.getDefaultInstance();
-        helper.getResourceManager();
-        String nsName = "TestExecRemote";
-        helper.createNodeSource(nsName);
+        List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
+                TargetType.NODE_URL.toString(), nodesUrls);
 
-        String hostname = null;
-        HashSet<String> nodesUrls = new HashSet<String>();
-        RMInitialState state = helper.getResourceManager().getMonitoring().getState();
-        for (RMNodeEvent ne : state.getNodesEvents()) {
-            nodesUrls.add(ne.getNodeUrl());
-            if (hostname == null) {
-                hostname = ne.getHostName();
-            }
+        assertFalse("The results must not be empty", results.size() == 0);
+        for (ScriptResult<Object> res : results) {
+            Throwable exception = res.getException();
+            assertNotNull("There should be an exception since the script is deliberately erroneous",
+                    exception);
         }
+    }
 
-        {
-            RMTHelper.log("Test 1 - Execute SimpleScript");
-            SimpleScript script = new SimpleScript(TestExecRemote.erroneousSimpleScriptContent, "javascript");
-            List<ScriptResult<Object>> results = helper.getResourceManager().executeScript(script,
-                    TargetType.NODE_URL.toString(), nodesUrls);
-            Assert.assertNotNull("The list of results must not be null", results);
-            Assert.assertFalse("The results must not be empty", results.size() == 0);
-            for (ScriptResult<Object> res : results) {
-                Throwable exception = res.getException();
-                Assert.assertNotNull(
-                        "There should be an exception since the script is deliberately erroneous", exception);
-            }
-        }
-        {
-            RMTHelper.log("Test 2 - Execute SelectionScript");
-            SelectionScript script = new SelectionScript(TestExecRemote.selectionScriptContent, "javascript");
-            List<ScriptResult<Boolean>> results = helper.getResourceManager().executeScript(script,
-                    TargetType.NODE_URL.toString(), nodesUrls);
-            Assert.assertNotNull("The list of results must not be null", results);
-            Assert.assertFalse("The results must not be empty", results.size() == 0);
-            for (ScriptResult<Boolean> res : results) {
-                Assert.assertTrue("The selection script must return true", res.getResult());
-                String output = res.getOutput();
-                Assert
-                        .assertTrue("The script output must contain the printed value", output
-                                .contains("true"));
-            }
-        }
-        {
-            File sFile = new File(miscDir + "processBuilder.groovy");
-            RMTHelper.log("Test 4 - Test " + sFile);
+    private void selectionScript(HashSet<String> nodesUrls) throws Exception {
+        RMTHelper.log("Test 2 - Execute SelectionScript");
+        SelectionScript script = new SelectionScript(TestExecRemote.selectionScriptContent, "javascript");
 
-            String[] cmd = (isLinux) ? new String[] { "/bin/bash", "-c", "echo " + valueToEcho }
-                    : new String[] { "cmd.exe", "/c", "@(echo " + valueToEcho + ")" };
+        List<ScriptResult<Boolean>> results = rmHelper.getResourceManager().executeScript(script,
+                TargetType.NODE_URL.toString(), nodesUrls);
+
+        assertFalse("The results must not be empty", results.size() == 0);
+        for (ScriptResult<Boolean> res : results) {
+            assertTrue("The selection script must return true", res.getResult());
+            String output = res.getOutput();
+            assertTrue("The script output must contain the printed value", output.contains("true"));
+        }
+    }
+
+    private void processBuilderScript(String miscDir, boolean isLinux, String valueToEcho,
+            HashSet<String> nodesUrls) throws Exception {
+        File sFile = new File(miscDir + "processBuilder.groovy");
+        RMTHelper.log("Test 4 - Test " + sFile);
+
+        String[] cmd = (isLinux) ? new String[] { "/bin/bash", "-c", "echo " + valueToEcho } : new String[] {
+                "cmd.exe", "/c", "@(echo " + valueToEcho + ")" };
+        SimpleScript script = new SimpleScript(sFile, cmd);
+
+        List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
+                TargetType.NODE_URL.toString(), nodesUrls);
+
+        assertFalse("The results must not be empty", results.size() == 0);
+        for (ScriptResult<Object> res : results) {
+            String output = res.getOutput();
+            assertTrue("The script output must contains " + valueToEcho, output.contains(valueToEcho));
+        }
+    }
+
+    private void processBuilderWithDSScript(String miscDir, boolean isLinux, String valueToEcho,
+            HashSet<String> nodesUrls) throws Exception {
+        File sFile = new File(miscDir + "processBuilderWithDS.groovy");
+        RMTHelper.log("Test 5 - Test " + sFile);
+
+        // Create test temporary file
+        File tempDir = tmpFolder.newFolder("testExecRemote");
+
+        String testFilename = "test.txt";
+        FileUtils.write(new File(tempDir, testFilename), valueToEcho);
+
+        // Generate the remote command execute in the remote localspace
+        DSHelper dsHelper = new DSHelper();
+
+        try {
+            // Start DS
+            String dsurl = dsHelper.startDS(tempDir.getAbsolutePath());
+            String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/cat", testFilename } : new String[] {
+                    dsurl, "cmd.exe", "/c", "more", testFilename };
+            // Execute the script
             SimpleScript script = new SimpleScript(sFile, cmd);
-            List<ScriptResult<Object>> results = helper.getResourceManager().executeScript(script,
+            List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
                     TargetType.NODE_URL.toString(), nodesUrls);
-            Assert.assertNotNull("The list of results must not be null", results);
-            Assert.assertFalse("The results must not be empty", results.size() == 0);
+
+            assertFalse("The results must not be empty", results.size() == 0);
             for (ScriptResult<Object> res : results) {
+                Throwable exception = res.getException();
+                if (exception != null) {
+                    RMTHelper.log("An exception occured while executing the script remotely:");
+                    exception.printStackTrace(System.out);
+                }
+
                 String output = res.getOutput();
-                Assert.assertTrue("The script output must contains " + valueToEcho, output
-                        .contains(valueToEcho));
-            }
-        }
-        {
-            File sFile = new File(miscDir + "processBuilderWithDS.groovy");
-            RMTHelper.log("Test 5 - Test " + sFile);
-            // Create test temporary file
-            String testFilename = "test.txt";
-            File tempDir = new File("testExecRemote");
-            tempDir.mkdir();
-            tempDir.deleteOnExit();
-            File testFile = new File(tempDir, testFilename);
-            testFile.createNewFile();
-            testFile.deleteOnExit();
-            // Write a string into the file that will be the output of the script result        				
-            BufferedWriter out = new BufferedWriter(new FileWriter(testFile));
-            out.write(valueToEcho);
-            out.close();
-            // Generate the remote command execute in the remote localspace
-            DSHelper dsHelper = new DSHelper();
-            try {
-                // Start DS				
-                String dsurl = dsHelper.startDS(tempDir.getAbsolutePath());
-                String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/cat", testFilename } : new String[] {
-                        dsurl, "cmd.exe", "/c", "more", testFilename };
-                // Execute the script
-                SimpleScript script = new SimpleScript(sFile, cmd);
-                List<ScriptResult<Object>> results = helper.getResourceManager().executeScript(script,
-                        TargetType.NODE_URL.toString(), nodesUrls);
-                Assert.assertFalse("The results must not be empty", results.size() == 0);
-                for (ScriptResult<Object> res : results) {
-                    Throwable exception = res.getException();
-                    if (exception != null) {
-                        RMTHelper.log("An exception occured while executing the script remotely:");
-                        exception.printStackTrace(System.out);
-                    }
 
-                    String output = res.getOutput();
+                assertTrue("The script output must contains " + valueToEcho, output.contains(valueToEcho));
+            }
+        } finally {
+            dsHelper.stopDS();
+        }
+    }
 
-                    Assert.assertNotNull("Output must not be null", output);
-                    Assert.assertTrue("The script output must contains " + valueToEcho, output
-                            .contains(valueToEcho));
-                }
-            } finally {
-                dsHelper.stopDS();
-                tempDir.deleteOnExit();
+    private void scriptOnHost(String hostname) throws Exception {
+        RMTHelper.log("Test 7 - Execute script with hostname as target");
+        SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
+        HashSet<String> targets = new HashSet<>(1);
+        targets.add(hostname);
+
+        List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
+                TargetType.HOSTNAME.toString(), targets);
+
+        assertEquals(
+                "The size of result list must equal to 1, if a hostname is specified a single node must be "
+                    + "selected", results.size(), 1);
+        for (ScriptResult<Object> res : results) {
+            Throwable exception = res.getException();
+            if (exception != null) {
+                RMTHelper.log("An exception occured while executing the script remotely:");
+                exception.printStackTrace(System.out);
             }
-        }
-        {
-            RMTHelper.log("Test 6 - Execute script on a specified nodesource name");
-            SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
-            HashSet<String> targets = new HashSet<String>(1);
-            targets.add(nsName);
-            List<ScriptResult<Object>> results = helper.getResourceManager().executeScript(script,
-                    TargetType.NODESOURCE_NAME.toString(), targets);
-            Assert.assertEquals("The size of result list must equal to size of nodesource", nodesUrls.size(),
-                    results.size());
-            for (ScriptResult<Object> res : results) {
-                Throwable exception = res.getException();
-                if (exception != null) {
-                    RMTHelper.log("An exception occured while executing the script remotely:");
-                    exception.printStackTrace(System.out);
-                }
-                Assert.assertNull("No exception must occur", exception);
-            }
-        }
-        {
-            RMTHelper.log("Test 7 - Execute script with hostname as target");
-            SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
-            HashSet<String> targets = new HashSet<String>(1);
-            targets.add(hostname);
-            List<ScriptResult<Object>> results = helper.getResourceManager().executeScript(script,
-                    TargetType.HOSTNAME.toString(), targets);
-            Assert.assertNotNull("The list of results must not be null", results);
-            Assert
-                    .assertEquals(
-                            "The size of result list must equal to 1, if a hostname is specified a single node must be selected",
-                            results.size(), 1);
-            for (ScriptResult<Object> res : results) {
-                Throwable exception = res.getException();
-                if (exception != null) {
-                    RMTHelper.log("An exception occured while executing the script remotely:");
-                    exception.printStackTrace(System.out);
-                }
-                Assert.assertNull("No exception must occur", exception);
-            }
+            assertNull("No exception must occur", exception);
         }
     }
 

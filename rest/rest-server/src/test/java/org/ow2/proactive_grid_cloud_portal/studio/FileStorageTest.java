@@ -29,7 +29,8 @@ public class FileStorageTest {
 
     @Before
     public void setUp() {
-        storage = new FileStorage<Workflow>(folder.getRoot(), new WorkflowSerializer(), new SmallestAvailableIdGenerator());
+        storage = new FileStorage<>(folder.getRoot(), new WorkflowSerializer(),
+                new SmallestAvailableIdGenerator());
     }
 
     @Test

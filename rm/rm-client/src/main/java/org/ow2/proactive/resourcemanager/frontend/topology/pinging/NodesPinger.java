@@ -57,7 +57,7 @@ public class NodesPinger implements Pinger {
      * @return distances map to hosts where these nodes are located
      */
     public HashMap<InetAddress, Long> ping(NodeSet nodes) {
-        HashMap<InetAddress, Long> results = new HashMap<InetAddress, Long>();
+        HashMap<InetAddress, Long> results = new HashMap<>();
         for (Node node : nodes) {
             try {
                 InetAddress current = NodeFactory.getDefaultNode().getVMInformation().getInetAddress();

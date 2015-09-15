@@ -80,7 +80,7 @@ public class ScriptHandler implements Serializable {
                 ((script.parameters != null) ? " with parameters=" + Arrays.asList(script.parameters) : "") +
                 ", and content:\n" + script.getScript(), t);
 
-            return new ScriptResult<T>(se);
+            return new ScriptResult<>(se);
         }
     }
 
@@ -101,7 +101,7 @@ public class ScriptHandler implements Serializable {
      */
     public void addBinding(String name, Object value) {
         if (additionalBindings == null) {
-            additionalBindings = new HashMap<String, Object>();
+            additionalBindings = new HashMap<>();
         }
         additionalBindings.put(name, value);
     }

@@ -43,6 +43,8 @@ import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
@@ -77,9 +79,10 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     protected static final String TASK_NAME = "TestJavaTask";
 
-    public final static String INPUT_FILE_BASE_NAME = "input";
+    // we add special characters to ensure they are supported
+    public final static String INPUT_FILE_BASE_NAME = "input é";
     public final static String INPUT_FILE_EXT = ".txt";
-    public final static String OUTPUT_FILE_BASE_NAME = "output";
+    public final static String OUTPUT_FILE_BASE_NAME = "output é";
     public final static String OUTPUT_FILE_EXT = ".out";
 
     protected RestSmartProxyImpl restSmartProxy;
@@ -89,7 +92,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init(RestSmartProxyTest.class.getSimpleName());
+        init();
     }
 
     @Before
@@ -114,8 +117,9 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         pushUrl = userspace;
         pullUrl = userspace;
 
-        inputLocalFolder = tempDir.newFolder("input");
-        outputLocalFolder = tempDir.newFolder("output");
+        // we add special characters and space to the folders to make sure transfer occurs normally
+        inputLocalFolder = tempDir.newFolder("input é");
+        outputLocalFolder = tempDir.newFolder("output é");
     }
 
     @Test(timeout = TEN_MINUTES)
@@ -131,6 +135,10 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     private void testJobSubmission(boolean isolateTaskOutput, boolean automaticTransfer) throws Exception {
         TaskFlowJob job = createTestJob(isolateTaskOutput);
 
+        // debugging the job produced
+        String jobXml = new Job2XMLTransformer().jobToxmlString(job);
+        System.out.println(jobXml);
+
         DataTransferNotifier notifier = new DataTransferNotifier();
 
         if (automaticTransfer) {
@@ -142,11 +150,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
                         job, inputLocalFolder.getAbsolutePath(),
                         pushUrl, outputLocalFolder.getAbsolutePath(), pullUrl,
                         isolateTaskOutput, automaticTransfer);
-
-        Thread.sleep(ONE_SECOND);
-
-        restSmartProxy.disconnect();
-        restSmartProxy.reconnect();
 
         JobState jobState = restSmartProxy.getJobState(id.toString());
         while (!jobState.isFinished()) {
@@ -182,12 +185,14 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private TaskFlowJob createTestJob(boolean isolateOutputs) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName());
+        // add a special character to the job name to ensure the job is parsed correctly by the server
+        job.setName(this.getClass().getSimpleName() + " é");
 
         for (int i = 0; i < NB_TASKS; i++) {
             JavaTask testTask = new JavaTask();
             testTask.setName(TASK_NAME + i);
             testTask.setExecutableClassName(SimpleJavaExecutable.class.getName());
+            testTask.setForkEnvironment(new ForkEnvironment());
             File inputFile = new File(inputLocalFolder, INPUT_FILE_BASE_NAME + "_" + i + INPUT_FILE_EXT);
             String outputFileName = OUTPUT_FILE_BASE_NAME + "_" + i + OUTPUT_FILE_EXT;
 
@@ -217,17 +222,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         job.setInputSpace(userspace);
         job.setOutputSpace(userspace);
 
-        setJobClassPath(job);
         return job;
-    }
-
-    private void setJobClassPath(Job job) throws Exception {
-        File appMainFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
-                .toURI());
-        String appClassPath = appMainFolder.getAbsolutePath();
-        JobEnvironment je = new JobEnvironment();
-        je.setJobClasspath(new String[] { appClassPath });
-        job.setEnvironment(je);
     }
 
     private String uniqueSessionId() {
@@ -244,7 +239,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private static final class DataTransferNotifier implements SchedulerEventListenerExtended {
 
-        private final BlockingQueue<String> finishedTask = new ArrayBlockingQueue<String>(NB_TASKS);
+        private final BlockingQueue<String> finishedTask = new ArrayBlockingQueue<>(NB_TASKS);
 
         @Override
         public void pullDataFailed(String jobId, String taskName, String localFolderPath, Throwable error) {

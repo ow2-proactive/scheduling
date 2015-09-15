@@ -73,7 +73,7 @@ public class ActiveFixture {
     private GCMApplication gcmad;
     protected List<Node> nodes = null;
     /** List of Active Actors which are currently deployed on the infrastructure */
-    protected final List<ActiveActor> knownActors = new LinkedList<ActiveActor>();
+    protected final List<ActiveActor> knownActors = new LinkedList<>();
 
     private static final Logger logger = Logger.getLogger(ActiveFixture.class);
 
@@ -122,7 +122,7 @@ public class ActiveFixture {
                 "Invalid usage of this object; loadInfrastructure() needs to be called first");
         logger.trace("# of available nodes: " + this.nodes.size());
         logger.trace("Deploying the actors...");
-        List<ActiveActor<T, V>> actors = new LinkedList<ActiveActor<T, V>>();
+        List<ActiveActor<T, V>> actors = new LinkedList<>();
         for (Node node : nodes) {
             // TODO templated active objects? how?
             ActiveActor<T, V> actor = PAActiveObject.newActive(ActiveActor.class, new Object[] { action,
