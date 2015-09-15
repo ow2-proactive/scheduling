@@ -69,7 +69,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
     private static String clientBatPath = "bin\\proactive-client.bat";
     private static String jobXmlPath = "scheduler\\scheduler-server\\src\\test\\resources\\functionaltests\\dataspaces\\Job_SpecialCharacterFileName.xml";
 
-    private static int TIMEOUT = 60; // in seconds
+    private static int TIMEOUT = 300; // in seconds
     private static final String ERROR_COMMAND_EXECUTION = "Error command execution";
 
     private static String returnExprInResultBeforeTimeout(InputStream inputStream, String expr, int timeout) throws Exception {
@@ -133,12 +133,14 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         schedulerCommand.add(schedulerStarterBatPath);
         ProcessBuilder schedulerProcessBuilder = new ProcessBuilder(schedulerCommand);
         schedulerProcessBuilder.environment().put("processID", "0");
+        long startTime = System.currentTimeMillis();
         if(returnExprInResultBeforeTimeout(schedulerProcessBuilder.start().getInputStream(), "started", TIMEOUT) == null)
         {
+            long duration = (System.currentTimeMillis() - startTime) / 1000;
             // Kill & Clean
             ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
             fileWithAccentIn.delete();
-            throw new Exception(ERROR_COMMAND_EXECUTION);
+            throw new Exception(ERROR_COMMAND_EXECUTION + " after " + duration + "s");
         }
         System.out.println("scheduler started!");
 
@@ -154,12 +156,14 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         ProcessBuilder jobSubmissionProcessBuilder = new ProcessBuilder(clientCommand);
         String jobSubmissionStr;
 
+        startTime = System.currentTimeMillis();
         if ((jobSubmissionStr= returnExprInResultBeforeTimeout(jobSubmissionProcessBuilder.start().getInputStream(), "submitted", TIMEOUT))==null)
         {
+            long duration = (System.currentTimeMillis() - startTime) / 1000;
             // Kill & Clean
             ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
             fileWithAccentIn.delete();
-            throw new Exception(ERROR_COMMAND_EXECUTION);
+            throw new Exception(ERROR_COMMAND_EXECUTION + " after " + duration + "s");
         }
         System.out.println("job submitted!");
 
@@ -174,10 +178,10 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         jobStatusCommand.add(jobId);
         ProcessBuilder jobStatusProcessBuilder = new ProcessBuilder(jobStatusCommand);
 
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         boolean jobFinished = false;
 
-        while (!jobFinished && ((System.currentTimeMillis() - startTime) / 1000) < 3 * TIMEOUT) {
+        while (!jobFinished && ((System.currentTimeMillis() - startTime) / 1000) < 5 * TIMEOUT) {
             System.out.println("SLEEP");
             Thread.sleep(5000);
             jobFinished = (returnExprInResultBeforeTimeout(jobStatusProcessBuilder.start().getInputStream(),"FINISHED", TIMEOUT) != null);
@@ -206,3 +210,4 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         }
     }
 }
+
