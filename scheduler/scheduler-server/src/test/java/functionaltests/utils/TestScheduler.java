@@ -65,7 +65,7 @@ public class TestScheduler {
     public static final int PNP_PORT = TestRM.PA_PNP_PORT;
 
     private static String schedulerUrl = "pnp://" + ProActiveInet.getInstance().getHostname() + ":" +
-        PNP_PORT + "/";
+            PNP_PORT + "/";
     private static Process schedulerProcess;
 
     private SchedulerAuthenticationInterface schedulerAuth;
@@ -100,7 +100,7 @@ public class TestScheduler {
         String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
         if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
             securityPolicy = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-                "/config/security.java.policy-server";
+                    "/config/security.java.policy-server";
         }
         commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + securityPolicy);
 
@@ -111,7 +111,7 @@ public class TestScheduler {
         commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + log4jConfiguration);
 
         commandLine.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
-            PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+                PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
                 PAResourceManagerProperties.RM_HOME.getValueAsString());
 
@@ -151,7 +151,7 @@ public class TestScheduler {
         schedulerProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(),
-            "[Scheduler output]: ");
+                "[Scheduler output]: ");
         outputReader.start();
 
         System.out.println("Waiting for the Scheduler using URL: " + schedulerUrl);
@@ -164,7 +164,7 @@ public class TestScheduler {
     }
 
     private void startLocalNodes(
-      SchedulerTestConfiguration configuration) throws KeyException, LoginException, InterruptedException {
+            SchedulerTestConfiguration configuration) throws KeyException, LoginException, InterruptedException {
         if (configuration.hasLocalNodes()) {
             // Waiting while all the nodes will be registered in the RM.
             // Without waiting test can finish earlier than nodes are added.

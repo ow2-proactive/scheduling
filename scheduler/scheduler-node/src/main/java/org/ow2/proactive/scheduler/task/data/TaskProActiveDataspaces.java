@@ -35,17 +35,7 @@
 package org.ow2.proactive.scheduler.task.data;
 
 import org.apache.commons.io.FileUtils;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
@@ -61,7 +51,15 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.utils.Formatter;
-import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.*;
 
 
 public class TaskProActiveDataspaces implements TaskDataspaces {
@@ -102,14 +100,14 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                 // assign it to the space
                 space = tidOutput;
                 logger.info(SchedulerConstants.TASKID_DIR_DEFAULT_NAME + " pattern found, changed " +
-                  spaceName + " space to : " + space.getRealURI());
+                        spaceName + " space to : " + space.getRealURI());
             }
         }
         return space;
     }
 
     private DataSpacesFileObject resolveToExisting(DataSpacesFileObject space, String spaceName,
-      boolean input) {
+                                                   boolean input) {
         if (space == null) {
             logger.info(spaceName + " space is disabled");
             return null;
@@ -128,7 +126,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         } else {
             logger.debug(spaceName + " space is " + space.getRealURI());
             logger.debug("(other available urls for " + spaceName + " space are " + space.getAllRealURIs() +
-              " )");
+                    " )");
         }
         return space;
     }
@@ -143,13 +141,13 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                     .getStubOnThis()), id, namingService);
 
             SCRATCH = PADataSpaces.resolveScratchForAO();
-            logger.debug("SCRATCH space is " + SCRATCH.getRealURI());
+            logger.info("SCRATCH space is " + SCRATCH.getRealURI());
 
         } catch (FileSystemException fse) {
             logger.error("There was a problem while initializing dataSpaces, they are not activated", fse);
             this.logDataspacesStatus(
-              "There was a problem while initializing dataSpaces, they are not activated",
-              DataspacesStatusLevel.ERROR);
+                    "There was a problem while initializing dataSpaces, they are not activated",
+                    DataspacesStatusLevel.ERROR);
             this.logDataspacesStatus(Formatter.stackTraceToString(fse), DataspacesStatusLevel.ERROR);
         }
 
@@ -198,12 +196,34 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         return null;
     }
 
+    public static String convertDataSpaceURIToFileIfPossible(String dataspaceURI, boolean errorIfNotFile) {
+        URI foUri = null;
+        try {
+            foUri = new URI(dataspaceURI);
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException(e);
+        }
+        String answer;
+        if (foUri.getScheme() == null || foUri.getScheme().equals("file")) {
+            answer = (new File(foUri)).getAbsolutePath();
+        } else {
+            if (errorIfNotFile) {
+                throw new IllegalStateException("Space " + dataspaceURI +
+                        " is not accessible via the file system.");
+            }
+            answer = foUri.toString();
+        }
+        return answer;
+    }
+
+
     @Override
     public File getScratchFolder() {
         if (SCRATCH == null) {
             return new File(".");
         }
-        return new File(SCRATCH.getPath());
+
+        return new File(convertDataSpaceURIToFileIfPossible(SCRATCH.getRealURI(), true));
     }
 
     @Override
@@ -211,39 +231,39 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         if (SCRATCH == null) {
             return new File(".").getAbsolutePath();
         }
-        return SCRATCH.getPath();
+        return convertDataSpaceURIToFileIfPossible(SCRATCH.getRealURI(), true);
     }
 
     @Override
     public String getInputURI() {
-        if(INPUT == null){
+        if (INPUT == null) {
             return "";
         }
-        return INPUT.getVirtualURI();
+        return convertDataSpaceURIToFileIfPossible(INPUT.getRealURI(), false);
     }
 
     @Override
     public String getOutputURI() {
-        if(OUTPUT == null){
+        if (OUTPUT == null) {
             return "";
         }
-        return OUTPUT.getVirtualURI();
+        return convertDataSpaceURIToFileIfPossible(OUTPUT.getRealURI(), false);
     }
 
     @Override
     public String getUserURI() {
-        if(USER == null){
+        if (USER == null) {
             return "";
         }
-        return USER.getVirtualURI();
+        return convertDataSpaceURIToFileIfPossible(USER.getRealURI(), false);
     }
 
     @Override
     public String getGlobalURI() {
-        if(GLOBAL == null){
+        if (GLOBAL == null) {
             return "";
         }
-        return GLOBAL.getVirtualURI();
+        return convertDataSpaceURIToFileIfPossible(GLOBAL.getRealURI(), false);
     }
 
     protected enum DataspacesStatusLevel {
@@ -267,11 +287,11 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     private boolean checkInputSpaceConfigured(DataSpacesFileObject space, String spaceName, InputSelector is) {
         if (space == null) {
             logger.error("Job " + spaceName +
-              " space is not defined or not properly configured while input files are specified : ");
+                    " space is not defined or not properly configured while input files are specified : ");
 
             this.logDataspacesStatus("Job " + spaceName +
-                " space is not defined or not properly configured while input files are specified : ",
-              DataspacesStatusLevel.ERROR);
+                            " space is not defined or not properly configured while input files are specified : ",
+                    DataspacesStatusLevel.ERROR);
 
             logger.error("--> " + is);
             this.logDataspacesStatus("--> " + is, DataspacesStatusLevel.ERROR);
@@ -455,15 +475,15 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     }
 
     protected ExecutorService executorTransfer = Executors.newFixedThreadPool(5,
-      new NamedThreadFactory("FileTransferThreadPool"));
+            new NamedThreadFactory("FileTransferThreadPool"));
 
     private boolean checkOuputSpaceConfigured(DataSpacesFileObject space, String spaceName, OutputSelector os) {
         if (space == null) {
             logger.debug("Job " + spaceName +
-              " space is not defined or not properly configured, while output files are specified :");
+                    " space is not defined or not properly configured, while output files are specified :");
             this.logDataspacesStatus("Job " + spaceName +
-                " space is not defined or not properly configured, while output files are specified :",
-              DataspacesStatusLevel.ERROR);
+                            " space is not defined or not properly configured, while output files are specified :",
+                    DataspacesStatusLevel.ERROR);
             this.logDataspacesStatus("--> " + os, DataspacesStatusLevel.ERROR);
             return false;
         }
@@ -603,6 +623,13 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
                         finalout.resolveFile(finalRelativePath).copyFrom(finaldsfo,
                                 FileSelector.SELECT_SELF);
+                        if (!finalout.resolveFile(finalRelativePath).exists()) {
+                            logger.error("There was a problem during the copy of " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() +
+                                    "/" + finalRelativePath + ". File not present after copy.");
+                            logDataspacesStatus("There was a problem during the copy of " + finaldsfo.getRealURI() + " to " + finalout.getRealURI() +
+                                            "/" + finalRelativePath + ". File not present after copy.",
+                                    DataspacesStatusLevel.ERROR);
+                        }
                         return true;
                     }
                 }));
@@ -614,7 +641,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         for (Future f : transferFutures) {
             try {
                 f.get();
-            } catch (InterruptedException | ExecutionException  e) {
+            } catch (InterruptedException | ExecutionException e) {
                 logger.error("", e);
                 exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
             }

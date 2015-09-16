@@ -36,17 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.io.Serializable;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Stopwatch;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
@@ -71,8 +62,13 @@ import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
-import com.google.common.base.Stopwatch;
-import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.Serializable;
+import java.security.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -128,7 +124,7 @@ public class TaskLauncher implements InitActive {
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
-            TaskTerminateNotification terminateNotification) {
+                       TaskTerminateNotification terminateNotification) {
         logger.info("Task started");
 
         WallTimer wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
@@ -148,11 +144,17 @@ public class TaskLauncher implements InitActive {
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-                dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
-                dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
-                        .toString(), getHostname());
+                    dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+                    dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
+                    .toString(), getHostname());
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
+
+            logger.info("Task working dir: " + workingDir);
+            logger.info("Input space: " + context.getInputURI());
+            logger.info("Output space: " + context.getOutputURI());
+            logger.info("User space: " + context.getUserURI());
+            logger.info("Global space: " + context.getGlobalURI());
 
             wallTimer.start();
 
@@ -204,7 +206,7 @@ public class TaskLauncher implements InitActive {
                     logger.info("Failed to execute task", taskFailure);
                     taskFailure.printStackTrace(taskLogger.getErrorSink());
                     taskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(),
-                        taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+                            taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
                     sendResultToScheduler(terminateNotification, taskResult);
 
             }
@@ -239,7 +241,7 @@ public class TaskLauncher implements InitActive {
 
     private TaskResultImpl getWalltimedTaskResult(Stopwatch taskStopwatchForFailures) {
         String message = "Walltime of " + initializer.getWalltime() + " ms reached on task " +
-            taskId.getReadableName();
+                taskId.getReadableName();
 
         return getTaskResult(taskStopwatchForFailures, new WalltimeExceededException(message));
     }
@@ -248,7 +250,7 @@ public class TaskLauncher implements InitActive {
         taskLogger.getErrorSink().println(exception.getMessage());
 
         return new TaskResultImpl(taskId, exception, taskLogger.getLogs(),
-            taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+                taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)
@@ -264,7 +266,7 @@ public class TaskLauncher implements InitActive {
         if (initializer.isPreciousLogs()) {
             try {
                 dataspaces.copyScratchDataToOutput(Collections.singletonList(new OutputSelector(
-                  new FileSelector(taskLogFile.getName()), OutputAccessMode.TransferToUserSpace)));
+                        new FileSelector(taskLogFile.getName()), OutputAccessMode.TransferToUserSpace)));
             } catch (FileSystemException e) {
                 logger.warn("Cannot copy logs of task to user data spaces", e);
             }
@@ -285,7 +287,7 @@ public class TaskLauncher implements InitActive {
     }
 
     private void sendResultToScheduler(TaskTerminateNotification terminateNotification,
-            TaskResultImpl taskResult) {
+                                       TaskResultImpl taskResult) {
         if (isNodeShuttingDown()) {
             return;
         }
@@ -299,7 +301,7 @@ public class TaskLauncher implements InitActive {
                 return;
             } catch (Throwable th) {
                 logger.warn("Cannot notify task termination " + taskId + ", will try again in " +
-                  pingPeriodMs + " ms", th);
+                        pingPeriodMs + " ms", th);
                 try {
                     Thread.sleep(pingPeriodMs);
                 } catch (InterruptedException e) {
@@ -308,7 +310,7 @@ public class TaskLauncher implements InitActive {
             }
         }
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
-            " attempts, terminating task launcher now");
+                " attempts, terminating task launcher now");
     }
 
     private boolean isNodeShuttingDown() {
