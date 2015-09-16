@@ -40,13 +40,16 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
+/**
+ * FileLockTest aims to check that {@link FileLock} implementation
+ * can be used from several threads at the same time to perform a
+ * kind of synchronization barrier.
+ */
 public class FileLockTest {
 
     @Test(timeout = 1000)
