@@ -12,7 +12,7 @@
 	<task name="TestSpecialCharacterFileNameTask">
 		<description>Copies a file to output</description>
 		<inputFiles>
-			<files  includes="myfile-é" accessMode="transferFromInputSpace"/>
+			<files  includes="*" accessMode="transferFromInputSpace"/>
 		</inputFiles>
 		<scriptExecutable>
                 <script>
@@ -22,7 +22,7 @@
                 </script>
             </scriptExecutable>
 		<outputFiles>
-			<files  includes="myfile-é" accessMode="transferToOutputSpace"/>
+			<files  includes="*" accessMode="transferToOutputSpace"/>
 		</outputFiles>
 	</task>
 		
