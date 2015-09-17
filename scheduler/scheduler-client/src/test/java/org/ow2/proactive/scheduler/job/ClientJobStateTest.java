@@ -55,7 +55,7 @@ public class ClientJobStateTest {
         TaskInfoImpl updatedTask = new TaskInfoImpl();
 
         updatedTask.setJobInfo(jobInfo);
-        updatedTask.setTaskId(TaskIdImpl.createTaskId(jobInfo.getJobId(), "task", 1, false));
+        updatedTask.setTaskId(TaskIdImpl.createTaskId(jobInfo.getJobId(), "task", 1));
         return updatedTask;
     }
 
@@ -94,7 +94,7 @@ public class ClientJobStateTest {
                     public TaskInfo getTaskInfo() {
                         TaskInfoImpl taskInfo = new TaskInfoImpl();
                         taskInfo.setJobInfo(jobInfo);
-                        taskInfo.setTaskId(TaskIdImpl.createTaskId(jobInfo.getJobId(), "task", 1, false));
+                        taskInfo.setTaskId(TaskIdImpl.createTaskId(jobInfo.getJobId(), "task", 1));
                         return taskInfo;
                     }
 

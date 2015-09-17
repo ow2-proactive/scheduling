@@ -96,7 +96,6 @@ public class JobEmailNotificationTest extends ProActiveTest {
 
     @Before
     public void setUp() throws KeyException {
-        PASchedulerProperties.JOB_FACTOR.updateProperty("1000");
         enableEmailNotifications();
         setSenderAddress(ADMIN_EMAIL);
         stubbedSender = mock(SendMail.class);

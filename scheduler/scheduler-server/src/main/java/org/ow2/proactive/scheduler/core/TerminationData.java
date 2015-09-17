@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
+import org.ow2.proactive.utils.TaskIdWrapper;
 
 
 /*
@@ -48,21 +49,21 @@ final class TerminationData {
 
     private final Set<JobId> jobsToTerminate;
 
-    private final Map<TaskId, TaskTerminationData> tasksToTerminate;
+    private final Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate;
 
-    private final Map<TaskId, TaskRestartData> tasksToRestart;
+    private final Map<TaskIdWrapper, TaskRestartData> tasksToRestart;
 
     static final TerminationData EMPTY = new TerminationData(Collections.<JobId> emptySet(), Collections
-            .<TaskId, TaskTerminationData> emptyMap(), Collections.<TaskId, TaskRestartData> emptyMap());
+            .<TaskIdWrapper, TaskTerminationData> emptyMap(), Collections.<TaskIdWrapper, TaskRestartData> emptyMap());
 
     static TerminationData newTerminationData() {
         return new TerminationData(new HashSet<JobId>(),
-                new HashMap<TaskId, TaskTerminationData>(),
-                new HashMap<TaskId, TaskRestartData>());
+                new HashMap<TaskIdWrapper, TaskTerminationData>(),
+                new HashMap<TaskIdWrapper, TaskRestartData>());
     }
 
-    private TerminationData(Set<JobId> jobsToTerminate, Map<TaskId, TaskTerminationData> tasksToTerminate,
-            Map<TaskId, TaskRestartData> tasksToRestart) {
+    private TerminationData(Set<JobId> jobsToTerminate, Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate,
+            Map<TaskIdWrapper, TaskRestartData> tasksToRestart) {
         this.jobsToTerminate = jobsToTerminate;
         this.tasksToTerminate = tasksToTerminate;
         this.tasksToRestart = tasksToRestart;
@@ -74,11 +75,11 @@ final class TerminationData {
 
     void addTaskData(RunningTaskData taskData, boolean normalTermination) {
         tasksToTerminate
-                .put(taskData.getTask().getId(), new TaskTerminationData(taskData, normalTermination));
+                .put(TaskIdWrapper.wrap(taskData.getTask().getId()), new TaskTerminationData(taskData, normalTermination));
     }
 
     void addRestartData(TaskId taskId, long waitTime) {
-        tasksToRestart.put(taskId, new TaskRestartData(taskId, waitTime));
+        tasksToRestart.put(TaskIdWrapper.wrap(taskId), new TaskRestartData(taskId, waitTime));
     }
 
     boolean isEmpty() {
@@ -90,8 +91,8 @@ final class TerminationData {
     }
 
     boolean taskTeminated(JobId jobId, String taskName) {
-        for (TaskId taskId : tasksToTerminate.keySet()) {
-            if (taskId.getReadableName().equals(taskName)) {
+        for (TaskIdWrapper taskIdWrapper : tasksToTerminate.keySet()) {
+            if (taskIdWrapper.getTaskId().getReadableName().equals(taskName)) {
                 return true;
             }
         }

@@ -43,6 +43,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import com.google.common.primitives.Longs;
 
 
 /**
@@ -86,17 +87,27 @@ public final class JobIdImpl implements JobId {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobId#getReadableName()
+     * {@inheritDoc}
      */
+    @Override
     public String getReadableName() {
         return this.readableName;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobId#value()
+     * {@inheritDoc}
      */
+    @Override
     public String value() {
         return String.valueOf(this.id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long longValue() {
+        return this.id;
     }
 
     /**
@@ -110,24 +121,26 @@ public final class JobIdImpl implements JobId {
     }
 
     /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     * @param jobId the id to be compared to <i>this</i> id.
-     * @return  a negative integer, zero, or a positive integer as this object
-     *		is less than, equal to, or greater than the specified object.
+     * {@inheritDoc}
      */
+    @Override
     public int compareTo(JobId jobId) {
-        return Long.valueOf(id).compareTo(Long.valueOf(((JobIdImpl) jobId).id));
+        return Longs.compare(id, ((JobIdImpl) jobId).id);
     }
 
     /**
-     * @see java.lang.Object#equals(java.lang.Object)
+     * {@inheritDoc}
      */
     @Override
     public boolean equals(Object o) {
-        if ((o != null) && o instanceof JobIdImpl) {
-            return ((JobIdImpl) o).id == id;
-        }
-        return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JobIdImpl jobId = (JobIdImpl) o;
+
+        if (id != jobId.id) return false;
+
+        return true;
     }
 
     /**
@@ -143,7 +156,7 @@ public final class JobIdImpl implements JobId {
     }
 
     /**
-     * @see java.lang.Object#toString()
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

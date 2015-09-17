@@ -103,7 +103,7 @@ public class SchedulerStarter {
     private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
     private static final int DEFAULT_NODES_NUMBER = 4;
-    private static final int DEFAULT_NODES_TIMEOUT = 30 * 1000;
+    private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
 
     private static BroadcastDiscovery discoveryService;
