@@ -254,7 +254,7 @@ project('common-api') {
         testRuntime 'org.python:jython-standalone:2.7.0'
         testRuntime 'org.codehaus.groovy:groovy-all:2.1.6'
         testRuntime 'jsr223:jsr223-nativeshell:0.3'
-        testCompile 'junit:junit:4.11'
+        testCompile 'junit:junit:4.12'
     }
 
     task stub(type: StubTask) {
