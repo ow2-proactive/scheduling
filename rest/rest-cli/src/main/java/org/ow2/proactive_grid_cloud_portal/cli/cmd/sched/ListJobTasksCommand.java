@@ -37,25 +37,27 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
+import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 
 import java.util.List;
 
+/**
+ * @author  the activeeon team.
+ */
+public class ListJobTasksCommand extends AbstractJobTagCommand implements Command {
 
-public class GetJobResultCommand extends AbstractJobTagCommand implements Command {
-
-    public GetJobResultCommand(String jobId) {
+    public ListJobTasksCommand(String jobId){
         super(jobId);
     }
 
-    public GetJobResultCommand(String jobId, String tag) {
+    public ListJobTasksCommand(String jobId, String tag){
         super(jobId, tag);
     }
 
@@ -63,25 +65,28 @@ public class GetJobResultCommand extends AbstractJobTagCommand implements Comman
     public void execute(ApplicationContext currentContext) throws CLIException {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            if(this.tag == null) {
-                JobResultData results = scheduler.jobResult(currentContext.getSessionId(), jobId);
-                resultStack(currentContext).push(results);
-                if (!currentContext.isForced()) {
-                    writeLine(currentContext, "%s", StringUtility.jobResultAsString(job(), results));
-                }
+            List<String> tasks = null;
+            if(this.tag != null){
+                tasks = scheduler.getJobTasksIdsByTag(currentContext.getSessionId(), jobId, tag);
             }
-            else {
-                List<TaskResultData> results = scheduler.taskresultByTag(currentContext.getSessionId(), jobId, tag);
-                resultStack(currentContext).push(results);
-                if (!currentContext.isForced()) {
-                    writeLine(currentContext, "%s", StringUtility.taskResultsAsString(results));
-                }
+            else{
+                tasks = scheduler.getJobTasksIds(currentContext.getSessionId(), jobId);
             }
 
+            resultStack(currentContext).push(tasks);
+
+            if (!currentContext.isSilent()) {
+                writeLine(currentContext, "%s", tasks);
+            }
         } catch (Exception e) {
-            handleError(String.format("An error occurred while retrieving %s result:", job()), e,
-                    currentContext);
+            String message = null;
+            if(this.tag == null){
+                message = String.format("An error occurred while retrieving %s tasks:", job());
+            }
+            else{
+                message = String.format("An error occurred while retrieving %s tasks filtered by tag %s:", job(), tag);
+            }
+            handleError(message, e, currentContext);
         }
     }
-
 }

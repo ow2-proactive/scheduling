@@ -69,6 +69,8 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultComma
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobTasksCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand);
 
 importClass(org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility);
 importClass(com.google.common.collect.ObjectArrays);
@@ -248,16 +250,37 @@ function listjobs(x, y) {
     }
 }
 
+function listtasks(jobId, tag) {
+    if(typeof tag == 'undefined'){
+        execute(new ListJobTasksCommand(jobId));
+    }
+    else{
+        execute(new ListJobTasksCommand(jobId, tag));
+    }
+}
+
 function schedulerstats() {
     execute(new SchedStatsCommand());
 }
 
-function jobresult(jobId) {
-    execute(new GetJobResultCommand('' + jobId));
+function jobresult(jobId, tag) {
+    if(typeof tag == 'undefined'){
+        execute(new GetJobResultCommand('' + jobId));
+    }
+    else{
+        execute(new GetJobResultCommand('' + jobId, tag));
+    }
+
 }
 
-function joboutput(jobId) {
-    execute(new GetJobOutputCommand('' + jobId));
+function joboutput(jobId, tag) {
+    if(typeof tag == 'undefined'){
+        execute(new GetJobOutputCommand('' + jobId));
+    }
+    else{
+        execute(new GetJobOutputCommand('' + jobId, tag));
+    }
+
 }
 
 function taskresult(jobId, taskId) {
@@ -266,6 +289,16 @@ function taskresult(jobId, taskId) {
 
 function taskoutput(jobId, taskId) {
     execute(new GetTaskOutputCommand('' + jobId, '' + taskId));
+}
+
+
+function taskstates(jobId, tag){
+    if(typeof tag == 'undefined'){
+        execute(new ListTaskStatesCommand(jobId));
+    }
+    else{
+        execute(new ListTaskStatesCommand(jobId, tag));
+    }
 }
 
 function preempttask(jobId, taskId) {

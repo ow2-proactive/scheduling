@@ -77,7 +77,6 @@ project(':rest:rest-server') {
         testCompile functionalTestDependencies
         testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
         testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
-        testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'org.eclipse.jetty:test-jetty-servlet:8.1.15.v20140411'
 
         runtime 'org.eclipse.jetty.aggregate:jetty-websocket:8.1.15.v20140411'
@@ -161,8 +160,19 @@ project(':rest:rest-cli') {
         compile project(":common-api")
         compile project(':rest:rest-api')
 
+        testCompile functionalTestDependencies
         testCompile 'org.eclipse.jetty:jetty-server:8.1.15.v20140411'
+        testCompile project(":rest:rest-server").sourceSets.test.output
     }
+
+    test {
+        exclude 'functionaltests/**'
+    }
+
+    task('functionalTest', type: Test).configure functionalTestConfiguration
+
+    functionalTest.dependsOn rootProject.dist
+    clean.dependsOn rootProject.cleanDist
 
 }
 

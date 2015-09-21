@@ -163,6 +163,18 @@ public class CommandSet {
             .hasOptionalArg(true).argNames("[latest=x |(from=y limit=z)]").commandClass(ListJobCommand.class)
             .entry();
 
+
+    public static final CommandSet.Entry JOB_TASK_LIST_BY_TAG = CommandSetEntryBuilder
+            .newInstance()
+            .opt("ljt")
+            .longOpt("listjobtasks")
+            .description(
+                    "Retrieve the list of tasks names for a given job and a specified tag.")
+            .hasArgs(true).hasOptionalArg(true).argNames("jobId tag").jsCommand("listtasks(job-id[,tag])")
+            .commandClass(ListJobTasksCommand.class)
+            .entry();
+
+
     public static final CommandSet.Entry JS_LIST_ALL = CommandSetEntryBuilder.newInstance().opt("")
             .longOpt("").description("Retrieve a list of all jobs.").jsCommand("listjobs()")
             .commandClass(ListJobCommand.class).entry();
@@ -177,8 +189,10 @@ public class CommandSet {
             .jsCommand("listjobs(x, y)").commandClass(ListJobCommand.class).entry();
 
     public static final CommandSet.Entry JOB_OUTPUT = CommandSetEntryBuilder.newInstance().opt("jo").longOpt(
-            "joboutput").description("Retrieve the output of specified job").hasArgs(true).numOfArgs(1)
-            .argNames("job-id").jsCommand("joboutput(id)").commandClass(GetJobOutputCommand.class).entry();
+            "joboutput").description("Retrieve the output of specified job. This output can be filtered by a tag")
+            .hasArgs(true).hasArgs(true).hasOptionalArg(true).argNames("job-id tag")
+            .jsCommand("joboutput(job-id[,tag])")
+            .commandClass(GetJobOutputCommand.class).entry();
 
     public static final CommandSet.Entry JOB_PRIORITY = CommandSetEntryBuilder.newInstance().opt("jp")
             .longOpt("jobpriority").description("Change the priority of the specified job").hasArgs(true)
@@ -186,8 +200,9 @@ public class CommandSet {
                     ChangeJobPriorityCommand.class).entry();
 
     public static final CommandSet.Entry JOB_RESULT = CommandSetEntryBuilder.newInstance().opt("jr").longOpt(
-            "jobresult").description("Retrieve the result of specified job").hasArgs(true).numOfArgs(1)
-            .argNames("job-id").jsCommand("jobresult(job-id)").commandClass(GetJobResultCommand.class)
+            "jobresult").description("Retrieve the result of specified job. This result can be filtered by a tag")
+            .hasArgs(true).hasOptionalArg(true).argNames("job-id tag")
+            .jsCommand("jobresult(job-id[,tag])").commandClass(GetJobResultCommand.class)
             .entry();
 
     public static final CommandSet.Entry JOB_STATE = CommandSetEntryBuilder.newInstance().opt("js").longOpt(
@@ -221,6 +236,15 @@ public class CommandSet {
             .longOpt("taskresult").description("Retrieve the result of specified task").hasArgs(true)
             .numOfArgs(2).argNames("job-id task-name").jsCommand("taskresult(job-id,task-name)")
             .commandClass(GetTaskResultCommand.class).entry();
+
+
+    public static final CommandSet.Entry TASKS_STATES = CommandSetEntryBuilder.newInstance().opt("ts")
+            .longOpt("taskstates")
+            .description("Retrieve the tasks states of a set of tasks belonging to a specified job and filtered by a tag")
+            .hasArgs(true)
+            .numOfArgs(2).argNames("job-id tag").jsCommand("taskstates(job-id,tag)")
+            .commandClass(ListTaskStatesCommand.class).entry();
+
 
     public static final CommandSet.Entry TASK_PREEMPT = CommandSetEntryBuilder.newInstance().opt("pt")
             .longOpt("preempttask").description(
@@ -376,8 +400,8 @@ public class CommandSet {
     /** CommandSet.Entry objects which are specific to Scheduler CLI */
     public static final CommandSet.Entry[] SCHED_ONLY = new CommandSet.Entry[] { SCHED_START, SCHED_STOP,
             SCHED_PAUSE, SCHED_RESUME, SCHED_FREEZE, SCHED_KILL, LINK_RM, SCHED_STATS, JOB_LIST, SUBMIT_DESC,
-            JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL,
-            JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE, DOWNLOAD_FILE,
+            JOB_STATE, JOB_OUTPUT, JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL, JOB_TASK_LIST_BY_TAG,
+            JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, TASKS_STATES, UPLOAD_FILE, DOWNLOAD_FILE,
             PUT_THIRD_PARTY_CREDENTIAL, REMOVE_THIRD_PARTY_CREDENTIAL, THIRD_PARTY_CREDENTIAL_KEY_SET,
             SCHED_HELP, LIVE_LOG };
 
