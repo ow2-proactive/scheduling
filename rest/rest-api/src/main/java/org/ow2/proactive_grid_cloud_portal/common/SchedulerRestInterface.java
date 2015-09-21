@@ -286,7 +286,7 @@ public interface SchedulerRestInterface {
      * @return a list of tasks' name
      */
     @GET
-    @Path("jobs/{jobid}/tasks/{tasktag}")
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}")
     @Produces("application/json")
     List<String> getJobTasksIdsByTag(@HeaderParam("sessionid")
                                 String sessionId, @PathParam("jobid")
