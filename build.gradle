@@ -6,8 +6,6 @@ archivesBaseName = 'scheduling' // in case current folder is not named schedulin
 
 project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
 
-
-
 sonarRunner {
     sonarProperties {    
     	property "sonar.projectKey", "$project.group:Scheduling"
@@ -19,7 +17,6 @@ sonarRunner {
         property 'sonar.junit.reportsPath', "${buildDir}/test-results"
     }
 }
-
 
 configurations {
     nativeBundle
@@ -43,7 +40,9 @@ buildscript {
         classpath "org.objectweb.proactive:programming-build-utils:${programmingVersion}"
         // needed at runtime by AntStubGenerator...
         classpath("org.objectweb.proactive:programming-core:${programmingVersion}")
-        classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
+        classpath('org.hsudbrock:gradle-trang:0.1-proactive') {
+            exclude group: 'xml-apis', module: 'xml-apis'
+        }
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
         classpath 'org.ow2.proactive:gradle-serialver:2.0'
         classpath 'org.postgresql:postgresql:9.3-1102-jdbc41'  
