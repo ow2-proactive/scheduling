@@ -335,7 +335,34 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertTrue(jsonArray.contains("LOOP-T2-1"));
         assertTrue(jsonArray.contains("LOOP-T2-2"));
         assertTrue(jsonArray.contains("LOOP-T2-3"));
+        assertTrue(jsonArray.contains("REPLICATE-T3-1"));
+        assertTrue(jsonArray.contains("REPLICATE-T3-2"));
+        assertEquals(5, jsonArray.size());
+    }
+
+
+    @Test
+    public void testJobTagsPrefix() throws Exception {
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tags/startsWith/LOOP");
+        JSONArray jsonArray = toJsonArray(response);
+
+        System.out.println(jsonArray.toJSONString());
+
+        assertTrue(jsonArray.contains("LOOP-T2-1"));
+        assertTrue(jsonArray.contains("LOOP-T2-2"));
+        assertTrue(jsonArray.contains("LOOP-T2-3"));
         assertEquals(3, jsonArray.size());
+    }
+
+
+    @Test
+    public void testJobTagsBadPrefix() throws Exception {
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tags/startsWith/blabla");
+        JSONArray jsonArray = toJsonArray(response);
+
+        System.out.println(jsonArray.toJSONString());
+
+        assertEquals(0, jsonArray.size());
     }
 
 }

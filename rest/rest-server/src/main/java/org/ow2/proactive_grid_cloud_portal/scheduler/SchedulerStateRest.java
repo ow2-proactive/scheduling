@@ -870,7 +870,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                 String sessionId, @PathParam("jobid")
                                 String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException{
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates");
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tags");
             JobState jobState = s.getJobState(jobId);
             return jobState.getTags();
         } catch (PermissionException e) {
@@ -881,6 +881,35 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         }
     }
+
+
+    /**
+     * Returns a list of the tags of the tasks belonging to job <code>jobId</code> and filtered by a prefix pattern
+     * @param sessionId a valid session id
+     * @param jobId jobid one wants to list the tasks' tags
+     * @param prefix the prefix used to filter tags
+     * @return a list of tasks' name
+     */
+    @GET
+    @Path("jobs/{jobid}/tasks/tags/startsWith/{prefix}")
+    @Produces("application/json")
+    public List<String> getJobTaskTagsPrefix(@HeaderParam("sessionid")
+                                      String sessionId, @PathParam("jobid")
+                                      String jobId, @PathParam("prefix")
+                                      String prefix) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException{
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tags/startswith/" + prefix);
+            JobState jobState = s.getJobState(jobId);
+            return jobState.getTags(prefix);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
 
 
     /**

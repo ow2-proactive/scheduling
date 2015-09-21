@@ -40,6 +40,37 @@
         <task ref="T2"/>
       </depends>
       <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
+      <controlFlow>
+        <replicate>
+          <script>
+            <code language="javascript">
+              //<![CDATA[
+              runs = 3;
+              //]]>
+            </code>
+          </script>
+        </replicate>
+      </controlFlow>
+    </task>
+    <task name="T4"
+          maxNumberOfExecution="4">
+      <description>
+
+      </description>
+      <depends>
+        <task ref="T3"/>
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
+    </task>
+    <task name="T5"
+          maxNumberOfExecution="4">
+      <description>
+
+      </description>
+      <depends>
+        <task ref="T4"/>
+      </depends>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
     </task>
     <task name="T2"
     maxNumberOfExecution="4">

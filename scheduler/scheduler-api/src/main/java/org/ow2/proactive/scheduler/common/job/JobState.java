@@ -230,6 +230,24 @@ public abstract class JobState extends Job implements Comparable<JobState> {
 
 
     /**
+     * To get the list of available tags in a job and that matches a given prefix.
+     * @param prefix the prefix used to filter the tags.
+     * @return the list of tags.
+     */
+    public List<String> getTags(String prefix){
+        Set<String> result = new HashSet<>();
+        String tag = null;
+        for(TaskState task: this.getTasks()){
+            tag = task.getTag();
+            if(tag != null && tag.startsWith(prefix)) {
+                result.add(task.getTag());
+            }
+        }
+        return new ArrayList<>(result);
+    }
+
+
+    /**
      * To get the numberOfFinishedTask
      *
      * @return the numberOfFinishedTask
