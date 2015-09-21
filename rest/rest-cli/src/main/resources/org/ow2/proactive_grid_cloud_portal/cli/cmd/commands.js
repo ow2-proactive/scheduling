@@ -249,16 +249,37 @@ function listjobs(x, y) {
     }
 }
 
+function listtasks(jobId, tag) {
+    if(typeof tag == 'undefined'){
+        execute(new ListJobTasksCommand(jobId));
+    }
+    else{
+        execute(new ListJobTasksCommand(jobId, tag));
+    }
+}
+
 function schedulerstats() {
     execute(new SchedStatsCommand());
 }
 
-function jobresult(jobId) {
-    execute(new GetJobResultCommand('' + jobId));
+function jobresult(jobId, tag) {
+    if(typeof tag == 'undefined'){
+        execute(new GetJobResultCommand('' + jobId));
+    }
+    else{
+        execute(new GetJobResultCommand('' + jobId, tag));
+    }
+
 }
 
-function joboutput(jobId) {
-    execute(new GetJobOutputCommand('' + jobId));
+function joboutput(jobId, tag) {
+    if(typeof tag == 'undefined'){
+        execute(new GetJobOutputCommand('' + jobId));
+    }
+    else{
+        execute(new GetJobOutputCommand('' + jobId, tag));
+    }
+
 }
 
 function taskresult(jobId, taskId) {
@@ -267,6 +288,16 @@ function taskresult(jobId, taskId) {
 
 function taskoutput(jobId, taskId) {
     execute(new GetTaskOutputCommand('' + jobId, '' + taskId));
+}
+
+
+function taskstates(jobId, tag){
+    if(typeof tag == 'undefined'){
+        execute(new ListTaskStatesCommand(jobId));
+    }
+    else{
+        execute(new ListTaskStatesCommand(jobId, tag));
+    }
 }
 
 function preempttask(jobId, taskId) {

@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2015 INRIA/University of
+ * Copyright (C) 1997-2012 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -34,24 +34,28 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
+import java.util.List;
 
-public class GetJobOutputCommand extends AbstractJobTagCommand implements Command {
+/**
+ * @author  the activeeon team.
+ */
+public class ListTaskStatesCommand extends AbstractJobTagCommand implements Command {
 
-
-    public GetJobOutputCommand(String jobId) {
+    public ListTaskStatesCommand(String jobId){
         super(jobId);
     }
 
-    public GetJobOutputCommand(String jobId, String tag) {
+    public ListTaskStatesCommand(String jobId, String tag){
         super(jobId, tag);
     }
 
@@ -60,19 +64,19 @@ public class GetJobOutputCommand extends AbstractJobTagCommand implements Comman
     public void execute(ApplicationContext currentContext) throws CLIException {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            String output = null;
-            if(this.tag == null) {
-                output = scheduler.jobLogs(currentContext.getSessionId(), jobId);
+            List<TaskStateData> tasks = null;
+            if(this.tag == null){
+                tasks = scheduler.getJobTaskStates(currentContext.getSessionId(), jobId);
             }
             else {
-                output = scheduler.tasklogByTag(currentContext.getSessionId(), jobId, tag);
+                tasks = scheduler.getJobTaskStatesByTag(currentContext.getSessionId(), jobId, tag);
             }
-            resultStack(currentContext).push(output);
+            resultStack(currentContext).push(tasks);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s", output);
+                writeLine(currentContext, "%s", StringUtility.taskStatesAsString(tasks, false));
             }
         } catch (Exception e) {
-            handleError(String.format("An error occurred while retrieving %s output:", job()), e,
+            handleError(String.format("An error occurred while retrieving %s state:", job()), e,
                     currentContext);
         }
     }

@@ -191,6 +191,16 @@ public class CommandSet {
                     .hasOptionalArg(true).argNames("[latest=x |(from=y limit=z)]")
                     .commandClass(ListJobCommand.class).entry();
 
+    public static final CommandSet.Entry JOB_TASK_LIST_BY_TAG = CommandSetEntryBuilder
+            .newInstance()
+            .opt("ljt")
+            .longOpt("listjobtasks")
+            .description(
+                    "Retrieve the list of tasks names for a given job and a specified tag.")
+            .hasArgs(true).hasOptionalArg(true).argNames("jobId tag").jsCommand("listtasks(job-id[,tag])")
+            .commandClass(ListJobTasksCommand.class)
+            .entry();
+
     public static final CommandSet.Entry JS_LIST_ALL =
             CommandSetEntryBuilder.newInstance()
                     .description("Retrieve a list of all jobs.").jsCommand("listjobs()")
@@ -206,11 +216,11 @@ public class CommandSet {
                     "Retrieves the list of 'y' (maximum) number of jobs, starting from the x'th job.")
                     .jsCommand("listjobs(x, y)").commandClass(ListJobCommand.class).entry();
 
-    public static final CommandSet.Entry JOB_OUTPUT =
-            CommandSetEntryBuilder.newInstance().opt("jo").longOpt("joboutput")
-                    .description("Retrieve the output of specified job").hasArgs(true).numOfArgs(1)
-                    .argNames("job-id").jsCommand("joboutput(id)")
-                    .commandClass(GetJobOutputCommand.class).entry();
+    public static final CommandSet.Entry JOB_OUTPUT = CommandSetEntryBuilder.newInstance().opt("jo").longOpt(
+            "joboutput").description("Retrieve the output of specified job. This output can be filtered by a tag")
+            .hasArgs(true).hasArgs(true).hasOptionalArg(true).argNames("job-id tag")
+            .jsCommand("joboutput(job-id[,tag])")
+            .commandClass(GetJobOutputCommand.class).entry();
 
     public static final CommandSet.Entry JOB_PRIORITY =
             CommandSetEntryBuilder.newInstance().opt("jp").longOpt("jobpriority")
@@ -219,11 +229,11 @@ public class CommandSet {
                     .jsCommand("jobpriority(job_id,priority)")
                     .commandClass(ChangeJobPriorityCommand.class).entry();
 
-    public static final CommandSet.Entry JOB_RESULT =
-            CommandSetEntryBuilder.newInstance().opt("jr").longOpt("jobresult")
-                    .description("Retrieve the result of specified job").hasArgs(true).numOfArgs(1)
-                    .argNames("job-id").jsCommand("jobresult(job-id)").commandClass(GetJobResultCommand.class)
-                    .entry();
+    public static final CommandSet.Entry JOB_RESULT = CommandSetEntryBuilder.newInstance().opt("jr").longOpt(
+            "jobresult").description("Retrieve the result of specified job. This result can be filtered by a tag")
+            .hasArgs(true).hasOptionalArg(true).argNames("job-id tag")
+            .jsCommand("jobresult(job-id[,tag])").commandClass(GetJobResultCommand.class)
+            .entry();
 
     public static final CommandSet.Entry JOB_STATE =
             CommandSetEntryBuilder.newInstance().opt("js").longOpt("jobstate")
@@ -267,6 +277,13 @@ public class CommandSet {
                     .description("Retrieve the result of specified task").hasArgs(true)
                     .numOfArgs(2).argNames("job-id task-name").jsCommand("taskresult(job-id,task-name)")
                     .commandClass(GetTaskResultCommand.class).entry();
+
+    public static final CommandSet.Entry TASKS_STATES = CommandSetEntryBuilder.newInstance().opt("ts")
+            .longOpt("taskstates")
+            .description("Retrieve the tasks states of a set of tasks belonging to a specified job and filtered by a tag")
+            .hasArgs(true)
+            .numOfArgs(2).argNames("job-id tag").jsCommand("taskstates(job-id,tag)")
+            .commandClass(ListTaskStatesCommand.class).entry();
 
     public static final CommandSet.Entry TASK_PREEMPT =
             CommandSetEntryBuilder.newInstance().opt("pt").longOpt("preempttask")
@@ -477,8 +494,8 @@ public class CommandSet {
             new CommandSet.Entry[] {
                     SCHEDULER_START, SCHEDULER_STOP, SCHEDULER_PAUSE, SCHEDULER_RESUME, SCHEDULER_FREEZE,
                     SCHEDULER_KILL, LINK_RM, SCHEDULER_STATS, JOB_LIST, SUBMIT, JOB_STATE, JOB_OUTPUT,
-                    JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL, JOB_REMOVE, TASK_RESTART,
-                    TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, UPLOAD_FILE, DOWNLOAD_FILE,
+                    JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL, JOB_TASK_LIST_BY_TAG, JOB_REMOVE, TASK_RESTART,
+                    TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, TASKS_STATES, UPLOAD_FILE, DOWNLOAD_FILE,
                     PUT_THIRD_PARTY_CREDENTIAL, REMOVE_THIRD_PARTY_CREDENTIAL, THIRD_PARTY_CREDENTIAL_KEY_SET,
                     SCHEDULER_HELP, LIVE_LOG };
 

@@ -44,23 +44,40 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
+
+import java.util.List;
 
 
-public class GetJobResultCommand extends AbstractJobCommand implements Command {
+public class GetJobResultCommand extends AbstractJobTagCommand implements Command {
 
     public GetJobResultCommand(String jobId) {
         super(jobId);
+    }
+
+    public GetJobResultCommand(String jobId, String tag) {
+        super(jobId, tag);
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            JobResultData jobResult = scheduler.jobResult(currentContext.getSessionId(), jobId);
-            resultStack(currentContext).push(jobResult);
-            if (!currentContext.isForced()) {
-                writeLine(currentContext, "%s", StringUtility.jobResultAsString(job(), jobResult));
+            if(this.tag == null) {
+                JobResultData results = scheduler.jobResult(currentContext.getSessionId(), jobId);
+                resultStack(currentContext).push(results);
+                if (!currentContext.isForced()) {
+                    writeLine(currentContext, "%s", StringUtility.jobResultAsString(job(), results));
+                }
             }
+            else {
+                List<TaskResultData> results = scheduler.taskresultByTag(currentContext.getSessionId(), jobId, tag);
+                resultStack(currentContext).push(results);
+                if (!currentContext.isForced()) {
+                    writeLine(currentContext, "%s", StringUtility.taskResultsAsString(results));
+                }
+            }
+
         } catch (Exception e) {
             handleError(String.format("An error occurred while retrieving %s result:", job()), e,
                     currentContext);

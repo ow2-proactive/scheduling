@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2015 INRIA/University of
+ * Copyright (C) 1997-2012 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -37,43 +37,18 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
-import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 
-public class GetJobOutputCommand extends AbstractJobTagCommand implements Command {
+public abstract class AbstractJobTagCommand extends AbstractJobCommand implements Command {
 
+    protected String tag = null;
 
-    public GetJobOutputCommand(String jobId) {
+    public AbstractJobTagCommand(String jobId){ super(jobId);}
+
+    public AbstractJobTagCommand(String jobId, String tag){
         super(jobId);
-    }
-
-    public GetJobOutputCommand(String jobId, String tag) {
-        super(jobId, tag);
-    }
-
-
-    @Override
-    public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
-        try {
-            String output = null;
-            if(this.tag == null) {
-                output = scheduler.jobLogs(currentContext.getSessionId(), jobId);
-            }
-            else {
-                output = scheduler.tasklogByTag(currentContext.getSessionId(), jobId, tag);
-            }
-            resultStack(currentContext).push(output);
-            if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s", output);
-            }
-        } catch (Exception e) {
-            handleError(String.format("An error occurred while retrieving %s output:", job()), e,
-                    currentContext);
-        }
+        this.tag = tag;
     }
 }
