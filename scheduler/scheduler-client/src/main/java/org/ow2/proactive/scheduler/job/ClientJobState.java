@@ -1,9 +1,6 @@
 package org.ow2.proactive.scheduler.job;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -34,7 +31,7 @@ public final class ClientJobState extends JobState {
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;
-    private Map<TaskId, TaskState> tasks = new HashMap<>();
+    private Map<TaskId, TaskState> tasks = new TreeMap<>();
 
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
