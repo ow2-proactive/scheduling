@@ -211,6 +211,17 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         });
     }
 
+    /**
+     * TO get the paginated filtered tasks by a given tag.
+     * @param tag used to filter the tasks
+     * @param offset the starting index of the sublist of tasks to get
+     * @param limit the last index (non inclusive) of the sublist of tasks to get
+     * @return the list of filtered tasks by tag and then paginated with [offset, limit[
+     */
+    public List<TaskState> getTaskPaginated(final String tag, final int offset, final int limit) {
+        List<TaskState> tasks = getTaskByTag(tag);
+        return tasks.subList(offset, limit);
+    }
 
     /**
      * To get the list of available tags in a job.
