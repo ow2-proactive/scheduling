@@ -163,9 +163,9 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testJobIdTagFromInteractive() throws Exception{
-        typeLine("listtasks(1, 'LOOP-T2-1')");
+        typeLine("listtasks(1, 'T2-LOOP-1')");
         executeTestInteractive();
-        verify(restApi).getJobTasksIdsByTag(anyString(), eq("1"), eq("LOOP-T2-1"));
+        verify(restApi).getJobTasksIdsByTag(anyString(), eq("1"), eq("T2-LOOP-1"));
     }
 
 

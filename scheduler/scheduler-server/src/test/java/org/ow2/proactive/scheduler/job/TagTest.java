@@ -184,8 +184,8 @@ public class TagTest extends ProActiveTest{
         InternalTask task2 = job.getTask("T1#1");
         execute(task2);
 
-        assertEquals("LOOP-T1-1", job.getTask("T1#1").getTag());
-        assertEquals("LOOP-T1-2", job.getTask("T1#2").getTag());
+        assertEquals("T1-LOOP-1", job.getTask("T1#1").getTag());
+        assertEquals("T1-LOOP-2", job.getTask("T1#2").getTag());
     }
 
     @Test
@@ -196,8 +196,8 @@ public class TagTest extends ProActiveTest{
 
         execute(new String[]{"T1", "T2", "T3", "T1#1", "T2#1", "T3#1"});
 
-        assertTags("LOOP-T3-1", new String[]{"T1#1", "T2#1", "T3#1"});
-        assertTags("LOOP-T3-2", new String[]{"T1#2", "T2#2", "T3#2"});
+        assertTags("T3-LOOP-1", new String[]{"T1#1", "T2#1", "T3#1"});
+        assertTags("T3-LOOP-2", new String[]{"T1#2", "T2#2", "T3#2"});
     }
 
 
@@ -206,7 +206,7 @@ public class TagTest extends ProActiveTest{
         InternalScriptTask task1 = createLoopTask("T1", "loop = '* * * * *'", null, "T1", false);
         execute(new String[]{"T1", "T1#1"});
 
-        assertTagsStartsWith("LOOP-T1-", new String[]{"T1#1", "T1#2"});
+        assertTagsStartsWith("T1-LOOP-", new String[]{"T1#1", "T1#2"});
     }
 
 
@@ -219,8 +219,8 @@ public class TagTest extends ProActiveTest{
         execute(task1);
 
         assertNull(job.getTask("T2").getTag());
-        assertEquals("REPLICATE-T1-1", job.getTask("T2*1").getTag());
-        assertEquals("REPLICATE-T1-2", job.getTask("T2*2").getTag());
+        assertEquals("T1-REPLICATE-1", job.getTask("T2*1").getTag());
+        assertEquals("T1-REPLICATE-2", job.getTask("T2*2").getTag());
     }
 
 
@@ -237,8 +237,8 @@ public class TagTest extends ProActiveTest{
         assertNull(job.getTask("T3").getTag());
         assertNull(job.getTask("T4").getTag());
 
-        assertTags("REPLICATE-T1-1", new String[]{"T2*1", "T3*1", "T4*1"});
-        assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2"});
+        assertTags("T1-REPLICATE-1", new String[]{"T2*1", "T3*1", "T4*1"});
+        assertTags("T1-REPLICATE-2", new String[]{"T2*2", "T3*2", "T4*2"});
     }
 
 
@@ -258,11 +258,11 @@ public class TagTest extends ProActiveTest{
                 "T1#1*1", "T3#1*1", "T4#1*1", "T5#1*1",
                 "T1#1*2", "T3#1*2", "T4#1*2", "T5#1*2"});
 
-        assertTags("REPLICATE-T-1", new String[]{"T1*1", "T3*1", "T4*1", "T5*1"});
-        assertTags("REPLICATE-T-2", new String[]{"T1*2", "T3*2", "T4*2", "T5*2"});
-        assertTags("LOOP-T2-1", new String[]{"T#1", "T1#1", "T3#1", "T4#1", "T5#1"});
-        assertTags("REPLICATE-T#1-1", new String[]{"T1#1*1", "T3#1*1", "T4#1*1", "T5#1*1"});
-        assertTags("REPLICATE-T#1-2", new String[]{"T1#1*2", "T3#1*2", "T4#1*2", "T5#1*2"});
+        assertTags("T-REPLICATE-1", new String[]{"T1*1", "T3*1", "T4*1", "T5*1"});
+        assertTags("T-REPLICATE-2", new String[]{"T1*2", "T3*2", "T4*2", "T5*2"});
+        assertTags("T2-LOOP-1", new String[]{"T#1", "T1#1", "T3#1", "T4#1", "T5#1"});
+        assertTags("T#1-REPLICATE-1", new String[]{"T1#1*1", "T3#1*1", "T4#1*1", "T5#1*1"});
+        assertTags("T#1-REPLICATE-2", new String[]{"T1#1*2", "T3#1*2", "T4#1*2", "T5#1*2"});
     }
 
 
@@ -281,14 +281,14 @@ public class TagTest extends ProActiveTest{
                 "T2#1*2", "T3#1*2", "T4#1*2"
         });
 
-        assertTags("LOOP-T4-1", new String[]{"T2#1", "T3#1", "T4#1"});
-        assertTags("LOOP-T4-2", new String[]{"T2#2", "T3#2", "T4#2"});
-        assertTags("REPLICATE-T1-1", new String[]{"T2*1", "T3*1", "T4*1"});
-        assertTags("LOOP-T4*1-1", new String[]{"T2#1*1", "T3#1*1", "T4#1*1"});
-        assertTags("LOOP-T4*2-1", new String[]{"T2#1*2", "T3#1*2", "T4#1*2"});
-        assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2"});
-        assertTags("LOOP-T4*1-2", new String[]{"T2#2*1", "T3#2*1", "T4#2*1"});
-        assertTags("LOOP-T4*2-2", new String[]{"T2#2*2", "T3#2*2", "T4#2*2"});
+        assertTags("T4-LOOP-1", new String[]{"T2#1", "T3#1", "T4#1"});
+        assertTags("T4-LOOP-2", new String[]{"T2#2", "T3#2", "T4#2"});
+        assertTags("T1-REPLICATE-1", new String[]{"T2*1", "T3*1", "T4*1"});
+        assertTags("T4*1-LOOP-1", new String[]{"T2#1*1", "T3#1*1", "T4#1*1"});
+        assertTags("T4*2-LOOP-1", new String[]{"T2#1*2", "T3#1*2", "T4#1*2"});
+        assertTags("T1-REPLICATE-2", new String[]{"T2*2", "T3*2", "T4*2"});
+        assertTags("T4*1-LOOP-2", new String[]{"T2#2*1", "T3#2*1", "T4#2*1"});
+        assertTags("T4*2-LOOP-2", new String[]{"T2#2*2", "T3#2*2", "T4#2*2"});
     }
 
 
@@ -303,12 +303,12 @@ public class TagTest extends ProActiveTest{
 
         execute(new String[]{"T1", "T2*1", "T2*2"});
 
-        assertTags("REPLICATE-T1-1", new String[]{"T2*1", "T3*1", "T4*1", "T5*1", "T6*1"});
-        assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2", "T5*2", "T6*2"});
-        assertTags("REPLICATE-T2*1-3", new String[]{"T3*3", "T4*3", "T5*3"});
-        assertTags("REPLICATE-T2*1-4", new String[]{"T3*4", "T4*4", "T5*4"});
-        assertTags("REPLICATE-T2*2-5", new String[]{"T3*5", "T4*5", "T5*5"});
-        assertTags("REPLICATE-T2*2-6", new String[]{"T3*6", "T4*6", "T5*6"});
+        assertTags("T1-REPLICATE-1", new String[]{"T2*1", "T3*1", "T4*1", "T5*1", "T6*1"});
+        assertTags("T1-REPLICATE-2", new String[]{"T2*2", "T3*2", "T4*2", "T5*2", "T6*2"});
+        assertTags("T2*1-REPLICATE-3", new String[]{"T3*3", "T4*3", "T5*3"});
+        assertTags("T2*1-REPLICATE-4", new String[]{"T3*4", "T4*4", "T5*4"});
+        assertTags("T2*2-REPLICATE-5", new String[]{"T3*5", "T4*5", "T5*5"});
+        assertTags("T2*2-REPLICATE-6", new String[]{"T3*6", "T4*6", "T5*6"});
     }
 
 

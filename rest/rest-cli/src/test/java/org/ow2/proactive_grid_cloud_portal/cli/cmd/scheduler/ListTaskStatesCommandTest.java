@@ -80,7 +80,7 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
         taskStateFaker.setGenerator("taskInfo.jobId", new FixedPropertyGenerator<JobIdData>(jobId));
         taskStateFaker.setGenerator("taskInfo.taskId.readableName", new PrefixPropertyGenerator("task", 1));
         taskStateFaker.setGenerator("name", new PrefixPropertyGenerator("task", 1));
-        taskStateFaker.setGenerator("tag", new FixedPropertyGenerator("LOOP-T2-1"));
+        taskStateFaker.setGenerator("tag", new FixedPropertyGenerator("T2-LOOP-1"));
 
         this.taskData = this.taskStateFaker.fakeList(6);
         this.taskDataFiltered = new ArrayList<>();
@@ -180,9 +180,9 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
 
     @Test
     public void testJobIdTagFromInteractive() throws Exception{
-        typeLine("taskstates(1, 'LOOP-T2-1')");
+        typeLine("taskstates(1, 'T2-LOOP-1')");
         executeTestInteractive();
-        verify(restApi).getJobTaskStatesByTag(anyString(), eq("1"), eq("LOOP-T2-1"));
+        verify(restApi).getJobTaskStatesByTag(anyString(), eq("1"), eq("T2-LOOP-1"));
     }
 
 

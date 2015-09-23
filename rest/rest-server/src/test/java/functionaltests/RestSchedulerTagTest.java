@@ -119,7 +119,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskIdsByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/T2-LOOP-1");
         JSONArray jsonArray = toJsonArray(response);
 
         System.out.println(jsonArray.toJSONString());
@@ -143,7 +143,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskStatesByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/taskstates/LOOP-T2-1");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/taskstates/T2-LOOP-1");
         JSONArray jsonArray = toJsonArray(response);
 
         System.out.println(jsonArray.toJSONString());
@@ -163,7 +163,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskLogAllByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/result/log/all");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/T2-LOOP-1/result/log/all");
         String responseContent = getContent(response);
 
         System.out.println(responseContent);
@@ -185,7 +185,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskLogErrByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/result/log/err");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/T2-LOOP-1/result/log/err");
         String responseContent = getContent(response);
 
         System.out.println(responseContent);
@@ -205,7 +205,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskLogOutByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/result/log/out");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/T2-LOOP-1/result/log/out");
         String responseContent = getContent(response);
 
         System.out.println(responseContent);
@@ -226,10 +226,10 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskLogServerByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/log/server");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/T2-LOOP-1/log/server");
         String responseContent = getContent(response);
 
-        for(TaskState state: scheduler.getJobState(jobId).getTaskByTag("LOOP-T2-1")){
+        for(TaskState state: scheduler.getJobState(jobId).getTaskByTag("T2-LOOP-1")){
             assertTrue(responseContent.contains("Task " + state.getId().value() + " logs"));
         }
     }
@@ -246,7 +246,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskResultByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/result");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/T2-LOOP-1/result");
         JSONArray jsonArray = toJsonArray(response);
 
         System.out.println(jsonArray.toJSONString());
@@ -277,7 +277,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskResultValueByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/result/value");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/T2-LOOP-1/result/value");
         JSONObject jsonObject = toJsonObject(response);
 
         System.out.println(jsonObject.toJSONString());
@@ -302,7 +302,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Test
     public void testTaskResultSerializedvalueByTag() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/result/serializedvalue");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/T2-LOOP-1/result/serializedvalue");
         JSONObject jsonObject = toJsonObject(response);
 
         System.out.println(jsonObject.toJSONString());
@@ -332,25 +332,25 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
         System.out.println(jsonArray.toJSONString());
 
-        assertTrue(jsonArray.contains("LOOP-T2-1"));
-        assertTrue(jsonArray.contains("LOOP-T2-2"));
-        assertTrue(jsonArray.contains("LOOP-T2-3"));
-        assertTrue(jsonArray.contains("REPLICATE-T3-1"));
-        assertTrue(jsonArray.contains("REPLICATE-T3-2"));
+        assertTrue(jsonArray.contains("T2-LOOP-1"));
+        assertTrue(jsonArray.contains("T2-LOOP-2"));
+        assertTrue(jsonArray.contains("T2-LOOP-3"));
+        assertTrue(jsonArray.contains("T3-REPLICATE-1"));
+        assertTrue(jsonArray.contains("T3-REPLICATE-2"));
         assertEquals(5, jsonArray.size());
     }
 
 
     @Test
     public void testJobTagsPrefix() throws Exception {
-        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tags/startsWith/LOOP");
+        HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tags/startsWith/T2");
         JSONArray jsonArray = toJsonArray(response);
 
         System.out.println(jsonArray.toJSONString());
 
-        assertTrue(jsonArray.contains("LOOP-T2-1"));
-        assertTrue(jsonArray.contains("LOOP-T2-2"));
-        assertTrue(jsonArray.contains("LOOP-T2-3"));
+        assertTrue(jsonArray.contains("T2-LOOP-1"));
+        assertTrue(jsonArray.contains("T2-LOOP-2"));
+        assertTrue(jsonArray.contains("T2-LOOP-3"));
         assertEquals(3, jsonArray.size());
     }
 

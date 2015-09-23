@@ -5,7 +5,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.scheduler;
  */
 public abstract class AbstractJobTagCommandTest extends AbstractJobCommandTest {
 
-    protected String tag = "LOOP-T2-1";
+    protected String tag = "T2-LOOP-1";
 
     protected String unknownTag = "unknownTag";
 }

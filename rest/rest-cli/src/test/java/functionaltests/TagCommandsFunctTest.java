@@ -67,7 +67,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListJobTaskIdsWithTag() throws Exception {
-        typeLine("listtasks(1, 'LOOP-T2-1')");
+        typeLine("listtasks(1, 'T2-LOOP-1')");
 
         runCli();
 
@@ -143,7 +143,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListTaskStateWithTag() throws Exception {
-        typeLine("taskstates(1, 'LOOP-T2-1')");
+        typeLine("taskstates(1, 'T2-LOOP-1')");
 
         runCli();
 
@@ -219,7 +219,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testJobOutputWithTag() throws Exception {
-        typeLine("joboutput(1, 'LOOP-T2-1')");
+        typeLine("joboutput(1, 'T2-LOOP-1')");
 
         runCli();
 
@@ -281,7 +281,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testJobResultWithTag() throws Exception {
-        typeLine("jobresult(1, 'LOOP-T2-1')");
+        typeLine("jobresult(1, 'T2-LOOP-1')");
 
         runCli();
 

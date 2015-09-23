@@ -737,20 +737,18 @@ public abstract class InternalJob extends JobState {
         StringBuffer buf = new StringBuffer();
 
         if(loopAction){
-            buf.append("LOOP-");
             buf.append(InternalTask.getInitialName(initiator.getName()));
             if(initiator.getReplicationIndex() > 0){
                 buf.append("*");
                 buf.append(initiator.getReplicationIndex());
             }
+            buf.append("-LOOP-");
         }
         else {
-            buf.append("REPLICATE-");
             buf.append(initiator.getName());
+            buf.append("-REPLICATE-");
         }
 
-
-        buf.append("-");
 
         if(loopAction){
             FlowScript flow = initiator.getFlowScript();

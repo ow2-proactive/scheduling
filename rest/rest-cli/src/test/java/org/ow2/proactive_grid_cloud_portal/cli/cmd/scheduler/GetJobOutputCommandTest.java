@@ -145,9 +145,9 @@ public class GetJobOutputCommandTest extends AbstractJobTagCommandTest{
 
     @Test
     public void testJobIdTagFromInteractive() throws Exception{
-        typeLine("joboutput(1, 'LOOP-T2-1')");
+        typeLine("joboutput(1, 'T2-LOOP-1')");
         executeTestInteractive();
-        verify(restApi).tasklogByTag(anyString(), eq("1"), eq("LOOP-T2-1"));
+        verify(restApi).tasklogByTag(anyString(), eq("1"), eq("T2-LOOP-1"));
     }
 
 
