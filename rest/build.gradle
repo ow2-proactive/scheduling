@@ -79,7 +79,7 @@ project(':rest:rest-server') {
         compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.13.Final'
 
         compile 'org.rrd4j:rrd4j:2.2.1'
-        compile 'net.sf.dozer:dozer:5.4.0'
+        compile 'net.sf.dozer:dozer:5.5.1'
         compile 'commons-io:commons-io:2.4'
         compile 'commons-codec:commons-codec:1.10'
 
