@@ -39,6 +39,7 @@ package org.ow2.proactive.resourcemanager.db;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
@@ -112,7 +113,7 @@ public class RMDBManager {
             } else {
                 try {
                     Properties properties = new Properties();
-                    properties.load(Files.newBufferedReader(configFile.toPath()));
+                    properties.load(Files.newBufferedReader(configFile.toPath(), Charset.defaultCharset()));
                     configuration.addProperties(properties);
                 } catch (IOException e) {
                     throw new IllegalArgumentException(e);

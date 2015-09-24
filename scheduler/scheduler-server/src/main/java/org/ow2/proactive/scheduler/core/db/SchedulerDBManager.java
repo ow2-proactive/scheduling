@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1577,7 +1578,7 @@ public class SchedulerDBManager {
                 } else {
                     try {
                         Properties properties = new Properties();
-                        properties.load(Files.newBufferedReader(configFile.toPath()));
+                        properties.load(Files.newBufferedReader(configFile.toPath(), Charset.defaultCharset()));
                         configuration.addProperties(properties);
                     } catch (IOException e) {
                         throw new IllegalArgumentException(e);
