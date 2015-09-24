@@ -84,7 +84,7 @@ project(':rest:rest-server') {
         compile 'commons-codec:commons-codec:1.10'
 
         compile 'com.netiq:websockify:1.6-proactive'
-        compile 'io.netty:netty:3.3.0.Final'
+        compile 'io.netty:netty:3.10.4.Final'
 
         compile 'org.atmosphere:atmosphere-runtime:2.3.4'
 
