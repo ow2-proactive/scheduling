@@ -251,7 +251,7 @@ project('common-api') {
 
         testRuntime 'org.jruby:jruby-complete:9.0.1.0'
         testRuntime 'org.python:jython-standalone:2.7.0'
-        testRuntime 'org.codehaus.groovy:groovy-all:2.1.6'
+        testRuntime 'org.codehaus.groovy:groovy-all:2.4.5'
         testRuntime 'jsr223:jsr223-nativeshell:0.3'
         testCompile 'junit:junit:4.12'
     }
@@ -352,7 +352,7 @@ project(':rm:rm-node') {
         runtime 'org.jruby:jruby-complete:9.0.1.0'
         runtime 'org.python:jython-standalone:2.7.0'
 
-        runtime 'org.codehaus.groovy:groovy-all:2.4.4'
+        runtime 'org.codehaus.groovy:groovy-all:2.4.5'
         runtime 'jsr223:jsr223-nativeshell:0.3'
     }
 
@@ -402,7 +402,7 @@ project('scheduler:scheduler-server') {
         testCompile 'org.mockito:mockito-core:1.10.19'
         testCompile 'org.hamcrest:hamcrest-all:1.3'
 
-        testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
+        testCompile 'org.codehaus.groovy:groovy-all:2.4.5'
 
         testCompile 'org.jvnet.winp:winp:1.23-proactive'
         testCompile files("${System.properties['java.home']}/../lib/tools.jar")
@@ -649,7 +649,7 @@ dependencies {
     nativeBundle 'org.jvnet.winp:winp:1.23-proactive:native'
     nativeBundle 'sigar:sigar:1.7.0-proactive:native'
 
-    compile 'org.codehaus.groovy:groovy-all:2.4.4'
+    compile 'org.codehaus.groovy:groovy-all:2.4.5'
     compile 'commons-io:commons-io:2.4'
 }
 
