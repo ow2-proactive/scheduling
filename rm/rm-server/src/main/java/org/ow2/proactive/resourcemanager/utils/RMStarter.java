@@ -74,7 +74,7 @@ public class RMStarter {
     private static Options options = new Options();
 
     public static final int DEFAULT_NODES_NUMBER =
-            Math.max(2, Runtime.getRuntime().availableProcessors());
+            Math.max(2, Runtime.getRuntime().availableProcessors() - 1);
 
     private static final int DEFAULT_NODE_TIMEOUT = 30 * 1000;
 
