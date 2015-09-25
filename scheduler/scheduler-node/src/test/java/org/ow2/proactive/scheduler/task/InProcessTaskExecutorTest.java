@@ -62,6 +62,24 @@ public class InProcessTaskExecutorTest {
     }
 
     @Test
+    public void testPaUserVariableAvailabilityFromScriptEngine() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        String jobOwner = "JohnDoe";
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setJobOwner(jobOwner);
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
+
+        new InProcessTaskExecutor().execute(new TaskContext(
+                new ScriptExecutableContainer(new TaskScript(
+                        new SimpleScript("print variables.get('PA_USER')", "python"))),
+                initializer), taskOutput.outputStream, taskOutput.error);
+
+        assertEquals(jobOwner, taskOutput.output().trim());
+    }
+
+    @Test
     public void failingScript() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
