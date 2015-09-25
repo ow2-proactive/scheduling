@@ -40,12 +40,13 @@ package org.ow2.proactive.scheduler.task;
 public enum SchedulerVars {
     PA_JOB_ID,
     PA_JOB_NAME,
+    PA_NODESFILE,
+    PA_NODESNUMBER,
+    PA_SCHEDULER_HOME,
     PA_TASK_ID,
     PA_TASK_NAME,
     PA_TASK_ITERATION,
     PA_TASK_PROGRESS_FILE,
     PA_TASK_REPLICATION,
-    PA_SCHEDULER_HOME,
-    PA_NODESFILE,
-    PA_NODESNUMBER;
+    PA_USER
 }

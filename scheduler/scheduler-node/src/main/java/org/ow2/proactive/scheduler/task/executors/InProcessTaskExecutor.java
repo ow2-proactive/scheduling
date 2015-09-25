@@ -248,6 +248,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         variables.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
         variables.put(SchedulerVars.PA_TASK_ITERATION.toString(), initializer.getIterationIndex());
         variables.put(SchedulerVars.PA_TASK_REPLICATION.toString(), initializer.getReplicationIndex());
+        variables.put(SchedulerVars.PA_USER.toString(), initializer.getJobOwner());
         return variables;
     }
 
