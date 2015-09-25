@@ -112,9 +112,32 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
                 String spaceName = spacesNames[i];
                 String spacePath = (new File(new URI(spacesUris[i]))).getAbsolutePath();
                 testIt(spaceName, spacePath, destPath, true);
-                testIt(spaceName, spacePath, destPath, false);
+
+                // if URL is not encoded then the path appended to the URL will be interpreted
+                // as if it is part of the URL. This will produce something like
+                // 'http://localhost:8080/rest/scheduler/dataspace/USERSPACE//'
+                // that contains a double slash at the end of the URL, which is now detected as invalid
+                // by Resteasy. Consequently, it will produce an error on server side (error 500 received on client side)
+
+                // for this reason the next line has been commented and a new test added below
+                // testIt(spaceName, spacePath, destPath, false);
             }
         }
+    }
+
+    @Test
+    public void testFailureWithNonEncodedParametersInUrlPath() throws Exception {
+        String destPath = "/";
+
+        String pullListUrl = getResourceUrl("dataspace/" +
+                SchedulerConstants.GLOBALSPACE_NAME + "/" + destPath);
+
+        HttpGet reqPullList = new HttpGet(pullListUrl);
+        setSessionHeader(reqPullList);
+
+        HttpResponse response = executeUriRequest(reqPullList);
+
+        assertEquals(500, response.getStatusLine().getStatusCode());
     }
 
     public void testIt(String spaceName, String spacePath, File destPath, boolean encode) throws Exception {
@@ -208,8 +231,10 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
         HttpResponse response4 = executeUriRequest(reqDelete);
 
         System.out.println(response4.getStatusLine());
+
         assertHttpStatusOK(response4);
 
-        Assert.assertTrue(destFile + " does not exist", !destFile.exists());
+        Assert.assertTrue(destFile + " still exist", !destFile.exists());
     }
+
 }

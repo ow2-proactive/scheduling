@@ -2,6 +2,8 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -131,9 +134,9 @@ public class SchedulerDBManager {
 
     public static SchedulerDBManager createInMemorySchedulerDBManager() {
         Configuration config = new Configuration();
-        config.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
-        config.setProperty("hibernate.connection.url", "jdbc:h2:mem:scheduler");
-        config.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        config.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbc.JDBCDriver");
+        config.setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
+        config.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         return new SchedulerDBManager(config, true);
     }
 
@@ -647,7 +650,7 @@ public class SchedulerDBManager {
                 "jobId", jobId).executeUpdate();
     }
 
-    public synchronized void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
+    public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             public Void executeWork(Session session) {
@@ -1007,12 +1010,15 @@ public class SchedulerDBManager {
                     taskIds.add(taskId(id));
                 }
 
-                List<TaskData> taskRuntimeDataList = new ArrayList<>();
-                List<InternalTask> tasks = new ArrayList<>();
-
                 Query tasksQuery = session.createQuery("from TaskData where id in (:ids)").setParameterList(
                         "ids", taskIds);
                 List<TaskData> tasksToUpdate = tasksQuery.list();
+                Set<TaskId> newTasks = changesInfo.getNewTasks();
+
+                int newListSize = tasksToUpdate.size() + newTasks.size();
+                List<TaskData> taskRuntimeDataList = new ArrayList<>(newListSize);
+                List<InternalTask> tasks = new ArrayList<>(newListSize);
+
                 for (TaskData taskData : tasksToUpdate) {
                     InternalTask task = job.getIHMTasks().get(taskData.createTaskId(job));
                     taskData.updateMutableAttributes(task);
@@ -1022,7 +1028,7 @@ public class SchedulerDBManager {
                 }
 
                 int counter = 0;
-                for (TaskId newTaskId : changesInfo.getNewTasks()) {
+                for (TaskId newTaskId : newTasks) {
                     InternalTask task = job.getIHMTasks().get(newTaskId);
                     if (task.getExecutableContainer() == null) {
                         InternalTask from = task.getReplicatedFrom();
@@ -1370,7 +1376,7 @@ public class SchedulerDBManager {
         }
     }
 
-    public synchronized void newJobSubmitted(final InternalJob job) {
+    public void newJobSubmitted(final InternalJob job) {
         runWithTransaction(new SessionWork<JobData>() {
 
             @Override
@@ -1387,10 +1393,12 @@ public class SchedulerDBManager {
                     InternalTask task = iTasks.get(i);
                     task.setId(TaskIdImpl.createTaskId(job.getId(),
                             task.getTaskInfo().getTaskId().getReadableName(), i));
+
                     tasksWithNewIds.add(task);
                 }
 
                 job.getIHMTasks().clear();
+
                 for (InternalTask task : tasksWithNewIds) {
                     job.getIHMTasks().put(task.getId(), task);
                 }
@@ -1502,12 +1510,13 @@ public class SchedulerDBManager {
         return runWithoutTransaction(new SessionWork<List<SchedulerUserInfo>>() {
             @Override
             public List<SchedulerUserInfo> executeWork(Session session) {
-                List<SchedulerUserInfo> users = new ArrayList<>();
                 Query query = session
                         .createQuery(
                                 "select owner, count(owner), max(submittedTime) from JobData group by owner");
 
-                for (Object obj : query.list()) {
+                List list = query.list();
+                List<SchedulerUserInfo> users = new ArrayList<>(list.size());
+                for (Object obj : list) {
                     Object[] nameAndCount = (Object[]) obj;
                     users.add(new SchedulerUserInfo(null, nameAndCount[0].toString(), 0, Long
                             .parseLong(nameAndCount[2].toString()), Integer.parseInt(nameAndCount[1]
@@ -1558,12 +1567,23 @@ public class SchedulerDBManager {
                 configContent = configContent.replace(property.getKey(), property.getValue());
             }
 
-            Configuration configuration;
+            Configuration configuration = new Configuration();
 
             File modifiedFile = File.createTempFile("dbconfig", "tmp");
             try {
                 FileToBytesConverter.convertByteArrayToFile(configContent.getBytes(), modifiedFile);
-                configuration = new Configuration().configure(modifiedFile);
+
+                if (configFile.getName().endsWith(".xml")) {
+                    configuration.configure(configFile);
+                } else {
+                    try {
+                        Properties properties = new Properties();
+                        properties.load(Files.newBufferedReader(configFile.toPath(), Charset.defaultCharset()));
+                        configuration.addProperties(properties);
+                    } catch (IOException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                }
             } finally {
                 modifiedFile.delete();
             }

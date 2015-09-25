@@ -6,8 +6,6 @@ archivesBaseName = 'scheduling' // in case current folder is not named schedulin
 
 project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
 
-
-
 sonarRunner {
     sonarProperties {    
     	property "sonar.projectKey", "$project.group:Scheduling"
@@ -20,7 +18,6 @@ sonarRunner {
     }
 }
 
-
 configurations {
     nativeBundle
     restCli
@@ -32,15 +29,20 @@ configurations {
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
+
         jcenter()
+
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
+        maven { url "http://nexus.qmino.com/content/repositories/miredot" }
     }
 
     dependencies {
         classpath "org.objectweb.proactive:programming-build-utils:${programmingVersion}"
         // needed at runtime by AntStubGenerator...
         classpath("org.objectweb.proactive:programming-core:${programmingVersion}")
-        classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
+        classpath('org.hsudbrock:gradle-trang:0.1-proactive') {
+            exclude group: 'xml-apis', module: 'xml-apis'
+        }
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
         classpath 'org.ow2.proactive:gradle-serialver:2.0'
         classpath 'org.postgresql:postgresql:9.3-1102-jdbc41'  
@@ -48,6 +50,8 @@ buildscript {
         classpath('org.gradle.api.plugins:gradle-format-plugin:1.1') {
                     exclude group: 'javassist', module: 'javassist'
         }
+
+        classpath 'com.qmino:miredot-plugin:1.6.2'
     }
 }
 
@@ -109,20 +113,21 @@ configure(javaSubprojects) {
         }
     }
 
-    sourceCompatibility = 1.7
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+    
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
-    
-    
-		
-	
 
     dependencies {
-        compile 'log4j:log4j:1.2.14'
+        compile 'log4j:log4j:1.2.17'
         compile 'com.google.guava:guava:18.0'
-        runtime 'org.slf4j:slf4j-log4j12:1.6.6'
+
+        runtime 'org.slf4j:slf4j-log4j12:1.7.12'
+
         testCompile 'junit:junit:4.12'
         testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
-        testCompile 'org.mockito:mockito-core:1.9.5'
+
+        testCompile 'org.mockito:mockito-core:1.10.19'
         testCompile 'com.jayway.awaitility:awaitility:1.6.0'
     }
 
@@ -196,17 +201,17 @@ project(':scheduler:scheduler-api') {
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
         compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
-        compile 'isorelax:isorelax:20030108'
-        compile 'commons-collections:commons-collections:3.2'
+        compile 'org.apache.commons:commons-collections4:4.0'
+        compile 'msv:isorelax:20050913'
         compile 'msv:msv:20050913'
         compile 'commons-io:commons-io:2.4'
 
         compile project(':common-api')
 
-        runtime 'org.codehaus.woodstox:woodstox-core-lgpl:4.1.2'
+        runtime 'com.fasterxml.woodstox:woodstox-core:5.0.1'
+        runtime 'msv:relaxngDatatype:20050913'
         runtime 'msv:xsdlib:20050913'
-        runtime 'msv:relaxngDatatype:20030807'
-        runtime 'xerces:xercesImpl:2.8.1'
+        runtime 'xerces:xercesImpl:2.11.0'
     }
 
     apply plugin: 'trang'
@@ -240,20 +245,15 @@ project(':scheduler:scheduler-api') {
 
 project('common-api') {
 
-	
-
-    
-
-
     dependencies {
         compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
         compile "org.objectweb.proactive:programming-util:${programmingVersion}"
 
-        testRuntime 'org.jruby:jruby-jline:1.7.4'
-        testRuntime 'org.python:jython-jline:2.5.4-rc1'
+        testRuntime 'org.jruby:jruby-complete:9.0.1.0'
+        testRuntime 'org.python:jython-standalone:2.7.0'
         testRuntime 'org.codehaus.groovy:groovy-all:2.1.6'
         testRuntime 'jsr223:jsr223-nativeshell:0.3'
-        testCompile 'junit:junit:4.11'
+        testCompile 'junit:junit:4.12'
     }
 
     task stub(type: StubTask) {
@@ -285,8 +285,8 @@ project(':scheduler:scheduler-client') {
 
 project('common-client') {
     dependencies {
-        compile 'commons-codec:commons-codec:1.6'
-        compile 'org.rrd4j:rrd4j:2.0.7'
+        compile 'commons-codec:commons-codec:1.10'
+        compile 'org.rrd4j:rrd4j:2.2.1'
         compile 'org.ow2.proactive:process-tree-killer:1.0.0'
 
         compile "org.objectweb.proactive:programming-core:${programmingVersion}"
@@ -334,7 +334,7 @@ project(':rm:rm-node') {
         compile 'net.java.dev.jna:jna:4.1.0'
         compile 'commons-io:commons-io:2.4'
 
-        compile 'commons-cli:commons-cli:1.1'
+        compile 'commons-cli:commons-cli:1.3'
         compile 'sigar:sigar:1.7.0-proactive'
 
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
@@ -349,9 +349,10 @@ project(':rm:rm-node') {
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
         // script engines
-        runtime 'org.jruby:jruby-jline:1.7.4'
-        runtime 'org.python:jython-jline:2.5.4-rc1'
-        runtime 'org.codehaus.groovy:groovy-all:2.1.6'
+        runtime 'org.jruby:jruby-complete:9.0.1.0'
+        runtime 'org.python:jython-standalone:2.7.0'
+
+        runtime 'org.codehaus.groovy:groovy-all:2.4.4'
         runtime 'jsr223:jsr223-nativeshell:0.3'
     }
 
@@ -381,14 +382,12 @@ project(':rm:rm-node-updater') {
 project('scheduler:scheduler-server') {
     apply plugin: 'java-library-distribution'
     dependencies {
-        compile 'commons-cli:commons-cli:1.1'
+        compile 'commons-cli:commons-cli:1.3'
         compile 'commons-io:commons-io:2.4'
         compile 'javax.mail:mail:1.4.7'
-        compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
-        compile 'org.hibernate:hibernate-core:4.1.7.Final'
-        compile 'org.eclipse.jetty:jetty-webapp:8.1.15.v20140411'
-
-
+        compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+        compile 'org.hibernate:hibernate-core:4.3.11.Final'
+        compile 'org.eclipse.jetty:jetty-webapp:9.2.13.v20150730'
         compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
         compile project(':common-api')
@@ -400,9 +399,11 @@ project('scheduler:scheduler-server') {
         compile project(':rm:rm-client')
 
         testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+        testCompile 'org.mockito:mockito-core:1.10.19'
         testCompile 'org.hamcrest:hamcrest-all:1.3'
-        testCompile 'com.h2database:h2:1.3.167'
-        testCompile 'org.codehaus.groovy:groovy-all:2.1.6'
+
+        testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
+
         testCompile 'org.jvnet.winp:winp:1.23-proactive'
         testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
@@ -411,9 +412,12 @@ project('scheduler:scheduler-server') {
         testCompile project(':rm:rm-policy:rm-policy-scheduler')
         testCompile project(':scheduler:scheduler-examples')
 
-        runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
-        runtime 'org.apache.derby:derby:10.8.2.2'
-        runtime 'mysql:mysql-connector-java:5.1.16'
+        runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
+            exclude group: 'org.javassist', module: 'javassist'
+        }
+
+        runtime 'org.hsqldb:hsqldb:2.3.3'
+
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
@@ -506,10 +510,10 @@ project('rm:rm-server') {
     apply plugin: 'java-library-distribution'
     dependencies {
         compile(
-                'commons-cli:commons-cli:1.1',
+                'commons-cli:commons-cli:1.3',
                 'it.sauronsoftware.cron4j:cron4j:2.2.5',
-                'org.hibernate:hibernate-core:4.1.7.Final',
-                'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final',
+                'org.hibernate:hibernate-core:4.3.11.Final',
+                'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final',
 
                 "org.objectweb.proactive:programming-core:${programmingVersion}",
                 "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
@@ -521,13 +525,17 @@ project('rm:rm-server') {
         )
         testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
         testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
-        testCompile 'org.jruby:jruby-jline:1.7.4'
-        testCompile 'org.python:jython-jline:2.5.4-rc1'
-        testCompile 'org.apache.sshd:sshd-core:0.12.0'
 
-        runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
-        runtime 'org.apache.derby:derby:10.8.2.2'
-        runtime 'mysql:mysql-connector-java:5.1.16'
+        testCompile 'org.jruby:jruby-complete:9.0.1.0'
+        testCompile 'org.python:jython-standalone:2.7.0'
+
+        testCompile 'org.apache.sshd:sshd-core:0.14.0'
+
+        runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
+            exclude group: 'org.javassist', module: 'javassist'
+        }
+
+        runtime 'org.hsqldb:hsqldb:2.3.3'
         runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     }
 
@@ -641,7 +649,7 @@ dependencies {
     nativeBundle 'org.jvnet.winp:winp:1.23-proactive:native'
     nativeBundle 'sigar:sigar:1.7.0-proactive:native'
 
-    compile 'org.codehaus.groovy:groovy-all:2.1.6'
+    compile 'org.codehaus.groovy:groovy-all:2.4.4'
     compile 'commons-io:commons-io:2.4'
 }
 

@@ -47,7 +47,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
 import com.google.common.collect.ObjectArrays;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -82,7 +82,7 @@ public abstract class EntryPoint {
             currentContext.setDevice(console);
 
             Options options = commandFactory.supportedOptions();
-            cli = (new GnuParser()).parse(options, args);
+            cli = new DefaultParser().parse(options, args);
 
         } catch (IOException ioe) {
             System.err.println("An error occurred.");

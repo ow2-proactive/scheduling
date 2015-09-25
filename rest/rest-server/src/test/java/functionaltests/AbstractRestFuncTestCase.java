@@ -141,7 +141,7 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected HttpResponse executeUriRequest(HttpUriRequest request) throws Exception {
-        return (new DefaultHttpClient()).execute(request);
+        return new DefaultHttpClient().execute(request);
     }
 
     protected void assertEquals(int expected, int actual) {

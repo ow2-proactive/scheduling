@@ -39,33 +39,54 @@ subprojects {
 
 project(':rest:rest-api') {
     dependencies {
-        compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
-        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
-        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.6.Final'
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.13.Final'
+        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.13.Final'
         compile "org.objectweb.proactive:programming-util:${programmingVersion}"
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
     }
 }
 
 project(':rest:rest-server') {
+    apply plugin: 'miredot'
 
-    configurations {
-        jaxDoclet
+    miredot {
+        source = sourceSets.main.allJava
+        destination = sourceSets.main.output
+        output {
+            formats {
+                'html' {
+                    initialCollapseLevel = 2
+                }
+            }
+            title = 'ProActive Workflows & Scheduling - REST API v' + version
+        }
+        // expires friday june 16th, 2017
+        licence = 'UHJvamVjdHxvcmcub3cyLnByb2FjdGl2ZV9ncmlkX2Nsb3VkX3BvcnRhbC5yZXN0LXNlcnZlcnwyMDE2LTA2LTE3fGZhbHNlI01Dd0NGQmRGVWVDcDBjUEFNRUtHUGQ5Mis2VUhWdCtDQWhSdWpOdE0wcGRxUGdUMVNZdUREZ3lyTEJvb3FBPT0='
+        restModel{
+            restFramework {
+                name = 'jax-rs'
+            }
+            titleNamingStrategies = [
+                    'tag: summary',
+                    'tag: title',
+                    'firstsentence'
+            ]
+        }
     }
-    dependencies {
-        compile 'org.jboss.resteasy:jaxrs-api:3.0.6.Final'
-        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.6.Final'
-        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.6.Final'
 
-        compile 'org.rrd4j:rrd4j:2.0.7'
-        compile 'net.sf.dozer:dozer:5.4.0'
+    dependencies {
+        compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.13.Final'
+        compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.13.Final'
+
+        compile 'org.rrd4j:rrd4j:2.2.1'
+        compile 'net.sf.dozer:dozer:5.5.1'
         compile 'commons-io:commons-io:2.4'
-        compile 'commons-codec:commons-codec:1.6'
+        compile 'commons-codec:commons-codec:1.10'
 
         compile 'com.netiq:websockify:1.6-proactive'
-        compile 'io.netty:netty:3.3.0.Final'
+        compile 'io.netty:netty:3.10.4.Final'
 
-        compile 'org.atmosphere:atmosphere-runtime:2.2.6'
+        compile 'org.atmosphere:atmosphere-runtime:2.3.4'
 
         compile project(":scheduler:scheduler-client")
         compile project(":rm:rm-client")
@@ -75,45 +96,22 @@ project(':rest:rest-server') {
         compile project(':rest:rest-api')
 
         testCompile functionalTestDependencies
-        testCompile 'org.apache.httpcomponents:httpmime:4.2.1'
-        testCompile 'org.jboss.resteasy:tjws:3.0.6.Final'
-        testCompile 'org.mockito:mockito-core:1.9.5'
-        testCompile 'org.eclipse.jetty:test-jetty-servlet:8.1.15.v20140411'
 
-        runtime 'org.eclipse.jetty.aggregate:jetty-websocket:8.1.15.v20140411'
-        runtime 'org.eclipse.jetty.aggregate:jetty-webapp:8.1.15.v20140411'
+        testCompile 'org.apache.httpcomponents:httpmime:4.2.6'
+        testCompile 'org.jboss.resteasy:tjws:3.0.13.Final'
+
+        testCompile 'org.mockito:mockito-core:1.10.19'
+        testCompile 'org.eclipse.jetty:jetty-client:9.2.13.v20150730'
+
+        runtime 'org.eclipse.jetty.websocket:websocket-server:9.2.13.v20150730'
+        runtime 'org.eclipse.jetty:jetty-webapp:9.2.13.v20150730'
         runtime 'javax.servlet:javax.servlet-api:3.0.1'
 
         runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
-
-        jaxDoclet 'com.lunatech.jax-doclets:doclets:0.10.1-proactive'
     }
 
     task stub(type: StubTask) {
         classes = ['org.ow2.proactive_grid_cloud_portal.scheduler.EventListener']
-    }
-
-    task jaxbDoc(type: Javadoc) {
-        enabled = System.getProperty("java.specification.version") != "1.8"
-        source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
-        destinationDir = file("src/main/webapp/doc/jaxbdocs")
-        options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
-        options.classpath = options.docletpath
-        options.doclet = "com.lunatech.doclets.jax.jaxb.JAXBDoclet"
-        options.footer = 'Copyright 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
-        options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
-    }
-
-    task jaxrsDoc(type: Javadoc, dependsOn: jaxbDoc) {
-        enabled = System.getProperty("java.specification.version") != "1.8"
-        source([project, project(':rest:rest-api')].collect { project -> project.sourceSets.main.allJava })
-        destinationDir = file("src/main/webapp/doc/jaxrsdocs")
-        options.links << '../jaxbdocs/'
-        options.footer = 'Copyright 1997-2014 ActiveEon/INRIA/University of Nice-Sophia Antipolis'
-        options.header = file('doc_header.html').text.replaceAll("[\r\n]+", " ")
-        options.docletpath = configurations.jaxDoclet.files.asType(List) + configurations.compile.files.asType(List)
-        options.classpath = options.docletpath
-        options.doclet = "com.lunatech.doclets.jax.jaxrs.JAXRSDoclet"
     }
 
     test {
@@ -125,7 +123,7 @@ project(':rest:rest-server') {
     functionalTest.dependsOn rootProject.dist
     clean.dependsOn rootProject.cleanDist
 
-    task proActiveWar(type: Sync, dependsOn: [ classes, jaxrsDoc, stub ]) {
+    task proActiveWar(type: Sync, dependsOn: [classes, stub, tasks.miredot]) {
         from "src/main/webapp"
 
         def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar
@@ -139,6 +137,14 @@ project(':rest:rest-server') {
             it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
         }
     }
+
+    task copyMiredotDoc(type: Copy) {
+        from "${buildDir}/miredot"
+        into "$rootDir/dist/war/rest/doc"
+    }
+
+    proActiveWar.finalizedBy(copyMiredotDoc)
+
     clean.dependsOn cleanProActiveWar
 
     rootProject.dist.dependsOn project.proActiveWar
@@ -151,17 +157,17 @@ project(':rest:rest-server') {
 project(':rest:rest-cli') {
 
     dependencies {
-        compile 'commons-cli:commons-cli:1.2'
+        compile 'commons-cli:commons-cli:1.3'
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:2.11'
 
-        compile 'org.apache.httpcomponents:httpclient:4.2.1'
-        compile 'org.apache.httpcomponents:httpmime:4.2.1'
+        compile 'org.apache.httpcomponents:httpclient:4.2.6'
+        compile 'org.apache.httpcomponents:httpmime:4.2.6'
 
         compile project(":common-api")
         compile project(':rest:rest-api')
 
-        testCompile 'org.eclipse.jetty:jetty-server:8.1.15.v20140411'
+        testCompile 'org.eclipse.jetty:jetty-server:9.2.13.v20150730'
     }
 
 }
@@ -171,18 +177,19 @@ project(':rest:rest-client') {
     apply plugin: 'java-library-distribution'
 
     dependencies {
-        compile 'commons-cli:commons-cli:1.2'
+        compile 'commons-cli:commons-cli:1.3'
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:2.11'
-        compile 'org.apache.httpcomponents:httpclient:4.2.1'
-        compile 'org.apache.httpcomponents:httpmime:4.2.1'
-        compile 'org.atmosphere:wasync:1.4.3'
+
+        compile 'org.apache.httpcomponents:httpclient:4.2.6'
+        compile 'org.apache.httpcomponents:httpmime:4.2.6'
+        compile 'org.atmosphere:wasync:2.1.2'
 
         compile project(":common-api")
         compile project(":scheduler:scheduler-api")
         compile project(':rest:rest-api')
 
-        runtime 'xerces:xercesImpl:2.8.1'
+        runtime 'xerces:xercesImpl:2.11.0'
 
         testCompile functionalTestDependencies
         testCompile project(':rest:rest-server').sourceSets.test.output
@@ -213,7 +220,7 @@ project(':rest:rest-smartproxy') {
     task bundle(type: Zip) {
         from configurations.runtime.allArtifacts.files
         from configurations.runtime
-        into (project.name + '-' + project.version + '-bundle')
+        into(project.name + '-' + project.version + '-bundle')
     }
 
     test {
