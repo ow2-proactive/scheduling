@@ -872,7 +872,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tags");
             JobState jobState = s.getJobState(jobId);
-            return jobState.getTags();
+            return jobState.getTags(false);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -900,7 +900,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tags/startswith/" + prefix);
             JobState jobState = s.getJobState(jobId);
-            return jobState.getTags(prefix);
+            return jobState.getTags(prefix, true);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {

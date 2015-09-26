@@ -310,6 +310,7 @@ public interface SchedulerRestInterface {
 
 
 
+
     /**
      * Returns a list of the tags of the tasks belonging to job <code>jobId</code> and filtered by a prefix pattern
      * @param sessionId a valid session id
