@@ -75,7 +75,7 @@ public class TaskLauncherInitializer implements Serializable {
     /** The walltime defined for the task (it is considered as defined if it is > 0) */
     private long walltime;
 
-    private String jobOwner;
+    private String jobOwner = "Unknown";
 
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
