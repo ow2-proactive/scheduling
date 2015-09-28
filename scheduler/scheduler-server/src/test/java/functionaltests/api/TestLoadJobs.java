@@ -32,6 +32,8 @@ import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestUsers;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,6 +45,8 @@ import static org.junit.Assert.assertTrue;
  * Test against method Scheduler.loadJobs
  */
 public class TestLoadJobs extends SchedulerFunctionalTest {
+
+    public static final Logger log = Logger.getLogger(TestLoadJobs.class);
 
     public static class TestJavaTask extends JavaExecutable {
 
@@ -58,6 +62,8 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
     @Before
     public void setUp() throws Exception {
+        log.setLevel(Level.INFO);
+
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
         List<JobInfo> jobs = scheduler.getJobs(0, 1000, criteria(true, true, true, true), null);
@@ -84,6 +90,8 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         Path lock = fileLock.lock();
         String fileLockPath = lock.toString();
 
+        log.info("File lock location is " + fileLockPath);
+
         JobInfo job;
 
         List<JobInfo> jobs;
@@ -97,12 +105,14 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), null);
         checkJobs(jobs, firstJob);
         job = jobs.get(0);
+
         assertEquals(this.getClass().getSimpleName(), job.getJobId().getReadableName());
         assertEquals(1, job.getTotalNumberOfTasks());
         assertEquals(0, job.getNumberOfFinishedTasks());
         assertEquals(0, job.getNumberOfPendingTasks());
         assertEquals(1, job.getNumberOfRunningTasks());
         assertEquals(JobStatus.RUNNING, job.getStatus());
+
         assertTrue("Unexpected submit time: " + job.getSubmittedTime(),
                 job.getSubmittedTime() > time && job.getSubmittedTime() < System.currentTimeMillis());
         assertTrue("Unexpected start time: " + job.getStartTime(),
@@ -128,8 +138,8 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         checkJobs(jobs, firstJob, secondJob, thirdJob);
 
         List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<>();
-
         sortParameters.add(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
+
         jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), sortParameters);
         checkJobs(jobs, firstJob, secondJob, thirdJob);
 
@@ -238,10 +248,14 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
         for (JobInfo job : jobs) {
             jobIds.add(job.getJobId());
+            log.info("Job " + job.getJobId() + " has status '" + job.getStatus() + "'");
         }
 
         for (JobId expectedId : expectedIds) {
-            assertTrue(jobIds.contains(expectedId));
+            final boolean expectedJobIdContained = jobIds.contains(expectedId);
+            log.info("Checking if " + jobs + " contains " + expectedId + "? " + expectedJobIdContained);
+
+            assertTrue(expectedJobIdContained);
         }
     }
 
