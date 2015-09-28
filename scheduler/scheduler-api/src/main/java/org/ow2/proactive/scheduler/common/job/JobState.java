@@ -212,7 +212,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     }
 
     /**
-     * TO get the paginated filtered tasks by a given tag.
+     * To get the paginated filtered tasks by a given tag.
      * @param tag used to filter the tasks
      * @param offset the starting index of the sublist of tasks to get
      * @param limit the last index (non inclusive) of the sublist of tasks to get
@@ -220,7 +220,14 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      */
     public List<TaskState> getTaskPaginated(final String tag, final int offset, final int limit) {
         List<TaskState> tasks = getTaskByTag(tag);
-        return tasks.subList(offset, limit);
+        
+        // check whether the indexes are inside the list boundaries or not
+        // if they're not, translate indexes inside the boundaries
+        int _offset = 0;
+        int _limit = tasks.size();
+        if (offset < _limit) _offset = offset;
+        if (limit < _limit) _limit = limit;      
+        return tasks.subList(_offset, _limit);
     }
 
     /**

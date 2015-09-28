@@ -929,6 +929,60 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
+    @Produces("application/json")
+    public List<TaskStateData> getJobTaskStatesByTagPaginated(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId,
+            @PathParam("tasktag") String taskTag,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("25") int limit)
+                    throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag + "/paginated");
+            JobState jobState = s.getJobState(jobId);
+            // Sanitize tasks indexes
+            final int MAX_PAGE_SIZE = 50;
+            int _offset = 0;
+            int _limit = MAX_PAGE_SIZE; // default value
+            
+            if (offset > 0 && offset < limit) {
+                _offset = offset;
+            }
+            else {
+                // invalid offset
+                logger.warn("offset index has beeen reajusted");
+            }
+            
+            if (limit > 0 && limit > offset) {
+                _limit = limit;
+            }
+            else {
+                // invalid limit
+                logger.warn("limit index has been reajusted");
+            }
+            
+            // check the page size
+            if ((_limit - _offset) > MAX_PAGE_SIZE) {
+                logger.warn("MAX_PAGE_SIZE has been reached");
+            }
+            
+            return map(jobState.getTaskPaginated(taskTag, _offset, _limit), TaskStateData.class);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+    
 
     @Override
     @GET
