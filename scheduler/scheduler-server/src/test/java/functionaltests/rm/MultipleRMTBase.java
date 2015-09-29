@@ -55,7 +55,7 @@ public class MultipleRMTBase extends ProActiveTest {
 
         String hibernateConfig = new String(Files.readAllBytes(Paths.get(hibernateConfigFile)));
 
-        String defaultJdbcUrl = "jdbc:hsqldb:file:build/TEST_RM_DB;create=true;hsqldb.tx=mvcc";
+        String defaultJdbcUrl = "jdbc:hsqldb:file:build/TEST_RM_DB;create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false";
 
         if (!hibernateConfig.contains(defaultJdbcUrl)) {
             Assert.fail("Hibernate config doesn't contain expected string");
@@ -68,9 +68,9 @@ public class MultipleRMTBase extends ProActiveTest {
         Path hibernateConfig2 = folder.newFile("dbconfig2.xml").toPath();
 
         writeStringToFile(hibernateConfig1, hibernateConfig.replace(defaultJdbcUrl,
-                "jdbc:hsqldb:file:" + db1.getAbsolutePath() + "/rm1;create=true;hsqldb.tx=mvcc"));
+                "jdbc:hsqldb:file:" + db1.getAbsolutePath() + "/rm1;create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false"));
         writeStringToFile(hibernateConfig2, hibernateConfig.replace(defaultJdbcUrl,
-                "jdbc:hsqldb:file:" + db2.getAbsolutePath() + "/rm2;create=true;hsqldb.tx=mvcc"));
+                "jdbc:hsqldb:file:" + db2.getAbsolutePath() + "/rm2;create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false"));
 
         config1 = folder.newFile("rmconfig1.txt");
         config2 = folder.newFile("rmconfig2.txt");

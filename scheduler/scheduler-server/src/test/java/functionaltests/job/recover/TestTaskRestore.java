@@ -25,6 +25,7 @@ import functionaltests.utils.SchedulerTHelper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.utils.Criteria;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
@@ -127,11 +128,6 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
 
     @Test
     public void test() throws Throwable {
-        // lpellegr: test is ignored on Windows while I am investigating the issue
-        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
-
-        tmpFolder.create();
-
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
 
@@ -202,7 +198,7 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
-        log("get state");
+        log("Get state");
         SchedulerState state = scheduler.getState();
         assertEquals(1, state.getRunningJobs().size());
         assertEquals(1, state.getPendingJobs().size());
@@ -211,6 +207,7 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
             state.getFinishedJobs().size());
 
         JobState jobState = state.getRunningJobs().get(0);
+
         assertEquals(1, jobState.getNumberOfFinishedTasks());
         assertEquals(2, jobState.getNumberOfPendingTasks() + jobState.getNumberOfRunningTasks());
 

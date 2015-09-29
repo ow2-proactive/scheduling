@@ -7,7 +7,7 @@
 
     <session-factory>
         <property name="hibernate.connection.driver_class">org.hsqldb.jdbc.JDBCDriver</property>
-        <property name="hibernate.connection.url">jdbc:hsqldb:file:build/TEST_SCHEDULER_DB;create=true;hsqldb.tx=mvcc</property>
+        <property name="hibernate.connection.url">jdbc:hsqldb:file:build/TEST_SCHEDULER_DB;create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false</property>
         <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
 
         <!-- Username and password -->
