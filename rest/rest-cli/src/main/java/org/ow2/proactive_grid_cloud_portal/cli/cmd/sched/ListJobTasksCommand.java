@@ -51,14 +51,26 @@ import java.util.List;
 /**
  * @author  the activeeon team.
  */
-public class ListJobTasksCommand extends AbstractJobTagCommand implements Command {
+public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implements Command {
 
+    private final int MAX_PAGE_SIZE = 50;
+    private int offset = 0;
+    private int limit = MAX_PAGE_SIZE;
+    
     public ListJobTasksCommand(String jobId){
         super(jobId);
     }
 
     public ListJobTasksCommand(String jobId, String tag){
         super(jobId, tag);
+    }
+    
+    public ListJobTasksCommand(String jobId, String tag, int offset, int limit) {
+        super(jobId, tag, offset, limit);
+    }
+    
+    public ListJobTasksCommand(String jobId, int offset, int limit) {
+        super(jobId, offset, limit);
     }
 
     @Override
