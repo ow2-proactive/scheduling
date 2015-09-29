@@ -41,21 +41,20 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.job.factories.JobComparator;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
-import org.junit.Assert;
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
-
 import functionaltests.job.multinodes.TestMultipleHostsRequest;
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -75,7 +74,9 @@ public class TestXMLTransformer {
     private static URL jobDescriptorsFolder = TestXMLTransformer.class
             .getResource("/functionaltests/descriptors/");
 
-    private static File tmpFolder = new File(System.getProperty("java.io.tmpdir"));
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     private static final String executablePathPropertyName = "EXEC_PATH";
     private static final String workingDirPropName = "WDIR";
@@ -89,10 +90,8 @@ public class TestXMLTransformer {
     private void setProperties() throws URISyntaxException {
         System.setProperty(executablePathPropertyName, new File(TestMultipleHostsRequest.class.getResource(
                 "/functionaltests/executables/test_multiple_hosts_request.sh").toURI()).getAbsolutePath());
-
-        System.setProperty(workingDirPropName, tmpFolder.getAbsolutePath());
+        System.setProperty(workingDirPropName, folder.getRoot().getAbsolutePath());
         System.setProperty(cmdPropName, "echo");
-
     }
 
     @Before
@@ -102,9 +101,6 @@ public class TestXMLTransformer {
 
     @Test
     public void run() throws Throwable {
-        // lpellegr: test is ignored on Windows while I am investigating the issue
-        assertTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
-
         File folder = new File(jobDescriptorsFolder.toURI());
         Collection<File> testJobDescrFiles = FileUtils.listFiles(folder, new String[] { "xml" }, true);
 
@@ -151,7 +147,7 @@ public class TestXMLTransformer {
         TaskFlowJob job1 = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 
         // job1 to xmlFile2
-        File xmlFile2 = new File(tmpFolder, xmlFile.getName());
+        File xmlFile2 = folder.newFile(xmlFile.getName());
         Job2XMLTransformer transformer = new Job2XMLTransformer();
         transformer.job2xmlFile(job1, xmlFile2);
 
@@ -180,9 +176,6 @@ public class TestXMLTransformer {
             message += "\n *************************** ";
             Assert.fail(message);
         }
-
-        // delete temporary file
-        FileUtils.forceDelete(xmlFile2);
     }
 
 }
