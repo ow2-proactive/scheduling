@@ -30,6 +30,7 @@ import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -127,7 +128,7 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
     @Test
     public void test() throws Throwable {
         // lpellegr: test is ignored on Windows while I am investigating the issue
-        assertTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
 
         tmpFolder.create();
 
