@@ -20,15 +20,16 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -125,6 +126,9 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
 
     @Test
     public void test() throws Throwable {
+        // lpellegr: test is ignored on Windows while I am investigating the issue
+        assertTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
+
         tmpFolder.create();
 
         TaskFlowJob job = new TaskFlowJob();

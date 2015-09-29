@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -51,6 +52,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
 
 import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -77,6 +79,8 @@ public class TestWorkflowRecoveryFinished extends SchedulerFunctionalTest {
 
     @Test
     public void run() throws Throwable {
+        // lpellegr: test is ignored on Windows while I am investigating the issue
+        assertTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
 
         Map<Integer, JobId> jobs = new HashMap<>();
         for (int i = 0; i < jobs_1.length; i++) {
@@ -119,4 +123,5 @@ public class TestWorkflowRecoveryFinished extends SchedulerFunctionalTest {
         }
 
     }
+
 }
