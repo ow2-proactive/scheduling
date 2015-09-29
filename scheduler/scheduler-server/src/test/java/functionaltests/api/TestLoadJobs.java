@@ -51,7 +51,7 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
     private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_DESC =
             ImmutableList.of(
-                    new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
+                    new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
 
     @Before
     public void setUp() throws Exception {
