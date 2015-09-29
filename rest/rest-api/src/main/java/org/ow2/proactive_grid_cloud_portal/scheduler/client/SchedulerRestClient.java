@@ -101,8 +101,12 @@ public class SchedulerRestClient {
     public SchedulerRestClient(String restEndpointURL, ClientHttpEngine httpEngine) {
         this.restEndpointURL = restEndpointURL;
         this.httpEngine = httpEngine;
+
         providerFactory = ResteasyProviderFactory.getInstance();
-        providerFactory.registerProvider(JacksonContextResolver.class);
+        if (!providerFactory.isRegistered(JacksonContextResolver.class)) {
+            providerFactory.registerProvider(JacksonContextResolver.class);
+        }
+
         scheduler = createRestProxy(providerFactory, restEndpointURL, httpEngine);
     }
 
