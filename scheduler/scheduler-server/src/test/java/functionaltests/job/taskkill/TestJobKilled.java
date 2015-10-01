@@ -41,7 +41,6 @@ import java.net.URL;
 import java.util.Map;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -52,7 +51,6 @@ import org.junit.Test;
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -73,9 +71,6 @@ public class TestJobKilled extends SchedulerFunctionalTest {
 
     @Test
     public void run() throws Throwable {
-        // lpellegr: test is ignored on Windows while I am investigating the issue
-        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
-
         schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
           "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
