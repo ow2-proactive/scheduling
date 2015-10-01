@@ -1,0 +1,45 @@
+apply plugin: 'java-library-distribution'
+apply plugin: 'gradle-one-jar'
+dependencies {
+    compile(
+            "org.objectweb.proactive:programming-extension-processbuilder:${programmingVersion}",
+            "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}",
+
+            project(':scheduler:scheduler-client'),
+            project(':rm:rm-node'),
+    )
+
+    runtime (
+            "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
+            "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}",
+    )
+
+    runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
+
+    testCompile project(':scheduler:scheduler-examples')
+}
+
+task stub(type: StubTask) {
+    classes = [
+            'org.ow2.proactive.scheduler.common.TaskTerminateNotification',
+            'org.ow2.proactive.scheduler.task.TaskLauncher'
+    ]
+}
+serialver.dependsOn stub
+
+ext.oneJarManifest = manifest {
+    attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
+    attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
+}
+
+task standaloneJar(type: OneJar) {
+    logging.captureStandardOutput LogLevel.INFO
+    mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
+    binLib = files({ rootProject.configurations.nativeBundle.collect { zipTree(it) } })
+    additionalDir = file('src/main/resources')
+    manifest = oneJarManifest
+}
+build.dependsOn standaloneJar
+artifacts {
+    archives standaloneJar
+}

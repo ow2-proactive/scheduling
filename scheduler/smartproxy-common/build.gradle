@@ -1,0 +1,7 @@
+dependencies {
+    compile 'org.fusesource.jdbm:jdbm:2.0.1'
+    compile project(':scheduler:scheduler-api')
+
+    testCompile project(':scheduler:scheduler-server').sourceSets.test.output // to get shared test classes
+    testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
+}
