@@ -169,7 +169,7 @@ public class JobData {
         return jobRuntimeData;
     }
 
-    @Column(name = "GENERIC_INFO")
+    @Column(name = "GENERIC_INFO", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, String> getGenericInformation() {
         return genericInformation;
@@ -179,7 +179,7 @@ public class JobData {
         this.genericInformation = genericInformation;
     }
 
-    @Column(name = "VARIABLES")
+    @Column(name = "VARIABLES", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, String> getVariables() {
         return variables;

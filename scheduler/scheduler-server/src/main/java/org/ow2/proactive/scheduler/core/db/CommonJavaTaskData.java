@@ -75,7 +75,7 @@ public class CommonJavaTaskData implements Serializable {
         this.taskData = taskData;
     }
 
-    @Column(name = "CLASS_NAME", nullable = false)
+    @Column(name = "CLASS_NAME", nullable = false, length = Integer.MAX_VALUE)
     @Lob
     public String getUserExecutableClassName() {
         return userExecutableClassName;
@@ -85,7 +85,7 @@ public class CommonJavaTaskData implements Serializable {
         this.userExecutableClassName = userExecutableClassName;
     }
 
-    @Column(name = "ARGUMENTS")
+    @Column(name = "ARGUMENTS", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, byte[]> getSearializedArguments() {
         return searializedArguments;

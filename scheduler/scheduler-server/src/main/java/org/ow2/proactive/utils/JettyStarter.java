@@ -34,6 +34,19 @@
  */
 package org.ow2.proactive.utils;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -42,21 +55,6 @@ import java.net.BindException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
-
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.util.ProActiveInet;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.webapp.WebAppContext;
 
 
 public class JettyStarter {
@@ -85,7 +83,6 @@ public class JettyStarter {
         if ("true".equals(properties.getProperty("web.deploy", "true"))) {
             logger.info("Starting the web applications...");
             int restPort = Integer.parseInt(properties.getProperty("web.port", "8080"));
-            int maxThreads = Integer.parseInt(properties.getProperty("web.max_threads", "100"));
             boolean httpsEnabled = Boolean.parseBoolean(properties.getProperty("web.https", "false"));
             String httpProtocol = httpsEnabled ? "https" : "http";
 
@@ -100,16 +97,7 @@ public class JettyStarter {
 
             HandlerList handlerList = new HandlerList();
             addWarsToHandlerList(handlerList);
-            handlerList.setParallelStart(true);
             server.setHandler(handlerList);
-
-            QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads);
-            try {
-                threadPool.start();
-            } catch (Exception e) {
-                logger.error("Could not start jetty thread pool", e);
-            }
-            server.setThreadPool(threadPool);
 
             String schedulerHost = ProActiveInet.getInstance().getHostname();
             startServer(server, schedulerHost, restPort, httpProtocol);
@@ -117,20 +105,41 @@ public class JettyStarter {
     }
 
     private static Server createHttpServer(Properties properties, int restPort, boolean httpsEnabled) {
-        Server server = new Server();
+        int maxThreads = Integer.parseInt(properties.getProperty("web.max_threads", "100"));
+        QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads);
+
+        Server server = new Server(threadPool);
+
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setSecureScheme("https");
+        httpConfig.setSecurePort(restPort);
+        httpConfig.setSendServerVersion(false);
+        httpConfig.setSendDateHeader(false);
+
+        ConnectionFactory[] connectionFactories;
+
         if (httpsEnabled) {
-            SslContextFactory httpsConfiguration = new SslContextFactory();
-            httpsConfiguration.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(properties
-                    .getProperty("web.https.keystore")));
-            httpsConfiguration.setKeyStorePassword(properties.getProperty("web.https.keystore.password"));
-            SslSelectChannelConnector ssl = new SslSelectChannelConnector(httpsConfiguration);
-            ssl.setPort(restPort);
-            server.addConnector(ssl);
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(properties.getProperty("web.https.keystore")));
+            sslContextFactory.setKeyStorePassword(properties.getProperty("web.https.keystore.password"));
+
+            HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
+            httpsConfig.addCustomizer(new SecureRequestCustomizer());
+
+            connectionFactories = new ConnectionFactory[]{
+                    new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                    new HttpConnectionFactory(httpsConfig)
+            };
         } else {
-            SelectChannelConnector http = new SelectChannelConnector();
-            http.setPort(restPort);
-            server.addConnector(http);
+            connectionFactories = new ConnectionFactory[]{
+                    new HttpConnectionFactory(httpConfig)
+            };
         }
+
+        ServerConnector http = new ServerConnector(server, connectionFactories);
+        http.setPort(restPort);
+        server.addConnector(http);
+
         return server;
     }
 
@@ -149,7 +158,7 @@ public class JettyStarter {
             }
         } catch (BindException bindException) {
             logger.error("Failed to start web modules (REST API, portals), port " + restPort +
-                " is already used", bindException);
+                    " is already used", bindException);
             System.exit(-1);
         } catch (Exception e) {
             logger.error("Failed to start web modules (REST API, portals)", e);
@@ -158,7 +167,7 @@ public class JettyStarter {
     }
 
     private static void printDeployedApplications(Server server, String schedulerHost, int restPort,
-            String httpProtocol) {
+                                                  String httpProtocol) {
         HandlerList handlerList = (HandlerList) server.getHandler();
         if (handlerList.getHandlers() != null) {
             for (Handler handler : handlerList.getHandlers()) {
@@ -167,15 +176,15 @@ public class JettyStarter {
                 if (startException == null) {
                     if (!"/".equals(webAppContext.getContextPath())) {
                         logger.info("The web application " + webAppContext.getContextPath() + " created on " +
-                            httpProtocol + "://" + schedulerHost + ":" + restPort +
-                            webAppContext.getContextPath());
+                                httpProtocol + "://" + schedulerHost + ":" + restPort +
+                                webAppContext.getContextPath());
                     }
                 } else {
                     logger.warn("Failed to start context " + webAppContext.getContextPath(), startException);
                 }
             }
             logger.info("*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort +
-                " ***");
+                    " ***");
         }
     }
 

@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.utils.TaskIdWrapper;
 
 
 class LiveJobs {
@@ -71,7 +72,7 @@ class LiveJobs {
 
     private final Map<JobId, JobData> jobs = new ConcurrentHashMap<>();
 
-    private final ConcurrentHashMap<TaskId, RunningTaskData> runningTasksData = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<TaskIdWrapper, RunningTaskData> runningTasksData = new ConcurrentHashMap<>();
 
     LiveJobs(SchedulerDBManager dbManager, SchedulerStateUpdate listener) {
         this.dbManager = dbManager;
@@ -83,7 +84,7 @@ class LiveJobs {
     }
 
     boolean canPingTask(RunningTaskData taskData) {
-        return runningTasksData.get(taskData.getTask().getId()) == taskData;
+        return runningTasksData.get(TaskIdWrapper.wrap(taskData.getTask().getId())) == taskData;
     }
 
     void jobRecovered(InternalJob job) {
@@ -283,7 +284,7 @@ class LiveJobs {
                 return emptyResult(taskId);
             }
 
-            RunningTaskData taskData = runningTasksData.remove(taskId);
+            RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(taskId));
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + taskId);
             }
@@ -342,11 +343,11 @@ class LiveJobs {
 
     void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher) {
         checkJobAccess(job.getId());
-        if (runningTasksData.containsKey(task.getId())) {
+        if (runningTasksData.containsKey(TaskIdWrapper.wrap(task.getId()))) {
             throw new IllegalStateException("Task is already started");
         }
 
-        runningTasksData.put(task.getId(), new RunningTaskData(task, job.getOwner(), job.getCredentials(),
+        runningTasksData.put(TaskIdWrapper.wrap(task.getId()), new RunningTaskData(task, job.getOwner(), job.getCredentials(),
             launcher));
 
         boolean firstTaskStarted;
@@ -373,7 +374,7 @@ class LiveJobs {
     }
 
     TerminationData emptyResult(TaskId taskId) {
-        RunningTaskData taskData = runningTasksData.remove(taskId);
+        RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(taskId));
         if (taskData != null) {
             throw new IllegalStateException("Task is marked as running: " + taskId);
         }
@@ -381,8 +382,8 @@ class LiveJobs {
     }
 
     TerminationData emptyData(JobId jobId) {
-        for (TaskId taskId : runningTasksData.keySet()) {
-            if (taskId.getJobId().equals(jobId)) {
+        for (TaskIdWrapper taskId : runningTasksData.keySet()) {
+            if (taskId.getTaskId().getJobId().equals(jobId)) {
                 throw new IllegalStateException("Unexpected task data: " + taskId);
             }
         }
@@ -407,7 +408,7 @@ class LiveJobs {
                 return emptyResult(taskId);
             }
 
-            RunningTaskData taskData = runningTasksData.remove(taskId);
+            RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(taskId));
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + taskId);
             }
@@ -458,7 +459,7 @@ class LiveJobs {
                 tlogger.info(task.getId(), "task isn't alive: " + task.getStatus());
                 return emptyResult(task.getId());
             }
-            RunningTaskData taskData = runningTasksData.remove(task.getId());
+            RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(task.getId()));
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
@@ -503,7 +504,7 @@ class LiveJobs {
                 tlogger.info(task.getId(), "task isn't alive: " + task.getStatus());
                 return emptyResult(task.getId());
             }
-            RunningTaskData taskData = runningTasksData.remove(task.getId());
+            RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(task.getId()));
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
@@ -536,7 +537,7 @@ class LiveJobs {
                 tlogger.info(task.getId(), "task isn't alive: " + task.getStatus());
                 return emptyResult(task.getId());
             }
-            RunningTaskData taskData = runningTasksData.remove(task.getId());
+            RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(task.getId()));
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }

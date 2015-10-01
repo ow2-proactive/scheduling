@@ -1,17 +1,22 @@
 package functionaltests.job.taskkill;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.junit.Test;
-
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestNode;
+import org.junit.Test;
+
+import static org.junit.Assume.assumeTrue;
 
 
 public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTest {
 
     @Test
     public void childProcessesForkedByTaskAreCleanedUpWhenRMNodeStarterIsKilled() throws Throwable {
+        // lpellegr: test is ignored on Windows while I am investigating the issue
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
+
         TestNode tNode = startSchedulerAndRMWithOneNode();
         startJobForkingProcesses();
 
@@ -33,4 +38,5 @@ public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTest {
         resourceManager.addNode(tNode.getNode().getNodeInformation().getURL());
         return tNode;
     }
+
 }

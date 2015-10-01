@@ -199,6 +199,7 @@ public class TaskLogger {
 
     // need to reset MDC because calling thread is not active thread (immediate service)
     public void resetLogContextForImmediateService() {
+        MDC.put(Log4JTaskLogs.MDC_JOB_ID, this.taskId.getJobId().value());
         MDC.put(Log4JTaskLogs.MDC_TASK_ID, this.taskId.value());
         MDC.put(Log4JTaskLogs.MDC_TASK_NAME, this.taskId.getReadableName());
         MDC.put(Log4JTaskLogs.MDC_HOST, hostname);

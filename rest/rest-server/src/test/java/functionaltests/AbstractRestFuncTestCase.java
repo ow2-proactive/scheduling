@@ -141,7 +141,7 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected HttpResponse executeUriRequest(HttpUriRequest request) throws Exception {
-        return (new DefaultHttpClient()).execute(request);
+        return new DefaultHttpClient().execute(request);
     }
 
     protected void assertEquals(int expected, int actual) {
@@ -202,7 +202,7 @@ public abstract class AbstractRestFuncTestCase {
         Scheduler scheduler = getScheduler();
         Job job = defaultJob();
         JobId jobId = scheduler.submit(job);
-        waitJobState(jobId, JobStatus.FINISHED, 30000);
+        waitJobState(jobId, JobStatus.FINISHED, 120000);
         return jobId.value();
     }
 

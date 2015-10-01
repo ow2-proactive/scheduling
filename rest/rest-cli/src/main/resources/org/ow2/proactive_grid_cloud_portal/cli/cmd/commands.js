@@ -349,11 +349,19 @@ function removens(nodeSource, preempt) {
 }
 
 function locknodes(nodeUrl) {
-    execute(new LockNodeCommand(nodeUrl));
+	var result = [];
+	for (var i = 0; i < arguments.length; i++) {
+	    result[i] = arguments[i];
+	}
+    execute(new LockNodeCommand(result));
 }
 
 function unlocknodes(nodeUrl) {
-    execute(new UnlockNodeCommand(nodeUrl));
+	var result = [];
+	for (var i = 0; i < arguments.length; i++) {
+	    result[i] = arguments[i];
+	}
+    execute(new UnlockNodeCommand(result));
 }
 
 function listnodes(nodeSource) {

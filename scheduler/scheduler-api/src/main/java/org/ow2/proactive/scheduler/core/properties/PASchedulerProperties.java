@@ -161,9 +161,6 @@ public enum PASchedulerProperties {
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
 
-    /** Multiplicative factor for job id (taskId will be : this_factor*jobID+taskID) */
-    JOB_FACTOR("pa.scheduler.job.factor", PropertyType.INTEGER),
-
     /** Delay to wait between getting a job result and removing the job concerned (0 = infinite) */
     SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PropertyType.INTEGER),
 
@@ -172,6 +169,9 @@ public enum PASchedulerProperties {
 
     /** Remove job in dataBase when removing it from scheduler. */
     JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PropertyType.BOOLEAN),
+
+    /** Specific character encoding when parsing the job xml file */
+    SCHEDULER_JOB_FILE_ENCODING("pa.scheduler.job.file.encoding", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************ TASKS PROPERTIES *********************** */

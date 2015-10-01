@@ -32,7 +32,7 @@ public class KillTaskLauncherTest {
             new SimpleScript("java.lang.Thread.sleep(10000)", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         Semaphore taskRunning = new Semaphore(0);
 
@@ -55,7 +55,7 @@ public class KillTaskLauncherTest {
             new SimpleScript("for(;;){}", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         Semaphore taskRunning = new Semaphore(0);
         final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
@@ -77,7 +77,7 @@ public class KillTaskLauncherTest {
             new SimpleScript("result='done'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
             new Semaphore(0)));
@@ -100,7 +100,7 @@ public class KillTaskLauncherTest {
           new SimpleScript("result='done'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
           new Semaphore(0)));
@@ -125,7 +125,7 @@ public class KillTaskLauncherTest {
             new SimpleScript("result='done'", "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         Semaphore taskRunning = new Semaphore(0);
         final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,

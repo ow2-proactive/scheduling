@@ -55,6 +55,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.FileUtils;
 
@@ -64,7 +65,7 @@ public class TestScheduler {
     public static final int PNP_PORT = TestRM.PA_PNP_PORT;
 
     private static String schedulerUrl = "pnp://" + ProActiveInet.getInstance().getHostname() + ":" +
-        PNP_PORT + "/";
+            PNP_PORT + "/";
     private static Process schedulerProcess;
 
     private SchedulerAuthenticationInterface schedulerAuth;
@@ -82,7 +83,8 @@ public class TestScheduler {
         List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
-        //commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,address=9009,suspend=y");
+        // commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
+
         String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
         if (!CentralPAPropertyRepository.PA_HOME.isSet()) {
             proactiveHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
@@ -98,7 +100,7 @@ public class TestScheduler {
         String securityPolicy = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue();
         if (!CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
             securityPolicy = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-                "/config/security.java.policy-server";
+                    "/config/security.java.policy-server";
         }
         commandLine.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + securityPolicy);
 
@@ -109,12 +111,14 @@ public class TestScheduler {
         commandLine.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + log4jConfiguration);
 
         commandLine.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() +
-            PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+                PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
         commandLine.add(PAResourceManagerProperties.RM_HOME.getCmdLine() +
-            PAResourceManagerProperties.RM_HOME.getValueAsString());
-        if (System.getProperty("pas.launcher.forkas.method") != null) {
-            commandLine.add("-Dpas.launcher.forkas.method=" +
-                System.getProperty("pas.launcher.forkas.method"));
+                PAResourceManagerProperties.RM_HOME.getValueAsString());
+
+        String forkMethodKeyValue = System.getProperty(ForkerUtils.FORK_METHOD_KEY);
+        if (forkMethodKeyValue != null) {
+            commandLine.add("-D" + ForkerUtils.FORK_METHOD_KEY + "=" +
+                System.getProperty(forkMethodKeyValue));
         }
         if (System.getProperty("proactive.test.runAsMe") != null) {
             commandLine.add("-Dproactive.test.runAsMe=true");
@@ -147,7 +151,7 @@ public class TestScheduler {
         schedulerProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(schedulerProcess.getInputStream(),
-            "[Scheduler output]: ");
+                "[Scheduler output]: ");
         outputReader.start();
 
         System.out.println("Waiting for the Scheduler using URL: " + schedulerUrl);
@@ -160,7 +164,7 @@ public class TestScheduler {
     }
 
     private void startLocalNodes(
-      SchedulerTestConfiguration configuration) throws KeyException, LoginException, InterruptedException {
+            SchedulerTestConfiguration configuration) throws KeyException, LoginException, InterruptedException {
         if (configuration.hasLocalNodes()) {
             // Waiting while all the nodes will be registered in the RM.
             // Without waiting test can finish earlier than nodes are added.

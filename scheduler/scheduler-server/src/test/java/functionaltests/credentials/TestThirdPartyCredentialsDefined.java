@@ -41,11 +41,10 @@ import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import functionaltests.utils.SchedulerFunctionalTest;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class TestThirdPartyCredentialsDefined extends SchedulerFunctionalTest {
@@ -53,7 +52,7 @@ public class TestThirdPartyCredentialsDefined extends SchedulerFunctionalTest {
     @Test
     public void testThatCredentialsAreCreatedIfThirdPartyCredentialHaveBeenDefined() throws Exception {
         schedulerHelper.getSchedulerInterface().putThirdPartyCredential("mykey", "myvalue");
-        assertEquals("{mykey=myvalue}", createAndSubmitTaskPrintingCredentials());
+        assertEquals("{mykey: myvalue}", createAndSubmitTaskPrintingCredentials());
     }
 
     public String createAndSubmitTaskPrintingCredentials() throws Exception {

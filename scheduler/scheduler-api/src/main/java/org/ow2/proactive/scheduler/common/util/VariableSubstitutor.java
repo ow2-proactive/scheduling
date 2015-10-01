@@ -121,8 +121,11 @@ public class VariableSubstitutor {
 
         if (variables != null) {
             for (Map.Entry<? extends Serializable, ? extends Serializable> variable : variables.entrySet()) {
-                replacements.put("$" + variable.getKey().toString(), variable.getValue().toString());
-                replacements.put("${" + variable.getKey().toString() + "}", variable.getValue().toString());
+                String key = variable.getKey().toString();
+                String value = variable.getValue().toString();
+
+                replacements.put("$" + key, value);
+                replacements.put("${" + key + "}", value);
             }
         }
 

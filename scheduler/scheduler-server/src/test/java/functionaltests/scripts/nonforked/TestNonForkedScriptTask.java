@@ -34,21 +34,22 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-package functionaltests.scripts;
+package functionaltests.scripts.nonforked;
+
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.*;
 
 
 public class TestNonForkedScriptTask extends SchedulerFunctionalTest {
@@ -56,6 +57,7 @@ public class TestNonForkedScriptTask extends SchedulerFunctionalTest {
     private static URL nonForked_jobDescriptor = TestNonForkedScriptTask.class
             .getResource("/functionaltests/descriptors/Job_non_forked_script_task.xml");
 
+    @Ignore
     @Test
     public void nonForkedTasks_SystemExitScript_KillsANode() throws Throwable {
         schedulerHelper.startScheduler(new File(TestNonForkedScriptTask.class.getResource(

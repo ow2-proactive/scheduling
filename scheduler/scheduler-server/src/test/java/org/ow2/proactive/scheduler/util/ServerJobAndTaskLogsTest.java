@@ -3,19 +3,17 @@ package org.ow2.proactive.scheduler.util;
 import java.io.File;
 import java.util.Collections;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
@@ -25,11 +23,13 @@ import static org.junit.Assert.assertTrue;
 
 
 public class ServerJobAndTaskLogsTest {
+
     @Rule
     public TemporaryFolder fakeSchedulerHome = new TemporaryFolder();
 
     private JobLogger jobLogger;
     private TaskLogger taskLogger;
+
     private JobId jobId;
     private TaskId taskId;
 
@@ -49,7 +49,7 @@ public class ServerJobAndTaskLogsTest {
         Logger.getLogger(TaskLogger.class).setLevel(Level.INFO);
 
         jobId = JobIdImpl.makeJobId("1");
-        taskId = TaskIdImpl.createTaskId(jobId, "task1", 10001, false);
+        taskId = TaskIdImpl.createTaskId(jobId, "task1", 10001);
     }
 
     @Test
@@ -73,10 +73,11 @@ public class ServerJobAndTaskLogsTest {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), jobId.toString()).exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), jobId.toString() + ".1").exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), taskId.toString()).exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), taskId.toString() + ".1").exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogFilename(jobId)).exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogFilename(jobId) + ".1").exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogFilename(taskId)).exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogFilename(taskId) + ".1").exists());
+
         assertEquals(4, new File(ServerJobAndTaskLogs.getLogsLocation()).list().length);
 
         ServerJobAndTaskLogs.remove(jobId, Collections.singleton(taskId));

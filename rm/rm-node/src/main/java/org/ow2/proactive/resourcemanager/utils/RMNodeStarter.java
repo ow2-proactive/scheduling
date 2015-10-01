@@ -80,12 +80,12 @@ import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.Tools;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.ConsoleAppender;
@@ -851,7 +851,7 @@ public class RMNodeStarter {
         //to add new options...
         fillOptions(options);
 
-        final Parser parser = new GnuParser();
+        final CommandLineParser parser = new DefaultParser();
 
         CommandLine cl;
         try {

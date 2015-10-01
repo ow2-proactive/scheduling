@@ -1,17 +1,17 @@
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
-import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,29 +51,38 @@ public class TestTaskIdGeneration extends BaseSchedulerDBTest {
     }
 
     private void checkIds(JobState job) throws Exception {
-        long jobId = Long.valueOf(job.getId().value());
+        Set<String> expected = ImmutableSet.of("0", "1", "2");
 
-        Set<String> expected = new HashSet<>(3);
-        expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor()));
-        expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor() + 1));
-        expected.add(String.valueOf(jobId * TaskIdImpl.getJobFactor() + 2));
-
-        Set<String> actual = new HashSet<>();
-        actual.add(findTask(job, "task1").getId().value());
-        actual.add(findTask(job, "task2").getId().value());
-        actual.add(findTask(job, "task3").getId().value());
+        Set<String> actual =
+                ImmutableSet.of(
+                        getTaskValue(job, "task1"),
+                        getTaskValue(job, "task2"),
+                        getTaskValue(job, "task3"));
 
         Assert.assertEquals(expected, actual);
 
-        actual = new HashSet<>();
-        actual.add(findTask(job, "task1").getId().getReadableName());
-        actual.add(findTask(job, "task2").getId().getReadableName());
-        actual.add(findTask(job, "task3").getId().getReadableName());
-        expected = new HashSet<>(3);
-        expected.add("task1");
-        expected.add("task2");
-        expected.add("task3");
+        actual =
+                ImmutableSet.of(
+                        getTaskReadableName(job, "task1"),
+                        getTaskReadableName(job, "task2"),
+                        getTaskReadableName(job, "task3")
+                );
+
+        expected = ImmutableSet.of("task1", "task2", "task3");
+
         Assert.assertEquals(expected, actual);
+    }
+
+    private String getTaskReadableName(JobState job, String taskName) {
+        return getTaskId(job, taskName).getReadableName();
+    }
+
+    private String getTaskValue(JobState job, String taskName) {
+        return getTaskId(job, taskName).value();
+    }
+
+    private TaskId getTaskId(JobState job, String taskName) {
+        return findTask(job, taskName).getId();
     }
 
 }

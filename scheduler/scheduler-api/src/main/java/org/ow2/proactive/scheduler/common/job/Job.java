@@ -36,14 +36,14 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.common.base.Joiner;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
+
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -264,10 +264,29 @@ public abstract class Job extends CommonAttribute {
     public String display() {
         String nl = System.lineSeparator();
 
-        return "Job '" + name + "' : " + nl + "\tDescription = '" +
-            description + '\'' + nl + "\tProjectName = '" + projectName + '\'' + nl + "\tPriority = " +
-            priority + nl + "\tInputSpace = '" + inputSpace + '\'' + nl + "\tOutputSpace = '" + outputSpace +
-            '\'' + nl + "\tGlobalSpace = '" + globalSpace + '\'' + nl + "\tUserSpace = '" + userSpace + '\'' +
-            nl + "\tVariables = " + variables;
+        return "Job '" +
+                name +
+                "' : " +
+                nl +
+                "\tDescription = '" +
+                description +
+                '\'' +
+                nl +
+                "\tProjectName = '" +
+                projectName +
+                '\'' +
+                nl +
+                (cancelJobOnError.isSet() ? "\tcancelJobOnError = '" +
+                        cancelJobOnError.getValue().getBooleanValue() + '\'' + nl : "") +
+                (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' +
+                        nl : "") +
+                (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
+                        maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
+                "\tgenericInformations = {" + nl +
+                Joiner.on('\n').withKeyValueSeparator("=").join(genericInformations) + nl + "}" + nl +
+                "\tPriority = " + priority + nl + "\tInputSpace = '" + inputSpace + '\'' + nl +
+                "\tOutputSpace = '" + outputSpace + '\'' + nl + "\tGlobalSpace = '" + globalSpace + '\'' + nl +
+                "\tUserSpace = '" + userSpace + '\'' + nl + "\tVariables = {" + nl +
+                Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}";
     }
 }

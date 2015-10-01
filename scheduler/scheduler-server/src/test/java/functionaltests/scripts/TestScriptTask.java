@@ -113,11 +113,14 @@ public class TestScriptTask extends SchedulerFunctionalTest {
 
         // dataspaces binding should be available
         TaskResult dataspacesTaskResult = jobResult.getResult("dataspaces");
+
         String dataspacesLogs = dataspacesTaskResult.getOutput().getAllLogs(false);
-        assertTrue(dataspacesLogs.contains("global=vfs://"));
-        assertTrue(dataspacesLogs.contains("user=vfs://"));
-        assertTrue(dataspacesLogs.contains("input=vfs://"));
-        assertTrue(dataspacesLogs.contains("output=vfs://"));
+        System.out.println(dataspacesLogs);
+        String schedulerHome = System.getProperty("pa.scheduler.home");
+        assertTrue(dataspacesLogs.contains("global="+schedulerHome));
+        assertTrue(dataspacesLogs.contains("user="+schedulerHome));
+        assertTrue(dataspacesLogs.contains("input="+schedulerHome));
+        assertTrue(dataspacesLogs.contains("output="+schedulerHome));
 
         TaskResult multiNodeTaskResult = jobResult.getResult("multi-node");
         String mnLogs = multiNodeTaskResult.getOutput().getAllLogs(false);

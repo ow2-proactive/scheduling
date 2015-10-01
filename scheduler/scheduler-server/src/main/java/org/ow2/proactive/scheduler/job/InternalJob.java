@@ -207,7 +207,7 @@ public abstract class InternalJob extends JobState {
         task.setJobId(getId());
 
         int taskId = tasks.size();
-        task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId, true));
+        task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId));
 
         boolean result = (tasks.put(task.getId(), task) == null);
 
@@ -923,7 +923,7 @@ public abstract class InternalJob extends JobState {
         //re-init taskId
         int id = 0;
         for (InternalTask td : sorted) {
-            TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++, true);
+            TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++);
             td.setId(newId);
             td.setJobInfo(getJobInfo());
             tasks.put(newId, td);

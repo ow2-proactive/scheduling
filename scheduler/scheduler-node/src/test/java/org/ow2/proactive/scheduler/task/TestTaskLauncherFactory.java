@@ -170,5 +170,10 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
                 throw new FileSystemException(e);
             }
         }
+
+        @Override
+        public void cleanScratchSpace() {
+            FileUtils.deleteQuietly(getScratchFolder());
+        }
     }
 }

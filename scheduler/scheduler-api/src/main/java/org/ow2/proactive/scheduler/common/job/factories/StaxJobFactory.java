@@ -36,11 +36,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -76,6 +72,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -175,7 +172,14 @@ public class StaxJobFactory extends JobFactory {
             //set relative path
             relativePathRoot = f.getParentFile().getAbsolutePath();
             //create and get XML STAX reader
-            XMLStreamReader xmlsr = xmlif.createXMLStreamReader(new FileReader(f));
+            XMLStreamReader xmlsr;
+            // use the server side property to accept encoding
+            if (PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.isSet()) {
+                xmlsr = xmlif.createXMLStreamReader(new FileInputStream(f),
+                        PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.getValueAsString());
+            } else {
+                xmlsr = xmlif.createXMLStreamReader(new FileInputStream(f));
+            }
             //Create the job starting at the first cursor position of the XML Stream reader
             createJob(xmlsr, updatedVariables);
             //Close the stream
@@ -213,7 +217,7 @@ public class StaxJobFactory extends JobFactory {
     }
 
     private String findSchemaByNamespaceUsed(File file) throws FileNotFoundException, XMLStreamException {
-        XMLStreamReader cursorRoot = xmlif.createXMLStreamReader(new FileReader(file));
+        XMLStreamReader cursorRoot = xmlif.createXMLStreamReader(new FileInputStream(file));
         String current;
         try {
             int eventType;

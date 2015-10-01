@@ -36,9 +36,13 @@
  */
 package functionaltests.rm.nodesource;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -49,13 +53,10 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.junit.Test;
 
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
-
-import static org.junit.Assert.*;
 
 
 /**
@@ -63,14 +64,15 @@ import static org.junit.Assert.*;
  * 
  */
 public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
-
-    private static URL simpleJob = TestJobNodeAccessToken.class
+	
+	private static URL simpleJob = TestJobNodeAccessToken.class
             .getResource("/functionaltests/descriptors/Job_simple.xml");
     private static URL simpleJobWithToken = TestJobNodeAccessToken.class
             .getResource("/functionaltests/descriptors/Job_simple_with_token.xml");
-
+    
     @Test
     public void run() throws Throwable {
+    	
         JobId id = schedulerHelper.submitJob(new File(simpleJob.toURI()).getAbsolutePath());
         SchedulerTHelper.log("Job submitted, id " + id.toString());
         schedulerHelper.waitForEventJobSubmitted(id);
@@ -91,8 +93,8 @@ public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
         String nsName = "NodeSourceWithToken";
 
         String nsProps = "-D" + RMNodeStarter.NODE_ACCESS_TOKEN + "=test_token";
-        rm.createNodeSource(nsName, LocalInfrastructure.class.getName(), new Object[] { creds, 1,
-                RMTHelper.DEFAULT_NODES_TIMEOUT, nsProps }, StaticPolicy.class.getName(), null);
+        assertTrue(rm.createNodeSource(nsName, LocalInfrastructure.class.getName(), new Object[] { creds, 1,
+                RMTHelper.DEFAULT_NODES_TIMEOUT, nsProps }, StaticPolicy.class.getName(), null).getBooleanValue());
 
         // ns created
         schedulerHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
@@ -107,6 +109,8 @@ public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
 
         schedulerHelper.waitForEventJobFinished(id2);
 
-        rm.removeNodeSource(nsName, true);
+        rm.removeNodeSource(nsName, false);
+        
+        
     }
 }

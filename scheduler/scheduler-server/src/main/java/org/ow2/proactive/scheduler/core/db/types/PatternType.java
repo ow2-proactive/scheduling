@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.core.db.types;
 
 import com.google.common.collect.ImmutableSet;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.SerializableToBlobType;
 
 import java.sql.ResultSet;
@@ -50,8 +51,8 @@ import java.sql.SQLException;
 public class PatternType extends SerializableToBlobType {
 
     @Override
-    public Object get(ResultSet rs, String name) throws SQLException {
-        Object result = super.get(rs, name);
+    public Object get(ResultSet rs, String name, SessionImplementor implementor) throws SQLException {
+        Object result = super.get(rs, name, implementor);
 
         // in the past includes and excludes patterns
         // were stored as String[]

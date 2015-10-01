@@ -29,7 +29,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private int maxNodes = 4;
     private AtomicInteger atomicMaxNodes;
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
-    private int nodeTimeout = 5000;
+    private int nodeTimeout = 10000;
     @Configurable(description = "Additional ProActive properties")
     private String paProperties = "";
 
@@ -150,10 +150,10 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
 
         //watching process
-        int threshold = 5;
+        int threshold = 10;
         Boolean isLost, isAcquired;
         while (((isLost = this.isDeployingNodeLost.get(depNodeURL)) != null) && !isLost &&
-            ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
+                ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
             if (processExecutor.isProcessFinished()) {
                 int exit = processExecutor.getExitCode();
                 if (exit != 0) {
@@ -162,7 +162,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                     message += "Command: " + obfuscatedCmd + lf;
                     String out = Tools.join(processExecutor.getOutput(), "\n");
                     String err = Tools.join(processExecutor.getErrorOutput(), "\n");
-                    message += "output: " + out + lf + "errput: " + err;
+                    message += "stdout: " + out + lf + "stderr: " + err;
                     this.declareDeployingNodeLost(depNodeURL, message);
                 }
                 //nodeNameToProcess will be clean up when exiting the loop
@@ -170,7 +170,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                 logger.debug("Waiting for node " + nodeName + " acquisition");
             }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 logger.warn("Interrupted while waiting for local process status", e);
                 threshold--;
@@ -181,8 +181,8 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
 
         logger.debug("Local Infrastructure manager exits watching loop for node " + nodeName);
-        logNodeOutput(nodeName + " output: ", processExecutor.getOutput());
-        logNodeOutput(nodeName + " errput: ", processExecutor.getErrorOutput());
+        logNodeOutput(nodeName + " stdout: ", processExecutor.getOutput());
+        logNodeOutput(nodeName + " stderr: ", processExecutor.getErrorOutput());
 
         if (isLost) {
             //clean up the process

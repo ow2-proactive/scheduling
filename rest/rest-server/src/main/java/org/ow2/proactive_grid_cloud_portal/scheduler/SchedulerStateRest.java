@@ -36,51 +36,23 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.SequenceInputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-
+import com.google.common.collect.Maps;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.vfs2.*;
+import org.apache.log4j.Logger;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceFactory;
+import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.websocket.WebSocketEventListenerAdapter;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -92,28 +64,9 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.exception.ConnectionException;
-import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -126,54 +79,27 @@ import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-import com.google.common.collect.Maps;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.log4j.Logger;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResourceFactory;
-import org.atmosphere.cpr.Broadcaster;
-import org.atmosphere.cpr.BroadcasterFactory;
-import org.atmosphere.websocket.WebSocketEventListenerAdapter;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
+
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.*;
+import java.util.Map.Entry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -181,7 +107,7 @@ import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.valid
 
 
 /**
- * this class exposes the Scheduler as a RESTful service.
+ * This class exposes the Scheduler as a RESTful service.
  */
 @Path("/scheduler/")
 public class SchedulerStateRest implements SchedulerRestInterface {
@@ -195,6 +121,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerStateRest.class);
 
     private static final String ATM_BROADCASTER_ID = "atmosphere.broadcaster.id";
+
     private static final String ATM_RESOURCE_ID = "atmosphere.resource.id";
 
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
@@ -216,6 +143,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private static final Mapper mapper = new DozerBeanMapper(Collections
             .singletonList("org/ow2/proactive_grid_cloud_portal/scheduler/dozer-mappings.xml"));
+
+    @Context
+    private HttpServletRequest httpServletRequest;
 
     /**
      * Returns the ids of the current jobs under a list of string.
@@ -932,7 +862,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     public InputStream retrieveTaskLogsUsingDataspaces(String sessionId, String jobId, TaskId taskId) throws PermissionRestException, IOException, NotConnectedRestException {
-        String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + taskId + ".log";
+        String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + taskId.value() + ".log";
         return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME, fullTaskLogsFile);
     }
 
@@ -2585,8 +2515,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             final SchedulerEventBroadcaster activedEventListener = PAActiveObject.turnActive(eventListener);
             scheduler.addEventListener(activedEventListener, subscription.isMyEventsOnly(), EventUtil
                     .toSchedulerEvents(subscription.getEvents()));
-            AtmosphereResource atmResource = AtmosphereResourceFactory.getDefault().find(
-                    (String) session.getAttribute(ATM_RESOURCE_ID));
+
+            AtmosphereResource atmResource =
+                    getAtmosphereResourceFactory().find(
+                            (String) session.getAttribute(ATM_RESOURCE_ID));
+
             atmResource.addEventListener(new WebSocketEventListenerAdapter() {
                 @Override
                 public void onDisconnect(@SuppressWarnings("rawtypes")
@@ -2603,16 +2536,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
-        } catch (ActiveObjectCreationException e) {
-            throw new RuntimeException(e);
-        } catch (NodeException e) {
+        } catch (ActiveObjectCreationException | NodeException e) {
             throw new RuntimeException(e);
         }
+
         return new EventNotification(EventNotification.Action.NONE, null, null);
     }
 
+    private AtmosphereResourceFactory getAtmosphereResourceFactory() {
+        return ((AtmosphereResource)
+                    httpServletRequest.getAttribute(
+                            "org.atmosphere.cpr.AtmosphereResource"))
+                                .getAtmosphereConfig().resourcesFactory();
+    }
+
     private Broadcaster lookupBroadcaster(String topic, boolean createNew) {
-        return BroadcasterFactory.getDefault().lookup(topic, createNew);
+        AtmosphereResource atmosphereResource = (AtmosphereResource)
+                httpServletRequest.getAttribute("org.atmosphere.cpr.AtmosphereResource");
+        return atmosphereResource.getAtmosphereConfig().getBroadcasterFactory().lookup(topic, createNew);
     }
 
     @GET

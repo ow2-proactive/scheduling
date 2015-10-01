@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.3"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+    name="TestSpecialCharacterFileNameJob" 
+    priority="normal"
+    cancelJobOnError="true">
+  
+  <taskFlow>
+ 
+	<task name="TestSpecialCharacterFileNameTask">
+		<description>Copies a file to output</description>
+		<inputFiles>
+			<files  includes="*" accessMode="transferFromInputSpace"/>
+		</inputFiles>
+		<scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+		<outputFiles>
+			<files  includes="*" accessMode="transferToOutputSpace"/>
+		</outputFiles>
+	</task>
+		
+  </taskFlow>
+</job>

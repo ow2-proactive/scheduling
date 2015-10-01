@@ -89,5 +89,10 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
         public void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException {
 
         }
+
+        @Override
+        public void cleanScratchSpace() {
+
+        }
     }
 }

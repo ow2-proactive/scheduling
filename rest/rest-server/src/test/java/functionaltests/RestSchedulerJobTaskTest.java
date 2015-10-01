@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import functionaltests.utils.RestFuncTUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -64,8 +65,6 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import functionaltests.utils.RestFuncTUtils;
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
@@ -179,6 +178,17 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         JSONObject jsonObject = toJsonObject(response);
         String taskResult = getTaskResult(jsonObject, getDefaultTaskName());
         assertNotNull(taskResult);
+    }
+
+    @Test
+    public void testGetNoJob() throws Exception {
+        String resourceUrl = getResourceUrl("jobs");
+        HttpGet httpGet = new HttpGet(resourceUrl);
+        setSessionHeader(httpGet);
+        HttpResponse response = executeUriRequest(httpGet);
+        assertHttpStatusOK(response);
+        JSONArray jsonArray = toJsonArray(response);
+        assertTrue(jsonArray.isEmpty());
     }
 
     @Test

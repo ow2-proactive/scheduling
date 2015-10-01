@@ -45,28 +45,30 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
-import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 
@@ -108,8 +110,13 @@ public class ForkedTaskExecutor implements TaskExecutor {
                     errorSink);
 
             try {
-                taskProcessTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller(context
-                        .getTaskId().value(), processBuilder.environment());
+                TaskId taskId = context.getTaskId();
+
+                String cookieNameSuffix = "Job" + taskId.getJobId().value() + "Task" + taskId.value();
+
+                taskProcessTreeKiller =
+                        CookieBasedProcessTreeKiller.createProcessChildrenKiller(
+                                cookieNameSuffix, processBuilder.environment());
             } catch (NotImplementedException e) {
                 // SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
             }
@@ -172,7 +179,11 @@ public class ForkedTaskExecutor implements TaskExecutor {
         }
 
         String javaHome = System.getProperty("java.home");
-        String jvmArguments = "";
+        ArrayList<String> jvmArguments = new ArrayList<>(1);
+        // set the task fork property so that script engines have a mean to know
+        // if they are running in a forked task or not
+        jvmArguments.add(PASchedulerProperties.TASK_FORK.getCmdLine() + "true");
+
         StringBuilder classpath = new StringBuilder("." + File.pathSeparatorChar);
         classpath.append(System.getProperty("java.class.path", ""));
 
@@ -203,7 +214,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
             }
 
             for (String jvmArgument : forkEnvironment.getJVMArguments()) {
-                jvmArguments += VariableSubstitutor.filterAndUpdate(jvmArgument, variables);
+                jvmArguments.add(VariableSubstitutor.filterAndUpdate(jvmArgument, variables));
             }
 
             if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
@@ -236,9 +247,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
         javaCommand.add(javaHome + File.separatorChar + "bin" + File.separatorChar + "java");
         javaCommand.add("-cp");
         javaCommand.add(classpath.toString());
-        if (!Objects.equals(jvmArguments, "")) {
-            javaCommand.add(jvmArguments);
-        }
+        javaCommand.addAll(jvmArguments);
         javaCommand.add(ForkedTaskExecutor.class.getName());
         javaCommand.add(serializedContext.getAbsolutePath());
 
@@ -258,7 +267,10 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
     // 1 called by forker
     private static File serializeContext(TaskContext context, File directory) throws IOException {
-        File file = File.createTempFile(context.getTaskId().value(), null, directory);
+        // prefix must be at least 3 characters long
+        String tmpFilePrefix = Strings.padStart(context.getTaskId().value(), 3, '0');
+
+        File file = File.createTempFile(tmpFilePrefix, null, directory);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             objectOutputStream.writeObject(context);
         }

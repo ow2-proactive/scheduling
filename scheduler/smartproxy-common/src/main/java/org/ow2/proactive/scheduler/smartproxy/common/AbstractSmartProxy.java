@@ -1,29 +1,77 @@
 package org.ow2.proactive.scheduler.smartproxy.common;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.*;
-import org.ow2.proactive.scheduler.common.usage.JobUsage;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-
-import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.security.KeyException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import javax.security.auth.login.LoginException;
+
+import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import com.google.common.net.UrlEscapers;
+import org.apache.log4j.Logger;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.*;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PAUSED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_FINISHED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_RUNNING;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RESUMED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RUNNING_TO_FINISHED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.KILLED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.RESUMED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTDOWN;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTTING_DOWN;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.STOPPED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PENDING_TO_RUNNING;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PROGRESS;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_RUNNING_TO_FINISHED;
 
 /**
  * Asbtract implementation of smart proxy that factorizes code used by all smart proxy implementations.
@@ -408,7 +456,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         String strDate = sdf.format(now);
 
         String newFolderName = user + "_" + strDate;
-        return newFolderName;
+        // escape the characters of the folder path as it is a remote path which will be appended to a url
+        return UrlEscapers.urlPathSegmentEscaper().escape(newFolderName);
     }
 
     /**
