@@ -46,6 +46,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
@@ -61,11 +62,19 @@ import org.codehaus.jackson.type.TypeReference;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
-import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.debugMode;
 import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
 
 
 public abstract class AbstractCommand implements Command {
+
+    private static final String DEBUG_MODE_USAGE_MESSAGE_PREFIX =
+            "\nYou can enable debug mode for getting more information using ";
+
+    private static final String DEBUG_MODE_USAGE_INTERACTIVE_SUFFIX =
+            "command '" + CommandSet.DEBUG.jsCommand() + "'.";
+
+    private static final String DEBUG_MODE_USAGE_NON_INTERACTIVE_SUFFIX =
+            "-" + CommandSet.DEBUG.opt() + " or --" + CommandSet.DEBUG.longOpt() + " option.";
 
     protected int statusCode(HttpResponseStatus status) {
         return status.statusCode();
@@ -94,24 +103,6 @@ public abstract class AbstractCommand implements Command {
 
     }
 
-    protected void writeLine(ApplicationContext currentContext, String format, Object... args) {
-        if (!currentContext.isSilent()) {
-            try {
-                currentContext.getDevice().writeLine(format, args);
-            } catch (IOException ioe) {
-                throw new CLIException(REASON_IO_ERROR, ioe);
-            }
-        }
-    }
-
-    protected String readLine(ApplicationContext currentContext, String format, Object... args) {
-        try {
-            return currentContext.getDevice().readLine(format, args);
-        } catch (IOException ioe) {
-            throw new CLIException(REASON_IO_ERROR, ioe);
-        }
-    }
-
     protected char[] readPassword(ApplicationContext currentContext, String format, Object... args) {
         try {
             return currentContext.getDevice().readPassword(format, args);
@@ -135,8 +126,8 @@ public abstract class AbstractCommand implements Command {
 
         } catch (SSLPeerUnverifiedException sslException) {
             throw new CLIException(CLIException.REASON_OTHER,
-                "SSL error. Perhaps HTTPS certificate could not be validated, "
-                    + "you can try with -k or insecure() for insecure SSL connection.", sslException);
+                    "SSL error. Perhaps HTTPS certificate could not be validated, "
+                            + "you can try with -k or insecure() for insecure SSL connection.", sslException);
         } catch (Exception e) {
             throw new CLIException(CLIException.REASON_OTHER, e.getMessage(), e);
         } finally {
@@ -174,11 +165,66 @@ public abstract class AbstractCommand implements Command {
         writeLine(currentContext, errorMessage);
         Throwable cause = error.getCause();
 
-        writeLine(currentContext, "Error Message: %s", (cause == null) ? error.getMessage() : cause
-                .getMessage());
+        String message = error.getMessage();
 
-        if (debugMode(currentContext)) {
-            writeLine(currentContext, "Stack Track: %s", stackTraceAsString((cause == null) ? error : cause));
+        if (cause != null) {
+            message = cause.getMessage();
+        }
+
+        writeLine(currentContext, "Error message: %s", message);
+
+        if (isDebugModeEnabled(currentContext)) {
+            writeLine(currentContext, "Stack trace: %s", stackTraceAsString((cause == null) ? error : cause));
+        } else {
+            writeDebugModeUsage(currentContext);
+        }
+    }
+
+    public static boolean isDebugModeEnabled(ApplicationContext currentContext) {
+        Boolean debug = currentContext.getProperty(SetDebugModeCommand.PROP_DEBUG_MODE, Boolean.class);
+        return (debug == null) ? false : debug;
+    }
+
+    public static boolean isInteractive(ApplicationContext currentContext) {
+        Boolean interactive = currentContext.getProperty(AbstractIModeCommand.IMODE, Boolean.class);
+        return (interactive == null) ? false : interactive;
+    }
+
+    public static void writeDebugModeUsage(ApplicationContext currentContext) {
+        writeDebugModeUsage(currentContext, false);
+    }
+
+    public static void writeDebugModeUsage(ApplicationContext currentContext, boolean breakEndline) {
+        String suffix = DEBUG_MODE_USAGE_NON_INTERACTIVE_SUFFIX;
+
+        if (isInteractive(currentContext)) {
+            suffix = DEBUG_MODE_USAGE_INTERACTIVE_SUFFIX;
+        }
+
+        String endline = "";
+
+        if (breakEndline) {
+            endline = "\n";
+        }
+
+        writeLine(currentContext, DEBUG_MODE_USAGE_MESSAGE_PREFIX + suffix + endline);
+    }
+
+    protected static void writeLine(ApplicationContext currentContext, String format, Object... args) {
+        if (!currentContext.isSilent()) {
+            try {
+                currentContext.getDevice().writeLine(format, args);
+            } catch (IOException ioe) {
+                throw new CLIException(REASON_IO_ERROR, ioe);
+            }
+        }
+    }
+
+    protected String readLine(ApplicationContext currentContext, String format, Object... args) {
+        try {
+            return currentContext.getDevice().readLine(format, args);
+        } catch (IOException ioe) {
+            throw new CLIException(REASON_IO_ERROR, ioe);
         }
     }
 
@@ -197,22 +243,25 @@ public abstract class AbstractCommand implements Command {
     private void writeError(String errorMsg, String responseContent, ApplicationContext currentContext) {
         writeLine(currentContext, errorMsg);
 
+
         HttpErrorView errorView = errorView(responseContent);
 
         if (errorView.errorCode != null) {
-            writeLine(currentContext, "HTTP Error Code: %s", errorView.errorCode);
+            writeLine(currentContext, "HTTP error code: %s", errorView.errorCode);
         }
 
         if (errorView.errorMessage != null) {
-            writeLine(currentContext, "Error Message: %s", errorView.errorMessage);
+            writeLine(currentContext, "Error message: %s", errorView.errorMessage);
         }
 
         if (errorView.errorCode == null && errorView.errorMessage == null) {
-            writeLine(currentContext, "Error Message:%n%s", responseContent);
+            writeLine(currentContext, "Error message:%n%s", responseContent);
         }
 
-        if (debugMode(currentContext)) {
-            writeLine(currentContext, "Stack Trace:%s", errorView.stackTrace);
+        if (isDebugModeEnabled(currentContext)) {
+            writeLine(currentContext, "Stack trace: %s", errorView.stackTrace);
+        } else {
+            writeDebugModeUsage(currentContext);
         }
     }
 
@@ -272,10 +321,13 @@ public abstract class AbstractCommand implements Command {
             throw new CLIException(REASON_UNAUTHORIZED_ACCESS, error.getErrorMessage());
         }
         writeLine(currentContext, errorMessage);
-        writeLine(currentContext, "%s %s", "HTTP Error Code:", error.getHttpErrorCode());
-        writeLine(currentContext, "%s %s", "Error Message:", error.getErrorMessage());
-        if (debugMode(currentContext)) {
-            writeLine(currentContext, "%s%n%s", "Stack Trace:", error.getStackTrace());
+        writeLine(currentContext, "%s %s", "HTTP error code:", error.getHttpErrorCode());
+        writeLine(currentContext, "%s %s", "Error message:", error.getErrorMessage());
+
+        if (isDebugModeEnabled(currentContext)) {
+            writeLine(currentContext, "%s%n%s", "Stack trace:", error.getStackTrace());
+        } else {
+            writeDebugModeUsage(currentContext);
         }
     }
 

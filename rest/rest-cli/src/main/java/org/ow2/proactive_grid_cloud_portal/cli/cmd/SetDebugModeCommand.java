@@ -64,4 +64,5 @@ public class SetDebugModeCommand extends AbstractCommand implements Command {
                     debugOn);
         }
     }
+
 }
