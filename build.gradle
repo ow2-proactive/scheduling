@@ -468,6 +468,8 @@ project('scheduler:scheduler-node') {
         testCompile project(':scheduler:scheduler-examples')
     }
 
+    task('functionalTest', type: Test).configure functionalTestConfiguration
+
     task stub(type: StubTask) {
         classes = [
                 'org.ow2.proactive.scheduler.common.TaskTerminateNotification',
