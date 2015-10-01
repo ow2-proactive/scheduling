@@ -151,8 +151,8 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
         String out = capturedOutput.toString();
         System.out.println(out);
 
-        assertThat(out, equalTo("An error occurred while retrieving job('2') state:\r\n" + "" +
-                "Error Message: Job 2 does not exists\r\n"));
+        assertThat(out, equalTo("An error occurred while retrieving job('2') state:\n" + "" +
+                "Error Message: Job 2 does not exists\n"));
     }
 
 
@@ -165,8 +165,8 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
         String out = capturedOutput.toString();
         System.out.println(out);
 
-        assertThat(out, equalTo("An error occurred while retrieving job('2') state:\r\n" + "" +
-                "Error Message: Job 2 does not exists\r\n"));
+        assertThat(out, equalTo("An error occurred while retrieving job('2') state:\n" + "" +
+                "Error Message: Job 2 does not exists\n"));
     }
 
 

@@ -37,6 +37,7 @@ package org.ow2.proactive.scheduler.job;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
@@ -200,7 +201,6 @@ public class TagTest extends ProActiveTest{
         assertTags("LOOP-T3-2", new String[]{"T1#2", "T2#2", "T3#2"});
     }
 
-
     @Test
     public void testReplicationLoopSelfCronTag() throws Exception {
         InternalScriptTask task1 = createLoopTask("T1", "loop = '* * * * *'", null, "T1", false);
@@ -208,7 +208,6 @@ public class TagTest extends ProActiveTest{
 
         assertTagsStartsWith("LOOP-T1-", new String[]{"T1#1", "T1#2"});
     }
-
 
     @Test
     public void testReplicationReplicateTag() throws Exception {
@@ -241,7 +240,6 @@ public class TagTest extends ProActiveTest{
         assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2"});
     }
 
-
     @Test
     public void testReplicationReplicateCombinedTag() throws Exception {
         InternalTask T = createReplicateTask("T", null, FlowBlock.START, "T2", 3);
@@ -264,7 +262,6 @@ public class TagTest extends ProActiveTest{
         assertTags("REPLICATE-T#1-1", new String[]{"T1#1*1", "T3#1*1", "T4#1*1", "T5#1*1"});
         assertTags("REPLICATE-T#1-2", new String[]{"T1#1*2", "T3#1*2", "T4#1*2", "T5#1*2"});
     }
-
 
     @Test
     public void testReplicationReplicateCombined2Tag() throws Exception {
@@ -290,7 +287,6 @@ public class TagTest extends ProActiveTest{
         assertTags("LOOP-T4*1-2", new String[]{"T2#2*1", "T3#2*1", "T4#2*1"});
         assertTags("LOOP-T4*2-2", new String[]{"T2#2*2", "T3#2*2", "T4#2*2"});
     }
-
 
     @Test
     public void testReplicationReplicateDoubleTag() throws Exception {
@@ -332,7 +328,6 @@ public class TagTest extends ProActiveTest{
         assertTags("REPLICATE-T2*2-5", new String[]{"T3*5", "T4*5", "T5*5"});
         assertTags("REPLICATE-T2*2-6", new String[]{"T3*6", "T4*6", "T5*6"});
     }*/
-
 
     @Test
     public void testTaskLogger() throws InvalidScriptException, UnknownTaskException {
