@@ -56,9 +56,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsage;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsageWithBreakEndLine;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
-import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.debugMode;
 import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
 
 
@@ -69,10 +70,15 @@ public abstract class EntryPoint {
     protected int run(String... args) {
 
         CommandFactory commandFactory = null;
-        CommandLine cli;
+        CommandLine cli = null;
         AbstractDevice console;
 
         ApplicationContext currentContext = ApplicationContextImpl.currentContext();
+
+        // Cannot rely on AbstractCommand#isDebugModeEnabled
+        // because at this step SetDebugModeCommand#execute has not yet been executed
+        // Consequently, SetDebugModeCommand.PROP_DEBUG_MODE is not set even if debug mode is enabled.
+        boolean isDebugModeEnabled = isDebugModeEnabled(args);
 
         try {
             commandFactory = getCommandFactory();
@@ -90,7 +96,7 @@ public abstract class EntryPoint {
             return 1;
 
         } catch (ParseException pe) {
-            writeError(currentContext, pe.getMessage(), pe);
+            writeError(currentContext, pe.getMessage(), pe, isDebugModeEnabled);
             // print usage
             Command help = commandFactory.commandForOption(new Option("h", null));
             if (help != null) {
@@ -109,7 +115,7 @@ public abstract class EntryPoint {
         try {
             commands = commandFactory.getCommandList(cli, currentContext);
         } catch (CLIException e) {
-            writeError(currentContext, "An error occurred.", e);
+            writeError(currentContext, "An error occurred.", e, isDebugModeEnabled);
             return 1;
         }
 
@@ -121,11 +127,11 @@ public abstract class EntryPoint {
             if (REASON_UNAUTHORIZED_ACCESS == error.reason() && hasLoginCommand(commands)) {
                 retryLogin = true;
             } else {
-                writeError(currentContext, "An error occurred.", error);
+                writeError(currentContext, "An error occurred.", error, isDebugModeEnabled);
                 return 1;
             }
         } catch (Throwable e) {
-            writeError(currentContext, "An error occurred.", e);
+            writeError(currentContext, "An error occurred.", e, isDebugModeEnabled);
             return 1;
         }
 
@@ -143,11 +149,30 @@ public abstract class EntryPoint {
                 currentContext.setProperty(PROP_RENEW_SESSION, true);
                 executeCommandList(commands, currentContext);
             } catch (Throwable error) {
-                writeError(currentContext, "An error occurred while execution.", error);
+                writeError(currentContext, "An error occurred while execution.", error, isDebugModeEnabled);
                 return 1;
             }
         }
         return 0;
+    }
+
+    /*
+     * The arguments are parsed manually because in case of
+     * parsing error (i.e. ParseException is raised), CommandLine object will be null.
+     * However, it is required in that case to know whether debug mode is enabled or not.
+     */
+    private boolean isDebugModeEnabled(String[] args) {
+        String shortOption = "-" + CommandSet.DEBUG.opt();
+        String longOption = "--" + CommandSet.DEBUG.longOpt();
+
+        for (String arg : args) {
+            if (arg.equals(shortOption) ||
+                    arg.equals(longOption)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void executeCommandList(List<Command> commandList, ApplicationContext currentContext)
@@ -157,20 +182,24 @@ public abstract class EntryPoint {
         }
     }
 
-    private void writeError(ApplicationContext currentContext, String errorMsg, Throwable cause) {
+    private void writeError(ApplicationContext currentContext, String errorMsg, Throwable cause,
+            boolean isDebugModeEnabled) {
         PrintWriter writer = new PrintWriter(currentContext.getDevice().getWriter(), true);
         writer.printf("%n%s", errorMsg);
+
         if (cause != null) {
             if (cause.getMessage() != null) {
-                writer.printf("%n%nError Message: %s%n", cause.getMessage());
+                writer.printf("%n%nError message: %s%n", cause.getMessage());
             }
 
-            if (debugMode(currentContext)) {
+            if (isDebugModeEnabled) {
                 if (cause instanceof CLIException && ((CLIException) cause).stackTrace() != null) {
-                    writer.printf("%n%nStackTrace: %s", ((CLIException) cause).stackTrace());
+                    writer.printf("%nStack trace: %s%n", ((CLIException) cause).stackTrace());
                 } else {
-                    writer.printf("%n%nStackTrace: %s", stackTraceAsString(cause));
+                    writer.printf("%nStack trace: %s%n", stackTraceAsString(cause));
                 }
+            } else {
+                writeDebugModeUsageWithBreakEndLine(currentContext);
             }
         }
     }

@@ -70,7 +70,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand)
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand);
 
-importClass(org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand);
 importClass(com.google.common.collect.ObjectArrays);
 
 
@@ -101,7 +101,7 @@ function prints() {
 
 function printError(error, currentContext) {
     print("An error occurred while executing the command:\r\n" + error.message + "\r\n");
-    if (ExceptionUtility.debugMode(currentContext)) {
+    if (AbstractCommand.isDebugModeEnabled(currentContext)) {
         if (error.javaException != null) {
             error.javaException.printStackTrace();
         } else {
