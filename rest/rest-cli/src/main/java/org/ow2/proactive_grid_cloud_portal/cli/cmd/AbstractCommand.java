@@ -194,7 +194,11 @@ public abstract class AbstractCommand implements Command {
         writeDebugModeUsage(currentContext, false);
     }
 
-    public static void writeDebugModeUsage(ApplicationContext currentContext, boolean breakEndline) {
+    public static void writeDebugModeUsageWithBreakEndLine(ApplicationContext currentContext) {
+        writeDebugModeUsage(currentContext, true);
+    }
+
+    private static void writeDebugModeUsage(ApplicationContext currentContext, boolean breakEndline) {
         String suffix = DEBUG_MODE_USAGE_NON_INTERACTIVE_SUFFIX;
 
         if (isInteractive(currentContext)) {

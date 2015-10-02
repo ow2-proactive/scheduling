@@ -57,6 +57,7 @@ import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNK
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsage;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsageWithBreakEndLine;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
@@ -198,7 +199,7 @@ public abstract class EntryPoint {
                     writer.printf("%nStack trace: %s%n", stackTraceAsString(cause));
                 }
             } else {
-                writeDebugModeUsage(currentContext, true);
+                writeDebugModeUsageWithBreakEndLine(currentContext);
             }
         }
     }
