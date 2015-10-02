@@ -1,21 +1,19 @@
 package org.ow2.proactive.scheduler.job;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.task.RestartMode;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -169,6 +167,15 @@ public final class ClientJobState extends JobState {
     public RestartMode getRestartTaskOnError() {
         throw new RuntimeException(
             "Not implemented: the restart task on error property is not available on client side.");
+    }
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        for(TaskState task : this.getTasks()) {
+            if (task instanceof ClientTaskState) {
+                ((ClientTaskState)task).restoreDependences(this.tasks);
+            }
+        }
     }
 
 }
