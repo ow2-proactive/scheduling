@@ -33,7 +33,7 @@
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
 
-package org.ow2.proactive.scheduler.job;
+package functionaltests.job;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
+import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
