@@ -55,11 +55,15 @@ public final class ProActiveVersionUtility {
 
     public static final String VERSION_UNDEFINED = "unknown";
 
+    public static void writeProActiveVersion(ApplicationContext currentContext, PrintStream printStream) {
+        writeProActiveVersion(currentContext, printStream, false);
+    }
+
     public static void writeProActiveVersionWithBreakEndLine(ApplicationContext currentContext, PrintStream printStream) {
         writeProActiveVersion(currentContext, printStream, true);
     }
 
-    public static void writeProActiveVersion(ApplicationContext currentContext, PrintStream printStream, boolean breakEndLine) {
+    private static void writeProActiveVersion(ApplicationContext currentContext, PrintStream printStream, boolean breakEndLine) {
         printStream.println("ProActive client version: " + getProActiveClientVersion());
         printStream.println("ProActive server version: " + getProActiveServerVersion(currentContext));
 

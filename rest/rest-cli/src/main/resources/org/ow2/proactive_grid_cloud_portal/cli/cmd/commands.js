@@ -69,6 +69,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultComma
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.JsVersionCommand);
 
 importClass(org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility);
 importClass(com.google.common.collect.ObjectArrays);
@@ -400,10 +401,12 @@ function shutdown() {
     execute(new ShutdownCommand());
 }
 
-
-
 function help() {
     execute(new JsHelpCommand());
+}
+
+function version() {
+    execute(new JsVersionCommand())
 }
 
 printWelcomeMsg();
