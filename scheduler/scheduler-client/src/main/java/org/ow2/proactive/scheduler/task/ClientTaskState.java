@@ -34,7 +34,7 @@ public final class ClientTaskState extends TaskState {
     private TaskInfo taskInfo;
     private int maxNumberOfExecutionOnFailure;
     private List<TaskId> dependenceIds = new ArrayList<>();
-    private List<TaskState> dependences = new ArrayList<>();
+    transient private List<TaskState> dependences = new ArrayList<>();
 
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
