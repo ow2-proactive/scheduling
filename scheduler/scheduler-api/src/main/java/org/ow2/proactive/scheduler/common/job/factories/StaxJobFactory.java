@@ -478,8 +478,12 @@ public class StaxJobFactory extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.COMMON_INFO.matches(cursorInfo.getLocalName())) {
-                            infos.put(cursorInfo.getAttributeValue(0),
-                                    replace(cursorInfo.getAttributeValue(1)));
+                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorInfo);
+
+                            String name = attributesAsMap.get(XMLAttributes.COMMON_NAME.getXMLName());
+                            String value = attributesAsMap.get(XMLAttributes.COMMON_VALUE.getXMLName());
+
+                            infos.put(name, value);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
