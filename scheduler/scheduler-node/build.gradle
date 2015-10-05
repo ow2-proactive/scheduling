@@ -27,6 +27,8 @@ task stub(type: StubTask) {
 }
 serialver.dependsOn stub
 
+task('functionalTest', type: Test).configure rootProject.schedulingFunctionalTestConfiguration
+
 ext.oneJarManifest = manifest {
     attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
     attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
