@@ -42,7 +42,7 @@ dependencies {
     runtime project(':rest:rest-server')
 }
 
-task('functionalTest', type: Test).configure functionalTestConfiguration
+task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration
 
 task testJar(type: Jar) {
     classifier = 'tests'
@@ -59,7 +59,15 @@ task stub(type: StubTask) {
 }
 serialver.dependsOn stub
 
+rootProject.dist.dependsOn testJar
+
+task dist(type: Copy) {
+    from testJar
+    into file("$rootDir/dist/lib")
+}
 artifacts {
     archives testJar
 }
 
+functionalTest.dependsOn rootProject.dist, dist
+clean.dependsOn rootProject.cleanDist

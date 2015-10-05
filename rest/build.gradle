@@ -4,7 +4,7 @@ ext.encoding = {
     props.getProperty('pa.scheduler.job.file.encoding')
 }
 
-def functionalTestConfiguration = {
+ext.functionalTestConfiguration = {
     forkEvery 1
     include 'functionaltests/**'
     systemProperties << ['rest.deploy': 'false']

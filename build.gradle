@@ -10,6 +10,7 @@ apply from: custom("jacoco-scheduling")
 archivesBaseName = 'scheduling' // in case current folder is not named scheduling
 
 project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
+project.ext.set('schedulingParentFolder', "$rootDir")
 
 
 configurations {
@@ -146,7 +147,7 @@ ext.encoding = {
     props.getProperty('pa.scheduler.job.file.encoding')
 }
 
-ext.functionalTestConfiguration = {
+ext.schedulingFunctionalTestConfiguration = {
 
     include 'functionaltests/**'
    
@@ -165,9 +166,11 @@ ext.functionalTestConfiguration = {
     }
 
     def clean = {
+    	println project.nativeLibsDir
+    	   	
         project.javaexec {
             main = "org.ow2.tests.ProcessCleaner"
-            classpath = fileTree("${rootDir.absolutePath}/dist/lib/").include("*.jar")
+            classpath = fileTree(project.nativeLibsDir).include("*.jar")
             systemProperty "java.library.path", project.nativeLibsDir
         }
     }
@@ -207,7 +210,7 @@ task dist(type: Sync) {
     from configurations.runtime
     from jar
 
-    [project(':rm:rm-server'), project(':scheduler:scheduler-server')].each {
+    [project(':scheduler:scheduler-server')].each {
         from it.configurations.archives.artifacts.files.files
         if (it.tasks.findByName('testJar')) {
             from it.testJar.outputs
@@ -223,6 +226,7 @@ task dist(type: Sync) {
 
 defaultTasks 'dist'
 build.dependsOn 'dist'
+
 
 task scripts
 dist.dependsOn scripts

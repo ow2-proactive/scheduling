@@ -30,8 +30,7 @@ dependencies {
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
 }
 
-
-task('functionalTest', type: Test).configure functionalTestConfiguration
+task('functionalTest', type: Test).configure rootProject.schedulingFunctionalTestConfiguration
 
 task stub(type: StubTask) {
     classes = [
@@ -59,6 +58,17 @@ task testJar(type: Jar) {
     from sourceSets.test.output
 }
 
+    
+task dist(type: Copy) {
+    from testJar
+    into file("$rootDir/dist/lib")
+}
+
+rootProject.dist.dependsOn testJar
+    
 artifacts {
     archives testJar
 }
+
+functionalTest.dependsOn rootProject.dist, dist
+clean.dependsOn rootProject.cleanDist
