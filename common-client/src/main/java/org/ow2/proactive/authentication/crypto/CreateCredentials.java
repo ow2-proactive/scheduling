@@ -322,7 +322,6 @@ public class CreateCredentials {
     }
 
     private static void displayHelp(Options options) {
-        System.out.println("");
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(135);
         hf.printHelp("create-cred" + Tools.shellExtension(), "", options, "", true);
