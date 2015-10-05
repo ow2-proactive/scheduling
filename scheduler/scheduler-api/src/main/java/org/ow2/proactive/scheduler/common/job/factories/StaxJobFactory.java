@@ -1325,8 +1325,12 @@ public class StaxJobFactory extends JobFactory {
                             ForkEnvironment forkEnv = createForkEnvironment(cursorExec);
                             javaTask.setForkEnvironment(forkEnv);
                         } else if (XMLTags.TASK_PARAMETER.matches(current)) {
-                            javaTask.addArgument(replace(cursorExec.getAttributeValue(0)),
-                                    replace(cursorExec.getAttributeValue(1)));
+                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorExec);
+
+                            String name = attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
+                            String value = attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName());
+
+                            javaTask.addArgument(replace(name), value);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:

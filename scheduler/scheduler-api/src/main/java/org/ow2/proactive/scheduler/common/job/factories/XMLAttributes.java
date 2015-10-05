@@ -74,6 +74,8 @@ public enum XMLAttributes {
     // NATIVE TASK ATTRIBUTES
     TASK_COMMAND_VALUE("value"),
     TASK_NB_NODES("numberOfNodes"),
+    TASK_PARAMETER_NAME("name"),
+    TASK_PARAMETER_VALUE("value"),
     TASK_WORKDING_DIR("workingDir"),
 
     // TOPOLOGY
