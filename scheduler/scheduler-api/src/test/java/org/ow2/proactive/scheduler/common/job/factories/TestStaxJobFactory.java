@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.common.job.factories;
 import java.net.URI;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import com.google.common.collect.Maps;
@@ -89,7 +90,7 @@ public class TestStaxJobFactory {
             throws Exception {
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri);
 
-        assertEquals("updated_task_generic_info_value", testJob.getTask("task1").getGenericInformations()
+        assertEquals("updated_task_generic_info_value", testJob.getTask("task1").getGenericInformation()
                 .get("task_generic_info"));
     }
 
@@ -101,7 +102,7 @@ public class TestStaxJobFactory {
 
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri, variablesMap);
 
-        assertEquals("updated_task_generic_info_value2", testJob.getTask("task1").getGenericInformations()
+        assertEquals("updated_task_generic_info_value2", testJob.getTask("task1").getGenericInformation()
                 .get("task_generic_info"));
     }
 
@@ -113,7 +114,8 @@ public class TestStaxJobFactory {
 
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri, variablesMap);
 
-        assertEquals("from_create_job_parameter_value", testJob.getVariables().get("from_create_job_parameter"));
+        assertEquals("from_create_job_parameter_value", testJob.getVariables().get(
+                "from_create_job_parameter"));
     }
 
     @Test
@@ -124,4 +126,5 @@ public class TestStaxJobFactory {
 
         assertEquals("system_property_value", testJob.getVariables().get("system_property"));
     }
+
 }

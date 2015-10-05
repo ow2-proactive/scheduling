@@ -57,7 +57,7 @@ public final class ClientJobState extends JobState {
         this.cancelJobOnError = jobState.isCancelJobOnError();
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
-        this.genericInformations = new HashMap<>(jobState.getGenericInformations());
+        this.genericInformations = new HashMap<>(jobState.getGenericInformation());
 
         List<ClientTaskState> taskStates = new ArrayList<>();
         for (TaskState ts : jobState.getTasks()) {
@@ -79,7 +79,7 @@ public final class ClientJobState extends JobState {
     }
 
     @Override
-    public Map<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformation() {
         return this.genericInformations;
     }
 

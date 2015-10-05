@@ -179,7 +179,7 @@ public abstract class CommonAttribute implements Serializable {
      *
      * @return the genericInformations.
      */
-    public Map<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformation() {
         Map<String, String> tmp = new HashMap<String, String>();
         for (Entry<String, BigString> e : this.genericInformations.entrySet()) {
             tmp.put(e.getKey(), e.getValue().getValue());

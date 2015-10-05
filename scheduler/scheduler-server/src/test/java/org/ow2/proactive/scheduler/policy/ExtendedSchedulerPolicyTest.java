@@ -183,7 +183,7 @@ public class ExtendedSchedulerPolicyTest {
     }
 
     private String startAtValue(EligibleTaskDescriptor taskDesc) {
-        return taskDesc.getInternal().getGenericInformations().get(GENERIC_INFO_START_AT_KEY);
+        return taskDesc.getInternal().getGenericInformation().get(GENERIC_INFO_START_AT_KEY);
     }
 
     private EligibleTaskDescriptor first(List<EligibleTaskDescriptor> taskDescList) {

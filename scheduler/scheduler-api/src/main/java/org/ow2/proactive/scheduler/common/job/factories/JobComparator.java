@@ -159,10 +159,10 @@ public class JobComparator {
         }
 
         stack.push(" genericInformations ");
-        if (!isEqualMap(attrib1.getGenericInformations(), attrib2.getGenericInformations())) {
+        if (!isEqualMap(attrib1.getGenericInformation(), attrib2.getGenericInformation())) {
 
-            stack.push("generic info 1= " + attrib1.getGenericInformations() + " ----- generic info 2 = " +
-                attrib2.getGenericInformations());
+            stack.push("generic info 1= " + attrib1.getGenericInformation() + " ----- generic info 2 = " +
+                attrib2.getGenericInformation());
 
             return false;
         }
