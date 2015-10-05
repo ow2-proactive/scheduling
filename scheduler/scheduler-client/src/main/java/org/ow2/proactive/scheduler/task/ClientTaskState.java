@@ -1,9 +1,5 @@
 package org.ow2.proactive.scheduler.task;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -14,6 +10,16 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -57,7 +63,7 @@ public final class ClientTaskState extends TaskState {
         this.maxNumberOfExecution = taskState.getMaxNumberOfExecution();
 
         this.setParallelEnvironment(taskState.getParallelEnvironment());
-        this.setGenericInformations(taskState.getGenericInformation());
+        this.setGenericInformations(taskState.getGenericInformations());
 
         // Store only task IDs here; #restoreDependences is later called by
         // ClientJobState in order for this instance to store references to the
@@ -190,5 +196,10 @@ public final class ClientTaskState extends TaskState {
     public RestartMode getRestartTaskOnError() {
         throw new RuntimeException(
             "Not implemented: the restart task on error property is not available on client side.");
+    }
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        this.dependences = new ArrayList<>();
     }
 }
