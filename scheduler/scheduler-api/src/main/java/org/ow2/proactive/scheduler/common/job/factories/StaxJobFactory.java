@@ -80,6 +80,7 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
+import com.google.common.collect.ImmutableMap;
 import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.xml.sax.SAXException;
@@ -417,8 +418,12 @@ public class StaxJobFactory extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
-                            variables.put(cursorVariables.getAttributeValue(0), replace(cursorVariables
-                                    .getAttributeValue(1)));
+                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables);
+
+                            String name = attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
+                            String value = attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName());
+
+                            variables.put(name, value);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -438,6 +443,18 @@ public class StaxJobFactory extends JobFactory {
             }
             throw new JobCreationException(cursorVariables.getLocalName(), attrtmp, e);
         }
+    }
+
+    private Map<String, String> getAttributesAsMap(
+            XMLStreamReader cursorVariables) throws JobCreationException {
+        final ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
+
+        for (int i = 0; i < cursorVariables.getAttributeCount(); i++) {
+            result.put(cursorVariables.getAttributeLocalName(i),
+                    replace(cursorVariables.getAttributeValue(i)));
+        }
+
+        return result.build();
     }
 
     private void updateVariables(Map<String, String> updatedVariables) {

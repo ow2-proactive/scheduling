@@ -59,6 +59,10 @@ public enum XMLAttributes {
     COMMON_RESTART_TASK_ON_ERROR("restartTaskOnError"),
     COMMON_VALUE("value"),
 
+    // VARIABLE
+    VARIABLE_NAME("name"),
+    VARIABLE_VALUE("value"),
+
     // TASKS
     TASK_CLASS_NAME("class"),
     TASK_DEPENDS_REF("ref"),
