@@ -168,6 +168,7 @@ project(':rest:rest-cli') {
         compile project(":common-api")
         compile project(':rest:rest-api')
 
+        testCompile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
         testCompile 'org.eclipse.jetty:jetty-server:9.2.13.v20150730'
     }
 

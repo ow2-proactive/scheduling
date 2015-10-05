@@ -72,7 +72,7 @@ public final class ProActiveVersionUtility {
         }
     }
 
-    private static String getProActiveClientVersion() {
+    protected static String getProActiveClientVersion() {
         String result = CommonEntryPoint.class.getPackage().getImplementationVersion();
 
         if (result == null) {
@@ -82,7 +82,7 @@ public final class ProActiveVersionUtility {
         return result;
     }
 
-    private static String getProActiveServerVersion(ApplicationContext currentContext) {
+    protected static String getProActiveServerVersion(ApplicationContext currentContext) {
         int timeout = (int) TimeUnit.SECONDS.toMillis(2);
 
         RequestConfig config =
@@ -97,25 +97,32 @@ public final class ProActiveVersionUtility {
             HttpGet getMethod = new HttpGet(currentContext.getResourceUrl("version"));
             HttpResponse response = httpClient.execute(getMethod);
 
-            int statusCode = response.getStatusLine().getStatusCode();
-
-            if (statusCode >= 200 && statusCode < 300) {
-                HttpEntity entity = response.getEntity();
-
-                if (entity != null) {
-                    JsonValue jsonValue = Json.parse(EntityUtils.toString(entity));
-
-                    if (jsonValue.isObject()) {
-                        JsonObject jsonObject = jsonValue.asObject();
-                        return jsonObject.get("rest").asString();
-                    }
-                }
-            }
+            String jsonObject = handleResponse(response);
+            if (jsonObject != null) return jsonObject;
         } catch (IOException ignore) {
             // ignore exception, default value will be used
         }
 
         return VERSION_UNDEFINED;
+    }
+
+    protected static String handleResponse(HttpResponse response) throws IOException {
+        int statusCode = response.getStatusLine().getStatusCode();
+
+        if (statusCode >= 200 && statusCode < 300) {
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                JsonValue jsonValue = Json.parse(EntityUtils.toString(entity));
+
+                if (jsonValue.isObject()) {
+                    JsonObject jsonObject = jsonValue.asObject();
+                    return jsonObject.get("rest").asString();
+                }
+            }
+        }
+
+        return null;
     }
 
 }
