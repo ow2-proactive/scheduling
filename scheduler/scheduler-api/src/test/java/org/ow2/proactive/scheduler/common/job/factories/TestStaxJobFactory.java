@@ -39,7 +39,6 @@ package org.ow2.proactive.scheduler.common.job.factories;
 import java.net.URI;
 import java.util.Map;
 
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import com.google.common.collect.Maps;
@@ -47,7 +46,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TestStaxJobFactory {
 
@@ -72,13 +71,13 @@ public class TestStaxJobFactory {
     }
 
     @Test
-    public void test_create_job_should_use_job_variables_to_replace_job_name_variable() throws Exception {
+    public void testCreateJobShouldUseJobVariablesToReplaceJobNameVariable() throws Exception {
         Job testScriptJob = factory.createJob(job_descriptor_uri);
         assertEquals("updated_job_name", testScriptJob.getName());
     }
 
     @Test
-    public void test_create_job_should_use_variable_map_to_replace_job_name_variable() throws Exception {
+    public void testCreateJobShouldUseVariableMapToReplaceJobNameVariable() throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("job_name", "updated_job_name2");
         Job testScriptJob = factory.createJob(job_descriptor_uri, variablesMap);
@@ -86,7 +85,7 @@ public class TestStaxJobFactory {
     }
 
     @Test
-    public void test_create_job_should_use_job_variables_to_replace_task_generic_info_variables()
+    public void testCreateJobShouldUseJobVariablesToReplaceTaskGenericInfoVariables()
             throws Exception {
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri);
 
@@ -95,7 +94,7 @@ public class TestStaxJobFactory {
     }
 
     @Test
-    public void test_create_job_should_use_variable_map_to_replace_task_generic_info_variables()
+    public void testCreateJobShouldUseVariableMapToReplaceTaskGenericInfoVariables()
             throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("task_generic_info", "updated_task_generic_info_value2");
@@ -107,7 +106,7 @@ public class TestStaxJobFactory {
     }
 
     @Test
-    public void test_create_job_should_use_variable_map_parameter_to_replace_variable_value()
+    public void testCreateJobShouldUseVariableMapParameterToReplaceVariableValue()
       throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("from_create_job_parameter", "from_create_job_parameter_value");
@@ -119,7 +118,7 @@ public class TestStaxJobFactory {
     }
 
     @Test
-    public void test_create_job_should_use_sysprops_to_replace_variables() throws Exception{
+    public void testCreateJobShouldUseSyspropsToReplaceVariables() throws Exception{
         System.setProperty("system_property", "system_property_value");
 
         Job testJob = factory.createJob(job_descriptor_sys_props_uri);
