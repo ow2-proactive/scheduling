@@ -43,6 +43,7 @@ import java.io.Writer;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ProActiveVersionUtility;
 import org.apache.commons.cli.HelpFormatter;
 
 
@@ -57,6 +58,9 @@ public class HelpCommand extends AbstractCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
         HelpFormatter formatter = new HelpFormatter();
         Writer writer = currentContext.getDevice().getWriter();
+
+        ProActiveVersionUtility.writeProActiveVersionWithBreakEndLine(currentContext, System.out);
+
         PrintWriter pw = new PrintWriter(writer, true);
         formatter.printHelp(pw, 110, USAGE, "", CommandFactory.getCommandFactory(CommandFactory.Type.ALL)
                 .supportedOptions(), formatter.getLeftPadding(), formatter.getDescPadding(), "", false);
