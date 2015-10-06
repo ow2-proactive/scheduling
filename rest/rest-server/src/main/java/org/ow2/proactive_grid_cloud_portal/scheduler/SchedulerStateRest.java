@@ -710,28 +710,46 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * Returns a list of the name of the tasks belonging to job
-     * <code>jobId</code>
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param jobId
-     *            jobid one wants to list the tasks' name
-     * @return a list of tasks' name
+     * Returns a list of the name of the tasks belonging to job <code>jobId</code>
+     * @param sessionId a valid session id
+     * @param jobId jobid one wants to list the tasks' name
+     * @return a list of tasks' name 
      */
     @Override
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    public List<String> getJobTasksIds(@HeaderParam("sessionid")
-    String sessionId, @PathParam("jobid")
-    String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+    public List<String> getJobTasksIds(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId)
+                    throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        return getJobTasksIdsPaginated(sessionId, jobId, 0, 50);
+    }
+    
+    /**
+     * Returns a list of the name of the tasks belonging to job <code>jobId</code> with pagination
+     * @param sessionId a valid session id
+     * @param jobId jobid one wants to list the tasks' name
+     * @param offset the number of the first task to fetch
+     * @param limit the number of the last task to fetch (non inclusive)
+     * @return a list of tasks' name
+     */
+    @Override
+    @GET
+    @Path("jobs/{jobid}/tasks/paginated")
+    @Produces("application/json")
+    public List<String> getJobTasksIdsPaginated(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit)
+                    throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
 
             JobState jobState = s.getJobState(jobId);
-            List<String> tasksName = new ArrayList<>(jobState.getTasks().size());
-            for (TaskState ts : jobState.getTasks()) {
+            List<String> tasksName = new ArrayList<>(jobState.getTasksPaginated(offset, limit).size());
+            for (TaskState ts : jobState.getTasksPaginated(offset, limit)) {
                 tasksName.add(ts.getId().getReadableName());
             }
 
@@ -770,7 +788,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
 
             JobState jobState = s.getJobState(jobId);
-            List<TaskState> tasks = jobState.getTaskByTag(taskTag);
+            List<TaskState> tasks = jobState.getTaskByTagPaginated(taskTag, 0, 50);
             List<String> tasksName = new ArrayList<>(tasks.size());
             for (TaskState ts : tasks) {
                 tasksName.add(ts.getId().getReadableName());
@@ -926,17 +944,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
-        try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates");
-            JobState jobState = s.getJobState(jobId);
-            return map(jobState.getTasks(), TaskStateData.class);
-        } catch (PermissionException e) {
-            throw new PermissionRestException(e);
-        } catch (UnknownJobException e) {
-            throw new UnknownJobRestException(e);
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
-        }
+        return getJobTaskStatesPaginated(sessionId, jobId, 0, 50);
     }
     
     
@@ -952,7 +960,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     @GET
     @GZIP
-    @Path("jobs/{jobid}/taskstates")
+    @Path("jobs/{jobid}/taskstates/paginated")
     @Produces("application/json")
     public List<TaskStateData> getJobTaskStatesPaginated(
             @HeaderParam("sessionid") String sessionId,
@@ -961,7 +969,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("50") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates");
+            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/paginated");
             JobState jobState = s.getJobState(jobId);
             
             return map(jobState.getTasksPaginated(offset, limit), TaskStateData.class);
@@ -1023,7 +1031,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("25") int limit)
+            @QueryParam("limit") @DefaultValue("50") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag + "/paginated");

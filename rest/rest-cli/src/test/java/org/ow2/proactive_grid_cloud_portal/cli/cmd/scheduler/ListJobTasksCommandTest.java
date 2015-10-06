@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.scheduler;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl;
@@ -89,11 +90,10 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
         reset(this.restApi);
     }
 
-
     @Test
     public void testCommandJobIdOnly() throws Exception{
         when(restApi.getJobTasksIds(anyString(), eq(jobId))).thenReturn(this.taskNames);
-
+        
         executeTest(jobId);
 
         String out = capturedOutput.toString();

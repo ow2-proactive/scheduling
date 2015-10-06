@@ -273,10 +273,28 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    List<String> getJobTasksIds(@HeaderParam("sessionid")
-    String sessionId, @PathParam("jobid")
-    String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
-
+    List<String> getJobTasksIds(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId)
+                    throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+    
+    /**
+     * Returns a list of the name of the tasks belonging to job <code>jobId</code> with pagination
+     * @param sessionId a valid session id
+     * @param jobId jobid one wants to list the tasks' name
+     * @param offset the number of the first task to fetch
+     * @param limit the number of the last task to fetch (non inclusive)
+     * @return a list of tasks' name
+     */
+    @GET
+    @Path("jobs/{jobid}/tasks/paginated")
+    @Produces("application/json")
+    List<String> getJobTasksIdsPaginated(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit)
+                    throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
      * Returns a list of the name of the tasks belonging to job <code>jobId</code>
@@ -384,6 +402,8 @@ public interface SchedulerRestInterface {
      * Returns a list of taskState with pagination
      * @param sessionId a valid session id
      * @param jobId the job id
+     * @param offset the index of the first TaskState to return
+     * @param limit the index (non inclusive) of the last TaskState to return
      * @return a list of task' states of the job <code>jobId</code>
      */
     @GET

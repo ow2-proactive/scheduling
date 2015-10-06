@@ -52,10 +52,6 @@ import java.util.List;
  * @author  the activeeon team.
  */
 public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implements Command {
-
-    private final int MAX_PAGE_SIZE = 50;
-    private int offset = 0;
-    private int limit = MAX_PAGE_SIZE;
     
     public ListJobTasksCommand(String jobId){
         super(jobId);
@@ -79,10 +75,24 @@ public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implemen
         try {
             List<String> tasks = null;
             if(this.tag != null){
-                tasks = scheduler.getJobTasksIdsByTag(currentContext.getSessionId(), jobId, tag);
+                if (this.limit == 0) {
+                    System.out.println("tag != null && limit == 0 case : [" + offset + ", " + limit + "[");
+                    tasks = scheduler.getJobTasksIdsByTag(currentContext.getSessionId(), jobId, tag);
+                }
+                else {
+                    System.out.println("tag != null && limit != 0 case : [" + offset + ", " + limit + "[");
+                    tasks = scheduler.getJobTasksIdsByTagPaginated(currentContext.getSessionId(), jobId, tag, offset, limit);
+                }
             }
             else{
-                tasks = scheduler.getJobTasksIds(currentContext.getSessionId(), jobId);
+                if (this.limit == 0) {
+                    System.out.println("tag == null && limit == 0 case : [" + offset + ", " + limit + "[");
+                    tasks = scheduler.getJobTasksIds(currentContext.getSessionId(), jobId);
+                }
+                else {
+                    System.out.println("tag == null && limit != 0 case : [" + offset + ", " + limit + "[");
+                    tasks = scheduler.getJobTasksIdsPaginated(currentContext.getSessionId(), jobId, offset, limit);
+                }
             }
 
             resultStack(currentContext).push(tasks);

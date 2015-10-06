@@ -4,7 +4,7 @@ public abstract class AbstractJobTagPaginatedCommand extends AbstractJobTagComma
 
     protected final int MAX_PAGE_SIZE = 50;
     protected int offset = 0;
-    protected int limit = MAX_PAGE_SIZE;
+    protected int limit = 0;
 
     public AbstractJobTagPaginatedCommand(String jobId) {
         super(jobId);
