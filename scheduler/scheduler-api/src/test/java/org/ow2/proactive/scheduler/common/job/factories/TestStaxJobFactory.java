@@ -36,12 +36,21 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.apache.commons.collections4.CollectionUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,6 +58,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class TestStaxJobFactory {
+
+    private static final ImmutableMap<String, String> EXPECTED_KEY_VALUE_ENTRIES =
+            ImmutableMap.of("name1", "value1", "name2", "value2");
 
     private static final String JOB_FACTORY_IMPL = StaxJobFactory.class.getName();
 
@@ -126,6 +138,43 @@ public class TestStaxJobFactory {
         Job testJob = factory.createJob(jobDescriptorSysPropsUri);
 
         assertEquals("system_property_value", testJob.getVariables().get("system_property"));
+    }
+
+    @Test
+    public void testJobCreationAttributeOrderDefinitionGenericInformationXmlElement() throws URISyntaxException, JobCreationException {
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_attr_def_generic_information_xml_element.xml"));
+        Map<String, String> genericInformation = job.getTask("task").getGenericInformation();
+        assertExpectedKeyValueEntriesMatch(genericInformation);
+    }
+
+    @Test
+    public void testJobCreationAttributeOrderDefinitionParameterXmlElement() throws URISyntaxException, JobCreationException, IOException, ClassNotFoundException {
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_attr_def_parameter_xml_element.xml"));
+        Map<String, Serializable> arguments = ((JavaTask) job.getTask("task")).getArguments();
+        assertExpectedKeyValueEntriesMatch(arguments);
+    }
+
+    @Test
+    public void testJobCreationAttributeOrderDefinitionVariableXmlElement() throws URISyntaxException, JobCreationException {
+        Job job = factory.createJob(getResource("job_attr_def_variable_xml_element.xml"));
+        Map<String, String> variables = job.getVariables();
+        assertExpectedKeyValueEntriesMatch(variables);
+    }
+
+    private static <K,V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
+        Assert.assertTrue(
+                Sets.symmetricDifference(
+                        EXPECTED_KEY_VALUE_ENTRIES.keySet(),
+                        map.keySet()).isEmpty());
+
+        Assert.assertTrue(
+                CollectionUtils.disjunction(
+                        EXPECTED_KEY_VALUE_ENTRIES.values(), map.values()).isEmpty());
+    }
+
+    private URI getResource(String filename) throws URISyntaxException {
+        return TestStaxJobFactory.class.getResource(
+                "/org/ow2/proactive/scheduler/common/job/factories/" + filename).toURI();
     }
 
 }
