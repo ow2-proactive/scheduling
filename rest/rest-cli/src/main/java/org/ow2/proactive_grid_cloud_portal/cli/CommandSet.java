@@ -365,13 +365,17 @@ public class CommandSet {
             .longOpt("").description("Interactive help").jsCommand("help()")
             .commandClass(JsHelpCommand.class).entry();
 
+    public static final CommandSet.Entry VERSION = CommandSetEntryBuilder.newInstance().opt("v").longOpt(
+            "version").description("Display the version number")
+            .commandClass(VersionCommand.class).jsCommand("version()").entry();
+
     /**
      * CommandSet.Entry objects which are common to both Scheduler and Resource
      * Manager CLIs
      */
     public static final CommandSet.Entry[] COMMON_COMMANDS = new CommandSet.Entry[] { URL, SESSION,
             SESSION_FILE, PASSWORD, CREDENTIALS, INSECURE, CACERTS, CACERTS_PASSWORD, EVAL, SILENT, PRINT,
-            OUTPUT, COMMON_HELP, DEBUG };
+            OUTPUT, COMMON_HELP, DEBUG, VERSION };
 
     /** CommandSet.Entry objects which are specific to Scheduler CLI */
     public static final CommandSet.Entry[] SCHED_ONLY = new CommandSet.Entry[] { SCHED_START, SCHED_STOP,
@@ -387,7 +391,7 @@ public class CommandSet {
             INFRASTRUCTURE, INFRASTRUCTURE_LIST, POLICY, POLICY_LIST, TOPOLOGY, FORCE, RM_STATS, RM_HELP };
 
     public static final Entry[] INTERACTIVE_COMMANDS = { JS_LIST_ALL, JS_LIST_LATEST, JS_LIST_FROM, EXIT,
-            RM_JS_HELP, SCHED_JS_HELP, COMMON_JS_HELP };
+            RM_JS_HELP, SCHED_JS_HELP, COMMON_JS_HELP, VERSION };
 
     private CommandSet() {
     }

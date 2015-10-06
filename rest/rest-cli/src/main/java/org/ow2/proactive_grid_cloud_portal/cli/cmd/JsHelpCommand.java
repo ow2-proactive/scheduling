@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ProActiveVersionUtility;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_COMMANDS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_ONLY;
@@ -50,6 +51,8 @@ public class JsHelpCommand extends AbstractJsHelpCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+        ProActiveVersionUtility.writeProActiveVersionWithBreakEndLine(currentContext, System.out);
         printHelp(currentContext, COMMON_COMMANDS, SCHED_ONLY, RM_ONLY, INTERACTIVE_COMMANDS);
     }
+
 }
