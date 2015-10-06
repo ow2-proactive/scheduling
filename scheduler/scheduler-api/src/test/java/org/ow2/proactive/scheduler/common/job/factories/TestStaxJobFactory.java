@@ -50,29 +50,31 @@ import static org.junit.Assert.assertEquals;
 
 public class TestStaxJobFactory {
 
-    private static final String impl = StaxJobFactory.class.getName();
-    private static URI job_descriptor_uri;
-    private static URI job_descriptor_sys_props_uri;
+    private static final String JOB_FACTORY_IMPL = StaxJobFactory.class.getName();
+
+    private static URI jobDescriptorUri;
+
+    private static URI jobDescriptorSysPropsUri;
 
     private JobFactory factory;
 
     @BeforeClass
     public static void setJobDescriptorcUri() throws Exception {
-        job_descriptor_uri = TestStaxJobFactory.class.getResource(
+        jobDescriptorUri = TestStaxJobFactory.class.getResource(
                 "/org/ow2/proactive/scheduler/common/job/factories/job_update_variables.xml").toURI();
-        job_descriptor_sys_props_uri = TestStaxJobFactory.class.getResource(
+        jobDescriptorSysPropsUri = TestStaxJobFactory.class.getResource(
                 "/org/ow2/proactive/scheduler/common/job/factories/job_update_variables_using_system_properties.xml")
                 .toURI();
     }
 
     @Before
     public void setJobFactory() {
-        factory = JobFactory.getFactory(impl);
+        factory = JobFactory.getFactory(JOB_FACTORY_IMPL);
     }
 
     @Test
     public void testCreateJobShouldUseJobVariablesToReplaceJobNameVariable() throws Exception {
-        Job testScriptJob = factory.createJob(job_descriptor_uri);
+        Job testScriptJob = factory.createJob(jobDescriptorUri);
         assertEquals("updated_job_name", testScriptJob.getName());
     }
 
@@ -80,14 +82,14 @@ public class TestStaxJobFactory {
     public void testCreateJobShouldUseVariableMapToReplaceJobNameVariable() throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("job_name", "updated_job_name2");
-        Job testScriptJob = factory.createJob(job_descriptor_uri, variablesMap);
+        Job testScriptJob = factory.createJob(jobDescriptorUri, variablesMap);
         assertEquals("updated_job_name2", testScriptJob.getName());
     }
 
     @Test
     public void testCreateJobShouldUseJobVariablesToReplaceTaskGenericInfoVariables()
             throws Exception {
-        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri);
 
         assertEquals("updated_task_generic_info_value", testJob.getTask("task1").getGenericInformation()
                 .get("task_generic_info"));
@@ -99,7 +101,7 @@ public class TestStaxJobFactory {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("task_generic_info", "updated_task_generic_info_value2");
 
-        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri, variablesMap);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap);
 
         assertEquals("updated_task_generic_info_value2", testJob.getTask("task1").getGenericInformation()
                 .get("task_generic_info"));
@@ -111,7 +113,7 @@ public class TestStaxJobFactory {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("from_create_job_parameter", "from_create_job_parameter_value");
 
-        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(job_descriptor_uri, variablesMap);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap);
 
         assertEquals("from_create_job_parameter_value", testJob.getVariables().get(
                 "from_create_job_parameter"));
@@ -121,7 +123,7 @@ public class TestStaxJobFactory {
     public void testCreateJobShouldUseSyspropsToReplaceVariables() throws Exception{
         System.setProperty("system_property", "system_property_value");
 
-        Job testJob = factory.createJob(job_descriptor_sys_props_uri);
+        Job testJob = factory.createJob(jobDescriptorSysPropsUri);
 
         assertEquals("system_property_value", testJob.getVariables().get("system_property"));
     }
