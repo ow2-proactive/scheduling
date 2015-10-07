@@ -282,7 +282,7 @@ public class CommandSet {
             .longOpt("taskstates")
             .description("Retrieve the tasks states of a set of tasks belonging to a specified job and filtered by a tag")
             .hasArgs(true)
-            .numOfArgs(2).argNames("job-id tag").jsCommand("taskstates(job-id,tag)")
+            .numOfArgs(2).argNames("job-id tag offset limit").jsCommand("taskstates(job-id [,tag] [,offset,limit])")
             .commandClass(ListTaskStatesCommand.class).entry();
 
     public static final CommandSet.Entry TASK_PREEMPT =

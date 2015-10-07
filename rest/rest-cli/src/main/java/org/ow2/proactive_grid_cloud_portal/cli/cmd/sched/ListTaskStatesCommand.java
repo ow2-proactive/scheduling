@@ -49,14 +49,22 @@ import java.util.List;
 /**
  * @author  the activeeon team.
  */
-public class ListTaskStatesCommand extends AbstractJobTagCommand implements Command {
-
+public class ListTaskStatesCommand extends AbstractJobTagPaginatedCommand implements Command {
+    
     public ListTaskStatesCommand(String jobId){
         super(jobId);
     }
 
     public ListTaskStatesCommand(String jobId, String tag){
         super(jobId, tag);
+    }
+    
+    public ListTaskStatesCommand(String jobId, String tag, String offset, String limit) {
+        super(jobId, tag, offset, limit);
+    }
+    
+    public ListTaskStatesCommand(String jobId, String offset, String limit) {
+        super(jobId, offset, limit);
     }
 
 
@@ -65,11 +73,21 @@ public class ListTaskStatesCommand extends AbstractJobTagCommand implements Comm
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
             List<TaskStateData> tasks = null;
-            if(this.tag == null){
-                tasks = scheduler.getJobTaskStates(currentContext.getSessionId(), jobId);
-            }
-            else {
-                tasks = scheduler.getJobTaskStatesByTag(currentContext.getSessionId(), jobId, tag);
+            if (this.tag == null) {
+                if (this.limit == 0) {
+                    tasks = scheduler.getJobTaskStates(currentContext.getSessionId(), jobId);
+                } else {
+                    tasks = scheduler.getJobTaskStatesPaginated(currentContext.getSessionId(), jobId, offset,
+                            limit);
+                }
+            } else {
+                if (this.limit == 0) {
+                    tasks = scheduler.getJobTaskStatesByTag(currentContext.getSessionId(), jobId, tag);
+                } else {
+                    tasks = scheduler.getJobTaskStatesByTagPaginated(currentContext.getSessionId(), jobId,
+                            tag, offset, limit);
+                }
+
             }
             resultStack(currentContext).push(tasks);
             if (!currentContext.isSilent()) {

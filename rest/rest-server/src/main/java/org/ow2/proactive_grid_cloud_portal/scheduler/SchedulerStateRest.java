@@ -1007,7 +1007,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag);
             JobState jobState = s.getJobState(jobId);
-            return map(jobState.getTaskByTag(taskTag), TaskStateData.class);
+            return map(jobState.getTaskByTagPaginated(taskTag, 0, 50), TaskStateData.class);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1036,33 +1036,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag + "/paginated");
             JobState jobState = s.getJobState(jobId);
-            // Sanitize tasks indexes
-            final int MAX_PAGE_SIZE = 50;
-            int _offset = 0;
-            int _limit = MAX_PAGE_SIZE; // default value
-            
-            if (offset > 0 && offset < limit) {
-                _offset = offset;
-            }
-            else {
-                // invalid offset
-                logger.warn("offset index has beeen reajusted");
-            }
-            
-            if (limit > 0 && limit > offset) {
-                _limit = limit;
-            }
-            else {
-                // invalid limit
-                logger.warn("limit index has been reajusted");
-            }
-            
-            // check the page size
-            if ((_limit - _offset) > MAX_PAGE_SIZE) {
-                logger.warn("MAX_PAGE_SIZE has been reached");
-            }
-            
-            return map(jobState.getTaskByTagPaginated(taskTag, _offset, _limit), TaskStateData.class);
+            return map(jobState.getTaskByTagPaginated(taskTag, offset, limit), TaskStateData.class);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
