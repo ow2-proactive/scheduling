@@ -29,14 +29,13 @@ import java.util.Map;
  */
 public final class ClientJobState extends JobState {
 
+    private final ClientJobSerializationHelper clientJobSerializationHelper;
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;
     private Map<TaskId, TaskState> tasks = new HashMap<>();
-
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
-
     private HashMap<String, String> genericInformations;
 
     public ClientJobState(JobState jobState) {
@@ -56,6 +55,8 @@ public final class ClientJobState extends JobState {
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
         this.genericInformations = new HashMap<>(jobState.getGenericInformations());
+
+        this.clientJobSerializationHelper = new ClientJobSerializationHelper();
 
         List<ClientTaskState> taskStates = new ArrayList<>();
         for (TaskState ts : jobState.getTasks()) {
@@ -169,13 +170,10 @@ public final class ClientJobState extends JobState {
             "Not implemented: the restart task on error property is not available on client side.");
     }
 
+
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
-        for(TaskState task : this.getTasks()) {
-            if (task instanceof ClientTaskState) {
-                ((ClientTaskState)task).restoreDependences(this.tasks);
-            }
-        }
+        this.clientJobSerializationHelper.serializeTasks(this.tasks);
     }
 
 }
