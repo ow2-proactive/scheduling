@@ -43,6 +43,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.*;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.*;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.*;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import org.apache.commons.cli.Option;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
@@ -705,7 +707,7 @@ public class CommandSet {
 
         @Override
         public int compareTo(Entry o) {
-            return opt.compareTo(o.opt);
+            return Ordering.natural().nullsFirst().compare(jsCommand, o.jsCommand);
         }
     }
 
