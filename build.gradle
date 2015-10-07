@@ -141,6 +141,11 @@ configure(javaSubprojects) {
     }
 }
 
+
+task wrapper(type: Wrapper) {
+   gradleVersion = '2.7' //version required
+}
+
 ext.encoding = {
     Properties props = new Properties()
     props.load(new FileInputStream("$rootDir/config/scheduler/settings.ini"))
