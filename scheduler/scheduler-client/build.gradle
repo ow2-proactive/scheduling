@@ -3,7 +3,12 @@ dependencies {
 
     compile project(':scheduler:scheduler-api')
     compile project(':common-client')
+
+    testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 }
+
+task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration
+functionalTest.dependsOn rootProject.dist
 
 task stub(type: StubTask) {
     classes = [
@@ -12,4 +17,3 @@ task stub(type: StubTask) {
     ]
 }
 serialver.dependsOn stub
-
