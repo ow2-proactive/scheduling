@@ -73,14 +73,16 @@ public class KeyGen {
         while (index < args.length) {
             if (args[index].equals("--size") || args[index].equals("-s")) {
                 if (++index == args.length) {
-                    System.out.println("No value provided for option --size");
+                    printError("No value provided for option --size");
+                    printUsage(algo, size);
                     return;
                 }
                 size = Integer.parseInt(args[index]);
             }
             if (args[index].equals("--private") || args[index].equals("-p")) {
                 if (++index == args.length) {
-                    System.out.println("No value provided for argument --private");
+                    printError("No value provided for argument --private");
+                    printUsage(algo, size);
                     return;
                 }
                 privKey = args[index];
@@ -88,50 +90,35 @@ public class KeyGen {
             }
             if (args[index].equals("--public") || args[index].equals("-P")) {
                 if (++index == args.length) {
-                    System.out.println("No value provided for argument --public");
+                    printError("No value provided for argument --public");
+                    printUsage(algo, size);
                     return;
                 }
                 pubKey = args[index];
             }
             if (args[index].equals("--algo") || args[index].equals("-a")) {
                 if (++index == args.length) {
-                    System.out.println("No value provided for option --algo");
+                    printError("No value provided for option --algo");
+                    printUsage(algo, size);
                     return;
                 }
                 algo = args[index];
             }
             if (args[index].equals("--help") || args[index].equals("-h")) {
-                System.out.println("Usage:");
-                System.out.println("\tjava " + KeyGen.class.getCanonicalName() + " arguments [options]");
-                System.out.println("");
-                System.out.println("Description:");
-                System.out.println("\tGenerates a couple of public and private keys that will");
-                System.out.println("\tbe used for Resource Manager and Scheduler authentication.");
-                System.out.println("");
-                System.out.println("Arguments:");
-                System.out.println("\t-P, --public PATH");
-                System.out.println("\t\tPath to the generated public key");
-                System.out.println("\t-p, --private PATH");
-                System.out.println("\t\tPath to the generated private key");
-                System.out.println("");
-                System.out.println("Options:");
-                System.out.println("\t-s, --size SIZE [=" + size + "]");
-                System.out.println("\t\tSize of the key");
-                System.out.println("\t-a, --algo ALGO [=" + algo + "]");
-                System.out.println("\t\tKey generation algorithm");
+                printUsage(algo, size);
                 return;
             }
             index++;
         }
 
         if (privKey == null) {
-            System.out.println("--private argument is mandatory.");
-            System.out.println("Use -h for help.");
+            printError("--private argument is mandatory");
+            printUsage(algo, size);
             return;
         }
         if (pubKey == null) {
-            System.out.println("--public argument is mandatory.");
-            System.out.println("Use -h for help.");
+            printError("--public argument is mandatory");
+            printUsage(algo, size);
             return;
         }
 
@@ -148,7 +135,7 @@ public class KeyGen {
                 f.mkdirs();
             }
         } catch (Exception e) {
-            System.out.println("Could not create directory: " + e.getMessage());
+            printError("Could not create directory: " + e.getMessage());
         }
 
         KeyPairUtil.generateKeyPair(algo, size, privKey, pubKey);
@@ -157,4 +144,30 @@ public class KeyGen {
         System.out.println("\t" + privKey);
         System.out.println("\t" + pubKey);
     }
+
+    private static void printError(String errorMessage) {
+        System.err.println(errorMessage + "\n");
+    }
+
+    private static void printUsage(String algo, int size) {
+        System.out.println("Usage:");
+        System.out.println("\tjava " + KeyGen.class.getCanonicalName() + " arguments [options]");
+        System.out.println("");
+        System.out.println("Description:");
+        System.out.println("\tGenerates a couple of public and private keys that will");
+        System.out.println("\tbe used for Resource Manager and Scheduler authentication.");
+        System.out.println("");
+        System.out.println("Arguments:");
+        System.out.println("\t-P, --public PATH");
+        System.out.println("\t\tPath to the generated public key");
+        System.out.println("\t-p, --private PATH");
+        System.out.println("\t\tPath to the generated private key");
+        System.out.println("");
+        System.out.println("Options:");
+        System.out.println("\t-s, --size SIZE [=" + size + "]");
+        System.out.println("\t\tSize of the key");
+        System.out.println("\t-a, --algo ALGO [=" + algo + "]");
+        System.out.println("\t\tKey generation algorithm");
+    }
+
 }
