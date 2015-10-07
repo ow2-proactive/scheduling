@@ -37,16 +37,11 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-
 
 class SchedulerCommandFactory extends CommandFactory {
 
     {
-        for (CommandSet.Entry entry : CommandSet.SCHED_ONLY) {
+        for (CommandSet.Entry entry : CommandSet.SCHEDULER_ONLY) {
             cmdMap.put(opt(entry), entry);
         }
     }

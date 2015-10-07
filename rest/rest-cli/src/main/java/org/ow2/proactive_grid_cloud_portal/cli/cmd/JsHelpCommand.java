@@ -44,7 +44,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.ProActiveVersionUtility;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_COMMANDS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_ONLY;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INTERACTIVE_COMMANDS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_ONLY;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHEDULER_ONLY;
 
 
 public class JsHelpCommand extends AbstractJsHelpCommand implements Command {
@@ -52,7 +52,7 @@ public class JsHelpCommand extends AbstractJsHelpCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         ProActiveVersionUtility.writeProActiveVersionWithBreakEndLine(currentContext, System.out);
-        printHelp(currentContext, COMMON_COMMANDS, SCHED_ONLY, RM_ONLY, INTERACTIVE_COMMANDS);
+        printHelp(currentContext, COMMON_COMMANDS, SCHEDULER_ONLY, RM_ONLY, INTERACTIVE_COMMANDS);
     }
 
 }

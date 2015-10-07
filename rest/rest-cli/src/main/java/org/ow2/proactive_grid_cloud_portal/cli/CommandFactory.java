@@ -38,8 +38,8 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CACERTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CACERTS_PASSWORD;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CA_CERTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CA_CERTS_PASSWORD;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_HELP;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.CREDENTIALS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.DEBUG;
@@ -50,9 +50,9 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.OUTPUT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.PASSWORD;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.POLICY;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_HELP;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_HELP;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION_FILE;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHEDULER_HELP;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION_ID;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SESSION_ID_FILE;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SILENT;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.URL;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DEFAULT_CREDENTIALS_PATH;
@@ -147,8 +147,7 @@ public abstract class CommandFactory {
     /**
      * Returns an ordered {@link Command} list for specified user arguments.
      *
-     * @param cli
-     *            the command-line arguments
+     * @param cli the command-line arguments
      * @return an ordered {@link Command} list.
      */
     protected List<Command> getCommandList(CommandLine cli, Map<String, Command> map,
@@ -165,8 +164,8 @@ public abstract class CommandFactory {
             return list;
         }
 
-        if (map.containsKey(opt(SCHED_HELP))) {
-            list.add(map.remove(opt(SCHED_HELP)));
+        if (map.containsKey(opt(SCHEDULER_HELP))) {
+            list.add(map.remove(opt(SCHEDULER_HELP)));
             return list;
         }
 
@@ -185,19 +184,19 @@ public abstract class CommandFactory {
         if (map.containsKey(opt(INSECURE))) {
             list.add(map.remove(opt(INSECURE)));
 
-        } else if (map.containsKey(opt(CACERTS))) {
-            list.add(map.remove(opt(CACERTS)));
+        } else if (map.containsKey(opt(CA_CERTS))) {
+            list.add(map.remove(opt(CA_CERTS)));
 
-            if (map.containsKey(opt(CACERTS_PASSWORD))) {
-                list.add(map.remove(opt(CACERTS_PASSWORD)));
+            if (map.containsKey(opt(CA_CERTS_PASSWORD))) {
+                list.add(map.remove(opt(CA_CERTS_PASSWORD)));
             }
         }
 
-        if (map.containsKey(opt(SESSION))) {
-            list.add(map.remove(opt(SESSION)));
+        if (map.containsKey(opt(SESSION_ID))) {
+            list.add(map.remove(opt(SESSION_ID)));
 
-        } else if (map.containsKey(opt(SESSION_FILE))) {
-            list.add(map.remove(opt(SESSION_FILE)));
+        } else if (map.containsKey(opt(SESSION_ID_FILE))) {
+            list.add(map.remove(opt(SESSION_ID_FILE)));
         }
 
         if (map.containsKey(opt(PASSWORD))) {
