@@ -261,20 +261,17 @@ public abstract class CommandFactory {
 
     protected Options createOptions(Collection<CommandSet.Entry> entries) {
         Options options = new Options();
+
         for (CommandSet.Entry entry : entries) {
-            Option option = new Option(entry.opt(), entry.longOpt(), entry.hasArgs(), entry.description());
-            if (entry.numOfArgs() > 0) {
-                option.setArgs(entry.numOfArgs());
-            } else if (entry.hasArgs() && entry.numOfArgs() == -1) {
-                option.setArgs(Integer.MAX_VALUE);
-            }
-            if (entry.hasOptionalArg()) {
-                option.setOptionalArg(true);
-                option.setArgs(Integer.MAX_VALUE);
-            }
-            if (entry.argNames() != null) {
-                option.setArgName(entry.argNames());
-            }
+            Option option =
+                    new Option(
+                            entry.opt(), entry.longOpt(),
+                            entry.hasArgs(), entry.description());
+
+            option.setArgName(entry.argNames());
+            option.setArgs(entry.numOfArgs());
+            option.setOptionalArg(entry.hasOptionalArg());
+
             options.addOption(option);
         }
         return options;

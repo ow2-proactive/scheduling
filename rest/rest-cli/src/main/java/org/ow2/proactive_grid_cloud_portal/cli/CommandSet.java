@@ -120,10 +120,11 @@ public class CommandSet {
     public static final CommandSet.Entry OUTPUT =
             CommandSetEntryBuilder.newInstance().opt("o").longOpt("output-file")
                     .description("Output the result of command execution to specified file")
-                    .hasArgs(true).numOfArgs(1).commandClass(OutputCommand.class).entry();
+                    .hasArgs(true).numOfArgs(1).argNames("output-file")
+                    .commandClass(OutputCommand.class).entry();
 
     public static final CommandSet.Entry EXIT =
-            CommandSetEntryBuilder.newInstance().opt("").longOpt("").description("Exit interactive shell")
+            CommandSetEntryBuilder.newInstance().description("Exit interactive shell")
                     .jsCommand("exit()").commandClass(ExitCommand.class).entry();
 
     public static final CommandSet.Entry DEBUG =
@@ -133,7 +134,8 @@ public class CommandSet {
 
     public static final CommandSet.Entry SUBMIT =
             CommandSetEntryBuilder.newInstance().opt("s").longOpt("submit")
-                    .description("Submit the specified job-description (XML) file").hasArgs(true)
+                    .description("Submit the specified job-description (XML) file")
+                    .hasArgs(true).numOfArgs(1).hasOptionalArg(true)
                     .argNames("job-descriptor [var1=value1 var2=value2 ...]")
                     .jsCommand("submit(job-descriptor,[var1=value1,var2=value2,...]")
                     .commandClass(SubmitJobCommand.class).entry();
@@ -188,19 +190,18 @@ public class CommandSet {
                     .commandClass(ListJobCommand.class).entry();
 
     public static final CommandSet.Entry JS_LIST_ALL =
-            CommandSetEntryBuilder.newInstance().opt("")
-                    .longOpt("").description("Retrieve a list of all jobs.").jsCommand("listjobs()")
+            CommandSetEntryBuilder.newInstance()
+                    .description("Retrieve a list of all jobs.").jsCommand("listjobs()")
                     .commandClass(ListJobCommand.class).entry();
 
     public static final CommandSet.Entry JS_LIST_LATEST =
-            CommandSetEntryBuilder.newInstance().opt("").longOpt("")
+            CommandSetEntryBuilder.newInstance()
                     .description("Retrieves a list of the latest 'x' number of jobs.")
                     .jsCommand("listjobs(x)").commandClass(ListJobCommand.class).entry();
 
     public static final CommandSet.Entry JS_LIST_FROM =
-            CommandSetEntryBuilder.newInstance().opt("").longOpt("")
-                    .description(
-                            "Retrieves the list of 'y' (maximum) number of jobs, starting from the x'th job.")
+            CommandSetEntryBuilder.newInstance().description(
+                    "Retrieves the list of 'y' (maximum) number of jobs, starting from the x'th job.")
                     .jsCommand("listjobs(x, y)").commandClass(ListJobCommand.class).entry();
 
     public static final CommandSet.Entry JOB_OUTPUT =
@@ -268,7 +269,7 @@ public class CommandSet {
     public static final CommandSet.Entry TASK_PREEMPT =
             CommandSetEntryBuilder.newInstance().opt("pt").longOpt("preempttask")
                     .description("Stop the specified task and re-schedules it after the specified delay")
-                    .hasArgs(true).argNames("job-id task-id [delay]")
+                    .hasArgs(true).numOfArgs(2).hasOptionalArg(true).argNames("job-id task-id [delay]")
                     .jsCommand("preempttask(job-id,task-name,delay)")
                     .commandClass(PreemptTaskCommand.class).entry();
 
@@ -300,7 +301,8 @@ public class CommandSet {
 
     public static final CommandSet.Entry EVAL =
             CommandSetEntryBuilder.newInstance().opt("sf").longOpt("script")
-                    .description("Evaluate the specified JavaScript file").hasArgs(true)
+                    .description("Evaluate the specified JavaScript file")
+                    .hasArgs(true).numOfArgs(1).hasOptionalArg(true)
                     .argNames("script-path [param-1=value-1 param-2=value-2 ...]")
                     .jsCommand("script(script-pathname,param1=value1,...)")
                     .commandClass(EvalScriptCommand.class).entry();
@@ -333,13 +335,13 @@ public class CommandSet {
 
     public static final CommandSet.Entry NODE_ADD =
             CommandSetEntryBuilder.newInstance().opt("a").longOpt("addnodes")
-                    .description("Add the specified nodes by their URLs").hasArgs(true)
+                    .description("Add the specified nodes by their URLs").hasArgs(true).numOfArgs(1)
                     .argNames("node-url").jsCommand("addnode(node-url[,node-source])")
                     .commandClass(AddNodeCommand.class).entry();
 
     public static final CommandSet.Entry NS_CREATE =
             CommandSetEntryBuilder.newInstance().opt("cn").longOpt("createns")
-                    .description("Create new node source").hasArgs(true).argNames("node-source")
+                    .description("Create new node source").hasArgs(true).numOfArgs(1).argNames("node-source")
                     .jsCommand("createns(node-source)").commandClass(CreateNodeSourceCommand.class).entry();
 
     public static final CommandSet.Entry NODE_REMOVE =
@@ -356,13 +358,14 @@ public class CommandSet {
     public static final CommandSet.Entry INFRASTRUCTURE =
             CommandSetEntryBuilder.newInstance().opt("in").longOpt("infrastructure")
                     .description("Specify an infrastructure for the node source")
-                    .hasArgs(true).argNames("param1 param2 ...")
+                    .hasArgs(true).numOfArgs(Option.UNLIMITED_VALUES).argNames("param1 param2 ...")
                     .commandClass(SetInfrastructureCommand.class).entry();
 
     public static final CommandSet.Entry POLICY =
             CommandSetEntryBuilder.newInstance().opt("po").longOpt("policy")
-                    .description("Specify a policy for the node source").hasArgs(true)
-                    .argNames("param1 param2 ...").commandClass(SetPolicyCommand.class).entry();
+                    .description("Specify a policy for the node source")
+                    .hasArgs(true).numOfArgs(Option.UNLIMITED_VALUES).argNames("param1 param2 ...")
+                    .commandClass(SetPolicyCommand.class).entry();
 
     public static final CommandSet.Entry NODE_LIST =
             CommandSetEntryBuilder.newInstance().opt("ln").longOpt("listnodes")
@@ -376,8 +379,9 @@ public class CommandSet {
 
     public static final CommandSet.Entry NODE_LOCK =
             CommandSetEntryBuilder.newInstance().opt("lon").longOpt("locknodes")
-                    .description("Lock specified nodes").hasArgs(true)
-                    .argNames("node1-url node2-url ...").jsCommand("locknodes([node1-url,node2-url,...])")
+                    .description("Lock specified nodes")
+                    .hasArgs(true).numOfArgs(Option.UNLIMITED_VALUES).argNames("node1-url node2-url ...")
+                    .jsCommand("locknodes([node1-url,node2-url,...])")
                     .commandClass(LockNodeCommand.class).entry();
 
     public static final CommandSet.Entry NODE_INFO =
@@ -388,12 +392,14 @@ public class CommandSet {
 
     public static final CommandSet.Entry NS =
             CommandSetEntryBuilder.newInstance().opt("ns").longOpt("nodesource")
-                    .description("Specify node source name").hasArgs(true).argNames("node-source")
+                    .description("Specify node source name")
+                    .hasArgs(true).numOfArgs(1).argNames("node-source")
                     .commandClass(SetNodeSourceCommand.class).entry();
 
     public static final CommandSet.Entry NS_REMOVE =
             CommandSetEntryBuilder.newInstance().opt("r").longOpt("removens")
-                    .description("Remove specified node source").hasArgs(true).argNames("node-source")
+                    .description("Remove specified node source")
+                    .hasArgs(true).numOfArgs(1).argNames("node-source")
                     .jsCommand("removens(node-source)").commandClass(RemoveNodeSourceCommand.class).entry();
 
     public static final CommandSet.Entry TOPOLOGY =
@@ -403,8 +409,9 @@ public class CommandSet {
 
     public static final CommandSet.Entry NODE_UNLOCK =
             CommandSetEntryBuilder.newInstance().opt("ulon").longOpt("unlocknodes")
-                    .description("Unlock specified nodes").hasArgs(true)
-                    .argNames("node1-url node2-url ...").jsCommand("unlocknodes([node1-url,node2-url,...])")
+                    .description("Unlock specified nodes")
+                    .hasArgs(true).numOfArgs(Option.UNLIMITED_VALUES).argNames("node1-url node2-url ...")
+                    .jsCommand("unlocknodes([node1-url,node2-url,...])")
                     .commandClass(UnlockNodeCommand.class).entry();
 
     public static final CommandSet.Entry INFRASTRUCTURE_LIST =
@@ -428,12 +435,12 @@ public class CommandSet {
                     .jsCommand("rmstats()").commandClass(RmStatsCommand.class).entry();
 
     public static final CommandSet.Entry SCHED_JS_HELP =
-            CommandSetEntryBuilder.newInstance().opt("")
-                    .longOpt("").description("Help on Scheduler commands")
+            CommandSetEntryBuilder.newInstance()
+                    .description("Help on Scheduler commands")
                     .jsCommand("schedulerhelp()").commandClass(SchedJsHelpCommand.class).entry();
 
     public static final CommandSet.Entry RM_JS_HELP =
-            CommandSetEntryBuilder.newInstance().opt("").longOpt("")
+            CommandSetEntryBuilder.newInstance()
                     .description("Help on RM commands").jsCommand("rmhelp()")
                     .commandClass(RmJsHelpCommand.class).entry();
 
@@ -443,7 +450,7 @@ public class CommandSet {
                     .commandClass(HelpCommand.class).entry();
 
     public static final CommandSet.Entry COMMON_JS_HELP =
-            CommandSetEntryBuilder.newInstance().opt("").longOpt("")
+            CommandSetEntryBuilder.newInstance()
                     .description("Interactive help").jsCommand("help()")
                     .commandClass(JsHelpCommand.class).entry();
 
