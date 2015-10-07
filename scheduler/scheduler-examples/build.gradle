@@ -1,0 +1,9 @@
+dependencies {
+    compile(
+            project(':scheduler:scheduler-node'),
+    )
+}
+
+task stub(type: StubTask) {
+    classes = ['org.ow2.proactive.scheduler.examples.MultiNodeExample']
+}

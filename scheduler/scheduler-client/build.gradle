@@ -1,0 +1,15 @@
+dependencies {
+    compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
+
+    compile project(':scheduler:scheduler-api')
+    compile project(':common-client')
+}
+
+task stub(type: StubTask) {
+    classes = [
+            'org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface',
+            'org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface'
+    ]
+}
+serialver.dependsOn stub
+
