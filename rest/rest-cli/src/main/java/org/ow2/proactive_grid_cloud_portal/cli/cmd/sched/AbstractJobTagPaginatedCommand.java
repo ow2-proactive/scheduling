@@ -14,15 +14,15 @@ public abstract class AbstractJobTagPaginatedCommand extends AbstractJobTagComma
         super(jobId, tag);
     }
 
-    public AbstractJobTagPaginatedCommand(String jobId, String tag, int offset, int limit) {
+    public AbstractJobTagPaginatedCommand(String jobId, String tag, String offset, String limit) {
         super(jobId, tag);
-        this.offset = offset;
-        this.limit = limit;
+        this.offset = Integer.valueOf(offset);
+        this.limit = Integer.valueOf(limit);
     }
 
-    public AbstractJobTagPaginatedCommand(String jobId, int offset, int limit) {
+    public AbstractJobTagPaginatedCommand(String jobId, String offset, String limit) {
         super(jobId);
-        this.offset = offset;
-        this.limit = limit;
+        this.offset = Integer.valueOf(offset);
+        this.limit = Integer.valueOf(limit);
     }
 }

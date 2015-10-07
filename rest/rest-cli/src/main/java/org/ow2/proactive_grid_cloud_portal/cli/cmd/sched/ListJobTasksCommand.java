@@ -61,11 +61,11 @@ public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implemen
         super(jobId, tag);
     }
     
-    public ListJobTasksCommand(String jobId, String tag, int offset, int limit) {
+    public ListJobTasksCommand(String jobId, String tag, String offset, String limit) {
         super(jobId, tag, offset, limit);
     }
     
-    public ListJobTasksCommand(String jobId, int offset, int limit) {
+    public ListJobTasksCommand(String jobId, String offset, String limit) {
         super(jobId, offset, limit);
     }
 
@@ -76,21 +76,17 @@ public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implemen
             List<String> tasks = null;
             if(this.tag != null){
                 if (this.limit == 0) {
-                    System.out.println("tag != null && limit == 0 case : [" + offset + ", " + limit + "[");
                     tasks = scheduler.getJobTasksIdsByTag(currentContext.getSessionId(), jobId, tag);
                 }
                 else {
-                    System.out.println("tag != null && limit != 0 case : [" + offset + ", " + limit + "[");
                     tasks = scheduler.getJobTasksIdsByTagPaginated(currentContext.getSessionId(), jobId, tag, offset, limit);
                 }
             }
             else{
                 if (this.limit == 0) {
-                    System.out.println("tag == null && limit == 0 case : [" + offset + ", " + limit + "[");
                     tasks = scheduler.getJobTasksIds(currentContext.getSessionId(), jobId);
                 }
                 else {
-                    System.out.println("tag == null && limit != 0 case : [" + offset + ", " + limit + "[");
                     tasks = scheduler.getJobTasksIdsPaginated(currentContext.getSessionId(), jobId, offset, limit);
                 }
             }

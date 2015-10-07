@@ -223,8 +223,13 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         // if they're not, translate indexes inside the boundaries
         int _offset = 0;
         int _limit = getTasks().size();
-        if (offset < _limit) _offset = offset;
-        if (limit < _limit) _limit = limit;
+        if (offset > 0 && offset < _limit) _offset = offset;
+        if (limit > 0 && limit < _limit) _limit = limit;
+        if (_offset > _limit) {
+            int tmp = _offset;
+            _offset = _limit;
+            _limit = tmp;
+        }
         return getTasks().subList(_offset, _limit);
     }
 
@@ -242,8 +247,13 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         // if they're not, translate indexes inside the boundaries
         int _offset = 0;
         int _limit = tasks.size();
-        if (offset < _limit) _offset = offset;
-        if (limit < _limit) _limit = limit;      
+        if (offset > 0 && offset < _limit) _offset = offset;
+        if (limit > 0 && limit < _limit) _limit = limit;
+        if (_offset > _limit) {
+            int tmp = _offset;
+            _offset = _limit;
+            _limit = tmp;
+        }
         return tasks.subList(_offset, _limit);
     }
 

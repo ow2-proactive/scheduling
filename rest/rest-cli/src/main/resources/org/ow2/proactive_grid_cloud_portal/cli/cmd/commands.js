@@ -249,13 +249,29 @@ function listjobs(x, y) {
     }
 }
 
-function listtasks(jobId, tag) {
-    if(typeof tag == 'undefined'){
-        execute(new ListJobTasksCommand(jobId));
-    }
-    else{
-        execute(new ListJobTasksCommand(jobId, tag));
-    }
+// expected params: jobId, tag, offset, limit 
+function listtasks(arg1, arg2, arg3, arg4) {
+	// There is only one parameter, the jobId
+	if (arguments.length == 1 && typeof arg1 != 'undefined') {
+		execute(new ListJobTasksCommand(arg1));
+	}
+	// Two arguments: jobId and tag
+	if (arguments.length == 2 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined') {
+		execute(new ListJobTasksCommand(arg1, arg2));
+	}
+	// Three parameters: jobId, offset and limit
+	if (arguments.length == 3 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined' && typeof arg3 != 'undefined') {
+		execute(new ListJobTasksCommand(arg1, arg2, arg3));
+	}
+	// Four parameters: jobId, tag, offset and limit
+	// We don't parse any parameters after the fourth one
+	if (arguments.length >= 4 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined' && typeof arg3 != 'undefined'
+			&& typeof arg4 != 'undefined') {
+		execute(new ListJobTasksCommand(arg1, arg2, arg3, arg4));
+	}
 }
 
 function schedulerstats() {
