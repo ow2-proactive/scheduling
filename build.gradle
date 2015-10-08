@@ -156,8 +156,7 @@ ext.schedulingFunctionalTestConfiguration = {
 
     include 'functionaltests/**'
     
-    boolean isRegression = System.getProperty("regression") != null ? Boolean.valueOf(System.getProperty("regression")) : false;
-    if(!isRegression){
+    if(!project.hasProperty('regression')){
         exclude 'functionaltests/regression/**'
     }
     
