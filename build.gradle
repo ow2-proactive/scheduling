@@ -120,7 +120,7 @@ configure(javaSubprojects) {
         	exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
         }
     }
-
+      
     task serialver(type: serialver.InsertSerialVersionUIDTask) {
         serialver = rootProject.serialver
     }
@@ -139,6 +139,11 @@ configure(javaSubprojects) {
             )
         }
     }
+}
+
+
+task wrapper(type: Wrapper) {
+   gradleVersion = '2.7' //version required
 }
 
 ext.encoding = {
@@ -164,7 +169,7 @@ ext.schedulingFunctionalTestConfiguration = {
     beforeTest { descriptor ->
         logger.lifecycle("Running: " + descriptor)
     }
-
+    
     def clean = {
     	println project.nativeLibsDir
     	   	
@@ -177,6 +182,8 @@ ext.schedulingFunctionalTestConfiguration = {
 
     finalizedBy project.task(project.name + '-clean', { doLast clean })
     doFirst clean
+
+
 }
 
 
