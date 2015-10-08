@@ -2,6 +2,8 @@ package functionaltests.job.taskkill;
 
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+
+import functionaltests.regression.job.taskkill.TestProcessTreeKiller;
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestNode;
 import org.junit.Test;
