@@ -169,6 +169,19 @@ ext.schedulingFunctionalTestConfiguration = {
     beforeTest { descriptor ->
         logger.lifecycle("Running: " + descriptor)
     }
+    
+    def clean = {
+    	println project.nativeLibsDir
+    	   	
+        project.javaexec {
+            main = "org.ow2.tests.ProcessCleaner"
+            classpath = fileTree(project.nativeLibsDir).include("*.jar")
+            systemProperty "java.library.path", project.nativeLibsDir
+        }
+    }
+
+    finalizedBy project.task(project.name + '-clean', { doLast clean })
+    doFirst clean
 
 
 }
