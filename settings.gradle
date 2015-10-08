@@ -1,4 +1,3 @@
-
 include 'common-api'
 include 'common-client'
 
@@ -26,5 +25,3 @@ include 'rest:rest-cli'
 include 'rest:rest-server'
 include 'rest:rest-client'
 include 'rest:rest-smartproxy'
-
-

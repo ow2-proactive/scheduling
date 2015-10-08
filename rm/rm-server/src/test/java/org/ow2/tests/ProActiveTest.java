@@ -34,44 +34,50 @@
  */
 package org.ow2.tests;
 
+import java.io.IOException;
 import java.security.Policy;
 
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
+import org.junit.BeforeClass;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 /**
- * Just to set the security manager without a system property in the command line.
+ * Just to set the security manager without a system property in the command
+ * line.
  */
 public class ProActiveTest {
-    static {
-        configureSecurityManager();
-        configurePAHome();
-        configureLog4j();
-    }
+	static {
+		configureSecurityManager();
+		configurePAHome();
+		configureLog4j();
+	}
 
-    private static void configureLog4j() {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.INFO);
-    }
+	private static void configureLog4j() {
+		BasicConfigurator.configure();
+		Logger.getRootLogger().setLevel(Level.INFO);
+	}
 
-    private static void configureSecurityManager() {
-        if (System.getProperty("java.security.policy") == null) {
-            System.setProperty("java.security.policy",
-                    System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
-                        "/config/security.java.policy-server");
+	private static void configureSecurityManager() {
+		if (System.getProperty("java.security.policy") == null) {
+			System.setProperty("java.security.policy", System.getProperty(PAResourceManagerProperties.RM_HOME.getKey())
+					+ "/config/security.java.policy-server");
 
-            Policy.getPolicy().refresh();
-        }
-    }
+			Policy.getPolicy().refresh();
+		}
+	}
 
-    private static void configurePAHome() {
-        String rmHome = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey());
-        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null && rmHome != null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), rmHome);
-        }
-    }
+	private static void configurePAHome() {
+		String rmHome = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey());
+		if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null && rmHome != null) {
+			System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), rmHome);
+		}
+	}
+
+	@BeforeClass
+	public void killAllProcesses() throws IOException {
+		new ProcessCleaner(".*proactive.test=true.*").killAliveProcesses();
+	}
 }
