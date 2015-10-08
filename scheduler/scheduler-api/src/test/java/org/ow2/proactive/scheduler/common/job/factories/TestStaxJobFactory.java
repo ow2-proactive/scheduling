@@ -140,6 +140,12 @@ public class TestStaxJobFactory {
         assertEquals("system_property_value", testJob.getVariables().get("system_property"));
     }
 
+    /**
+     * The next 3 tests are there to check that parsing a workflow XML description involving XML elements
+     * with more than 1 attribute (defined in any order) returns an object description with expected values
+     * in corresponding data structures.
+     */
+
     @Test
     public void testJobCreationAttributeOrderDefinitionGenericInformationXmlElement() throws URISyntaxException, JobCreationException {
         TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_attr_def_generic_information_xml_element.xml"));
@@ -162,11 +168,17 @@ public class TestStaxJobFactory {
     }
 
     private static <K,V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
+        // map variable is assumed to contain attributes name/value parsed from XML
+
+        // expected attribute names and parsed ones should be the same, so the symmetric
+        // difference between both sets should be empty
         Assert.assertTrue(
                 Sets.symmetricDifference(
                         EXPECTED_KEY_VALUE_ENTRIES.keySet(),
                         map.keySet()).isEmpty());
 
+        // expected attribute values and parsed ones should be the same, so the symmetric
+        // difference between both sets should be empty
         Assert.assertTrue(
                 CollectionUtils.disjunction(
                         EXPECTED_KEY_VALUE_ENTRIES.values(), map.values()).isEmpty());
