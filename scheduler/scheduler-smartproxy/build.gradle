@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':scheduler:smartproxy-common')
+    compile project(':scheduler:scheduler-smartproxy-common')
     compile project(':scheduler:scheduler-server')
 
     testCompile project(':scheduler:scheduler-server').sourceSets.test.output // to get shared test classes

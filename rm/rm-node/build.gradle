@@ -9,7 +9,7 @@ dependencies {
 
     compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
-    compile project(':common-client')
+    compile project(':common:common-client')
     compile project(':rm:rm-client')
 
     runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')

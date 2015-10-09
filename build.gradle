@@ -208,7 +208,7 @@ dependencies {
     restCli project(':rest:rest-cli')
     distLib project(':rest:rest-client')
     distLib project(':rest:rest-smartproxy')
-    distLib project(':scheduler:smartproxy')
+    distLib project(':scheduler:scheduler-smartproxy')
 
     nativeBundle 'org.jvnet.winp:winp:1.23-proactive:native'
     nativeBundle 'sigar:sigar:1.7.0-proactive:native'
@@ -330,7 +330,7 @@ artifacts {
 // credentials are generated during release process
 def createGenerateCredentialTask(String name, List<String> cliArgs) {
     project.tasks.create(name: ('generateCredentials' + name), type: JavaExec) {
-        classpath = project(':common-client').sourceSets.main.runtimeClasspath
+        classpath = project(':common:common-client').sourceSets.main.runtimeClasspath
         main = 'org.ow2.proactive.authentication.crypto.CreateCredentials'
         args = cliArgs
     }
@@ -349,8 +349,8 @@ task generateCredentials
 generateCredentials.dependsOn generateCredentialsAdmin, generateCredentialsScheduler, generateCredentialsRm, generateCredentialsNode
 
 def exportedProjects= [
-        ":common-api",
-        ":common-client",
+        ":common:common-api",
+        ":common:common-client",
         ":scheduler:scheduler-api",
         ":scheduler:scheduler-client",
         ":rm:rm-client",

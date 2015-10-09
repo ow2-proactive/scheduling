@@ -1,12 +1,12 @@
-include 'common-api'
-include 'common-client'
+include 'common:common-api'
+include 'common:common-client'
 
 include 'scheduler:scheduler-api'
 include 'scheduler:scheduler-client'
 include 'scheduler:scheduler-server'
 include 'scheduler:scheduler-node'
-include 'scheduler:smartproxy'
-include 'scheduler:smartproxy-common'
+include 'scheduler:scheduler-smartproxy'
+include 'scheduler:scheduler-smartproxy-common'
 include 'scheduler:scheduler-examples'
 
 include 'rm:rm-client'
@@ -25,3 +25,5 @@ include 'rest:rest-cli'
 include 'rest:rest-server'
 include 'rest:rest-client'
 include 'rest:rest-smartproxy'
+
+
