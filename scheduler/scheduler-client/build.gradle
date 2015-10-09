@@ -2,7 +2,7 @@ dependencies {
     compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
 
     compile project(':scheduler:scheduler-api')
-    compile project(':common:common-client')
+    compile project(':common-client')
 }
 
 task stub(type: StubTask) {

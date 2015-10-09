@@ -2,7 +2,7 @@ apply plugin: 'java-library-distribution'
 
 dependencies {
     compile project(':rest:rest-client')
-    compile project(':scheduler:scheduler-smartproxy-common')
+    compile project(':scheduler:smartproxy-common')
 
     testCompile functionalTestDependencies
     testCompile project(':rest:rest-server').sourceSets.test.output
