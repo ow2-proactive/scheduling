@@ -2147,6 +2147,30 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    @PUT
+    @Path("session")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json")
+    public String loginOrRenewSession(
+            @HeaderParam("sessionid") String sessionId,
+            @FormParam("username") String username,
+            @FormParam("password") String password) throws SchedulerRestException, LoginException, NotConnectedRestException {
+        if (sessionId == null || !sessionStore.exists(sessionId)) {
+            return login(username, password);
+        }
+
+        try {
+            sessionStore.renewSession(sessionId);
+            return sessionId;
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    /**
      * login to the scheduler using a multipart form can be used either by
      * submitting - 2 fields username & password - a credential file with field
      * name 'credential'

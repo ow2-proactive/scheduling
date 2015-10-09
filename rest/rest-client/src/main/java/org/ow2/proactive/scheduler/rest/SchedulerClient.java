@@ -51,6 +51,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.google.common.base.Strings;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
@@ -784,7 +785,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public void renewSession() throws NotConnectedException {
         try {
-            sid = restApi().login(login, password);
+            sid = restApi().loginOrRenewSession(sid, login, password);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
