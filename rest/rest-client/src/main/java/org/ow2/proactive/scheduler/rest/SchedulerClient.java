@@ -121,7 +121,7 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
-    private static final long retry_interval = TimeUnit.SECONDS.toMillis(1);
+    private static final long RETRY_INTERVAL = TimeUnit.SECONDS.toMillis(1);
 
     private SchedulerRestClient schedulerRestClient;
 
@@ -624,8 +624,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             if (isJobFinished(jobId)) {
                 return getJobResult(jobId);
             }
-            if (currentTimeMillis() + retry_interval < timeout) {
-                sleep(retry_interval);
+            if (currentTimeMillis() + RETRY_INTERVAL < timeout) {
+                sleep(RETRY_INTERVAL);
             } else {
                 break;
             }
@@ -655,8 +655,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             if (isTaskFinished(jobId, taskName)) {
                 return getTaskResult(jobId, taskName);
             }
-            if (currentTimeMillis() + retry_interval < timeout) {
-                sleep(retry_interval);
+            if (currentTimeMillis() + RETRY_INTERVAL < timeout) {
+                sleep(RETRY_INTERVAL);
             } else {
                 break;
             }
@@ -688,8 +688,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                     return toEntry(jobId, getJobResult(jobId));
                 }
             }
-            if (currentTimeMillis() + retry_interval < timeout) {
-                sleep(retry_interval);
+            if (currentTimeMillis() + RETRY_INTERVAL < timeout) {
+                sleep(RETRY_INTERVAL);
             } else {
                 break;
             }
@@ -708,8 +708,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                     return toEntry(taskName, getTaskResult(jobId, taskName));
                 }
             }
-            if (currentTimeMillis() + retry_interval < timeout) {
-                sleep(retry_interval);
+            if (currentTimeMillis() + RETRY_INTERVAL < timeout) {
+                sleep(RETRY_INTERVAL);
             } else {
                 break;
             }
