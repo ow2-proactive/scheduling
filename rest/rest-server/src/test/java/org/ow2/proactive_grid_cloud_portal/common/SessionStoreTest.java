@@ -65,23 +65,21 @@ public class SessionStoreTest {
     }
 
     @Test
-    public void no_sessions_when_not_logged_in() throws Exception {
+    public void testNoSessionWhenNotLoggedIn() throws Exception {
         assertNull(sessionStore.get("unknownSession"));
     }
 
     @Test
-    public void session_created_when_logged_in() throws Exception {
+    public void testSessionCreatedWhenLoggedIn() throws Exception {
         String sessionId = sessionStore.createUnnamedSession().getSessionId();
-
         Session session = sessionStore.get(sessionId);
 
         assertNotNull(session);
     }
 
     @Test
-    public void scheduler_created_on_login_and_RM_lazy_creation() throws Exception {
+    public void testSchedulerCreatedOnLoginAndRmLazyCreation() throws Exception {
         String sessionId = sessionStore.createUnnamedSession().getSessionId();
-
         Session session = sessionStore.get(sessionId);
 
         verifyZeroInteractions(schedulerProxyFactory);
@@ -98,9 +96,8 @@ public class SessionStoreTest {
     }
 
     @Test
-    public void rm_created_on_login_and_scheduler_lazy_creation() throws Exception {
+    public void testRmCreatedOnLoginAndSchedulerLazyCreation() throws Exception {
         String sessionId = sessionStore.createUnnamedSession().getSessionId();
-
         Session session = sessionStore.get(sessionId);
 
         verifyZeroInteractions(schedulerProxyFactory);
@@ -117,7 +114,7 @@ public class SessionStoreTest {
     }
 
     @Test
-    public void session_all_expired() throws Exception {
+    public void testSessionAllExpired() throws Exception {
         when(clock.now()).thenReturn(0L);
 
         sessionStore.createUnnamedSession();
@@ -130,7 +127,7 @@ public class SessionStoreTest {
     }
 
     @Test
-    public void session_one_is_expired() throws Exception {
+    public void testSessionOneIsExpired() throws Exception {
         when(clock.now()).thenReturn(0L);
         sessionStore.createUnnamedSession();
 
@@ -147,7 +144,7 @@ public class SessionStoreTest {
     }
 
     @Test
-    public void session_is_renewed() throws Exception {
+    public void testSessionIsRenewed() throws Exception {
         when(clock.now()).thenReturn(0L);
         Session session = sessionStore.createUnnamedSession();
 
@@ -173,9 +170,8 @@ public class SessionStoreTest {
     }
 
     @Test
-    public void session_logout() throws Exception {
+    public void testSessionLogout() throws Exception {
         Session session = sessionStore.createUnnamedSession();
-
         sessionStore.terminate(session.getSessionId());
 
         assertEquals(0, sessionStore.size());
@@ -184,9 +180,8 @@ public class SessionStoreTest {
     }
 
     @Test
-    public void shutdown_terminate_all() throws Exception {
-        Session session = sessionStore.createUnnamedSession();
-
+    public void testShutdownTerminateAll() throws Exception {
+        sessionStore.createUnnamedSession();
         sessionStore.terminateAll();
 
         assertEquals(0, sessionStore.size());
