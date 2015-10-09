@@ -80,10 +80,10 @@ public class Session {
         this.sessionId = sessionId;
         this.schedulerRMProxyFactory = schedulerRMProxyFactory;
         this.clock = clock;
-        updateLasAccessedTime();
+        updateLastAccessedTime();
     }
 
-    private void updateLasAccessedTime() {
+    private void updateLastAccessedTime() {
         this.lastAccessTimestamp = clock.now();
     }
 
@@ -100,7 +100,7 @@ public class Session {
     }
 
     public SchedulerProxyUserInterface getScheduler() {
-        updateLasAccessedTime();
+        updateLastAccessedTime();
         if (scheduler == null) {
             try {
                 if (credData != null) {
@@ -129,7 +129,7 @@ public class Session {
     }
 
     public RMProxyUserInterface getRM() {
-        updateLasAccessedTime();
+        updateLastAccessedTime();
         if (rm == null) {
             try {
                 if (credData != null) {
