@@ -155,6 +155,11 @@ ext.encoding = {
 ext.schedulingFunctionalTestConfiguration = {
 
     include 'functionaltests/**'
+    
+    if(!project.hasProperty('regression')){
+        exclude 'functionaltests/regression/**'
+    }
+    
    
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]

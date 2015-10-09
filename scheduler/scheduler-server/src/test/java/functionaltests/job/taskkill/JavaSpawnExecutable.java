@@ -41,14 +41,13 @@ import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+import org.apache.log4j.Level;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
-import org.ow2.proactive.utils.OperatingSystem;
-import org.ow2.proactive.utils.OperatingSystemFamily;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.task.utils.ThreadReader;
-import org.apache.log4j.Level;
-
+import org.ow2.proactive.utils.OperatingSystem;
+import org.ow2.proactive.utils.OperatingSystemFamily;
 
 /**
  * JavaSpawnExecutable
@@ -57,112 +56,113 @@ import org.apache.log4j.Level;
  */
 public class JavaSpawnExecutable extends JavaExecutable {
 
-    public static String launchersDir = "/functionaltests/executables/TestSleep.exe";
+	public static String launchersDir = "/functionaltests/executables/TestSleep.exe";
 
-    public static String nativeLinuxExecLauncher = "/functionaltests/executables/PTK_launcher.sh";
-    public static String nativeWindowsExecLauncher = "/functionaltests/executables/PTK_launcher.bat";
-    public static String nativeLinuxExecLauncher2 = "/functionaltests/executables/PTK_launcher2.sh";
-    public static String nativeWindowsExecLauncher2 = "/functionaltests/executables/PTK_launcher2.bat";
+	public static String nativeLinuxExecLauncher = "/functionaltests/executables/PTK_launcher.sh";
+	public static String nativeWindowsExecLauncher = "/functionaltests/executables/PTK_launcher.bat";
+	public static String nativeLinuxExecLauncher2 = "/functionaltests/executables/PTK_launcher2.sh";
+	public static String nativeWindowsExecLauncher2 = "/functionaltests/executables/PTK_launcher2.bat";
 
-    Integer sleep;
+	Integer sleep;
 
-    String tname;
+	String tname;
 
-    String tmpdir = System.getProperty("java.io.tmpdir");
+	String tmpdir = System.getProperty("java.io.tmpdir");
 
-    File killFile;
+	File killFile;
 
-    String home;
+	public String home;
 
-    @Override
-    public void init(Map<String, Serializable> args) throws Exception {
-        super.init(args);
-        tname = (String) args.get("tname");
-        killFile = new File(tmpdir, tname + ".tmp");
-        if (killFile.exists()) {
-            killFile.delete();
-        }
-    }
+	@Override
+	public void init(Map<String, Serializable> args) throws Exception {
+		super.init(args);
+		tname = (String) args.get("tname");
+		killFile = new File(tmpdir, tname + ".tmp");
+		if (killFile.exists()) {
+			killFile.delete();
+		}
+	}
 
-    @Override
-    public Serializable execute(TaskResult... results) throws Throwable {
+	@Override
+	public Serializable execute(TaskResult... results) throws Throwable {
 
-        org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
-        Process process = null;
+		org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
+		Process process = null;
 
-        process = Runtime.getRuntime().exec(getNativeExecLauncher(false), null,
-                getExecutablePath(launchersDir).getParentFile().getCanonicalFile());
+		process = Runtime.getRuntime().exec(getNativeExecLauncher(false), null,
+				getExecutablePath(launchersDir).getParentFile().getCanonicalFile());
 
-        // redirect streams
-        BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+		// redirect streams
+		BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-        Thread tsout = new Thread(new ThreadReader(sout, System.out));
-        Thread tserr = new Thread(new ThreadReader(serr, System.err));
-        tsout.setDaemon(true);
-        tserr.setDaemon(true);
-        tsout.start();
-        tserr.start();
+		Thread tsout = new Thread(new ThreadReader(sout, System.out));
+		Thread tserr = new Thread(new ThreadReader(serr, System.err));
+		tsout.setDaemon(true);
+		tserr.setDaemon(true);
+		tsout.start();
+		tserr.start();
 
-        process.waitFor();
+		process.waitFor();
 
-        Thread.sleep(sleep * 1000); // we sleep 2 sec
+		Thread.sleep(sleep * 1000); // we sleep 2 sec
 
-        return true;
-    }
+		return true;
+	}
 
-    /**
-     * Returns the path to the native launcher script
-     * In case of Native Executable normal termination test, we use a set of alternate scripts which will not run a
-     * detached executable
-     *
-     * @param alternate to use alternate scripts
-     */
-    public String[] getNativeExecLauncher(boolean alternate) throws Exception {
-        String osName = System.getProperty("os.name");
-        OperatingSystem operatingSystem = OperatingSystem.resolveOrError(osName);
-        OperatingSystemFamily family = operatingSystem.getFamily();
-        String[] nativeExecLauncher = null;
-        switch (family) {
-            case LINUX:
-            case UNIX:
-            case MAC:
-                String executable = null;
-                if (alternate) {
-                    executable = getExecutablePath(nativeLinuxExecLauncher2).getName();
-                } else {
-                    executable = getExecutablePath(nativeLinuxExecLauncher).getName();
-                }
-                // TODO runAsMe mode for this Test
-                nativeExecLauncher = new String[] { "/bin/sh", executable };
+	/**
+	 * Returns the path to the native launcher script In case of Native
+	 * Executable normal termination test, we use a set of alternate scripts
+	 * which will not run a detached executable
+	 *
+	 * @param alternate
+	 *            to use alternate scripts
+	 */
+	public String[] getNativeExecLauncher(boolean alternate) throws Exception {
+		String osName = System.getProperty("os.name");
+		OperatingSystem operatingSystem = OperatingSystem.resolveOrError(osName);
+		OperatingSystemFamily family = operatingSystem.getFamily();
+		String[] nativeExecLauncher = null;
+		switch (family) {
+		case LINUX:
+		case UNIX:
+		case MAC:
+			String executable = null;
+			if (alternate) {
+				executable = getExecutablePath(nativeLinuxExecLauncher2).getName();
+			} else {
+				executable = getExecutablePath(nativeLinuxExecLauncher).getName();
+			}
+			// TODO runAsMe mode for this Test
+			nativeExecLauncher = new String[] { "/bin/sh", executable };
 
-                break;
-            case WINDOWS:
-                if (alternate) {
-                    nativeExecLauncher = new String[] { "cmd.exe", "/C",
-                            getExecutablePath(nativeWindowsExecLauncher2).getName() };
-                } else {
-                    nativeExecLauncher = new String[] { "cmd.exe", "/C",
-                            getExecutablePath(nativeWindowsExecLauncher).getName() };
+			break;
+		case WINDOWS:
+			if (alternate) {
+				nativeExecLauncher = new String[] { "cmd.exe", "/C",
+						getExecutablePath(nativeWindowsExecLauncher2).getName() };
+			} else {
+				nativeExecLauncher = new String[] { "cmd.exe", "/C",
+						getExecutablePath(nativeWindowsExecLauncher).getName() };
 
-                }
+			}
 
-        }
-        return nativeExecLauncher;
-    }
+		}
+		return nativeExecLauncher;
+	}
 
-    private File getExecutablePath(String launcherPath) throws URISyntaxException {
-        try {
-            return new File(new File(home, "scheduler/scheduler-server/src/test/resources"), launcherPath);
-        } catch (Exception e) {
-            File addonsFolder = new File(home, "addons");
-            return new File(addonsFolder, launcherPath);
-        }
-    }
+	private File getExecutablePath(String launcherPath) throws URISyntaxException {
+		try {
+			return new File(new File(home, "scheduler/scheduler-server/src/test/resources"), launcherPath);
+		} catch (Exception e) {
+			File addonsFolder = new File(home, "addons");
+			return new File(addonsFolder, launcherPath);
+		}
+	}
 
-    public static void main(String[] args) throws Throwable {
-        JavaSpawnExecutable jse = new JavaSpawnExecutable();
-        jse.sleep = 1;
-        jse.execute(new TaskResult[0]);
-    }
+	public static void main(String[] args) throws Throwable {
+		JavaSpawnExecutable jse = new JavaSpawnExecutable();
+		jse.sleep = 1;
+		jse.execute(new TaskResult[0]);
+	}
 }
