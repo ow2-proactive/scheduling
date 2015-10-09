@@ -1,21 +1,19 @@
 package org.ow2.proactive.scheduler.job;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.task.RestartMode;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -31,14 +29,13 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
  */
 public final class ClientJobState extends JobState {
 
+    private final ClientJobSerializationHelper clientJobSerializationHelper;
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;
     private Map<TaskId, TaskState> tasks = new HashMap<>();
-
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
-
     private HashMap<String, String> genericInformations;
 
     public ClientJobState(JobState jobState) {
@@ -58,6 +55,8 @@ public final class ClientJobState extends JobState {
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
         this.genericInformations = new HashMap<>(jobState.getGenericInformations());
+
+        this.clientJobSerializationHelper = new ClientJobSerializationHelper();
 
         List<ClientTaskState> taskStates = new ArrayList<>();
         for (TaskState ts : jobState.getTasks()) {
@@ -169,6 +168,12 @@ public final class ClientJobState extends JobState {
     public RestartMode getRestartTaskOnError() {
         throw new RuntimeException(
             "Not implemented: the restart task on error property is not available on client side.");
+    }
+
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        this.clientJobSerializationHelper.serializeTasks(this.tasks);
     }
 
 }
