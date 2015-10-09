@@ -56,7 +56,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
-import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsage;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsageWithBreakEndLine;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
@@ -81,20 +80,14 @@ public abstract class EntryPoint {
         boolean isDebugModeEnabled = isDebugModeEnabled(args);
 
         try {
-            commandFactory = getCommandFactory();
-            console = AbstractDevice.getConsole(AbstractDevice.JLINE);
-            ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(),
-                    CommandSet.INTERACTIVE_COMMANDS, CommandSet.Entry.class));
-            currentContext.setDevice(console);
-
+            commandFactory = getCommandFactory(currentContext);
             Options options = commandFactory.supportedOptions();
-            cli = new DefaultParser().parse(options, args);
 
+            cli = parseArgs(options, args);
         } catch (IOException ioe) {
             System.err.println("An error occurred.");
             ioe.printStackTrace(System.err);
             return 1;
-
         } catch (ParseException pe) {
             writeError(currentContext, pe.getMessage(), pe, isDebugModeEnabled);
             // print usage
@@ -156,6 +149,25 @@ public abstract class EntryPoint {
         return 0;
     }
 
+    protected static CommandFactory getCommandFactory(ApplicationContext currentContext) throws IOException {
+        CommandFactory commandFactory;
+        AbstractDevice console;
+        commandFactory = getCommandFactory();
+        console = AbstractDevice.getConsole(AbstractDevice.JLINE);
+        ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(),
+                CommandSet.INTERACTIVE_COMMANDS, CommandSet.Entry.class));
+        currentContext.setDevice(console);
+        return commandFactory;
+    }
+
+    private static CommandFactory getCommandFactory() {
+        return CommandFactory.getCommandFactory(CommandFactory.Type.ALL);
+    }
+
+    protected static CommandLine parseArgs(Options options, String[] args) throws ParseException {
+        return new DefaultParser().parse(options, args);
+    }
+
     /*
      * The arguments are parsed manually because in case of
      * parsing error (i.e. ParseException is raised), CommandLine object will be null.
@@ -185,7 +197,7 @@ public abstract class EntryPoint {
     private void writeError(ApplicationContext currentContext, String errorMsg, Throwable cause,
             boolean isDebugModeEnabled) {
         PrintWriter writer = new PrintWriter(currentContext.getDevice().getWriter(), true);
-        writer.printf("%n%s", errorMsg);
+        writer.printf("%s", errorMsg);
 
         if (cause != null) {
             if (cause.getMessage() != null) {
@@ -202,10 +214,6 @@ public abstract class EntryPoint {
                 writeDebugModeUsageWithBreakEndLine(currentContext);
             }
         }
-    }
-
-    private CommandFactory getCommandFactory() {
-        return CommandFactory.getCommandFactory(CommandFactory.Type.ALL);
     }
 
     private boolean hasLoginCommand(List<Command> commandList) {

@@ -4,7 +4,7 @@ dependencies {
     compile 'net.java.dev.jna:jna:4.1.0'
     compile 'commons-io:commons-io:2.4'
 
-    compile 'commons-cli:commons-cli:1.3'
+    compile 'commons-cli:commons-cli:1.3.1'
     compile 'sigar:sigar:1.7.0-proactive'
 
     compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"

@@ -43,22 +43,14 @@ import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet.Entry;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.ImodeCommand;
 
 import com.google.common.collect.ObjectArrays;
-
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INFRASTRUCTURE;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.OUTPUT;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.POLICY;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_HELP;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_HELP;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_HELP;
 
 
 class CommonCommandFactory extends CommandFactory {
 
     {
-        for (Entry entry : ObjectArrays.concat(CommandSet.SCHED_ONLY, CommandSet.RM_ONLY, Entry.class)) {
+        for (Entry entry : ObjectArrays.concat(CommandSet.SCHEDULER_ONLY, CommandSet.RM_ONLY, Entry.class)) {
             cmdMap.put(opt(entry), entry);
         }
     }
