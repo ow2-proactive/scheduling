@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import com.google.common.collect.ImmutableSet;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
@@ -44,6 +45,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.HeaderParam;
 
@@ -55,6 +57,8 @@ import static org.junit.Assert.fail;
 public class SchedulerStateRestSecurityTest {
 
     private final SchedulerRestInterface restInterface = new SchedulerStateRest();
+
+    private final Set<String> EXCLUDED_METHODS = ImmutableSet.of("loginOrRenewSession");
 
     // call all interface's methods using reflection
     @Test
@@ -76,6 +80,10 @@ public class SchedulerStateRestSecurityTest {
     }
 
     private boolean methodShouldBeSecured(Method method) {
+        if (EXCLUDED_METHODS.contains(method.getName())) {
+            return false;
+        }
+
         if (method.getParameterTypes().length > 0) {
             Class<?> sessionIdParameterType = method.getParameterTypes()[0];
             if (method.getParameterAnnotations()[0].length > 0) {

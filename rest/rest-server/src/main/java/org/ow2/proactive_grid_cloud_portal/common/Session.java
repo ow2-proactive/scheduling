@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
-import java.security.KeyException;
-
-import javax.security.auth.login.LoginException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -49,10 +45,14 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.dataspace.FileSystem;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
+
+import javax.security.auth.login.LoginException;
+import java.security.KeyException;
 
 
 public class Session {
@@ -149,7 +149,7 @@ public class Session {
         return userName;
     }
 
-    void setUserName(String userName) {
+    protected void setUserName(String userName) {
         this.userName = userName;
     }
 
@@ -190,4 +190,11 @@ public class Session {
     public FileSystem fileSystem() {
         return fs;
     }
+
+    public void renewSession() throws NotConnectedException {
+        if (scheduler != null) {
+            scheduler.renewSession();
+        }
+    }
+
 }
