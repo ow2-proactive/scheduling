@@ -197,4 +197,11 @@ public class Session {
         }
     }
 
+    /*
+     * For testing purposes only.
+     */
+    protected void setScheduler(SchedulerProxyUserInterface scheduler) {
+        this.scheduler = scheduler;
+    }
+
 }

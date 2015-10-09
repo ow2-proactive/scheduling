@@ -36,14 +36,13 @@ package org.ow2.proactive_grid_cloud_portal.common;
 
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
