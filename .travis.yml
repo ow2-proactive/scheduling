@@ -1,2 +1,2 @@
 language : JAVA
-script: ./gradlew functionalTest --debug
+script: ./gradlew functionalTest --info
