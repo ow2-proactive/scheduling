@@ -57,7 +57,7 @@ import java.security.KeyException;
 
 public class Session {
 
-    private static final Logger LOGGER = ProActiveLogger.getLogger(Session.class);
+    private static final Logger logger = ProActiveLogger.getLogger(Session.class);
 
     private long lastAccessTimestamp;
 
@@ -109,7 +109,7 @@ public class Session {
                     connectToScheduler(credentials);
                 }
             } catch (Exception e) {
-                LOGGER.warn("Failed to connect to the Scheduler", e);
+                logger.warn("Failed to connect to the Scheduler", e);
                 throw new RuntimeException(e);
             }
         }
@@ -138,7 +138,7 @@ public class Session {
                     connectToRM(credentials);
                 }
             } catch (Exception e) {
-                LOGGER.warn("Failed to connect to the RM", e);
+                logger.warn("Failed to connect to the RM", e);
                 throw new RuntimeException(e);
             }
         }
@@ -174,7 +174,7 @@ public class Session {
             try {
                 PAActiveObject.terminateActiveObject(activeObject, true);
             } catch (Throwable e) {
-                LOGGER.warn("Error occurred while terminating active object tied to session " + sessionId, e);
+                logger.warn("Error occurred while terminating active object tied to session " + sessionId, e);
             }
         }
     }
