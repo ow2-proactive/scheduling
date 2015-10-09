@@ -6,7 +6,7 @@ dependencies {
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
 
-    compile project(':common:common-api')
+    compile project(':common-api')
 }
 
 task stub(type: StubTask) {

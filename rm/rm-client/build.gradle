@@ -3,7 +3,7 @@
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
 
-    compile project(':common:common-client')
+    compile project(':common-client')
 }
 task stub(type: StubTask) {
     classes = ['org.ow2.proactive.utils.NodeSet',

@@ -7,7 +7,7 @@ dependencies {
         compile 'org.apache.httpcomponents:httpclient:4.2.6'
         compile 'org.apache.httpcomponents:httpmime:4.2.6'
 
-        compile project(":common:common-api")
+        compile project(":common-api")
         compile project(':rest:rest-api')
 
         testCompile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'

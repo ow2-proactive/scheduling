@@ -9,8 +9,8 @@ dependencies {
             "org.objectweb.proactive:programming-core:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
 
-            project(':common:common-api'),
-            project(':common:common-client'),
+            project(':common-api'),
+            project(':common-client'),
             project(':rm:rm-client'),
             project(':rm:rm-node'),
     )

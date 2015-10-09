@@ -9,7 +9,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpmime:4.2.6'
     compile 'org.atmosphere:wasync:2.1.2'
 
-    compile project(":common:common-api")
+    compile project(":common-api")
     compile project(":scheduler:scheduler-api")
     compile project(':rest:rest-api')
 
