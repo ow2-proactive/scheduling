@@ -233,7 +233,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
                 Assert.assertEquals(job.getName(), state.getId().getReadableName());
                 Assert.assertEquals(job.getName(), state.getName());
                 Assert.assertEquals(job.getPriority(), state.getPriority());
-                Assert.assertEquals(job.getGenericInformations(), state.getGenericInformations());
+                Assert.assertEquals(job.getGenericInformation(), state.getGenericInformation());
                 Assert.assertEquals("Unexpected tasks number", tasksNumber, state.getTasks().size());
                 Assert.assertEquals(JobType.TASKSFLOW, state.getType());
                 Assert.assertEquals(DEFAULT_USER_NAME, state.getOwner());

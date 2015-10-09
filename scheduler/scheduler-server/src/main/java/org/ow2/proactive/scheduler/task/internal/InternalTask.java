@@ -1059,7 +1059,7 @@ public abstract class InternalTask extends TaskState {
      * $PA_TASK_REPLICATION by it's actual value
      *
      */
-    public Map<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformation() {
 
         if (taskInfo == null || genericInformations == null) {
             // task is not yet properly initialized
@@ -1091,9 +1091,9 @@ public abstract class InternalTask extends TaskState {
      */
     public Map<String, String> getGenericInformations(boolean replaceVariables) {
         if (replaceVariables) {
-            return this.getGenericInformations();
+            return this.getGenericInformation();
         } else {
-            return super.getGenericInformations();
+            return super.getGenericInformation();
         }
     }
 }

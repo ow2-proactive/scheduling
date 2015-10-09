@@ -1300,7 +1300,7 @@ public abstract class InternalJob extends JobState {
      * $PA_TASK_REPLICATION by it's actual value
      *
      */
-    public Map<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformation() {
         if (genericInformations == null) {
             // task is not yet properly initialized
             return new HashMap<>();
@@ -1323,9 +1323,9 @@ public abstract class InternalJob extends JobState {
      */
     public Map<String, String> getGenericInformations(boolean replaceVariables) {
         if (replaceVariables) {
-            return this.getGenericInformations();
+            return this.getGenericInformation();
         } else {
-            return super.getGenericInformations();
+            return super.getGenericInformation();
         }
     }
 

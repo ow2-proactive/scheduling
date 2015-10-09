@@ -84,7 +84,7 @@ public class TestJobFactory {
     private void run_(String impl) throws Throwable {
         String scriptFolder = new File(getClass().getResource("scripts/").toURI()).getAbsolutePath();
         System.setProperty("jobName", "Job_TaskFlow");
-        log("Test Job TASKFLOW");
+        log("Test Job TASK_FLOW");
         TaskFlowJob tfJob = getJob(jobTaskFlowDescriptor, impl, scriptFolder);
         //Check job properties
         assertEquals(tfJob.getDescription(), "No paquit in its HostName.");
@@ -127,7 +127,7 @@ public class TestJobFactory {
         assertEquals(tfJob.getTask("task1").getNumberOfNodesNeeded(), 1);
         assertEquals(tfJob.getTask("task1").getWallTime(), 12 * 1000);
         assertEquals(tfJob.getTask("task1").isWallTimeSet(), true);
-        assertEquals(tfJob.getTask("task1").getGenericInformations().size(), 0);
+        assertEquals(tfJob.getTask("task1").getGenericInformation().size(), 0);
         assertNull(tfJob.getTask("task1").getInputFilesList());
         assertNull(tfJob.getTask("task1").getOutputFilesList());
         assertEquals(((JavaTask) tfJob.getTask("task1")).getArgument("sleepTime"), "1");
@@ -155,7 +155,7 @@ public class TestJobFactory {
         assertEquals(tfJob.getTask("task2").getNumberOfNodesNeeded(), 1);
         assertEquals(tfJob.getTask("task2").getWallTime(), 0);
         assertEquals(tfJob.getTask("task2").isWallTimeSet(), false);
-        assertEquals(tfJob.getTask("task2").getGenericInformations().size(), 0);
+        assertEquals(tfJob.getTask("task2").getGenericInformation().size(), 0);
         Assert.assertTrue(tfJob.getTask("task2").getInputFilesList().get(0).getInputFiles()
                 .getIncludes().contains("tata*"));
         Assert.assertTrue(tfJob.getTask("task2").getInputFilesList().get(0).getInputFiles()
@@ -237,7 +237,7 @@ public class TestJobFactory {
         assertEquals(tfJob.getTask("task3").getDependencesList().get(1).getName(), "task2");
         assertEquals(tfJob.getTask("task3").getWallTime(), 10 * 60 * 1000 + 53 * 1000);
         assertEquals(tfJob.getTask("task3").isWallTimeSet(), true);
-        assertEquals(tfJob.getTask("task3").getGenericInformations().size(), 0);
+        assertEquals(tfJob.getTask("task3").getGenericInformation().size(), 0);
         assertEquals(1, tfJob.getTask("task3").getInputFilesList().size());
         Assert.assertTrue(tfJob.getTask("task3").getInputFilesList().get(0).getInputFiles()
                 .getIncludes().contains("tata*"));
@@ -267,8 +267,8 @@ public class TestJobFactory {
         assertEquals(tfJob.getTask("task4").getDependencesList().get(0).getName(), "task3");
         assertEquals(tfJob.getTask("task4").getWallTime(), 0);
         assertEquals(tfJob.getTask("task4").isWallTimeSet(), false);
-        assertEquals(tfJob.getTask("task4").getGenericInformations().get("n11"), "v11");
-        assertEquals(tfJob.getTask("task4").getGenericInformations().get("n22"), "v22");
+        assertEquals(tfJob.getTask("task4").getGenericInformation().get("n11"), "v11");
+        assertEquals(tfJob.getTask("task4").getGenericInformation().get("n22"), "v22");
         assertNull(tfJob.getTask("task4").getInputFilesList());
         assertEquals(5, tfJob.getTask("task4").getOutputFilesList().size());
         Assert.assertTrue(tfJob.getTask("task4").getOutputFilesList().get(0).getOutputFiles()
@@ -310,8 +310,8 @@ public class TestJobFactory {
         assertEquals(mnJob.getMaxNumberOfExecution(), 1);
         assertEquals(mnJob.getRestartTaskOnError(), RestartMode.ANYWHERE);
         assertEquals(mnJob.getType(), JobType.TASKSFLOW);
-        assertEquals(mnJob.getGenericInformations().get("n1"), "v1");
-        assertEquals(mnJob.getGenericInformations().get("n2"), "v2");
+        assertEquals(mnJob.getGenericInformation().get("n1"), "v1");
+        assertEquals(mnJob.getGenericInformation().get("n2"), "v2");
         //Check task properties
         JavaTask jt = (JavaTask) mnJob.getTask("Controller");
         assertEquals(jt.getArgument("numberToFind"), "100");
@@ -320,8 +320,8 @@ public class TestJobFactory {
         assertEquals(jt.getDependencesList(), null);
         assertEquals(jt.getDescription(), "Will control the workers in order to find the prime number");
         assertEquals(jt.getExecutableClassName(), "org.ow2.proactive.scheduler.examples.MultiNodeExample");
-        assertEquals(jt.getGenericInformations().get("n11"), "v11");
-        assertEquals(jt.getGenericInformations().get("n22"), "v22");
+        assertEquals(jt.getGenericInformation().get("n11"), "v11");
+        assertEquals(jt.getGenericInformation().get("n22"), "v22");
         assertEquals(jt.getMaxNumberOfExecution(), 1);
         assertEquals(jt.getName(), "Controller");
         assertEquals(jt.getNumberOfNodesNeeded(), 3);

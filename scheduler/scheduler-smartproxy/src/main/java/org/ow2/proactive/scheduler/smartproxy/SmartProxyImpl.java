@@ -293,7 +293,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
     @Override
     public boolean uploadInputfiles(TaskFlowJob job, String localInputFolderPath) throws Exception {
-        String push_URL = job.getGenericInformations().get(GENERIC_INFO_PUSH_URL_PROPERTY_NAME);
+        String push_URL = job.getGenericInformation().get(GENERIC_INFO_PUSH_URL_PROPERTY_NAME);
 
         if ((push_URL == null) || (push_URL.trim().equals(""))) {
             return false;
