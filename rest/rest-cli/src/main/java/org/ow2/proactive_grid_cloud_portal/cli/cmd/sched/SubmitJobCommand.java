@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -56,14 +56,16 @@ import com.google.common.collect.Maps;
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
     private final String pathname;
-    private String[] variables;
+    private String variables;
+    private final JobKeyValueTransformer jobKeyValueTransformer;
 
     public SubmitJobCommand(String... params) {
+
         this.pathname = params[0];
         if (params.length > 1) {
-            this.variables = new String[params.length - 1];
-            System.arraycopy(params, 1, this.variables, 0, params.length - 1);
+            this.variables = params[1];
         }
+        this.jobKeyValueTransformer=new JobKeyValueTransformer();
     }
 
     @Override
@@ -90,18 +92,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         }
     }
 
-    private Map<String, String> map(String[] variables) {
-        Map<String, String> map = Maps.newHashMap();
-        if (variables != null) {
-            for (String entry : variables) {
-                if (entry.contains("=")) {
-                    String[] keyValue = entry.split("=");
-                    map.put(keyValue[0], keyValue[1]);
-                } else {
-                    map.put(entry, String.valueOf(true));
-                }
-            }
-        }
-        return map;
+    private Map<String, String> map(String variables) {
+        return jobKeyValueTransformer.transformVariablesToMap(variables);
     }
 }

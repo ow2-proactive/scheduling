@@ -192,17 +192,17 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         task.setGenericInformations(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());
 
-        Assert.assertNotNull(taskData.getGenericInformations());
-        Assert.assertTrue(taskData.getGenericInformations().isEmpty());
+        Assert.assertNotNull(taskData.getGenericInformation());
+        Assert.assertTrue(taskData.getGenericInformation().isEmpty());
 
         genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
         task.setGenericInformations(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());
-        Assert.assertEquals(2, taskData.getGenericInformations().size());
-        Assert.assertEquals("v1", taskData.getGenericInformations().get("p1"));
-        Assert.assertEquals("v2", taskData.getGenericInformations().get("p2"));
+        Assert.assertEquals(2, taskData.getGenericInformation().size());
+        Assert.assertEquals("v1", taskData.getGenericInformation().get("p1"));
+        Assert.assertEquals("v2", taskData.getGenericInformation().get("p2"));
 
         StringBuilder longString = new StringBuilder();
         for (int i = 0; i < 100; i++) {
@@ -212,8 +212,8 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         genericInfo.put("longProperty", longString.toString());
         task.setGenericInformations(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());
-        Assert.assertEquals(1, taskData.getGenericInformations().size());
-        Assert.assertEquals(longString.toString(), taskData.getGenericInformations().get("longProperty"));
+        Assert.assertEquals(1, taskData.getGenericInformation().size());
+        Assert.assertEquals(longString.toString(), taskData.getGenericInformation().get("longProperty"));
     }
 
 }

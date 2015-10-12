@@ -1,0 +1,14 @@
+dependencies {
+    compile project(':scheduler:scheduler-smartproxy-common')
+    compile project(':scheduler:scheduler-server')
+
+    testCompile project(':scheduler:scheduler-server').sourceSets.test.output // to get shared test classes
+    testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
+}
+
+task stub(type: StubTask) {
+    classes = ['org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl']
+}
+serialver.dependsOn stub
+
+task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration

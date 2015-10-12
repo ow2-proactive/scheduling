@@ -203,7 +203,7 @@ function submit(pathname, variables) {
     if (typeof variables == 'undefined') {
         execute(new SubmitJobCommand([string(pathname)]));
     } else {
-        execute(new SubmitJobCommand(ObjectArrays.concat([string(pathname)], variables, java.lang.String)));
+        execute(new SubmitJobCommand(new Array([string(pathname)], variables)));
     }
 }
 

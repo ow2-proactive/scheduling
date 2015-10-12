@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -1300,7 +1300,7 @@ public abstract class InternalJob extends JobState {
      * $PA_TASK_REPLICATION by it's actual value
      *
      */
-    public Map<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformation() {
         if (genericInformations == null) {
             // task is not yet properly initialized
             return new HashMap<>();
@@ -1323,9 +1323,9 @@ public abstract class InternalJob extends JobState {
      */
     public Map<String, String> getGenericInformations(boolean replaceVariables) {
         if (replaceVariables) {
-            return this.getGenericInformations();
+            return this.getGenericInformation();
         } else {
-            return super.getGenericInformations();
+            return super.getGenericInformation();
         }
     }
 

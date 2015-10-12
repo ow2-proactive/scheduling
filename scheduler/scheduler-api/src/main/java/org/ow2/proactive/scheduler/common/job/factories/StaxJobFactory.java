@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -80,6 +80,7 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
+import com.google.common.collect.ImmutableMap;
 import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.xml.sax.SAXException;
@@ -92,22 +93,30 @@ import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filter
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
- *
- * $Id$
  */
 public class StaxJobFactory extends JobFactory {
 
-    public static Logger logger = Logger.getLogger(StaxJobFactory.class);
+    public static final Logger logger = Logger.getLogger(StaxJobFactory.class);
 
-    /** XML input factory */
-    private XMLInputFactory xmlif = null;
-    /** Instance variables of the XML files. */
+    /**
+     * XML input factory
+     */
+    private XMLInputFactory xmlInputFactory = null;
+    /**
+     * Instance variables of the XML files.
+     */
     private HashMap<String, String> variables = new HashMap<>();
-    /** Job instance : to be sent to the user once created. */
+    /**
+     * Job instance : to be sent to the user once created.
+     */
     private Job job = null;
-    /** file relative path (relative file path (js) given in XML will be relative to this path) */
+    /**
+     * file relative path (relative file path (js) given in XML will be relative to this path)
+     */
     private String relativePathRoot = "./";
-    /** Instance that will temporary store the dependencies between tasks */
+    /**
+     * Instance that will temporary store the dependencies between tasks
+     */
     private HashMap<String, ArrayList<String>> dependencies = null;
 
     /**
@@ -115,12 +124,11 @@ public class StaxJobFactory extends JobFactory {
      */
     StaxJobFactory() {
         System.setProperty("javax.xml.stream.XMLInputFactory", "com.ctc.wstx.stax.WstxInputFactory");
-        //System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
-        xmlif = XMLInputFactory.newInstance();
-        xmlif.setProperty("javax.xml.stream.isCoalescing", Boolean.TRUE);
-        xmlif.setProperty("javax.xml.stream.isReplacingEntityReferences", Boolean.TRUE);
-        xmlif.setProperty("javax.xml.stream.isNamespaceAware", Boolean.TRUE);
-        xmlif.setProperty("javax.xml.stream.supportDTD", Boolean.FALSE);
+        xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty("javax.xml.stream.isCoalescing", Boolean.TRUE);
+        xmlInputFactory.setProperty("javax.xml.stream.isReplacingEntityReferences", Boolean.TRUE);
+        xmlInputFactory.setProperty("javax.xml.stream.isNamespaceAware", Boolean.TRUE);
+        xmlInputFactory.setProperty("javax.xml.stream.supportDTD", Boolean.FALSE);
     }
 
     @Override
@@ -133,8 +141,8 @@ public class StaxJobFactory extends JobFactory {
         clean();
         try {
             // Check if the file exist
-            File f = new File(filePath);
-            return createJob(f, updatedVariables);
+            File file = new File(filePath);
+            return createJob(file, updatedVariables);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -148,12 +156,12 @@ public class StaxJobFactory extends JobFactory {
     }
 
     @Override
-    public Job createJob(URI filePath, Map<String,String> updatedVariables) throws JobCreationException {
+    public Job createJob(URI filePath, Map<String, String> updatedVariables) throws JobCreationException {
         clean();
         try {
             //Check if the file exist
-            File f = new File(filePath);
-            return createJob(f, updatedVariables);
+            File file = new File(filePath);
+            return createJob(file, updatedVariables);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -161,24 +169,24 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
-    private Job createJob(File f, Map<String, String> updatedVariables) throws JobCreationException {
+    private Job createJob(File file, Map<String, String> updatedVariables) throws JobCreationException {
         try {
             //Check if the file exist
-            if (!f.exists()) {
-                throw new FileNotFoundException("This file has not been found : " + f.getAbsolutePath());
+            if (!file.exists()) {
+                throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
             //validate content using the proper XML schema
-            validate(f);
+            validate(file);
             //set relative path
-            relativePathRoot = f.getParentFile().getAbsolutePath();
+            relativePathRoot = file.getParentFile().getAbsolutePath();
             //create and get XML STAX reader
             XMLStreamReader xmlsr;
             // use the server side property to accept encoding
             if (PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.isSet()) {
-                xmlsr = xmlif.createXMLStreamReader(new FileInputStream(f),
+                xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(file),
                         PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.getValueAsString());
             } else {
-                xmlsr = xmlif.createXMLStreamReader(new FileInputStream(f));
+                xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(file));
             }
             //Create the job starting at the first cursor position of the XML Stream reader
             createJob(xmlsr, updatedVariables);
@@ -186,7 +194,7 @@ public class StaxJobFactory extends JobFactory {
             xmlsr.close();
             //make dependencies
             makeDependences();
-            logger.debug("Job successfully created !");
+            logger.debug("Job successfully created!");
             //debug mode only
             displayJobInfo();
             return job;
@@ -217,7 +225,7 @@ public class StaxJobFactory extends JobFactory {
     }
 
     private String findSchemaByNamespaceUsed(File file) throws FileNotFoundException, XMLStreamException {
-        XMLStreamReader cursorRoot = xmlif.createXMLStreamReader(new FileInputStream(file));
+        XMLStreamReader cursorRoot = xmlInputFactory.createXMLStreamReader(new FileInputStream(file));
         String current;
         try {
             int eventType;
@@ -273,7 +281,7 @@ public class StaxJobFactory extends JobFactory {
             resolveCleaningScripts((TaskFlowJob) job, job.getVariables());
         } catch (JobCreationException jce) {
             if (XMLTags.TASK.matches(current)) {
-                jce.pushTag(XMLTags.TASKFLOW.getXMLName());
+                jce.pushTag(XMLTags.TASK_FLOW.getXMLName());
             }
             throw jce;
         } catch (Exception e) {
@@ -285,27 +293,24 @@ public class StaxJobFactory extends JobFactory {
      * Create the real job and fill it with its property. Leave the method at
      * the first tag that define the real type of job.
      *
-     * @param cursorJob
-     *            the streamReader with the cursor on the job element.
-     * @param updatedVariableMap
-     *            map of variables which has precedence over those that defined
-     *            in Job descriptor
-     * @throws JobCreationException
-     *             if an exception occurs during job creation.
+     * @param cursorJob          the streamReader with the cursor on the job element.
+     * @param updatedVariableMap map of variables which has precedence over those that defined
+     *                           in Job descriptor
+     * @throws JobCreationException if an exception occurs during job creation.
      */
     private void createAndFillJob(XMLStreamReader cursorJob, Map<String, String> updatedVariableMap)
             throws JobCreationException {
         //create a job that will just temporary store the common properties of the job
-        Job jtmp = new Job() {
+        Job commonPropertiesHolder = new Job() {
 
             @Override
             public JobId getId() {
-                throw new RuntimeException("Not Available !");
+                throw new RuntimeException("Not Available!");
             }
 
             @Override
             public JobType getType() {
-                throw new RuntimeException("Not Available !");
+                throw new RuntimeException("Not Available!");
             }
         };
         //parse job attributes and fill the temporary one
@@ -314,84 +319,88 @@ public class StaxJobFactory extends JobFactory {
         for (; i < attrLen; i++) {
             String attrName = cursorJob.getAttributeLocalName(i);
             if (XMLAttributes.COMMON_NAME.matches(attrName)) {
-                jtmp.setName(cursorJob.getAttributeValue(i));
+                commonPropertiesHolder.setName(cursorJob.getAttributeValue(i));
             } else if (XMLAttributes.JOB_PRIORITY.matches(attrName)) {
-                jtmp.setPriority(JobPriority.findPriority(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.COMMON_CANCELJOBONERROR.matches(attrName)) {
-                jtmp.setCancelJobOnError(Boolean.parseBoolean(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.COMMON_RESTARTTASKONERROR.matches(attrName)) {
-                jtmp.setRestartTaskOnError(RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.COMMON_MAXNUMBEROFEXECUTION.matches(attrName)) {
-                jtmp.setMaxNumberOfExecution(Integer.parseInt(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.JOB_PROJECTNAME.matches(attrName)) {
+                commonPropertiesHolder.setPriority(
+                        JobPriority.findPriority(replace(cursorJob.getAttributeValue(i))));
+            } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
+                commonPropertiesHolder.setCancelJobOnError(
+                        Boolean.parseBoolean(replace(cursorJob.getAttributeValue(i))));
+            } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
+                commonPropertiesHolder.setRestartTaskOnError(
+                        RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
+            } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attrName)) {
+                commonPropertiesHolder.setMaxNumberOfExecution(
+                        Integer.parseInt(replace(cursorJob.getAttributeValue(i))));
+            } else if (XMLAttributes.JOB_PROJECT_NAME.matches(attrName)) {
                 //don't replace() here it is done at the end of the job
-                jtmp.setProjectName(cursorJob.getAttributeValue(i));
+                commonPropertiesHolder.setProjectName(cursorJob.getAttributeValue(i));
             }
         }
         //parse job elements and fill the temporary one
         try {
             int eventType;
-            boolean continu = true;
-            while (continu && cursorJob.hasNext()) {
+            boolean shouldContinue = true;
+            while (shouldContinue && cursorJob.hasNext()) {
                 eventType = cursorJob.next();
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         String current = cursorJob.getLocalName();
                         if (XMLTags.VARIABLES.matches(current)) {
-                            if (! (updatedVariableMap ==  null || updatedVariableMap.isEmpty())) {
+                            if (!(updatedVariableMap == null || updatedVariableMap.isEmpty())) {
                                 updateVariables(updatedVariableMap);
                             }
                             createVariables(cursorJob);
-                            if (! (updatedVariableMap ==  null || updatedVariableMap.isEmpty())) {
+                            if (!(updatedVariableMap == null || updatedVariableMap.isEmpty())) {
                                 updateVariables(updatedVariableMap);
                             }
                         } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
-                            jtmp.setGenericInformations(getGenericInformations(cursorJob));
+                            commonPropertiesHolder.setGenericInformations(getGenericInformation(cursorJob));
                         } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
                             logger.warn(
                                     "Element " + XMLTags.JOB_CLASSPATHES.getXMLName() +
                                             " is no longer supported. Please define a " +
                                             XMLTags.FORK_ENVIRONMENT.getXMLName() + " per task if needed.");
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
-                            jtmp.setDescription(getDescription(cursorJob));
-                        } else if (XMLTags.DS_INPUTSPACE.matches(current)) {
-                            jtmp.setInputSpace(getIOSpace(cursorJob));
-                        } else if (XMLTags.DS_OUTPUTSPACE.matches(current)) {
-                            jtmp.setOutputSpace(getIOSpace(cursorJob));
-                        } else if (XMLTags.DS_GLOBALSPACE.matches(current)) {
-                            jtmp.setGlobalSpace(getIOSpace(cursorJob));
-                        } else if (XMLTags.DS_USERSPACE.matches(current)) {
-                            jtmp.setUserSpace(getIOSpace(cursorJob));
-                        } else if (XMLTags.TASKFLOW.matches(current)) {
+                            commonPropertiesHolder.setDescription(getDescription(cursorJob));
+                        } else if (XMLTags.DS_INPUT_SPACE.matches(current)) {
+                            commonPropertiesHolder.setInputSpace(getIOSpace(cursorJob));
+                        } else if (XMLTags.DS_OUTPUT_SPACE.matches(current)) {
+                            commonPropertiesHolder.setOutputSpace(getIOSpace(cursorJob));
+                        } else if (XMLTags.DS_GLOBAL_SPACE.matches(current)) {
+                            commonPropertiesHolder.setGlobalSpace(getIOSpace(cursorJob));
+                        } else if (XMLTags.DS_USER_SPACE.matches(current)) {
+                            commonPropertiesHolder.setUserSpace(getIOSpace(cursorJob));
+                        } else if (XMLTags.TASK_FLOW.matches(current)) {
                             job = new TaskFlowJob();
-                            continu = false;
+                            shouldContinue = false;
                         }
                         break;
                 }
             }
             //if this point is reached, fill the real job using the temporary one
-            job.setDescription(jtmp.getDescription());
-            job.setName(jtmp.getName());
-            job.setPriority(jtmp.getPriority());
-            job.setProjectName(jtmp.getProjectName());
-            job.setCancelJobOnError(jtmp.isCancelJobOnError());
-            job.setRestartTaskOnError(jtmp.getRestartTaskOnError());
-            job.setMaxNumberOfExecution(jtmp.getMaxNumberOfExecution());
-            job.setGenericInformations(jtmp.getGenericInformations());
-            job.setInputSpace(jtmp.getInputSpace());
-            job.setOutputSpace(jtmp.getOutputSpace());
-            job.setGlobalSpace(jtmp.getGlobalSpace());
-            job.setUserSpace(jtmp.getUserSpace());
+            job.setDescription(commonPropertiesHolder.getDescription());
+            job.setName(commonPropertiesHolder.getName());
+            job.setPriority(commonPropertiesHolder.getPriority());
+            job.setProjectName(commonPropertiesHolder.getProjectName());
+            job.setCancelJobOnError(commonPropertiesHolder.isCancelJobOnError());
+            job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
+            job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
+            job.setGenericInformations(commonPropertiesHolder.getGenericInformation());
+            job.setInputSpace(commonPropertiesHolder.getInputSpace());
+            job.setOutputSpace(commonPropertiesHolder.getOutputSpace());
+            job.setGlobalSpace(commonPropertiesHolder.getGlobalSpace());
+            job.setUserSpace(commonPropertiesHolder.getUserSpace());
             job.setVariables(this.variables);
         } catch (JobCreationException jce) {
             jce.pushTag(cursorJob.getLocalName());
             throw jce;
         } catch (Exception e) {
-            String attrtmp = null;
+            String temporaryAttribute = null;
             if (cursorJob.isStartElement() && cursorJob.getAttributeCount() > i) {
-                attrtmp = cursorJob.getAttributeLocalName(i);
+                temporaryAttribute = cursorJob.getAttributeLocalName(i);
             }
-            throw new JobCreationException(cursorJob.getLocalName(), attrtmp, e);
+            throw new JobCreationException(cursorJob.getLocalName(), temporaryAttribute, e);
         }
     }
 
@@ -409,8 +418,12 @@ public class StaxJobFactory extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
-                            variables.put(cursorVariables.getAttributeValue(0), replace(cursorVariables
-                                    .getAttributeValue(1)));
+                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables);
+
+                            String name = attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
+                            String value = attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName());
+
+                            variables.put(name, value);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -432,18 +445,30 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
+    private Map<String, String> getAttributesAsMap(
+            XMLStreamReader cursorVariables) throws JobCreationException {
+        final ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
+
+        for (int i = 0; i < cursorVariables.getAttributeCount(); i++) {
+            result.put(cursorVariables.getAttributeLocalName(i),
+                    replace(cursorVariables.getAttributeValue(i)));
+        }
+
+        return result.build();
+    }
+
     private void updateVariables(Map<String, String> updatedVariables) {
-            this.variables.putAll(updatedVariables);
+        this.variables.putAll(updatedVariables);
     }
 
     /**
-     * Get the defined generic informations of the entity.
+     * Get the defined generic information of the entity.
      * Leave the method at the end of 'ELEMENT_COMMON_GENERIC_INFORMATION' tag.
      *
      * @param cursorInfo the streamReader with the cursor on the 'ELEMENT_COMMON_GENERIC_INFORMATION' tag.
      * @return the list of generic information as a hashMap.
      */
-    private HashMap<String, String> getGenericInformations(XMLStreamReader cursorInfo)
+    private HashMap<String, String> getGenericInformation(XMLStreamReader cursorInfo)
             throws JobCreationException {
         HashMap<String, String> infos = new HashMap<>();
         try {
@@ -453,8 +478,12 @@ public class StaxJobFactory extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.COMMON_INFO.matches(cursorInfo.getLocalName())) {
-                            infos.put(cursorInfo.getAttributeValue(0),
-                              replace(cursorInfo.getAttributeValue(1)));
+                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorInfo);
+
+                            String name = attributesAsMap.get(XMLAttributes.COMMON_NAME.getXMLName());
+                            String value = attributesAsMap.get(XMLAttributes.COMMON_VALUE.getXMLName());
+
+                            infos.put(name, value);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -495,8 +524,7 @@ public class StaxJobFactory extends JobFactory {
                 return description;
             }
             //go to the description END_ELEMENT
-            while (cursorVariables.next() != XMLEvent.END_ELEMENT)
-                ;
+            while (cursorVariables.next() != XMLEvent.END_ELEMENT) ;
 
             return description;
         } catch (JobCreationException jce) {
@@ -517,17 +545,16 @@ public class StaxJobFactory extends JobFactory {
         try {
             String url = replace(cursorVariables.getAttributeValue(0));
             //go to the END_ELEMENT
-            while (cursorVariables.next() != XMLEvent.END_ELEMENT)
-                ;
+            while (cursorVariables.next() != XMLEvent.END_ELEMENT) ;
             return url;
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
-            String attrtmp = null;
+            String temporaryAttribute = null;
             if (cursorVariables.isStartElement() && cursorVariables.getAttributeCount() == 1) {
-                attrtmp = cursorVariables.getAttributeLocalName(0);
+                temporaryAttribute = cursorVariables.getAttributeLocalName(0);
             }
-            throw new JobCreationException((String) null, attrtmp, e);
+            throw new JobCreationException((String) null, temporaryAttribute, e);
         }
     }
 
@@ -560,7 +587,7 @@ public class StaxJobFactory extends JobFactory {
                             break;
                         case PARAMETER_SWEEPING:
                             current = XMLTags.TASK;
-                            throw new RuntimeException("Job Parameter Sweeping is not yet implemented !");
+                            throw new RuntimeException("Job parameter sweeping is not yet implemented!");
                     }
                 }
             }
@@ -586,7 +613,8 @@ public class StaxJobFactory extends JobFactory {
         String taskName = null;
         try {
             Task toReturn = null;
-            Task tmpTask = new Task() {};
+            Task tmpTask = new Task() {
+            };
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();
             for (i = 0; i < attrLen; i++) {
@@ -597,41 +625,41 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.TASK_NB_NODES.matches(attrName)) {
                     int numberOfNodesNeeded = Integer.parseInt(replace(cursorTask.getAttributeValue(i)));
                     tmpTask.setParallelEnvironment(new ParallelEnvironment(numberOfNodesNeeded));
-                } else if (XMLAttributes.COMMON_CANCELJOBONERROR.matches(attrName)) {
+                } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
                     tmpTask.setCancelJobOnError(Boolean
                             .parseBoolean(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.COMMON_RESTARTTASKONERROR.matches(attrName)) {
+                } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
                     tmpTask.setRestartTaskOnError(RestartMode
                             .getMode(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.COMMON_MAXNUMBEROFEXECUTION.matches(attrName)) {
+                } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attrName)) {
                     tmpTask.setMaxNumberOfExecution(Integer
                             .parseInt(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.TASK_PRECIOUSRESULT.matches(attrName)) {
+                } else if (XMLAttributes.TASK_PRECIOUS_RESULT.matches(attrName)) {
                     tmpTask.setPreciousResult(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.TASK_PRECIOUSLOGS.matches(attrName)) {
+                } else if (XMLAttributes.TASK_PRECIOUS_LOGS.matches(attrName)) {
                     tmpTask.setPreciousLogs(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.TASK_WALLTIME.matches(attrName)) {
                     tmpTask.setWallTime(Tools.formatDate(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.TASK_RUNASME.matches(attrName)) {
+                } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attrName)) {
                     tmpTask.setRunAsMe(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
                 }
             }
             int eventType;
-            boolean continu = true;
-            while (continu && cursorTask.hasNext()) {
+            boolean shouldContinue = true;
+            while (shouldContinue && cursorTask.hasNext()) {
                 eventType = cursorTask.next();
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         current = cursorTask.getLocalName();
                         currentTag = null;
                         if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
-                            tmpTask.setGenericInformations(getGenericInformations(cursorTask));
+                            tmpTask.setGenericInformations(getGenericInformation(cursorTask));
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
                             tmpTask.setDescription(getDescription(cursorTask));
-                        } else if (XMLTags.DS_INPUTFILES.matches(current)) {
-                            setIOFIles(cursorTask, XMLTags.DS_INPUTFILES.getXMLName(), tmpTask);
-                        } else if (XMLTags.DS_OUTPUTFILES.matches(current)) {
-                            setIOFIles(cursorTask, XMLTags.DS_OUTPUTFILES.getXMLName(), tmpTask);
+                        } else if (XMLTags.DS_INPUT_FILES.matches(current)) {
+                            setIOFIles(cursorTask, XMLTags.DS_INPUT_FILES.getXMLName(), tmpTask);
+                        } else if (XMLTags.DS_OUTPUT_FILES.matches(current)) {
+                            setIOFIles(cursorTask, XMLTags.DS_OUTPUT_FILES.getXMLName(), tmpTask);
                         } else if (XMLTags.PARALLEL_ENV.matches(current)) {
                             tmpTask.setParallelEnvironment(createParallelEnvironment(cursorTask));
                         } else if (XMLTags.SCRIPT_SELECTION.matches(current)) {
@@ -648,7 +676,7 @@ public class StaxJobFactory extends JobFactory {
                             tmpTask.setFlowScript(createControlFlowScript(cursorTask, tmpTask));
                         } else if (XMLTags.TASK_DEPENDENCES.matches(current)) {
                             currentTag = XMLTags.TASK_DEPENDENCES;
-                            createdependences(cursorTask, tmpTask);
+                            createDependences(cursorTask, tmpTask);
                         } else if (XMLTags.JAVA_EXECUTABLE.matches(current)) {
                             toReturn = new JavaTask();
                             setJavaExecutable((JavaTask) toReturn, cursorTask);
@@ -663,7 +691,7 @@ public class StaxJobFactory extends JobFactory {
                     case XMLEvent.END_ELEMENT:
                         current = cursorTask.getLocalName();
                         if (XMLTags.TASK.matches(cursorTask.getLocalName())) {
-                            continu = false;
+                            shouldContinue = false;
                         }
                         break;
                 }
@@ -671,7 +699,7 @@ public class StaxJobFactory extends JobFactory {
             //fill the real task with common attribute if it is a new one
             autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
             autoCopyfields(Task.class, tmpTask, toReturn);
-            if(toReturn != null){
+            if (toReturn != null) {
                 //set the following properties only if it is needed.
                 if (toReturn.getCancelJobOnErrorProperty().isSet()) {
                     toReturn.setCancelJobOnError(toReturn.isCancelJobOnError());
@@ -710,16 +738,17 @@ public class StaxJobFactory extends JobFactory {
      * Leave the method with the cursor at the end of 'ELEMENT_DS_INPUT/OUTPUTFILES' tag.
      *
      * @param cursorTask the streamReader with the cursor on the 'ELEMENT_DS_INPUT/OUTPUTFILES' tag.
-     * @param endTag the final tag for this tag : ELEMENT_DS_INPUTFILES or ELEMENT_DS_INPUTFILES
-     * @param task the task in which to add the input/output files selector
+     * @param endTag     the final tag for this tag : ELEMENT_DS_INPUTFILES or ELEMENT_DS_INPUTFILES
+     * @param task       the task in which to add the input/output files selector
      * @throws JobCreationException
      */
-    private void setIOFIles(XMLStreamReader cursorTask, String endTag, Task task) throws JobCreationException {
+    private void setIOFIles(XMLStreamReader cursorTask, String endTag,
+            Task task) throws JobCreationException {
         int i = 0;
         try {
             int eventType;
-            boolean continu = true;
-            while (continu && cursorTask.hasNext()) {
+            boolean shouldContinue = true;
+            while (shouldContinue && cursorTask.hasNext()) {
                 eventType = cursorTask.next();
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
@@ -740,11 +769,11 @@ public class StaxJobFactory extends JobFactory {
                                         selector = new FileSelector();
                                     }
                                     selector.setExcludes(replace(cursorTask.getAttributeValue(i)));
-                                } else if (XMLAttributes.DS_ACCESSMODE.matches(attrName)) {
+                                } else if (XMLAttributes.DS_ACCESS_MODE.matches(attrName)) {
                                     accessMode = cursorTask.getAttributeValue(i);
                                 }
                                 if (selector != null && accessMode != null) {
-                                    if (XMLTags.DS_INPUTFILES.matches(endTag)) {
+                                    if (XMLTags.DS_INPUT_FILES.matches(endTag)) {
                                         task.addInputFiles(selector, InputAccessMode
                                                 .getAccessMode(accessMode));
                                     } else {
@@ -757,7 +786,7 @@ public class StaxJobFactory extends JobFactory {
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (cursorTask.getLocalName().equals(endTag)) {
-                            continu = false;
+                            shouldContinue = false;
                         }
                         break;
                 }
@@ -779,9 +808,9 @@ public class StaxJobFactory extends JobFactory {
      * Leave this method at the end of the 'ELEMENT_TASK_DEPENDENCES' tag.
      *
      * @param cursorDepends the streamReader with the cursor on the 'ELEMENT_TASK_DEPENDENCES' tag.
-     * @param t the task on which to apply the dependencies.
+     * @param t             the task on which to apply the dependencies.
      */
-    private void createdependences(XMLStreamReader cursorDepends, Task t) throws JobCreationException {
+    private void createDependences(XMLStreamReader cursorDepends, Task t) throws JobCreationException {
         try {
             if (dependencies == null) {
                 dependencies = new HashMap<>();
@@ -848,12 +877,12 @@ public class StaxJobFactory extends JobFactory {
 
         String tag = null;
 
-        // REPLICATE : no attribute
+        // REPLICATE: no attribute
         if (XMLTags.FLOW_REPLICATE.matches(cursorTask.getLocalName())) {
             type = FlowActionType.REPLICATE.toString();
             tag = XMLTags.FLOW_REPLICATE.getXMLName();
         }
-        // IF : attributes TARGET_IF and TARGET_ELSE and TARGET_JOIN
+        // IF: attributes TARGET_IF and TARGET_ELSE and TARGET_JOIN
         else if (XMLTags.FLOW_IF.matches(cursorTask.getLocalName())) {
             type = FlowActionType.IF.toString();
             tag = XMLTags.FLOW_IF.getXMLName();
@@ -868,7 +897,7 @@ public class StaxJobFactory extends JobFactory {
                 }
             }
         }
-        // LOOP : attribute TARGET
+        // LOOP: attribute TARGET
         else if (XMLTags.FLOW_LOOP.matches(cursorTask.getLocalName())) {
             type = FlowActionType.LOOP.toString();
             tag = XMLTags.FLOW_LOOP.getXMLName();
@@ -941,7 +970,7 @@ public class StaxJobFactory extends JobFactory {
                 if (event == XMLEvent.START_ELEMENT) {
                     break;
                 } else if (event == XMLEvent.END_ELEMENT &&
-                    XMLTags.PARALLEL_ENV.matches(cursorTask.getLocalName())) {
+                        XMLTags.PARALLEL_ENV.matches(cursorTask.getLocalName())) {
                     return new ParallelEnvironment(nodesNumber, TopologyDescriptor.ARBITRARY);
                 }
             }
@@ -953,7 +982,7 @@ public class StaxJobFactory extends JobFactory {
                     if (event == XMLEvent.START_ELEMENT) {
                         break;
                     } else if (event == XMLEvent.END_ELEMENT &&
-                        XMLTags.TOPOLOGY.matches(cursorTask.getLocalName())) {
+                            XMLTags.TOPOLOGY.matches(cursorTask.getLocalName())) {
                         throw new RuntimeException("Incorrect topology description");
                     }
                 }
@@ -1008,9 +1037,9 @@ public class StaxJobFactory extends JobFactory {
      * Leave the method with cursor at the end of the corresponding script.
      *
      * @param cursorScript the streamReader with the cursor on the corresponding script tag (pre, post, cleaning, selection, generation).
-     * @param type nature of the script : 1 : selection
-     *                                         2 : flow
-     *                                         3 : else
+     * @param type         nature of the script : 1 : selection
+     *                     2 : flow
+     *                     3 : else
      * @return the script defined at the specified cursor.
      */
     private Script<?> createScript(XMLStreamReader cursorScript, int type) throws JobCreationException {
@@ -1057,7 +1086,7 @@ public class StaxJobFactory extends JobFactory {
                                 int ev = cursorScript.next();
                                 if (((ev == XMLEvent.START_ELEMENT) && XMLTags.SCRIPT_ARGUMENTS
                                         .matches(cursorScript.getLocalName())) ||
-                                    (ev == XMLEvent.END_ELEMENT)) {
+                                        (ev == XMLEvent.END_ELEMENT)) {
                                     break;
                                 }
                             }
@@ -1184,11 +1213,11 @@ public class StaxJobFactory extends JobFactory {
                 }
                 return args.toArray(new String[args.size()]);
             } catch (Exception e) {
-                String attrtmp = null;
+                String temporaryAttribute = null;
                 if (cursorArgs.isStartElement() && cursorArgs.getAttributeCount() == 1) {
-                    attrtmp = cursorArgs.getAttributeLocalName(0);
+                    temporaryAttribute = cursorArgs.getAttributeLocalName(0);
                 }
-                throw new JobCreationException(cursorArgs.getLocalName(), attrtmp, e);
+                throw new JobCreationException(cursorArgs.getLocalName(), temporaryAttribute, e);
             }
         } else {
             return null;
@@ -1208,11 +1237,11 @@ public class StaxJobFactory extends JobFactory {
         String current = null;
         try {
             //one step ahead to go to the command (static or dynamic)
-            while (cursorExec.next() != XMLEvent.START_ELEMENT)
-                ;
+            while (cursorExec.next() != XMLEvent.START_ELEMENT) ;
+
             current = cursorExec.getLocalName();
             ArrayList<String> command = new ArrayList<>(0);
-            if (XMLTags.NATIVE_TASK_STATICCOMMAND.matches(cursorExec.getLocalName())) {
+            if (XMLTags.NATIVE_TASK_STATIC_COMMAND.matches(cursorExec.getLocalName())) {
                 String attr_ = null;
                 String current_ = null;
                 try {
@@ -1251,17 +1280,17 @@ public class StaxJobFactory extends JobFactory {
                     throw new JobCreationException(current_, attr_, e);
                 }
             } else {
-                throw new RuntimeException("Unknow command type : " + cursorExec.getLocalName());
+                throw new RuntimeException("Unknown command type: " + cursorExec.getLocalName());
             }
         } catch (JobCreationException jce) {
             jce.pushTag(current);
             throw jce;
         } catch (Exception e) {
-            String attrtmp = null;
+            String temporaryAttribute = null;
             if (cursorExec.isStartElement() && cursorExec.getAttributeCount() > 0) {
-                attrtmp = cursorExec.getAttributeLocalName(i);
+                temporaryAttribute = cursorExec.getAttributeLocalName(i);
             }
-            throw new JobCreationException(current, attrtmp, e);
+            throw new JobCreationException(current, temporaryAttribute, e);
         }
     }
 
@@ -1269,10 +1298,11 @@ public class StaxJobFactory extends JobFactory {
      * Add the Java Executable to this java Task.
      * The cursor is currently at the beginning of the 'ELEMENT_JAVA_EXECUTABLE' tag.
      *
-     * @param javaTask the task in which to add the Java Executable.
+     * @param javaTask   the task in which to add the Java Executable.
      * @param cursorExec the streamReader with the cursor on the 'ELEMENT_JAVA_EXECUTABLE' tag.
      */
-    private void setJavaExecutable(JavaTask javaTask, XMLStreamReader cursorExec) throws JobCreationException {
+    private void setJavaExecutable(JavaTask javaTask,
+            XMLStreamReader cursorExec) throws JobCreationException {
         int i = 0;
         String current = cursorExec.getLocalName();
         try {
@@ -1280,7 +1310,7 @@ public class StaxJobFactory extends JobFactory {
             int attrCount = cursorExec.getAttributeCount();
             for (i = 0; i < attrCount; i++) {
                 String attrName = cursorExec.getAttributeLocalName(i);
-                if (XMLAttributes.TASK_CLASSNAME.matches(attrName)) {
+                if (XMLAttributes.TASK_CLASS_NAME.matches(attrName)) {
                     javaTask.setExecutableClassName(cursorExec.getAttributeValue(i));
                 }
             }
@@ -1295,8 +1325,12 @@ public class StaxJobFactory extends JobFactory {
                             ForkEnvironment forkEnv = createForkEnvironment(cursorExec);
                             javaTask.setForkEnvironment(forkEnv);
                         } else if (XMLTags.TASK_PARAMETER.matches(current)) {
-                            javaTask.addArgument(replace(cursorExec.getAttributeValue(0)),
-                              replace(cursorExec.getAttributeValue(1)));
+                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorExec);
+
+                            String name = attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
+                            String value = attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName());
+
+                            javaTask.addArgument(replace(name), value);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -1334,7 +1368,7 @@ public class StaxJobFactory extends JobFactory {
             int attrCount = cursorExec.getAttributeCount();
             for (i = 0; i < attrCount; i++) {
                 String attrName = cursorExec.getAttributeLocalName(i);
-                if (XMLAttributes.FORK_JAVAHOME.matches(attrName)) {
+                if (XMLAttributes.FORK_JAVA_HOME.matches(attrName)) {
                     forkEnv.setJavaHome(replace(cursorExec.getAttributeValue(i)));
                 }
                 if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
@@ -1405,7 +1439,7 @@ public class StaxJobFactory extends JobFactory {
                     if (names != null) {
                         for (String name : names) {
                             if (tfj.getTask(name) == null) {
-                                throw new JobCreationException("Unknow dependence : " + name);
+                                throw new JobCreationException("Unknown dependence: " + name);
                             } else {
                                 t.addDependence(tfj.getTask(name));
                             }
@@ -1459,18 +1493,19 @@ public class StaxJobFactory extends JobFactory {
 
     private void displayJobInfo() {
         if (logger.isDebugEnabled()) {
-            logger.debug("type : " + job.getType());
-            logger.debug("name : " + job.getName());
-            logger.debug("desc : " + job.getDescription());
-            logger.debug("proj : " + job.getProjectName());
-            logger.debug("prio : " + job.getPriority());
-            logger.debug("cjoe : " + job.isCancelJobOnError());
-            logger.debug("rtoe : " + job.getRestartTaskOnError());
-            logger.debug("mnoe : " + job.getMaxNumberOfExecution());
-            logger.debug("insp : " + job.getInputSpace());
-            logger.debug("ousp : " + job.getOutputSpace());
-            logger.debug("info : " + job.getGenericInformations());
+            logger.debug("type: " + job.getType());
+            logger.debug("name: " + job.getName());
+            logger.debug("description: " + job.getDescription());
+            logger.debug("projectName: " + job.getProjectName());
+            logger.debug("priority: " + job.getPriority());
+            logger.debug("cancelJobOnError: " + job.isCancelJobOnError());
+            logger.debug("restartTaskOnError: " + job.getRestartTaskOnError());
+            logger.debug("maxNumberOfExecution: " + job.getMaxNumberOfExecution());
+            logger.debug("inputSpace: " + job.getInputSpace());
+            logger.debug("outputSpace: " + job.getOutputSpace());
+            logger.debug("genericInformation: " + job.getGenericInformation());
             logger.debug("TASKS ------------------------------------------------");
+
             ArrayList<Task> tasks = new ArrayList<>();
             switch (job.getType()) {
                 case TASKSFLOW:
@@ -1478,64 +1513,65 @@ public class StaxJobFactory extends JobFactory {
                     break;
             }
             for (Task t : tasks) {
-                logger.debug("name  : " + t.getName());
-                logger.debug("desc  : " + t.getDescription());
-                logger.debug("paral : " + t.isParallel());
-                logger.debug("node  : " +
-                    (t.getParallelEnvironment() == null ? "1" : t.getParallelEnvironment().getNodesNumber()));
-                logger.debug("cjoe  : " + t.isCancelJobOnError());
-                logger.debug("res   : " + t.isPreciousResult());
-                logger.debug("logs  : " + t.isPreciousLogs());
-                logger.debug("rtoe  : " + t.getRestartTaskOnError());
-                logger.debug("mnoe  : " + t.getMaxNumberOfExecution());
-                logger.debug("wall  : " + t.getWallTime());
-                logger.debug("selec : " + t.getSelectionScripts());
-                logger.debug("pre   : " + t.getPreScript());
-                logger.debug("post  : " + t.getPostScript());
-                logger.debug("clean : " + t.getCleaningScript());
+                logger.debug("name: " + t.getName());
+                logger.debug("description: " + t.getDescription());
+                logger.debug("parallel: " + t.isParallel());
+                logger.debug(
+                        "nbNodes: " + (t.getParallelEnvironment() == null ? "1" : t.getParallelEnvironment().getNodesNumber()));
+                logger.debug("cancelJobOnError: " + t.isCancelJobOnError());
+                logger.debug("preciousResult: " + t.isPreciousResult());
+                logger.debug("preciousLogs: " + t.isPreciousLogs());
+                logger.debug("restartTaskOnError: " + t.getRestartTaskOnError());
+                logger.debug("maxNumberOfExecution: " + t.getMaxNumberOfExecution());
+                logger.debug("walltime: " + t.getWallTime());
+                logger.debug("selectionScripts: " + t.getSelectionScripts());
+                logger.debug("preScript: " + t.getPreScript());
+                logger.debug("postScript: " + t.getPostScript());
+                logger.debug("cleaningScript: " + t.getCleaningScript());
+
                 try {
-                    logger.debug("ifsel : length=" + t.getInputFilesList().size());
+                    logger.debug("inputFileList: length=" + t.getInputFilesList().size());
                 } catch (NullPointerException ignored) {
                 }
                 try {
-                    logger.debug("ofsel : inc=" + t.getOutputFilesList().size());
+                    logger.debug("outputFileList: length=" + t.getOutputFilesList().size());
                 } catch (NullPointerException ignored) {
                 }
+
                 if (t.getDependencesList() != null) {
-                    String dep = "dep   : ";
+                    String dep = "dependence: ";
                     for (Task tdep : t.getDependencesList()) {
                         dep += tdep.getName() + " ";
                     }
                     logger.debug(dep);
                 } else {
-                    logger.debug("dep   : null");
+                    logger.debug("dependence: null");
                 }
-                logger.debug("infos : " + t.getGenericInformations());
+
+                logger.debug("genericInformation: " + t.getGenericInformation());
+
                 if (t instanceof JavaTask) {
-                    logger.debug("class : " + ((JavaTask) t).getExecutableClassName());
+                    logger.debug("class: " + ((JavaTask) t).getExecutableClassName());
                     try {
-                        logger.debug("args  : " + ((JavaTask) t).getArguments());
+                        logger.debug("args: " + ((JavaTask) t).getArguments());
                     } catch (Exception e) {
-                        logger.debug("Cannot get args  : " + e.getMessage(), e);
+                        logger.debug("Cannot get args: " + e.getMessage(), e);
                     }
-                    logger.debug("fork  : " + ((JavaTask) t).isFork());
+                    logger.debug("fork: " + ((JavaTask) t).isFork());
                 } else if (t instanceof NativeTask) {
-                    logger.debug("cmd   : " + Arrays.toString(((NativeTask) t).getCommandLine()));
+                    logger.debug("commandLine: " + Arrays.toString(((NativeTask) t).getCommandLine()));
                 } else if (t instanceof ScriptTask) {
-                    logger.debug("script   : " + ((ScriptTask) t).getScript());
+                    logger.debug("script: " + ((ScriptTask) t).getScript());
                 }
 
                 ForkEnvironment forkEnvironment = t.getForkEnvironment();
 
                 if (forkEnvironment != null) {
-                    logger.debug("forkJ  : " + forkEnvironment.getJavaHome());
-                    logger
-                            .debug("forkSys: " +
-                                    forkEnvironment.getSystemEnvironment());
-                    logger.debug("forkJVM: " + forkEnvironment.getJVMArguments());
-                    logger.debug("forkCP : " +
-                            forkEnvironment.getAdditionalClasspath());
-                    logger.debug("forkScr: " + forkEnvironment.getEnvScript());
+                    logger.debug("javaHome: " + forkEnvironment.getJavaHome());
+                    logger.debug("systemEnvironment: " + forkEnvironment.getSystemEnvironment());
+                    logger.debug("jvmArguments: " + forkEnvironment.getJVMArguments());
+                    logger.debug("classpath: " + forkEnvironment.getAdditionalClasspath());
+                    logger.debug("envScript: " + forkEnvironment.getEnvScript());
                 }
 
                 logger.debug("--------------------------------------------------");
@@ -1548,10 +1584,10 @@ public class StaxJobFactory extends JobFactory {
      * Will only iterate on non-private field.
      * Private fields in 'cFrom' won't be set in 'to'.
      *
-     * @param <T> check type given as argument is equals or under this type.
+     * @param <T>   check type given as argument is equals or under this type.
      * @param klass the klass in which to find the fields
-     * @param from the T object in which to get the value
-     * @param to the T object in which to set the value
+     * @param from  the T object in which to get the value
+     * @param to    the T object in which to set the value
      */
     private static <T> void autoCopyfields(Class<T> klass, T from, T to) throws IllegalArgumentException,
             IllegalAccessException {

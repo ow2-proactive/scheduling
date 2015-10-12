@@ -66,8 +66,8 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         Assert.assertEquals("input", jobData.getInputSpace());
         Assert.assertEquals("output", jobData.getOutputSpace());
         Assert.assertEquals(JobPriority.HIGHEST, jobData.getPriority());
-        Assert.assertNotNull(jobData.getGenericInformations());
-        Assert.assertTrue(jobData.getGenericInformations().isEmpty());
+        Assert.assertNotNull(jobData.getGenericInformation());
+        Assert.assertTrue(jobData.getGenericInformation().isEmpty());
     }
 
     @Test
@@ -80,17 +80,17 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         genericInfo = new HashMap<>();
         job.setGenericInformations(genericInfo);
         jobData = defaultSubmitJobAndLoadInternal(false, job);
-        Assert.assertNotNull(jobData.getGenericInformations());
-        Assert.assertTrue(jobData.getGenericInformations().isEmpty());
+        Assert.assertNotNull(jobData.getGenericInformation());
+        Assert.assertTrue(jobData.getGenericInformation().isEmpty());
 
         genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
         job.setGenericInformations(genericInfo);
         jobData = defaultSubmitJobAndLoadInternal(false, job);
-        Assert.assertEquals(2, jobData.getGenericInformations().size());
-        Assert.assertEquals("v1", jobData.getGenericInformations().get("p1"));
-        Assert.assertEquals("v2", jobData.getGenericInformations().get("p2"));
+        Assert.assertEquals(2, jobData.getGenericInformation().size());
+        Assert.assertEquals("v1", jobData.getGenericInformation().get("p1"));
+        Assert.assertEquals("v2", jobData.getGenericInformation().get("p2"));
 
         StringBuilder longString = new StringBuilder();
         for (int i = 0; i < 100; i++) {
@@ -100,8 +100,8 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         genericInfo.put("longProperty", longString.toString());
         job.setGenericInformations(genericInfo);
         jobData = defaultSubmitJobAndLoadInternal(false, job);
-        Assert.assertEquals(1, jobData.getGenericInformations().size());
-        Assert.assertEquals(longString.toString(), jobData.getGenericInformations().get("longProperty"));
+        Assert.assertEquals(1, jobData.getGenericInformation().size());
+        Assert.assertEquals(longString.toString(), jobData.getGenericInformation().get("longProperty"));
     }
 
 }

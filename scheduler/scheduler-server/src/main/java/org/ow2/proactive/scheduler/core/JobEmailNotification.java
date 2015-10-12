@@ -86,7 +86,7 @@ public class JobEmailNotification {
     }
 
     private String getTo() throws JobEmailNotificationException {
-        String to = jobState.getGenericInformations().get(GENERIC_INFORMATION_KEY_EMAIL);
+        String to = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_EMAIL);
         if (to == null) {
             throw new JobEmailNotificationException("Recipient address is not set in generic information");
         }

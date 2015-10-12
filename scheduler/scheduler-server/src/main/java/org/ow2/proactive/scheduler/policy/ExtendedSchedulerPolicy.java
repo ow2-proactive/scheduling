@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2013 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -122,10 +122,10 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
      * the same property defined job level.
      */
     private String getStartAtValue(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) {
-        String startAt = taskDesc.getInternal().getGenericInformations()
+        String startAt = taskDesc.getInternal().getGenericInformation()
                 .get(GENERIC_INFORMATION_KEY_START_AT);
         if (startAt == null) {
-            startAt = jobDesc.getInternal().getGenericInformations().get(GENERIC_INFORMATION_KEY_START_AT);
+            startAt = jobDesc.getInternal().getGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
         }
         return startAt;
     }

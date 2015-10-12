@@ -7,7 +7,7 @@ dependencies {
     compile 'msv:msv:20050913'
     compile 'commons-io:commons-io:2.4'
 
-    compile project(':common-api')
+    compile project(':common:common-api')
 
     runtime 'com.fasterxml.woodstox:woodstox-core:5.0.1'
     runtime 'msv:relaxngDatatype:20050913'

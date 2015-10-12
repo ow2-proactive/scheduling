@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -38,7 +38,7 @@ package org.ow2.proactive.scheduler.common.job.factories;
 
 import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.SCRIPT_EXECUTABLE;
 import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.TASK;
-import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.TASKFLOW;
+import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.TASK_FLOW;
 
 import java.io.File;
 import java.io.IOException;
@@ -137,7 +137,7 @@ public class ValidationUtil {
                 ErrorInfo errorInfo = ((ValidityViolation) se).getErrorInfo();
                 if (errorInfo instanceof ErrorInfo.IncompleteContentModel) {
                     String qName = ((ErrorInfo.IncompleteContentModel) errorInfo).qName;
-                    if (TASKFLOW.getXMLName().equals(qName)) {
+                    if (TASK_FLOW.getXMLName().equals(qName)) {
                         sb.append("Uncompleted job: At least one task must be defined.").append('\n');
                     } else if (TASK.getXMLName().equals(qName)) {
                         sb.append("Uncompleted task: At least the Executable element must be define.")

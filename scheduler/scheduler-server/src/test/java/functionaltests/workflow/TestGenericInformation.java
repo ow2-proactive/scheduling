@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -127,7 +127,7 @@ public class TestGenericInformation extends SchedulerFunctionalTest {
 
         for (String key : expected.keySet()) {
             Assert.assertEquals("Wrong value for " + key, expected.get(key), jobState
-                    .getGenericInformations().get(key));
+                    .getGenericInformation().get(key));
             System.out.println(key + " is " + expected.get(key) + " - good");
         }
     }
@@ -144,7 +144,7 @@ public class TestGenericInformation extends SchedulerFunctionalTest {
 
         for (String key : expected.keySet()) {
             Assert.assertEquals("Wrong value for " + key, expected.get(key), taskState
-                    .getGenericInformations().get(key));
+                    .getGenericInformation().get(key));
             System.out.println(key + " is " + expected.get(key) + " - good");
         }
     }

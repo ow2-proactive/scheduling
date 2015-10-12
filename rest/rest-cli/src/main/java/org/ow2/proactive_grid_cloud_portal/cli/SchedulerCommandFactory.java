@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -37,16 +37,11 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-
 
 class SchedulerCommandFactory extends CommandFactory {
 
     {
-        for (CommandSet.Entry entry : CommandSet.SCHED_ONLY) {
+        for (CommandSet.Entry entry : CommandSet.SCHEDULER_ONLY) {
             cmdMap.put(opt(entry), entry);
         }
     }

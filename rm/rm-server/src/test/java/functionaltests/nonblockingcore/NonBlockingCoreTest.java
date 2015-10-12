@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -37,26 +37,15 @@
 package functionaltests.nonblockingcore;
 
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.net.URL;
 
 import javax.security.auth.login.LoginException;
 
-import org.junit.Test;
-import org.objectweb.proactive.api.PAFuture;
-import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.utils.NodeSet;
+import com.sun.org.apache.xpath.internal.NodeSet;
 
-import functionaltests.selectionscript.StaticSelectionScriptTest;
+import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestUsers;
@@ -71,7 +60,7 @@ import functionaltests.utils.TestUsers;
  */
 public class NonBlockingCoreTest extends RMFunctionalTest {
 
-	private URL selectionScriptWithtimeOutPath = StaticSelectionScriptTest.class
+	private URL selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class
 			.getResource("selectionScriptWithtimeOut.groovy");
 
 	private NodeSet nodes;
