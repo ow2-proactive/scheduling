@@ -44,6 +44,13 @@ import static org.mockito.Mockito.verify;
 
 public class SessionTest {
 
+    /**
+     * Check that session id does not change if {@link Session#renewSession} is called on an existing session instance.
+     * The test also checks that {@link SchedulerProxyUserInterface#renewSession} is invoked on embedded scheduler
+     * instance if available.
+     *
+     * @throws NotConnectedException
+     */
     @Test
     public void testRenewSession() throws NotConnectedException {
         SchedulerRMProxyFactory schedulerProxyFactory = mock(SchedulerRMProxyFactory.class);
