@@ -154,10 +154,12 @@ ext.encoding = {
 
 ext.schedulingFunctionalTestConfiguration = {
 
-    include 'functionaltests/**'
+	
+    include 'functionaltests/**'  
     
     if(!project.hasProperty('regression')){
-        exclude 'functionaltests/regression/**'
+	    def regression_tests = new File('regression_tests.txt')
+	    regression_tests.readLines().findAll { !it.startsWith("--") }.each { exclude '**/'+it+'.class' }
     }
     
    
