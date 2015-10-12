@@ -6,11 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.*;
 import org.ow2.proactive.scripting.helper.progress.ProgressFile;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -24,6 +21,7 @@ import static org.junit.Assume.assumeTrue;
  *
  * @author The ProActive Team
  */
+@Ignore
 public class ProgressFileReaderTest {
 
     private static final int NB_UPDATES = 3;
