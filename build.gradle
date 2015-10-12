@@ -159,7 +159,7 @@ ext.schedulingFunctionalTestConfiguration = {
     
     if(!project.hasProperty('regression')){
 	    def regression_tests = new File(project.rootDir, "/regression_tests.txt")
-	    regression_tests.readLines().findAll { !it.startsWith("--") }.each { exclude '**/'+it+'.class' }
+	    regression_tests.readLines().each { exclude '**/'+it+'.class' }
     }
     
    
