@@ -831,6 +831,24 @@ public interface SchedulerRestInterface {
     String password) throws LoginException, SchedulerRestException;
 
     /**
+     * Renew the session identified by the given {@code sessionId} if it exists or create a new session.
+     *
+     * @param username username
+     * @param password password
+     * @param sessionId session id identifying a session to renew.
+     * @return the new session id to use.
+     * @throws SchedulerRestException
+     */
+    @PUT
+    @Path("session")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json")
+    String loginOrRenewSession(
+            @HeaderParam("sessionid") String sessionId,
+            @FormParam("username") String username,
+            @FormParam("password") String password) throws SchedulerRestException, LoginException, NotConnectedRestException;
+
+    /**
      * login to the scheduler using a multipart form
      *  can be used either by submitting 
      *   - 2 fields username & password

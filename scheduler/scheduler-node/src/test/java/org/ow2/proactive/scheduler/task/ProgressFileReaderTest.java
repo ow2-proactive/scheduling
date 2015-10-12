@@ -28,7 +28,7 @@ public class ProgressFileReaderTest {
 
     private static final int NB_UPDATES = 3;
 
-    private static final int SLEEP_TIMEOUT = 1000; // in milliseconds
+    private static final int SLEEP_TIMEOUT = 3000; // in milliseconds
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -39,7 +39,6 @@ public class ProgressFileReaderTest {
 
     @Before
     public void setup() throws IOException {
-        assumeTrue(System.getProperty("os.name").contains("Linux")); // too slow on Mac JDK7 and Windows
         String progressFileName = "test";
         progressFileReader.register(listener);
         progressFileReader.start(folder.getRoot(), progressFileName);
