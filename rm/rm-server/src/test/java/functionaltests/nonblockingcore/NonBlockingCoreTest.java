@@ -36,19 +36,30 @@
  */
 package functionaltests.nonblockingcore;
 
-import static functionaltests.utils.RMTHelper.log;
-
 import java.io.File;
 import java.net.URL;
 
 import javax.security.auth.login.LoginException;
 
-import com.sun.org.apache.xpath.internal.NodeSet;
+import org.objectweb.proactive.api.PAFuture;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.utils.NodeSet;
+import org.junit.Test;
 
-import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestUsers;
+import functionaltests.selectionscript.SelectionScriptTimeOutTest;
+
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
+
 
 /**
  * Test starts node selection using timeout script. At the same time adds and
