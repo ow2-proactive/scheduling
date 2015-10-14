@@ -1,0 +1,2 @@
+language : JAVA
+script: ./gradlew functionalTest --info
