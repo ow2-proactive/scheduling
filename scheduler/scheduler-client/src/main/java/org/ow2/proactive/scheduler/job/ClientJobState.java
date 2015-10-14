@@ -78,7 +78,7 @@ public final class ClientJobState extends JobState {
     }
 
     @Override
-    public Map<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformation() {
         return this.genericInformations;
     }
 
