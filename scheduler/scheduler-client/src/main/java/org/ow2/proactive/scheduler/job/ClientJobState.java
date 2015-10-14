@@ -54,7 +54,7 @@ public final class ClientJobState extends JobState {
         this.cancelJobOnError = jobState.isCancelJobOnError();
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
-        this.genericInformations = new HashMap<>(jobState.getGenericInformations());
+        this.genericInformations = new HashMap<>(jobState.getGenericInformation());
 
         this.clientJobSerializationHelper = new ClientJobSerializationHelper();
 
