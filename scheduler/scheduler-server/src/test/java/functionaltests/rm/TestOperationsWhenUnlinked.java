@@ -78,13 +78,11 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTest {
 
     static final String TASK_NAME = "Test task";
 
-    static final long EVENT_TIMEOUT = 60000;
-
-    private File config;
-    private RMTHelper rmHelper;
-
+    static final long EVENT_TIMEOUT = 5*60000;
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
+    private File config;
+    private RMTHelper rmHelper;
 
     @Before
     public void createConfig() throws Exception {
