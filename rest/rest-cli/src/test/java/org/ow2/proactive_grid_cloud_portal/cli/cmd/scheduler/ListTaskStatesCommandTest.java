@@ -37,9 +37,18 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.scheduler;
 
-import objectFaker.DataFaker;
-import objectFaker.propertyGenerator.FixedPropertyGenerator;
-import objectFaker.propertyGenerator.PrefixPropertyGenerator;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,18 +60,15 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
-import java.util.List;
+import objectFaker.DataFaker;
+import objectFaker.propertyGenerator.FixedPropertyGenerator;
+import objectFaker.propertyGenerator.PrefixPropertyGenerator;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ApplicationContextImpl.class)
-@PowerMockIgnore({"javax.script.*", "com.sun.script.*", "org.fusesource.jansi.internal.Kernel32"})
-public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
-
+@PowerMockIgnore({ "javax.script.*", "com.sun.script.*", "org.fusesource.jansi.internal.Kernel32" })
+public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest {
 
     protected DataFaker<TaskStateData> taskStateFaker;
 
@@ -71,7 +77,7 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
     protected List<TaskStateData> taskDataFiltered;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         super.setUp();
 
         JobIdData jobId = jobIdFaker.fake();
@@ -90,7 +96,7 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
     }
 
     @Test
-    public void testCommandJobIdOnly() throws Exception{
+    public void testCommandJobIdOnly() throws Exception {
         when(restApi.getJobTaskStates(anyString(), eq(jobId))).thenReturn(taskData);
         executeTest(jobId);
 
@@ -106,9 +112,8 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
         assertThat(out, containsString("task6"));
     }
 
-
     @Test
-    public void testCommandJobIdTag() throws Exception{
+    public void testCommandJobIdTag() throws Exception {
         when(restApi.getJobTaskStatesByTag(anyString(), eq(jobId), eq(tag))).thenReturn(taskDataFiltered);
         executeTest(jobId, tag);
 
@@ -124,10 +129,8 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
         assertThat(out, not(containsString("task6")));
     }
 
-
-
     @Test
-    public void testCommandJobIdUnknownTag() throws Exception{
+    public void testCommandJobIdUnknownTag() throws Exception {
         when(restApi.getJobTaskStatesByTag(anyString(), eq("1"), eq("unknownTag")))
                 .thenReturn(new ArrayList<TaskStateData>());
 
@@ -140,9 +143,8 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
         assertThat(out, containsString("ID     NAME"));
     }
 
-
     @Test
-    public void testCommandUnknownJobIdUnknownTag() throws Exception{
+    public void testCommandUnknownJobIdUnknownTag() throws Exception {
         when(restApi.getJobTaskStatesByTag(anyString(), eq(unknownJobId), eq(unknownTag)))
                 .thenThrow(exceptionUnknownJob);
 
@@ -151,13 +153,15 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
         String out = capturedOutput.toString();
         System.out.println(out);
 
-        assertThat(out, equalTo("An error occurred while retrieving job('2') state:\n" + "" +
-                "Error Message: Job 2 does not exists\n"));
+        assertThat(out,
+                equalTo("An error occurred while retrieving job('2') state:" + System.lineSeparator() +
+                    "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
+                    "You can enable debug mode for getting more information using -X or --debug option." +
+                    System.lineSeparator()));
     }
 
-
     @Test
-    public void testCommandUnknownJob() throws Exception{
+    public void testCommandUnknownJob() throws Exception {
         when(restApi.getJobTaskStates(anyString(), eq(unknownJobId))).thenThrow(exceptionUnknownJob);
 
         executeTest(unknownJobId);
@@ -165,33 +169,32 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest{
         String out = capturedOutput.toString();
         System.out.println(out);
 
-        assertThat(out, equalTo("An error occurred while retrieving job('2') state:\n" + "" +
-                "Error Message: Job 2 does not exists\n"));
+        assertThat(out,
+                equalTo("An error occurred while retrieving job('2') state:" + System.lineSeparator() +
+                    "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
+                    "You can enable debug mode for getting more information using -X or --debug option." +
+                    System.lineSeparator()));
     }
 
-
     @Test
-    public void testJobIdOnlyFromInteractive() throws Exception{
+    public void testJobIdOnlyFromInteractive() throws Exception {
         typeLine("taskstates(1)");
         executeTestInteractive();
         verify(restApi).getJobTaskStates(anyString(), eq("1"));
     }
 
-
     @Test
-    public void testJobIdTagFromInteractive() throws Exception{
+    public void testJobIdTagFromInteractive() throws Exception {
         typeLine("taskstates(1, 'LOOP-T2-1')");
         executeTestInteractive();
         verify(restApi).getJobTaskStatesByTag(anyString(), eq("1"), eq("LOOP-T2-1"));
     }
 
-
     @Override
     protected void executeCommandWithArgs(Object... args) {
-        if(args.length == 1){
+        if (args.length == 1) {
             new ListTaskStatesCommand((String) args[0]).execute(this.context);
-        }
-        else{
+        } else {
             new ListTaskStatesCommand((String) args[0], (String) args[1]).execute(this.context);
         }
     }

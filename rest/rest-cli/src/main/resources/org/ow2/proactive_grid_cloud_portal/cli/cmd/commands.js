@@ -53,6 +53,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobTasksCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand);
@@ -65,6 +66,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputComman
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);

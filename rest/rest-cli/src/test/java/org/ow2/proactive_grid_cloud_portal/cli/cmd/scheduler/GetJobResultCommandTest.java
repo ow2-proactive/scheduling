@@ -37,8 +37,17 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.scheduler;
 
-import objectFaker.DataFaker;
-import objectFaker.propertyGenerator.PrefixPropertyGenerator;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,36 +59,28 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
-import java.util.List;
+import objectFaker.DataFaker;
+import objectFaker.propertyGenerator.PrefixPropertyGenerator;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ApplicationContextImpl.class)
-@PowerMockIgnore({"javax.script.*", "com.sun.script.*", "org.fusesource.jansi.internal.Kernel32"})
-public class GetJobResultCommandTest extends AbstractJobTagCommandTest{
-
+@PowerMockIgnore({ "javax.script.*", "com.sun.script.*", "org.fusesource.jansi.internal.Kernel32" })
+public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
 
     protected JobResultData jobResult;
 
     protected List<TaskResultData> taskResults;
 
-
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         super.setUp();
 
         DataFaker<JobResultData> jobResultFaker = new DataFaker<JobResultData>(JobResultData.class);
         jobResultFaker.setGenerator("id.readableName", new PrefixPropertyGenerator("job", 1));
         jobResultFaker.setGenerator("allResults.key", new PrefixPropertyGenerator("task", 1));
-        jobResultFaker.setGenerator("allResults.value.id.readableName", new PrefixPropertyGenerator("task", 1));
+        jobResultFaker.setGenerator("allResults.value.id.readableName",
+                new PrefixPropertyGenerator("task", 1));
 
         jobResult = jobResultFaker.fake();
 
@@ -89,9 +90,8 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest{
         taskResults = taskResultsDataFaker.fakeList(3);
     }
 
-
     @Test
-    public void testCommandJobIdOnly() throws Exception{
+    public void testCommandJobIdOnly() throws Exception {
         when(restApi.jobResult(anyString(), eq(jobId))).thenReturn(this.jobResult);
         executeTest(jobId);
         String out = capturedOutput.toString();
@@ -103,9 +103,8 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest{
         assertThat(out, containsString("task3 : serializedValue3"));
     }
 
-
     @Test
-    public void testCommandJobIdTag() throws Exception{
+    public void testCommandJobIdTag() throws Exception {
         when(restApi.taskresultByTag(anyString(), eq(jobId), eq(tag))).thenReturn(this.taskResults);
         executeTest(jobId, tag);
 
@@ -117,23 +116,25 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest{
         assertThat(out, containsString("task6 result: serializedValue3"));
     }
 
-
     @Test
-    public void testCommandUnknownJob() throws Exception{
+    public void testCommandUnknownJob() throws Exception {
         when(restApi.jobResult(anyString(), eq(unknownJobId))).thenThrow(exceptionUnknownJob);
         executeTest(unknownJobId);
 
         String out = capturedOutput.toString();
         System.out.println(out);
 
-        assertThat(out, equalTo("An error occurred while retrieving job('2') result:" + System.lineSeparator() +
-                "Error Message: Job 2 does not exists" + System.lineSeparator()));
+        assertThat(out,
+                equalTo("An error occurred while retrieving job('2') result:" + System.lineSeparator() +
+                    "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
+                    "You can enable debug mode for getting more information using -X or --debug option." +
+                    System.lineSeparator()));
     }
 
-
     @Test
-    public void testCommandJobIdUnknownTag() throws Exception{
-        when(restApi.taskresultByTag(anyString(), eq(jobId), eq(unknownTag))).thenReturn(new ArrayList<TaskResultData>());
+    public void testCommandJobIdUnknownTag() throws Exception {
+        when(restApi.taskresultByTag(anyString(), eq(jobId), eq(unknownTag)))
+                .thenReturn(new ArrayList<TaskResultData>());
         executeTest(jobId, unknownTag);
 
         String out = capturedOutput.toString();
@@ -142,42 +143,41 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest{
         assertThat(out, equalTo(System.lineSeparator()));
     }
 
-
     @Test
-    public void testCommandUnknownJobIdUnknownTag() throws Exception{
-        when(restApi.taskresultByTag(anyString(), eq(unknownJobId), anyString())).thenThrow(exceptionUnknownJob);
+    public void testCommandUnknownJobIdUnknownTag() throws Exception {
+        when(restApi.taskresultByTag(anyString(), eq(unknownJobId), anyString()))
+                .thenThrow(exceptionUnknownJob);
         executeTest(unknownJobId, unknownTag);
 
         String out = capturedOutput.toString();
         System.out.println(out);
 
-        assertThat(out, equalTo("An error occurred while retrieving job('2') result:" + System.lineSeparator() +
-                "Error Message: Job 2 does not exists" + System.lineSeparator()));
+        assertThat(out,
+                equalTo("An error occurred while retrieving job('2') result:" + System.lineSeparator() +
+                    "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
+                    "You can enable debug mode for getting more information using -X or --debug option." +
+                    System.lineSeparator()));
     }
 
-
     @Test
-    public void testJobIdOnlyFromInteractive() throws Exception{
+    public void testJobIdOnlyFromInteractive() throws Exception {
         typeLine("jobresult(1)");
         executeTestInteractive();
         verify(restApi).jobResult(anyString(), eq("1"));
     }
 
-
     @Test
-    public void testJobIdTagFromInteractive() throws Exception{
+    public void testJobIdTagFromInteractive() throws Exception {
         typeLine("jobresult(1, 'LOOP-T2-1')");
         executeTestInteractive();
         verify(restApi).taskresultByTag(anyString(), eq("1"), eq("LOOP-T2-1"));
     }
 
-
     @Override
     protected void executeCommandWithArgs(Object... args) {
-        if(args.length == 1){
+        if (args.length == 1) {
             new GetJobResultCommand((String) args[0]).execute(this.context);
-        }
-        else{
+        } else {
             new GetJobResultCommand((String) args[0], (String) args[1]).execute(this.context);
         }
     }
