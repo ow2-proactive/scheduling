@@ -9,8 +9,23 @@ dependencies {
 
         compile project(":common:common-api")
         compile project(':rest:rest-api')
+        
+        
         compile 'com.googlecode.json-simple:json-simple:1.1'
+        
+        testCompile functionalTestDependencies
+        testCompile project(':rest:rest-server')
+        testCompile project(':rest:rest-server').sourceSets.test.output 
+        
+        testCompile project(':scheduler:scheduler-api')
+        
 
         testCompile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
         testCompile 'org.eclipse.jetty:jetty-server:9.2.13.v20150730'
 }
+
+task('functionalTest', type: Test).configure functionalTestConfiguration
+
+
+functionalTest.dependsOn rootProject.dist
+clean.dependsOn rootProject.cleanDist

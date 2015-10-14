@@ -40,15 +40,6 @@ import java.security.Policy;
 
 import javax.ws.rs.core.MediaType;
 
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -63,6 +54,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 
 import functionaltests.jobs.NonTerminatingJob;
 import functionaltests.jobs.SimpleJob;
@@ -83,9 +83,9 @@ public abstract class AbstractRestFuncTestCase {
 
     private static void configureSecurityManager() {
         if (System.getProperty("java.security.policy") == null) {
-            System.setProperty("java.security.policy", System.getProperty(PAResourceManagerProperties.RM_HOME
-                    .getKey()) +
-                "/config/security.java.policy-server");
+            System.setProperty("java.security.policy",
+                    System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
+                        "/config/security.java.policy-server");
 
             Policy.getPolicy().refresh();
         }
@@ -192,7 +192,6 @@ public abstract class AbstractRestFuncTestCase {
         return RestFuncTestConfig.getInstance().getNonAdminLonginPassword();
     }
 
-
     protected JobId submitDefaultJob() throws Exception {
         Job job = defaultJob();
         return getScheduler().submit(job);
@@ -206,11 +205,11 @@ public abstract class AbstractRestFuncTestCase {
         return jobId.value();
     }
 
-    protected void waitJobState(JobId jobId, JobStatus expected, long timeout) throws Exception {
+    public void waitJobState(JobId jobId, JobStatus expected, long timeout) throws Exception {
         waitJobState(jobId.value(), expected, timeout);
     }
 
-    protected void waitJobState(String jobId, JobStatus expected, long timeout) throws Exception {
+    public void waitJobState(String jobId, JobStatus expected, long timeout) throws Exception {
         long stopTime = System.currentTimeMillis() + timeout;
 
         while (System.currentTimeMillis() < stopTime) {
@@ -224,8 +223,8 @@ public abstract class AbstractRestFuncTestCase {
             }
         }
 
-        Assert.fail("Failed to wait when " + jobId + " is " + expected + ", current status is "
-                + getScheduler().getJobState(jobId).getStatus());
+        Assert.fail("Failed to wait when " + jobId + " is " + expected + ", current status is " +
+            getScheduler().getJobState(jobId).getStatus());
     }
 
     protected String submitPendingJobId() throws Exception {
