@@ -128,7 +128,7 @@ public class StringUtility {
 
     public static String string(NodeEventView[] nodeEvents) {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
-        formatter.setMaxColumnLength(80);
+        formatter.setMaxColumnLength(300);
         formatter.setSpace(4);
 
         List<String> titles = new ArrayList<>();
