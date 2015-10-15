@@ -37,71 +37,47 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.job.JobResultImpl;
-import org.ow2.proactive.scheduler.task.TaskIdImpl;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
 
 /**
  * The [offset, limit[ boundaries and tag filtering are out of the scope of these tests
- * because their control is done in the <code>JobState</code> class
+ * because their control is done in the <code>JobState</code> class.
+ * We are only testing the REST interface methods providing the pagination on tasks.
  * @author paraita
  *
  */
 public class SchedulerStateRestPaginationTest extends RestTestServer {
 
-    private String generateReadableName(final String jobIdStr, final int i, final int nbTasks) {
-        return "JOB-" + jobIdStr + "-TASK-" + (i + 1) + "/" + nbTasks;
+    private SchedulerRestInterface restInterface = null;
+    private SchedulerProxyUserInterface mockOfScheduler = null;
+    private String sessionId = null;
+
+    @Before
+    public void setUp() throws Throwable {
+        restInterface = new SchedulerStateRest();
+        mockOfScheduler = mock(SchedulerProxyUserInterface.class);
+        sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
     }
 
-    private JobState newMockedJob(final String jobIdStr, final int nbTasks) {
-        JobState mockedJob = mock(JobState.class);
-        JobId mockedJobId = mock(JobId.class);
-
-        List<TaskState> dumbList = new ArrayList<TaskState>(nbTasks);
-        for (int i = 0; i < nbTasks; i++) {
-            TaskState mockedTask = mock(TaskState.class);
-            TaskId mockedTaskId = mock(TaskId.class);
-            when(mockedTaskId.getReadableName()).thenReturn(generateReadableName(jobIdStr, i, nbTasks));
-            when(mockedTask.getId()).thenReturn(mockedTaskId);
-            dumbList.add(mockedTask);
-        }
-
-        when(mockedJobId.value()).thenReturn(jobIdStr);
-        when(mockedJob.getId()).thenReturn(mockedJobId);
-        when(mockedJob.getTasksPaginated(0, 50)).thenReturn(dumbList);
-        return mockedJob;
-    }
-
-    /**
-     * The [offset, limit[ boundaries and tag filtering are out of the scope of these tests
-     * because their control is done in the <code>JobState</code> class
-     * @throws Throwable
-     */
     @Test
     public void testGetJobTasksIdsPaginated() throws Throwable {
-        SchedulerRestInterface restInterface = new SchedulerStateRest();
-
-        SchedulerProxyUserInterface mockOfScheduler = mock(SchedulerProxyUserInterface.class);
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
 
         int nbTasks = 50;
         String jobIdStr = "1";
@@ -121,52 +97,70 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
 
     @Test
     public void testGetJobTasksIdsByTagPaginated() throws Throwable {
+        int nbTasks = 50;
+        String jobIdStr = "1";
+        JobState job = newMockedJob(jobIdStr, nbTasks);
+        when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
+        List<String> res = restInterface.getJobTasksIdsPaginated(sessionId, jobIdStr, 0, nbTasks);
+
+        assertEquals("Number of tasks is incorrect", nbTasks, res.size());
+
+        for (int i = 0; i < nbTasks; i++) {
+            assertEquals("Task readable name is incorrect", generateReadableName(jobIdStr, i, nbTasks),
+                    res.get(i));
+        }
     }
 
     @Test
     public void testGetJobTaskStatesPaginated() throws Throwable {
+        int nbTasks = 50;
+        String jobIdStr = "1";
+        JobState job = newMockedJob(jobIdStr, nbTasks);
+        when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
+
+        List<TaskStateData> res = restInterface.getJobTaskStatesPaginated(sessionId, jobIdStr, 0, nbTasks);
+
+        assertEquals("Number of tasks is incorrect", nbTasks, res.size());
 
     }
 
     @Test
     public void testGetJobTaskStatesByTagPaginated() throws Throwable {
+        int nbTasks = 50;
+        String jobIdStr = "1";
+        JobState job = newMockedJob(jobIdStr, nbTasks);
+        when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
+
+        List<TaskStateData> res = restInterface.getJobTaskStatesByTagPaginated(sessionId, jobIdStr, "", 0,
+                nbTasks);
+
+        assertEquals("Number of tasks is incorrect", nbTasks, res.size());
 
     }
 
-    @Test
-    public void testValueOfTaskResult_ExceptionNoMessage() throws Throwable {
-        SchedulerRestInterface restInterface = new SchedulerStateRest();
+    private JobState newMockedJob(final String jobIdStr, final int nbTasks) {
+        JobState mockedJob = mock(JobState.class);
+        JobId mockedJobId = mock(JobId.class);
 
-        SchedulerProxyUserInterface mockOfScheduler = mock(SchedulerProxyUserInterface.class);
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
+        List<TaskState> dumbList = new ArrayList<TaskState>(nbTasks);
+        for (int i = 0; i < nbTasks; i++) {
+            TaskState mockedTask = mock(TaskState.class);
+            TaskId mockedTaskId = mock(TaskId.class);
+            when(mockedTaskId.getReadableName()).thenReturn(generateReadableName(jobIdStr, i, nbTasks));
+            when(mockedTask.getId()).thenReturn(mockedTaskId);
+            dumbList.add(mockedTask);
+        }
 
-        TaskResultImpl taskResultWithException = new TaskResultImpl(
-            TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "mytask", 1), null, new byte[0], null);
-        when(mockOfScheduler.getTaskResult("42", "mytask")).thenReturn(taskResultWithException);
-
-        String exceptionStackTrace = (String) restInterface.valueOftaskresult(sessionId, "42", "mytask");
-
-        assertNotNull(exceptionStackTrace);
+        when(mockedJobId.value()).thenReturn(jobIdStr);
+        when(mockedJob.getId()).thenReturn(mockedJobId);
+        when(mockedJob.getTasksPaginated(0, 50)).thenReturn(dumbList);
+        when(mockedJob.getTaskByTagPaginated("", 0, 50)).thenReturn(dumbList);
+        return mockedJob;
     }
 
-    @Test
-    public void testValueOfJobResult_ExceptionNoMessage() throws Throwable {
-        SchedulerRestInterface restInterface = new SchedulerStateRest();
-
-        SchedulerProxyUserInterface mockOfScheduler = mock(SchedulerProxyUserInterface.class);
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
-
-        TaskResultImpl taskResultWithException = new TaskResultImpl(
-            TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "mytask", 1), null, new byte[0], null);
-        JobResultImpl jobResultWithException = new JobResultImpl();
-        jobResultWithException.addTaskResult("mytask", taskResultWithException, false);
-        when(mockOfScheduler.getJobResult("42")).thenReturn(jobResultWithException);
-
-        Map<String, String> jobResult = restInterface.jobResultValue(sessionId, "42");
-        String exceptionStackTrace = jobResult.get("mytask");
-
-        assertNotNull(exceptionStackTrace);
+    private String generateReadableName(final String jobIdStr, final int i, final int nbTasks) {
+        return "JOB-" + jobIdStr + "-TASK-" + (i + 1) + "/" + nbTasks;
     }
 
 }
