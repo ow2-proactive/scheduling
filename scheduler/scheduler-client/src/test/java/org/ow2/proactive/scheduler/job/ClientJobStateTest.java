@@ -4,7 +4,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.varia.NullAppender;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -12,7 +11,6 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 

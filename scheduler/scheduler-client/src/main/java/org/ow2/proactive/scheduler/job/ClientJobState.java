@@ -4,7 +4,11 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.RestartMode;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 
