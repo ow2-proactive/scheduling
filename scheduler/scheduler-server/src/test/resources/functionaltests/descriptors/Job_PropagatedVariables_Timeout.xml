@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
-     name="job_walltime_vars" cancelJobOnError="false" priority="normal">
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.3"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+        name="Job_PropagatedVariables_Timeout"
+        priority="normal"
+        cancelJobOnError="false">
     <variables>
         <variable name="var" value="var-value"/>
     </variables>
     <taskFlow>
         <task name="walltime" walltime="5">
-            <nativeExecutable>
-                <staticCommand value="sleep">
-                    <arguments>
-                        <argument value="30"/>
-                    </arguments>
-                </staticCommand>
-            </nativeExecutable>
+            <scriptExecutable>
+                <script>
+                    <code language="python">
+                        <![CDATA[
+import time
+
+print "Start : %s" % time.ctime()
+time.sleep( 30 )
+print "End : %s" % time.ctime()
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
         </task>
         <task name="read_var">
             <depends>
@@ -22,13 +33,18 @@
             <scriptExecutable>
                 <script>
                     <code language="groovy">
-                        if (!variables.get("var")) {
-                            throw new Exception("expects var in variables")
-                        }
-                        println variables
+                        <![CDATA[
+if (!variables.get("var")) {
+    throw new Exception("expects var in variables")
+    }
+println variables
+println 'Propagated value:'
+println variables.get("var")
+]]>
                     </code>
                 </script>
             </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
         </task>
     </taskFlow>
 </job>
