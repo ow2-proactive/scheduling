@@ -17,13 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-
 /**
  * 
  * This class is a client view of a {@link TaskState}. A client may access
