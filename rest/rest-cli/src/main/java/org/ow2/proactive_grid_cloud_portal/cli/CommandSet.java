@@ -137,9 +137,9 @@ public class CommandSet {
     public static final CommandSet.Entry SUBMIT =
             CommandSetEntryBuilder.newInstance().opt("s").longOpt("submit")
                     .description("Submit the specified job-description (XML) file")
-                    .hasArgs(true).numOfArgs(1).hasOptionalArg(true)
-                    .argNames("job-descriptor [var1=value1 var2=value2 ...]")
-                    .jsCommand("submit(job-descriptor,[var1=value1,var2=value2,...]")
+                    .hasArgs(true).numOfArgs(2).hasOptionalArg(true)
+                    .argNames("job-descriptor '[{\"var1\":\"value1\",\"var2\":\"value2\"}]'")
+                    .jsCommand("submit(job-descriptor,'{\"var1\":\"value1\",\"var2\":\"value2\"}'")
                     .commandClass(SubmitJobCommand.class).entry();
 
     public static final CommandSet.Entry SCHEDULER_START =
