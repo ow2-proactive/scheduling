@@ -37,6 +37,11 @@
 
 package functionaltests;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -47,28 +52,21 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive_grid_cloud_portal.scheduler.WorkflowSubmitter;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by Sandrine on 12/09/2015.
  */
-public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
+public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
 
     private static Scheduler scheduler;
 
     private static JobId jobId = null;
-
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -77,7 +75,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
     @Before
     public void setUp() throws Exception {
-        if(jobId == null) {
+        if (jobId == null) {
             scheduler = RestFuncTHelper.getScheduler();
             SchedulerState state = scheduler.getState();
             List<JobState> jobStates = new ArrayList<>();
@@ -90,15 +88,13 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
                 scheduler.removeJob(jobId);
             }
 
-
             //submit a job with a loop and out and err outputs
             System.out.println("submit a job with loop, out and err outputs");
             jobId = submitJob("flow_loop_out.xml");
         }
     }
 
-
-    private JobId submitJob(String filename) throws Exception{
+    private JobId submitJob(String filename) throws Exception {
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
         WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler);
         JobId id = submitter.submit(jobFile, new HashMap<String, String>());
@@ -106,8 +102,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         return id;
     }
 
-
-    private HttpResponse sendRequest(String url) throws Exception{
+    private HttpResponse sendRequest(String url) throws Exception {
         String schedulerUrl = getResourceUrl(url);
         HttpGet httpGet = new HttpGet(schedulerUrl);
         setSessionHeader(httpGet);
@@ -115,7 +110,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertHttpStatusOK(response);
         return response;
     }
-
 
     @Test
     public void testTaskIdsByTag() throws Exception {
@@ -130,7 +124,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(4, jsonArray.size());
     }
 
-
     @Test
     public void testTaskIdsByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/unknownTag");
@@ -139,7 +132,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         System.out.println(jsonArray.toJSONString());
         assertEquals(0, jsonArray.size());
     }
-
 
     @Test
     public void testTaskStatesByTag() throws Exception {
@@ -150,7 +142,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(4, jsonArray.size());
     }
 
-
     @Test
     public void testTaskStatesByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/taskstates/unknownTag");
@@ -159,7 +150,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         System.out.println(jsonArray.toJSONString());
         assertEquals(0, jsonArray.size());
     }
-
 
     @Test
     public void testTaskLogAllByTag() throws Exception {
@@ -173,7 +163,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(2, StringUtils.countMatches(responseContent, "Terminate task number 1"));
     }
 
-
     @Test
     public void testTaskLogAllByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/unknownTag/result/log/all");
@@ -181,7 +170,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
         assertEquals("", responseContent);
     }
-
 
     @Test
     public void testTaskLogErrByTag() throws Exception {
@@ -193,7 +181,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(2, StringUtils.countMatches(responseContent, "Task 1 : Test STDERR"));
     }
 
-
     @Test
     public void testTaskLogErrByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/unknownTag/result/log/err");
@@ -201,7 +188,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
 
         assertEquals("", responseContent);
     }
-
 
     @Test
     public void testTaskLogOutByTag() throws Exception {
@@ -214,7 +200,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(2, StringUtils.countMatches(responseContent, "Terminate task number 1"));
     }
 
-
     @Test
     public void testTaskLogOutByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/unknownTag/result/log/all");
@@ -223,17 +208,15 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals("", responseContent);
     }
 
-
     @Test
     public void testTaskLogServerByTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/log/server");
         String responseContent = getContent(response);
 
-        for(TaskState state: scheduler.getJobState(jobId).getTaskByTag("LOOP-T2-1")){
-            assertTrue(responseContent.contains("Task " + state.getId().value() + " logs"));
+        for (TaskState state : scheduler.getJobState(jobId).getTaskByTag("LOOP-T2-1")) {
+            assertTrue(responseContent.contains("Task " + state.getId() + " logs"));
         }
     }
-
 
     @Test
     public void testTaskLogSeverByUnknownTag() throws Exception {
@@ -243,7 +226,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertTrue(!responseContent.contains("TaskLogger"));
     }
 
-
     @Test
     public void testTaskResultByTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/result");
@@ -252,7 +234,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         System.out.println(jsonArray.toJSONString());
 
         ArrayList<String> taskNames = new ArrayList<>();
-        for(int i = 0; i < jsonArray.size(); i++){
+        for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject id = (JSONObject) ((JSONObject) jsonArray.get(i)).get("id");
             String name = (String) id.get("readableName");
             taskNames.add(name);
@@ -264,7 +246,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertTrue(taskNames.contains("T2#1"));
         assertEquals(4, jsonArray.size());
     }
-
 
     @Test
     public void testTaskResultByUnknownTag() throws Exception {
@@ -289,7 +270,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(4, jsonObject.size());
     }
 
-
     @Test
     public void testTaskResultValueByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/unknownTag/result/value");
@@ -298,7 +278,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         System.out.println(jsonObject.toJSONString());
         assertEquals(0, jsonObject.size());
     }
-
 
     @Test
     public void testTaskResultSerializedvalueByTag() throws Exception {
@@ -314,7 +293,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(4, jsonObject.size());
     }
 
-
     @Test
     public void testTaskResultSerializedvalueByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/unknownTag/result/serializedvalue");
@@ -323,7 +301,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         System.out.println(jsonObject.toJSONString());
         assertEquals(0, jsonObject.size());
     }
-
 
     @Test
     public void testJobTags() throws Exception {
@@ -340,7 +317,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertEquals(5, jsonArray.size());
     }
 
-
     @Test
     public void testJobTagsPrefix() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tags/startsWith/LOOP");
@@ -353,7 +329,6 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase{
         assertTrue(jsonArray.contains("LOOP-T2-3"));
         assertEquals(3, jsonArray.size());
     }
-
 
     @Test
     public void testJobTagsBadPrefix() throws Exception {
