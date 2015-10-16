@@ -66,8 +66,8 @@ public class ClientJobStateSerializationTest {
 
     public class TestJobState extends JobState {
 
-        JobInfoImpl jobInfo;
-        Map<TaskId, TaskState> taskMap = new HashMap<>();
+        final JobInfoImpl jobInfo;
+        final Map<TaskId, TaskState> taskMap = new HashMap<>();
 
         public TestJobState(long number) {
             this.jobInfo = new JobInfoImpl();
@@ -112,8 +112,8 @@ public class ClientJobStateSerializationTest {
 
     public class TestTaskState extends TaskState {
 
-        List<TaskState> dependencies = new ArrayList<>();
-        TaskInfoImpl taskInfo;
+        final List<TaskState> dependencies = new ArrayList<>();
+        final TaskInfoImpl taskInfo;
 
         public TestTaskState(long number) {
             this.taskInfo = new TaskInfoImpl();
