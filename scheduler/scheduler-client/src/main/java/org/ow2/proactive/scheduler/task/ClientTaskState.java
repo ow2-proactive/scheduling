@@ -1,9 +1,5 @@
 package org.ow2.proactive.scheduler.task;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -15,6 +11,11 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -34,7 +35,7 @@ public final class ClientTaskState extends TaskState {
     private TaskInfo taskInfo;
     private int maxNumberOfExecutionOnFailure;
     private List<TaskId> dependenceIds = new ArrayList<>();
-    private List<TaskState> dependences = new ArrayList<>();
+    transient private List<TaskState> dependences = new ArrayList<>();
 
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
@@ -190,5 +191,10 @@ public final class ClientTaskState extends TaskState {
     public RestartMode getRestartTaskOnError() {
         throw new RuntimeException(
             "Not implemented: the restart task on error property is not available on client side.");
+    }
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        this.dependences = new ArrayList<>();
     }
 }
