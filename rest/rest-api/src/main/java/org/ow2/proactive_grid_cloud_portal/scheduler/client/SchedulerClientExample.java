@@ -87,8 +87,8 @@ public class SchedulerClientExample {
         TaskResultData taskresult = scheduler.taskresult(sessionId, Long.toString(flatJob.getId()), "task_1");
         System.out.println(taskresult);
 
-        List<TaskStateData> jobTaskStates = scheduler.getJobTaskStates(sessionId,
-                Long.toString(flatJob.getId()));
+        List<TaskStateData> jobTaskStates = scheduler
+                .getJobTaskStates(sessionId, Long.toString(flatJob.getId())).getTasks();
         System.out.println(jobTaskStates);
 
         TaskStateData task_1 = scheduler.jobtask(sessionId, Long.toString(flatJob.getId()), "task_1");

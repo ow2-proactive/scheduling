@@ -53,6 +53,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobTasksCommand;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdsPage;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -86,7 +87,7 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdOnly() throws Exception {
-        when(restApi.getJobTasksIds(anyString(), eq(jobId))).thenReturn(this.taskNames);
+        when(restApi.getJobTasksIds(anyString(), eq(jobId))).thenReturn(new TaskIdsPage(this.taskNames));
 
         executeTest(jobId);
 
@@ -98,7 +99,8 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdTag() throws Exception {
-        when(restApi.getJobTasksIdsByTag(anyString(), eq(jobId), eq(tag))).thenReturn(this.filteredTaskNames);
+        when(restApi.getJobTasksIdsByTag(anyString(), eq(jobId), eq(tag)))
+                .thenReturn(new TaskIdsPage(this.filteredTaskNames));
         executeTest(jobId, tag);
 
         String out = capturedOutput.toString();
@@ -110,7 +112,7 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
     @Test
     public void testCommandJobIdUnknownTag() throws Exception {
         when(restApi.getJobTasksIdsByTag(anyString(), eq(jobId), eq(unknownTag)))
-                .thenReturn(new ArrayList<String>());
+                .thenReturn(new TaskIdsPage(new ArrayList<String>()));
 
         executeTest(jobId, unknownTag);
 

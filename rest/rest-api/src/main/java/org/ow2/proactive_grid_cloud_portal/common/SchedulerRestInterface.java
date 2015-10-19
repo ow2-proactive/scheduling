@@ -72,8 +72,10 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdsPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateDataPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
@@ -257,7 +259,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    List<String> getJobTasksIds(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+    TaskIdsPage getJobTasksIds(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
@@ -266,12 +268,12 @@ public interface SchedulerRestInterface {
      * @param jobId jobid one wants to list the tasks' name
      * @param offset the number of the first task to fetch
      * @param limit the number of the last task to fetch (non inclusive)
-     * @return a list of tasks' name
+     * @return the list of task ids with the total number of them
      */
     @GET
     @Path("jobs/{jobid}/tasks/paginated")
     @Produces("application/json")
-    List<String> getJobTasksIdsPaginated(@HeaderParam("sessionid") String sessionId,
+    TaskIdsPage getJobTasksIdsPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
@@ -281,12 +283,12 @@ public interface SchedulerRestInterface {
      * @param sessionId a valid session id
      * @param jobId jobid one wants to list the tasks' name
      * @param taskTag the tag used to filter the tasks.
-     * @return a list of tasks' name
+     * @return a list of task ids filtered by the tag and with the total number of tasks ids
      */
     @GET
     @Path("jobs/{jobid}/tasks/tag/{tasktag}")
     @Produces("application/json")
-    List<String> getJobTasksIdsByTag(@HeaderParam("sessionid") String sessionId,
+    TaskIdsPage getJobTasksIdsByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -297,13 +299,13 @@ public interface SchedulerRestInterface {
      * @param taskTag the tag used to filter the tasks.
      * @param offset the number of the first task to fetch
      * @param limit the number of the last task to fetch (non inclusive)
-     * @return a list of task' states of the job <code>jobId</code> filtered by a given tag, for a given pagination.
+     * @return a list of task ids filtered by the tag and with the total number of tasks ids
      */
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/paginated")
     @Produces("application/json")
-    List<String> getJobTasksIdsByTagPaginated(@HeaderParam("sessionid") String sessionId,
+    TaskIdsPage getJobTasksIdsByTagPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit)
@@ -357,13 +359,13 @@ public interface SchedulerRestInterface {
      * Returns a list of taskState 
      * @param sessionId a valid session id
      * @param jobId the job id
-     * @return a list of task' states of the job <code>jobId</code>
+     * @return a list of task' states of the job <code>jobId</code> and the total number
      */
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates")
     @Produces("application/json")
-    List<TaskStateData> getJobTaskStates(@HeaderParam("sessionid") String sessionId,
+    TaskStateDataPage getJobTaskStates(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -373,13 +375,13 @@ public interface SchedulerRestInterface {
      * @param jobId the job id
      * @param offset the index of the first TaskState to return
      * @param limit the index (non inclusive) of the last TaskState to return
-     * @return a list of task' states of the job <code>jobId</code>
+     * @return a list of task' states of the job <code>jobId</code> and the total number
      */
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates/paginated")
     @Produces("application/json")
-    List<TaskStateData> getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
+    TaskStateDataPage getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
@@ -389,13 +391,13 @@ public interface SchedulerRestInterface {
      * @param sessionId a valid session id.
      * @param jobId the job id.
      * @param taskTag the tag used to filter the tasks.
-     * @return a list of task' states of the job <code>jobId</code> filtered by a given tag.
+     * @return a list of task' states of the job <code>jobId</code> filtered by a given tag and the total number
      */
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}")
     @Produces("application/json")
-    List<TaskStateData> getJobTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
+    TaskStateDataPage getJobTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -406,13 +408,13 @@ public interface SchedulerRestInterface {
      * @param taskTag the tag used to filter the tasks.
      * @param offset the number of the first task to fetch
      * @param limit the number of the last task to fetch (non inclusive)
-     * @return a list of task' states of the job <code>jobId</code> filtered by a given tag, for a given pagination.
+     * @return a list of task' states of the job <code>jobId</code> filtered by a given tag, and the total number
      */
     @GET
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
     @Produces("application/json")
-    List<TaskStateData> getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
+    TaskStateDataPage getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit)
@@ -1030,10 +1032,9 @@ public interface SchedulerRestInterface {
     @Path("session")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/json")
-    String loginOrRenewSession(
-            @HeaderParam("sessionid") String sessionId,
-            @FormParam("username") String username,
-            @FormParam("password") String password) throws SchedulerRestException, LoginException, NotConnectedRestException;
+    String loginOrRenewSession(@HeaderParam("sessionid") String sessionId,
+            @FormParam("username") String username, @FormParam("password") String password)
+                    throws SchedulerRestException, LoginException, NotConnectedRestException;
 
     /**
      * login to the scheduler using a multipart form

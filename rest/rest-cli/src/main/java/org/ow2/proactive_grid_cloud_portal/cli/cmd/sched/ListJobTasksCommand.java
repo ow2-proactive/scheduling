@@ -37,34 +37,31 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import org.ow2.proactive.utils.Tools;
+import java.util.List;
+
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 
-import java.util.List;
 
 /**
  * @author  the activeeon team.
  */
 public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implements Command {
-    
-    public ListJobTasksCommand(String jobId){
+
+    public ListJobTasksCommand(String jobId) {
         super(jobId);
     }
 
-    public ListJobTasksCommand(String jobId, String tag){
+    public ListJobTasksCommand(String jobId, String tag) {
         super(jobId, tag);
     }
-    
+
     public ListJobTasksCommand(String jobId, String tag, String offset, String limit) {
         super(jobId, tag, offset, limit);
     }
-    
+
     public ListJobTasksCommand(String jobId, String offset, String limit) {
         super(jobId, offset, limit);
     }
@@ -74,20 +71,21 @@ public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implemen
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
             List<String> tasks = null;
-            if(this.tag != null){
+            if (this.tag != null) {
                 if (this.limit == 0) {
-                    tasks = scheduler.getJobTasksIdsByTag(currentContext.getSessionId(), jobId, tag);
+                    tasks = scheduler.getJobTasksIdsByTag(currentContext.getSessionId(), jobId, tag)
+                            .getTaskIds();
+                } else {
+                    tasks = scheduler.getJobTasksIdsByTagPaginated(currentContext.getSessionId(), jobId, tag,
+                            offset, limit).getTaskIds();
                 }
-                else {
-                    tasks = scheduler.getJobTasksIdsByTagPaginated(currentContext.getSessionId(), jobId, tag, offset, limit);
-                }
-            }
-            else{
+            } else {
                 if (this.limit == 0) {
-                    tasks = scheduler.getJobTasksIds(currentContext.getSessionId(), jobId);
-                }
-                else {
-                    tasks = scheduler.getJobTasksIdsPaginated(currentContext.getSessionId(), jobId, offset, limit);
+                    tasks = scheduler.getJobTasksIds(currentContext.getSessionId(), jobId).getTaskIds();
+                } else {
+                    tasks = scheduler
+                            .getJobTasksIdsPaginated(currentContext.getSessionId(), jobId, offset, limit)
+                            .getTaskIds();
                 }
             }
 
@@ -98,11 +96,11 @@ public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implemen
             }
         } catch (Exception e) {
             String message = null;
-            if(this.tag == null){
+            if (this.tag == null) {
                 message = String.format("An error occurred while retrieving %s tasks:", job());
-            }
-            else{
-                message = String.format("An error occurred while retrieving %s tasks filtered by tag %s:", job(), tag);
+            } else {
+                message = String.format("An error occurred while retrieving %s tasks filtered by tag %s:",
+                        job(), tag);
             }
             handleError(message, e, currentContext);
         }

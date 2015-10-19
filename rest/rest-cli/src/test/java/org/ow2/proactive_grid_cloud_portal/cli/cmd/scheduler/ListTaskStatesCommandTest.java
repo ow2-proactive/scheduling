@@ -56,6 +56,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateDataPage;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -97,7 +98,7 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdOnly() throws Exception {
-        when(restApi.getJobTaskStates(anyString(), eq(jobId))).thenReturn(taskData);
+        when(restApi.getJobTaskStates(anyString(), eq(jobId))).thenReturn(new TaskStateDataPage(taskData));
         executeTest(jobId);
 
         String out = capturedOutput.toString();
@@ -114,7 +115,8 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdTag() throws Exception {
-        when(restApi.getJobTaskStatesByTag(anyString(), eq(jobId), eq(tag))).thenReturn(taskDataFiltered);
+        when(restApi.getJobTaskStatesByTag(anyString(), eq(jobId), eq(tag)))
+                .thenReturn(new TaskStateDataPage(taskDataFiltered));
         executeTest(jobId, tag);
 
         String out = capturedOutput.toString();
@@ -132,7 +134,7 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest {
     @Test
     public void testCommandJobIdUnknownTag() throws Exception {
         when(restApi.getJobTaskStatesByTag(anyString(), eq("1"), eq("unknownTag")))
-                .thenReturn(new ArrayList<TaskStateData>());
+                .thenReturn(new TaskStateDataPage(new ArrayList<TaskStateData>()));
 
         executeTest(jobId, unknownTag);
 
