@@ -71,7 +71,7 @@ public class GetJobResultCommand extends AbstractJobTagCommand implements Comman
                 }
             }
             else {
-                List<TaskResultData> results = scheduler.taskresultByTag(currentContext.getSessionId(), jobId, tag);
+                List<TaskResultData> results = scheduler.taskResultByTag(currentContext.getSessionId(), jobId, tag);
                 resultStack(currentContext).push(results);
                 if (!currentContext.isForced()) {
                     writeLine(currentContext, "%s", StringUtility.taskResultsAsString(results));

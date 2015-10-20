@@ -295,7 +295,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobsinfo")
     @Produces({ "application/json", "application/xml" })
-    public List<UserJobData> jobsinfo(@HeaderParam("sessionid") String sessionId,
+    public List<UserJobData> jobsInfo(@HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
             @QueryParam("range") @DefaultValue("-1") int range)
                     throws PermissionRestException, NotConnectedRestException {
@@ -346,7 +346,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
-    public Map<Long, List<UserJobData>> revisionAndjobsinfo(@HeaderParam("sessionid") String sessionId,
+    public Map<Long, List<UserJobData>> revisionAndJobsInfo(@HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
             @QueryParam("range") @DefaultValue("-1") int range,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
@@ -1162,7 +1162,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/{taskname}")
     @Produces("application/json")
-    public TaskStateData jobtask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+    public TaskStateData jobTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
                     PermissionRestException, UnknownTaskRestException {
         try {
@@ -1207,7 +1207,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/value")
     @Produces("*/*")
-    public Serializable valueOftaskresult(@HeaderParam("sessionid") String sessionId,
+    public Serializable valueOfTaskResult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/value");
         TaskResult taskResult = s.getTaskResult(jobId, taskname);
@@ -1230,7 +1230,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/value")
     @Produces("application/json")
-    public Map<String, String> valueOftaskresultByTag(@HeaderParam("sessionid") String sessionId,
+    public Map<String, String> valueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
         Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/value");
         List<TaskResult> taskResults = s.getTaskResultByTag(jobId, taskTag);
@@ -1284,7 +1284,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
     @Produces("*/*")
-    public byte[] serializedValueOftaskresult(@HeaderParam("sessionid") String sessionId,
+    public byte[] serializedValueOfTaskResult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId,
                 "jobs/" + jobId + "/tasks/" + taskname + "/result/serializedvalue");
@@ -1309,7 +1309,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue")
     @Produces("application/json")
-    public Map<String, byte[]> serializedValueOftaskresultByTag(@HeaderParam("sessionid") String sessionId,
+    public Map<String, byte[]> serializedValueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
         Scheduler s = checkAccess(sessionId,
                 "jobs/" + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
@@ -1339,7 +1339,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result")
     @Produces("application/json")
-    public TaskResultData taskresult(@HeaderParam("sessionid") String sessionId,
+    public TaskResultData taskResult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskname") String taskname)
                     throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
                     PermissionRestException {
@@ -1377,7 +1377,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result")
     @Produces("application/json")
-    public List<TaskResultData> taskresultByTag(@HeaderParam("sessionid") String sessionId,
+    public List<TaskResultData> taskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
@@ -1416,7 +1416,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
     @Produces("application/json")
-    public String tasklog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+    public String taskLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
                     UnknownTaskRestException, PermissionRestException {
         try {
@@ -1458,7 +1458,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/all")
     @Produces("application/json")
-    public String tasklogByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+    public String taskLogByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
@@ -1539,7 +1539,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
     @Produces("application/json")
-    public String tasklogErr(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+    public String taskLogErr(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
                     UnknownTaskRestException, PermissionRestException {
         try {
@@ -1573,7 +1573,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/err")
     @Produces("application/json")
-    public String tasklogErrByTag(@HeaderParam("sessionid") String sessionId,
+    public String taskLogErrByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
@@ -1613,7 +1613,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
     @Produces("application/json")
-    public String tasklogout(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+    public String taskLogout(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
                     UnknownTaskRestException, PermissionRestException {
         try {
@@ -1646,7 +1646,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/out")
     @Produces("application/json")
-    public String tasklogoutByTag(@HeaderParam("sessionid") String sessionId,
+    public String taskLogoutByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {

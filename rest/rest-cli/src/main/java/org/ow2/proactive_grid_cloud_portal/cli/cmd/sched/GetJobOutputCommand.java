@@ -65,7 +65,7 @@ public class GetJobOutputCommand extends AbstractJobTagCommand implements Comman
                 output = scheduler.jobLogs(currentContext.getSessionId(), jobId);
             }
             else {
-                output = scheduler.tasklogByTag(currentContext.getSessionId(), jobId, tag);
+                output = scheduler.taskLogByTag(currentContext.getSessionId(), jobId, tag);
             }
             resultStack(currentContext).push(output);
             if (!currentContext.isSilent()) {

@@ -66,7 +66,7 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
                 .makeJobId("42"), "mytask", 1), null, new byte[0], null);
         when(mockOfScheduler.getTaskResult("42", "mytask")).thenReturn(taskResultWithException);
 
-        String exceptionStackTrace = (String) restInterface.valueOftaskresult(sessionId, "42", "mytask");
+        String exceptionStackTrace = (String) restInterface.valueOfTaskResult(sessionId, "42", "mytask");
 
         assertNotNull(exceptionStackTrace);
     }

@@ -79,7 +79,7 @@ public class GetJobOutputCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdTag() throws Exception {
-        when(restApi.tasklogByTag(anyString(), eq(jobId), eq(tag))).thenReturn(expectedOutputJobIdTag);
+        when(restApi.taskLogByTag(anyString(), eq(jobId), eq(tag))).thenReturn(expectedOutputJobIdTag);
         executeTest(jobId, tag);
 
         String out = capturedOutput.toString();
@@ -105,7 +105,7 @@ public class GetJobOutputCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdUnknownTag() throws Exception {
-        when(restApi.tasklogByTag(anyString(), eq(jobId), eq(unknownTag))).thenReturn("");
+        when(restApi.taskLogByTag(anyString(), eq(jobId), eq(unknownTag))).thenReturn("");
         executeTest(jobId, unknownTag);
 
         String out = capturedOutput.toString();
@@ -116,7 +116,7 @@ public class GetJobOutputCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandUnknownJobIdUnknownTag() throws Exception {
-        when(restApi.tasklogByTag(anyString(), eq(unknownJobId), anyString())).thenThrow(exceptionUnknownJob);
+        when(restApi.taskLogByTag(anyString(), eq(unknownJobId), anyString())).thenThrow(exceptionUnknownJob);
         executeTest(unknownJobId, unknownTag);
 
         String out = capturedOutput.toString();
@@ -140,7 +140,7 @@ public class GetJobOutputCommandTest extends AbstractJobTagCommandTest {
     public void testJobIdTagFromInteractive() throws Exception {
         typeLine("joboutput(1, 'LOOP-T2-1')");
         executeTestInteractive();
-        verify(restApi).tasklogByTag(anyString(), eq("1"), eq("LOOP-T2-1"));
+        verify(restApi).taskLogByTag(anyString(), eq("1"), eq("LOOP-T2-1"));
     }
 
     @Override

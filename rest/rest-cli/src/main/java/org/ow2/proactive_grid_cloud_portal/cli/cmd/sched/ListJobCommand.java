@@ -135,7 +135,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
     private static void printJobsList(int index, int offset, ApplicationContext currentContext)
             throws PermissionRestException, NotConnectedRestException, IOException {
         Map<Long, List<UserJobData>> stateMap = currentContext.getRestClient().getScheduler()
-                .revisionAndjobsinfo(currentContext.getSessionId(), index, offset, false, true, true, true);
+                .revisionAndJobsInfo(currentContext.getSessionId(), index, offset, false, true, true, true);
         List<UserJobData> jobs = stateMap.values().iterator().next();
         currentContext.getDevice().writeLine("%s", StringUtility.jobsAsString(jobs));
     }

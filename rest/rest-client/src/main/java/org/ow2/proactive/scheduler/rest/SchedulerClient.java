@@ -288,7 +288,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             List<SortParameter<JobSortParameter>> arg3) throws NotConnectedException, PermissionException {
         List<JobInfo> jobInfos = null;
         try {
-            List<UserJobData> userJobDataList = restApi().jobsinfo(sid, index, range);
+            List<UserJobData> userJobDataList = restApi().jobsInfo(sid, index, range);
             jobInfos = toJobInfos(userJobDataList);
         } catch (Exception e) {
             throwNCEOrPE(e);
@@ -325,19 +325,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         TaskResultImpl taskResult = null;
         try {
-            TaskResultData taskResultData = restApi().taskresult(sid, jobId, taskName);
+            TaskResultData taskResultData = restApi().taskResult(sid, jobId, taskName);
             taskResult = (TaskResultImpl) toTaskResult(JobIdImpl.makeJobId(jobId), taskResultData);
             if (taskResult.value() == null) {
-                Serializable value = restApi().valueOftaskresult(sid, jobId, taskName);
+                Serializable value = restApi().valueOfTaskResult(sid, jobId, taskName);
                 if (value != null) {
                     taskResult.setHadException(true);
                     taskResult.setValue(value);
                 }
             }
 
-            String all = restApi().tasklog(sid, jobId, taskName);
-            String out = restApi().tasklogout(sid, jobId, taskName);
-            String err = restApi().tasklogErr(sid, jobId, taskName);
+            String all = restApi().taskLog(sid, jobId, taskName);
+            String out = restApi().taskLogout(sid, jobId, taskName);
+            String err = restApi().taskLogErr(sid, jobId, taskName);
 
             taskResult.setOutput(DataUtility.toTaskLogs(all, out, err));
 
@@ -370,7 +370,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
         String taskLogs = "";
         try {
-            taskLogs = restApi().tasklog(sid, arg0, arg1);
+            taskLogs = restApi().taskLog(sid, arg0, arg1);
         } catch (Exception e) {
             throwUJEOrNCEOrPEOrUTE(e);
         }
@@ -382,7 +382,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws UnknownJobException, NotConnectedException, PermissionException {
         String taskLogs = "";
         try {
-            taskLogs = restApi().tasklogByTag(sid, arg0, arg1);
+            taskLogs = restApi().taskLogByTag(sid, arg0, arg1);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }
@@ -662,7 +662,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException {
         boolean finished = false;
         try {
-            TaskStateData taskStateData = restApi().jobtask(sid, jobId, taskName);
+            TaskStateData taskStateData = restApi().jobTask(sid, jobId, taskName);
             TaskState taskState = taskState(taskStateData);
             finished = !taskState.getStatus().isTaskAlive();
         } catch (Exception e) {
