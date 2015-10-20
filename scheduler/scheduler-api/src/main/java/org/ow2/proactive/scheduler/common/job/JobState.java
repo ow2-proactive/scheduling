@@ -36,7 +36,11 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -45,6 +49,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 
 
 /**
@@ -214,15 +219,18 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     
     /**
      * To get the paginated tasks.
+     * The tasks are paginated with the following rule: [offset,limit[
      * @param offset the starting index of the sublist of tasks to get
      * @param limit the last index (non inclusive) of the sublist of tasks to get
-     * @return the list of tasks paginated with [offset, limit[
+     * @return a TaskStatePage which includes subset of tasks and the total number of all tasks
      */
-    public List<TaskState> getTasksPaginated(final int offset, final int limit) {
+    public TaskStatesPage getTasksPaginated(final int offset, final int limit) {
      // check whether the indexes are inside the list boundaries or not
         // if they're not, translate indexes inside the boundaries
         int _offset = 0;
-        int _limit = getTasks().size();
+        int total_size = getTasks().size();
+        int _limit = total_size;
+        
         if (offset > 0 && offset < _limit) _offset = offset;
         if (limit > 0 && limit < _limit) _limit = limit;
         if (_offset > _limit) {
@@ -230,23 +238,25 @@ public abstract class JobState extends Job implements Comparable<JobState> {
             _offset = _limit;
             _limit = tmp;
         }
-        return getTasks().subList(_offset, _limit);
+        return new TaskStatesPage(getTasks().subList(_offset, _limit), total_size);
     }
 
     /**
      * To get the paginated filtered tasks by a given tag.
+     * The filtered tasks are paginated with the following rule: [offset,limit[
      * @param tag used to filter the tasks
      * @param offset the starting index of the sublist of tasks to get
      * @param limit the last index (non inclusive) of the sublist of tasks to get
-     * @return the list of filtered tasks by tag and then paginated with [offset, limit[
+     * @return a TaskStatePage which includes subset of filtered tasks and the total number of all filtered tasks
      */
-    public List<TaskState> getTaskByTagPaginated(final String tag, final int offset, final int limit) {
+    public TaskStatesPage getTaskByTagPaginated(final String tag, final int offset, final int limit) {
         List<TaskState> tasks = getTaskByTag(tag);
+        int total_size = tasks.size();
         
         // check whether the indexes are inside the list boundaries or not
         // if they're not, translate indexes inside the boundaries
         int _offset = 0;
-        int _limit = tasks.size();
+        int _limit = total_size;
         if (offset > 0 && offset < _limit) _offset = offset;
         if (limit > 0 && limit < _limit) _limit = limit;
         if (_offset > _limit) {
@@ -254,7 +264,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
             _offset = _limit;
             _limit = tmp;
         }
-        return tasks.subList(_offset, _limit);
+        return new TaskStatesPage(tasks.subList(_offset, _limit), total_size);
     }
 
     /**

@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -156,8 +157,8 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
 
         when(mockedJobId.value()).thenReturn(jobIdStr);
         when(mockedJob.getId()).thenReturn(mockedJobId);
-        when(mockedJob.getTasksPaginated(0, 50)).thenReturn(dumbList);
-        when(mockedJob.getTaskByTagPaginated("", 0, 50)).thenReturn(dumbList);
+        when(mockedJob.getTasksPaginated(0, 50)).thenReturn(new TaskStatesPage(dumbList, nbTasks));
+        when(mockedJob.getTaskByTagPaginated("", 0, 50)).thenReturn(new TaskStatesPage(dumbList, nbTasks));
         return mockedJob;
     }
 

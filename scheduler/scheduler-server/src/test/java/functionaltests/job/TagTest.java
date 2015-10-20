@@ -35,9 +35,15 @@
 
 package functionaltests.job;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import java.util.ArrayList;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
@@ -52,11 +58,6 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.tests.ProActiveTest;
 
-import java.util.ArrayList;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-
 
 public class TagTest extends ProActiveTest{
 
@@ -67,8 +68,6 @@ public class TagTest extends ProActiveTest{
 
 
     protected InternalTaskFlowJob job = null;
-
-
 
     @Before
     public void setUp() {

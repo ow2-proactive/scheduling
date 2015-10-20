@@ -80,30 +80,30 @@ public class JobStateTest extends ProActiveTest {
 
     @Test
     public void testGetTasksPaginated() throws Exception {
-        assertEquals(10, jobState.getTasksPaginated(0, 10).size());
-        assertEquals(10, jobState.getTasksPaginated(0, 50).size());
-        assertEquals(10, jobState.getTasksPaginated(0, 5000000).size());
-        assertEquals(10, jobState.getTasksPaginated(-1000, 50).size());
-        assertEquals(9, jobState.getTasksPaginated(1, -1).size());
-        assertEquals(10, jobState.getTasksPaginated(0, 0).size());
-        assertEquals(1, jobState.getTasksPaginated(0, 1).size());
-        assertEquals(2, jobState.getTasksPaginated(0, 2).size());
-        assertEquals(3, jobState.getTasksPaginated(0, 3).size());
-        assertEquals(10, jobState.getTasksPaginated(50, 5000).size());
+        assertEquals(10, jobState.getTasksPaginated(0, 10).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(0, 50).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(0, 5000000).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(-1000, 50).getTaskStates().size());
+        assertEquals(9, jobState.getTasksPaginated(1, -1).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(0, 0).getTaskStates().size());
+        assertEquals(1, jobState.getTasksPaginated(0, 1).getTaskStates().size());
+        assertEquals(2, jobState.getTasksPaginated(0, 2).getTaskStates().size());
+        assertEquals(3, jobState.getTasksPaginated(0, 3).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(50, 5000).getTaskStates().size());
     }
 
     @Test
     public void testGetTaskByTagPaginated() {
-        assertEquals(10, jobState.getTasksPaginated(0, 10).size());
-        assertEquals(10, jobState.getTasksPaginated(0, 50).size());
-        assertEquals(10, jobState.getTasksPaginated(0, 5000000).size());
-        assertEquals(10, jobState.getTasksPaginated(-1000, 50).size());
-        assertEquals(9, jobState.getTasksPaginated(1, -1).size());
-        assertEquals(10, jobState.getTasksPaginated(0, 0).size());
-        assertEquals(1, jobState.getTasksPaginated(0, 1).size());
-        assertEquals(2, jobState.getTasksPaginated(0, 2).size());
-        assertEquals(3, jobState.getTasksPaginated(0, 3).size());
-        assertEquals(10, jobState.getTasksPaginated(50, 5000).size());
+        assertEquals(10, jobState.getTasksPaginated(0, 10).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(0, 50).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(0, 5000000).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(-1000, 50).getTaskStates().size());
+        assertEquals(9, jobState.getTasksPaginated(1, -1).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(0, 0).getTaskStates().size());
+        assertEquals(1, jobState.getTasksPaginated(0, 1).getTaskStates().size());
+        assertEquals(2, jobState.getTasksPaginated(0, 2).getTaskStates().size());
+        assertEquals(3, jobState.getTasksPaginated(0, 3).getTaskStates().size());
+        assertEquals(10, jobState.getTasksPaginated(50, 5000).getTaskStates().size());
     }
 
 }

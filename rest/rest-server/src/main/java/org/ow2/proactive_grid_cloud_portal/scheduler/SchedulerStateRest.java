@@ -143,6 +143,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -796,11 +797,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
 
             JobState jobState = s.getJobState(jobId);
-            List<String> tasksNames = new ArrayList<>(jobState.getTasksPaginated(offset, limit).size());
-            for (TaskState ts : jobState.getTasksPaginated(offset, limit)) {
+            TaskStatesPage page = jobState.getTasksPaginated(offset, limit);
+            List<String> tasksNames = new ArrayList<>(page.getTaskStates().size());
+            for (TaskState ts : page.getTaskStates()) {
                 tasksNames.add(ts.getId().getReadableName());
             }
-            return new TaskIdsPage(tasksNames);
+            return new TaskIdsPage(tasksNames, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -833,13 +835,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
 
             JobState jobState = s.getJobState(jobId);
-            List<TaskState> tasks = jobState.getTaskByTagPaginated(taskTag, 0, 50);
+            TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, 0, 50);
+            List<TaskState> tasks = page.getTaskStates();
             List<String> tasksName = new ArrayList<>(tasks.size());
             for (TaskState ts : tasks) {
                 tasksName.add(ts.getId().getReadableName());
             }
 
-            return new TaskIdsPage(tasksName);
+            return new TaskIdsPage(tasksName, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -872,14 +875,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskTag + "/paginated");
 
             JobState jobState = s.getJobState(jobId);
-            List<TaskState> tasks = jobState.getTaskByTagPaginated(taskTag, offset, limit);
+            TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, offset, limit);
+            List<TaskState> tasks = page.getTaskStates();
             List<String> tasksName = new ArrayList<>(tasks.size());
 
             for (TaskState ts : tasks) {
                 tasksName.add(ts.getId().getReadableName());
             }
 
-            return new TaskIdsPage(tasksName);
+            return new TaskIdsPage(tasksName, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1000,9 +1004,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/paginated");
             JobState jobState = s.getJobState(jobId);
-
-            List<TaskStateData> tasks = map(jobState.getTasksPaginated(offset, limit), TaskStateData.class);
-            return new TaskStateDataPage(tasks);
+            TaskStatesPage page = jobState.getTasksPaginated(offset, limit);
+            List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
+            return new TaskStateDataPage(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1034,9 +1038,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag);
             JobState jobState = s.getJobState(jobId);
-            List<TaskStateData> tasks = map(jobState.getTaskByTagPaginated(taskTag, 0, 50),
-                    TaskStateData.class);
-            return new TaskStateDataPage(tasks);
+            TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, 0, 50);
+            List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
+            return new TaskStateDataPage(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1062,9 +1066,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag + "/paginated");
             JobState jobState = s.getJobState(jobId);
-            List<TaskStateData> tasks = map(jobState.getTaskByTagPaginated(taskTag, offset, limit),
-                    TaskStateData.class);
-            return new TaskStateDataPage(tasks);
+            TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, offset, limit);
+            List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
+            return new TaskStateDataPage(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {

@@ -16,9 +16,9 @@ public class TaskStateDataPage {
 
     }
 
-    public TaskStateDataPage(List<TaskStateData> tasks) {
+    public TaskStateDataPage(List<TaskStateData> tasks, int size) {
         this.tasks = tasks;
-        this.size = tasks.size();
+        this.size = size;
     }
 
     public int getSize() {

@@ -15,10 +15,10 @@ public class TaskIdsPage {
     public TaskIdsPage() {
 
     }
-
-    public TaskIdsPage(List<String> taskIds) {
+    
+    public TaskIdsPage(List<String> taskIds, int size) {
         this.taskIds = taskIds;
-        this.size = taskIds.size();
+        this.size = size;
     }
 
     public int getSize() {
