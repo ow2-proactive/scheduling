@@ -273,7 +273,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    TaskIdsPage getJobTasksIds(
+    TaskIdsPage getTasksNames(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
@@ -289,7 +289,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/paginated")
     @Produces("application/json")
-    TaskIdsPage getJobTasksIdsPaginated(
+    TaskIdsPage getTasksNamesPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @QueryParam("offset") @DefaultValue("0") int offset,

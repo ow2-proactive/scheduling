@@ -87,7 +87,7 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdOnly() throws Exception {
-        when(restApi.getJobTasksIds(anyString(), eq(jobId))).thenReturn(new TaskIdsPage(this.taskNames, taskNames.size()));
+        when(restApi.getTasksNames(anyString(), eq(jobId))).thenReturn(new TaskIdsPage(this.taskNames, taskNames.size()));
 
         executeTest(jobId);
 
@@ -124,7 +124,7 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandUnknownJob() throws Exception {
-        when(restApi.getJobTasksIds(anyString(), eq(unknownJobId))).thenThrow(exceptionUnknownJob);
+        when(restApi.getTasksNames(anyString(), eq(unknownJobId))).thenThrow(exceptionUnknownJob);
         executeTest(unknownJobId);
 
         String out = capturedOutput.toString();
@@ -158,7 +158,7 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
     public void testJobIdOnlyFromInteractive() throws Exception {
         typeLine("listtasks(1)");
         executeTestInteractive();
-        verify(restApi).getJobTasksIds(anyString(), eq("1"));
+        verify(restApi).getTasksNames(anyString(), eq("1"));
     }
 
     @Test

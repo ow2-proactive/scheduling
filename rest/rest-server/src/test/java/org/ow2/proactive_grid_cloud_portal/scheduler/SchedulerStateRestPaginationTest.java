@@ -86,7 +86,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
-        TaskIdsPage page = restInterface.getJobTasksIdsPaginated(sessionId, jobIdStr, 0, nbTasks);
+        TaskIdsPage page = restInterface.getTasksNamesPaginated(sessionId, jobIdStr, 0, nbTasks);
 
         assertEquals("Number of tasks is incorrect", nbTasks, page.getSize());
 
@@ -104,7 +104,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
-        TaskIdsPage page = restInterface.getJobTasksIdsPaginated(sessionId, jobIdStr, 0, nbTasks);
+        TaskIdsPage page = restInterface.getTasksNamesPaginated(sessionId, jobIdStr, 0, nbTasks);
 
         assertEquals("Number of tasks is incorrect", nbTasks, page.getSize());
 

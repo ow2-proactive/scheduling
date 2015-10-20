@@ -771,10 +771,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    public TaskIdsPage getJobTasksIds(@HeaderParam("sessionid") String sessionId,
+    public TaskIdsPage getTasksNames(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
-        return getJobTasksIdsPaginated(sessionId, jobId, 0, 50);
+        return getTasksNamesPaginated(sessionId, jobId, 0, 50);
     }
 
     /**
@@ -789,7 +789,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/paginated")
     @Produces("application/json")
-    public TaskIdsPage getJobTasksIdsPaginated(@HeaderParam("sessionid") String sessionId,
+    public TaskIdsPage getTasksNamesPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
