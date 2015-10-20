@@ -50,20 +50,49 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
  */
 public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implements Command {
 
-    public ListJobTasksCommand(String jobId) {
-        super(jobId);
+    private ListJobTasksCommand() {
+        super("undefined");
     }
-
-    public ListJobTasksCommand(String jobId, String tag) {
-        super(jobId, tag);
-    }
-
-    public ListJobTasksCommand(String jobId, String tag, String offset, String limit) {
-        super(jobId, tag, offset, limit);
-    }
-
-    public ListJobTasksCommand(String jobId, String offset, String limit) {
-        super(jobId, offset, limit);
+    
+    /*
+     * Utility class to build ListJobTasksCommand objects.
+     */
+    public static class LJTCommandBuilder {
+        
+        private ListJobTasksCommand obj;
+        
+        private LJTCommandBuilder() {
+            obj = new ListJobTasksCommand();
+        }
+        
+        public static LJTCommandBuilder newInstance() {
+            return new LJTCommandBuilder();
+        }
+        
+        public LJTCommandBuilder jobId(String jobId) {
+            obj.jobId = jobId;
+            return this;
+        }
+        
+        public LJTCommandBuilder offset(String offset) {
+            obj.offset = Integer.valueOf(offset);
+            return this;
+        }
+        
+        public LJTCommandBuilder limit(String limit) {
+            obj.limit = Integer.valueOf(limit);
+            return this;
+        }
+        
+        public LJTCommandBuilder tag(String tag) {
+            obj.tag = tag;
+            return this;
+        }
+        
+        public ListJobTasksCommand instance() {
+            return obj;
+        }
+        
     }
 
     @Override

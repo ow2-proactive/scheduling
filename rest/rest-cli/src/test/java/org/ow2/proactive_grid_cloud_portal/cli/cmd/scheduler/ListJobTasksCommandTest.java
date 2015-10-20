@@ -170,10 +170,33 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Override
     protected void executeCommandWithArgs(Object... args) {
-        if (args.length == 1) {
-            new ListJobTasksCommand((String) args[0]).execute(this.context);
-        } else {
-            new ListJobTasksCommand((String) args[0], (String) args[1]).execute(this.context);
+        switch (args.length) {
+            case 1:
+                // args: jobId
+                ListJobTasksCommand.LJTCommandBuilder.newInstance()
+                .jobId((String) args[0]).instance().execute(this.context);
+                break;
+            case 2:
+                // args: jobId and tag
+                ListJobTasksCommand.LJTCommandBuilder.newInstance()
+                .jobId((String) args[0]).tag((String) args[1]).instance()
+                .execute(this.context);
+                break;
+            case 3:
+                // args: jobId, offset and limit
+                ListJobTasksCommand.LJTCommandBuilder.newInstance()
+                .jobId((String) args[0]).offset((String) args[1])
+                .limit((String) args[2]).instance()
+                .execute(this.context);
+                break;
+            default:
+                // args: jobId, tag, offset and limit
+                // We don't consider parameters beyond the fourth
+                ListJobTasksCommand.LJTCommandBuilder.newInstance()
+                .jobId((String) args[0]).tag((String) args[1])
+                .offset((String) args[2]).limit((String) args[3])
+                .instance().execute(this.context);
+                break;
         }
     }
 }

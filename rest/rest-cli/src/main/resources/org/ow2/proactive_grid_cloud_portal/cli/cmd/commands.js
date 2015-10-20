@@ -255,24 +255,24 @@ function listjobs(x, y) {
 function listtasks(arg1, arg2, arg3, arg4) {
 	// There is only one parameter, the jobId
 	if (arguments.length == 1 && typeof arg1 != 'undefined') {
-		execute(new ListJobTasksCommand(arg1));
+		execute(ListJobTasksCommand.LJTCommandBuilder.newInstance().jobId(arg1).instance());
 	}
 	// Two arguments: jobId and tag
 	if (arguments.length == 2 && typeof arg1 != 'undefined'
 		&& typeof arg2 != 'undefined') {
-		execute(new ListJobTasksCommand(arg1, arg2));
+		execute(ListJobTasksCommand.LJTCommandBuilder.newInstance().jobId(arg1).tag(arg2).instance());
 	}
 	// Three parameters: jobId, offset and limit
 	if (arguments.length == 3 && typeof arg1 != 'undefined'
 		&& typeof arg2 != 'undefined' && typeof arg3 != 'undefined') {
-		execute(new ListJobTasksCommand(arg1, arg2, arg3));
+		execute(ListJobTasksCommand.LJTCommandBuilder.newInstance().jobId(arg1).offset(arg2).limit(arg3).instance());
 	}
 	// Four parameters: jobId, tag, offset and limit
 	// We don't parse any parameters after the fourth one
 	if (arguments.length >= 4 && typeof arg1 != 'undefined'
 		&& typeof arg2 != 'undefined' && typeof arg3 != 'undefined'
 			&& typeof arg4 != 'undefined') {
-		execute(new ListJobTasksCommand(arg1, arg2, arg3, arg4));
+		execute(ListJobTasksCommand.LJTCommandBuilder.newInstance().jobId(arg1).tag(arg2).offset(arg3).limit(arg4).instance());
 	}
 }
 
