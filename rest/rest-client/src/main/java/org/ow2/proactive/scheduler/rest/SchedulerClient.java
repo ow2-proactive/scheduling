@@ -366,11 +366,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public String getTaskServerLogs(String arg0, String arg1)
+    public String getTaskServerLogs(String jobId, String taskName)
             throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
         String taskLogs = "";
         try {
-            taskLogs = restApi().taskLog(sid, arg0, arg1);
+            taskLogs = restApi().taskLog(sid, jobId, taskName);
         } catch (Exception e) {
             throwUJEOrNCEOrPEOrUTE(e);
         }
@@ -378,11 +378,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public String getTaskServerLogsByTag(String arg0, String arg1)
+    public String getTaskServerLogsByTag(String jobId, String tag)
             throws UnknownJobException, NotConnectedException, PermissionException {
         String taskLogs = "";
         try {
-            taskLogs = restApi().taskLogByTag(sid, arg0, arg1);
+            taskLogs = restApi().taskLogByTag(sid, jobId, tag);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }
