@@ -1,129 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="urn:proactive:jobdescriptor:3.2"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
-    name="flow_loop" projectName="myProject"
-    priority="normal"
-    cancelJobOnError="false">
-  <genericInformation>
-    <info name="var1" value="val1"/>
-    <info name="var2" value="val2"/>
-  </genericInformation>
-  <taskFlow>
-    <task name="T"
-    maxNumberOfExecution="4">
-      <description>
-        <![CDATA[ x=149,y=69
-      // ]]>
-      </description>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
-    </task>
-    <task name="T1"
-    maxNumberOfExecution="4">
-      <description>
-        <![CDATA[ x=149,y=138      // ]]>
-      </description>
-      <depends>
-        <task ref="T"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
-      <controlFlow block="start"></controlFlow>
-    </task>
-    <task name="T3"
-    maxNumberOfExecution="4">
-      <description>
-        <![CDATA[ x=151,y=278
-      // ]]>
-      </description>
-      <depends>
-        <task ref="T2"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
-      <controlFlow>
-        <replicate>
-          <script>
-            <code language="javascript">
-              //<![CDATA[
-              runs = 3;
-              //]]>
-            </code>
-          </script>
-        </replicate>
-      </controlFlow>
-    </task>
-    <task name="T4"
-          maxNumberOfExecution="4">
-      <description>
-
-      </description>
-      <depends>
-        <task ref="T3"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
-    </task>
-    <task name="T5"
-          maxNumberOfExecution="4">
-      <description>
-
-      </description>
-      <depends>
-        <task ref="T4"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
-    </task>
-    <task name="T2"
-    maxNumberOfExecution="4">
-      <description>
-        <![CDATA[ x=150,y=207,a=284,b=179
-      // ]]>
-      </description>
-      <depends>
-        <task ref="T1"/>
-        <task ref="Print2"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
-      <controlFlow  block="end">
-        <loop target="T1">
-			<script>
-            <code language="javascript">
-// <![CDATA[
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.3"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+        name="flow_loop" projectName="myProject"
+        priority="normal"
+        cancelJobOnError="false">
+    <genericInformation>
+        <info name="var1" value="val1"/>
+        <info name="var2" value="val2"/>
+    </genericInformation>
+    <taskFlow>
+        <task name="T" maxNumberOfExecution="4">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
+        </task>
+        <task name="T1" maxNumberOfExecution="4">
+            <depends>
+                <task ref="T"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
+            <controlFlow block="start"/>
+        </task>
+        <task name="T3" maxNumberOfExecution="4">
+            <depends>
+                <task ref="T2"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
+            <controlFlow>
+                <replicate>
+                    <script>
+                        <code language="javascript">
+                            //<![CDATA[
+                            runs = 3;
+                             //]]>
+                        </code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="T4" maxNumberOfExecution="4">
+            <description/>
+            <depends>
+                <task ref="T3"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
+        </task>
+        <task name="T5" maxNumberOfExecution="4">
+            <depends>
+                <task ref="T4"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
+        </task>
+        <task name="T2" maxNumberOfExecution="4">
+            <depends>
+                <task ref="T1"/>
+                <task ref="Print2"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob"></javaExecutable>
+            <controlFlow  block="end">
+                <loop target="T1">
+                    <script>
+                        <code language="javascript">
+                            // <![CDATA[
 if (result < 7) {
 loop = true;
 } else {
 loop = false;
 }
 // ]]>
-            </code>
-          </script>
-		</loop>
-      </controlFlow>
-    </task>
-    <task name="Print1"
-    maxNumberOfExecution="4">
-      <depends>
-        <task ref="T1"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
-        <parameters>
-          <parameter name="sleepTime" value="1"/>
-          <parameter name="number" value="${PA_TASK_ITERATION}"/>
-        </parameters>
-      </javaExecutable>
-      <controlFlow block="none"></controlFlow>
-    </task>
-	<task name="Print2"
-    maxNumberOfExecution="4">
-      <depends>
-        <task ref="Print1"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
-        <parameters>
-          <parameter name="sleepTime" value="1"/>
-          <parameter name="number" value="${PA_TASK_ITERATION}"/>
-        </parameters>
-      </javaExecutable>
-      <controlFlow block="none"></controlFlow>
-    </task>
-  </taskFlow>
+                        </code>
+                    </script>
+                </loop>
+            </controlFlow>
+        </task>
+        <task name="Print1" maxNumberOfExecution="4">
+            <depends>
+                <task ref="T1"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+                <parameters>
+                    <parameter name="sleepTime" value="1"/>
+                    <parameter name="number" value="${PA_TASK_ITERATION}"/>
+                </parameters>
+            </javaExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="Print2" maxNumberOfExecution="4">
+            <depends>
+                <task ref="Print1"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+                <parameters>
+                    <parameter name="sleepTime" value="1"/>
+                    <parameter name="number" value="${PA_TASK_ITERATION}"/>
+                </parameters>
+            </javaExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+    </taskFlow>
 </job>

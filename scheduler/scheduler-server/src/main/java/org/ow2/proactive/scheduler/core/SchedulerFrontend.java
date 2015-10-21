@@ -420,7 +420,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 results.add(currentResult);
             }
             catch(UnknownTaskException ex){
-                ex.printStackTrace();
+                //never occurs because tasks are filtered by tag so they cannot be unknown.
             }
         }
         return results;

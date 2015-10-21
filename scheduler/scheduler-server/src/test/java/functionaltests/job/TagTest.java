@@ -144,24 +144,24 @@ public class TagTest extends ProActiveTest{
 
 
     private String getTaskNameList(boolean showTags){
-        StringBuffer buf = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         ArrayList<InternalTask> tasks = job.getITasks();
         if(tasks.size() > 0){
-            buf.append(tasks.get(0).getName());
+            builder.append(tasks.get(0).getName());
             for(int i = 1; i < tasks.size(); i++){
                 InternalTask currentTask = tasks.get(i);
-                buf.append(", ");
-                buf.append(currentTask.getName());
+                builder.append(", ");
+                builder.append(currentTask.getName());
                 if(showTags){
                     if(currentTask.getTag() != null){
-                        buf.append("(");
-                        buf.append(currentTask.getTag());
-                        buf.append(")");
+                        builder.append("(");
+                        builder.append(currentTask.getTag());
+                        builder.append(")");
                     }
                 }
             }
         }
-        return buf.toString();
+        return builder.toString();
     }
 
 

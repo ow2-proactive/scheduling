@@ -60,7 +60,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.WorkflowSubmitter;
 
 
 /**
- * Created by Sandrine on 12/09/2015.
+ * Created by the activeeon team.
  */
 public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
 
