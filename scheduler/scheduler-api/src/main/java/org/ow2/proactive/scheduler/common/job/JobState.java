@@ -86,6 +86,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     private static int currentSort = SORT_BY_ID;
     private static int currentOrder = ASC_ORDER;
 
+    
     /** ProActive default constructor */
     public JobState() {
     }
@@ -225,20 +226,11 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return a TaskStatePage which includes subset of tasks and the total number of all tasks
      */
     public TaskStatesPage getTasksPaginated(final int offset, final int limit) {
-     // check whether the indexes are inside the list boundaries or not
-        // if they're not, translate indexes inside the boundaries
-        int _offset = 0;
+
         int total_size = getTasks().size();
-        int _limit = total_size;
-        
-        if (offset > 0 && offset < _limit) _offset = offset;
-        if (limit > 0 && limit < _limit) _limit = limit;
-        if (_offset > _limit) {
-            int tmp = _offset;
-            _offset = _limit;
-            _limit = tmp;
-        }
-        return new TaskStatesPage(getTasks().subList(_offset, _limit), total_size);
+        PageBoundaries pb = sanitizeBoundaries(getTasks(), offset, limit);
+
+        return new TaskStatesPage(getTasks().subList(pb.getOffset(), pb.getLimit()), total_size);
     }
 
     /**
@@ -252,19 +244,8 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     public TaskStatesPage getTaskByTagPaginated(final String tag, final int offset, final int limit) {
         List<TaskState> tasks = getTaskByTag(tag);
         int total_size = tasks.size();
-        
-        // check whether the indexes are inside the list boundaries or not
-        // if they're not, translate indexes inside the boundaries
-        int _offset = 0;
-        int _limit = total_size;
-        if (offset > 0 && offset < _limit) _offset = offset;
-        if (limit > 0 && limit < _limit) _limit = limit;
-        if (_offset > _limit) {
-            int tmp = _offset;
-            _offset = _limit;
-            _limit = tmp;
-        }
-        return new TaskStatesPage(tasks.subList(_offset, _limit), total_size);
+        PageBoundaries pb = sanitizeBoundaries(tasks, offset, limit);
+        return new TaskStatesPage(tasks.subList(pb.getOffset(), pb.getLimit()), total_size);
     }
 
     /**
@@ -441,6 +422,27 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return false;
     }
 
+
+    /*
+     * Returns sanitized boundaries.
+     * If the provided indexes are not valid, they are translated to
+     * valid ones.
+     */
+    private PageBoundaries sanitizeBoundaries(List<?> tasksList, int offset, int limit) {
+        int _offset = 0;
+        int total_size = tasksList.size();
+        int _limit = total_size;
+        
+        if (offset > 0 && offset < _limit) _offset = offset;
+        if (limit > 0 && limit < _limit) _limit = limit;
+        if (_offset > _limit) {
+            int tmp = _offset;
+            _offset = _limit;
+            _limit = tmp;
+        }
+        return new PageBoundaries(_offset, _limit);
+    }
+    
     /**
      * @see java.lang.Object#toString()
      */
@@ -449,4 +451,27 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return getClass().getSimpleName() + "[" + getId() + "]";
     }
 
+    /*
+     * Utility class to pass boundaries easily.
+     */
+    private static class PageBoundaries {
+
+        private int offset;
+        private int limit;
+
+        public PageBoundaries(int offset, int limit) {
+            this.offset = offset;
+            this.limit = limit;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public int getLimit() {
+            return limit;
+        }
+
+    }
+    
 }

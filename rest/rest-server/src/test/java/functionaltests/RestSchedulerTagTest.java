@@ -114,41 +114,42 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
     @Test
     public void testTaskIdsByTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1");
-        JSONArray jsonArray = toJsonArray(response);
+        JSONObject jsonObject = toJsonObject(response);
+        JSONArray taskIds = (JSONArray) jsonObject.get("taskIds");
 
-        System.out.println(jsonArray.toJSONString());
-        assertTrue(jsonArray.contains("T1#1"));
-        assertTrue(jsonArray.contains("Print1#1"));
-        assertTrue(jsonArray.contains("Print2#1"));
-        assertTrue(jsonArray.contains("T2#1"));
-        assertEquals(4, jsonArray.size());
+        System.out.println(jsonObject.toJSONString());
+        assertTrue(taskIds.contains("T1#1"));
+        assertTrue(taskIds.contains("Print1#1"));
+        assertTrue(taskIds.contains("Print2#1"));
+        assertTrue(taskIds.contains("T2#1"));
+        assertEquals("4", jsonObject.get("size").toString());
     }
 
     @Test
     public void testTaskIdsByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/unknownTag");
-        JSONArray jsonArray = toJsonArray(response);
+        JSONObject jsonObject = toJsonObject(response);
 
-        System.out.println(jsonArray.toJSONString());
-        assertEquals(0, jsonArray.size());
+        System.out.println(jsonObject.toJSONString());
+        assertEquals("0", jsonObject.get("size").toString());
     }
 
     @Test
     public void testTaskStatesByTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/taskstates/LOOP-T2-1");
-        JSONArray jsonArray = toJsonArray(response);
+        JSONObject jsonObject = toJsonObject(response);
 
-        System.out.println(jsonArray.toJSONString());
-        assertEquals(4, jsonArray.size());
+        System.out.println(jsonObject.toJSONString());
+        assertEquals("4", jsonObject.get("size").toString());
     }
 
     @Test
     public void testTaskStatesByUnknownTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/taskstates/unknownTag");
-        JSONArray jsonArray = toJsonArray(response);
+        JSONObject jsonObject = toJsonObject(response);
 
-        System.out.println(jsonArray.toJSONString());
-        assertEquals(0, jsonArray.size());
+        System.out.println(jsonObject.toJSONString());
+        assertEquals("0", jsonObject.get("size").toString());
     }
 
     @Test
@@ -226,6 +227,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
         assertTrue(!responseContent.contains("TaskLogger"));
     }
 
+    //FIXME
     @Test
     public void testTaskResultByTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/result");
@@ -233,7 +235,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
 
         System.out.println(jsonArray.toJSONString());
 
-        ArrayList<String> taskNames = new ArrayList<>();
+        ArrayList<String> taskNames = new ArrayList<>(4);
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject id = (JSONObject) ((JSONObject) jsonArray.get(i)).get("id");
             String name = (String) id.get("readableName");

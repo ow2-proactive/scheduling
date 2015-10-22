@@ -88,13 +88,8 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
 
         TaskIdsPage page = restInterface.getTasksNamesPaginated(sessionId, jobIdStr, 0, nbTasks);
 
-        assertEquals("Number of tasks is incorrect", nbTasks, page.getSize());
-
-        for (int i = 0; i < nbTasks; i++) {
-            assertEquals("Task readable name is incorrect", generateReadableName(jobIdStr, i, nbTasks),
-                    page.getTaskIds().get(i));
-        }
-
+        assertTasks(nbTasks, jobIdStr, page);
+        
     }
 
     @Test
@@ -106,12 +101,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
 
         TaskIdsPage page = restInterface.getTasksNamesPaginated(sessionId, jobIdStr, 0, nbTasks);
 
-        assertEquals("Number of tasks is incorrect", nbTasks, page.getSize());
-
-        for (int i = 0; i < nbTasks; i++) {
-            assertEquals("Task readable name is incorrect", generateReadableName(jobIdStr, i, nbTasks),
-                    page.getTaskIds().get(i));
-        }
+        assertTasks(nbTasks, jobIdStr, page);
     }
 
     @Test
@@ -164,6 +154,15 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
 
     private String generateReadableName(final String jobIdStr, final int i, final int nbTasks) {
         return "JOB-" + jobIdStr + "-TASK-" + (i + 1) + "/" + nbTasks;
+    }
+    
+    private void assertTasks(final int nbTasks, String jobIdStr, TaskIdsPage page) {
+        assertEquals("Number of tasks is incorrect", nbTasks, page.getSize());
+
+        for (int i = 0; i < nbTasks; i++) {
+            assertEquals("Task readable name is incorrect", generateReadableName(jobIdStr, i, nbTasks),
+                    page.getTaskIds().get(i));
+        }
     }
 
 }

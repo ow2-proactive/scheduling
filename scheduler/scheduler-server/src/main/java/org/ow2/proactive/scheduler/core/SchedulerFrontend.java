@@ -39,7 +39,11 @@ package org.ow2.proactive.scheduler.core;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -407,19 +411,21 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);
     }
 
-
     @Override
+    @ImmediateService
     public List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
+        frontendState.checkPermission("getTaskResultByTag",
+                "You do not have permission to get the task result of this job !");
         List<TaskState> taskStates = getJobState(jobId).getTaskByTag(taskTag);
         ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
-        for(TaskState currentState: taskStates){
+        for (TaskState currentState : taskStates) {
             String taskName = currentState.getTaskInfo().getName();
             try {
                 TaskResult currentResult = getTaskResult(jobId, taskName);
                 results.add(currentResult);
             }
-            catch(UnknownTaskException ex){
+            catch (UnknownTaskException ex){
                 //never occurs because tasks are filtered by tag so they cannot be unknown.
             }
         }
@@ -427,6 +433,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public List<TaskResult> getTaskResultByTag(String jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return this.getTaskResultByTag(JobIdImpl.makeJobId(jobId), taskTag);
@@ -984,7 +991,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public String getTaskServerLogsByTag(String jobId, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
         JobId id = JobIdImpl.makeJobId(jobId);
-        frontendState.checkJobOwner("getTaskServerLogs", id,
+        frontendState.checkJobOwner("getTaskServerLogsByTag", id,
                 "You do not have permission to get the task logs of this job");
 
         Set<TaskId> tasksIds = new HashSet<>();

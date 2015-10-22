@@ -251,7 +251,21 @@ function listjobs(x, y) {
     }
 }
 
-// expected params: jobId, tag, offset, limit 
+/*
+ * The following parameters have different meaning whether
+ * listtasks is called with 1,2,3 or 4 parameters.
+ * 1 parameter : arg1 is the jobId
+ * 2 parameters : arg1 is the jobId
+ * 				  arg2 is the tag
+ * 3 parameters : arg1 is the jobId
+ * 				  arg2 is the offset
+ * 				  arg3 is the limit
+ * 4 parameters : arg1 is the jobId
+ * 				  arg2 is the tag
+ * 				  arg3 is the offset
+ * 				  arg4 is the limit
+ * 
+ */
 function listtasks(arg1, arg2, arg3, arg4) {
 	// There is only one parameter, the jobId
 	if (arguments.length == 1 && typeof arg1 != 'undefined') {
@@ -308,7 +322,21 @@ function taskoutput(jobId, taskId) {
     execute(new GetTaskOutputCommand('' + jobId, '' + taskId));
 }
 
-
+/*
+ * The following parameters have different meaning whether
+ * taskstates is called with 1,2,3 or 4 parameters.
+ * 1 parameter : arg1 is the jobId
+ * 2 parameters : arg1 is the jobId
+ * 				  arg2 is the tag
+ * 3 parameters : arg1 is the jobId
+ * 				  arg2 is the offset
+ * 				  arg3 is the limit
+ * 4 parameters : arg1 is the jobId
+ * 				  arg2 is the tag
+ * 				  arg3 is the offset
+ * 				  arg4 is the limit
+ * 
+ */
 function taskstates(arg1, arg2, arg3, arg4){
 	// There is only one parameter, the jobId
 	if (arguments.length == 1 && typeof arg1 != 'undefined') {

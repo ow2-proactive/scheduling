@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
@@ -57,7 +58,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility;
-import org.apache.commons.codec.binary.StringUtils;
 
 
 public class StringUtility {
@@ -245,7 +245,7 @@ public class StringUtility {
         List<String> list = new ArrayList<>();
         list.add("ID");
         list.add("NAME");
-        if(displayTags) {
+        if (displayTags) {
             list.add("TAG");
         }
         list.add("ITER");
@@ -270,7 +270,7 @@ public class StringUtility {
 
             list.add(String.valueOf(taskId.getId()));
             list.add(taskId.getReadableName());
-            if(displayTags) {
+            if (displayTags) {
                 list.add((taskState.getTag() != null) ? taskState.getTag() : "");
             }
             list.add((taskState.getIterationIndex() > 0) ? "" + taskState.getIterationIndex() : "");
