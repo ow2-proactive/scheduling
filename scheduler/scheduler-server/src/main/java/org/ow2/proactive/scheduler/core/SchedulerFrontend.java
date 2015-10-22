@@ -48,6 +48,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
@@ -112,7 +113,6 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -413,11 +413,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     @Override
     @ImmediateService
-    public List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag)
+    public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
         frontendState.checkPermission("getTaskResultByTag",
                 "You do not have permission to get the task result of this job !");
-        List<TaskState> taskStates = getJobState(jobId).getTaskByTag(taskTag);
+        List<TaskState> taskStates = getJobState(jobId).getTasksByTag(taskTag);
         ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
         for (TaskState currentState : taskStates) {
             String taskName = currentState.getTaskInfo().getName();
@@ -434,9 +434,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     @Override
     @ImmediateService
-    public List<TaskResult> getTaskResultByTag(String jobId, String taskTag)
+    public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        return this.getTaskResultByTag(JobIdImpl.makeJobId(jobId), taskTag);
+        return this.getTaskResultsByTag(JobIdImpl.makeJobId(jobId), taskTag);
     }
 
     /**
@@ -993,9 +993,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         JobId id = JobIdImpl.makeJobId(jobId);
         frontendState.checkJobOwner("getTaskServerLogsByTag", id,
                 "You do not have permission to get the task logs of this job");
-
-        Set<TaskId> tasksIds = new HashSet<>();
-        for (TaskState taskState : frontendState.getJobState(id).getTaskByTag(taskTag)) {
+        List<TaskState> lTaskState = frontendState.getJobState(id).getTasksByTag(taskTag); 
+        Set<TaskId> tasksIds = new HashSet<>(lTaskState.size());
+        for (TaskState taskState : lTaskState) {
             tasksIds.add(taskState.getId());
         }
 

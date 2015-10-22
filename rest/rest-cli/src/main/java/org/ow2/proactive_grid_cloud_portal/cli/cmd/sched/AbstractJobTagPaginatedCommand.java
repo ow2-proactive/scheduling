@@ -1,8 +1,10 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
+import org.ow2.proactive_grid_cloud_portal.cli.RestConstants;
+
 public abstract class AbstractJobTagPaginatedCommand extends AbstractJobTagCommand {
 
-    protected final int MAX_PAGE_SIZE = 50;
+    protected final int MAX_PAGE_SIZE = RestConstants.DFLT_PAGINATION_SIZE;
     protected int offset = 0;
     protected int limit = 0;
 

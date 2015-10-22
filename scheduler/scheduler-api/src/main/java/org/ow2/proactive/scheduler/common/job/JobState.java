@@ -206,7 +206,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @param tag the used to filter the tasks.
      * @return the set of filtered task states.
      */
-    public List<TaskState> getTaskByTag(final String tag){
+    public List<TaskState> getTasksByTag(final String tag){
         List<TaskState> tasks = this.getTasks();
         return (List<TaskState>) CollectionUtils.select(tasks, new Predicate() {
             @Override
@@ -242,7 +242,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return a TaskStatePage which includes subset of filtered tasks and the total number of all filtered tasks
      */
     public TaskStatesPage getTaskByTagPaginated(final String tag, final int offset, final int limit) {
-        List<TaskState> tasks = getTaskByTag(tag);
+        List<TaskState> tasks = getTasksByTag(tag);
         int total_size = tasks.size();
         PageBoundaries pb = sanitizeBoundaries(tasks, offset, limit);
         return new TaskStatesPage(tasks.subList(pb.getOffset(), pb.getLimit()), total_size);

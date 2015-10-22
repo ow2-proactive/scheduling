@@ -354,15 +354,27 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag)
+    public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        throw new UnsupportedOperationException();
+        List<TaskState> taskStates = getJobState(jobId).getTasksByTag(taskTag);
+        ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
+        for (TaskState currentState : taskStates) {
+            String taskName = currentState.getTaskInfo().getName();
+            try {
+                TaskResult currentResult = getTaskResult(jobId, taskName);
+                results.add(currentResult);
+            }
+            catch(UnknownTaskException ex){
+                //never occurs because tasks are filtered by tag so they cannot be unknown.
+            }
+        }
+        return results;
     }
 
     @Override
-    public List<TaskResult> getTaskResultByTag(String jobId, String taskTag)
+    public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        throw new UnsupportedOperationException();
+        return this.getTaskResultsByTag(JobIdImpl.makeJobId(jobId), taskTag);
     }
 
     @Override
@@ -512,9 +524,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean removeJob(JobId arg0)
+    public boolean removeJob(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        throw new UnsupportedOperationException();
+        return removeJob(jobId.value());
     }
 
     @Override

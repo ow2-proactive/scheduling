@@ -463,7 +463,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException if the job does not exist.
      * @throws PermissionException if you can't access to this particular job.
      */
-    List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag) throws NotConnectedException,
+    List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag) throws NotConnectedException,
             UnknownJobException, PermissionException;
 
 
@@ -483,7 +483,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException if the job does not exist.
      * @throws PermissionException if you can't access to this particular job.
      */
-    List<TaskResult> getTaskResultByTag(String jobId, String taskTag) throws NotConnectedException,
+    List<TaskResult> getTaskResultsByTag(String jobId, String taskTag) throws NotConnectedException,
             UnknownJobException, PermissionException;
 
     /**

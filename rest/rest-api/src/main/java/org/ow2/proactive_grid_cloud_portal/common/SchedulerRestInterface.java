@@ -87,12 +87,11 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedR
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 
-
 @Path("/scheduler/")
 public interface SchedulerRestInterface {
 
     String ENCODING = "utf-8";
-
+    
     /**
      * Returns the ids of the current jobs under a list of string.
      * @param sessionId a valid session id
@@ -293,7 +292,7 @@ public interface SchedulerRestInterface {
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("50") int limit)
+            @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
@@ -330,7 +329,7 @@ public interface SchedulerRestInterface {
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("50") int limit)
+            @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**

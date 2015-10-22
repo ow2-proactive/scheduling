@@ -214,7 +214,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1/log/server");
         String responseContent = getContent(response);
 
-        for (TaskState state : scheduler.getJobState(jobId).getTaskByTag("LOOP-T2-1")) {
+        for (TaskState state : scheduler.getJobState(jobId).getTasksByTag("LOOP-T2-1")) {
             assertTrue(responseContent.contains("Task " + state.getId() + " logs"));
         }
     }

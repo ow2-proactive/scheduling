@@ -291,17 +291,17 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
 
     @Override
-    public List<TaskResult> getTaskResultByTag(JobId jobId, String taskTag)
+    public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
-        return uischeduler.getTaskResultByTag(jobId, taskTag);
+        return uischeduler.getTaskResultsByTag(jobId, taskTag);
     }
 
     @Override
-    public List<TaskResult> getTaskResultByTag(String jobId, String taskTag)
+    public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
-        return uischeduler.getTaskResultByTag(jobId, taskTag);
+        return uischeduler.getTaskResultsByTag(jobId, taskTag);
     }
 
     @Override

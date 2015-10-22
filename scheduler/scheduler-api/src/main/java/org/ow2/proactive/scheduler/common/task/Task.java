@@ -36,7 +36,14 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import com.google.common.base.Joiner;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -50,12 +57,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.base.Joiner;
 
 
 /**
@@ -691,6 +693,7 @@ public abstract class Task extends CommonAttribute {
                 "\tDescription = '" + description + "'" + nl +
                 (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl : "") +
                 (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" + maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
+                "\ttag = " + tag + nl +
                 "\tgenericInformations = {" + nl + Joiner.on('\n').withKeyValueSeparator("=").join(genericInformations) + nl + "}" + nl +
                 "\tInputFiles = " + inputFiles + nl +
                 "\tOutputFiles = " + outputFiles + nl +

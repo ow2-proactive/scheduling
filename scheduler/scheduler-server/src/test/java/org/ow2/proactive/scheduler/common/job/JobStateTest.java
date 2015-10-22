@@ -36,7 +36,7 @@ public class JobStateTest extends ProActiveTest {
 
             @Override
             public ArrayList<TaskState> getTasks() {
-                ArrayList<TaskState> list = new ArrayList<TaskState>();
+                ArrayList<TaskState> list = new ArrayList<TaskState>(10);
                 for (int i = 0; i < 10; i++) {
                     list.add(mock(TaskState.class));
                 }

@@ -58,7 +58,13 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.tests.ProActiveTest;
 
-
+/**
+ * This integration test creates different tasks and check that they're
+ * tagged accordingly to their type
+ * 
+ * @author sandrine
+ *
+ */
 public class TagTest extends ProActiveTest{
 
     /* mocks */

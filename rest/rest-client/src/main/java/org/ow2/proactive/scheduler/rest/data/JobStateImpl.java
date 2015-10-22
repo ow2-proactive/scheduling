@@ -88,7 +88,7 @@ public class JobStateImpl extends JobState {
     }
 
     @Override
-    public List<TaskState> getTaskByTag(String tag) {
+    public List<TaskState> getTasksByTag(String tag) {
         ArrayList<TaskState> taskStateList = new ArrayList<>();
         Map<String, TaskStateData> taskStateMap = d.getTasks();
         for (TaskStateData ts : taskStateMap.values()) {
