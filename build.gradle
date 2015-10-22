@@ -109,10 +109,9 @@ configure(javaSubprojects) {
         testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
 
         testCompile 'org.mockito:mockito-core:1.10.19'
-        testCompile 'org.powermock:powermock-mockito-release-full:1.6.2'
-	testCompile 'ObjectFaker:ObjectFaker:0.1'
+		testCompile 'ObjectFaker:ObjectFaker:0.1'
         testCompile 'com.jayway.awaitility:awaitility:1.6.0'
-	testCompile 'org.apache.commons:commons-lang3:3.4'
+		testCompile 'org.apache.commons:commons-lang3:3.4'
     }
 
     test {
