@@ -1,10 +1,22 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.scheduler;
 
-import objectFaker.DataFaker;
-import objectFaker.propertyGenerator.PrefixPropertyGenerator;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.Stack;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.mockito.MockitoAnnotations;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.ImodeCommand;
@@ -13,20 +25,14 @@ import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.powermock.api.mockito.PowerMockito;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import java.io.*;
-import java.util.Stack;
-
-
-import static org.mockito.Mockito.*;
+import objectFaker.DataFaker;
+import objectFaker.propertyGenerator.PrefixPropertyGenerator;
 
 
 public abstract class AbstractSchedulerCommandTest {
 
-    @Mock ApplicationContext context;
+    @Mock ApplicationContextImpl context;
     @Mock SchedulerRestClient restClient;
     @Mock SchedulerRestInterface restApi;
     @Mock Stack stack;
@@ -41,6 +47,7 @@ public abstract class AbstractSchedulerCommandTest {
 
 
     public void setUp() throws Exception{
+        MockitoAnnotations.initMocks(this);
         jobIdFaker = new DataFaker<JobIdData>(JobIdData.class);
         jobIdFaker.setGenerator("readableName", new PrefixPropertyGenerator("job", 1));
 
@@ -57,8 +64,9 @@ public abstract class AbstractSchedulerCommandTest {
 
         when(context.getProperty(eq(AbstractIModeCommand.TERMINATE), any(Class.class), anyBoolean())).thenReturn(false);
 
-        PowerMockito.mockStatic(ApplicationContextImpl.class);
-        Mockito.when(ApplicationContextImpl.currentContext()).thenReturn(context);
+       
+        //Mockito.when(ApplicationContextImpl.currentContext()).thenReturn(context);
+        ApplicationContextImpl.mockCurrentContext(context.newApplicationContextHolder());
     }
 
 

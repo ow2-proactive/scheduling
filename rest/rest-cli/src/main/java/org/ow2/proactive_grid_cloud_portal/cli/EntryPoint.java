@@ -37,22 +37,6 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
-import com.google.common.collect.ObjectArrays;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.codehaus.jackson.map.ObjectMapper;
-
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
@@ -60,6 +44,23 @@ import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeD
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
+
+import com.google.common.collect.ObjectArrays;
 
 
 public abstract class EntryPoint {
@@ -72,7 +73,7 @@ public abstract class EntryPoint {
         CommandLine cli = null;
         AbstractDevice console;
 
-        ApplicationContext currentContext = ApplicationContextImpl.currentContext();
+        ApplicationContext currentContext = new ApplicationContextImpl().currentContext();
 
         // Cannot rely on AbstractCommand#isDebugModeEnabled
         // because at this step SetDebugModeCommand#execute has not yet been executed

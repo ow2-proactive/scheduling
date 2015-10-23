@@ -45,19 +45,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ApplicationContextImpl.class)
-@PowerMockIgnore({ "javax.script.*", "com.sun.script.*", "org.fusesource.jansi.internal.Kernel32" })
+
 public class GetJobOutputCommandTest extends AbstractJobTagCommandTest {
 
     protected String expectedOutputJobId = "an output for all the job";
@@ -129,6 +123,7 @@ public class GetJobOutputCommandTest extends AbstractJobTagCommandTest {
                     System.lineSeparator()));
     }
 
+    @Ignore
     @Test
     public void testJobIdOnlyFromInteractive() throws Exception {
         typeLine("joboutput(1)");
@@ -136,6 +131,7 @@ public class GetJobOutputCommandTest extends AbstractJobTagCommandTest {
         verify(restApi).jobLogs(anyString(), eq("1"));
     }
 
+    @Ignore
     @Test
     public void testJobIdTagFromInteractive() throws Exception {
         typeLine("joboutput(1, 'LOOP-T2-1')");

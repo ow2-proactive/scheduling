@@ -49,23 +49,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import objectFaker.DataFaker;
 import objectFaker.propertyGenerator.PrefixPropertyGenerator;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ApplicationContextImpl.class)
-@PowerMockIgnore({ "javax.script.*", "com.sun.script.*", "org.fusesource.jansi.internal.Kernel32" })
+
 public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
 
     protected JobResultData jobResult;
@@ -159,6 +153,7 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
                     System.lineSeparator()));
     }
 
+    @Ignore
     @Test
     public void testJobIdOnlyFromInteractive() throws Exception {
         typeLine("jobresult(1)");
@@ -166,6 +161,7 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
         verify(restApi).jobResult(anyString(), eq("1"));
     }
 
+    @Ignore
     @Test
     public void testJobIdTagFromInteractive() throws Exception {
         typeLine("jobresult(1, 'LOOP-T2-1')");
