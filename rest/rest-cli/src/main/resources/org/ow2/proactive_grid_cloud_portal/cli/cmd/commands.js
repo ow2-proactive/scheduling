@@ -53,6 +53,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobTasksCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand);
@@ -65,6 +66,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputComman
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);
@@ -249,16 +251,67 @@ function listjobs(x, y) {
     }
 }
 
+/*
+ * The following parameters have different meaning whether
+ * listtasks is called with 1,2,3 or 4 parameters.
+ * 1 parameter : arg1 is the jobId
+ * 2 parameters : arg1 is the jobId
+ * 				  arg2 is the tag
+ * 3 parameters : arg1 is the jobId
+ * 				  arg2 is the offset
+ * 				  arg3 is the limit
+ * 4 parameters : arg1 is the jobId
+ * 				  arg2 is the tag
+ * 				  arg3 is the offset
+ * 				  arg4 is the limit
+ * 
+ */
+function listtasks(arg1, arg2, arg3, arg4) {
+	// There is only one parameter, the jobId
+	if (arguments.length == 1 && typeof arg1 != 'undefined') {
+		execute(ListJobTasksCommand.LJTCommandBuilder.newInstance().jobId(arg1).instance());
+	}
+	// Two arguments: jobId and tag
+	if (arguments.length == 2 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined') {
+		execute(ListJobTasksCommand.LJTCommandBuilder.newInstance().jobId(arg1).tag(arg2).instance());
+	}
+	// Three parameters: jobId, offset and limit
+	if (arguments.length == 3 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined' && typeof arg3 != 'undefined') {
+		execute(ListJobTasksCommand.LJTCommandBuilder.newInstance().jobId(arg1).offset(arg2).limit(arg3).instance());
+	}
+	// Four parameters: jobId, tag, offset and limit
+	// We don't parse any parameters after the fourth one
+	if (arguments.length >= 4 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined' && typeof arg3 != 'undefined'
+			&& typeof arg4 != 'undefined') {
+		execute(ListJobTasksCommand.LJTCommandBuilder.newInstance().jobId(arg1).tag(arg2).offset(arg3).limit(arg4).instance());
+	}
+}
+
 function schedulerstats() {
     execute(new SchedStatsCommand());
 }
 
-function jobresult(jobId) {
-    execute(new GetJobResultCommand('' + jobId));
+function jobresult(jobId, tag) {
+    if(typeof tag == 'undefined'){
+        execute(new GetJobResultCommand('' + jobId));
+    }
+    else{
+        execute(new GetJobResultCommand('' + jobId, tag));
+    }
+
 }
 
-function joboutput(jobId) {
-    execute(new GetJobOutputCommand('' + jobId));
+function joboutput(jobId, tag) {
+    if(typeof tag == 'undefined'){
+        execute(new GetJobOutputCommand('' + jobId));
+    }
+    else{
+        execute(new GetJobOutputCommand('' + jobId, tag));
+    }
+
 }
 
 function taskresult(jobId, taskId) {
@@ -267,6 +320,45 @@ function taskresult(jobId, taskId) {
 
 function taskoutput(jobId, taskId) {
     execute(new GetTaskOutputCommand('' + jobId, '' + taskId));
+}
+
+/*
+ * The following parameters have different meaning whether
+ * taskstates is called with 1,2,3 or 4 parameters.
+ * 1 parameter : arg1 is the jobId
+ * 2 parameters : arg1 is the jobId
+ * 				  arg2 is the tag
+ * 3 parameters : arg1 is the jobId
+ * 				  arg2 is the offset
+ * 				  arg3 is the limit
+ * 4 parameters : arg1 is the jobId
+ * 				  arg2 is the tag
+ * 				  arg3 is the offset
+ * 				  arg4 is the limit
+ * 
+ */
+function taskstates(arg1, arg2, arg3, arg4){
+	// There is only one parameter, the jobId
+	if (arguments.length == 1 && typeof arg1 != 'undefined') {
+		execute(new ListTaskStatesCommand(arg1));
+	}
+	// Two arguments: jobId and tag
+	if (arguments.length == 2 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined') {
+		execute(new ListTaskStatesCommand(arg1, arg2));
+	}
+	// Three parameters: jobId, offset and limit
+	if (arguments.length == 3 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined' && typeof arg3 != 'undefined') {
+		execute(new ListTaskStatesCommand(arg1, arg2, arg3));
+	}
+	// Four parameters: jobId, tag, offset and limit
+	// We don't parse any parameters after the fourth one
+	if (arguments.length >= 4 && typeof arg1 != 'undefined'
+		&& typeof arg2 != 'undefined' && typeof arg3 != 'undefined'
+			&& typeof arg4 != 'undefined') {
+		execute(new ListTaskStatesCommand(arg1, arg2, arg3, arg4));
+	}
 }
 
 function preempttask(jobId, taskId) {

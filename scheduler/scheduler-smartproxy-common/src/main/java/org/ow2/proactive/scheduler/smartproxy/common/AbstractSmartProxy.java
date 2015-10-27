@@ -722,6 +722,12 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         return getScheduler().getTaskServerLogs(id, taskName);
     }
 
+
+    @Override
+    public String getTaskServerLogsByTag(String id, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
+        return getScheduler().getTaskServerLogsByTag(id, taskTag);
+    }
+
     @Override
     public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         return getScheduler().getJobs(offset, limit, filterCriteria, sortParameters);
@@ -1030,4 +1036,13 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         getScheduler().removeThirdPartyCredential(key);
     }
 
+    @Override
+    public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().getTaskResultsByTag(jobId, taskTag);
+    }
+
+    @Override
+    public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag) throws NotConnectedException, UnknownJobException, PermissionException {
+        return getScheduler().getTaskResultsByTag(jobId, taskTag);
+    }
 }

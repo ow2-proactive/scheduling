@@ -84,14 +84,14 @@ public class SchedulerClientExample {
         JobResultData jobResultData = scheduler.jobResult(sessionId, Long.toString(flatJob.getId()));
         System.out.println(jobResultData);
 
-        TaskResultData taskresult = scheduler.taskresult(sessionId, Long.toString(flatJob.getId()), "task_1");
+        TaskResultData taskresult = scheduler.taskResult(sessionId, Long.toString(flatJob.getId()), "task_1");
         System.out.println(taskresult);
 
-        List<TaskStateData> jobTaskStates = scheduler.getJobTaskStates(sessionId, Long.toString(flatJob
-                .getId()));
+        List<TaskStateData> jobTaskStates = scheduler
+                .getJobTaskStates(sessionId, Long.toString(flatJob.getId())).getTasks();
         System.out.println(jobTaskStates);
 
-        TaskStateData task_1 = scheduler.jobtasks(sessionId, Long.toString(flatJob.getId()), "task_1");
+        TaskStateData task_1 = scheduler.jobTask(sessionId, Long.toString(flatJob.getId()), "task_1");
         System.out.println(task_1);
 
         // OTHER CALLS
@@ -100,7 +100,7 @@ public class SchedulerClientExample {
         System.out.println(users);
         System.out.println(users.size());
 
-        Map<Long, List<UserJobData>> map = scheduler.revisionAndjobsinfo(sessionId, 0, 50, true, true, true,
+        Map<Long, List<UserJobData>> map = scheduler.revisionAndJobsInfo(sessionId, 0, 50, true, true, true,
                 true);
         System.out.println(map);
 

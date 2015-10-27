@@ -44,20 +44,32 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 
-public class GetJobOutputCommand extends AbstractJobCommand implements Command {
+public class GetJobOutputCommand extends AbstractJobTagCommand implements Command {
+
 
     public GetJobOutputCommand(String jobId) {
         super(jobId);
     }
 
+    public GetJobOutputCommand(String jobId, String tag) {
+        super(jobId, tag);
+    }
+
+
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            String jobOutput = scheduler.jobLogs(currentContext.getSessionId(), jobId);
-            resultStack(currentContext).push(jobOutput);
+            String output = null;
+            if(this.tag == null) {
+                output = scheduler.jobLogs(currentContext.getSessionId(), jobId);
+            }
+            else {
+                output = scheduler.taskLogByTag(currentContext.getSessionId(), jobId, tag);
+            }
+            resultStack(currentContext).push(output);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s", jobOutput);
+                writeLine(currentContext, "%s", output);
             }
         } catch (Exception e) {
             handleError(String.format("An error occurred while retrieving %s output:", job()), e,

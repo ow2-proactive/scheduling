@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
@@ -57,7 +58,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility;
-import org.apache.commons.codec.binary.StringUtils;
 
 
 public class StringUtility {
@@ -224,6 +224,18 @@ public class StringUtility {
         buffer.append(id).append("\tNAME: ").append(jobState.getName()).append("\tOWNER: ").append(
                 jobState.getOwner()).append("\tSTATUS: ").append(jobState.getJobInfo().getStatus()).append(
                 "\t#TASKS: ").append(jobState.getJobInfo().getTotalNumberOfTasks());
+
+        buffer.append('\n');
+
+        Collection<TaskStateData> tasks = jobState.getTasks().values();
+        buffer.append(taskStatesAsString(tasks, true));
+        return buffer.toString();
+    }
+
+
+
+
+    public static String taskStatesAsString(Collection<TaskStateData> tasks, boolean displayTags){
         // create formatter
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(80);
@@ -233,6 +245,9 @@ public class StringUtility {
         List<String> list = new ArrayList<>();
         list.add("ID");
         list.add("NAME");
+        if (displayTags) {
+            list.add("TAG");
+        }
         list.add("ITER");
         list.add("DUP");
         list.add("STATUS");
@@ -245,8 +260,7 @@ public class StringUtility {
         formatter.setTitle(list);
         // separator
         formatter.addEmptyLine();
-        // add each lines
-        Collection<TaskStateData> tasks = jobState.getTasks().values();
+
         // TaskState.setSortingBy(sort);
         // Collections.sort(tasks);
         for (TaskStateData taskState : tasks) {
@@ -256,6 +270,9 @@ public class StringUtility {
 
             list.add(String.valueOf(taskId.getId()));
             list.add(taskId.getReadableName());
+            if (displayTags) {
+                list.add((taskState.getTag() != null) ? taskState.getTag() : "");
+            }
             list.add((taskState.getIterationIndex() > 0) ? "" + taskState.getIterationIndex() : "");
             list.add((taskState.getReplicationIndex() > 0) ? "" + taskState.getReplicationIndex() : "");
             list.add(taskInfo.getTaskStatus().toString());
@@ -266,19 +283,18 @@ public class StringUtility {
             if (taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft() < taskState
                     .getMaxNumberOfExecution()) {
                 list.add((taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft() + 1) +
-                    "/" + taskState.getMaxNumberOfExecution());
+                        "/" + taskState.getMaxNumberOfExecution());
             } else {
                 list.add((taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft()) + "/" +
-                    taskState.getMaxNumberOfExecution());
+                        taskState.getMaxNumberOfExecution());
             }
             list.add((taskState.getMaxNumberOfExecutionOnFailure() - taskInfo
                     .getNumberOfExecutionOnFailureLeft()) +
-                "/" + taskState.getMaxNumberOfExecutionOnFailure());
+                    "/" + taskState.getMaxNumberOfExecutionOnFailure());
             formatter.addLine(list);
         }
-        buffer.append('\n');
-        buffer.append(Tools.getStringAsArray(formatter));
-        return buffer.toString();
+
+        return Tools.getStringAsArray(formatter);
     }
 
     public static String jobsAsString(List<UserJobData> jobs) {
@@ -340,6 +356,17 @@ public class StringUtility {
 
         return row;
     }
+
+
+    public static String taskResultsAsString(List<TaskResultData> results){
+        StringBuffer buf = new StringBuffer();
+        for(TaskResultData currentResult: results){
+            buf.append(taskResultAsString(currentResult.getId().getReadableName(), currentResult));
+            buf.append("\n");
+        }
+        return buf.toString();
+    }
+
 
     public static String taskResultAsString(String id,
             org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData taskResult) {

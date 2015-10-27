@@ -34,13 +34,15 @@
  */
 package org.ow2.tests;
 
+import java.nio.file.Paths;
 import java.security.Policy;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+
 
 /**
  * Just to set the security manager without a system property in the command
@@ -58,10 +60,11 @@ public class ProActiveTest {
 		Logger.getRootLogger().setLevel(Level.INFO);
 	}
 
-	private static void configureSecurityManager() {
-		if (System.getProperty("java.security.policy") == null) {
-			System.setProperty("java.security.policy", System.getProperty(PAResourceManagerProperties.RM_HOME.getKey())
-					+ "/config/security.java.policy-server");
+    private static void configureSecurityManager() {
+        if (System.getProperty("java.security.policy") == null) {
+            System.setProperty("java.security.policy",
+                    System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
+                        "/config/security.java.policy-server");
 
 			Policy.getPolicy().refresh();
 		}

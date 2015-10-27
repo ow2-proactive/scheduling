@@ -57,7 +57,7 @@ public class GetTaskResultCommand extends AbstractTaskCommand implements Command
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            TaskResultData taskResult = scheduler.taskresult(currentContext.getSessionId(), jobId, taskId);
+            TaskResultData taskResult = scheduler.taskResult(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(taskResult);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s", StringUtility.taskResultAsString(task(), taskResult));

@@ -39,13 +39,16 @@ package org.ow2.proactive.scheduler.core;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
@@ -110,7 +113,6 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -407,6 +409,34 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         return this.getTaskResult(JobIdImpl.makeJobId(jobId), taskName);
+    }
+
+    @Override
+    @ImmediateService
+    public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        frontendState.checkPermission("getTaskResultByTag",
+                "You do not have permission to get the task result of this job !");
+        List<TaskState> taskStates = getJobState(jobId).getTasksByTag(taskTag);
+        ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
+        for (TaskState currentState : taskStates) {
+            String taskName = currentState.getTaskInfo().getName();
+            try {
+                TaskResult currentResult = getTaskResult(jobId, taskName);
+                results.add(currentResult);
+            }
+            catch (UnknownTaskException ex){
+                //never occurs because tasks are filtered by tag so they cannot be unknown.
+            }
+        }
+        return results;
+    }
+
+    @Override
+    @ImmediateService
+    public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return this.getTaskResultsByTag(JobIdImpl.makeJobId(jobId), taskTag);
     }
 
     /**
@@ -796,6 +826,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return frontendState.getJobState(jobId);
     }
 
+
+
+
+
     /**
      * {@inheritDoc}
      */
@@ -950,6 +984,22 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         }
 
         throw new UnknownTaskException("Unknown task " + taskName + " in job " + jobId);
+    }
+
+
+    @Override
+    @ImmediateService
+    public String getTaskServerLogsByTag(String jobId, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
+        JobId id = JobIdImpl.makeJobId(jobId);
+        frontendState.checkJobOwner("getTaskServerLogsByTag", id,
+                "You do not have permission to get the task logs of this job");
+        List<TaskState> lTaskState = frontendState.getJobState(id).getTasksByTag(taskTag); 
+        Set<TaskId> tasksIds = new HashSet<>(lTaskState.size());
+        for (TaskState taskState : lTaskState) {
+            tasksIds.add(taskState.getId());
+        }
+
+        return ServerJobAndTaskLogs.getJobLog(id, tasksIds);
     }
 
     /**

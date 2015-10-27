@@ -28,3 +28,7 @@ build/
 
 *.log
 
+*.setting
+
+# gradle commandline completion cache
+*.gradletasknamecache

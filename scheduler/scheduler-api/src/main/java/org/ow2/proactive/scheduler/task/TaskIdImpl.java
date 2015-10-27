@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -56,8 +57,12 @@ public final class TaskIdImpl implements TaskId {
     // Task identifier
     private long id;
 
+    /** Human readable name */
     private String readableName = SchedulerConstants.TASK_DEFAULT_NAME;
 
+    /** tag of the task */
+    private String tag;
+    
     private JobId jobId;
 
     private TaskIdImpl(JobId jobId, long taskId) {
@@ -92,6 +97,15 @@ public final class TaskIdImpl implements TaskId {
     public void setJobId(JobId jobId) {
         this.jobId = jobId;
     }
+    
+    @Override
+    public String getTag() {
+        return this.tag;
+    }
+
+    public void setTag(String tag){this.tag = tag;}
+
+    
 
     /**
      * Return the human readable name associated to this id.
@@ -101,6 +115,7 @@ public final class TaskIdImpl implements TaskId {
     public String getReadableName() {
         return this.readableName;
     }
+
 
     /**
      * Set readable name of this TaskId.
@@ -129,6 +144,9 @@ public final class TaskIdImpl implements TaskId {
         return id == taskId.id;
     }
 
+    /**
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         return (int) (id % Integer.MAX_VALUE);

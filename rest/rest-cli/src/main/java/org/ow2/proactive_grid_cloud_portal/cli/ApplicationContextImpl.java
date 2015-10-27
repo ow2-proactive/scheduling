@@ -1,5 +1,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli;
 
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -7,15 +9,13 @@ import java.util.Stack;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.apache.http.client.HttpClient;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
-import org.apache.http.client.HttpClient;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
-
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 
 public class ApplicationContextImpl implements ApplicationContext {
@@ -27,7 +27,7 @@ public class ApplicationContextImpl implements ApplicationContext {
     private static final String POLICIES = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.policies";
     private static final String RESULT_STACK = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.resultStack";
 
-    private static final ApplicationContextHolder threadLocalContext = new ApplicationContextHolder();
+    private static ApplicationContextHolder threadLocalContext = new ApplicationContextHolder();
 
     private String sessionId = "";
     private String restServerUrl;
@@ -40,8 +40,18 @@ public class ApplicationContextImpl implements ApplicationContext {
     public static ApplicationContext currentContext() {
         return threadLocalContext.get();
     }
+    
+    //Only for test purpose
+    public static void mockCurrentContext(ApplicationContextHolder mockThreadLocalContext) {
+        threadLocalContext = mockThreadLocalContext;
+    }
+    
+    //Only for test purpose
+    public static ApplicationContextHolder newApplicationContextHolder() {
+        return new ApplicationContextHolder();
+    }
 
-    private ApplicationContextImpl() {
+    ApplicationContextImpl() {
     }
 
     @Override

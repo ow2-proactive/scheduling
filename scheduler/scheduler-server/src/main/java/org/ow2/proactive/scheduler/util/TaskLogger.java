@@ -61,7 +61,7 @@ public class TaskLogger {
     }
 
     private String format(TaskId id, String message) {
-        return PREFIX + id + " (" + id.getReadableName() + ")" + " " + message;
+        return PREFIX + id + " (" + id.getReadableName() + ") " + message;
     }
 
     public void info(TaskId id, String message) {
