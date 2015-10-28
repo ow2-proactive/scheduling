@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -51,12 +51,12 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -73,7 +73,11 @@ public class RMStarter {
 
     private static Options options = new Options();
 
+    public static final int DEFAULT_NODES_NUMBER =
+            Math.max(2, Runtime.getRuntime().availableProcessors() - 1);
+
     private static final int DEFAULT_NODE_TIMEOUT = 30 * 1000;
+
     private static int nodeTimeout = DEFAULT_NODE_TIMEOUT;
 
     private static void initOptions() {
@@ -114,7 +118,7 @@ public class RMStarter {
 
         initOptions();
 
-        Parser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine cmd;
 
         try {
@@ -143,6 +147,12 @@ public class RMStarter {
             RMAuthentication auth = RMFactory.startLocal();
 
             int defaultNodesNumber = PAResourceManagerProperties.RM_NB_LOCAL_NODES.getValueAsInt();
+
+            // -1 means that the number of local nodes depends of the number of cores in the local machine
+            if (defaultNodesNumber == -1) {
+                defaultNodesNumber = DEFAULT_NODES_NUMBER;
+            }
+
             if (localNodes && defaultNodesNumber > 0) {
                 ResourceManager resourceManager = auth.login(Credentials
                         .getCredentials(PAResourceManagerProperties

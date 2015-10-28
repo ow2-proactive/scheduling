@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -41,59 +41,65 @@ import java.util.Map;
 
 
 /**
- * XMLAttributes represents all the attributes of XML job descriptors
+ * XMLAttributes defines attributes allowed in XML job descriptors.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.1
  */
 public enum XMLAttributes {
 
-    //JOBS
+    // JOBS
     JOB_PRIORITY("priority"),
-    JOB_PROJECTNAME("projectName"),
+    JOB_PROJECT_NAME("projectName"),
 
-    //COMMON
-    COMMON_CANCELJOBONERROR("cancelJobOnError"),
-    COMMON_MAXNUMBEROFEXECUTION("maxNumberOfExecution"),
-    COMMON_RESTARTTASKONERROR("restartTaskOnError"),
+    // COMMON
+    COMMON_CANCELJOB_ON_ERROR("cancelJobOnError"),
+    COMMON_MAX_NUMBER_OF_EXECUTION("maxNumberOfExecution"),
     COMMON_NAME("name"),
+    COMMON_RESTART_TASK_ON_ERROR("restartTaskOnError"),
     COMMON_VALUE("value"),
 
-    //TASKS
-    TASK_PRECIOUSRESULT("preciousResult"),
-    TASK_PRECIOUSLOGS("preciousLogs"),
-    TASK_CLASSNAME("class"),
-    TASK_WALLTIME("walltime"),
-    TASK_RUNASME("runAsMe"),
-    TASK_DEPENDS_REF("ref"),
+    // VARIABLE
+    VARIABLE_NAME("name"),
+    VARIABLE_VALUE("value"),
 
-    //NATIVE TASK ATTRIBUTES
+    // TASKS
+    TASK_CLASS_NAME("class"),
+    TASK_DEPENDS_REF("ref"),
+    TASK_PRECIOUS_LOGS("preciousLogs"),
+    TASK_PRECIOUS_RESULT("preciousResult"),
+    TASK_RUN_AS_ME("runAsMe"),
+    TASK_WALLTIME("walltime"),
+
+    // NATIVE TASK ATTRIBUTES
     TASK_COMMAND_VALUE("value"),
     TASK_NB_NODES("numberOfNodes"),
+    TASK_PARAMETER_NAME("name"),
+    TASK_PARAMETER_VALUE("value"),
     TASK_WORKDING_DIR("workingDir"),
 
-    //TOPOLOGY
+    // TOPOLOGY
     TOPOLOGY_THRESHOLD("threshold"),
 
-    //SCRIPTS
+    // SCRIPTS
     SCRIPT_URL("url"),
 
-    //FORK ENVIRONMENT
-    FORK_JAVAHOME("javaHome"),
+    // FORK ENVIRONMENT
+    FORK_JAVA_HOME("javaHome"),
 
     // FLOW CONTROL
     FLOW_BLOCK("block"),
-    FLOW_TARGET("target"),
-    FLOW_ELSE("else"),
     FLOW_CONTINUATION("continuation"),
+    FLOW_ELSE("else"),
+    FLOW_TARGET("target"),
 
-    //DATASPACES
-    DS_INCLUDES("includes"),
+    // DATASPACES
+    DS_ACCESS_MODE("accessMode"),
     DS_EXCLUDES("excludes"),
-    DS_ACCESSMODE("accessMode"),
+    DS_INCLUDES("includes"),
     DS_URL("url"),
 
-    //NOT USED IN XML FACTORY BUT USED IN XML DESCRIPTION
+    // NOT USED IN XML FACTORY BUT USED IN XML DESCRIPTION
     PATH("path"),
     LANGUAGE("language");
 

@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2013 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -34,6 +34,7 @@
  */
 package org.ow2.tests;
 
+import java.nio.file.Paths;
 import java.security.Policy;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -44,19 +45,20 @@ import org.apache.log4j.Logger;
 
 
 /**
- * Just to set the security manager without a system property in the command line.
+ * Just to set the security manager without a system property in the command
+ * line.
  */
 public class ProActiveTest {
-    static {
-        configureSecurityManager();
-        configurePAHome();
-        configureLog4j();
-    }
+	static {
+		configureSecurityManager();
+		configurePAHome();
+		configureLog4j();
+	}
 
-    private static void configureLog4j() {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.INFO);
-    }
+	private static void configureLog4j() {
+		BasicConfigurator.configure();
+		Logger.getRootLogger().setLevel(Level.INFO);
+	}
 
     private static void configureSecurityManager() {
         if (System.getProperty("java.security.policy") == null) {
@@ -64,14 +66,15 @@ public class ProActiveTest {
                     System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
                         "/config/security.java.policy-server");
 
-            Policy.getPolicy().refresh();
-        }
-    }
+			Policy.getPolicy().refresh();
+		}
+	}
 
-    private static void configurePAHome() {
-        String rmHome = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey());
-        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null && rmHome != null) {
-            System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), rmHome);
-        }
-    }
+	private static void configurePAHome() {
+		String rmHome = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey());
+		if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null && rmHome != null) {
+			System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), rmHome);
+		}
+	}
+
 }

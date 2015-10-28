@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -46,11 +46,11 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import functionaltests.utils.SchedulerFunctionalTest;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class TaskUsingCredentialsTest extends SchedulerFunctionalTest {
@@ -116,16 +116,17 @@ public class TaskUsingCredentialsTest extends SchedulerFunctionalTest {
             + "JnOm6wonDaEsjyrKaJ2VXVNferBnYvnocCUMlC1NUGDvcE3Vp/M2y6BiwOJK1tnt\n"
             + "xQEPcQKBgFf7A3BlBLAOfnSFr1JUW5LqhNOwangXLAyMkLtMlL4QemGj+yhwzE/N\n"
             + "YOoInV75eaD8In57HQlwgbRIazyJ9b8gDensPlDFlVAQ98ffOb42gR11QRinQ6PL\n"
-            + "VYXdGf7hRbfCSUqDDEYoJI18q8H0yomBE3pMoRRiuGX3A/YW6wyT\n" + "-----END RSA PRIVATE KEY-----";
-        scheduler.putThirdPartyCredential("MY_APP_PASSWORD", longPassword);
+            + "VYXdGf7hRbfCSUqDDEYoJI18q8H0yomBE3pMoRRiuGX3A/YW6wyT\n"
+            + "-----END RSA PRIVATE KEY-----";
 
+        scheduler.putThirdPartyCredential("MY_APP_PASSWORD", longPassword);
         Set<String> credentialsKeySet = scheduler.thirdPartyCredentialsKeySet();
         assertTrue(credentialsKeySet.contains("MY_APP_PASSWORD"));
 
         scheduler.removeThirdPartyCredential("MY_APP_PASSWORD");
 
-        Set<String> emptyCredentialsKeySet = scheduler.thirdPartyCredentialsKeySet();
-        assertFalse(emptyCredentialsKeySet.contains("MY_APP_PASSWORD"));
-
+        credentialsKeySet = scheduler.thirdPartyCredentialsKeySet();
+        assertFalse(credentialsKeySet.contains("MY_APP_PASSWORD"));
     }
+
 }

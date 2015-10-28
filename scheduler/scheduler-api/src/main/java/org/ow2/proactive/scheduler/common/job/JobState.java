@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -37,13 +37,19 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 
 
 /**
@@ -80,6 +86,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     private static int currentSort = SORT_BY_ID;
     private static int currentOrder = ASC_ORDER;
 
+    
     /** ProActive default constructor */
     public JobState() {
     }
@@ -192,6 +199,89 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return the tasks as a hash map
      */
     public abstract Map<TaskId, TaskState> getHMTasks();
+
+
+    /**
+     * To get the task as an array list and filtered by a given tag.
+     * @param tag the used to filter the tasks.
+     * @return the set of filtered task states.
+     */
+    public List<TaskState> getTasksByTag(final String tag){
+        List<TaskState> tasks = this.getTasks();
+        return (List<TaskState>) CollectionUtils.select(tasks, new Predicate() {
+            @Override
+            public boolean evaluate(Object object) {
+                String taskTag = ((TaskState) object).getTag();
+                return (taskTag != null) && (taskTag.equals(tag));
+            }
+        });
+    }
+    
+    
+    /**
+     * To get the paginated tasks.
+     * The tasks are paginated with the following rule: [offset,limit[
+     * @param offset the starting index of the sublist of tasks to get
+     * @param limit the last index (non inclusive) of the sublist of tasks to get
+     * @return a TaskStatePage which includes subset of tasks and the total number of all tasks
+     */
+    public TaskStatesPage getTasksPaginated(final int offset, final int limit) {
+
+        int total_size = getTasks().size();
+        PageBoundaries pb = sanitizeBoundaries(getTasks(), offset, limit);
+
+        return new TaskStatesPage(getTasks().subList(pb.getOffset(), pb.getLimit()), total_size);
+    }
+
+    /**
+     * To get the paginated filtered tasks by a given tag.
+     * The filtered tasks are paginated with the following rule: [offset,limit[
+     * @param tag used to filter the tasks
+     * @param offset the starting index of the sublist of tasks to get
+     * @param limit the last index (non inclusive) of the sublist of tasks to get
+     * @return a TaskStatePage which includes subset of filtered tasks and the total number of all filtered tasks
+     */
+    public TaskStatesPage getTaskByTagPaginated(final String tag, final int offset, final int limit) {
+        List<TaskState> tasks = getTasksByTag(tag);
+        int total_size = tasks.size();
+        PageBoundaries pb = sanitizeBoundaries(tasks, offset, limit);
+        return new TaskStatesPage(tasks.subList(pb.getOffset(), pb.getLimit()), total_size);
+    }
+
+    /**
+     * To get the list of available tags in a job.
+     * @return the list of tags.
+     */
+    public List<String> getTags(){
+        Set<String> result = new HashSet<>();
+        String tag = null;
+        for(TaskState task: this.getTasks()){
+            tag = task.getTag();
+            if(tag != null) {
+                result.add(task.getTag());
+            }
+        }
+        return new ArrayList<>(result);
+    }
+
+
+    /**
+     * To get the list of available tags in a job and that matches a given prefix.
+     * @param prefix the prefix used to filter the tags.
+     * @return the list of tags.
+     */
+    public List<String> getTags(String prefix){
+        Set<String> result = new HashSet<>();
+        String tag = null;
+        for(TaskState task: this.getTasks()){
+            tag = task.getTag();
+            if(tag != null && tag.startsWith(prefix)) {
+                result.add(task.getTag());
+            }
+        }
+        return new ArrayList<>(result);
+    }
+
 
     /**
      * To get the numberOfFinishedTask
@@ -332,6 +422,27 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return false;
     }
 
+
+    /*
+     * Returns sanitized boundaries.
+     * If the provided indexes are not valid, they are translated to
+     * valid ones.
+     */
+    private PageBoundaries sanitizeBoundaries(List<?> tasksList, int offset, int limit) {
+        int _offset = 0;
+        int total_size = tasksList.size();
+        int _limit = total_size;
+        
+        if (offset > 0 && offset < _limit) _offset = offset;
+        if (limit > 0 && limit < _limit) _limit = limit;
+        if (_offset > _limit) {
+            int tmp = _offset;
+            _offset = _limit;
+            _limit = tmp;
+        }
+        return new PageBoundaries(_offset, _limit);
+    }
+    
     /**
      * @see java.lang.Object#toString()
      */
@@ -340,4 +451,27 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return getClass().getSimpleName() + "[" + getId() + "]";
     }
 
+    /*
+     * Utility class to pass boundaries easily.
+     */
+    private static class PageBoundaries {
+
+        private int offset;
+        private int limit;
+
+        public PageBoundaries(int offset, int limit) {
+            this.offset = offset;
+            this.limit = limit;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public int getLimit() {
+            return limit;
+        }
+
+    }
+    
 }

@@ -1,0 +1,35 @@
+apply plugin: 'java-library-distribution'
+
+dependencies {
+    compile project(':rest:rest-client')
+    compile project(':scheduler:scheduler-smartproxy-common')
+
+    testCompile functionalTestDependencies
+    testCompile project(':rest:rest-server').sourceSets.test.output
+}
+
+task bundle(type: Zip) {
+    from configurations.runtime.allArtifacts.files
+    from configurations.runtime
+    into(project.name + '-' + project.version + '-bundle')
+}
+
+test {
+    exclude 'functionaltests/**'
+}
+
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+rootProject.dist.dependsOn testJar
+
+task dist(type: Copy) {
+    from testJar
+    into file("$rootDir/dist/lib")
+}
+
+task('functionalTest', type:Test).configure functionalTestConfiguration
+
+functionalTest.dependsOn rootProject.dist, dist
+clean.dependsOn rootProject.cleanDist

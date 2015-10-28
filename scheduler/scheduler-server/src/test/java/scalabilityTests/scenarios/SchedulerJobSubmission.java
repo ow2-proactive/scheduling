@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -49,14 +49,6 @@ import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionGroup;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -66,7 +58,14 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobId;
-
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import scalabilityTests.fixtures.SchedulerFixture;
 import scalabilityTests.fixtures.SchedulerFixture.CannotRegisterListenerException;
 import scalabilityTests.framework.AbstractSchedulerUser;
@@ -97,7 +96,7 @@ public class SchedulerJobSubmission {
     public static void main(String[] args) {
         Options options = new Options();
         addCommandLineOptions(options);
-        Parser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
         try {
             cmd = parser.parse(options, args);
@@ -340,7 +339,7 @@ public class SchedulerJobSubmission {
                 JobSubmissionAction jobAction = new JobSubmissionAction(jobDescriptor);
 
                 jobSubmissionScenario.loadInfrastructure();
-                List<AbstractSchedulerUser<JobId>> schedulerUsers = null;
+                List<AbstractSchedulerUser<JobId>> schedulerUsers;
                 if (singleLogin) {
                     Credentials credentials = Credentials.createCredentials(new CredData(CredData
                             .parseLogin(username), CredData.parseDomain(username), password), pubKey);

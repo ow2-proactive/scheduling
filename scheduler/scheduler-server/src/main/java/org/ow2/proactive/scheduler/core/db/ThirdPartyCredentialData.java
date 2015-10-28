@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -55,13 +55,16 @@ public class ThirdPartyCredentialData implements Serializable {
     @Column(name = "CREDENTIAL_KEY")
     String key;
 
-    @Column(name = "ENCRYPTED_SYMMETRIC_KEY")
+    @Column(name = "ENCRYPTED_SYMMETRIC_KEY", length = Integer.MAX_VALUE)
     @Lob
     byte[] encryptedSymmetricKey;
 
-    @Column(name = "ENCRYPTED_CREDENTIAL_VALUE")
+    @Column(name = "ENCRYPTED_CREDENTIAL_VALUE", length = Integer.MAX_VALUE)
     @Lob
     byte[] encryptedValue;
+
+    public ThirdPartyCredentialData() {
+    }
 
     public ThirdPartyCredentialData(String username, String key, byte[] encryptedSymmetricKey,
             byte[] encryptedValue) {

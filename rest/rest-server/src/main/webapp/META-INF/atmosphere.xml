@@ -1,8 +1,8 @@
 <atmosphere-handlers>
     <!-- RESTEasy -->
-    <atmosphere-handler support-session="false"
-                        context-root="/scheduler/events/*"
-                        class-name="org.atmosphere.handler.ReflectorServletProcessor">
+    <atmosphere-handler
+            context-root="/scheduler/events/*"
+            class-name="org.atmosphere.handler.ReflectorServletProcessor">
         <property name="servletClassName"
                   value="org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher"/>
     </atmosphere-handler>

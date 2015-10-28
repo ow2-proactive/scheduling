@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -46,36 +46,45 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import com.google.common.collect.ImmutableList;
 
 
 public abstract class AbstractJsHelpCommand extends AbstractCommand implements Command {
 
-    public void printHelp(ApplicationContext currentContext, CommandSet.Entry[]... entrySet)
-            throws CLIException {
+    public void printHelp(ApplicationContext currentContext,
+            CommandSet.Entry[]... entrySet) throws CLIException {
+
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(100);
         formatter.setSpace(2);
-        ArrayList<String> titles = new ArrayList<>();
-        titles.add("Command");
-        titles.add("Description");
-        formatter.setTitle(titles);
+        formatter.setTitle(ImmutableList.of("Command", "Description"));
         formatter.addEmptyLine();
-        ArrayList<String> line;
+
+        boolean versionEntryAdded = false;
 
         List<CommandSet.Entry> entries = new ArrayList<>();
         for (CommandSet.Entry[] es : entrySet) {
-            Collections.addAll(entries, es);
+            for (CommandSet.Entry entry : es) {
+                if (entry.jsCommand() != null && entry.jsCommand().equals(CommandSet.VERSION.jsCommand())) {
+                    if (!versionEntryAdded) {
+                        entries.add(entry);
+                        versionEntryAdded = true;
+                    }
+                } else {
+                    entries.add(entry);
+                }
+            }
         }
+
         Collections.sort(entries);
 
         for (CommandSet.Entry entry : entries) {
             if (entry.jsCommand() != null) {
-                line = new ArrayList<>();
-                line.add(entry.jsCommand());
-                line.add(entry.description());
-                formatter.addLine(line);
+                formatter.addLine(ImmutableList.of(entry.jsCommand(), entry.description()));
             }
         }
+
         writeLine(currentContext, "%s", StringUtility.objectArrayFormatterAsString(formatter));
     }
+
 }

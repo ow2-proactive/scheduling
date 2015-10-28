@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -330,7 +330,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
         //setting job informations
         if (job.getTasks().size() == 0) {
-            String msg = "This job does not contain Tasks !! Insert tasks before submitting job";
+            String msg = "Job " + job.getId().value() + " contains no task. You need to insert at least one task before submitting job";
             logger.info(msg);
             throw new JobCreationException(msg);
         }

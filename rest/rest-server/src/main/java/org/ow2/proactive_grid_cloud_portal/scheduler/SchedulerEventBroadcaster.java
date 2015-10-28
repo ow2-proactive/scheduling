@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,13 +36,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import com.google.common.base.Throwables;
 import org.apache.log4j.Logger;
 import org.atmosphere.cpr.BroadcasterFactory;
+import org.atmosphere.util.ServletContextFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.dozer.DozerBeanMapperSingletonWrapper;
 import org.dozer.Mapper;
+
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -52,16 +55,18 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
-
-import com.google.common.base.Throwables;
+import javax.servlet.ServletContext;
 
 
 /**
  * Broadcasts the scheduler events which it receives to the target REST client.
  */
 public class SchedulerEventBroadcaster implements SchedulerEventListener {
+
     private static final Logger log = Logger.getLogger(SchedulerEventBroadcaster.class);
+
     private static final Mapper dozerMapper = DozerBeanMapperSingletonWrapper.getInstance();
+
     private static final ObjectMapper mapper;
 
     static {
@@ -70,13 +75,15 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
         mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
     }
 
-    private String broadcasterUuid;
+    private String broadcasterUUID;
 
     public SchedulerEventBroadcaster() {
+        super();
     }
 
     public SchedulerEventBroadcaster(String broadcasterUuid) {
-        this.broadcasterUuid = broadcasterUuid;
+        this();
+        this.broadcasterUUID = broadcasterUuid;
     }
 
     @Override
@@ -113,8 +120,12 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
 
     private void broadcast(EventNotification eventNotification) {
         try {
-            BroadcasterFactory.getDefault().lookup(broadcasterUuid).broadcast(
-                    mapper.writeValueAsString(eventNotification));
+            ServletContext servletContext =
+                    ServletContextFactory.getDefault().getServletContext();
+
+            ((BroadcasterFactory) servletContext.getAttribute(
+                    BroadcasterFactory.class.getName())).lookup(broadcasterUUID).broadcast(
+                        mapper.writeValueAsString(eventNotification));
         } catch (Exception e) {
             log.error("Cannot broadcast event notification.", e);
             Throwables.propagate(e);
@@ -124,4 +135,5 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
     private <T> String eventTypeName(NotificationData<T> notification) {
         return notification.getEventType().name();
     }
+
 }

@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -55,6 +55,7 @@ import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskContext;
@@ -109,8 +110,13 @@ public class ForkedTaskExecutor implements TaskExecutor {
                     errorSink);
 
             try {
-                taskProcessTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller(context
-                        .getTaskId().value(), processBuilder.environment());
+                TaskId taskId = context.getTaskId();
+
+                String cookieNameSuffix = "Job" + taskId.getJobId().value() + "Task" + taskId.value();
+
+                taskProcessTreeKiller =
+                        CookieBasedProcessTreeKiller.createProcessChildrenKiller(
+                                cookieNameSuffix, processBuilder.environment());
             } catch (NotImplementedException e) {
                 // SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
             }
@@ -261,7 +267,10 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
     // 1 called by forker
     private static File serializeContext(TaskContext context, File directory) throws IOException {
-        File file = File.createTempFile(context.getTaskId().value(), null, directory);
+        // prefix must be at least 3 characters long
+        String tmpFilePrefix = Strings.padStart(context.getTaskId().value(), 3, '0');
+
+        File file = File.createTempFile(tmpFilePrefix, null, directory);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             objectOutputStream.writeObject(context);
         }

@@ -299,16 +299,20 @@ public class TaskLauncher implements InitActive {
                 terminateNotification.terminate(taskId, taskResult);
                 logger.debug("Successfully notified task termination " + taskId);
                 return;
-            } catch (Throwable th) {
-                logger.warn("Cannot notify task termination " + taskId + ", will try again in " +
-                        pingPeriodMs + " ms", th);
-                try {
-                    Thread.sleep(pingPeriodMs);
-                } catch (InterruptedException e) {
-                    logger.error("Interrupted while waiting to notify task termination", e);
+            } catch (Throwable t) {
+                logger.warn(
+                        "Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms", t);
+
+                if (i != pingAttempts - 1) {
+                    try {
+                        Thread.sleep(pingPeriodMs);
+                    } catch (InterruptedException e) {
+                        logger.error("Interrupted while waiting to notify task termination", e);
+                    }
                 }
             }
         }
+
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
                 " attempts, terminating task launcher now");
     }

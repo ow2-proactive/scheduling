@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -44,13 +44,13 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.junit.Test;
-
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
+import org.junit.Test;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 
 /**

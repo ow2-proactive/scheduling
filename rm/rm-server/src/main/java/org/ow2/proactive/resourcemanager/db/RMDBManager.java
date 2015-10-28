@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -38,8 +38,12 @@
 package org.ow2.proactive.resourcemanager.db;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -55,6 +59,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.internal.util.config.ConfigurationException;
 
 
 public class RMDBManager {
@@ -100,15 +105,30 @@ public class RMDBManager {
                     " and drop nodesources = " + dropNS + " and configuration file = " +
                     configFile.getAbsolutePath());
             }
-            return new RMDBManager(new Configuration().configure(configFile), drop, dropNS);
+
+            Configuration configuration = new Configuration();
+
+            if (configFile.getName().endsWith(".xml")) {
+                configuration.configure(configFile);
+            } else {
+                try {
+                    Properties properties = new Properties();
+                    properties.load(Files.newBufferedReader(configFile.toPath(), Charset.defaultCharset()));
+                    configuration.addProperties(properties);
+                } catch (IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            }
+
+            return new RMDBManager(configuration, drop, dropNS);
         }
     }
 
     private static RMDBManager createInMemoryRMDBManager() {
         Configuration config = new Configuration();
-        config.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
-        config.setProperty("hibernate.connection.url", "jdbc:h2:mem:scheduler");
-        config.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        config.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbc.JDBCDriver");
+        config.setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
+        config.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         return new RMDBManager(config, true, true);
     }
 

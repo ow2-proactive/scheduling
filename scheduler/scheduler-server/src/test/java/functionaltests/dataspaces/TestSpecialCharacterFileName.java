@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -47,8 +47,10 @@ import java.util.Collections;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import functionaltests.utils.SchedulerFunctionalTest;
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -60,6 +62,7 @@ import static org.junit.Assume.assumeTrue;
  * @date 31 aug 15
  * @since ProActive Scheduling 1.0
  */
+@Ignore // lpellegr: test is marked as ignored while I am investigating the issue
 public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
 
     private static String fileNameWithAccent = "myfile-é";
@@ -70,20 +73,18 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
     private static String clientBatPath = "bin\\proactive-client.bat";
     private static String jobXmlPath = "scheduler\\scheduler-server\\src\\test\\resources\\functionaltests\\dataspaces\\Job_SpecialCharacterFileName.xml";
 
-    private static int TIMEOUT = 20; // in seconds
+    private static int TIMEOUT = 300; // in seconds
     private static final String ERROR_COMMAND_EXECUTION = "Error command execution";
 
-    private static String outputResultOrThrow(InputStream inputStream, String expr, int timeout) throws Exception {
+    private static String returnExprInResultBeforeTimeout(InputStream inputStream, String expr, int timeout) throws Exception {
         StringBuilder sb = new StringBuilder();
-        BufferedReader br = null;
-        br = new BufferedReader(new InputStreamReader(inputStream));
-        String line = null;
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
         long startTime = System.currentTimeMillis();
 
         while ((line = br.readLine()) != null && (System.currentTimeMillis() - startTime) / 1000 < timeout) {
-            System.out.println("^^ "+ line +" ^^");
-            logger.info("^^ "+ line +" ^^");
             sb.append(line + System.getProperty("line.separator"));
+            System.out.println(line);
 
             if (line.contains(expr)) {
                 br.close();
@@ -91,14 +92,13 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
             }
         }
         br.close();
-
-        throw new Exception(ERROR_COMMAND_EXECUTION);
+        return null;
     }
 
     File fileWithAccentIn;
     File fileWithAccentOut;
 
-    @org.junit.Before
+    @Before
     public void OnlyOnWindows() throws IOException {
         assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
 
@@ -115,6 +115,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         }
 
         File inputSpaceDir = new File(inputSpace);
+        inputSpaceDir.mkdirs();
         String inputSpaceDirPath = inputSpaceDir.getAbsolutePath();
         fileWithAccentIn = new File(inputSpaceDirPath + File.separator + fileNameWithAccent);
         fileWithAccentIn.createNewFile();
@@ -125,26 +126,27 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
      *
      * @throws Throwable any exception that can be thrown during the test.
      */
-    @Ignore
-    @org.junit.Test
+    @Test
     public void run() throws Throwable {
-
 
         // Now we launch the scheduler from the generated script, to consider the -Dfile.encoding parameter
         schedulerHelper.killScheduler();
 
         // Start the scheduler
-        logger.info("IAMHERE1 " + new File(".").getAbsolutePath());
-        System.out.println("IAMHERE1 " + new File(".").getAbsolutePath());
-
-        logger.info("IAMHERE2 " + new File(schedulerStarterBatPath).exists());
-        System.out.println("IAMHERE2 " + new File(schedulerStarterBatPath).exists());
-
         ArrayList<String> schedulerCommand = new ArrayList<>();
         schedulerCommand.add(schedulerStarterBatPath);
         ProcessBuilder schedulerProcessBuilder = new ProcessBuilder(schedulerCommand);
         schedulerProcessBuilder.environment().put("processID", "0");
-        outputResultOrThrow(schedulerProcessBuilder.start().getInputStream(), "started", TIMEOUT);
+        long startTime = System.currentTimeMillis();
+        if(returnExprInResultBeforeTimeout(schedulerProcessBuilder.start().getInputStream(), "started", TIMEOUT) == null)
+        {
+            long duration = (System.currentTimeMillis() - startTime) / 1000;
+            // Kill & Clean
+            ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
+            fileWithAccentIn.delete();
+            throw new Exception(ERROR_COMMAND_EXECUTION + " after " + duration + "s");
+        }
+        System.out.println("scheduler started!");
 
         // Start the proactive client to submit the job
         ArrayList<String> clientCommand = new ArrayList<>();
@@ -156,7 +158,18 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         clientCommand.add("-s");
         clientCommand.add(jobXmlPath);
         ProcessBuilder jobSubmissionProcessBuilder = new ProcessBuilder(clientCommand);
-        String jobSubmissionStr = outputResultOrThrow(jobSubmissionProcessBuilder.start().getInputStream(), "submitted", TIMEOUT);
+        String jobSubmissionStr;
+
+        startTime = System.currentTimeMillis();
+        if ((jobSubmissionStr= returnExprInResultBeforeTimeout(jobSubmissionProcessBuilder.start().getInputStream(), "submitted", TIMEOUT))==null)
+        {
+            long duration = (System.currentTimeMillis() - startTime) / 1000;
+            // Kill & Clean
+            ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
+            fileWithAccentIn.delete();
+            throw new Exception(ERROR_COMMAND_EXECUTION + " after " + duration + "s");
+        }
+        System.out.println("job submitted!");
 
         // Retrieve the jobId
         String[] result = jobSubmissionStr.split("'");
@@ -169,30 +182,37 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
         jobStatusCommand.add(jobId);
         ProcessBuilder jobStatusProcessBuilder = new ProcessBuilder(jobStatusCommand);
 
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         boolean jobFinished = false;
 
-        while (!jobFinished && ((System.currentTimeMillis() - startTime) / 1000) < 2 * TIMEOUT)
-        {
-            try {
-                jobFinished = (outputResultOrThrow(jobStatusProcessBuilder.start().getInputStream(), "FINISHED", TIMEOUT) != null);
-            }catch (Exception e){}
+        while (!jobFinished && ((System.currentTimeMillis() - startTime) / 1000) < 5 * TIMEOUT) {
+            System.out.println("SLEEP");
+            Thread.sleep(5000);
+            jobFinished = (returnExprInResultBeforeTimeout(jobStatusProcessBuilder.start().getInputStream(),
+                    "FINISHED", TIMEOUT) != null);
         }
 
         if (!jobFinished)
+        {
+            // Kill & Clean
+            ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
+            fileWithAccentIn.delete();
             throw new Exception(ERROR_COMMAND_EXECUTION);
+        }
+        System.out.println("job finished!");
 
         // Assertion
-        //Assert.assertTrue(new File(IOSPACE + OUT + File.separator + out).exists());
         File outputSpaceDir = new File(outputSpace);
         fileWithAccentOut = new File(outputSpaceDir.getAbsolutePath() + File.separator + fileNameWithAccent);
-        Assert.assertTrue(fileWithAccentOut.exists());
 
-        // Kill
-        ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
-
-        // Clean
-        fileWithAccentIn.delete();
-        fileWithAccentOut.delete();
+        try {
+            Assert.assertTrue(fileWithAccentOut.exists());
+        }finally {
+            // Kill & Clean
+            ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
+            fileWithAccentIn.delete();
+            fileWithAccentOut.delete();
+        }
     }
 }
+

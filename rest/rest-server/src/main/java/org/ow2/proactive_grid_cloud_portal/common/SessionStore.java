@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -33,6 +33,8 @@
  *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive_grid_cloud_portal.common;
+
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -85,8 +87,8 @@ public class SessionStore {
 
     public void terminateAll() {
         synchronized (sessions) {
-            for (Iterator<Map.Entry<String, Session>> iterator = sessions.entrySet().iterator(); iterator
-                    .hasNext();) {
+            for (Iterator<Map.Entry<String, Session>> iterator =
+                    sessions.entrySet().iterator(); iterator.hasNext();) {
                 Map.Entry<String, Session> sessionEntry = iterator.next();
                 Session session = sessionEntry.getValue();
                 iterator.remove();
@@ -98,8 +100,8 @@ public class SessionStore {
     public int terminateExpiredSessions(long timeoutDelay) {
         synchronized (sessions) {
             int terminatedSessionCounter = 0;
-            for (Iterator<Map.Entry<String, Session>> iterator = sessions.entrySet().iterator(); iterator
-                    .hasNext();) {
+            for (Iterator<Map.Entry<String, Session>> iterator =
+                 sessions.entrySet().iterator(); iterator.hasNext();) {
                 Map.Entry<String, Session> sessionEntry = iterator.next();
                 Session session = sessionEntry.getValue();
                 if (session.isExpired(timeoutDelay)) {
@@ -115,4 +117,13 @@ public class SessionStore {
     public int size() {
         return sessions.size();
     }
+
+    public void renewSession(String sessionId) throws NotConnectedException {
+        Session session = sessions.get(sessionId);
+
+        if (session != null) {
+            session.renewSession();
+        }
+    }
+
 }

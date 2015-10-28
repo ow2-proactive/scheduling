@@ -41,7 +41,7 @@ public class ForkedTaskExecutorRunAsMeTest {
         ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), decrypter);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         ScriptExecutableContainer container = new ScriptExecutableContainer(new TaskScript(new SimpleScript(
             "whoami", "native")));

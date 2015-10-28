@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -63,14 +64,14 @@ public abstract class CommonAttribute implements Serializable {
     /** The key for specifying start at time as generic information */
     public static final String GENERIC_INFO_START_AT_KEY = "START_AT";
 
-    /** 
+    /**
      * Do the job has to cancel when an exception occurs in a task. (default is false) <br />
      * You can override this property inside each task.
      */
     protected UpdatableProperties<BooleanWrapper> cancelJobOnError = new UpdatableProperties<BooleanWrapper>(
         new BooleanWrapper(false));
 
-    /** 
+    /**
      * Where will a task be restarted if an error occurred. (default is ANYWHERE)<br />
      * It will be restarted according to the number of execution remaining.<br />
      * You can override this property inside each task.
@@ -108,7 +109,7 @@ public abstract class CommonAttribute implements Serializable {
 
     /**
      * Get the cancelJobOnError updatable property.
-     * 
+     *
      * @return the cancelJobOnError updatable property.
      */
     public UpdatableProperties<BooleanWrapper> getCancelJobOnErrorProperty() {
@@ -117,7 +118,7 @@ public abstract class CommonAttribute implements Serializable {
 
     /**
      * Returns the restartTaskOnError state.
-     * 
+     *
      * @return the restartTaskOnError state.
      */
     public RestartMode getRestartTaskOnError() {
@@ -135,7 +136,7 @@ public abstract class CommonAttribute implements Serializable {
 
     /**
      * Get the restartTaskOnError updatable property.
-     * 
+     *
      * @return the restartTaskOnError updatable property.
      */
     public UpdatableProperties<RestartMode> getRestartTaskOnErrorProperty() {
@@ -144,7 +145,7 @@ public abstract class CommonAttribute implements Serializable {
 
     /**
      * Get the number of execution allowed for this task.
-     * 
+     *
      * @return the number of execution allowed for this task
      */
     public int getMaxNumberOfExecution() {
@@ -166,7 +167,7 @@ public abstract class CommonAttribute implements Serializable {
 
     /**
      * Get the maximum number Of Execution updatable property.
-     * 
+     *
      * @return the maximum number Of Execution updatable property
      */
     public UpdatableProperties<IntegerWrapper> getMaxNumberOfExecutionProperty() {
@@ -174,17 +175,35 @@ public abstract class CommonAttribute implements Serializable {
     }
 
     /**
-     * Returns the genericInformations.<br>
-     * These informations are transmitted to the policy that can use it for the scheduling.
+     * Returns generic information.
+     * <p/>
+     * These information are transmitted to the policy that can use it for the scheduling.
      *
-     * @return the genericInformations.
+     * @return generic information.
+     * @deprecated Use {@link #getGenericInformation()} instead.
+     * This method is scheduled for removal in next major release.
      */
+    @Deprecated
     public Map<String, String> getGenericInformations() {
-        Map<String, String> tmp = new HashMap<String, String>();
-        for (Entry<String, BigString> e : this.genericInformations.entrySet()) {
-            tmp.put(e.getKey(), e.getValue().getValue());
+        return getGenericInformation();
+    }
+
+    /**
+     * Returns generic information.
+     * <p>
+     * These information are transmitted to the policy that can use it for the scheduling.
+     *
+     * @return generic information.
+     */
+    public Map<String, String> getGenericInformation() {
+        Set<Entry<String, BigString>> entries = this.genericInformations.entrySet();
+        Map<String, String> result = new HashMap<>(entries.size());
+
+        for (Entry<String, BigString> entry : entries) {
+            result.put(entry.getKey(), entry.getValue().getValue());
         }
-        return tmp;
+
+        return result;
     }
 
     /**
@@ -207,7 +226,7 @@ public abstract class CommonAttribute implements Serializable {
      * @param genericInformations the generic information to set.
      */
     public void setGenericInformations(Map<String, String> genericInformations) {
-        this.genericInformations = new HashMap<String, BigString>();
+        this.genericInformations = new HashMap<>();
         if (genericInformations != null) {
             for (Entry<String, String> e : genericInformations.entrySet()) {
                 addGenericInformation(e.getKey(), e.getValue());

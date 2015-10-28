@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -139,6 +139,8 @@ public abstract class InternalTask extends TaskState {
     public InternalTask getReplicatedFrom() {
         return replicatedFrom;
     }
+
+
 
     /**
      * {@inheritDoc}
@@ -730,7 +732,7 @@ public abstract class InternalTask extends TaskState {
      * <p>
      * The provided String will be appended the iteration and replication index
      * if > 0, so that: <br>
-     * <code>name = name [iterationSeparator iteration] [replicationSeparator replication]</code>
+     * <code>name = name [ITERATION_SEPARATOR iteration] [REPLICATION_SEPARATOR replication]</code>
      *
      * @param newName
      *            the name to set.
@@ -740,9 +742,9 @@ public abstract class InternalTask extends TaskState {
             return;
         }
         int i = -1;
-        if ((i = newName.indexOf(TaskId.iterationSeparator)) != -1) {
+        if ((i = newName.indexOf(TaskId.ITERATION_SEPARATOR)) != -1) {
             newName = newName.substring(0, i);
-        } else if ((i = newName.indexOf(TaskId.replicationSeparator)) != -1) {
+        } else if ((i = newName.indexOf(TaskId.REPLICATION_SEPARATOR)) != -1) {
             newName = newName.substring(0, i);
         }
 
@@ -797,10 +799,10 @@ public abstract class InternalTask extends TaskState {
     private String getTaskNameSuffix() {
         String n = "";
         if (this.iteration > 0) {
-            n += TaskId.iterationSeparator + this.iteration;
+            n += TaskId.ITERATION_SEPARATOR + this.iteration;
         }
         if (this.replication > 0) {
-            n += TaskId.replicationSeparator + this.replication;
+            n += TaskId.REPLICATION_SEPARATOR + this.replication;
         }
         return n;
     }
@@ -821,8 +823,8 @@ public abstract class InternalTask extends TaskState {
     private static final Pattern[] namePatterns;
 
     static {
-        String[] regexps = new String[] { "^(.*)[" + TaskId.iterationSeparator + "].*$",
-                "^(.*)[" + TaskId.replicationSeparator + "].*$", "^(.*)$" };
+        String[] regexps = new String[] { "^(.*)[" + TaskId.ITERATION_SEPARATOR + "].*$",
+                "^(.*)[" + TaskId.REPLICATION_SEPARATOR + "].*$", "^(.*)$" };
 
         namePatterns = new Pattern[regexps.length];
 
@@ -863,10 +865,10 @@ public abstract class InternalTask extends TaskState {
      * @return the replication index contained in the name
      */
     public static int getReplicationIndexFromName(String name) {
-        if (name.indexOf(TaskId.replicationSeparator) == -1) {
+        if (name.indexOf(TaskId.REPLICATION_SEPARATOR) == -1) {
             return 0;
         } else {
-            return Integer.parseInt(name.split("[" + TaskId.replicationSeparator + "]")[1]);
+            return Integer.parseInt(name.split("[" + TaskId.REPLICATION_SEPARATOR + "]")[1]);
         }
     }
 
@@ -878,11 +880,11 @@ public abstract class InternalTask extends TaskState {
      * @return the replication index contained in the name
      */
     public static int getIterationIndexFromName(String name) {
-        if (name.indexOf(TaskId.iterationSeparator) == -1) {
+        if (name.indexOf(TaskId.ITERATION_SEPARATOR) == -1) {
             return 0;
         } else {
-            String suffix = name.split("[" + TaskId.iterationSeparator + "]")[1];
-            return Integer.parseInt(suffix.split("[" + TaskId.replicationSeparator + "]")[0]);
+            String suffix = name.split("[" + TaskId.ITERATION_SEPARATOR + "]")[1];
+            return Integer.parseInt(suffix.split("[" + TaskId.REPLICATION_SEPARATOR + "]")[0]);
         }
     }
 
@@ -1015,6 +1017,7 @@ public abstract class InternalTask extends TaskState {
     protected TaskLauncherInitializer getDefaultTaskLauncherInitializer(InternalJob job) {
         TaskLauncherInitializer tli = new TaskLauncherInitializer();
         tli.setTaskId(getId());
+        tli.setJobOwner(job.getJobInfo().getJobOwner());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
         tli.setControlFlowScript(getFlowScript());
@@ -1058,7 +1061,7 @@ public abstract class InternalTask extends TaskState {
      * $PA_TASK_REPLICATION by it's actual value
      *
      */
-    public Map<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformation() {
 
         if (taskInfo == null || genericInformations == null) {
             // task is not yet properly initialized
@@ -1090,9 +1093,9 @@ public abstract class InternalTask extends TaskState {
      */
     public Map<String, String> getGenericInformations(boolean replaceVariables) {
         if (replaceVariables) {
-            return this.getGenericInformations();
+            return this.getGenericInformation();
         } else {
-            return super.getGenericInformations();
+            return super.getGenericInformation();
         }
     }
 }

@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -47,15 +47,17 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**

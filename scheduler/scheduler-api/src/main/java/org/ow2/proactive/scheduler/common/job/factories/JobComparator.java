@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +64,6 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.apache.commons.collections.CollectionUtils;
 
 
 public class JobComparator {
@@ -158,10 +159,10 @@ public class JobComparator {
         }
 
         stack.push(" genericInformations ");
-        if (!isEqualMap(attrib1.getGenericInformations(), attrib2.getGenericInformations())) {
+        if (!isEqualMap(attrib1.getGenericInformation(), attrib2.getGenericInformation())) {
 
-            stack.push("generic info 1= " + attrib1.getGenericInformations() + " ----- generic info 2 = " +
-                attrib2.getGenericInformations());
+            stack.push("generic info 1= " + attrib1.getGenericInformation() + " ----- generic info 2 = " +
+                attrib2.getGenericInformation());
 
             return false;
         }
@@ -241,9 +242,12 @@ public class JobComparator {
             }
 
             // we only compare the names in the 2 dependencies lists
-            Set<String> names1 = new HashSet<>();
-            Set<String> names2 = new HashSet<>();
-            for (int k = 0; k < dep1.size(); k++) {
+            int dep1Size = dep1.size();
+
+            Set<String> names1 = new HashSet<String>(dep1Size);
+            Set<String> names2 = new HashSet<String>(dep1Size);
+
+            for (int k = 0; k < dep1Size; k++) {
                 names1.add(dep1.get(k).getName());
                 names2.add(dep2.get(k).getName());
             }

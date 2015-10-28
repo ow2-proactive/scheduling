@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
-import java.security.KeyException;
-
-import javax.security.auth.login.LoginException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -49,15 +45,19 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.dataspace.FileSystem;
 import org.ow2.proactive_grid_cloud_portal.scheduler.JobsOutputController;
 
+import javax.security.auth.login.LoginException;
+import java.security.KeyException;
+
 
 public class Session {
 
-    private static final Logger LOGGER = ProActiveLogger.getLogger(Session.class);
+    private static final Logger logger = ProActiveLogger.getLogger(Session.class);
 
     private long lastAccessTimestamp;
 
@@ -80,10 +80,10 @@ public class Session {
         this.sessionId = sessionId;
         this.schedulerRMProxyFactory = schedulerRMProxyFactory;
         this.clock = clock;
-        updateLasAccessedTime();
+        updateLastAccessedTime();
     }
 
-    private void updateLasAccessedTime() {
+    private void updateLastAccessedTime() {
         this.lastAccessTimestamp = clock.now();
     }
 
@@ -100,7 +100,7 @@ public class Session {
     }
 
     public SchedulerProxyUserInterface getScheduler() {
-        updateLasAccessedTime();
+        updateLastAccessedTime();
         if (scheduler == null) {
             try {
                 if (credData != null) {
@@ -109,7 +109,7 @@ public class Session {
                     connectToScheduler(credentials);
                 }
             } catch (Exception e) {
-                LOGGER.warn("Failed to connect to the Scheduler", e);
+                logger.warn("Failed to connect to the Scheduler", e);
                 throw new RuntimeException(e);
             }
         }
@@ -129,7 +129,7 @@ public class Session {
     }
 
     public RMProxyUserInterface getRM() {
-        updateLasAccessedTime();
+        updateLastAccessedTime();
         if (rm == null) {
             try {
                 if (credData != null) {
@@ -138,7 +138,7 @@ public class Session {
                     connectToRM(credentials);
                 }
             } catch (Exception e) {
-                LOGGER.warn("Failed to connect to the RM", e);
+                logger.warn("Failed to connect to the RM", e);
                 throw new RuntimeException(e);
             }
         }
@@ -149,7 +149,7 @@ public class Session {
         return userName;
     }
 
-    void setUserName(String userName) {
+    protected void setUserName(String userName) {
         this.userName = userName;
     }
 
@@ -174,7 +174,7 @@ public class Session {
             try {
                 PAActiveObject.terminateActiveObject(activeObject, true);
             } catch (Throwable e) {
-                LOGGER.warn("Error occurred while terminating active object tied to session " + sessionId, e);
+                logger.warn("Error occurred while terminating active object tied to session " + sessionId, e);
             }
         }
     }
@@ -190,4 +190,18 @@ public class Session {
     public FileSystem fileSystem() {
         return fs;
     }
+
+    public void renewSession() throws NotConnectedException {
+        if (scheduler != null) {
+            scheduler.renewSession();
+        }
+    }
+
+    /*
+     * For testing purposes only.
+     */
+    protected void setScheduler(SchedulerProxyUserInterface scheduler) {
+        this.scheduler = scheduler;
+    }
+
 }

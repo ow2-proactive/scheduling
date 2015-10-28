@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -211,13 +211,13 @@ public class FlowChecker {
         for (Task task : job.getTasks()) {
             String name = task.getName();
 
-            if (name.indexOf(TaskId.iterationSeparator) != -1) {
+            if (name.indexOf(TaskId.ITERATION_SEPARATOR) != -1) {
                 throw new FlowError("Task name cannot contain special character '" +
-                    TaskId.iterationSeparator + "'", FlowErrorType.NAME, name);
+                    TaskId.ITERATION_SEPARATOR + "'", FlowErrorType.NAME, name);
             }
-            if (name.indexOf(TaskId.replicationSeparator) != -1) {
+            if (name.indexOf(TaskId.REPLICATION_SEPARATOR) != -1) {
                 throw new FlowError("Task name cannot contain special character '" +
-                    TaskId.replicationSeparator + "'", FlowErrorType.NAME, name);
+                    TaskId.REPLICATION_SEPARATOR + "'", FlowErrorType.NAME, name);
             }
 
             if (tasks.contains(name)) {

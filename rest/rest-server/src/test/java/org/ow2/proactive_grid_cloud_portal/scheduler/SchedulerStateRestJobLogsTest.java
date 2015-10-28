@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -159,13 +159,13 @@ public class SchedulerStateRestJobLogsTest {
         task.setPreciousLogs(true);
         task.setFinishedTime(finishedTime);
         jobState.addTask(task);
-        task.setId(TaskIdImpl.createTaskId(new JobIdImpl(123, "job"), "task", id, false));
+        task.setId(TaskIdImpl.createTaskId(new JobIdImpl(123, "job"), "task", id));
     }
 
     private JobResultImpl createJobResult(String taskOutput, String taskErrput) {
         JobResultImpl jobResult = new JobResultImpl();
         jobResult.addTaskResult("OneTask", new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl
-                .makeJobId("123"), "OneTask", 1, false), "result",
+                .makeJobId("123"), "OneTask", 1), "result",
             new SimpleTaskLogs(taskOutput, taskErrput), 100), false);
         return jobResult;
     }

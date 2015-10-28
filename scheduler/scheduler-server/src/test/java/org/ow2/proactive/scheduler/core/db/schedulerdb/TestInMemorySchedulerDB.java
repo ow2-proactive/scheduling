@@ -1,15 +1,16 @@
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.tests.ProActiveTest;
-import org.junit.Assert;
-import org.junit.Test;
 
 
+// FIXME: This is not a unit test
 public class TestInMemorySchedulerDB extends ProActiveTest {
 
     @Test

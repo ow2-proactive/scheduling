@@ -1,24 +1,16 @@
+def custom ={ "$rootDir/gradle/${it}.gradle"} 
+
 apply plugin: 'java'
-apply plugin: "sonar-runner"
+
+apply from: custom("sonar-scheduling")
+apply from: custom("jacoco-scheduling")
+
 
 
 archivesBaseName = 'scheduling' // in case current folder is not named scheduling
 
 project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
-
-
-
-sonarRunner {
-    sonarProperties {    
-    	property "sonar.projectKey", "$project.group:Scheduling"
-    	property "sonar.projectName", "Scheduling" 
-        property "sonar.jdbc.driverClassName", "org.postgresql.Driver"
-        property "sonar.language", "java"
-        property "sonar.sources", "src/main"
-        property 'sonar.jacoco.reportPath', "${buildDir}/jacoco/testDebug.exec"
-        property 'sonar.junit.reportsPath', "${buildDir}/test-results"
-    }
-}
+project.ext.set('schedulingParentFolder', "$rootDir")
 
 
 configurations {
@@ -32,15 +24,20 @@ configurations {
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
-        mavenCentral()
+
+        jcenter()
+
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
+        maven { url "http://nexus.qmino.com/content/repositories/miredot" }
     }
 
     dependencies {
         classpath "org.objectweb.proactive:programming-build-utils:${programmingVersion}"
         // needed at runtime by AntStubGenerator...
         classpath("org.objectweb.proactive:programming-core:${programmingVersion}")
-        classpath 'org.hsudbrock:gradle-trang:0.1-proactive'
+        classpath('org.hsudbrock:gradle-trang:0.1-proactive') {
+            exclude group: 'xml-apis', module: 'xml-apis'
+        }
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
         classpath 'org.ow2.proactive:gradle-serialver:2.0'
         classpath 'org.postgresql:postgresql:9.3-1102-jdbc41'  
@@ -48,6 +45,8 @@ buildscript {
         classpath('org.gradle.api.plugins:gradle-format-plugin:1.1') {
                     exclude group: 'javassist', module: 'javassist'
         }
+
+        classpath 'com.qmino:miredot-plugin:1.6.2'
     }
 }
 
@@ -67,6 +66,8 @@ allprojects {
     rootProject.buildscript.repositories.each {
         repositories.add(it)
     }
+
+
 
     uploadArchives {
         repositories {
@@ -92,36 +93,25 @@ configure(javaSubprojects) {
     apply plugin: 'format'
     apply plugin: 'jacoco'
     
-    jacoco {
-        toolVersion = '0.7.1.201405082137'
-    }
+   
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
     
-    jacocoTestReport {
-        additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
-        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
-        classDirectories =  files(sourceSets.main.output)
-        reports {
-            html.enabled = true
-            xml.enabled = true
-            csv.enabled = false
-        }
-    }
-
-    sourceCompatibility = 1.7
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
-    
-    
-		
-	
 
     dependencies {
-        compile 'log4j:log4j:1.2.14'
+        compile 'log4j:log4j:1.2.17'
         compile 'com.google.guava:guava:18.0'
-        runtime 'org.slf4j:slf4j-log4j12:1.6.6'
+
+        runtime 'org.slf4j:slf4j-log4j12:1.7.12'
+
         testCompile 'junit:junit:4.12'
         testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
-        testCompile 'org.mockito:mockito-core:1.9.5'
+
+        testCompile 'org.mockito:mockito-core:1.10.19'
+		testCompile 'ObjectFaker:ObjectFaker:0.1'
         testCompile 'com.jayway.awaitility:awaitility:1.6.0'
+		testCompile 'org.apache.commons:commons-lang3:3.4'
     }
 
     test {
@@ -153,15 +143,27 @@ configure(javaSubprojects) {
     }
 }
 
+
+task wrapper(type: Wrapper) {
+   gradleVersion = '2.7' //version required
+}
+
 ext.encoding = {
     Properties props = new Properties()
     props.load(new FileInputStream("$rootDir/config/scheduler/settings.ini"))
     props.getProperty('pa.scheduler.job.file.encoding')
 }
 
-def functionalTestConfiguration = {
+ext.schedulingFunctionalTestConfiguration = {
 
-    include 'functionaltests/**'
+	
+    include 'functionaltests/**'  
+    
+    if(!project.hasProperty('regression')){
+	    def regression_tests = new File(project.rootDir, "/regression_tests.txt")
+	    regression_tests.readLines().each { exclude '**/'+it+'.class' }
+    }
+    
    
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
@@ -178,446 +180,22 @@ def functionalTestConfiguration = {
     }
 
     def clean = {
+    	println project.nativeLibsDir
+    	   	
         project.javaexec {
             main = "org.ow2.tests.ProcessCleaner"
-            classpath = fileTree("${rootDir.absolutePath}/dist/lib/").include("*.jar")
+            classpath = fileTree(project.nativeLibsDir).include("*.jar")
             systemProperty "java.library.path", project.nativeLibsDir
         }
     }
 
     finalizedBy project.task(project.name + '-clean', { doLast clean })
     doFirst clean
-}
-
-project(':scheduler:scheduler-api') {
-    dependencies {
-        compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
-
-        compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
-        compile 'isorelax:isorelax:20030108'
-        compile 'commons-collections:commons-collections:3.2'
-        compile 'msv:msv:20050913'
-        compile 'commons-io:commons-io:2.4'
-
-        compile project(':common-api')
-
-        runtime 'org.codehaus.woodstox:woodstox-core-lgpl:4.1.2'
-        runtime 'msv:xsdlib:20050913'
-        runtime 'msv:relaxngDatatype:20030807'
-        runtime 'xerces:xercesImpl:2.8.1'
-    }
-
-    apply plugin: 'trang'
-    task convertSchemas
-    ['3.0', '3.1', '3.2', '3.3', 'dev'].each { schemaVersion ->
-        task("convertSchemasXsd-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
-            sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
-            targetDirectory = sourceDirectory
-            doLast {
-                project.delete project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}/xsi.xsd")
-            }
-        }
-        task("convertSchemasRng-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
-            sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
-            targetDirectory = sourceDirectory
-            targetExtension = 'rng'
-            doLast {
-                project.delete project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}/xsi.xsd")
-            }
-        }
-        task("convertSchemas-$schemaVersion").dependsOn << ["convertSchemasXsd-$schemaVersion", "convertSchemasRng-$schemaVersion"]
-        convertSchemas.dependsOn << "convertSchemasXsd-$schemaVersion"
-        convertSchemas.dependsOn << "convertSchemasRng-$schemaVersion"
-    }
-
-    task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.common.Scheduler']
-    }
-    serialver.dependsOn stub
-}
-
-project('common-api') {
-
-	
-
-    
 
 
-    dependencies {
-        compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
-        compile "org.objectweb.proactive:programming-util:${programmingVersion}"
-
-        testRuntime 'org.jruby:jruby-jline:1.7.4'
-        testRuntime 'org.python:jython-jline:2.5.4-rc1'
-        testRuntime 'org.codehaus.groovy:groovy-all:2.1.6'
-        testRuntime 'jsr223:jsr223-nativeshell:0.3'
-        testCompile 'junit:junit:4.11'
-    }
-
-    task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scripting.ScriptResult']
-    }
-    serialver.dependsOn stub
 }
 
 
-
-
-
-project(':scheduler:scheduler-client') {
-    dependencies {
-        compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
-
-        compile project(':scheduler:scheduler-api')
-        compile project(':common-client')
-    }
-
-    task stub(type: StubTask) {
-        classes = [
-                'org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface',
-                'org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface'
-        ]
-    }
-    serialver.dependsOn stub
-}
-
-project('common-client') {
-    dependencies {
-        compile 'commons-codec:commons-codec:1.6'
-        compile 'org.rrd4j:rrd4j:2.0.7'
-        compile 'org.ow2.proactive:process-tree-killer:1.0.0'
-
-        compile "org.objectweb.proactive:programming-core:${programmingVersion}"
-        compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
-
-        compile project(':common-api')
-    }
-
-    task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scripting.ScriptHandler',
-                   'org.ow2.proactive.jmx.provider.ro.ROServerImpl',
-                   'org.ow2.proactive.jmx.provider.ro.ROConnection']
-    }
-    serialver.dependsOn stub
-}
-
-project('rm:rm-client') {
-    dependencies {
-        compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
-        compile "org.objectweb.proactive:programming-core:${programmingVersion}"
-        compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
-
-        compile project(':common-client')
-    }
-    task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.utils.NodeSet',
-                   'org.ow2.proactive.resourcemanager.frontend.ResourceManager',
-                   'org.ow2.proactive.resourcemanager.authentication.RMAuthentication',
-                   'org.ow2.proactive.resourcemanager.common.event.RMInitialState',
-                   'org.ow2.proactive.resourcemanager.common.RMState',
-                   'org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface',
-                   'org.ow2.proactive.resourcemanager.common.util.RMListenerProxy',
-                   'org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger',
-                   'org.ow2.proactive.resourcemanager.frontend.topology.pinging.NodesPinger',
-                   'org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger',
-                   'org.ow2.proactive.resourcemanager.frontend.RMMonitoring']
-    }
-    serialver.dependsOn stub
-}
-
-project(':rm:rm-node') {
-    dependencies {
-        compile 'org.ow2.proactive:process-tree-killer:1.0.0'
-        compile 'org.jvnet.winp:winp:1.23-proactive'
-        compile 'net.java.dev.jna:jna:4.1.0'
-        compile 'commons-io:commons-io:2.4'
-
-        compile 'commons-cli:commons-cli:1.1'
-        compile 'sigar:sigar:1.7.0-proactive'
-
-        compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
-
-        compile project(':common-client')
-        compile project(':rm:rm-client')
-
-        runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
-
-        // protocols
-        runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
-
-        // script engines
-        runtime 'org.jruby:jruby-jline:1.7.4'
-        runtime 'org.python:jython-jline:2.5.4-rc1'
-        runtime 'org.codehaus.groovy:groovy-all:2.1.6'
-        runtime 'jsr223:jsr223-nativeshell:0.3'
-    }
-
-}
-
-project(':rm:rm-node-updater') {
-    dependencies {
-        compile 'commons-io:commons-io:2.4'
-
-    }
-    jar {
-        manifest {
-            attributes("Implementation-Title": "ProActive",
-                    "Implementation-Version": version,
-                    "Specification-Version": version,
-                    "Implementation-Vendor": "Activeeon - OASIS - INRIA Sophia Antipolis",
-                    "Implementation-URL": "http://proactive.inria.fr",
-                    'Main-Class': 'org.ow2.proactive.resourcemanager.updater.RMNodeUpdater',
-                    'Class-Path' : "scheduler-node.jar"
-            )
-        }
-        from configurations.compile.collect { zipTree(it) }
-        archiveName = 'node-updater.jar'
-    }
-}
-
-project('scheduler:scheduler-server') {
-    apply plugin: 'java-library-distribution'
-    dependencies {
-        compile 'commons-cli:commons-cli:1.1'
-        compile 'commons-io:commons-io:2.4'
-        compile 'javax.mail:mail:1.4.7'
-        compile 'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final'
-        compile 'org.hibernate:hibernate-core:4.1.7.Final'
-        compile 'org.eclipse.jetty:jetty-webapp:8.1.15.v20140411'
-
-
-        compile "org.objectweb.proactive:programming-core:${programmingVersion}"
-
-        compile project(':common-api')
-        compile project(':common-client')
-        compile project(':scheduler:scheduler-api')
-        compile project(':scheduler:scheduler-client')
-        compile project(':scheduler:scheduler-node')
-        compile project(':rm:rm-server')
-        compile project(':rm:rm-client')
-
-        testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        testCompile 'org.hamcrest:hamcrest-all:1.3'
-        testCompile 'com.h2database:h2:1.3.167'
-        testCompile 'org.codehaus.groovy:groovy-all:2.1.6'
-        testCompile 'org.jvnet.winp:winp:1.23-proactive'
-        testCompile files("${System.properties['java.home']}/../lib/tools.jar")
-
-        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
-        testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
-        testCompile project(':rm:rm-policy:rm-policy-scheduler')
-        testCompile project(':scheduler:scheduler-examples')
-
-        runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
-        runtime 'org.apache.derby:derby:10.8.2.2'
-        runtime 'mysql:mysql-connector-java:5.1.16'
-        runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
-
-        runtime project(':rest:rest-server')
-    }
-
-    task('functionalTest', type: Test).configure functionalTestConfiguration
-
-    task testJar(type: Jar) {
-        classifier = 'tests'
-        from sourceSets.test.output
-    }
-
-    task stub(type: StubTask) {
-        classes = [
-                'org.ow2.proactive.scheduler.authentication.SchedulerAuthentication',
-                'org.ow2.proactive.scheduler.core.rmproxies.RMProxyActiveObject',
-                'org.ow2.proactive.scheduler.core.SchedulerFrontend',
-                'org.ow2.proactive.scheduler.core.TerminateNotification'
-        ]
-    }
-    serialver.dependsOn stub
-
-    artifacts {
-        archives testJar
-    }
-}
-
-project('scheduler:scheduler-node') {
-    apply plugin: 'java-library-distribution'
-    apply plugin: 'gradle-one-jar'
-    dependencies {
-        compile(
-                "org.objectweb.proactive:programming-extension-processbuilder:${programmingVersion}",
-                "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}",
-
-                project(':scheduler:scheduler-client'),
-                project(':rm:rm-node'),
-        )
-
-        runtime (
-                "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
-                "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}",
-        )
-
-        runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
-
-        testCompile project(':scheduler:scheduler-examples')
-    }
-
-    task stub(type: StubTask) {
-        classes = [
-                'org.ow2.proactive.scheduler.common.TaskTerminateNotification',
-                'org.ow2.proactive.scheduler.task.TaskLauncher'
-        ]
-    }
-    serialver.dependsOn stub
-
-    ext.oneJarManifest = manifest {
-        attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
-        attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
-    }
-
-    task standaloneJar(type: OneJar) {
-        logging.captureStandardOutput LogLevel.INFO
-        mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
-        binLib = files({ rootProject.configurations.nativeBundle.collect { zipTree(it) } })
-        additionalDir = file('src/main/resources')
-        manifest = oneJarManifest
-    }
-    build.dependsOn standaloneJar
-    artifacts {
-        archives standaloneJar
-    }
-}
-
-project(':scheduler:scheduler-examples') {
-    dependencies {
-        compile(
-                project(':scheduler:scheduler-node'),
-        )
-    }
-
-    task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.examples.MultiNodeExample']
-    }
-}
-
-project('rm:rm-server') {
-    apply plugin: 'java-library-distribution'
-    dependencies {
-        compile(
-                'commons-cli:commons-cli:1.1',
-                'it.sauronsoftware.cron4j:cron4j:2.2.5',
-                'org.hibernate:hibernate-core:4.1.7.Final',
-                'org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final',
-
-                "org.objectweb.proactive:programming-core:${programmingVersion}",
-                "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
-
-                project(':common-api'),
-                project(':common-client'),
-                project(':rm:rm-client'),
-                project(':rm:rm-node'),
-        )
-        testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-        testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
-        testCompile 'org.jruby:jruby-jline:1.7.4'
-        testCompile 'org.python:jython-jline:2.5.4-rc1'
-        testCompile 'org.apache.sshd:sshd-core:0.12.0'
-
-        runtime 'org.hibernate:hibernate-c3p0:4.1.7.Final'
-        runtime 'org.apache.derby:derby:10.8.2.2'
-        runtime 'mysql:mysql-connector-java:5.1.16'
-        runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-    }
-
-
-    task('functionalTest', type: Test).configure functionalTestConfiguration
-
-    task stub(type: StubTask) {
-        classes = [
-                'org.ow2.proactive.resourcemanager.authentication.Client',
-                'org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl',
-                'org.ow2.proactive.resourcemanager.cleaning.NodesCleaner',
-                'org.ow2.proactive.resourcemanager.core.RMCore',
-                'org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl',
-                'org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent',
-                'org.ow2.proactive.resourcemanager.nodesource.policy.CronPolicy',
-                'org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy',
-                'org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy',
-                'org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy',
-                'org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy',
-                'org.ow2.proactive.resourcemanager.nodesource.NodeSource',
-                'org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator',
-                'org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager',
-                'org.ow2.proactive.resourcemanager.utils.ClientPinger'
-        ]
-    }
-    serialver.dependsOn stub
-
-    task testJar(type: Jar) {
-        classifier = 'tests'
-        from sourceSets.test.output
-    }
-
-    artifacts {
-        archives testJar
-    }
-}
-
-project('rm:rm-infrastructure:rm-infrastructure-ec2') {
-    dependencies {
-        compile 'com.google.code.typica:typica:1.7.2'
-        compile project(':rm:rm-server')
-    }
-}
-project('rm:rm-infrastructure:rm-infrastructure-gcm') {
-    dependencies {
-        compile "org.objectweb.proactive:programming-extension-gcmdeployment:${programmingVersion}"
-        compile project(':rm:rm-server')
-    }
-}
-project('rm:rm-infrastructure:rm-infrastructure-winhpc') {
-    dependencies {
-        compile 'org.apache.axis2:axis2:1.4'
-        compile 'org.apache.ws.commons.axiom:axiom-api:1.2.7'
-        compile 'winhpc:WinHPCWebserviceStubs:1.0-proactive'
-        compile project(':rm:rm-server')
-    }
-}
-
-project('rm:rm-policy:rm-policy-scheduler') {
-    dependencies {
-        compile project(':scheduler:scheduler-client')
-        compile project(':rm:rm-server')
-    }
-}
-
-project(':scheduler:smartproxy') {
-    dependencies {
-        compile project(':scheduler:smartproxy-common')
-        compile project(':scheduler:scheduler-server')
-
-        testCompile project(':scheduler:scheduler-server').sourceSets.test.output // to get shared test classes
-        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
-    }
-
-    task stub(type: StubTask) {
-        classes = ['org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl']
-    }
-    serialver.dependsOn stub
-
-    task('functionalTest', type: Test).configure functionalTestConfiguration
-}
-
-project(':scheduler:smartproxy-common') {
-    dependencies {
-        compile 'org.fusesource.jdbm:jdbm:2.0.1'
-        compile project(':scheduler:scheduler-api')
-
-        testCompile project(':scheduler:scheduler-server').sourceSets.test.output // to get shared test classes
-        testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
-    }
-
-}
 
 dependencies {
     distLib(project(':scheduler:scheduler-server')) {
@@ -634,12 +212,12 @@ dependencies {
     restCli project(':rest:rest-cli')
     distLib project(':rest:rest-client')
     distLib project(':rest:rest-smartproxy')
-    distLib project(':scheduler:smartproxy')
+    distLib project(':scheduler:scheduler-smartproxy')
 
     nativeBundle 'org.jvnet.winp:winp:1.23-proactive:native'
     nativeBundle 'sigar:sigar:1.7.0-proactive:native'
 
-    compile 'org.codehaus.groovy:groovy-all:2.1.6'
+    compile 'org.codehaus.groovy:groovy-all:2.4.5'
     compile 'commons-io:commons-io:2.4'
 }
 
@@ -648,7 +226,7 @@ task dist(type: Sync) {
     from configurations.runtime
     from jar
 
-    [project(':rm:rm-server'), project(':scheduler:scheduler-server')].each {
+    [project(':scheduler:scheduler-server')].each {
         from it.configurations.archives.artifacts.files.files
         if (it.tasks.findByName('testJar')) {
             from it.testJar.outputs
@@ -722,7 +300,6 @@ def createStartScripts(className, name, String outputFolder) {
 }
 
 createStartScripts('org.ow2.proactive.scheduler.util.SchedulerStarter', 'proactive-server', 'bin')
-createStartScripts('org.ow2.proactive.scheduler.util.GroovySchedulerStarter', 'proactive-server-script', 'tools')
 createStartScripts('org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint', 'proactive-client', 'bin')
 createStartScripts('org.ow2.proactive.resourcemanager.utils.RMNodeStarter', 'proactive-node', 'bin')
 createStartScripts('org.objectweb.proactive.extensions.vfsprovider.console.PADataserverStarter', 'proactive-dataserver', 'tools')
@@ -756,7 +333,7 @@ artifacts {
 // credentials are generated during release process
 def createGenerateCredentialTask(String name, List<String> cliArgs) {
     project.tasks.create(name: ('generateCredentials' + name), type: JavaExec) {
-        classpath = project(':common-client').sourceSets.main.runtimeClasspath
+        classpath = project(':common:common-client').sourceSets.main.runtimeClasspath
         main = 'org.ow2.proactive.authentication.crypto.CreateCredentials'
         args = cliArgs
     }
@@ -775,8 +352,8 @@ task generateCredentials
 generateCredentials.dependsOn generateCredentialsAdmin, generateCredentialsScheduler, generateCredentialsRm, generateCredentialsNode
 
 def exportedProjects= [
-        ":common-api",
-        ":common-client",
+        ":common:common-api",
+        ":common:common-client",
         ":scheduler:scheduler-api",
         ":scheduler:scheduler-client",
         ":rm:rm-client",

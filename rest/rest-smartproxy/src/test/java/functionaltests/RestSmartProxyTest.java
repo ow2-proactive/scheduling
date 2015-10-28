@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -152,9 +152,11 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
                         isolateTaskOutput, automaticTransfer);
 
         JobState jobState = restSmartProxy.getJobState(id.toString());
+
+        Thread.sleep(ONE_SECOND);
         while (!jobState.isFinished()) {
-            Thread.sleep(ONE_SECOND);
             jobState = restSmartProxy.getJobState(id.toString());
+            Thread.sleep(ONE_SECOND);
         }
 
         assertEquals(JobStatus.FINISHED, jobState.getStatus());

@@ -1,0 +1,27 @@
+dependencies {
+    compile 'org.ow2.proactive:process-tree-killer:1.0.0'
+    compile 'org.jvnet.winp:winp:1.23-proactive'
+    compile 'net.java.dev.jna:jna:4.1.0'
+    compile 'commons-io:commons-io:2.4'
+
+    compile 'commons-cli:commons-cli:1.3.1'
+    compile 'sigar:sigar:1.7.0-proactive'
+
+    compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
+
+    compile project(':common:common-client')
+    compile project(':rm:rm-client')
+
+    runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
+
+    // protocols
+    runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+    runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
+
+    // script engines
+    runtime 'org.jruby:jruby-complete:9.0.1.0'
+    runtime 'org.python:jython-standalone:2.7.0'
+
+    runtime 'org.codehaus.groovy:groovy-all:2.4.5'
+    runtime 'jsr223:jsr223-nativeshell:0.3'
+}

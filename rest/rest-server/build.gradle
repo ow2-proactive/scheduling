@@ -1,0 +1,106 @@
+apply plugin: 'miredot'
+
+miredot {
+    source = sourceSets.main.allJava
+    destination = sourceSets.main.output
+    output {
+        formats {
+            'html' {
+                initialCollapseLevel = 2
+            }
+        }
+        title = 'ProActive Workflows & Scheduling - REST API v' + version
+    }
+    // expires friday june 16th, 2017
+    licence = 'UHJvamVjdHxvcmcub3cyLnByb2FjdGl2ZV9ncmlkX2Nsb3VkX3BvcnRhbC5yZXN0LXNlcnZlcnwyMDE2LTA2LTE3fGZhbHNlI01Dd0NGQmRGVWVDcDBjUEFNRUtHUGQ5Mis2VUhWdCtDQWhSdWpOdE0wcGRxUGdUMVNZdUREZ3lyTEJvb3FBPT0='
+    restModel{
+        restFramework {
+            name = 'jax-rs'
+        }
+        titleNamingStrategies = [
+                'tag: summary',
+                'tag: title',
+                'firstsentence'
+        ]
+    }
+}
+
+dependencies {
+    compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.13.Final'
+    compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.13.Final'
+
+    compile 'org.rrd4j:rrd4j:2.2.1'
+    compile 'net.sf.dozer:dozer:5.5.1'
+    compile 'commons-io:commons-io:2.4'
+    compile 'commons-codec:commons-codec:1.10'
+
+    compile 'com.netiq:websockify:1.6-proactive'
+    compile 'io.netty:netty:3.10.4.Final'
+
+    compile 'org.atmosphere:atmosphere-runtime:2.3.4'
+
+    compile project(":scheduler:scheduler-client")
+    compile project(":rm:rm-client")
+    compile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+    compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
+
+    compile project(':rest:rest-api')
+
+    testCompile functionalTestDependencies
+
+    testCompile 'org.apache.httpcomponents:httpmime:4.2.6'
+    testCompile 'org.jboss.resteasy:tjws:3.0.13.Final'
+
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.eclipse.jetty:jetty-client:9.2.13.v20150730'
+
+    runtime 'org.eclipse.jetty.websocket:websocket-server:9.2.13.v20150730'
+    runtime 'org.eclipse.jetty:jetty-webapp:9.2.13.v20150730'
+    runtime 'javax.servlet:javax.servlet-api:3.0.1'
+
+    runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
+}
+
+task stub(type: StubTask) {
+    classes = ['org.ow2.proactive_grid_cloud_portal.scheduler.EventListener']
+}
+
+test {
+    exclude 'functionaltests/**'
+}
+
+task('functionalTest', type: Test).configure functionalTestConfiguration
+
+functionalTest.dependsOn rootProject.dist
+clean.dependsOn rootProject.cleanDist
+
+task proActiveWar(type: Sync, dependsOn: [classes, stub, tasks.miredot]) {
+    from "src/main/webapp"
+
+    def schedulerNodeJar = project(":scheduler:scheduler-node").standaloneJar
+    from schedulerNodeJar
+
+    into file("$rootDir/dist/war/rest")
+
+    rename(schedulerNodeJar.outputs.files.singleFile.name, 'node.jar')
+
+    filesMatching('**/*.html') {
+        it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['rest_api.version': project.version])
+    }
+}
+
+task copyMiredotDoc(type: Copy) {
+    from "${buildDir}/miredot"
+    into "$rootDir/dist/war/rest/doc"
+}
+
+proActiveWar.finalizedBy(copyMiredotDoc)
+
+clean.dependsOn cleanProActiveWar
+
+rootProject.dist.dependsOn project.proActiveWar
+
+artifacts {
+    jar
+}
+

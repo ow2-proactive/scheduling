@@ -1,0 +1,29 @@
+apply plugin: 'java-library-distribution'
+
+dependencies {
+    compile 'commons-cli:commons-cli:1.3.1'
+    compile 'commons-io:commons-io:2.4'
+    compile 'jline:jline:2.11'
+
+    compile 'org.apache.httpcomponents:httpclient:4.2.6'
+    compile 'org.apache.httpcomponents:httpmime:4.2.6'
+    compile 'org.atmosphere:wasync:2.1.2'
+
+    compile project(":common:common-api")
+    compile project(":scheduler:scheduler-api")
+    compile project(':rest:rest-api')
+
+    runtime 'xerces:xercesImpl:2.11.0'
+
+    testCompile functionalTestDependencies
+    testCompile project(':rest:rest-server').sourceSets.test.output
+}
+
+test {
+    exclude 'functionaltests/**'
+}
+
+task('functionalTest', type: Test).configure functionalTestConfiguration
+
+functionalTest.dependsOn rootProject.dist
+clean.dependsOn rootProject.cleanDist

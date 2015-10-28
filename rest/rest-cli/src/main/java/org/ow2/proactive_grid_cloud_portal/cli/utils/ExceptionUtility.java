@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -39,9 +39,6 @@ package org.ow2.proactive_grid_cloud_portal.cli.utils;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetDebugModeCommand;
-
 
 public class ExceptionUtility {
 
@@ -56,8 +53,4 @@ public class ExceptionUtility {
         return out.toString();
     }
 
-    public static boolean debugMode(ApplicationContext currentContext) {
-        Boolean debug = currentContext.getProperty(SetDebugModeCommand.PROP_DEBUG_MODE, Boolean.class);
-        return (debug == null) ? false : debug;
-    }
 }

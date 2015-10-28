@@ -1,0 +1,75 @@
+apply plugin: 'java-library-distribution'
+
+dependencies {
+    compile(
+            'commons-cli:commons-cli:1.3.1',
+            'it.sauronsoftware.cron4j:cron4j:2.2.5',
+            'org.hibernate:hibernate-core:4.3.11.Final',
+            'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final',
+
+            "org.objectweb.proactive:programming-core:${programmingVersion}",
+            "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
+
+            project(':common:common-api'),
+            project(':common:common-client'),
+            project(':rm:rm-client'),
+            project(':rm:rm-node'),
+    )
+    testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+    testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
+
+    testCompile 'org.jruby:jruby-complete:9.0.1.0'
+    testCompile 'org.python:jython-standalone:2.7.0'
+
+    testCompile 'org.apache.sshd:sshd-core:0.14.0'
+
+    runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
+        exclude group: 'org.javassist', module: 'javassist'
+    }
+
+    runtime 'org.hsqldb:hsqldb:2.3.3'
+    runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+}
+
+task('functionalTest', type: Test).configure rootProject.schedulingFunctionalTestConfiguration
+
+task stub(type: StubTask) {
+    classes = [
+            'org.ow2.proactive.resourcemanager.authentication.Client',
+            'org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl',
+            'org.ow2.proactive.resourcemanager.cleaning.NodesCleaner',
+            'org.ow2.proactive.resourcemanager.core.RMCore',
+            'org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl',
+            'org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent',
+            'org.ow2.proactive.resourcemanager.nodesource.policy.CronPolicy',
+            'org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy',
+            'org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy',
+            'org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy',
+            'org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy',
+            'org.ow2.proactive.resourcemanager.nodesource.NodeSource',
+            'org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator',
+            'org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager',
+            'org.ow2.proactive.resourcemanager.utils.ClientPinger'
+    ]
+}
+serialver.dependsOn stub
+
+task testJar(type: Jar) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+
+    
+task dist(type: Copy) {
+    from testJar
+    into file("$rootDir/dist/lib")
+}
+
+rootProject.dist.dependsOn testJar
+    
+artifacts {
+    archives testJar
+}
+
+functionalTest.dependsOn rootProject.dist, dist
+clean.dependsOn rootProject.cleanDist

@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -39,6 +39,7 @@ package functionaltests.job.log;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.objectweb.proactive.api.PAActiveObject;
@@ -53,7 +54,9 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
-import org.apache.commons.collections.ListUtils;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.After;
@@ -61,22 +64,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-
 
 /**
  * Test against method Scheduler.listenJobLogs.
- * Test calls Scheduler.listenJobLogs several times for the same job and check 
+ * Test calls Scheduler.listenJobLogs several times for the same job and check
  * that it works properly in different conditions:
  * <ul>
  * <li>can get logs for task which is running
  * <li>can get log for task which finished but job is still running
  * <li>can get log for task after job has finished
  * </ul>
- * 
- * @author ProActive team
  *
+ * @author ProActive team
  */
 public class TestListenJobLogs extends SchedulerFunctionalTest {
 
@@ -173,7 +172,7 @@ public class TestListenJobLogs extends SchedulerFunctionalTest {
     @Test
     public void test() throws Exception {
         schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
-          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+                "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
         testLogs();
     }
@@ -282,12 +281,12 @@ public class TestListenJobLogs extends SchedulerFunctionalTest {
 
         synchronized void waitForLoggingEvent(long timeout, String... expectedMessages)
                 throws InterruptedException {
-            List<String> expectedMessagesList = new ArrayList<>();
-            for (String message : expectedMessages) {
-                expectedMessagesList.add(message);
-            }
+            List<String> expectedMessagesList = new ArrayList<>(expectedMessages.length);
+
+            Collections.addAll(expectedMessagesList, expectedMessages);
+
             System.out.println("Waiting for logging events with messages: " + expectedMessagesList + " (" +
-                name + ")");
+                    name + ")");
 
             long endTime = System.currentTimeMillis() + timeout;
             while (!ListUtils.removeAll(expectedMessagesList, actualMessages).isEmpty()) {
@@ -300,7 +299,7 @@ public class TestListenJobLogs extends SchedulerFunctionalTest {
             }
 
             Assert.assertTrue("Didn't receive expected events, expected: " + expectedMessagesList +
-                ", actual: " + actualMessages, ListUtils.removeAll(expectedMessagesList, actualMessages)
+                    ", actual: " + actualMessages, ListUtils.removeAll(expectedMessagesList, actualMessages)
                     .isEmpty());
             actualMessages.clear();
         }

@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -45,7 +45,9 @@ import org.apache.log4j.MDC;
 public class TaskLogger {
 
     private static final String PREFIX = "task ";
+
     private static TaskLogger instance = null;
+
     private Logger logger = Logger.getLogger(TaskLogger.class);
 
     private TaskLogger() {
@@ -59,24 +61,24 @@ public class TaskLogger {
     }
 
     private String format(TaskId id, String message) {
-        return PREFIX + id + " (" + id.getReadableName() + ")" + " " + message;
+        return PREFIX + id + " (" + id.getReadableName() + ") " + message;
     }
 
     public void info(TaskId id, String message) {
-        MDC.put(FileAppender.FILE_NAME, id);
+        updateMdcWithTaskLogFilename(id);
         logger.info(format(id, message));
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void info(TaskId id, String message, Throwable th) {
-        MDC.put(FileAppender.FILE_NAME, id);
+        updateMdcWithTaskLogFilename(id);
         logger.info(format(id, message), th);
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void debug(TaskId id, String message) {
         if (logger.isDebugEnabled()) {
-            MDC.put(FileAppender.FILE_NAME, id);
+            updateMdcWithTaskLogFilename(id);
             logger.debug(format(id, message));
             MDC.remove(FileAppender.FILE_NAME);
         }
@@ -84,7 +86,7 @@ public class TaskLogger {
 
     public void debug(TaskId id, String message, Throwable th) {
         if (logger.isDebugEnabled()) {
-            MDC.put(FileAppender.FILE_NAME, id);
+            updateMdcWithTaskLogFilename(id);
             logger.debug(format(id, message), th);
             MDC.remove(FileAppender.FILE_NAME);
         }
@@ -92,7 +94,7 @@ public class TaskLogger {
 
     public void trace(TaskId id, String message) {
         if (logger.isTraceEnabled()) {
-            MDC.put(FileAppender.FILE_NAME, id);
+            updateMdcWithTaskLogFilename(id);
             logger.trace(format(id, message));
             MDC.remove(FileAppender.FILE_NAME);
         }
@@ -100,16 +102,24 @@ public class TaskLogger {
 
     public void trace(TaskId id, String message, Throwable th) {
         if (logger.isTraceEnabled()) {
-            MDC.put(FileAppender.FILE_NAME, id);
+            updateMdcWithTaskLogFilename(id);
             logger.trace(format(id, message), th);
             MDC.remove(FileAppender.FILE_NAME);
         }
     }
 
     public void error(TaskId id, String message, Throwable th) {
-        MDC.put(FileAppender.FILE_NAME, id);
+        updateMdcWithTaskLogFilename(id);
         logger.error(format(id, message), th);
         MDC.remove(FileAppender.FILE_NAME);
+    }
+
+    private void updateMdcWithTaskLogFilename(TaskId id) {
+        MDC.put(FileAppender.FILE_NAME, getTaskLogFilename(id));
+    }
+
+    public static String getTaskLogFilename(TaskId id) {
+        return id.toString();
     }
 
     public boolean isDebugEnabled() {
@@ -119,4 +129,5 @@ public class TaskLogger {
     public boolean isTraceEnabled() {
         return logger.isTraceEnabled();
     }
+
 }

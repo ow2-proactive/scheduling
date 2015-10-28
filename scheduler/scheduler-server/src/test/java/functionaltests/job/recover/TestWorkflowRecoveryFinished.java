@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -44,11 +44,10 @@ import java.util.Map.Entry;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.junit.Assert;
-import org.junit.Test;
-
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
+import org.junit.Assert;
+import org.junit.Test;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 
@@ -77,7 +76,6 @@ public class TestWorkflowRecoveryFinished extends SchedulerFunctionalTest {
 
     @Test
     public void run() throws Throwable {
-
         Map<Integer, JobId> jobs = new HashMap<>();
         for (int i = 0; i < jobs_1.length; i++) {
             String job = new File(TestWorkflowRecoveryFinished.class.getResource(
@@ -119,4 +117,5 @@ public class TestWorkflowRecoveryFinished extends SchedulerFunctionalTest {
         }
 
     }
+
 }

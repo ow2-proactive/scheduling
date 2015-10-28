@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -57,7 +57,7 @@ public class GetTaskResultCommand extends AbstractTaskCommand implements Command
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
-            TaskResultData taskResult = scheduler.taskresult(currentContext.getSessionId(), jobId, taskId);
+            TaskResultData taskResult = scheduler.taskResult(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(taskResult);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s", StringUtility.taskResultAsString(task(), taskResult));

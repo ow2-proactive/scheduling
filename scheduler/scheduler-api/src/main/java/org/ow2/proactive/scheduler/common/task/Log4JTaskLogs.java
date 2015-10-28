@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -65,6 +65,7 @@ public class Log4JTaskLogs implements TaskLogs {
     /** Prefix for job logger */
     public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";
 
+    public static final String MDC_JOB_ID = "job.id";
     /** Log4j context variable name for task ids */
     public static final String MDC_TASK_ID = "task.id";
     public static final String MDC_TASK_NAME = "task.name";
@@ -74,7 +75,7 @@ public class Log4JTaskLogs implements TaskLogs {
 
     /** Default layout for logs */
     public static Layout getTaskLogLayout() {
-        return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
+        return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" + Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
             "};%d{HH:mm:ss}]" + " %m %n");
     }
 

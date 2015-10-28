@@ -2,10 +2,10 @@ package functionaltests.job.taskkill;
 
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestNode;
+import org.junit.Test;
 
 
 public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTest {
@@ -33,4 +33,5 @@ public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTest {
         resourceManager.addNode(tNode.getNode().getNodeInformation().getURL());
         return tNode;
     }
+
 }

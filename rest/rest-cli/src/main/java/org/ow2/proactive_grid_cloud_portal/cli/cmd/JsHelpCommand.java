@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -39,17 +39,20 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.ProActiveVersionUtility;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.COMMON_COMMANDS;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.RM_ONLY;
 import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.INTERACTIVE_COMMANDS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHED_ONLY;
+import static org.ow2.proactive_grid_cloud_portal.cli.CommandSet.SCHEDULER_ONLY;
 
 
 public class JsHelpCommand extends AbstractJsHelpCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        printHelp(currentContext, COMMON_COMMANDS, SCHED_ONLY, RM_ONLY, INTERACTIVE_COMMANDS);
+        ProActiveVersionUtility.writeProActiveVersionWithBreakEndLine(currentContext, System.out);
+        printHelp(currentContext, COMMON_COMMANDS, SCHEDULER_ONLY, RM_ONLY, INTERACTIVE_COMMANDS);
     }
+
 }

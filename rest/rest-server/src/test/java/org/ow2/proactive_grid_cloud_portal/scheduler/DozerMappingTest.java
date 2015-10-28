@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -101,7 +101,7 @@ public class DozerMappingTest {
 
             @Override
             public Map<TaskId, TaskState> getHMTasks() {
-                TaskId taskId = TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1, false);
+                TaskId taskId = TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1);
                 TaskState value = new ClientTaskState(new TaskState() {
                     @Override
                     public void update(TaskInfo taskInfo) {
@@ -117,7 +117,7 @@ public class DozerMappingTest {
                     public TaskInfo getTaskInfo() {
                         TaskInfoImpl taskInfo = new TaskInfoImpl();
                         taskInfo.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"),
-                                "remoteVisuTask", 1, false));
+                                "remoteVisuTask", 1));
                         return taskInfo;
                     }
 

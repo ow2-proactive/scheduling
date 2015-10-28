@@ -174,7 +174,7 @@ public class TaskResultData {
         this.previewerClassName = previewerClassName;
     }
 
-    @Column(name = "PROPAGATED_VARIABLES")
+    @Column(name = "PROPAGATED_VARIABLES", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, byte[]> getPropagatedVariables() {
         return propagatedVariables;

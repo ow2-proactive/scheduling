@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -164,8 +164,13 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTest {
         assertTrue(tr4.getException() instanceof TaskAbortedException);
         //check result j4
         assertEquals(JobStatus.CANCELED, ji4.getStatus());
-        assertEquals(TaskStatus.ABORTED, getTask(j4, "t1").getStatus());
-        assertEquals(TaskStatus.ABORTED, getTask(j4, "t2").getStatus());
+
+        TaskStatus t1Status = getTask(j4, "t1").getStatus();
+        assertTrue(t1Status.equals(TaskStatus.ABORTED) || t1Status.equals(TaskStatus.NOT_RESTARTED));
+
+        TaskStatus t2Status = getTask(j4, "t2").getStatus();
+        assertTrue(t2Status.equals(TaskStatus.ABORTED) || t2Status.equals(TaskStatus.NOT_RESTARTED));
+
         assertEquals(TaskStatus.FAULTY, getTask(j4, "t3").getStatus());
         assertEquals(TaskStatus.FAULTY, getTask(j4, "t4").getStatus());
         //check result tr5

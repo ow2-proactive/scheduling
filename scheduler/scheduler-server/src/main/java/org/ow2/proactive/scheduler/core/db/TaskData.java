@@ -100,6 +100,8 @@ public class TaskData {
 
     private String taskName;
 
+    private String tag;
+
     private String description;
 
     private long startTime;
@@ -295,30 +297,22 @@ public class TaskData {
         }
 
         @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + (int) (jobId ^ (jobId >>> 32));
-            result = prime * result + (int) (taskId ^ (taskId >>> 32));
-            return result;
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            DBTaskId dbTaskId = (DBTaskId) o;
+
+            if (jobId != dbTaskId.jobId) return false;
+            return taskId == dbTaskId.taskId;
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            DBTaskId other = (DBTaskId) obj;
-            if (jobId != other.jobId)
-                return false;
-            if (taskId != other.taskId)
-                return false;
-            return true;
+        public int hashCode() {
+            int result = (int) (jobId ^ (jobId >>> 32));
+            result = 31 * result + (int) (taskId ^ (taskId >>> 32));
+            return result;
         }
-
     }
 
     private static final Map<Class<? extends TopologyDescriptor>, String> topologyDescMapping;
@@ -390,10 +384,11 @@ public class TaskData {
 
         TaskData.DBTaskId taskId = new DBTaskId();
         taskId.setJobId(jobRuntimeData.getId());
-        taskId.setTaskId(Long.valueOf(task.getTaskInfo().getTaskId().value()));
+        taskId.setTaskId(task.getTaskInfo().getTaskId().longValue());
 
         taskData.setId(taskId);
         taskData.setDescription(task.getDescription());
+        taskData.setTag(task.getTag());
         taskData.setParallelEnvironment(task.getParallelEnvironment());
         taskData.setFlowBlock(task.getFlowBlock());
         taskData.setRestartMode(task.getRestartTaskOnError());
@@ -480,7 +475,7 @@ public class TaskData {
     }
 
     TaskId createTaskId(InternalJob internalJob) {
-        return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId(), false);
+        return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId());
     }
 
     InternalTask toInternalTask(InternalJob internalJob) throws InvalidScriptException {
@@ -498,6 +493,7 @@ public class TaskData {
 
         internalTask.setId(taskId);
         internalTask.setDescription(getDescription());
+        internalTask.setTag(this.getTag());
         internalTask.setStatus(getTaskStatus());
         internalTask.setJobInfo(internalJob.getJobInfo());
         internalTask.setName(getTaskName());
@@ -729,6 +725,12 @@ public class TaskData {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Column(name = "TAG", updatable = false)
+    public String getTag(){ return this.tag; }
+
+    public void setTag(String tag) { this.tag = tag; }
+
 
     @Column(name = "MAX_NUMBER_OF_EXEC", updatable = false)
     public int getMaxNumberOfExecution() {
@@ -969,7 +971,7 @@ public class TaskData {
     }
 
     TaskUsage toTaskUsage(JobIdImpl jobId) {
-        TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId(), false);
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
 
         return new TaskUsage(taskId.value(), getTaskName(), getStartTime(), getFinishedTime(),
             getExecutionDuration(), getParallelEnvironment() == null ? 1 : getParallelEnvironment()

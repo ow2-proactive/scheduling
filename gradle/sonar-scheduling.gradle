@@ -1,0 +1,13 @@
+apply plugin: "sonar-runner"
+
+sonarRunner {
+    sonarProperties {    
+    	property "sonar.projectKey", "$project.group:Scheduling"
+    	property "sonar.projectName", "Scheduling" 
+        property "sonar.jdbc.driverClassName", "org.postgresql.Driver"
+        property "sonar.language", "java"
+        property "sonar.sources", "src/main"
+        property 'sonar.jacoco.reportPath', "${buildDir}/jacoco/testDebug.exec"
+        property 'sonar.junit.reportsPath', "${buildDir}/test-results"
+    }
+}

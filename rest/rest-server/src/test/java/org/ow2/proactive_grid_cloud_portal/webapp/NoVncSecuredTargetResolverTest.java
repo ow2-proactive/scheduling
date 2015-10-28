@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -96,8 +96,8 @@ public class NoVncSecuredTargetResolverTest {
     public void testMagicStringFoundInLogs() throws Exception {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
-                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
-                        false), new byte[0], new byte[0], new SimpleTaskLogs(
+                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1),
+                        new byte[0], new byte[0], new SimpleTaskLogs(
                     "PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900", "")));
 
         InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
@@ -111,8 +111,8 @@ public class NoVncSecuredTargetResolverTest {
     public void testMagicStringFoundInLogs_MagicStringOnSeveralLines() throws Exception {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(schedulerMock);
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
-                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
-                        false), new byte[0], new byte[0], new SimpleTaskLogs(
+                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1),
+                        new byte[0], new byte[0], new SimpleTaskLogs(
                     "PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900", "")));
 
         InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
@@ -147,8 +147,8 @@ public class NoVncSecuredTargetResolverTest {
                         "42",
                         createLiveLogs("[Visualization_task@node2;10:38:06]PA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900"));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
-                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
-                        false), new byte[0], new byte[0], new SimpleTaskLogs("", "")));
+                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1),
+                        new byte[0], new byte[0], new SimpleTaskLogs("", "")));
 
         InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
                 "remoteVisuTask");
@@ -163,8 +163,8 @@ public class NoVncSecuredTargetResolverTest {
         SharedSessionStore.getInstance().get(sessionId).getJobsOutputController().addJobOutputAppender("42",
                 createLiveLogs("PA_REMOTE_CONNECTION\nPA_REMOTE_CONNECTION;1;vnc;node.grid.com:5900 "));
         when(schedulerMock.getTaskResult("42", "remoteVisuTask")).thenReturn(
-                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1,
-                        false), new byte[0], new byte[0], new SimpleTaskLogs("", "")));
+                new TaskResultImpl(TaskIdImpl.createTaskId(new JobIdImpl(42, "job"), "remoteVisuTask", 1),
+                        new byte[0], new byte[0], new SimpleTaskLogs("", "")));
 
         InetSocketAddress targetVncHost = new NoVncSecuredTargetResolver().doResolve(sessionId, "42",
                 "remoteVisuTask");

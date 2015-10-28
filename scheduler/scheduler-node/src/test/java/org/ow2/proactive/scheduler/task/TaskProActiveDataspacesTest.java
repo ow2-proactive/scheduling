@@ -16,7 +16,7 @@ public class TaskProActiveDataspacesTest {
         CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
 
         TaskProActiveDataspaces dataspaces = new TaskProActiveDataspaces(
-          TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false), null);
+          TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L), null);
 
         dataspaces.copyInputDataToScratch(Collections.<InputSelector>emptyList());
     }

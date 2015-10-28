@@ -20,15 +20,18 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
+import org.ow2.proactive.utils.Criteria;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -125,8 +128,6 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
 
     @Test
     public void test() throws Throwable {
-        tmpFolder.create();
-
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
 
@@ -197,7 +198,7 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
-        log("get state");
+        log("Get state");
         SchedulerState state = scheduler.getState();
         assertEquals(1, state.getRunningJobs().size());
         assertEquals(1, state.getPendingJobs().size());
@@ -206,6 +207,7 @@ public class TestTaskRestore extends SchedulerFunctionalTest {
             state.getFinishedJobs().size());
 
         JobState jobState = state.getRunningJobs().get(0);
+
         assertEquals(1, jobState.getNumberOfFinishedTasks());
         assertEquals(2, jobState.getNumberOfPendingTasks() + jobState.getNumberOfRunningTasks());
 

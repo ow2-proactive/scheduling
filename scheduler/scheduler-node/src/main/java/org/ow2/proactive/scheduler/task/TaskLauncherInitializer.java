@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -74,6 +74,8 @@ public class TaskLauncherInitializer implements Serializable {
     private FlowScript flowScript;
     /** The walltime defined for the task (it is considered as defined if it is > 0) */
     private long walltime;
+
+    private String jobOwner = "Unknown";
 
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
@@ -251,6 +253,13 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     /**
+     * @return the job owner
+     */
+    public String getJobOwner() {
+        return jobOwner;
+    }
+
+    /**
      * @param id the iteration index: task was replicated sequentially 
      */
     public void setReplicationIndex(int id) {
@@ -269,6 +278,10 @@ public class TaskLauncherInitializer implements Serializable {
      */
     public boolean isPreciousLogs() {
         return preciousLogs;
+    }
+
+    public void setJobOwner(String jobOwner) {
+        this.jobOwner = jobOwner;
     }
 
     /**

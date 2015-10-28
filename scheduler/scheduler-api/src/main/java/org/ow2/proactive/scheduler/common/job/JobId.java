@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -66,5 +66,12 @@ public interface JobId extends Comparable<JobId>, Serializable {
      * @return the textual representation of this jobId
      */
     String value();
+
+    /**
+     * Returns the current value of the JobId.
+     *
+     * @return the current value of the JobId as a long.
+     */
+    long longValue();
 
 }

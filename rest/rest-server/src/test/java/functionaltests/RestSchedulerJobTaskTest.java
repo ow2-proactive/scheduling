@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -43,14 +43,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import functionaltests.utils.RestFuncTUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -65,6 +57,15 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+
+import functionaltests.utils.RestFuncTUtils;
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
@@ -239,7 +240,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         setSessionHeader(httpGet);
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
-        JSONArray jsonArray = toJsonArray(response);
+        JSONObject jsonObject = toJsonObject(response);
+        JSONArray jsonArray = (JSONArray) jsonObject.get("taskIds");
         assertEquals(getDefaultTaskName(), jsonArray.get(0).toString());
     }
 
@@ -252,7 +254,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         setSessionHeader(httpGet);
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
-        JSONArray jsonArray = toJsonArray(response);
+        JSONObject jsonObject = toJsonObject(response);
+        JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
         assertTrue(jsonArray.size() > 0);
     }
 

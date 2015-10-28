@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -37,17 +37,18 @@
 package functionaltests.job.recover;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.util.FileLock;
 import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.ProActiveLock;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static functionaltests.job.recover.TestPauseJobRecover.createJob;
@@ -55,12 +56,13 @@ import static functionaltests.job.recover.TestPauseJobRecover.createJob;
 
 public class TestJobRecoverClasspathInUserSpace extends SchedulerFunctionalTest {
 
-    @Test
     // SCHEDULING-2077
+    @Test
     public void run() throws Throwable {
-        ProActiveLock controlJobExecution = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
+        FileLock controlJobExecution = new FileLock();
+        Path controlJobExecutionPath = controlJobExecution.lock();
 
-        TaskFlowJob job = createJob(PAActiveObject.getUrl(controlJobExecution));
+        TaskFlowJob job = createJob(controlJobExecutionPath.toString());
 
         ForkEnvironment forkEnvironment = new ForkEnvironment();
         forkEnvironment.addAdditionalClasspath("$USERSPACE/test.jar");
@@ -80,7 +82,7 @@ public class TestJobRecoverClasspathInUserSpace extends SchedulerFunctionalTest 
         controlJobExecution.unlock();
 
         log("Waiting for job 1 to finish");
-        schedulerHelper.waitForEventJobFinished(idJ1, 30 * 1000);
+        schedulerHelper.waitForEventJobFinished(idJ1, 30000);
     }
 
 }

@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2012 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -45,6 +45,7 @@ public class TaskStateData {
 
     private String name;
     private String description;
+    private String tag;
     private int iterationIndex;
     private int replicationIndex;
     private int maxNumberOfExecution;
@@ -67,6 +68,10 @@ public class TaskStateData {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getTag() { return this.tag; }
+
+    public void setTag(String tag) { this.tag = tag; }
 
     public int getIterationIndex() {
         return iterationIndex;

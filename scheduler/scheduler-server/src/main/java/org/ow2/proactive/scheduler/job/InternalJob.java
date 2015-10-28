@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,6 +68,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
@@ -207,7 +209,7 @@ public abstract class InternalJob extends JobState {
         task.setJobId(getId());
 
         int taskId = tasks.size();
-        task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId, true));
+        task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId));
 
         boolean result = (tasks.put(task.getId(), task) == null);
 
@@ -236,7 +238,7 @@ public abstract class InternalJob extends JobState {
         td.setStartTime(System.currentTimeMillis());
         td.setFinishedTime(-1);
         td.setExecutionHostName(td.getExecuterInformation().getHostName() + " (" +
-            td.getExecuterInformation().getNodeName() + ")");
+                td.getExecuterInformation().getNodeName() + ")");
     }
 
     /**
@@ -317,333 +319,23 @@ public abstract class InternalJob extends JobState {
                  * LOOP action
                  */
                 case LOOP: {
-                    // find the target of the loop
-                    InternalTask target = null;
-                    if (action.getTarget().equals(initiator.getName())) {
-                        target = initiator;
-                    } else {
-                        target = findTaskUp(action.getTarget(), initiator);
-                    }
-                    didAction = replicateForNextLoopIteration(initiator, target, changesInfo, frontend);
-                    if (didAction && action.getCronExpr() != null) {
-                        for (TaskId tid : changesInfo.getNewTasks()) {
-                            InternalTask newTask = tasks.get(tid);
-                            try {
-                                Date startAt = (new Predictor(action.getCronExpr())).nextMatchingDate();
-                                newTask.addGenericInformation(GENERIC_INFO_START_AT_KEY, ISO8601DateUtil
-                                        .parse(startAt));
-                            } catch (InvalidPatternException e) {
-                                // this will not happen as the cron expression is
-                                // already being validated in FlowScript class.
-                            }
-                        }
-                    }
+                    didAction = terminateLoopTask(didAction, action, initiator, changesInfo, frontend);
                     break;
                 }
 
                     /*
                      * IF action
                      */
-                case IF:
-
-                {
-                    // the targetIf from action.getTarget() is the selected branch;
-                    // the IF condition has already been evaluated prior to being put in a FlowAction
-                    // the targetElse from action.getTargetElse() is the branch that was NOT selected
-                    InternalTask targetIf = null;
-                    InternalTask targetElse = null;
-                    InternalTask targetJoin = null;
-
-                    // search for the targets as perfect matches of the unique name
-                    for (InternalTask it : tasks.values()) {
-
-                        // target is finished : probably looped
-                        if (it.getStatus().equals(TaskStatus.FINISHED) ||
-                            it.getStatus().equals(TaskStatus.SKIPPED)) {
-                            continue;
-                        }
-                        if (action.getTarget().equals(it.getName())) {
-                            if (it.getIfBranch().equals(initiator)) {
-                                targetIf = it;
-                            }
-                        } else if (action.getTargetElse().equals(it.getName())) {
-                            if (it.getIfBranch().equals(initiator)) {
-                                targetElse = it;
-                            }
-                        } else if (action.getTargetContinuation().equals(it.getName())) {
-                            InternalTask up = findTaskUp(initiator.getName(), it);
-                            if (up != null && up.equals(initiator)) {
-                                targetJoin = it;
-                            }
-                        }
-
-                    }
-
-                    boolean searchIf = (targetIf == null);
-                    boolean searchElse = (targetElse == null);
-                    boolean searchJoin = (targetJoin == null);
-
-                    // search of a runnable perfect match for the targets failed;
-                    // the natural target was iterated, need to find the next iteration
-                    // which is the the one with the same dup index and base name,
-                    // but the highest iteration index
-                    for (InternalTask it : tasks.values()) {
-
-                        // does not share the same dup index : cannot be the same scope
-                        if (it.getReplicationIndex() != initiator.getReplicationIndex()) {
-                            continue;
-                        }
-
-                        if (it.getStatus().equals(TaskStatus.FINISHED) ||
-                            it.getStatus().equals(TaskStatus.SKIPPED)) {
-                            continue;
-                        }
-
-                        String name = InternalTask.getInitialName(it.getName());
-
-                        if (searchIf && InternalTask.getInitialName(action.getTarget()).equals(name)) {
-                            if (targetIf == null || targetIf.getIterationIndex() < it.getIterationIndex()) {
-                                targetIf = it;
-                            }
-                        } else if (searchElse &&
-                            InternalTask.getInitialName(action.getTargetElse()).equals(name)) {
-                            if (targetElse == null || targetElse.getIterationIndex() < it.getIterationIndex()) {
-                                targetElse = it;
-                            }
-                        } else if (searchJoin &&
-                            InternalTask.getInitialName(action.getTargetContinuation()).equals(name)) {
-                            if (targetJoin == null || targetJoin.getIterationIndex() < it.getIterationIndex()) {
-                                targetJoin = it;
-                            }
-                        }
-                    }
-
-                    logger.info("Control Flow Action IF: " + targetIf.getId() + " join: " +
-                        ((targetJoin == null) ? "null" : targetJoin.getId()));
-
-                    // these 2 tasks delimit the Task Block formed by the IF branch
-                    InternalTask branchStart = targetIf;
-                    InternalTask branchEnd = null;
-
-                    String match = targetIf.getMatchingBlock();
-                    if (match != null) {
-                        for (InternalTask t : tasks.values()) {
-                            if (match.equals(t.getName()) &&
-                                !(t.getStatus().equals(TaskStatus.FINISHED) || t.getStatus().equals(
-                                        TaskStatus.SKIPPED))) {
-                                branchEnd = t;
-                            }
-                        }
-                    }
-                    // no matching block: there is no block, the branch is a single task
-                    if (branchEnd == null) {
-                        branchEnd = targetIf;
-                    }
-
-                    // plug the branch
-                    branchStart.addDependence(initiator);
-                    changesInfo.taskUpdated(branchStart);
-                    if (targetJoin != null) {
-                        targetJoin.addDependence(branchEnd);
-                        changesInfo.taskUpdated(targetJoin);
-                    }
-
-                    // the other branch will not be executed
-                    // first, find the concerned tasks
-                    List<InternalTask> elseTasks = new ArrayList<>();
-                    //  elseTasks.add(targetElse);
-                    for (InternalTask t : this.tasks.values()) {
-                        if (t.dependsOn(targetElse)) {
-                            elseTasks.add(t);
-                        }
-                    }
-
-                    // even though the targetElse is not going to be executed, a
-                    // dependency on initiator still makes sense and would help
-                    // reconstruct the job graph on the client
-                    targetElse.addDependence(initiator);
-                    changesInfo.taskUpdated(targetElse);
-
-                    for (InternalTask it : elseTasks) {
-                        it.setFinishedTime(descriptor.getFinishedTime() + 1);
-                        it.setStatus(TaskStatus.SKIPPED);
-                        it.setExecutionDuration(0);
-
-                        changesInfo.taskSkipped(it);
-                        setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
-                        setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
-                        logger.info("Task " + it.getId() + " will not be executed");
-                    }
-
-                    // plug the branch in the descriptor
-                    TaskId joinId = null;
-                    if (targetJoin != null) {
-                        joinId = targetJoin.getId();
-                    }
-                    getJobDescriptor().doIf(initiator.getId(), branchStart.getId(), branchEnd.getId(),
-                            joinId, targetElse.getId(), elseTasks);
-
-                    this.jobInfo.setTasksChanges(changesInfo, this);
-                    // notify frontend that tasks were modified
-                    if (frontend != null) {
-                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<>(
-                                SchedulerEvent.TASK_SKIPPED, this.getJobInfo()));
-                    }
-                    this.jobInfo.clearTasksChanges();
-
-                    // no jump is performed ; now that the tasks have been plugged
-                    // the flow can continue its normal operation
-                    getJobDescriptor().terminate(taskId);
-
-                    didAction = true;
-
+                case IF: {
+                    didAction = terminateIfTask(action, initiator, changesInfo, frontend, descriptor, taskId);
                     break;
                 }
 
                     /*
                      * REPLICATE action
                      */
-                case REPLICATE:
-
-                {
-                    int runs = action.getDupNumber();
-                    if (runs < 1) {
-                        runs = 1;
-                    }
-
-                    logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
-                    List<InternalTask> toReplicate = new ArrayList<>();
-
-                    // find the tasks that need to be replicated
-                    for (InternalTask ti : tasks.values()) {
-                        List<InternalTask> tl = ti.getIDependences();
-                        if (tl != null) {
-                            for (InternalTask ts : tl) {
-                                if (ts.getId().equals(initiator.getId()) && !toReplicate.contains(ti)) {
-                                    // ti needs to be replicated
-                                    toReplicate.add(ti);
-                                }
-                            }
-                        }
-                    }
-
-                    // for each initial task to replicate
-                    for (InternalTask todup : toReplicate) {
-
-                        // determine the target of the replication whether it is a block or a single task
-                        InternalTask target = null;
-
-                        // target is a task block start : replication of the block
-                        if (todup.getFlowBlock().equals(FlowBlock.START)) {
-                            String tg = todup.getMatchingBlock();
-                            for (InternalTask t : tasks.values()) {
-                                if (tg.equals(t.getName()) &&
-                                    !(t.getStatus().equals(TaskStatus.FINISHED) || t.getStatus().equals(
-                                            TaskStatus.SKIPPED)) && t.dependsOn(todup)) {
-                                    target = t;
-                                    break;
-                                }
-                            }
-                            if (target == null) {
-                                logger.error("REPLICATE: could not find matching block '" + tg + "'");
-                                continue;
-                            }
-                        }
-                        // target is not a block : replication of the task
-                        else {
-                            target = todup;
-                        }
-
-                        // for each number of parallel run
-                        for (int i = 1; i < runs; i++) {
-
-                            // accumulates the tasks between the initiator and the target
-                            Map<TaskId, InternalTask> dup = new HashMap<>();
-                            // replicate the tasks between the initiator and the target
-                            try {
-                                target.replicateTree(dup, todup.getId(), false, initiator
-                                        .getReplicationIndex() *
-                                    runs, 0);
-                            } catch (Exception e) {
-                                logger.error("REPLICATE: could not replicate tree", e);
-                                break;
-                            }
-
-                            ((JobInfoImpl) this.getJobInfo()).setNumberOfPendingTasks(this.getJobInfo()
-                                    .getNumberOfPendingTasks() +
-                                dup.size());
-
-                            // pointers to the new replicated tasks corresponding the begin and
-                            // the end of the block ; can be the same
-                            InternalTask newTarget = null;
-                            InternalTask newEnd = null;
-
-                            // configure the new tasks
-                            for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-                                InternalTask nt = it.getValue();
-                                nt.setJobInfo(getJobInfo());
-                                int dupIndex = getNextReplicationIndex(InternalTask.getInitialName(nt
-                                        .getName()), nt.getIterationIndex());
-                                this.addTask(nt);
-                                nt.setReplicationIndex(dupIndex);
-                            }
-                            changesInfo.newTasksAdded(dup.values());
-
-                            // find the beginning and the ending of the replicated block
-                            for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-                                InternalTask nt = it.getValue();
-
-                                // connect the first task of the replicated block to the initiator
-                                if (todup.getId().equals(it.getKey())) {
-                                    newTarget = nt;
-                                    newTarget.addDependence(initiator);
-                                    // no need to add newTarget to modifiedTasks
-                                    // because newTarget is among dup.values(), and we
-                                    // have added them all
-                                }
-                                // connect the last task of the block with the merge task(s)
-                                if (target.getId().equals(it.getKey())) {
-                                    newEnd = nt;
-
-                                    List<InternalTask> toAdd = new ArrayList<>();
-                                    // find the merge tasks ; can be multiple
-                                    for (InternalTask t : tasks.values()) {
-                                        List<InternalTask> pdeps = t.getIDependences();
-                                        if (pdeps != null) {
-                                            for (InternalTask parent : pdeps) {
-                                                if (parent.getId().equals(target.getId())) {
-                                                    toAdd.add(t);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    // connect the merge tasks
-                                    for (InternalTask t : toAdd) {
-                                        t.addDependence(newEnd);
-                                        changesInfo.taskUpdated(t);
-                                    }
-                                }
-                            }
-
-                            // propagate the changes on the JobDescriptor
-                            getJobDescriptor().doReplicate(taskId, dup, newTarget, target.getId(),
-                                    newEnd.getId());
-
-                        }
-                    }
-
-                    // notify frontend that tasks were added to the job
-                    this.jobInfo.setTasksChanges(changesInfo, this);
-                    if (frontend != null) {
-                        frontend.jobStateUpdated(this.getOwner(), new NotificationData<>(
-                                SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
-                    }
-                    this.jobInfo.clearTasksChanges();
-
-                    // no jump is performed ; now that the tasks have been replicated and
-                    // configured, the flow can continue its normal operation
-                    getJobDescriptor().terminate(taskId);
-                    didAction = true;
+                case REPLICATE: {
+                    didAction = terminateReplicateTask(action, initiator, changesInfo, frontend, taskId);
                     break;
 
                 }
@@ -693,9 +385,396 @@ public abstract class InternalJob extends JobState {
 
         return changesInfo;
     }
+    
+    
+    private boolean terminateLoopTask(boolean didAction, FlowAction action, InternalTask initiator, 
+    			ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend){
+    	// find the target of the loop
+        InternalTask target = null;
+        if (action.getTarget().equals(initiator.getName())) {
+            target = initiator;
+        } else {
+            target = findTaskUp(action.getTarget(), initiator);
+        }
+        didAction = replicateForNextLoopIteration(initiator, target, changesInfo, frontend, action);
+        if (didAction && action.getCronExpr() != null) {
+            for (TaskId tid : changesInfo.getNewTasks()) {
+                InternalTask newTask = tasks.get(tid);
+                try {
+                    Date startAt = (new Predictor(action.getCronExpr())).nextMatchingDate();
+                    newTask.addGenericInformation(GENERIC_INFO_START_AT_KEY, ISO8601DateUtil
+                            .parse(startAt));
+                } catch (InvalidPatternException e) {
+                    // this will not happen as the cron expression is
+                    // already being validated in FlowScript class.
+                }
+            }
+        }
+        return didAction;
+    }
+    
+    
+    private InternalTask[] searchIfElseJoinTasks(FlowAction action, InternalTask initiator){
+    	InternalTask targetIf = null;
+        InternalTask targetElse = null;
+        InternalTask targetJoin = null;
+
+        // search for the targets as perfect matches of the unique name
+        for (InternalTask it : tasks.values()) {
+
+            // target is finished : probably looped
+            if (it.getStatus().equals(TaskStatus.FINISHED) ||
+                it.getStatus().equals(TaskStatus.SKIPPED)) {
+                continue;
+            }
+            if (action.getTarget().equals(it.getName())) {
+                if (it.getIfBranch().equals(initiator)) {
+                    targetIf = it;
+                }
+            } else if (action.getTargetElse().equals(it.getName())) {
+                if (it.getIfBranch().equals(initiator)) {
+                    targetElse = it;
+                }
+            } else if (action.getTargetContinuation().equals(it.getName())) {
+                InternalTask up = findTaskUp(initiator.getName(), it);
+                if (up != null && up.equals(initiator)) {
+                    targetJoin = it;
+                }
+            }
+
+        }
+
+        boolean searchIf = (targetIf == null);
+        boolean searchElse = (targetElse == null);
+        boolean searchJoin = (targetJoin == null);
+
+        // search of a runnable perfect match for the targets failed;
+        // the natural target was iterated, need to find the next iteration
+        // which is the the one with the same dup index and base name,
+        // but the highest iteration index
+        for (InternalTask it : tasks.values()) {
+
+            // does not share the same dup index : cannot be the same scope
+            if (it.getReplicationIndex() != initiator.getReplicationIndex()) {
+                continue;
+            }
+
+            if (it.getStatus().equals(TaskStatus.FINISHED) ||
+                it.getStatus().equals(TaskStatus.SKIPPED)) {
+                continue;
+            }
+
+            String name = InternalTask.getInitialName(it.getName());
+
+            if (searchIf && InternalTask.getInitialName(action.getTarget()).equals(name)) {
+                if (targetIf == null || targetIf.getIterationIndex() < it.getIterationIndex()) {
+                    targetIf = it;
+                }
+            } else if (searchElse &&
+                InternalTask.getInitialName(action.getTargetElse()).equals(name)) {
+                if (targetElse == null || targetElse.getIterationIndex() < it.getIterationIndex()) {
+                    targetElse = it;
+                }
+            } else if (searchJoin &&
+                InternalTask.getInitialName(action.getTargetContinuation()).equals(name)) {
+                if (targetJoin == null || targetJoin.getIterationIndex() < it.getIterationIndex()) {
+                    targetJoin = it;
+                }
+            }
+        }
+        
+        InternalTask[] result = {targetIf, targetElse, targetJoin};
+        return result;
+    }
+    
+    
+    private boolean terminateIfTask(FlowAction action, InternalTask initiator, 
+			ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, InternalTask descriptor, TaskId taskId){
+    	
+    	InternalTask [] targets = searchIfElseJoinTasks(action, initiator);
+    	
+    	// the targetIf from action.getTarget() is the selected branch;
+        // the IF condition has already been evaluated prior to being put in a FlowAction
+        // the targetElse from action.getTargetElse() is the branch that was NOT selected
+        InternalTask targetIf = targets[0];
+        InternalTask targetElse = targets[1];
+        InternalTask targetJoin = targets[2];
+
+        logger.info("Control Flow Action IF: " + targetIf.getId() + " join: " +
+            ((targetJoin == null) ? "null" : targetJoin.getId()));
+
+        // these 2 tasks delimit the Task Block formed by the IF branch
+        InternalTask branchStart = targetIf;
+        InternalTask branchEnd = null;
+
+        String match = targetIf.getMatchingBlock();
+        if (match != null) {
+            for (InternalTask t : tasks.values()) {
+                if (match.equals(t.getName()) &&
+                    !(t.getStatus().equals(TaskStatus.FINISHED) || t.getStatus().equals(
+                            TaskStatus.SKIPPED))) {
+                    branchEnd = t;
+                }
+            }
+        }
+        // no matching block: there is no block, the branch is a single task
+        if (branchEnd == null) {
+            branchEnd = targetIf;
+        }
+
+        // plug the branch
+        branchStart.addDependence(initiator);
+        changesInfo.taskUpdated(branchStart);
+        if (targetJoin != null) {
+            targetJoin.addDependence(branchEnd);
+            changesInfo.taskUpdated(targetJoin);
+        }
+
+        // the other branch will not be executed
+        // first, find the concerned tasks
+        List<InternalTask> elseTasks = new ArrayList<>();
+        //  elseTasks.add(targetElse);
+        for (InternalTask t : this.tasks.values()) {
+            if (t.dependsOn(targetElse)) {
+                elseTasks.add(t);
+            }
+        }
+
+        // even though the targetElse is not going to be executed, a
+        // dependency on initiator still makes sense and would help
+        // reconstruct the job graph on the client
+        targetElse.addDependence(initiator);
+        changesInfo.taskUpdated(targetElse);
+
+        for (InternalTask it : elseTasks) {
+            it.setFinishedTime(descriptor.getFinishedTime() + 1);
+            it.setStatus(TaskStatus.SKIPPED);
+            it.setExecutionDuration(0);
+
+            changesInfo.taskSkipped(it);
+            setNumberOfPendingTasks(getNumberOfPendingTasks() - 1);
+            setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
+            logger.info("Task " + it.getId() + " will not be executed");
+        }
+
+        // plug the branch in the descriptor
+        TaskId joinId = null;
+        if (targetJoin != null) {
+            joinId = targetJoin.getId();
+        }
+        getJobDescriptor().doIf(initiator.getId(), branchStart.getId(), branchEnd.getId(),
+                joinId, targetElse.getId(), elseTasks);
+
+        this.jobInfo.setTasksChanges(changesInfo, this);
+        // notify frontend that tasks were modified
+        if (frontend != null) {
+            frontend.jobStateUpdated(this.getOwner(), new NotificationData<>(
+                    SchedulerEvent.TASK_SKIPPED, this.getJobInfo()));
+        }
+        this.jobInfo.clearTasksChanges();
+
+        // no jump is performed ; now that the tasks have been plugged
+        // the flow can continue its normal operation
+        getJobDescriptor().terminate(taskId);
+
+        return true;
+    }
+    
+    
+    private boolean terminateReplicateTask(FlowAction action, InternalTask initiator, 
+			ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, TaskId taskId){
+    	int runs = action.getDupNumber();
+        if (runs < 1) {
+            runs = 1;
+        }
+
+        logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
+        List<InternalTask> toReplicate = new ArrayList<>();
+
+        // find the tasks that need to be replicated
+        for (InternalTask ti : tasks.values()) {
+            List<InternalTask> tl = ti.getIDependences();
+            if (tl != null) {
+                for (InternalTask ts : tl) {
+                    if (ts.getId().equals(initiator.getId()) && !toReplicate.contains(ti)) {
+                        // ti needs to be replicated
+                        toReplicate.add(ti);
+                    }
+                }
+            }
+        }
+
+        // for each initial task to replicate
+        for (InternalTask todup : toReplicate) {
+
+            // determine the target of the replication whether it is a block or a single task
+            InternalTask target = null;
+
+            // target is a task block start : replication of the block
+            if (todup.getFlowBlock().equals(FlowBlock.START)) {
+                String tg = todup.getMatchingBlock();
+                for (InternalTask t : tasks.values()) {
+                    if (tg.equals(t.getName()) &&
+                        !(t.getStatus().equals(TaskStatus.FINISHED) || t.getStatus().equals(
+                                TaskStatus.SKIPPED)) && t.dependsOn(todup)) {
+                        target = t;
+                        break;
+                    }
+                }
+                if (target == null) {
+                    logger.error("REPLICATE: could not find matching block '" + tg + "'");
+                    continue;
+                }
+            }
+            // target is not a block : replication of the task
+            else {
+                target = todup;
+            }
+
+            // for each number of parallel run
+            for (int i = 1; i < runs; i++) {
+
+                // accumulates the tasks between the initiator and the target
+                Map<TaskId, InternalTask> dup = new HashMap<>();
+                // replicate the tasks between the initiator and the target
+                try {
+                    target.replicateTree(dup, todup.getId(), false, initiator
+                            .getReplicationIndex() *
+                        runs, 0);
+
+                } catch (Exception e) {
+                    logger.error("REPLICATE: could not replicate tree", e);
+                    break;
+                }
+
+                ((JobInfoImpl) this.getJobInfo()).setNumberOfPendingTasks(this.getJobInfo()
+                        .getNumberOfPendingTasks() +
+                    dup.size());
+
+                // pointers to the new replicated tasks corresponding the begin and
+                // the end of the block ; can be the same
+                InternalTask newTarget = null;
+                InternalTask newEnd = null;
+
+                // configure the new tasks
+                for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                    InternalTask nt = it.getValue();
+                    nt.setJobInfo(getJobInfo());
+                    int dupIndex = getNextReplicationIndex(InternalTask.getInitialName(nt
+                            .getName()), nt.getIterationIndex());
+                    this.addTask(nt);
+                    nt.setReplicationIndex(dupIndex);
+                    assignReplicationTag(nt, initiator, false, action);
+                }
+                changesInfo.newTasksAdded(dup.values());
+
+                // find the beginning and the ending of the replicated block
+                for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                    InternalTask nt = it.getValue();
+
+                    // connect the first task of the replicated block to the initiator
+                    if (todup.getId().equals(it.getKey())) {
+                        newTarget = nt;
+                        newTarget.addDependence(initiator);
+                        // no need to add newTarget to modifiedTasks
+                        // because newTarget is among dup.values(), and we
+                        // have added them all
+                    }
+                    // connect the last task of the block with the merge task(s)
+                    if (target.getId().equals(it.getKey())) {
+                        newEnd = nt;
+
+                        List<InternalTask> toAdd = new ArrayList<>();
+                        // find the merge tasks ; can be multiple
+                        for (InternalTask t : tasks.values()) {
+                            List<InternalTask> pdeps = t.getIDependences();
+                            if (pdeps != null) {
+                                for (InternalTask parent : pdeps) {
+                                    if (parent.getId().equals(target.getId())) {
+                                        toAdd.add(t);
+                                    }
+                                }
+                            }
+                        }
+                        // connect the merge tasks
+                        for (InternalTask t : toAdd) {
+                            t.addDependence(newEnd);
+                            changesInfo.taskUpdated(t);
+                        }
+                    }
+                }
+
+                // propagate the changes on the JobDescriptor
+                getJobDescriptor().doReplicate(taskId, dup, newTarget, target.getId(),
+                        newEnd.getId());
+
+            }
+        }
+
+        // notify frontend that tasks were added to the job
+        this.jobInfo.setTasksChanges(changesInfo, this);
+        if (frontend != null) {
+            frontend.jobStateUpdated(this.getOwner(), new NotificationData<>(
+                    SchedulerEvent.TASK_REPLICATED, this.getJobInfo()));
+        }
+        this.jobInfo.clearTasksChanges();
+
+        // no jump is performed ; now that the tasks have been replicated and
+        // configured, the flow can continue its normal operation
+        getJobDescriptor().terminate(taskId);
+        
+        return true;
+    }
+
+    /**
+     * Assign a tag to new duplicated task because of a REPLICATE or LOOP.
+     * @param replicatedTask the new duplicated task.
+     * @param initiator the initiator of the duplication.
+     * @param loopAction true if the duplication if after a loop or, false if it is a replicate.
+     * @param action the duplication action.
+     */
+    private void assignReplicationTag(InternalTask replicatedTask, InternalTask initiator, boolean loopAction, FlowAction action){
+        StringBuffer buf = new StringBuffer();
+
+        if(loopAction){
+            buf.append("LOOP-");
+            buf.append(InternalTask.getInitialName(initiator.getName()));
+            if(initiator.getReplicationIndex() > 0){
+                buf.append("*");
+                buf.append(initiator.getReplicationIndex());
+            }
+        }
+        else {
+            buf.append("REPLICATE-");
+            buf.append(initiator.getName());
+        }
+
+
+        buf.append("-");
+
+        if(loopAction){
+            FlowScript flow = initiator.getFlowScript();
+            String cronExpr = action.getCronExpr();
+            if(cronExpr.equals("")){
+                buf.append(replicatedTask.getIterationIndex());
+            }
+            else{
+                //cron task: the replication index is the next date that matches the cron expression
+                Date resolvedCron = (new Predictor(cronExpr)).nextMatchingDate();
+                SimpleDateFormat dt = new SimpleDateFormat("dd_MM_YY_HH_mm");
+                buf.append(dt.format(resolvedCron));
+            }
+        }
+        else{
+            buf.append(replicatedTask.getReplicationIndex());
+        }
+
+        replicatedTask.setTag(buf.toString());
+    }
+
 
     private boolean replicateForNextLoopIteration(InternalTask initiator, InternalTask target,
-            ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend) {
+            ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, FlowAction action) {
 
         logger.info("LOOP (init:" + initiator.getId() + ";target:" + target.getId() + ")");
 
@@ -742,6 +821,7 @@ public abstract class InternalJob extends JobState {
             }
             nt.setJobInfo(getJobInfo());
             this.addTask(nt);
+            assignReplicationTag(nt, initiator, true, action);
         }
         changesInfo.newTasksAdded(dup.values());
 
@@ -923,7 +1003,7 @@ public abstract class InternalJob extends JobState {
         //re-init taskId
         int id = 0;
         for (InternalTask td : sorted) {
-            TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++, true);
+            TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++);
             td.setId(newId);
             td.setJobInfo(getJobInfo());
             tasks.put(newId, td);
@@ -1300,7 +1380,7 @@ public abstract class InternalJob extends JobState {
      * $PA_TASK_REPLICATION by it's actual value
      *
      */
-    public Map<String, String> getGenericInformations() {
+    public Map<String, String> getGenericInformation() {
         if (genericInformations == null) {
             // task is not yet properly initialized
             return new HashMap<>();
@@ -1323,9 +1403,9 @@ public abstract class InternalJob extends JobState {
      */
     public Map<String, String> getGenericInformations(boolean replaceVariables) {
         if (replaceVariables) {
-            return this.getGenericInformations();
+            return this.getGenericInformation();
         } else {
-            return super.getGenericInformations();
+            return super.getGenericInformation();
         }
     }
 

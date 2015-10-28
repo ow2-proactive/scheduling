@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,11 +36,8 @@
  */
 package functionaltests.job.log;
 
-import java.io.File;
-import java.net.URL;
-import java.util.List;
-import java.util.regex.Pattern;
-
+import functionaltests.utils.SchedulerFunctionalTest;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -48,17 +45,24 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -111,15 +115,19 @@ public class TestJobServerLogs extends SchedulerFunctionalTest {
         schedulerHelper.waitForEventJobFinished(simpleJobId);
         String jobLogs = schedulerHelper.getSchedulerInterface().getJobServerLogs(simpleJobId.toString());
         for (int i = 0; i < TASKS_IN_SIMPLE_JOB; i++) {
-        if (!matchLine(jobLogs, "task " + simpleJobId + "000" + i + " \\(task[12]\\) started")) {
+            TaskId taskId = TaskIdImpl.createTaskId(simpleJobId, "task" + (i+1), i);
+            String taskIdString = taskId.toString();
+            String taskIdStringQuoted = Pattern.quote(taskIdString);
+
+            if (!matchLine(jobLogs, "task " + taskIdStringQuoted + " \\(task[12]\\) started")) {
                 log("Incorrect job server logs");
                 log(jobLogs);
-                fail("Task " + simpleJobId + "000" + i + " was not scheduled");
+                fail("Task " + taskIdString + " was not scheduled");
             }
-            if (!matchLine(jobLogs, "task " + simpleJobId + "000" + i + " \\(task[12]\\) finished")) {
+            if (!matchLine(jobLogs, "task " + taskIdStringQuoted + " \\(task[12]\\) finished")) {
                 log("Incorrect job server logs");
                 log(jobLogs);
-                fail("Task " + simpleJobId + "000" + i + " was not finished");
+                fail("Task " + taskIdString + " was not finished");
             }
         }
 
@@ -174,9 +182,9 @@ public class TestJobServerLogs extends SchedulerFunctionalTest {
 
     private void checkJobAndTaskLogFiles(JobId jobId, List<TaskState> tasks, boolean shouldExist)
             throws Exception {
-        checkFile(shouldExist, new File(logsLocation, jobId.toString()));
+        checkFile(shouldExist, new File(logsLocation, JobLogger.getJobLogFilename(jobId)));
         for (TaskState taskState : tasks) {
-            checkFile(shouldExist, new File(logsLocation, taskState.getId().toString()));
+            checkFile(shouldExist, new File(logsLocation, TaskLogger.getTaskLogFilename(taskState.getId())));
         }
     }
 

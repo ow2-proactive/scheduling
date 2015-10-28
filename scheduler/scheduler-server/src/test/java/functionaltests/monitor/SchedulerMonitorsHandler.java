@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -51,29 +51,29 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.utils.TaskIdWrapper;
 
 
 /**
- * this class provide waiting methods on different Scheduler events
+ * This class provides waiting methods on different Scheduler events.
  * A thread can ask to wait for specific events, related to jobs, tasks
  * and Scheduler state. If event has already occurred,
  * waiting methods return immediately, otherwise, waiting is performed.
  * It provides waiting methods with a timeout too.
  *
- * waitForEvent**() methods, this object act as Producer-consumer mechanism ;
- * a Scheduler produce events that are memorized by this object,
+ * waitForEvent**() methods, this object act as Producer-consumer mechanism;
+ * a Scheduler produces events that are memorized by this object,
  * and waiting methods waitForEvent**() are as consumer of these event.
  * It means that an event asked to be waited by a call to waitForEvent**() methods, is removed
  * after its occurrence. On the contrary, an event is kept till a waitForEvent**() for this event
  * has been called.
  *
- * waitForTerminatedJob() method dosen't act has other waitForEvent**() Methods.
+ * waitForTerminatedJob() method doesn't act has other waitForEvent**() Methods.
  * This method deduce a job finished from current Scheduler's job states and received event.
- * This method can also be used for testing for job submission with killing and restarting
+ * This method can also be used for testing for job submission when killing and restarting
  * Scheduler.
  *
  * @author ProActive team
- *
  */
 public class SchedulerMonitorsHandler {
 
@@ -93,7 +93,7 @@ public class SchedulerMonitorsHandler {
      * Tasks events received and not yet checked by a waiter.
      * (not yet 'consumed')
      */
-    private HashMap<TaskId, List<TaskEventMonitor>> tasksEvents;
+    private HashMap<TaskIdWrapper, List<TaskEventMonitor>> tasksEvents;
 
     /**
      * Awaited event from Scheduler ;
@@ -110,7 +110,6 @@ public class SchedulerMonitorsHandler {
 
     /**
      * Constructor
-     * @param userInterface
      */
     public SchedulerMonitorsHandler() {
         jobsEvents = new HashMap<>();
@@ -259,7 +258,7 @@ public class SchedulerMonitorsHandler {
     /**
      * Add a job event to the list of occurred events (memorize it).
      * @param event type of event occurred.
-     * @param jEvent associated JobEvent object to event occurred.
+     * @param jInfo associated JobEvent object to event occurred.
      */
     private void addJobEvent(SchedulerEvent event, JobInfo jInfo) {
         if (!jobsEvents.containsKey(jInfo.getJobId())) {
@@ -274,7 +273,7 @@ public class SchedulerMonitorsHandler {
      * Here object associated to Event is a Job and not a Job event because some
      * event (as Job submitted event have a Job object associated).
      * @param event type of event occurred.
-     * @param job associated Job object to the event
+     * @param jState associated Job object to the event
      */
     private void addJobEvent(SchedulerEvent event, JobState jState) {
         if (!jobsEvents.containsKey(jState.getId())) {
@@ -287,14 +286,19 @@ public class SchedulerMonitorsHandler {
     /**
      * Add a Task Event to the list of occurred events (memorize it).
      * @param event type of task event
-     * @param tEvent TaskEvent object associated to Event
+     * @param taskInfo TaskEvent object associated to Event
      */
-    private void addTaskEvent(SchedulerEvent event, TaskInfo tInfo) {
-        if (!tasksEvents.containsKey(tInfo.getTaskId())) {
-            List<TaskEventMonitor> list = new ArrayList<>();
-            tasksEvents.put(tInfo.getTaskId(), list);
+    private void addTaskEvent(SchedulerEvent event, TaskInfo taskInfo) {
+        TaskIdWrapper taskId = TaskIdWrapper.wrap(taskInfo.getTaskId());
+
+        List<TaskEventMonitor> taskEventMonitors = tasksEvents.get(taskId);
+
+        if (taskEventMonitors == null) {
+            taskEventMonitors = new ArrayList<>();
+            tasksEvents.put(taskId, taskEventMonitors);
         }
-        tasksEvents.get(tInfo.getTaskId()).add(new TaskEventMonitor(event, tInfo));
+
+        taskEventMonitors.add(new TaskEventMonitor(event, taskInfo));
     }
 
     /**
@@ -320,12 +324,18 @@ public class SchedulerMonitorsHandler {
      */
     private TaskEventMonitor removeTaskEvent(JobId id, String taskName, SchedulerEvent event) {
         TaskEventMonitor tmp = new TaskEventMonitor(event, id, taskName);
-        for (Entry<TaskId, List<TaskEventMonitor>> entry : this.tasksEvents.entrySet()) {
-            if (entry.getKey().getJobId().equals(id) && entry.getKey().getReadableName().equals(taskName) &&
-                entry.getValue().contains(tmp)) {
-                return entry.getValue().remove(entry.getValue().indexOf(tmp));
+
+        for (Entry<TaskIdWrapper, List<TaskEventMonitor>> entry : tasksEvents.entrySet()) {
+            TaskId taskId = entry.getKey().getTaskId();
+            List<TaskEventMonitor> value = entry.getValue();
+
+            if (taskId.getJobId().equals(id)
+                    && taskId.getReadableName().equals(taskName)
+                    && value.contains(tmp)) {
+                return value.remove(value.indexOf(tmp));
             }
         }
+
         return null;
     }
 
@@ -532,4 +542,5 @@ public class SchedulerMonitorsHandler {
             }
         }
     }
+
 }

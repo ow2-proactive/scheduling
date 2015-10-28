@@ -42,7 +42,7 @@ public class ForkedTaskExecutorTest {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "sample", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "sample", 1000L)));
 
         ForkedTaskExecutor forkedTaskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder());
 
@@ -67,7 +67,7 @@ public class ForkedTaskExecutorTest {
         ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder());
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
@@ -86,7 +86,7 @@ public class ForkedTaskExecutorTest {
         ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
@@ -103,7 +103,7 @@ public class ForkedTaskExecutorTest {
         ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
             new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
@@ -121,7 +121,7 @@ public class ForkedTaskExecutorTest {
         ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), decrypter);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         ScriptExecutableContainer container = new ScriptExecutableContainer(new TaskScript(new SimpleScript(
             "print('hello'); result='hello'", "javascript")));
@@ -144,7 +144,7 @@ public class ForkedTaskExecutorTest {
         ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         ForkEnvironment forkEnvironment = new ForkEnvironment();
         forkEnvironment.addSystemEnvironmentVariable("envVar", "envValue");
@@ -169,7 +169,7 @@ public class ForkedTaskExecutorTest {
         ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
         initializer.setVariables(Collections.singletonMap("aVar","aValue"));
 
         ForkEnvironment forkEnvironment = new ForkEnvironment();
@@ -195,7 +195,7 @@ public class ForkedTaskExecutorTest {
         ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir);
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L, false)));
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         ForkEnvironment forkEnvironment = new ForkEnvironment();
         forkEnvironment.setEnvScript(new SimpleScript("should fail execution", "groovy"));

@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2013 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -40,12 +40,13 @@ package org.ow2.proactive.scheduler.task;
 public enum SchedulerVars {
     PA_JOB_ID,
     PA_JOB_NAME,
+    PA_NODESFILE,
+    PA_NODESNUMBER,
+    PA_SCHEDULER_HOME,
     PA_TASK_ID,
     PA_TASK_NAME,
     PA_TASK_ITERATION,
     PA_TASK_PROGRESS_FILE,
     PA_TASK_REPLICATION,
-    PA_SCHEDULER_HOME,
-    PA_NODESFILE,
-    PA_NODESNUMBER;
+    PA_USER
 }

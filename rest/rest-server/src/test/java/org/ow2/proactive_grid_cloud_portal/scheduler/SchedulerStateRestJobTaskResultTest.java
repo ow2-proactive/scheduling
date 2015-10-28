@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -63,10 +63,10 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
 
         TaskResultImpl taskResultWithException = new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl
-                .makeJobId("42"), "mytask", 1, false), null, new byte[0], null);
+                .makeJobId("42"), "mytask", 1), null, new byte[0], null);
         when(mockOfScheduler.getTaskResult("42", "mytask")).thenReturn(taskResultWithException);
 
-        String exceptionStackTrace = (String) restInterface.valueOftaskresult(sessionId, "42", "mytask");
+        String exceptionStackTrace = (String) restInterface.valueOfTaskResult(sessionId, "42", "mytask");
 
         assertNotNull(exceptionStackTrace);
     }
@@ -79,7 +79,7 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
 
         TaskResultImpl taskResultWithException = new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl
-                .makeJobId("42"), "mytask", 1, false), null, new byte[0], null);
+                .makeJobId("42"), "mytask", 1), null, new byte[0], null);
         JobResultImpl jobResultWithException = new JobResultImpl();
         jobResultWithException.addTaskResult("mytask", taskResultWithException, false);
         when(mockOfScheduler.getJobResult("42")).thenReturn(jobResultWithException);

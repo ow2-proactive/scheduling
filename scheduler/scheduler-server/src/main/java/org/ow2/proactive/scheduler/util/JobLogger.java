@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -56,33 +56,41 @@ public class JobLogger {
     }
 
     public void info(JobId id, String message) {
-        MDC.put(FileAppender.FILE_NAME, id);
+        updateMdcWithTaskLogFilename(id);
         logger.info(PREFIX + id + " " + message);
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void debug(JobId id, String message) {
-        MDC.put(FileAppender.FILE_NAME, id);
+        updateMdcWithTaskLogFilename(id);
         logger.debug(PREFIX + id + " " + message);
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void warn(JobId id, String message) {
-        MDC.put(FileAppender.FILE_NAME, id);
+        updateMdcWithTaskLogFilename(id);
         logger.warn(PREFIX + id + " " + message);
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void error(JobId id, String message) {
-        MDC.put(FileAppender.FILE_NAME, id);
+        updateMdcWithTaskLogFilename(id);
         logger.error(PREFIX + id + " " + message);
         MDC.remove(FileAppender.FILE_NAME);
     }
 
     public void error(JobId id, String message, Throwable th) {
-        MDC.put(FileAppender.FILE_NAME, id);
+        updateMdcWithTaskLogFilename(id);
         logger.error(PREFIX + id + " " + message, th);
         MDC.remove(FileAppender.FILE_NAME);
+    }
+
+    private void updateMdcWithTaskLogFilename(JobId id) {
+        MDC.put(FileAppender.FILE_NAME, getJobLogFilename(id));
+    }
+
+    public static String getJobLogFilename(JobId id) {
+        return id.value();
     }
 
 }

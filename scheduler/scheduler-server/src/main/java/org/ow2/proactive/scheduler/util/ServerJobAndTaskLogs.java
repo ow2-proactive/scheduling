@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2014 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -63,12 +63,12 @@ public class ServerJobAndTaskLogs {
     }
 
     public static String getTaskLog(TaskId id) {
-        String result = readLog(id.toString());
+        String result = readLog(TaskLogger.getTaskLogFilename(id));
         return result != null ? result : "Cannot retrieve logs for task " + id;
     }
 
     public static String getJobLog(JobId jobId, Set<TaskId> tasks) {
-        String jobLog = readLog(jobId.toString());
+        String jobLog = readLog(JobLogger.getJobLogFilename(jobId));
         if (jobLog == null) {
             return "Cannot retrieve logs for job " + jobId;
         }
@@ -85,15 +85,15 @@ public class ServerJobAndTaskLogs {
     }
 
     public static void remove(JobId jobId, Set<TaskId> taskIds) {
-        removeLog(jobId.toString());
-        for (TaskId t : taskIds) {
-            removeLog(t.toString());
+        removeLog(JobLogger.getJobLogFilename(jobId));
+        for (TaskId taskId : taskIds) {
+            removeLog(TaskLogger.getTaskLogFilename(taskId));
         }
     }
 
-    private static void removeLog(String id) {
+    private static void removeLog(String filename) {
         for (String suffix : new String[] { "", ".1" }) {
-            removeFile(id + suffix);
+            removeFile(filename + suffix);
         }
     }
 
@@ -122,10 +122,10 @@ public class ServerJobAndTaskLogs {
         return PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
     }
 
-    private static String readLog(String id) {
+    private static String readLog(String filename) {
         String result = null;
         for (String suffix : new String[] { ".1", "" }) {
-            String contents = readFile(new File(getLogsLocation(), id + suffix));
+            String contents = readFile(new File(getLogsLocation(), filename + suffix));
             if (contents != null) {
                 if (result == null) {
                     result = contents;

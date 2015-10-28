@@ -1,0 +1,21 @@
+ dependencies {
+    compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
+    compile "org.objectweb.proactive:programming-core:${programmingVersion}"
+    compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
+
+    compile project(':common:common-client')
+}
+task stub(type: StubTask) {
+    classes = ['org.ow2.proactive.utils.NodeSet',
+               'org.ow2.proactive.resourcemanager.frontend.ResourceManager',
+               'org.ow2.proactive.resourcemanager.authentication.RMAuthentication',
+               'org.ow2.proactive.resourcemanager.common.event.RMInitialState',
+               'org.ow2.proactive.resourcemanager.common.RMState',
+               'org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface',
+               'org.ow2.proactive.resourcemanager.common.util.RMListenerProxy',
+               'org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger',
+               'org.ow2.proactive.resourcemanager.frontend.topology.pinging.NodesPinger',
+               'org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger',
+               'org.ow2.proactive.resourcemanager.frontend.RMMonitoring']
+}
+serialver.dependsOn stub

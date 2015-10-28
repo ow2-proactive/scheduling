@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,7 +36,14 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import com.google.common.base.Joiner;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -50,12 +57,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.base.Joiner;
 
 
 /**
@@ -89,6 +91,9 @@ public abstract class Task extends CommonAttribute {
 
     /** Description of the task. */
     protected String description = null;
+
+    /** tag of the task */
+    protected String tag = null;
 
     /** DataSpace inputFiles */
     protected List<InputSelector> inputFiles = null;
@@ -278,6 +283,26 @@ public abstract class Task extends CommonAttribute {
                 name);
         }
         this.name = name;
+    }
+
+
+    /**
+     * Get the tag of this task.
+     * Return null if this task has no tag.
+     *
+     * @return the tag of this task
+     */
+    public String getTag() {
+        return this.tag;
+    }
+
+
+    /**
+     * Set the tag of this task.
+     * @param the tag value
+     */
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     /**
@@ -668,6 +693,7 @@ public abstract class Task extends CommonAttribute {
                 "\tDescription = '" + description + "'" + nl +
                 (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl : "") +
                 (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" + maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
+                "\ttag = " + tag + nl +
                 "\tgenericInformations = {" + nl + Joiner.on('\n').withKeyValueSeparator("=").join(genericInformations) + nl + "}" + nl +
                 "\tInputFiles = " + inputFiles + nl +
                 "\tOutputFiles = " + outputFiles + nl +

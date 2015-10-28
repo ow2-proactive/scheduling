@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -36,16 +36,17 @@
  */
 package functionaltests.job;
 
-import org.objectweb.proactive.api.PAActiveObject;
+import java.nio.file.Path;
+
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.util.FileLock;
 import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.ProActiveLock;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static functionaltests.job.recover.TestPauseJobRecover.createJob;
@@ -54,19 +55,17 @@ import static org.junit.Assert.*;
 
 
 /**
- * 
  * Test checks that once a job is paused the execution of all tasks except running
  * is postponed.
- *   
  */
 public class TestPauseJob extends SchedulerFunctionalTest {
 
     @Test
     public void test() throws Throwable {
+        FileLock fileLock = new FileLock();
+        Path fileLockPath = fileLock.lock();
 
-        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
-
-        TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));
+        TaskFlowJob job = createJob(fileLockPath.toString());
 
         log("Submit job");
         JobId jobId = schedulerHelper.submitJob(job);
@@ -88,13 +87,13 @@ public class TestPauseJob extends SchedulerFunctionalTest {
         assertEquals(TaskStatus.RUNNING, getTaskState("task1", js).getStatus());
         assertEquals(TaskStatus.PAUSED, getTaskState("task2", js).getStatus());
 
-        //let the task1 finish
-        communicationObject.unlock();
+        // let the task1 finish
+        fileLock.unlock();
 
         log("Checking is the status of task2 remains unchanged");
         Thread.sleep(5000);
         js = schedulerHelper.getSchedulerInterface().getJobState(jobId);
         assertEquals(TaskStatus.PAUSED, getTaskState("task2", js).getStatus());
-
     }
+
 }

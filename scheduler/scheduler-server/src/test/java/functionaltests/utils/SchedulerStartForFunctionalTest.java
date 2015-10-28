@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -54,6 +54,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
 
 /**
@@ -117,9 +118,10 @@ public class SchedulerStartForFunctionalTest implements Serializable {
                                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
                         ResourceManager rmAdmin = rmAuth.login(creds);
                         Map<String, String> params = new HashMap<>();
-                        if (System.getProperty("pas.launcher.forkas.method") != null) {
-                            params.put("pas.launcher.forkas.method",
-                                    System.getProperty("pas.launcher.forkas.method"));
+
+                        String forkMethodKeyValue = System.getProperty(ForkerUtils.FORK_METHOD_KEY);
+                        if (forkMethodKeyValue != null) {
+                            params.put(ForkerUtils.FORK_METHOD_KEY, forkMethodKeyValue);
                         }
                         if (System.getProperty("proactive.test.runAsMe") != null) {
                             params.put("proactive.test.runAsMe", "true");

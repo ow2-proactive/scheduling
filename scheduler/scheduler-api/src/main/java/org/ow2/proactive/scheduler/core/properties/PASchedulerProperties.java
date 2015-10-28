@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -161,9 +161,6 @@ public enum PASchedulerProperties {
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
 
-    /** Multiplicative factor for job id (taskId will be : this_factor*jobID+taskID) */
-    JOB_FACTOR("pa.scheduler.job.factor", PropertyType.INTEGER),
-
     /** Delay to wait between getting a job result and removing the job concerned (0 = infinite) */
     SCHEDULER_REMOVED_JOB_DELAY("pa.scheduler.core.removejobdelay", PropertyType.INTEGER),
 
@@ -188,6 +185,8 @@ public enum PASchedulerProperties {
 
     /** If true script tasks are ran in a forked JVM, if false they are ran in the node's JVM */
     TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN),
+    
+    TASKS_PAGE_SIZE("pa.scheduler.tasks.page.size", PropertyType.INTEGER),
 
     /* ***************************************************************** */
     /* ********************** DATASPACES PROPERTIES ******************** */

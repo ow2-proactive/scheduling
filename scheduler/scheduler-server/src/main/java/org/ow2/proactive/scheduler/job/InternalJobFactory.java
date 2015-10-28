@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -133,12 +133,6 @@ public class InternalJobFactory {
         if (userJob.getTasks().size() == 0) {
             logger.info("Job '" + userJob.getName() + "' must contain tasks !");
             throw new JobCreationException("This job must contains tasks !");
-        }
-
-        int maxTask = PASchedulerProperties.JOB_FACTOR.getValueAsInt();
-        if (userJob.getTasks().size() > maxTask) {
-            logger.info("Job '" + userJob.getName() + "' cannot contain more than " + maxTask + " tasks !");
-            throw new JobCreationException("Job cannot contain more than " + maxTask + " tasks !");
         }
 
         // validate taskflow
