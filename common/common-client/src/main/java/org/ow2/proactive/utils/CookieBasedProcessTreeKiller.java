@@ -97,4 +97,12 @@ public class CookieBasedProcessTreeKiller {
         });
     }
 
+    public String getCookieName() {
+        return cookieName;
+    }
+
+    public String getCookieValue() {
+        return cookieValue;
+    }
+
 }
