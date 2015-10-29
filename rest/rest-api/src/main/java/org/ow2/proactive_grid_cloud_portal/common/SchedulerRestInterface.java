@@ -332,6 +332,68 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+    //TODO PARAITA
+    /**
+     * Returns all tasks name regarding the given parameters (it is decoupled from the associated jobs).
+     * @param sessionId a valid session id.
+     * @param from the starting scheduled date to which we start fetching tasks.
+     * @param to the end scheduled end date to stop fetching tasks.
+     * @param mytasks fetch only the user tasks.
+     * @param running fetch running tasks.
+     * @param pending fetch pending tasks.
+     * @param finished fetch finished tasks.
+     * @param offset the index of the first task to fetch (for pagination).
+     * @param limit the index of the last (excluded) task to fetch (for pagination).
+     * @return a list of task ids and the total number of tasks ids
+     */
+    @GET
+    @GZIP
+    @Path("tasks")
+    @Produces("application/json")
+    TaskIdsPage getTaskIds(
+            @HeaderParam("sessionid") String sessionId,
+            @QueryParam("from") @DefaultValue("-1") long from,
+            @QueryParam("to") @DefaultValue("-1") long to,
+            @QueryParam("mytasks") @DefaultValue("true") boolean mytasks,
+            @QueryParam("running") @DefaultValue("false") boolean running,
+            @QueryParam("pending") @DefaultValue("false") boolean pending,
+            @QueryParam("finished") @DefaultValue("false") boolean finished,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("-1") int limit)
+                    throws NotConnectedRestException, PermissionRestException;
+    
+  //TODO PARAITA
+    /**
+     * Returns all tasks name regarding the given parameters (it is decoupled from the associated jobs).
+     * @param sessionId a valid session id.
+     * @param tag to filter the tasks.
+     * @param from the starting scheduled date to which we start fetching tasks.
+     * @param to the end scheduled end date to stop fetching tasks.
+     * @param mytasks fetch only the user tasks.
+     * @param running fetch running tasks.
+     * @param pending fetch pending tasks.
+     * @param finished fetch finished tasks.
+     * @param offset the index of the first task to fetch (for pagination).
+     * @param limit the index of the last (excluded) task to fetch (for pagination).
+     * @return a list of task ids and the total number of tasks ids
+     */
+    @GET
+    @GZIP
+    @Path("tasks/tag/{tasktag}")
+    @Produces("application/json")
+    TaskIdsPage getTaskIdsByTag(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("tasktag") String taskTag,
+            @QueryParam("from") @DefaultValue("-1") long from,
+            @QueryParam("to") @DefaultValue("-1") long to,
+            @QueryParam("mytasks") @DefaultValue("true") boolean mytasks,
+            @QueryParam("running") @DefaultValue("false") boolean running,
+            @QueryParam("pending") @DefaultValue("false") boolean pending,
+            @QueryParam("finished") @DefaultValue("false") boolean finished,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("-1") int limit)
+                    throws NotConnectedRestException, PermissionRestException;
+    
     /**
      * Returns a list of the tags of the tasks belonging to job <code>jobId</code>
      * @param sessionId a valid session id
@@ -455,6 +517,69 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("50") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+    // TODO PARAITA
+    /**
+     * Returns all <code>TaskStateData</code> regarding the given parameters (it is decoupled from the associated jobs).
+     * @param sessionId a valid session id.
+     * @param from the starting scheduled date to which we start fetching tasks.
+     * @param to the end scheduled end date to stop fetching tasks.
+     * @param mytasks fetch only the user tasks.
+     * @param running fetch running tasks.
+     * @param pending fetch pending tasks.
+     * @param finished fetch finished tasks.
+     * @param offset the index of the first task to fetch (for pagination).
+     * @param limit the index of the last (excluded) task to fetch (for pagination).
+     * @return a list of <code>TaskStateData</code>  and the total number of them
+     */
+    @GET
+    @GZIP
+    @Path("taskstates")
+    @Produces("application/json")
+    TaskStateDataPage getTaskStates (
+            @HeaderParam("sessionid") String sessionId,
+            @QueryParam("from") @DefaultValue("-1") long from,
+            @QueryParam("to") @DefaultValue("-1") long to,
+            @QueryParam("mytasks") @DefaultValue("true") boolean mytasks,
+            @QueryParam("running") @DefaultValue("false") boolean running,
+            @QueryParam("pending") @DefaultValue("false") boolean pending,
+            @QueryParam("finished") @DefaultValue("false") boolean finished,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("-1") int limit)
+                    throws NotConnectedRestException, PermissionRestException;
+    
+ // TODO PARAITA
+    /**
+     * Returns all <code>TaskStateData</code> regarding the given parameters (it is decoupled from the associated jobs).
+     * @param sessionId a valid session id.
+     * @param tag to filter the tasks.
+     * @param from the starting scheduled date to which we start fetching tasks.
+     * @param to the end scheduled end date to stop fetching tasks.
+     * @param mytasks fetch only the user tasks.
+     * @param running fetch running tasks.
+     * @param pending fetch pending tasks.
+     * @param finished fetch finished tasks.
+     * @param offset the index of the first task to fetch (for pagination).
+     * @param limit the index of the last (excluded) task to fetch (for pagination).
+     * @return a list of <code>TaskStateData</code>  and the total number of them
+     */
+    @GET
+    @GZIP
+    @Path("taskstates/tag/{tasktag}")
+    @Produces("application/json")
+    TaskStateDataPage getTaskStatesByTag (
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("tasktag") String taskTag,
+            @QueryParam("from") @DefaultValue("-1") long from,
+            @QueryParam("to") @DefaultValue("-1") long to,
+            @QueryParam("mytasks") @DefaultValue("true") boolean mytasks,
+            @QueryParam("running") @DefaultValue("false") boolean running,
+            @QueryParam("pending") @DefaultValue("false") boolean pending,
+            @QueryParam("finished") @DefaultValue("false") boolean finished,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("-1") int limit)
+                    throws NotConnectedRestException, PermissionRestException;
+    
+    
     /**
      *  Returns full logs generated by tasks in job.
      *

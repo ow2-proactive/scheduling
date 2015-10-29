@@ -21,11 +21,22 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
@@ -35,6 +46,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
@@ -51,16 +63,6 @@ import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
@@ -977,5 +979,28 @@ public class TaskData {
             getExecutionDuration(), getParallelEnvironment() == null ? 1 : getParallelEnvironment()
                     .getNodesNumber());
     }
+    
 
+    TaskInfoImpl createTaskInfo(JobIdImpl jobId) {
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
+        TaskInfoImpl taskInfo = new TaskInfoImpl();
+        taskInfo.setTaskId(taskId);
+        taskInfo.setStatus(getTaskStatus());
+        taskInfo.setStartTime(getStartTime());
+        taskInfo.setProgress(0);
+        taskInfo.setNumberOfExecutionOnFailureLeft(getNumberOfExecutionOnFailureLeft());
+        taskInfo.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
+        taskInfo.setJobInfo(getJobData().toJobInfo());
+        taskInfo.setJobId(jobId);
+        taskInfo.setFinishedTime(getFinishedTime());
+        taskInfo.setExecutionHostName(getExecutionHostName());
+        taskInfo.setExecutionDuration(getExecutionDuration());
+        return taskInfo;
+    }
+    
+    TaskInfo toTaskInfo() {
+        JobIdImpl jobId = new JobIdImpl(getJobData().getId(), getJobData().getJobName());
+        TaskInfoImpl taskInfo = createTaskInfo(jobId);
+        return taskInfo;
+    }
 }

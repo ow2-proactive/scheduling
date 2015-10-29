@@ -77,6 +77,7 @@ import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -92,6 +93,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
@@ -926,5 +928,21 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         } catch (PermissionRestException e) {
             throw new PermissionException(e);
         }
+    }
+
+    @Override
+    public TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        System.out.println("SchedulerClient.getTaskIds()");
+        return null;
+    }
+
+    @Override
+    public TaskPage<TaskState>  getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        // TODO PARAITA
+        return null;
     }
 }
