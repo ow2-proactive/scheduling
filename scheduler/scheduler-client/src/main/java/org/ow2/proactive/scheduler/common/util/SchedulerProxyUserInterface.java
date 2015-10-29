@@ -63,6 +63,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -78,7 +79,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -598,4 +601,20 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
         uischeduler.removeThirdPartyCredential(key);
     }
+
+    @Override
+    public TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        logger.warn("SchedulerProxyUserInterface.getTaskIds()");
+        return uischeduler.getTaskIds(sessionId, taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+    }
+
+    @Override
+    public TaskPage<TaskState>  getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        return uischeduler.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+    }
+
 }

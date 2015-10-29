@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.SchedulerUsage;
@@ -924,4 +925,17 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * These are meaningful users for accounting {@link SchedulerUsage}
      */
     List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException;
+    
+    
+    
+    
+    TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException;
+
+
+    TaskPage<TaskState> getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException;
+
 }

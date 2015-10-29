@@ -122,6 +122,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
@@ -3229,6 +3230,50 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private boolean isXmlWorkflow(InputPart fileInputPart) {
         return fileInputPart.getMediaType().toString().toLowerCase()
                 .contains(MediaType.APPLICATION_XML.toLowerCase());
+    }
+
+    @Override
+    public TaskIdsPage getTaskIds(String sessionId, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedRestException, PermissionRestException {
+        return getTaskIdsByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit);
+    }
+    
+ // TODO PARAITA
+    @Override
+    public TaskIdsPage getTaskIdsByTag(String sessionId, String taskTag, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedRestException, PermissionRestException {
+        Scheduler s = checkAccess(sessionId, "tasks");
+        TaskPage<TaskId> page = null;
+        try {
+            page = s.getTaskIds(sessionId, "", from, to, mytasks, running, pending, finished, offset, limit);
+            ArrayList<String> taskNames = new ArrayList<String>(page.getList().size());
+            for (TaskId taskId : page.getList()) {
+                taskNames.add(taskId.getReadableName());
+            }
+            return new TaskIdsPage(taskNames, page.getSize());
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
+    }
+
+    @Override
+    public TaskStateDataPage getTaskStates(String sessionId, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedRestException, PermissionRestException {
+        return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit);
+    }
+
+ // TODO PARAITA
+    @Override
+    public TaskStateDataPage getTaskStatesByTag(String sessionId, String taskTag, long from, long to,
+            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedRestException, PermissionRestException {
+        Scheduler s = checkAccess(sessionId, "tasks/tag/" + taskTag);
+        return null;
     }
 
 }

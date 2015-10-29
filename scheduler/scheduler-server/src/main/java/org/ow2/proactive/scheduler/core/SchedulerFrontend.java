@@ -39,10 +39,13 @@ package org.ow2.proactive.scheduler.core;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,6 +78,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -94,6 +98,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
@@ -1119,5 +1124,39 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         UserIdentificationImpl ident = frontendState.checkPermission("removeThirdPartyCredential",
                 "You do not have permission to remove third-party credentials from the scheduler!");
         dbManager.removeThirdPartyCredential(ident.getUsername(), key);
+    }
+    
+    @Override
+    public TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        logger.warn("SchedulerFrontend.getTaskIds()");
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+        long dateFrom = 0;
+        long dateTo = 0;
+        
+        try {
+            dateFrom = df.parse("01/01/1900").getTime();
+            dateTo = df.parse("01/01/2040").getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        
+        TaskPage<TaskInfo> pTaskInfo;
+        pTaskInfo = dbManager.getTasks(dateFrom, dateTo, "", 0, 70, "admin", true, true, true, null);
+        List<TaskId> lTaskId = new ArrayList<TaskId>(pTaskInfo.getList().size());
+        for (TaskInfo taskInfo : pTaskInfo.getList()) {
+            lTaskId.add(taskInfo.getTaskId());
+        }
+        logger.warn(lTaskId);
+        return new TaskPage<TaskId>(lTaskId, pTaskInfo.getSize());
+    }
+
+    @Override
+    public TaskPage<TaskState> getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
