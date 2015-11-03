@@ -326,6 +326,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
             }
         }
 
+        try{
+
+            throw new RuntimeException("leave the buildiong");
+        }catch(Throwable tr){}
+
         Script<Serializable> script = ((ScriptExecutableContainer) taskContext.getExecutableContainer())
                 .getScript();
         replaceScriptParameters(script, thirdPartyCredentials, variables, error);
