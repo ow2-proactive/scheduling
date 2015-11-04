@@ -82,6 +82,7 @@ public class ProgressFileReader {
         } catch (IOException e) {
 
         }
+        return true;
     }
 
     private void createProgressFile(File workingDir, String progressFileName) throws IOException {
