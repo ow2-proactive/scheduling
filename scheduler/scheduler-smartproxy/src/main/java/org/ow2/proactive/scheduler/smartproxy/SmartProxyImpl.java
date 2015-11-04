@@ -27,12 +27,12 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -717,7 +717,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to,
+    public Page<TaskId> getTaskIds(String sessionId, String taskTag, String from, String to,
             boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         return schedulerProxy.getTaskIds(sessionId, taskTag, from, to, mytasks, running, pending, finished,
@@ -725,7 +725,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public TaskPage<TaskState> getTaskStates(String sessionId, String taskTag, long from, long to,
+    public Page<TaskState> getTaskStates(String sessionId, String taskTag, String from, String to,
             boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         return schedulerProxy.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished,

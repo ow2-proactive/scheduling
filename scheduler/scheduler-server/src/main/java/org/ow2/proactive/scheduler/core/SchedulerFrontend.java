@@ -39,13 +39,10 @@ package org.ow2.proactive.scheduler.core;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,6 +68,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -78,7 +76,6 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -118,6 +115,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
+
 
 
 /**
@@ -1127,36 +1125,34 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
     
     @Override
-    public TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit)
+    public Page<TaskId> getTaskIds(String sessionId, String taskTag, String from, String to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
-        logger.warn("SchedulerFrontend.getTaskIds()");
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
-        long dateFrom = 0;
-        long dateTo = 0;
-        
-        try {
-            dateFrom = df.parse("01/01/1900").getTime();
-            dateTo = df.parse("01/01/2040").getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        
-        TaskPage<TaskInfo> pTaskInfo;
-        pTaskInfo = dbManager.getTasks(dateFrom, dateTo, "", 0, 70, "admin", true, true, true, null);
+        RestPageParameters params = new RestPageParameters(frontendState, "getTaskStates", from, to, mytasks,
+                running, pending, finished, offset, limit, taskTag);
+        Page<TaskInfo> pTaskInfo;
+        pTaskInfo = dbManager.getTasks(params.getFrom(), params.getTo(), params.getTag(),
+                params.getOffset(), params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
+                params.isFinished(), null);
         List<TaskId> lTaskId = new ArrayList<TaskId>(pTaskInfo.getList().size());
         for (TaskInfo taskInfo : pTaskInfo.getList()) {
             lTaskId.add(taskInfo.getTaskId());
         }
-        logger.warn(lTaskId);
-        return new TaskPage<TaskId>(lTaskId, pTaskInfo.getSize());
+        return new Page<TaskId>(lTaskId, pTaskInfo.getSize());
     }
 
     @Override
-    public TaskPage<TaskState> getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
-            boolean running, boolean pending, boolean finished, int offset, int limit)
+    public Page<TaskState> getTaskStates(String sessionId, String taskTag, String from, String to,
+            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
-        // TODO Auto-generated method stub
-        return null;
+        RestPageParameters params = new RestPageParameters(frontendState, "getTaskStates", from, to, mytasks,
+            running, pending, finished, offset, limit, taskTag);
+        Page<TaskState> pTasks;
+        pTasks = dbManager.getTaskStates(params.getFrom(), params.getTo(), params.getTag(), params.getOffset(),
+                params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
+                params.isFinished(), null);
+        return pTasks;
+        
     }
+    
 }

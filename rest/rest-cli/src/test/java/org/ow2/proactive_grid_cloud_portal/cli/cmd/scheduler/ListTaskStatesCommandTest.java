@@ -55,7 +55,7 @@ import org.junit.Test;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateDataPage;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 
 import objectFaker.DataFaker;
 import objectFaker.propertyGenerator.FixedPropertyGenerator;
@@ -92,7 +92,7 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest {
     @Test
     public void testCommandJobIdOnly() throws Exception {
         when(restApi.getJobTaskStates(anyString(), eq(jobId)))
-        .thenReturn(new TaskStateDataPage(taskData, taskData.size()));
+        .thenReturn(new RestPage(taskData, taskData.size()));
         executeTest(jobId);
 
         String out = capturedOutput.toString();
@@ -110,7 +110,7 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest {
     @Test
     public void testCommandJobIdTag() throws Exception {
         when(restApi.getJobTaskStatesByTag(anyString(), eq(jobId), eq(tag)))
-        .thenReturn(new TaskStateDataPage(taskDataFiltered, taskDataFiltered.size()));
+        .thenReturn(new RestPage(taskDataFiltered, taskDataFiltered.size()));
         executeTest(jobId, tag);
 
         String out = capturedOutput.toString();
@@ -128,7 +128,7 @@ public class ListTaskStatesCommandTest extends AbstractJobTagCommandTest {
     @Test
     public void testCommandJobIdUnknownTag() throws Exception {
         when(restApi.getJobTaskStatesByTag(anyString(), eq("1"), eq("unknownTag")))
-                .thenReturn(new TaskStateDataPage(new ArrayList<TaskStateData>(), 0));
+                .thenReturn(new RestPage(new ArrayList<TaskStateData>(), 0));
 
         executeTest(jobId, unknownTag);
 

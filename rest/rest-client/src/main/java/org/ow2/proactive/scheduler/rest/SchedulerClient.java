@@ -74,10 +74,10 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -931,7 +931,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+    public Page<TaskId> getTaskIds(String sessionId, String taskTag, String from, String to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         System.out.println("SchedulerClient.getTaskIds()");
@@ -939,10 +939,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public TaskPage<TaskState>  getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+    public Page<TaskState>  getTaskStates(String sessionId, String taskTag, String from, String to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
-        // TODO PARAITA
+        //  TODO PARAITA a quoi ca sert ?
         return null;
     }
 }

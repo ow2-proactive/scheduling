@@ -118,11 +118,11 @@ import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
@@ -159,13 +159,12 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdsPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateDataPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
@@ -805,7 +804,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    public TaskIdsPage getTasksNames(
+    public RestPage<String> getTasksNames(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException,
@@ -825,7 +824,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/paginated")
     @Produces("application/json")
-    public TaskIdsPage getTasksNamesPaginated(
+    public RestPage<String> getTasksNamesPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @QueryParam("offset") @DefaultValue("0") int offset,
@@ -842,7 +841,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             for (TaskState ts : page.getTaskStates()) {
                 tasksNames.add(ts.getId().getReadableName());
             }
-            return new TaskIdsPage(tasksNames, page.getSize());
+            return new RestPage<String>(tasksNames, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -868,7 +867,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/tag/{tasktag}")
     @Produces("application/json")
-    public TaskIdsPage getJobTasksIdsByTag(
+    public RestPage<String> getJobTasksIdsByTag(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag)
@@ -885,7 +884,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 tasksName.add(ts.getId().getReadableName());
             }
 
-            return new TaskIdsPage(tasksName, page.getSize());
+            return new RestPage<String>(tasksName, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -908,7 +907,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/paginated")
     @Produces("application/json")
-    public TaskIdsPage getJobTasksIdsByTagPaginated(
+    public RestPage<String> getJobTasksIdsByTagPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset,
@@ -928,7 +927,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 tasksName.add(ts.getId().getReadableName());
             }
 
-            return new TaskIdsPage(tasksName, page.getSize());
+            return new RestPage<String>(tasksName, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1027,7 +1026,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates")
     @Produces("application/json")
-    public TaskStateDataPage getJobTaskStates(
+    public RestPage getJobTaskStates(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException,
@@ -1049,7 +1048,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/paginated")
     @Produces("application/json")
-    public TaskStateDataPage getJobTaskStatesPaginated(
+    public RestPage getJobTaskStatesPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @QueryParam("offset") @DefaultValue("0") int offset,
@@ -1062,7 +1061,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTasksPaginated(offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new TaskStateDataPage(tasks, page.getSize());
+            return new RestPage(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1088,7 +1087,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}")
     @Produces("application/json")
-    public TaskStateDataPage getJobTaskStatesByTag(
+    public RestPage getJobTaskStatesByTag(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag)
@@ -1099,7 +1098,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, 0, TASKS_PAGE_SIZE);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new TaskStateDataPage(tasks, page.getSize());
+            return new RestPage(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1117,7 +1116,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
     @Produces("application/json")
-    public TaskStateDataPage getJobTaskStatesByTagPaginated(
+    public RestPage getJobTaskStatesByTagPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset,
@@ -1130,7 +1129,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new TaskStateDataPage(tasks, page.getSize());
+            return new RestPage(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -3233,26 +3232,27 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public TaskIdsPage getTaskIds(String sessionId, long from, long to, boolean mytasks, boolean running,
+    public RestPage<String> getTaskIds(String sessionId, String from, String to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         return getTaskIdsByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit);
     }
     
- // TODO PARAITA
     @Override
-    public TaskIdsPage getTaskIdsByTag(String sessionId, String taskTag, long from, long to, boolean mytasks,
+    public RestPage<String> getTaskIdsByTag(String sessionId, String taskTag, String from, String to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks");
-        TaskPage<TaskId> page = null;
+        PageBoundariesRest boundaries = getBoundaries(offset, limit);
+        Page<TaskId> page = null;
         try {
-            page = s.getTaskIds(sessionId, "", from, to, mytasks, running, pending, finished, offset, limit);
+            page = s.getTaskIds(sessionId, taskTag, from, to, mytasks, running, pending, finished,
+                    boundaries.getOffset(), boundaries.getLimit());
             ArrayList<String> taskNames = new ArrayList<String>(page.getList().size());
             for (TaskId taskId : page.getList()) {
                 taskNames.add(taskId.getReadableName());
             }
-            return new TaskIdsPage(taskNames, page.getSize());
+            return new RestPage<String>(taskNames, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -3261,19 +3261,79 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public TaskStateDataPage getTaskStates(String sessionId, long from, long to, boolean mytasks,
+    public RestPage<TaskStateData> getTaskStates(String sessionId, String from, String to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit);
     }
 
- // TODO PARAITA
     @Override
-    public TaskStateDataPage getTaskStatesByTag(String sessionId, String taskTag, long from, long to,
+    public RestPage<TaskStateData> getTaskStatesByTag(String sessionId, String taskTag, String from, String to,
             boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks/tag/" + taskTag);
-        return null;
+        PageBoundariesRest boundaries = getBoundaries(offset, limit);
+        Page<TaskState> page = null;
+        try {
+            page = s.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished, boundaries.getOffset(), boundaries.getLimit());
+            
+            List<TaskStateData> tasks = map(page.getList(), TaskStateData.class);
+            
+            /*
+            List<TaskStateData> ltsd = new ArrayList<TaskStateData>(page.getList().size());
+            for (TaskState task : page.getList()) {
+                TaskStateData tsd = new TaskStateData();
+                tsd.setName(task.getName());
+                tsd.setDescription(task.getDescription());
+                tsd.setTag(task.getTag());
+                tsd.setIterationIndex(task.getIterationIndex());
+                tsd.setReplicationIndex(task.getReplicationIndex());
+                tsd.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
+                tsd.setMaxNumberOfExecutionOnFailure(task.getMaxNumberOfExecutionOnFailure());
+                tsd.setTaskInfo((TaskInfoData) (task.getTaskInfo()));
+                tsd.setParallelEnvironment(null);
+                ltsd.add(tsd);
+                //TODO PARAITA faire un dozer.map !
+            }
+            */
+            return new RestPage<TaskStateData>(tasks, page.getSize());
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
+    }
+    
+    private PageBoundariesRest getBoundaries(int offset, int limit) {
+        
+        if (offset < 0) offset = 0;
+        if (limit < 0 || offset > limit) limit = offset + TASKS_PAGE_SIZE;
+        
+        return new PageBoundariesRest(offset, limit);
+        
     }
 
+    /*
+     * Utility class to pass REST boundaries easily.
+     */
+    private static class PageBoundariesRest {
+
+        private int offset;
+        private int limit;
+
+        public PageBoundariesRest(int offset, int limit) {
+            this.offset = offset;
+            this.limit = limit;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public int getLimit() {
+            return limit;
+        }
+
+    }
+    
 }

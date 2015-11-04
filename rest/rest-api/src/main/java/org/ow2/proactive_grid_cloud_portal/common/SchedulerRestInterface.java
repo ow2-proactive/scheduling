@@ -70,12 +70,11 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdsPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateDataPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
@@ -272,7 +271,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    TaskIdsPage getTasksNames(
+    RestPage<String> getTasksNames(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
@@ -288,7 +287,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/paginated")
     @Produces("application/json")
-    TaskIdsPage getTasksNamesPaginated(
+    RestPage<String> getTasksNamesPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @QueryParam("offset") @DefaultValue("0") int offset,
@@ -305,7 +304,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/tag/{tasktag}")
     @Produces("application/json")
-    TaskIdsPage getJobTasksIdsByTag(
+    RestPage<String> getJobTasksIdsByTag(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag)
@@ -324,7 +323,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/paginated")
     @Produces("application/json")
-    TaskIdsPage getJobTasksIdsByTagPaginated(
+    RestPage<String> getJobTasksIdsByTagPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag,
@@ -332,7 +331,6 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
-    //TODO PARAITA
     /**
      * Returns all tasks name regarding the given parameters (it is decoupled from the associated jobs).
      * @param sessionId a valid session id.
@@ -350,19 +348,18 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("tasks")
     @Produces("application/json")
-    TaskIdsPage getTaskIds(
+    RestPage<String> getTaskIds(
             @HeaderParam("sessionid") String sessionId,
-            @QueryParam("from") @DefaultValue("-1") long from,
-            @QueryParam("to") @DefaultValue("-1") long to,
-            @QueryParam("mytasks") @DefaultValue("true") boolean mytasks,
-            @QueryParam("running") @DefaultValue("false") boolean running,
-            @QueryParam("pending") @DefaultValue("false") boolean pending,
-            @QueryParam("finished") @DefaultValue("false") boolean finished,
+            @QueryParam("from") @DefaultValue("") String from,
+            @QueryParam("to") @DefaultValue("") String to,
+            @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, PermissionRestException;
     
-  //TODO PARAITA
     /**
      * Returns all tasks name regarding the given parameters (it is decoupled from the associated jobs).
      * @param sessionId a valid session id.
@@ -381,15 +378,15 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("tasks/tag/{tasktag}")
     @Produces("application/json")
-    TaskIdsPage getTaskIdsByTag(
+    RestPage<String> getTaskIdsByTag(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("tasktag") String taskTag,
-            @QueryParam("from") @DefaultValue("-1") long from,
-            @QueryParam("to") @DefaultValue("-1") long to,
-            @QueryParam("mytasks") @DefaultValue("true") boolean mytasks,
-            @QueryParam("running") @DefaultValue("false") boolean running,
-            @QueryParam("pending") @DefaultValue("false") boolean pending,
-            @QueryParam("finished") @DefaultValue("false") boolean finished,
+            @QueryParam("from") @DefaultValue("") String from,
+            @QueryParam("to") @DefaultValue("") String to,
+            @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, PermissionRestException;
@@ -455,7 +452,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates")
     @Produces("application/json")
-    TaskStateDataPage getJobTaskStates(
+    RestPage<TaskStateData> getJobTaskStates(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
@@ -472,7 +469,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/paginated")
     @Produces("application/json")
-    TaskStateDataPage getJobTaskStatesPaginated(
+    RestPage<TaskStateData> getJobTaskStatesPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @QueryParam("offset") @DefaultValue("0") int offset,
@@ -490,7 +487,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}")
     @Produces("application/json")
-    TaskStateDataPage getJobTaskStatesByTag(
+    RestPage<TaskStateData> getJobTaskStatesByTag(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag)
@@ -509,7 +506,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
     @Produces("application/json")
-    TaskStateDataPage getJobTaskStatesByTagPaginated(
+    RestPage<TaskStateData> getJobTaskStatesByTagPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag,
@@ -517,7 +514,6 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("50") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
-    // TODO PARAITA
     /**
      * Returns all <code>TaskStateData</code> regarding the given parameters (it is decoupled from the associated jobs).
      * @param sessionId a valid session id.
@@ -535,19 +531,18 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("taskstates")
     @Produces("application/json")
-    TaskStateDataPage getTaskStates (
+    RestPage<TaskStateData> getTaskStates (
             @HeaderParam("sessionid") String sessionId,
-            @QueryParam("from") @DefaultValue("-1") long from,
-            @QueryParam("to") @DefaultValue("-1") long to,
-            @QueryParam("mytasks") @DefaultValue("true") boolean mytasks,
-            @QueryParam("running") @DefaultValue("false") boolean running,
-            @QueryParam("pending") @DefaultValue("false") boolean pending,
-            @QueryParam("finished") @DefaultValue("false") boolean finished,
+            @QueryParam("from") @DefaultValue("") String from,
+            @QueryParam("to") @DefaultValue("") String to,
+            @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, PermissionRestException;
     
- // TODO PARAITA
     /**
      * Returns all <code>TaskStateData</code> regarding the given parameters (it is decoupled from the associated jobs).
      * @param sessionId a valid session id.
@@ -566,15 +561,15 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("taskstates/tag/{tasktag}")
     @Produces("application/json")
-    TaskStateDataPage getTaskStatesByTag (
+    RestPage<TaskStateData> getTaskStatesByTag (
             @HeaderParam("sessionid") String sessionId,
             @PathParam("tasktag") String taskTag,
-            @QueryParam("from") @DefaultValue("-1") long from,
-            @QueryParam("to") @DefaultValue("-1") long to,
-            @QueryParam("mytasks") @DefaultValue("true") boolean mytasks,
-            @QueryParam("running") @DefaultValue("false") boolean running,
-            @QueryParam("pending") @DefaultValue("false") boolean pending,
-            @QueryParam("finished") @DefaultValue("false") boolean finished,
+            @QueryParam("from") @DefaultValue("") String from,
+            @QueryParam("to") @DefaultValue("") String to,
+            @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, PermissionRestException;

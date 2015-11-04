@@ -103,18 +103,18 @@ public class ListJobTasksCommand extends AbstractJobTagPaginatedCommand implemen
             if (this.tag != null) {
                 if (this.limit == 0) {
                     tasks = scheduler.getJobTasksIdsByTag(currentContext.getSessionId(), jobId, tag)
-                            .getTaskIds();
+                            .getList();
                 } else {
                     tasks = scheduler.getJobTasksIdsByTagPaginated(currentContext.getSessionId(), jobId, tag,
-                            offset, limit).getTaskIds();
+                            offset, limit).getList();
                 }
             } else {
                 if (this.limit == 0) {
-                    tasks = scheduler.getTasksNames(currentContext.getSessionId(), jobId).getTaskIds();
+                    tasks = scheduler.getTasksNames(currentContext.getSessionId(), jobId).getList();
                 } else {
                     tasks = scheduler
                             .getTasksNamesPaginated(currentContext.getSessionId(), jobId, offset, limit)
-                            .getTaskIds();
+                            .getList();
                 }
             }
 

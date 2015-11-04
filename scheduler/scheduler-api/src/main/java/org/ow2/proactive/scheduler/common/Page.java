@@ -3,17 +3,17 @@ package org.ow2.proactive.scheduler.common;
 import java.io.Serializable;
 import java.util.List;
 
-public class TaskPage<T extends Serializable> implements Serializable {
+public class Page<T> implements Serializable {
     
     private int size;
 
     private List<T> list;
     
-    public TaskPage() {
+    public Page() {
 
     }
     
-    public TaskPage(List<T> list, int size) {
+    public Page(List<T> list, int size) {
         this.list = list;
         this.size = size;
     }

@@ -46,11 +46,11 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.TaskPage;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -503,7 +503,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     @Override
-    public TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+    public Page<TaskId> getTaskIds(String sessionId, String taskTag, String from, String to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         logger.warn("RestSmartProxyImpl.getTaskIds()");
@@ -511,7 +511,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     @Override
-    public TaskPage<TaskState>  getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+    public Page<TaskState>  getTaskStates(String sessionId, String taskTag, String from, String to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         return restSchedulerClient.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished, offset, limit);

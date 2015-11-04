@@ -37,6 +37,7 @@ import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
@@ -47,6 +48,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+import org.ow2.proactive.scheduler.task.TaskStateImpl;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
@@ -998,9 +1000,37 @@ public class TaskData {
         return taskInfo;
     }
     
-    TaskInfo toTaskInfo() {
+    public TaskInfo toTaskInfo() {
         JobIdImpl jobId = new JobIdImpl(getJobData().getId(), getJobData().getJobName());
         TaskInfoImpl taskInfo = createTaskInfo(jobId);
+        System.out.println("jobName=" + getJobData().getJobName());
         return taskInfo;
     }
+    
+    public TaskState toTaskState() {
+        TaskInfo taskInfo = toTaskInfo();
+        TaskStateImpl taskState = new TaskStateImpl();
+        taskState.update(taskInfo);
+        taskState.setName(getTaskName());
+        taskState.setDescription(getDescription());
+        taskState.setTag(getTag());
+        taskState.setIterationIndex(getIteration());
+        taskState.setReplicationIndex(getReplication());
+        taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
+        taskState.setParallelEnvironment(getParallelEnvironment());
+        
+        System.out.println("getName()=" + taskState.getName());
+        System.out.println("getDescription()=" + taskState.getDescription());
+        System.out.println("getTag()=" + taskState.getTag());
+        System.out.println("getIterationIndex()=" + taskState.getIterationIndex());
+        System.out.println("getReplicationIndex()=" + taskState.getReplicationIndex());
+        System.out.println("getMaxNumberOfExecution()=" + taskState.getMaxNumberOfExecution());
+        System.out.println("getMaxNumberOfExecutionOnFailure()=" + taskState.getMaxNumberOfExecutionOnFailure());
+        System.out.println("getTaskInfo()=" + taskState.getTaskInfo());
+        System.out.println("getParallelEnvironment()=" + taskState.getParallelEnvironment());
+        System.out.println("getNumberOfNodesNeeded()=" + taskState.getNumberOfNodesNeeded());        
+        return taskState;
+    }
+    
+    
 }
