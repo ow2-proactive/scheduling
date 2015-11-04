@@ -80,9 +80,9 @@ public class ProgressFileReader {
 
             return true;
         } catch (IOException e) {
-            logger.warn("Error while creating progress file. Progress will not be reported.", e);
-            return false;
+
         }
+        return true;
     }
 
     private void createProgressFile(File workingDir, String progressFileName) throws IOException {
