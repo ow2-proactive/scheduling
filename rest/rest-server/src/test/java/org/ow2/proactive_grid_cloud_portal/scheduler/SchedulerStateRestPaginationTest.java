@@ -54,7 +54,7 @@ import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdsPage;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
 
@@ -86,7 +86,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
-        TaskIdsPage page = restInterface.getTasksNamesPaginated(sessionId, jobIdStr, 0, nbTasks);
+        RestPage<String> page = restInterface.getTasksNamesPaginated(sessionId, jobIdStr, 0, nbTasks);
 
         assertTasks(nbTasks, jobIdStr, page);
         
@@ -99,7 +99,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
-        TaskIdsPage page = restInterface.getTasksNamesPaginated(sessionId, jobIdStr, 0, nbTasks);
+        RestPage<String> page = restInterface.getTasksNamesPaginated(sessionId, jobIdStr, 0, nbTasks);
 
         assertTasks(nbTasks, jobIdStr, page);
     }
@@ -112,7 +112,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
         List<TaskStateData> res = restInterface.getJobTaskStatesPaginated(sessionId, jobIdStr, 0, nbTasks)
-                .getTasks();
+                .getList();
 
         assertEquals("Number of tasks is incorrect", nbTasks, res.size());
 
@@ -126,7 +126,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
         List<TaskStateData> res = restInterface
-                .getJobTaskStatesByTagPaginated(sessionId, jobIdStr, "", 0, nbTasks).getTasks();
+                .getJobTaskStatesByTagPaginated(sessionId, jobIdStr, "", 0, nbTasks).getList();
 
         assertEquals("Number of tasks is incorrect", nbTasks, res.size());
 
@@ -156,12 +156,12 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
         return "JOB-" + jobIdStr + "-TASK-" + (i + 1) + "/" + nbTasks;
     }
     
-    private void assertTasks(final int nbTasks, String jobIdStr, TaskIdsPage page) {
+    private void assertTasks(final int nbTasks, String jobIdStr, RestPage<String> page) {
         assertEquals("Number of tasks is incorrect", nbTasks, page.getSize());
 
         for (int i = 0; i < nbTasks; i++) {
             assertEquals("Task readable name is incorrect", generateReadableName(jobIdStr, i, nbTasks),
-                    page.getTaskIds().get(i));
+                    page.getList().get(i));
         }
     }
 

@@ -37,11 +37,13 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement
-public class TaskStateData {
+public class TaskStateData implements Serializable {
 
     private String name;
     private String description;

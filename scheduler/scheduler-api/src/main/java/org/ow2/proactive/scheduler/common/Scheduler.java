@@ -929,12 +929,12 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     
     
     
-    TaskPage<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+    Page<TaskId> getTaskIds(String sessionId, String taskTag, String from, String to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException;
 
 
-    TaskPage<TaskState> getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+    Page<TaskState> getTaskStates(String sessionId, String taskTag, String from, String to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException;
 
