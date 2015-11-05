@@ -88,7 +88,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
-        RestPage<String> page = restInterface.getTaskIds(sessionId, "", "", true, true, true, true, 0, 50);
+        RestPage<String> page = restInterface.getTaskIds(sessionId, 0, 0, true, true, true, true, 0, 50);
         
         assertTasks(nbTasks, jobIdStr, page);
     }

@@ -1,20 +1,15 @@
 package org.ow2.proactive.scheduler.core;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Locale;
-
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 
 
 class RestPageParameters {
 
-    private DateFormat df;
     private SchedulerFrontendState frontEnd;
     private String calledMethod;
-    private String from;
-    private String to;
+    private long from;
+    private long to;
     private boolean myTasksOnly;
     private boolean running;
     private boolean pending;
@@ -23,10 +18,9 @@ class RestPageParameters {
     private int limit;
     private String tag;
 
-    public RestPageParameters(SchedulerFrontendState frontEnd, String calledMethod, String from, String to,
+    public RestPageParameters(SchedulerFrontendState frontEnd, String calledMethod, long from, long to,
             boolean myTasksOnly, boolean running, boolean pending, boolean finished, int offset, int limit,
             String tag) {
-        df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
         this.frontEnd = frontEnd;
         this.calledMethod = calledMethod;
         this.setFrom(from);
@@ -41,34 +35,18 @@ class RestPageParameters {
     }
 
     public long getFrom() {
-        long dateFrom = 0;
-        if (from != null && "".compareTo(from) != 0) {
-            try {
-                dateFrom = df.parse(from).getTime();
-            } catch (ParseException e) {
-                dateFrom = 0;
-            }
-        }
-        return dateFrom;
+        return from;
     }
 
-    public void setFrom(String from) {
+    public void setFrom(long from) {
         this.from = from;
     }
 
     public long getTo() {
-        long dateTo = 0;
-        if (to != null && "".compareTo(to) != 0) {
-            try {
-                dateTo = df.parse(to).getTime();
-            } catch (ParseException e) {
-                dateTo = 0;
-            }
-        }
-        return dateTo;
+        return to;
     }
 
-    public void setTo(String to) {
+    public void setTo(long to) {
         this.to = to;
     }
 

@@ -931,7 +931,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String sessionId, String taskTag, String from, String to, boolean mytasks, boolean running,
+    public Page<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         System.out.println("SchedulerClient.getTaskIds()");
@@ -939,7 +939,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Page<TaskState>  getTaskStates(String sessionId, String taskTag, String from, String to, boolean mytasks,
+    public Page<TaskState>  getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         //  TODO PARAITA a quoi ca sert ?
