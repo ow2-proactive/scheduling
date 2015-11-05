@@ -603,14 +603,14 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String sessionId, String taskTag, String from, String to, boolean mytasks, boolean running,
+    public Page<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         return uischeduler.getTaskIds(sessionId, taskTag, from, to, mytasks, running, pending, finished, offset, limit);
     }
 
     @Override
-    public Page<TaskState>  getTaskStates(String sessionId, String taskTag, String from, String to, boolean mytasks,
+    public Page<TaskState>  getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         return uischeduler.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished, offset, limit);

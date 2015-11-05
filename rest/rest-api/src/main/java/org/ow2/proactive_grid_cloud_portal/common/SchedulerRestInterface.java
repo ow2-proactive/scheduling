@@ -337,15 +337,15 @@ public interface SchedulerRestInterface {
      * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
      * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
      * 
-     * @param sessionId a valid session id.
-     * @param from the scheduled date to which we start fetching tasks. The format is MM/DD/YYY.
-     * @param to the end scheduled end date to stop fetching tasks. The format is MM/DD/YYY.
-     * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
-     * @param running fetch running tasks.
-     * @param pending fetch pending tasks.
-     * @param finished fetch finished tasks.
-     * @param offset the index of the first task to fetch (for pagination).
-     * @param limit the index of the last (excluded) task to fetch (for pagination).
+     * @param sessionId  a valid session id.
+     * @param from  the scheduled date to which we start fetching tasks. The format is in Epoch time.
+     * @param to  the end scheduled end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks  <code>True</code> if you want to fetch only the user's tasks. Default value is <code>False</code>.
+     * @param running  fetch running tasks. Default value is <code>True</code>.
+     * @param pending  fetch pending tasks. Default value is <code>True</code>.
+     * @param finished  fetch finished tasks. Default value is <code>True</code>.
+     * @param offset  the index of the first task to fetch (for pagination).
+     * @param limit  the index of the last (excluded) task to fetch (for pagination).
      * @return a list of task ids and the total number of tasks ids
      */
     @GET
@@ -354,8 +354,8 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     RestPage<String> getTaskIds(
             @HeaderParam("sessionid") String sessionId,
-            @QueryParam("from") @DefaultValue("") String from,
-            @QueryParam("to") @DefaultValue("") String to,
+            @QueryParam("from") @DefaultValue("0") long from,
+            @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
             @QueryParam("running") @DefaultValue("true") boolean running,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
@@ -369,16 +369,17 @@ public interface SchedulerRestInterface {
      * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
      * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
      * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
-     * @param sessionId a valid session id.
-     * @param taskTag tag to filter the tasks. The tag should be complete as the criteria is strict.
-     * @param from the scheduled date to which we start fetching tasks. The format is MM/DD/YYY.
-     * @param to the end scheduled end date to stop fetching tasks. The format is MM/DD/YYY.
-     * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
-     * @param running fetch running tasks.
-     * @param pending fetch pending tasks.
-     * @param finished fetch finished tasks.
-     * @param offset the index of the first task to fetch (for pagination).
-     * @param limit the index of the last (excluded) task to fetch (for pagination).
+     * 
+     * @param sessionId  a valid session id.
+     * @param taskTag  tag to filter the tasks. The tag should be complete as the criteria is strict.
+     * @param from  the scheduled date to which we start fetching tasks. The format is in Epoch time.
+     * @param to  the end scheduled end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks  <code>True</code> if you want to fetch only the user's tasks. Default value is <code>False</code>.
+     * @param running  fetch running tasks. Default value is <code>True</code>.
+     * @param pending  fetch pending tasks. Default value is <code>True</code>.
+     * @param finished  fetch finished tasks. Default value is <code>True</code>.
+     * @param offset  the index of the first task to fetch (for pagination).
+     * @param limit  the index of the last (excluded) task to fetch (for pagination).
      * @return a list of task ids and the total number of tasks ids
      */
     @GET
@@ -388,8 +389,8 @@ public interface SchedulerRestInterface {
     RestPage<String> getTaskIdsByTag(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("tasktag") String taskTag,
-            @QueryParam("from") @DefaultValue("") String from,
-            @QueryParam("to") @DefaultValue("") String to,
+            @QueryParam("from") @DefaultValue("0") long from,
+            @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
             @QueryParam("running") @DefaultValue("true") boolean running,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
@@ -526,15 +527,16 @@ public interface SchedulerRestInterface {
      * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
      * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
      * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
-     * @param sessionId a valid session id.
-     * @param from the scheduled date to which we start fetching tasks. The format is MM/DD/YYYY.
-     * @param to the end scheduled end date to stop fetching tasks. The format is MM/DD/YYYY.
-     * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
-     * @param running fetch running tasks.
-     * @param pending fetch pending tasks.
-     * @param finished fetch finished tasks.
-     * @param offset the index of the first task to fetch (for pagination).
-     * @param limit the index of the last (excluded) task to fetch (for pagination).
+     * 
+     * @param sessionId  a valid session id.
+     * @param from  the scheduled date to which we start fetching tasks. The format is in Epoch time.
+     * @param to  the end scheduled end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks  <code>True</code> if you want to fetch only the user's tasks. Default value is <code>False</code>.
+     * @param running  fetch running tasks. Default value is <code>True</code>.
+     * @param pending  fetch pending tasks. Default value is <code>True</code>.
+     * @param finished  fetch finished tasks. Default value is <code>True</code>.
+     * @param offset  the index of the first task to fetch (for pagination).
+     * @param limit  the index of the last (excluded) task to fetch (for pagination).
      * @return a list of <code>TaskStateData</code>  and the total number of them.
      */
     @GET
@@ -543,8 +545,8 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     RestPage<TaskStateData> getTaskStates (
             @HeaderParam("sessionid") String sessionId,
-            @QueryParam("from") @DefaultValue("") String from,
-            @QueryParam("to") @DefaultValue("") String to,
+            @QueryParam("from") @DefaultValue("0") long from,
+            @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
             @QueryParam("running") @DefaultValue("true") boolean running,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
@@ -558,16 +560,17 @@ public interface SchedulerRestInterface {
      * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
      * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
      * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
-     * @param sessionId a valid session id.
-     * @param taskTag tag to filter the tasks. The tag should be complete as the criteria is strict.
-     * @param from the scheduled date to which we start fetching tasks. The format is MM/DD/YYYY.
-     * @param to the end scheduled end date to stop fetching tasks. The format is MM/DD/YYYY.
+     * 
+     * @param sessionId  a valid session id.
+     * @param taskTag  tag to filter the tasks. The tag should be complete as the criteria is strict.
+     * @param from  the scheduled date to which we start fetching tasks. The format is in Epoch time.
+     * @param to  the end scheduled end date to stop fetching tasks. The format is in Epoch time.
      * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
-     * @param running fetch running tasks.
-     * @param pending fetch pending tasks.
-     * @param finished fetch finished tasks.
-     * @param offset the index of the first task to fetch (for pagination).
-     * @param limit the index of the last (excluded) task to fetch (for pagination).
+     * @param running  fetch running tasks. Default value is <code>True</code>.
+     * @param pending  fetch pending tasks. Default value is <code>True</code>.
+     * @param finished  fetch finished tasks. Default value is <code>True</code>.
+     * @param offset  the index of the first task to fetch (for pagination).
+     * @param limit  the index of the last (excluded) task to fetch (for pagination).
      * @return a list of <code>TaskStateData</code>  and the total number of them.
      */
     @GET
@@ -577,8 +580,8 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getTaskStatesByTag (
             @HeaderParam("sessionid") String sessionId,
             @PathParam("tasktag") String taskTag,
-            @QueryParam("from") @DefaultValue("") String from,
-            @QueryParam("to") @DefaultValue("") String to,
+            @QueryParam("from") @DefaultValue("0") long from,
+            @QueryParam("to") @DefaultValue("0") long to,
             @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
             @QueryParam("running") @DefaultValue("true") boolean running,
             @QueryParam("pending") @DefaultValue("true") boolean pending,

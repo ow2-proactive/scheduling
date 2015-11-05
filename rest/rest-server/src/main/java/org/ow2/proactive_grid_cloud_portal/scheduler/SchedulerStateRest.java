@@ -3232,14 +3232,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public RestPage<String> getTaskIds(String sessionId, String from, String to, boolean mytasks, boolean running,
+    public RestPage<String> getTaskIds(String sessionId, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         return getTaskIdsByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit);
     }
     
     @Override
-    public RestPage<String> getTaskIdsByTag(String sessionId, String taskTag, String from, String to, boolean mytasks,
+    public RestPage<String> getTaskIdsByTag(String sessionId, String taskTag, long from, long to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks");
@@ -3261,41 +3261,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public RestPage<TaskStateData> getTaskStates(String sessionId, String from, String to, boolean mytasks,
+    public RestPage<TaskStateData> getTaskStates(String sessionId, long from, long to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit);
     }
 
     @Override
-    public RestPage<TaskStateData> getTaskStatesByTag(String sessionId, String taskTag, String from, String to,
+    public RestPage<TaskStateData> getTaskStatesByTag(String sessionId, String taskTag, long from, long to,
             boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks/tag/" + taskTag);
         PageBoundariesRest boundaries = getBoundaries(offset, limit);
         Page<TaskState> page = null;
         try {
-            page = s.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished, boundaries.getOffset(), boundaries.getLimit());
-            
+            page = s.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished,
+                    boundaries.getOffset(), boundaries.getLimit());
             List<TaskStateData> tasks = map(page.getList(), TaskStateData.class);
-            
-            /*
-            List<TaskStateData> ltsd = new ArrayList<TaskStateData>(page.getList().size());
-            for (TaskState task : page.getList()) {
-                TaskStateData tsd = new TaskStateData();
-                tsd.setName(task.getName());
-                tsd.setDescription(task.getDescription());
-                tsd.setTag(task.getTag());
-                tsd.setIterationIndex(task.getIterationIndex());
-                tsd.setReplicationIndex(task.getReplicationIndex());
-                tsd.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
-                tsd.setMaxNumberOfExecutionOnFailure(task.getMaxNumberOfExecutionOnFailure());
-                tsd.setTaskInfo((TaskInfoData) (task.getTaskInfo()));
-                tsd.setParallelEnvironment(null);
-                ltsd.add(tsd);
-                //TODO PARAITA faire un dozer.map !
-            }
-            */
             return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
