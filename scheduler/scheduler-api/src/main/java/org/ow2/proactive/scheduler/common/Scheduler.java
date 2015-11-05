@@ -911,7 +911,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you have not enough permission to access this method.
      */
-    List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
+    Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException;
 

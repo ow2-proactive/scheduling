@@ -111,6 +111,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
@@ -286,12 +287,12 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<JobInfo> getJobs(int index, int range, JobFilterCriteria criteria,
+    public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria criteria,
             List<SortParameter<JobSortParameter>> arg3) throws NotConnectedException, PermissionException {
-        List<JobInfo> jobInfos = null;
+        Page<JobInfo> jobInfos = null;
         try {
-            List<UserJobData> userJobDataList = restApi().jobsInfo(sid, index, range);
-            jobInfos = toJobInfos(userJobDataList);
+            RestPage<UserJobData> userJobDataList = restApi().jobsInfo(sid, index, range);
+            jobInfos = new Page<JobInfo>(toJobInfos(userJobDataList.getList()), userJobDataList.getSize());
         } catch (Exception e) {
             throwNCEOrPE(e);
         }

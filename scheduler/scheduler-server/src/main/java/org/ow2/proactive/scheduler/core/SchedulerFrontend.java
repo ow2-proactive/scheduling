@@ -1010,7 +1010,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
-    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
+    public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getJobs",

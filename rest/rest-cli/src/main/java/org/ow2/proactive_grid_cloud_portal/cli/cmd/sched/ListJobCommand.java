@@ -143,7 +143,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
     private static int getNumberOfJobs(int index, int offset, ApplicationContext currentContext)
             throws NotConnectedRestException, PermissionRestException {
         return currentContext.getRestClient().getScheduler()
-                .jobs(currentContext.getSessionId(), index, offset).size();
+                .jobs(currentContext.getSessionId(), index, offset).getList().size();
     }
 
     private static Integer valueAsInt(String nameValue) {

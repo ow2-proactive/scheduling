@@ -1003,7 +1003,6 @@ public class TaskData {
     public TaskInfo toTaskInfo() {
         JobIdImpl jobId = new JobIdImpl(getJobData().getId(), getJobData().getJobName());
         TaskInfoImpl taskInfo = createTaskInfo(jobId);
-        System.out.println("jobName=" + getJobData().getJobName());
         return taskInfo;
     }
     
@@ -1018,17 +1017,6 @@ public class TaskData {
         taskState.setReplicationIndex(getReplication());
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
         taskState.setParallelEnvironment(getParallelEnvironment());
-        
-        System.out.println("getName()=" + taskState.getName());
-        System.out.println("getDescription()=" + taskState.getDescription());
-        System.out.println("getTag()=" + taskState.getTag());
-        System.out.println("getIterationIndex()=" + taskState.getIterationIndex());
-        System.out.println("getReplicationIndex()=" + taskState.getReplicationIndex());
-        System.out.println("getMaxNumberOfExecution()=" + taskState.getMaxNumberOfExecution());
-        System.out.println("getMaxNumberOfExecutionOnFailure()=" + taskState.getMaxNumberOfExecutionOnFailure());
-        System.out.println("getTaskInfo()=" + taskState.getTaskInfo());
-        System.out.println("getParallelEnvironment()=" + taskState.getParallelEnvironment());
-        System.out.println("getNumberOfNodesNeeded()=" + taskState.getNumberOfNodesNeeded());        
         return taskState;
     }
     
