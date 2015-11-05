@@ -1,5 +1,22 @@
 package org.ow2.proactive.scheduler.smartproxy.common;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.base.Throwables.propagateIfInstanceOf;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PAUSED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_FINISHED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_RUNNING;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RESUMED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RUNNING_TO_FINISHED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.KILLED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.RESUMED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTDOWN;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTTING_DOWN;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.STOPPED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PENDING_TO_RUNNING;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PROGRESS;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_RUNNING_TO_FINISHED;
+
 import java.io.File;
 import java.security.KeyException;
 import java.text.SimpleDateFormat;
@@ -16,11 +33,13 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -53,25 +72,8 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import com.google.common.net.UrlEscapers;
-import org.apache.log4j.Logger;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.base.Throwables.propagate;
-import static com.google.common.base.Throwables.propagateIfInstanceOf;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PAUSED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_FINISHED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_RUNNING;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RESUMED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RUNNING_TO_FINISHED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.KILLED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.RESUMED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTDOWN;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTTING_DOWN;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.STOPPED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PENDING_TO_RUNNING;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PROGRESS;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_RUNNING_TO_FINISHED;
+import com.google.common.net.UrlEscapers;
 
 /**
  * Asbtract implementation of smart proxy that factorizes code used by all smart proxy implementations.
@@ -729,7 +731,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
+    public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         return getScheduler().getJobs(offset, limit, filterCriteria, sortParameters);
     }
 

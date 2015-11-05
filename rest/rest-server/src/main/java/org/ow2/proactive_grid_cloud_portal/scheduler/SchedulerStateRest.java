@@ -244,7 +244,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs")
     @Produces("application/json")
-    public List<String> jobs(
+    public RestPage<String> jobs(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
             @QueryParam("range") @DefaultValue("-1") int range)
@@ -252,14 +252,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs");
 
-            List<JobInfo> jobs = s.getJobs(index, range, new JobFilterCriteria(false, true, true, true),
+            Page<JobInfo> page = s.getJobs(index, range, new JobFilterCriteria(false, true, true, true),
                     DEFAULT_JOB_SORT_PARAMS);
-            List<String> ids = new ArrayList<>(jobs.size());
-            for (JobInfo jobInfo : jobs) {
+
+            List<String> ids = new ArrayList<String>(page.getList().size());
+            for (JobInfo jobInfo : page.getList()) {
                 ids.add(jobInfo.getJobId().value());
             }
-
-            return ids;
+            return new RestPage<String>(ids, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -300,7 +300,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobsinfo")
     @Produces({ "application/json", "application/xml" })
-    public List<UserJobData> jobsInfo(
+    public RestPage<UserJobData> jobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
             @QueryParam("range") @DefaultValue("-1") int range)
@@ -308,14 +308,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
 
-            List<JobInfo> jobInfoList = s.getJobs(index, range,
+            Page<JobInfo> page = s.getJobs(index, range,
                     new JobFilterCriteria(false, true, true, true), DEFAULT_JOB_SORT_PARAMS);
-            List<UserJobData> userJobInfoList = new ArrayList<>(jobInfoList.size());
-            for (JobInfo jobInfo : jobInfoList) {
+            List<UserJobData> userJobInfoList = new ArrayList<UserJobData>(page.getList().size());
+            for (JobInfo jobInfo : page.getList()) {
                 userJobInfoList.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
 
-            return userJobInfoList;
+            return new RestPage<>(userJobInfoList, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -368,7 +368,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             boolean onlyUserJobs = (myJobs && user != null && user.trim().length() > 0);
 
             List<JobInfo> jobsInfo = s.getJobs(index, range,
-                    new JobFilterCriteria(onlyUserJobs, pending, running, finished), DEFAULT_JOB_SORT_PARAMS);
+                    new JobFilterCriteria(onlyUserJobs, pending, running, finished), DEFAULT_JOB_SORT_PARAMS)
+                    .getList();
             List<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
             for (JobInfo jobInfo : jobsInfo) {
                 jobs.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));

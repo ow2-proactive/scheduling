@@ -82,24 +82,24 @@ public class SchedulerDBManager {
 
     private static final Logger debugLogger = Logger.getLogger(SchedulerDBManager.class);
 
-    private static final Set<JobStatus> FINISHED_JOB_STATUSES =
+    protected static final Set<JobStatus> FINISHED_JOB_STATUSES =
             ImmutableSet.of(
                     JobStatus.CANCELED,
                     JobStatus.FAILED,
                     JobStatus.KILLED,
                     JobStatus.FINISHED);
 
-    private static final Set<JobStatus> PENDING_JOB_STATUSES =
+    protected static final Set<JobStatus> PENDING_JOB_STATUSES =
             ImmutableSet.of(
                     JobStatus.PENDING);
 
-    private static final Set<JobStatus> RUNNING_JOB_STATUSES =
+    protected static final Set<JobStatus> RUNNING_JOB_STATUSES =
             ImmutableSet.of(
                     JobStatus.PAUSED,
                     JobStatus.STALLED,
                     JobStatus.RUNNING);
 
-    private static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES =
+    protected static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES =
             ImmutableSet.copyOf(
                     Iterables.concat(
                         RUNNING_JOB_STATUSES,
@@ -171,15 +171,18 @@ public class SchedulerDBManager {
 
     }
 
-    public List<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
+    public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
             final boolean running, final boolean finished,
             final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
-            return Collections.emptyList();
+            return new Page<JobInfo>(new ArrayList<JobInfo>(), 0);
         }
 
-        return runWithoutTransaction(new SessionWork<List<JobInfo>>() {
+        DBJobDataParameters params = new DBJobDataParameters(offset, limit, user, pending, running, finished, sortParameters);
+        int totalNbJobs = getTotalNumberOfJobs(params);
+        final Set<JobStatus> jobStatuses = params.getStatuses();
+        List<JobInfo> lJobs = runWithoutTransaction(new SessionWork<List<JobInfo>>() {
             @Override
             @SuppressWarnings("unchecked")
             public List<JobInfo> executeWork(Session session) {
@@ -195,17 +198,7 @@ public class SchedulerDBManager {
                 }
                 boolean allJobs = pending && running && finished;
                 if (!allJobs) {
-                    Set<JobStatus> status = new HashSet<>();
-                    if (pending) {
-                        status.addAll(PENDING_JOB_STATUSES);
-                    }
-                    if (running) {
-                        status.addAll(RUNNING_JOB_STATUSES);
-                    }
-                    if (finished) {
-                        status.addAll(FINISHED_JOB_STATUSES);
-                    }
-                    criteria.add(Restrictions.in("status", status.toArray(new JobStatus[status.size()])));
+                    criteria.add(Restrictions.in("status", jobStatuses));
                 }
 
                 criteria.add(Restrictions.eq("removedTime", -1L));
@@ -248,70 +241,21 @@ public class SchedulerDBManager {
             }
 
         });
+        
+        return new Page(lJobs, totalNbJobs);
     }
+    
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag,
             final int offset, final int limit,
             final String user, final boolean pending, final boolean running,
             final boolean finished, final List<SortParameter<TaskSortParameter>> sortParameters) {
 
-        int totalNbTasks = getTotalNumberOfTasks(from, to, tag, user, pending, running, finished);
-        final List<TaskStatus> lStatuses = includedStatuses(pending, running, finished);
-        List<TaskState> lTasks=  runWithoutTransaction(new SessionWork<List<TaskState>>() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public List<TaskState> executeWork(Session session) {
-                Criteria criteria = session.createCriteria(TaskData.class);
-                
-                if (limit > 0)
-                    criteria.setMaxResults(limit);
-                if (offset >= 0)
-                    criteria.setFirstResult(offset);
-                if (sortParameters != null) {
-                    Order sortOrder;
-                    for (SortParameter<TaskSortParameter> param : sortParameters) {
-                        switch (param.getParameter()) {
-                            case ID:
-                                sortOrder = configureSortOrderTask(param, Property.forName("id"));
-                                break;
-                            case NAME:
-                                sortOrder = configureSortOrderTask(param, Property.forName("name"));
-                                break;
-                            default:
-                                throw new IllegalArgumentException("Unsupported sort parameter: " +
-                                        param.getParameter());
-                        }
-                        criteria.addOrder(sortOrder);
-                    }
-                }
-                
-                if (user != null && "".compareTo(user) != 0) {
-                    criteria.createAlias("jobData", "job").add(Restrictions.eq("job.owner", user));
-                }
-                
-                if (from != 0 && to != 0) {
-                    criteria.add(Restrictions.ge("startTime", from));
-                    criteria.add(Restrictions.le("finishedTime", to));
-                }
-                
-                if (!lStatuses.isEmpty()) {
-                    criteria.add(Restrictions.in("taskStatus", lStatuses));
-                }
-                
-                if (tag != null && "".compareTo(tag) != 0) {
-                    criteria.add(Restrictions.eq("tag", tag));
-                }
-                
-                List<TaskData> tasksList = criteria.list();
-                List<TaskState> result = new ArrayList<TaskState>(tasksList.size());
-                for (TaskData taskData : tasksList) {
-                    result.add(taskData.toTaskState());
-                }
-                
-                return result;
-            }
-        });
+        DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
+            pending, running, finished, sortParameters);
+        int totalNbTasks = getTotalNumberOfTasks(parameters);
+        List<TaskState> lTasks = runWithoutTransaction(TaskDBUtils.taskStateSessionWork(parameters));
+        
         return new Page<TaskState>(lTasks, totalNbTasks);
     }
     
@@ -320,84 +264,31 @@ public class SchedulerDBManager {
             final String user, final boolean pending, final boolean running,
             final boolean finished, final List<SortParameter<TaskSortParameter>> sortParameters) {
 
-        int totalNbTasks = getTotalNumberOfTasks(from, to, tag, user, pending, running, finished);
-        final List<TaskStatus> lStatuses = includedStatuses(pending, running, finished);
-        List<TaskInfo> lTaskInfo =  runWithoutTransaction(new SessionWork<List<TaskInfo>>() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public List<TaskInfo> executeWork(Session session) {
-                Criteria criteria = session.createCriteria(TaskData.class);
-                
-                if (limit > 0)
-                    criteria.setMaxResults(limit);
-                if (offset >= 0)
-                    criteria.setFirstResult(offset);
-                if (sortParameters != null) {
-                    Order sortOrder;
-                    for (SortParameter<TaskSortParameter> param : sortParameters) {
-                        switch (param.getParameter()) {
-                            case ID:
-                                sortOrder = configureSortOrderTask(param, Property.forName("id"));
-                                break;
-                            case NAME:
-                                sortOrder = configureSortOrderTask(param, Property.forName("name"));
-                                break;
-                            default:
-                                throw new IllegalArgumentException("Unsupported sort parameter: " +
-                                        param.getParameter());
-                        }
-                        criteria.addOrder(sortOrder);
-                    }
-                }
-                
-                if (user != null && "".compareTo(user) != 0) {
-                    criteria.createAlias("jobData", "job").add(Restrictions.eq("job.owner", user));
-                }
-                
-                if (from != 0 && to != 0) {
-                    criteria.add(Restrictions.ge("startTime", from));
-                    criteria.add(Restrictions.le("finishedTime", to));
-                }
-                
-                if (!lStatuses.isEmpty()) {
-                    criteria.add(Restrictions.in("taskStatus", lStatuses));
-                }
-                
-                if (tag != null && "".compareTo(tag) != 0) {
-                    criteria.add(Restrictions.eq("tag", tag));
-                }
-                
-                
-                List<TaskData> tasksList = criteria.list();
-                List<TaskInfo> result = new ArrayList<TaskInfo>(tasksList.size());
-                for (TaskData taskData : tasksList) {
-                    result.add(taskData.toTaskInfo());
-                }                
-                return result;
-            }
-        });
+        DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
+                pending, running, finished, sortParameters);
+        int totalNbTasks = getTotalNumberOfTasks(parameters);
+        List<TaskInfo> lTaskInfo =  runWithoutTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
+        
         return new Page<TaskInfo>(lTaskInfo, totalNbTasks);
     }
     
-    private int getTotalNumberOfTasks(final long from, final long to, final String tag, final String user,
-            final boolean pending, final boolean running, final boolean finished) {
+    private int getTotalNumberOfTasks(final DBTaskDataParameters params) {
 
         return runWithoutTransaction(new SessionWork<Integer>() {
 
             @Override
             public Integer executeWork(Session session) {
 
-                List<TaskStatus> lStatuses = includedStatuses(pending, running, finished);
+                List<TaskStatus> lStatuses = params.getStatuses();
 
                 if (lStatuses.isEmpty()) {
                     return 0;
                 } else {
 
-                    boolean hasUser = user != null && "".compareTo(user) != 0;
-                    boolean hasTag = tag != null && "".compareTo(tag) != 0;
-                    boolean hasDateFrom = from != 0;
-                    boolean hasDateTo = to != 0;
+                    boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
+                    boolean hasTag = params.getTag() != null && "".compareTo(params.getTag()) != 0;
+                    boolean hasDateFrom = params.getFrom() != 0;
+                    boolean hasDateTo = params.getTo() != 0;
 
                     StringBuilder queryString = new StringBuilder(
                         "select count(*) from TaskData T where T.jobData.removedTime = -1 ");
@@ -419,15 +310,15 @@ public class SchedulerDBManager {
                     Query query = session.createQuery(queryString.toString());
                     query.setParameterList("taskStatus", lStatuses);
                     if (hasUser) {
-                        query.setParameter("user", user);
+                        query.setParameter("user", params.getUser());
                     }
 
                     if (hasDateFrom)
-                        query.setParameter("dateFrom", from);
+                        query.setParameter("dateFrom", params.getFrom());
                     if (hasDateTo)
-                        query.setParameter("dateTo", to);
+                        query.setParameter("dateTo", params.getTo());
                     if (hasTag)
-                        query.setParameter("taskTag", tag);
+                        query.setParameter("taskTag", params.getTag());
                     Long count = (Long) query.uniqueResult();
                     
                     return count.intValue();
@@ -436,45 +327,44 @@ public class SchedulerDBManager {
         });
     }
     
-    private List<TaskStatus> includedStatuses(final boolean pending, final boolean running,
-            final boolean finished) {
+    private int getTotalNumberOfJobs(final DBJobDataParameters params) {
 
-        List<TaskStatus> lStatuses = new ArrayList<TaskStatus>();
+        return runWithoutTransaction(new SessionWork<Integer>() {
 
-        if (pending) {
-            lStatuses.add(TaskStatus.SUBMITTED);
-            lStatuses.add(TaskStatus.PENDING);
-            lStatuses.add(TaskStatus.NOT_STARTED);
-        }
+            @Override
+            public Integer executeWork(Session session) {
 
-        if (running) {
-            lStatuses.add(TaskStatus.PAUSED);
-            lStatuses.add(TaskStatus.RUNNING);
-            lStatuses.add(TaskStatus.WAITING_ON_ERROR);
-            lStatuses.add(TaskStatus.WAITING_ON_FAILURE);
-        }
+                Set<JobStatus> statuses = params.getStatuses();
 
-        if (finished) {
-            lStatuses.add(TaskStatus.FAILED);
-            lStatuses.add(TaskStatus.NOT_RESTARTED);
-            lStatuses.add(TaskStatus.ABORTED);
-            lStatuses.add(TaskStatus.FAULTY);
-            lStatuses.add(TaskStatus.FINISHED);
-            lStatuses.add(TaskStatus.SKIPPED);
-        }
+                if (statuses.isEmpty()) {
+                    return 0;
+                } else {
 
-        return lStatuses;
+                    boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
+
+                    StringBuilder queryString = new StringBuilder(
+                        "select count(*) from JobData where removedTime = -1 ");
+
+                    if (hasUser)
+                        queryString.append("and owner = :user ");
+
+                    queryString.append("and status in (:taskStatus) ");
+
+                    Query query = session.createQuery(queryString.toString());
+                    query.setParameterList("taskStatus", statuses);
+                    if (hasUser) {
+                        query.setParameter("user", params.getUser());
+                    }
+
+                    Long count = (Long) query.uniqueResult();
+                    
+                    return count.intValue();
+                }
+            }
+        });
     }
     
     private Order configureSortOrder(SortParameter<JobSortParameter> param, Property property) {
-        if (param.getSortOrder().isAscending()) {
-            return property.asc();
-        } else {
-            return property.desc();
-        }
-    }
-
-    private Order configureSortOrderTask(SortParameter<TaskSortParameter> param, Property property) {
         if (param.getSortOrder().isAscending()) {
             return property.asc();
         } else {

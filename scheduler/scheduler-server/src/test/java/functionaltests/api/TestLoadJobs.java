@@ -1,5 +1,8 @@
 package functionaltests.api;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -7,6 +10,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Level;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -27,17 +33,13 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.FileLock;
+
 import com.google.common.collect.ImmutableList;
+
 import functionaltests.monitor.MonitorEventReceiver;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestUsers;
-import org.apache.log4j.Level;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -59,7 +61,7 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
-        List<JobInfo> jobs = scheduler.getJobs(0, 1000, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        List<JobInfo> jobs = scheduler.getJobs(0, 1000, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
 
         for (JobInfo job : jobs) {
             scheduler.removeJob(job.getJobId());
@@ -69,7 +71,7 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
     @Test
     public void testLoadNoJob() throws Exception {
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
-        List<JobInfo> jobs = scheduler.getJobs(0, 0, criteria(true, true, true, true), null);
+        List<JobInfo> jobs = scheduler.getJobs(0, 0, criteria(true, true, true, true), null).getList();
         assertTrue(jobs.isEmpty());
     }
 
@@ -86,13 +88,13 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         logger.info("File lock location is " + fileLockPath);
 
         JobInfo job;
-        List<JobInfo> jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        List<JobInfo> jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs);
 
         JobId firstJob = scheduler.submit(createJob(fileLockPath));
         schedulerHelper.waitForEventTaskRunning(firstJob, "Test");
 
-        jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, firstJob);
         job = jobs.get(0);
 
@@ -115,22 +117,22 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         JobId secondJob = scheduler.submit(createJob(fileLockPath));
         JobId thirdJob = scheduler.submit(createJob(fileLockPath));
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs);
 
-        jobs = scheduler.getJobs(1, 10, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(1, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, secondJob, thirdJob);
 
-        jobs = scheduler.getJobs(1, 1, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(1, 1, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, secondJob);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, firstJob, secondJob, thirdJob);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, firstJob, secondJob, thirdJob);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_DESC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_DESC).getList();
         checkJobs(jobs, thirdJob, secondJob, firstJob);
 
         fileLock.unlock();
@@ -139,10 +141,10 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
             schedulerHelper.waitForEventJobFinished(jobInfo.getJobId(), 30000);
         }
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, false), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, false), SORT_BY_ID_ASC).getList();
         checkJobs(jobs);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, firstJob, secondJob, thirdJob);
 
         scheduler.disconnect();
@@ -161,10 +163,10 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         SchedulerState state = scheduler.addEventListener(eventReceiver, true, true);
         monitorsHandler.init(state);
 
-        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, firstJob, secondJob, thirdJob);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs);
 
         fileLockPath = fileLock.lock().toString();
@@ -172,37 +174,37 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         JobId fourthJob = scheduler.submit(createJob(fileLockPath));
         monitorsHandler.waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING, fourthJob, "Test", 30000);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, fourthJob);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs);
 
-        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, firstJob, secondJob, thirdJob, fourthJob);
 
-        jobs = scheduler.getJobs(2, 10, criteria(false, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(2, 10, criteria(false, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, thirdJob, fourthJob);
 
         fileLock.unlock();
         monitorsHandler.waitForFinishedJob(fourthJob, 30000);
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, fourthJob);
 
-        jobs = scheduler.getJobs(0, 10, criteria(false, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(false, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, firstJob, secondJob, thirdJob, fourthJob);
 
-        jobs = scheduler.getJobs(1, 1, criteria(false, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(1, 1, criteria(false, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, secondJob);
 
-        jobs = scheduler.getJobs(1, 2, criteria(false, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(1, 2, criteria(false, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, secondJob, thirdJob);
 
-        jobs = scheduler.getJobs(2, 1, criteria(false, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(2, 1, criteria(false, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, thirdJob);
 
-        jobs = scheduler.getJobs(2, 2, criteria(false, false, false, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(2, 2, criteria(false, false, false, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, thirdJob, fourthJob);
 
         scheduler.disconnect();
@@ -219,10 +221,10 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
         JobId myjob = scheduler.submit(createJob(fileLockPath));
 
-        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, myjob);
 
-        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), SORT_BY_ID_ASC);
+        jobs = scheduler.getJobs(0, 10, criteria(false, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs, myjob);
 
         scheduler.disconnect();
