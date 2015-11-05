@@ -332,11 +332,15 @@ public interface SchedulerRestInterface {
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
-     * Returns all tasks name regarding the given parameters (it is decoupled from the associated jobs).
+     * Returns all tasks name regarding the given parameters (decoupled from the associated jobs).
+     * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
+     * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
+     * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
+     * 
      * @param sessionId a valid session id.
-     * @param from the starting scheduled date to which we start fetching tasks.
-     * @param to the end scheduled end date to stop fetching tasks.
-     * @param mytasks fetch only the user tasks.
+     * @param from the scheduled date to which we start fetching tasks. The format is MM/DD/YYY.
+     * @param to the end scheduled end date to stop fetching tasks. The format is MM/DD/YYY.
+     * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
      * @param running fetch running tasks.
      * @param pending fetch pending tasks.
      * @param finished fetch finished tasks.
@@ -361,12 +365,15 @@ public interface SchedulerRestInterface {
                     throws NotConnectedRestException, PermissionRestException;
     
     /**
-     * Returns all tasks name regarding the given parameters (it is decoupled from the associated jobs).
+     * Returns all tasks name regarding the given parameters (decoupled from the associated jobs).
+     * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
+     * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
+     * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
      * @param sessionId a valid session id.
-     * @param tag to filter the tasks.
-     * @param from the starting scheduled date to which we start fetching tasks.
-     * @param to the end scheduled end date to stop fetching tasks.
-     * @param mytasks fetch only the user tasks.
+     * @param taskTag tag to filter the tasks. The tag should be complete as the criteria is strict.
+     * @param from the scheduled date to which we start fetching tasks. The format is MM/DD/YYY.
+     * @param to the end scheduled end date to stop fetching tasks. The format is MM/DD/YYY.
+     * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
      * @param running fetch running tasks.
      * @param pending fetch pending tasks.
      * @param finished fetch finished tasks.
@@ -515,17 +522,20 @@ public interface SchedulerRestInterface {
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
-     * Returns all <code>TaskStateData</code> regarding the given parameters (it is decoupled from the associated jobs).
+     * Returns a paginated list of <code>TaskStateData</code> regarding the given parameters (decoupled from the associated jobs).
+     * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
+     * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
+     * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
      * @param sessionId a valid session id.
-     * @param from the starting scheduled date to which we start fetching tasks.
-     * @param to the end scheduled end date to stop fetching tasks.
-     * @param mytasks fetch only the user tasks.
+     * @param from the scheduled date to which we start fetching tasks. The format is MM/DD/YYYY.
+     * @param to the end scheduled end date to stop fetching tasks. The format is MM/DD/YYYY.
+     * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
      * @param running fetch running tasks.
      * @param pending fetch pending tasks.
      * @param finished fetch finished tasks.
      * @param offset the index of the first task to fetch (for pagination).
      * @param limit the index of the last (excluded) task to fetch (for pagination).
-     * @return a list of <code>TaskStateData</code>  and the total number of them
+     * @return a list of <code>TaskStateData</code>  and the total number of them.
      */
     @GET
     @GZIP
@@ -544,18 +554,21 @@ public interface SchedulerRestInterface {
                     throws NotConnectedRestException, PermissionRestException;
     
     /**
-     * Returns all <code>TaskStateData</code> regarding the given parameters (it is decoupled from the associated jobs).
+     * Returns a paginated list of <code>TaskStateData</code> regarding the given parameters (decoupled from the associated jobs).
+     * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
+     * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
+     * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
      * @param sessionId a valid session id.
-     * @param tag to filter the tasks.
-     * @param from the starting scheduled date to which we start fetching tasks.
-     * @param to the end scheduled end date to stop fetching tasks.
-     * @param mytasks fetch only the user tasks.
+     * @param taskTag tag to filter the tasks. The tag should be complete as the criteria is strict.
+     * @param from the scheduled date to which we start fetching tasks. The format is MM/DD/YYYY.
+     * @param to the end scheduled end date to stop fetching tasks. The format is MM/DD/YYYY.
+     * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
      * @param running fetch running tasks.
      * @param pending fetch pending tasks.
      * @param finished fetch finished tasks.
      * @param offset the index of the first task to fetch (for pagination).
      * @param limit the index of the last (excluded) task to fetch (for pagination).
-     * @return a list of <code>TaskStateData</code>  and the total number of them
+     * @return a list of <code>TaskStateData</code>  and the total number of them.
      */
     @GET
     @GZIP
