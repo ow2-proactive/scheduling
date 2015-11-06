@@ -1,13 +1,5 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.IOException;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
@@ -20,16 +12,28 @@ import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.utils.Tools;
 
+import java.io.IOException;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class LocalInfrastructure extends InfrastructureManager {
+
+    public static final int DEFAULT_NODE_NUMBER = Math.max(2, Runtime.getRuntime().availableProcessors() - 1);
+    public static final int DEFAULT_TIMEOUT = 30000;
 
     @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true)
     private Credentials credentials;
     @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")
-    private int maxNodes = 4;
+    private int maxNodes = DEFAULT_NODE_NUMBER;
+    // number of nodes which can still be acquired
     private AtomicInteger atomicMaxNodes;
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
-    private int nodeTimeout = 10000;
+    private int nodeTimeout = DEFAULT_TIMEOUT;
     @Configurable(description = "Additional ProActive properties")
     private String paProperties = "";
 
