@@ -91,7 +91,7 @@ public class RMTHelper {
     /**
      * Number of nodes deployed with default deployment descriptor
      */
-    private static final int DEFAULT_NODES_NUMBER = 2;
+    public static final int DEFAULT_NODES_NUMBER = 2;
 
     private final static ProActiveSetup setup = new ProActiveSetup();
 
@@ -177,6 +177,7 @@ public class RMTHelper {
     }
 
     /** Wait for the node source to be created and the nodes to be connected */
+    @Deprecated
     public void waitForNodeSourceCreation(String name, int nodeNumber) {
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, name);
         for (int i = 0; i < nodeNumber; i++) {
