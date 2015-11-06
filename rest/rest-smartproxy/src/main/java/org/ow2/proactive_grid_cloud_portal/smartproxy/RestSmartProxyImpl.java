@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -503,17 +504,23 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
-        return restSchedulerClient.getTaskIds(sessionId, taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+        return restSchedulerClient.getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
     }
 
     @Override
-    public Page<TaskState>  getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+    public Page<TaskState>  getTaskStates(String taskTag, long from, long to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
-        return restSchedulerClient.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+        return restSchedulerClient.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+    }
+
+    @Override
+    public JobInfo getJobInfo(String jobId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        return restSchedulerClient.getJobInfo(jobId);
     }
 
 }

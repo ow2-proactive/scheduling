@@ -315,7 +315,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 userJobInfoList.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
 
-            return new RestPage<>(userJobInfoList, page.getSize());
+            return new RestPage<UserJobData>(userJobInfoList, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -556,6 +556,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobInfoData jobInfo(String sessionId, String jobId)
+            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
+        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/info");
+        JobInfoData job = null;
+        try {
+            job = mapper.map(s.getJobState(jobId).getJobInfo(), JobInfoData.class);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
+        return job;
     }
 
     /**
@@ -3247,7 +3267,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         PageBoundariesRest boundaries = getBoundaries(offset, limit);
         Page<TaskId> page = null;
         try {
-            page = s.getTaskIds(sessionId, taskTag, from, to, mytasks, running, pending, finished,
+            page = s.getTaskIds(taskTag, from, to, mytasks, running, pending, finished,
                     boundaries.getOffset(), boundaries.getLimit());
             ArrayList<String> taskNames = new ArrayList<String>(page.getList().size());
             for (TaskId taskId : page.getList()) {
@@ -3276,7 +3296,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         PageBoundariesRest boundaries = getBoundaries(offset, limit);
         Page<TaskState> page = null;
         try {
-            page = s.getTaskStates(sessionId, taskTag, from, to, mytasks, running, pending, finished,
+            page = s.getTaskStates(taskTag, from, to, mytasks, running, pending, finished,
                     boundaries.getOffset(), boundaries.getLimit());
             List<TaskStateData> tasks = map(page.getList(), TaskStateData.class);
             return new RestPage<TaskStateData>(tasks, page.getSize());

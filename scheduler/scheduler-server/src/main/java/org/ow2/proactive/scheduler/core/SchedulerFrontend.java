@@ -1125,10 +1125,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
     
     @Override
-    public Page<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks,
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
-        RestPageParameters params = new RestPageParameters(frontendState, "getTaskStates", from, to, mytasks,
+        RestPageParameters params = new RestPageParameters(frontendState, "getTaskIds", from, to, mytasks,
                 running, pending, finished, offset, limit, taskTag);
         Page<TaskInfo> pTaskInfo;
         pTaskInfo = dbManager.getTasks(params.getFrom(), params.getTo(), params.getTag(),
@@ -1142,7 +1142,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
-    public Page<TaskState> getTaskStates(String sessionId, String taskTag, long from, long to,
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to,
             boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         RestPageParameters params = new RestPageParameters(frontendState, "getTaskStates", from, to, mytasks,
@@ -1153,6 +1153,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 params.isFinished(), null);
         return pTasks;
         
+    }
+
+    @Override
+    public JobInfo getJobInfo(String jobId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        return getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
     }
     
 }

@@ -928,14 +928,56 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     
     
     
-    
-    Page<TaskId> getTaskIds(String sessionId, String taskTag, long from, long to, boolean mytasks, boolean running,
+    /**
+     * Retrieve a tasks names list from the scheduler.
+     * 
+     * @param sessionId  a valid session id
+     * @param taskTag  a complete tag to use to filter tasks
+     * @param from  the starting date to fetch tasks from. The format is in Epoch time.
+     * @param to  the end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks  <code>True</code> will only fetch the user tasks, <code>False</code> will fetch everyones.
+     * @param running  fetch the running tasks.
+     * @param pending  fetch the pending tasks.
+     * @param finished  fetch the finished tasks.
+     * @param offset  the starting task to include in the paginated list.
+     * @param limit  the last task (not included) before stopping fetching tasks in the paginated list.
+     * @return  the paginated list of tasks names satisfying the given criterias. The total number of tasks (without pagination() is also returned.
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException;
 
-
-    Page<TaskState> getTaskStates(String sessionId, String taskTag, long from, long to, boolean mytasks,
+    /**
+     * Retrieve a taskstates list from the scheduler.
+     * 
+     * @param sessionId  a valid session id
+     * @param taskTag  a complete tag to use to filter tasks
+     * @param from  the starting date to fetch tasks from. The format is in Epoch time.
+     * @param to  the end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks  <code>True</code> will only fetch the user tasks, <code>False</code> will fetch everyones.
+     * @param running  fetch the running tasks.
+     * @param pending  fetch the pending tasks.
+     * @param finished  fetch the finished tasks.
+     * @param offset  the starting task to include in the paginated list.
+     * @param limit  the last task (not included) before stopping fetching tasks in the paginated list.
+     * @return  the paginated list of taskstates satisfying the given criterias. The total number of tasks (without pagination() is also returned.
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException;
 
+    /**
+     * Retrieve a job info by it id.
+     * 
+     * @param jobId  the id of the job we want to fetch info.
+     * @return the <code>JobInfo</code> associated to the given id
+     * @throws UnknownJobException
+     * @throws NotConnectedException
+     * @throws PermissionException
+     */
+    JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException;
 }

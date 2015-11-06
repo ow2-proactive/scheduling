@@ -66,6 +66,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
@@ -190,13 +191,28 @@ public interface SchedulerRestInterface {
      */
     @GET
     @GZIP
-    @Path("jobs/{jobid}/result")
+    @Path("jobs/{jobid}/info")
     @Produces("application/json")
     JobResultData jobResult(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
-
+    
+    /**
+     * Returns the job info associated to the job referenced by the 
+     * id <code>jobid</code>
+     * @param sessionId  a valid session id
+     * @return  the job info of the corresponding job
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/info")
+    @Produces("application/json")
+    JobInfoData jobInfo(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+    
     /**
      * Returns all the task results of this job as a map whose the key is the
      * name of the task and its task result.<br>

@@ -51,6 +51,15 @@ public class JobInfoData {
     private int numberOfFinishedTasks;
     private JobPriorityData priority;
     private String jobOwner;
+    private boolean toBeRemoved = false;
+    
+    public void setToBeRemoved() {
+        toBeRemoved = true;
+    }
+    
+    public boolean isToBeRemoved() {
+        return toBeRemoved;
+    }
 
     public long getRemovedTime() {
         return removedTime;
