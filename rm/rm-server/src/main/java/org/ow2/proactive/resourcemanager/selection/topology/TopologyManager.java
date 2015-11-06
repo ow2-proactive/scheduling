@@ -103,7 +103,7 @@ public class TopologyManager {
             throw new TopologyDisabledException("Topology is disabled");
         }
         if (topologyDescriptor instanceof BestProximityDescriptor || topologyDescriptor instanceof ThresholdProximityDescriptor) {
-            if (!PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.isSet() || !PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
+            if (!PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
                 throw new TopologyDisabledException("Topology distance is disabled, cannot use distance-based descriptors");
             }
         }
