@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 import java.util.Collection;
@@ -60,7 +61,9 @@ public class LocalSelectionTest extends RMFunctionalTest {
     private static final int NODE_NUMBER = 4;
 
     private void getNodesAndReleaseThem(int number, TopologyDescriptor descriptor, int expectedReceived, int expectedExtraNodesSize) {
-        NodeSet ns = resourceManager.getAtMostNodes(number, descriptor, null, null);
+        Criteria c = new Criteria(number);
+        c.setTopology(descriptor);
+        NodeSet ns = resourceManager.getNodes(c);
         Assert.assertEquals(expectedReceived, ns.size());
         Collection<Node> extra = ns.getExtraNodes();
         if (expectedExtraNodesSize == 0) {

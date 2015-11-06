@@ -73,6 +73,9 @@ public class TopologyImpl implements Topology, Cloneable {
      */
     private HashMap<String, InetAddress> hosts = new HashMap<String, InetAddress>();
 
+    private Long long0 = new Long(0);
+    private Long longMax = new Long(Long.MAX_VALUE);
+
     /**
      * {@inheritDoc}
      */
@@ -87,13 +90,19 @@ public class TopologyImpl implements Topology, Cloneable {
      */
     public Long getDistance(InetAddress host, InetAddress host2) {
         if (host.equals(host2)) {
-            return new Long(0);
-        } else if (distances.get(host) != null && distances.get(host).get(host2) != null) {
-            return distances.get(host).get(host2);
-        } else if (distances.get(host2) != null && distances.get(host2).get(host) != null) {
-            return distances.get(host2).get(host);
+            return long0;
+        } else {
+            HashMap<InetAddress, Long> dhost = distances.get(host);
+            HashMap<InetAddress, Long> dhost2 = distances.get(host2);
+            Long dHostToHost2;
+            Long dHost2ToHost;
+            if (dhost != null && (dHostToHost2 = dhost.get(host2)) != null) {
+                return dHostToHost2;
+            } else if (dhost2 != null && (dHost2ToHost = dhost2.get(host)) != null) {
+                return dHost2ToHost;
+            }
         }
-        return new Long(Long.MAX_VALUE);
+        return longMax;
     }
 
     /**

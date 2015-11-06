@@ -25,13 +25,14 @@ import org.ow2.proactive.utils.Tools;
 
 public class LocalInfrastructure extends InfrastructureManager {
 
-    public static final int DEFAULT_NODE_NUMBER = 4;
+    public static final int DEFAULT_NODE_NUMBER = Math.max(2, Runtime.getRuntime().availableProcessors() - 1);
     public static final int DEFAULT_TIMEOUT = 30000;
 
     @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true)
     private Credentials credentials;
     @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")
     private int maxNodes = DEFAULT_NODE_NUMBER;
+    // number of nodes which can still be acquired
     private AtomicInteger atomicMaxNodes;
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     private int nodeTimeout = DEFAULT_TIMEOUT;
