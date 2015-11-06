@@ -36,13 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.core.properties;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.PAPropertiesLazyLoader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
 /**
@@ -199,6 +199,11 @@ public enum PAResourceManagerProperties {
     /** Topology feature enable option */
     RM_TOPOLOGY_ENABLED("pa.rm.topology.enabled", PropertyType.BOOLEAN),
 
+    /**
+     * If this is true, the topology mechanism will compute distances between hosts using ping
+     **/
+    RM_TOPOLOGY_DISTANCE_ENABLED("pa.rm.topology.distance.enabled", PropertyType.BOOLEAN),
+
     RM_TOPOLOGY_PINGER("pa.rm.topology.pinger.class", PropertyType.STRING),
 
     /** Resource Manager selection process logs*/
@@ -234,24 +239,6 @@ public enum PAResourceManagerProperties {
     }
 
     /**
-     * Get the key.
-     *
-     * @return the key.
-     */
-    public String getKey() {
-        return key;
-    }
-
-    /**
-     * Set the value of this property to the given one.
-     *
-     * @param value the new value to set.
-     */
-    public void updateProperty(String value) {
-        propertiesLoader.getProperties().setProperty(key, value);
-    }
-
-    /**
      * Load the properties from the given file.
      * This method will clean every loaded properties before.
      *
@@ -259,7 +246,7 @@ public enum PAResourceManagerProperties {
      */
     protected static void loadProperties(String filename) {
         propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key, PA_RM_PROPERTIES_FILEPATH,
-            PA_RM_PROPERTIES_RELATIVE_FILEPATH, filename);
+                PA_RM_PROPERTIES_RELATIVE_FILEPATH, filename);
     }
 
     /**
@@ -285,6 +272,40 @@ public enum PAResourceManagerProperties {
     }
 
     /**
+     * Get the absolute path of the given path.<br/>
+     * It the path is absolute, then it is returned. If the path is relative, then the RM_home directory is
+     * concatenated in front of the given string.
+     *
+     * @param userPath the path to check transform.
+     * @return the absolute path of the given path.
+     */
+    public static String getAbsolutePath(String userPath) {
+        if (new File(userPath).isAbsolute()) {
+            return userPath;
+        } else {
+            return PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + userPath;
+        }
+    }
+
+    /**
+     * Get the key.
+     *
+     * @return the key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Set the value of this property to the given one.
+     *
+     * @param value the new value to set.
+     */
+    public void updateProperty(String value) {
+        propertiesLoader.getProperties().setProperty(key, value);
+    }
+
+    /**
      * Return true if this property is set, false otherwise.
      *
      * @return true if this property is set, false otherwise.
@@ -307,7 +328,7 @@ public enum PAResourceManagerProperties {
     /**
      * Returns the value of this property as an integer.
      * If value is not an integer, an exception will be thrown.
-     * 
+     *
      * @return the value of this property.
      */
     public int getValueAsInt() {
@@ -317,7 +338,7 @@ public enum PAResourceManagerProperties {
                 return Integer.parseInt(valueS);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(key +
-                    " is not an integer property. getValueAsInt cannot be called on this property");
+                        " is not an integer property. getValueAsInt cannot be called on this property");
             }
         } else {
             return 0;
@@ -326,7 +347,7 @@ public enum PAResourceManagerProperties {
 
     /**
      * Returns the value of this property as a string.
-     * 
+     *
      * @return the value of this property.
      */
     public String getValueAsString() {
@@ -360,8 +381,8 @@ public enum PAResourceManagerProperties {
     /**
      * Returns the value of this property as a boolean.
      * If value is not a boolean, an exception will be thrown.<br>
-     * The behavior of this method is the same as the {@link java.lang.Boolean#parseBoolean(String s)}. 
-     * 
+     * The behavior of this method is the same as the {@link java.lang.Boolean#parseBoolean(String s)}.
+     *
      * @return the value of this property.
      */
     public boolean getValueAsBoolean() {
@@ -388,22 +409,6 @@ public enum PAResourceManagerProperties {
     @Override
     public String toString() {
         return getValueAsString();
-    }
-
-    /**
-     * Get the absolute path of the given path.<br/>
-     * It the path is absolute, then it is returned. If the path is relative, then the RM_home directory is 
-     * concatenated in front of the given string.
-     *
-     * @param userPath the path to check transform.
-     * @return the absolute path of the given path.
-     */
-    public static String getAbsolutePath(String userPath) {
-        if (new File(userPath).isAbsolute()) {
-            return userPath;
-        } else {
-            return PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + userPath;
-        }
     }
 
     /**

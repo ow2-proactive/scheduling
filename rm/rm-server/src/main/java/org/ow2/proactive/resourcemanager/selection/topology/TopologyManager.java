@@ -36,15 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.selection.topology;
 
-import java.net.InetAddress;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -58,15 +49,11 @@ import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger;
-import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
-import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
-import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.MultipleHostsExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
-import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
-import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.topology.descriptor.*;
 import org.ow2.proactive.utils.NodeSet;
+
+import java.net.InetAddress;
+import java.util.*;
 
 
 /**
@@ -117,10 +104,16 @@ public class TopologyManager {
             !PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             throw new TopologyDisabledException("Topology is disabled");
         }
+        if (topologyDescriptor instanceof BestProximityDescriptor || topologyDescriptor instanceof ThresholdProximityDescriptor) {
+            if (!PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.isSet() || !PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
+                throw new TopologyDisabledException("Topology distance is disabled, cannot use distance-based descriptors");
+            }
+        }
         TopologyHandler handler = handlers.get(topologyDescriptor.getClass());
         if (handler == null) {
             throw new IllegalArgumentException("Unknown descriptor type " + topologyDescriptor.getClass());
         }
+
         handler.setDescriptor(topologyDescriptor);
         return handler;
     }
@@ -157,15 +150,16 @@ public class TopologyManager {
                     toPing.add(nodesOnHost.get(h).iterator().next());
                 }
             }
+            HashMap<InetAddress, Long> hostsTopology = null;
 
-            HashMap<InetAddress, Long> hostsTopology = pingNode(node, toPing);
+            if (PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
+                hostsTopology = pingNode(node, toPing);
+            }
             synchronized (topology) {
-                if (hostsTopology != null) {
-                    topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-                    List<Node> nodesList = new LinkedList<Node>();
-                    nodesList.add(node);
-                    nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
-                }
+                topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
+                List<Node> nodesList = new LinkedList<Node>();
+                nodesList.add(node);
+                nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
             }
         }
     }
@@ -432,45 +426,6 @@ public class TopologyManager {
      */
     private class MultipleHostsExclusiveHandler extends TopologyHandler {
 
-        private class Host implements Comparable<Host> {
-            private InetAddress address;
-            private int nodesNumber;
-
-            public Host(InetAddress address, int nodesNumber) {
-                this.address = address;
-                this.nodesNumber = nodesNumber;
-            }
-
-            public boolean equals(Object obj) {
-                if (obj instanceof Host) {
-                    Host host = (Host) obj;
-                    if (address == null && host.address == null) {
-                        return true;
-                    } else if (address != null && host.address != null) {
-                        return address.equals(host.address);
-                    }
-                }
-                return false;
-            }
-
-            public int compareTo(Host host) {
-                boolean equal = equals(host);
-                if (equal) {
-                    return 0;
-                } else {
-                    // must not return 0 in order to comply with equals()
-                    int nodesDiff = nodesNumber - host.nodesNumber;
-                    if (nodesDiff == 0) {
-                        // the same node number, use addresses to define what is bigger
-                        String thisAdd = address == null ? "" : address.toString();
-                        String hostAdd = host.address == null ? "" : host.address.toString();
-                        return thisAdd.compareTo(hostAdd);
-                    }
-                    return nodesDiff;
-                }
-            }
-        }
-
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
             if (number <= 0 || matchedNodes.size() == 0) {
@@ -544,6 +499,45 @@ public class TopologyManager {
             }
             freeHosts.remove(host);
             return host.address;
+        }
+
+        private class Host implements Comparable<Host> {
+            private InetAddress address;
+            private int nodesNumber;
+
+            public Host(InetAddress address, int nodesNumber) {
+                this.address = address;
+                this.nodesNumber = nodesNumber;
+            }
+
+            public boolean equals(Object obj) {
+                if (obj instanceof Host) {
+                    Host host = (Host) obj;
+                    if (address == null && host.address == null) {
+                        return true;
+                    } else if (address != null && host.address != null) {
+                        return address.equals(host.address);
+                    }
+                }
+                return false;
+            }
+
+            public int compareTo(Host host) {
+                boolean equal = equals(host);
+                if (equal) {
+                    return 0;
+                } else {
+                    // must not return 0 in order to comply with equals()
+                    int nodesDiff = nodesNumber - host.nodesNumber;
+                    if (nodesDiff == 0) {
+                        // the same node number, use addresses to define what is bigger
+                        String thisAdd = address == null ? "" : address.toString();
+                        String hostAdd = host.address == null ? "" : host.address.toString();
+                        return thisAdd.compareTo(hostAdd);
+                    }
+                    return nodesDiff;
+                }
+            }
         }
     }
 
