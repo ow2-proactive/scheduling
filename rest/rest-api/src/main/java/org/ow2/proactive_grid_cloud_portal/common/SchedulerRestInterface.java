@@ -191,7 +191,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @GZIP
-    @Path("jobs/{jobid}/info")
+    @Path("jobs/{jobid}/result")
     @Produces("application/json")
     JobResultData jobResult(
             @HeaderParam("sessionid") String sessionId,

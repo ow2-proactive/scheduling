@@ -217,7 +217,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @SuppressWarnings("unchecked")
-    private static final List<SortParameter<JobSortParameter>> DEFAULT_JOB_SORT_PARAMS = Arrays.asList(
+    protected static final List<SortParameter<JobSortParameter>> DEFAULT_JOB_SORT_PARAMS = Arrays.asList(
             new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
             new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
 
