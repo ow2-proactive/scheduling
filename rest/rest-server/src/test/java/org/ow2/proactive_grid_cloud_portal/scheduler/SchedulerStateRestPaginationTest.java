@@ -70,19 +70,21 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
     private SchedulerRestInterface restInterface = null;
     private SchedulerProxyUserInterface mockOfScheduler = null;
     private String sessionId = null;
+    private int nbTasks;
+    private String jobIdStr = null;
 
     @Before
     public void setUp() throws Throwable {
         restInterface = new SchedulerStateRest();
         mockOfScheduler = mock(SchedulerProxyUserInterface.class);
         sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
+        nbTasks = 50;
+        jobIdStr = "1";
     }
 
     @Test
     public void testGetJobTasksIdsPaginated() throws Throwable {
 
-        int nbTasks = 50;
-        String jobIdStr = "1";
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
@@ -94,8 +96,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
 
     @Test
     public void testGetJobTasksIdsByTagPaginated() throws Throwable {
-        int nbTasks = 50;
-        String jobIdStr = "1";
+
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
@@ -106,8 +107,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
 
     @Test
     public void testGetJobTaskStatesPaginated() throws Throwable {
-        int nbTasks = 50;
-        String jobIdStr = "1";
+
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
@@ -120,8 +120,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
 
     @Test
     public void testGetJobTaskStatesByTagPaginated() throws Throwable {
-        int nbTasks = 50;
-        String jobIdStr = "1";
+
         JobState job = newMockedJob(jobIdStr, nbTasks);
         when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
 
