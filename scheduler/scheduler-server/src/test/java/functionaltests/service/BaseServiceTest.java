@@ -3,6 +3,10 @@ package functionaltests.service;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.mockito.Mockito;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -15,14 +19,10 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.tests.ProActiveTest;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.mockito.Mockito;
 
 
 public class BaseServiceTest extends ProActiveTest {
@@ -53,7 +53,7 @@ public class BaseServiceTest extends ProActiveTest {
         service.taskStarted(jobDesc.getInternal(), task, launcher);
     }
 
-    static InternalJob createJob(TaskFlowJob job) throws Exception {
+    public static InternalJob createJob(TaskFlowJob job) throws Exception {
         InternalJob internalJob = InternalJobFactory.createJob(job, getDefaultCredentials());
         internalJob.setOwner(DEFAULT_USER_NAME);
         return internalJob;

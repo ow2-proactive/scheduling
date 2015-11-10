@@ -84,6 +84,9 @@ public class TaskDBUtils {
             @Override
             @SuppressWarnings("unchecked")
             public List<TaskInfo> executeWork(Session session) {
+                
+                if (params.getStatuses().isEmpty()) return new ArrayList<TaskInfo>();
+                
                 Criteria criteria = session.createCriteria(TaskData.class);
 
                 if (params.getLimit() > 0)
@@ -118,9 +121,7 @@ public class TaskDBUtils {
                     criteria.add(Restrictions.le("finishedTime", params.getTo()));
                 }
 
-                if (!params.getStatuses().isEmpty()) {
-                    criteria.add(Restrictions.in("taskStatus", params.getStatuses()));
-                }
+                criteria.add(Restrictions.in("taskStatus", params.getStatuses()));
 
                 if (params.getTag() != null && "".compareTo(params.getTag()) != 0) {
                     criteria.add(Restrictions.eq("tag", params.getTag()));
