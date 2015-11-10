@@ -99,37 +99,17 @@ public enum JobStatus implements java.io.Serializable {
         definition = def;
         this.jobAlive = jobAlive;
     }
-    
+
     public static JobStatus findPriority(String name) {
-        if (name.equalsIgnoreCase(PENDING.toString())) {
-            return PENDING;
+
+        for (JobStatus jobStatus : JobStatus.values()) {
+            if (name.equalsIgnoreCase(jobStatus.toString()))
+                return jobStatus;
         }
 
-        if (name.equalsIgnoreCase(RUNNING.toString())) {
-            return RUNNING;
-        }
-
-        if (name.equalsIgnoreCase(STALLED.toString())) {
-            return STALLED;
-        }
-
-        if (name.equalsIgnoreCase(FINISHED.toString())) {
-            return FINISHED;
-        }
-
-        if (name.equalsIgnoreCase(PAUSED.toString())) {
-            return PAUSED;
-        }
-
-        if (name.equalsIgnoreCase(CANCELED.toString())) {
-            return CANCELED;
-        }
-        
-        if (name.equalsIgnoreCase(FAILED.toString())) {
-            return FAILED;
-        }
-        
+        // default case
         return KILLED;
+
     }
 
     /**
@@ -144,4 +124,6 @@ public enum JobStatus implements java.io.Serializable {
         return jobAlive;
     }
 
+    
+    
 }

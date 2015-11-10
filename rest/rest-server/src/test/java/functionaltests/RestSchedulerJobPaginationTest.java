@@ -42,13 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import functionaltests.jobs.NonTerminatingJob;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
@@ -58,6 +51,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+
+import functionaltests.jobs.NonTerminatingJob;
 
 
 /**
@@ -104,9 +105,11 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
         // check 'jobsinfo' and 'revisionjobsinfo' provide job's attributes
 
+        JSONObject page;
         JSONArray jobs;
 
-        jobs = getRequestJSONArray(getResourceUrl("jobsinfo"));
+        page = getRequestJSONObject(getResourceUrl("jobsinfo"));
+        jobs = (JSONArray) page.get("list");
         checkJob((JSONObject) jobs.get(2), JobStatus.RUNNING, 1, 0);
 
         JSONObject map = getRequestJSONObject(getResourceUrl("revisionjobsinfo"));
@@ -133,7 +136,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
         JSONObject job = null;
 
-        jobs = getRequestJSONArray(getResourceUrl("jobsinfo"));
+        page = getRequestJSONObject(getResourceUrl("jobsinfo"));
+        jobs = (JSONArray) page.get("list");
         checkJob(findJob("1", jobs), JobStatus.KILLED, 0, 0);
 
         map = getRequestJSONObject(getResourceUrl("revisionjobsinfo"));

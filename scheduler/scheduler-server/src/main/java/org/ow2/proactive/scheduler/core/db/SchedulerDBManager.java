@@ -105,6 +105,28 @@ public class SchedulerDBManager {
                         RUNNING_JOB_STATUSES,
                         PENDING_JOB_STATUSES));
 
+    protected static final Set<TaskStatus> PENDING_TASKS =
+            ImmutableSet.of(
+                    TaskStatus.SUBMITTED,
+                    TaskStatus.PENDING,
+                    TaskStatus.NOT_STARTED);
+    
+    protected static final Set<TaskStatus> RUNNING_TASKS =
+            ImmutableSet.of(
+                    TaskStatus.PAUSED,
+                    TaskStatus.RUNNING,
+                    TaskStatus.WAITING_ON_ERROR,
+                    TaskStatus.WAITING_ON_FAILURE);
+    
+    protected static final Set<TaskStatus> FINISHED_TASKS =
+            ImmutableSet.of(
+                    TaskStatus.FAILED,
+                    TaskStatus.NOT_RESTARTED,
+                    TaskStatus.ABORTED,
+                    TaskStatus.FAULTY,
+                    TaskStatus.FINISHED,
+                    TaskStatus.SKIPPED);
+    
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
@@ -279,7 +301,7 @@ public class SchedulerDBManager {
             @Override
             public Integer executeWork(Session session) {
 
-                List<TaskStatus> lStatuses = params.getStatuses();
+                Set<TaskStatus> lStatuses = params.getStatuses();
 
                 if (lStatuses.isEmpty()) {
                     return 0;

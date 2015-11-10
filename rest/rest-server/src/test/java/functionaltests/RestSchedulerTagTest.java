@@ -115,7 +115,7 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
     public void testTaskIdsByTag() throws Exception {
         HttpResponse response = sendRequest("jobs/" + jobId + "/tasks/tag/LOOP-T2-1");
         JSONObject jsonObject = toJsonObject(response);
-        JSONArray taskIds = (JSONArray) jsonObject.get("taskIds");
+        JSONArray taskIds = (JSONArray) jsonObject.get("list");
 
         System.out.println(jsonObject.toJSONString());
         assertTrue(taskIds.contains("T1#1"));

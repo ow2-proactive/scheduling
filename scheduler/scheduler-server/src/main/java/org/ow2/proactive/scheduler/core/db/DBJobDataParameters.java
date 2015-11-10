@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,13 +14,14 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
  *
  */
 public class DBJobDataParameters {
-    private int offset;
-    private int limit;
-    private String user;
-    private boolean pending;
-    private boolean running;
-    private boolean finished;
-    private List<SortParameter<JobSortParameter>> sortParameters;
+    private final int offset;
+    private final int limit;
+    private final String user;
+    private final boolean pending;
+    private final boolean running;
+    private final boolean finished;
+    private final List<SortParameter<JobSortParameter>> sortParameters;
+    private final Set<JobStatus> status;
 
     DBJobDataParameters(int offset, int limit, String user,
             boolean pending, boolean running, boolean finished,
@@ -31,6 +33,19 @@ public class DBJobDataParameters {
         this.running = running;
         this.finished = finished;
         this.sortParameters = sortParameters;
+        
+        Set<JobStatus> newStatus = new HashSet<JobStatus>();
+        if (pending) {
+            newStatus.addAll(SchedulerDBManager.PENDING_JOB_STATUSES);
+        }
+        if (running) {
+            newStatus.addAll(SchedulerDBManager.RUNNING_JOB_STATUSES);
+        }
+        if (finished) {
+            newStatus.addAll(SchedulerDBManager.FINISHED_JOB_STATUSES);
+        }
+        this.status = Collections.unmodifiableSet(newStatus);
+        
     }
 
     public int getOffset() {
@@ -50,18 +65,6 @@ public class DBJobDataParameters {
     }
 
     public Set<JobStatus> getStatuses() {
-
-        Set<JobStatus> status = new HashSet<JobStatus>();
-        if (pending) {
-            status.addAll(SchedulerDBManager.PENDING_JOB_STATUSES);
-        }
-        if (running) {
-            status.addAll(SchedulerDBManager.RUNNING_JOB_STATUSES);
-        }
-        if (finished) {
-            status.addAll(SchedulerDBManager.FINISHED_JOB_STATUSES);
-        }
-
         return status;
     }
 }

@@ -1,7 +1,9 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.TaskSortParameter;
@@ -12,16 +14,17 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
  *
  */
 public class DBTaskDataParameters {
-    private String tag;
-    private long from;
-    private long to;
-    private int offset;
-    private int limit;
-    private String user;
-    private boolean pending;
-    private boolean running;
-    private boolean finished;
-    private List<SortParameter<TaskSortParameter>> sortParameters;
+    private final String tag;
+    private final long from;
+    private final long to;
+    private final int offset;
+    private final int limit;
+    private final String user;
+    private final boolean pending;
+    private final boolean running;
+    private final boolean finished;
+    private final List<SortParameter<TaskSortParameter>> sortParameters;
+    private final Set<TaskStatus> status;
 
     DBTaskDataParameters(String tag, long from, long to, int offset, int limit, String user,
             boolean pending, boolean running, boolean finished,
@@ -36,6 +39,15 @@ public class DBTaskDataParameters {
         this.running = running;
         this.finished = finished;
         this.sortParameters = sortParameters;
+        
+        Set<TaskStatus> newStatus = new HashSet<TaskStatus>();
+
+        if (pending) newStatus.addAll(SchedulerDBManager.PENDING_TASKS);
+        if (running) newStatus.addAll(SchedulerDBManager.RUNNING_TASKS);
+        if (finished) newStatus.addAll(SchedulerDBManager.PENDING_TASKS);
+        
+        this.status = Collections.unmodifiableSet(newStatus);
+        
     }
 
     public String getTag() {
@@ -66,31 +78,7 @@ public class DBTaskDataParameters {
         return sortParameters;
     }
 
-    public List<TaskStatus> getStatuses() {
-        List<TaskStatus> lStatuses = new ArrayList<TaskStatus>();
-
-        if (pending) {
-            lStatuses.add(TaskStatus.SUBMITTED);
-            lStatuses.add(TaskStatus.PENDING);
-            lStatuses.add(TaskStatus.NOT_STARTED);
-        }
-
-        if (running) {
-            lStatuses.add(TaskStatus.PAUSED);
-            lStatuses.add(TaskStatus.RUNNING);
-            lStatuses.add(TaskStatus.WAITING_ON_ERROR);
-            lStatuses.add(TaskStatus.WAITING_ON_FAILURE);
-        }
-
-        if (finished) {
-            lStatuses.add(TaskStatus.FAILED);
-            lStatuses.add(TaskStatus.NOT_RESTARTED);
-            lStatuses.add(TaskStatus.ABORTED);
-            lStatuses.add(TaskStatus.FAULTY);
-            lStatuses.add(TaskStatus.FINISHED);
-            lStatuses.add(TaskStatus.SKIPPED);
-        }
-
-        return lStatuses;
+    public Set<TaskStatus> getStatuses() {
+        return status;
     }
 }

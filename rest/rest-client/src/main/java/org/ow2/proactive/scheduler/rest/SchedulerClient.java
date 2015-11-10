@@ -119,6 +119,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
@@ -938,13 +940,12 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks,
-            boolean running, boolean pending, boolean finished, int offset, int limit)
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         RestPage<TaskStateData> page = null;
         try {
-            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset,
-                    limit);
+            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset, limit);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         } catch (PermissionRestException e) {
@@ -952,11 +953,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
         List<TaskId> lTaskIds = new ArrayList<TaskId>(page.getList().size());
         for (TaskStateData taskStateData : page.getList()) {
-            JobId jobId = new JobIdImpl(taskStateData.getTaskInfo().getJobId().getId(),
-                taskStateData.getTaskInfo().getJobId().getReadableName());
-            TaskId taskId = TaskIdImpl.createTaskId(jobId,
-                    taskStateData.getTaskInfo().getTaskId().getReadableName(),
-                    taskStateData.getTaskInfo().getTaskId().getId());
+            TaskInfoData taskInfo = taskStateData.getTaskInfo();
+            TaskIdData taskIdData = taskInfo.getTaskId();
+            JobId jobId = new JobIdImpl(taskInfo.getJobId().getId(), taskInfo.getJobId().getReadableName());
+            TaskId taskId = TaskIdImpl.createTaskId(jobId, taskIdData.getReadableName(), taskIdData.getId());
             lTaskIds.add(taskId);
         }
         return new Page<TaskId>(lTaskIds, page.getSize());
