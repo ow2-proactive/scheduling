@@ -151,7 +151,7 @@ public final class ClientTaskState extends TaskState {
     @Override
     public Script<?> getPreScript() {
         throw new RuntimeException(
-            "Not implemented: the PreScript  atttribute is not available on client side.");
+            "Not implemented: the PreScript atttribute is not available on client side.");
     }
 
     /**
@@ -161,7 +161,7 @@ public final class ClientTaskState extends TaskState {
     @Override
     public Script<?> getPostScript() {
         throw new RuntimeException(
-            "Not implemented: the PostScript  atttribute is not available on client side.");
+            "Not implemented: the PostScript atttribute is not available on client side.");
     }
 
     /**
@@ -171,7 +171,7 @@ public final class ClientTaskState extends TaskState {
     @Override
     public List<SelectionScript> getSelectionScripts() {
         throw new RuntimeException(
-            "Not implemented: the SelectionScript  atttribute is not available on client side.");
+            "Not implemented: the SelectionScript atttribute is not available on client side.");
     }
 
     /**
@@ -181,7 +181,7 @@ public final class ClientTaskState extends TaskState {
     @Override
     public FlowScript getFlowScript() {
         throw new RuntimeException(
-            "Not implemented: the FlowScript  atttribute is not available on client side.");
+            "Not implemented: the FlowScript atttribute is not available on client side.");
     }
 
     /**
