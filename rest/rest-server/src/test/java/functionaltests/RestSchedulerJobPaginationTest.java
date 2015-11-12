@@ -267,6 +267,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
     private void checkJobIds(boolean indexAndRange, int index, int range, String... expectedIds)
             throws Exception {
+        JSONObject page;
         JSONArray jobs;
 
         Set<String> expected = new HashSet<>(Arrays.asList(expectedIds));
@@ -280,7 +281,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         } else {
             url = getResourceUrl("jobs");
         }
-        jobs = getRequestJSONArray(url);
+        page = getRequestJSONObject(url);
+        jobs = (JSONArray) page.get("list");
         for (int i = 0; i < jobs.size(); i++) {
             actual.add((String) jobs.get(i));
         }
@@ -292,7 +294,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         } else {
             url = getResourceUrl("jobsinfo");
         }
-        jobs = getRequestJSONArray(url);
+        page = getRequestJSONObject(url);
+        jobs = (JSONArray) page.get("list");
         actual.clear();
         for (int i = 0; i < jobs.size(); i++) {
             JSONObject job = (JSONObject) jobs.get(i);
