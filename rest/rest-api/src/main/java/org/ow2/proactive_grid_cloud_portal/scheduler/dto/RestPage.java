@@ -1,6 +1,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -11,14 +12,14 @@ public class RestPage<T extends Serializable> {
 
     private int size;
 
-    private List<T> list;
+    private ArrayList<T> list;
 
     public RestPage() {
 
     }
 
     public RestPage(List<T> tasks, int size) {
-        this.list = tasks;
+        this.list = new ArrayList<T>(tasks);
         this.size = size;
     }
 
@@ -35,7 +36,7 @@ public class RestPage<T extends Serializable> {
     }
 
     public void setTasks(List<T> tasks) {
-        this.list = tasks;
+        this.list = new ArrayList<T>(tasks);
     }
 
     @Override

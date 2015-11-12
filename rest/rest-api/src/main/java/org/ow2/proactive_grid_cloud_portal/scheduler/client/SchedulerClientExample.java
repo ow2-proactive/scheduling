@@ -35,6 +35,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.client;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
@@ -100,8 +102,8 @@ public class SchedulerClientExample {
         System.out.println(users);
         System.out.println(users.size());
 
-        Map<Long, List<UserJobData>> map = scheduler.revisionAndJobsInfo(sessionId, 0, 50, true, true, true,
-                true);
+        RestMapPage<Long, ArrayList<UserJobData>> page = scheduler.revisionAndJobsInfo(sessionId, 0, 50, true, true, true,true);
+        Map<Long, ArrayList<UserJobData>> map = page.getMap(); 
         System.out.println(map);
 
         System.out.println(scheduler.getSchedulerStatus(sessionId));

@@ -159,6 +159,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
@@ -352,7 +353,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
-    public Map<Long, List<UserJobData>> revisionAndJobsInfo(
+    public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
             @QueryParam("range") @DefaultValue("-1") int range,
@@ -367,17 +368,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             boolean onlyUserJobs = (myJobs && user != null && user.trim().length() > 0);
 
-            List<JobInfo> jobsInfo = s.getJobs(index, range,
-                    new JobFilterCriteria(onlyUserJobs, pending, running, finished), DEFAULT_JOB_SORT_PARAMS)
-                    .getList();
-            List<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
+            Page<JobInfo> page = s.getJobs(index, range, new JobFilterCriteria(onlyUserJobs, pending, running, finished), DEFAULT_JOB_SORT_PARAMS);
+            List<JobInfo> jobsInfo = page.getList();
+            ArrayList<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
             for (JobInfo jobInfo : jobsInfo) {
                 jobs.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
 
-            HashMap<Long, List<UserJobData>> map = new HashMap<>(1);
+            HashMap<Long, ArrayList<UserJobData>> map = new HashMap<Long, ArrayList<UserJobData>>(1);
             map.put(SchedulerStateListener.getInstance().getSchedulerStateRevision(), jobs);
-            return map;
+            RestMapPage<Long, ArrayList<UserJobData>> restMapPage = new RestMapPage<Long, ArrayList<UserJobData>>();
+            restMapPage.setMap(map);
+            restMapPage.setSize(page.getSize());
+            return restMapPage;
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {

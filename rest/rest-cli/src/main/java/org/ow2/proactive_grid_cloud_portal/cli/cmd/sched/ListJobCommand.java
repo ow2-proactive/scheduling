@@ -38,6 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
@@ -134,8 +136,9 @@ public class ListJobCommand extends AbstractCommand implements Command {
 
     private static void printJobsList(int index, int offset, ApplicationContext currentContext)
             throws PermissionRestException, NotConnectedRestException, IOException {
-        Map<Long, List<UserJobData>> stateMap = currentContext.getRestClient().getScheduler()
+        RestMapPage<Long, ArrayList<UserJobData>> page = currentContext.getRestClient().getScheduler()
                 .revisionAndJobsInfo(currentContext.getSessionId(), index, offset, false, true, true, true);
+        Map<Long, ArrayList<UserJobData>> stateMap = page.getMap();
         List<UserJobData> jobs = stateMap.values().iterator().next();
         currentContext.getDevice().writeLine("%s", StringUtility.jobsAsString(jobs));
     }
