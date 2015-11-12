@@ -71,6 +71,8 @@ public class ErrorCases {
 
     @Before
     public void captureInputOutput() throws Exception {
+    	skipIfHeadlessEnvironment();
+
         System.setProperty(WindowsTerminal.DIRECT_CONSOLE, "false"); // to be able to type input on Windows
         inputLines = "";
         capturedOutput = new ByteArrayOutputStream();
