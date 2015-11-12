@@ -32,22 +32,10 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
+package org.ow2.proactive.scheduler.common;
 
-package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
-
-import java.io.Serializable;
-
-public class ParallelEnvironmentData implements Serializable {
-
-    private int nodesNumber;
-
-    public int getNodesNumber() {
-        return nodesNumber;
-    }
-
-    public void setNodesNumber(int nodesNumber) {
-        this.nodesNumber = nodesNumber;
-    }
+public enum TaskSortParameter {
+    ID, NAME
 }

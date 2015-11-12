@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
@@ -67,49 +66,49 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         List<JobInfo> jobs;
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)));
+                sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC))).getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)));
+                sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC))).getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
                 new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
-                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)));
+                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC))).getList();
         checkJobs(jobs, 1, 4, 2, 5, 3, 6);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
                 new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
-                new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)));
+                new SortParameter<>(JobSortParameter.ID, SortOrder.DESC))).getList();
         checkJobs(jobs, 4, 1, 5, 2, 6, 3);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.ASC)));
+                sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.ASC))).getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.DESC)));
+                sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.DESC))).getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
         jobs = dbManager
                 .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<>(
-                        JobSortParameter.PRIORITY, SortOrder.ASC)));
+                        JobSortParameter.PRIORITY, SortOrder.ASC))).getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
         jobs = dbManager
                 .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<>(
-                        JobSortParameter.PRIORITY, SortOrder.DESC)));
+                        JobSortParameter.PRIORITY, SortOrder.DESC))).getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
                 new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
-                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)));
+                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC))).getList();
         checkJobs(jobs, 2, 4, 6, 3, 5, 1);
 
         jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
                 new SortParameter<>(JobSortParameter.STATE, SortOrder.DESC),
-                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)));
+                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC))).getList();
         checkJobs(jobs, 1, 3, 5, 2, 4, 6);
     }
 
@@ -163,7 +162,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         List<SortParameter<JobSortParameter>> sortParameters = new ArrayList<>();
         sortParameters.add(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
 
-        jobs = dbManager.getJobs(5, 1, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(5, 1, null, true, true, true, sortParameters).getList();
         JobInfo jobInfo = jobs.get(0);
         Assert.assertEquals("6", jobInfo.getJobId().value());
         Assert.assertEquals(JobStatus.FINISHED, jobInfo.getStatus());
@@ -175,64 +174,64 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         Assert.assertEquals(JobPriority.NORMAL, jobInfo.getPriority());
         Assert.assertEquals(DEFAULT_USER_NAME, jobInfo.getJobOwner());
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(-1, -1, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(-1, -1, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(-1, 5, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(-1, 5, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 1, 2, 3, 4, 5);
 
-        jobs = dbManager.getJobs(2, -1, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(2, -1, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(0, 0, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(0, 0, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(0, 1, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(0, 1, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 1);
 
-        jobs = dbManager.getJobs(0, 3, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(0, 3, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 1, 2, 3);
 
-        jobs = dbManager.getJobs(1, 10, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(1, 10, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 2, 3, 4, 5, 6, 7);
 
-        jobs = dbManager.getJobs(5, 10, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(5, 10, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 6, 7);
 
-        jobs = dbManager.getJobs(6, 10, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(6, 10, null, true, true, true, sortParameters).getList();
         checkJobs(jobs, 7);
 
-        jobs = dbManager.getJobs(7, 10, null, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(7, 10, null, true, true, true, sortParameters).getList();
         checkJobs(jobs);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, true, true, sortParameters);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, true, true, sortParameters).getList();
         checkJobs(jobs, 1, 3, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, "user1", true, true, true, sortParameters);
+        jobs = dbManager.getJobs(0, 10, "user1", true, true, true, sortParameters).getList();
         checkJobs(jobs, 2);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, false, false, sortParameters);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, false, false, sortParameters).getList();
         checkJobs(jobs, 1);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, true, false, sortParameters);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, true, false, sortParameters).getList();
         checkJobs(jobs, 3);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, true, sortParameters);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, true, sortParameters).getList();
         checkJobs(jobs, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, true, true, sortParameters);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, true, true, sortParameters).getList();
         checkJobs(jobs, 3, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, false, true, sortParameters);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, false, true, sortParameters).getList();
         checkJobs(jobs, 1, 4, 6, 7);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, true, false, sortParameters);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, true, true, false, sortParameters).getList();
         checkJobs(jobs, 1, 3);
 
-        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, false, sortParameters);
+        jobs = dbManager.getJobs(0, 10, DEFAULT_USER_NAME, false, false, false, sortParameters).getList();
         checkJobs(jobs);
     }
 

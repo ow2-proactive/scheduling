@@ -16,11 +16,28 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
+import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.TaskSortParameter;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -52,24 +69,9 @@ import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
-import org.hibernate.transform.DistinctRootEntityResultTransformer;
-
-import static org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 
 
 public class SchedulerDBManager {
@@ -80,29 +82,51 @@ public class SchedulerDBManager {
 
     private static final Logger debugLogger = Logger.getLogger(SchedulerDBManager.class);
 
-    private static final Set<JobStatus> FINISHED_JOB_STATUSES =
+    protected static final Set<JobStatus> FINISHED_JOB_STATUSES =
             ImmutableSet.of(
                     JobStatus.CANCELED,
                     JobStatus.FAILED,
                     JobStatus.KILLED,
                     JobStatus.FINISHED);
 
-    private static final Set<JobStatus> PENDING_JOB_STATUSES =
+    protected static final Set<JobStatus> PENDING_JOB_STATUSES =
             ImmutableSet.of(
                     JobStatus.PENDING);
 
-    private static final Set<JobStatus> RUNNING_JOB_STATUSES =
+    protected static final Set<JobStatus> RUNNING_JOB_STATUSES =
             ImmutableSet.of(
                     JobStatus.PAUSED,
                     JobStatus.STALLED,
                     JobStatus.RUNNING);
 
-    private static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES =
+    protected static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES =
             ImmutableSet.copyOf(
                     Iterables.concat(
                         RUNNING_JOB_STATUSES,
                         PENDING_JOB_STATUSES));
 
+    protected static final Set<TaskStatus> PENDING_TASKS =
+            ImmutableSet.of(
+                    TaskStatus.SUBMITTED,
+                    TaskStatus.PENDING,
+                    TaskStatus.NOT_STARTED);
+    
+    protected static final Set<TaskStatus> RUNNING_TASKS =
+            ImmutableSet.of(
+                    TaskStatus.PAUSED,
+                    TaskStatus.RUNNING,
+                    TaskStatus.WAITING_ON_ERROR,
+                    TaskStatus.WAITING_ON_FAILURE);
+    
+    protected static final Set<TaskStatus> FINISHED_TASKS =
+            ImmutableSet.of(
+                    TaskStatus.FAILED,
+                    TaskStatus.NOT_RESTARTED,
+                    TaskStatus.ABORTED,
+                    TaskStatus.FAULTY,
+                    TaskStatus.FINISHED,
+                    TaskStatus.SKIPPED);
+    
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
@@ -169,15 +193,18 @@ public class SchedulerDBManager {
 
     }
 
-    public List<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
+    public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
             final boolean running, final boolean finished,
             final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
-            return Collections.emptyList();
+            return new Page<JobInfo>(new ArrayList<JobInfo>(), 0);
         }
 
-        return runWithoutTransaction(new SessionWork<List<JobInfo>>() {
+        DBJobDataParameters params = new DBJobDataParameters(offset, limit, user, pending, running, finished, sortParameters);
+        int totalNbJobs = getTotalNumberOfJobs(params);
+        final Set<JobStatus> jobStatuses = params.getStatuses();
+        List<JobInfo> lJobs = runWithoutTransaction(new SessionWork<List<JobInfo>>() {
             @Override
             @SuppressWarnings("unchecked")
             public List<JobInfo> executeWork(Session session) {
@@ -193,17 +220,7 @@ public class SchedulerDBManager {
                 }
                 boolean allJobs = pending && running && finished;
                 if (!allJobs) {
-                    Set<JobStatus> status = new HashSet<>();
-                    if (pending) {
-                        status.addAll(PENDING_JOB_STATUSES);
-                    }
-                    if (running) {
-                        status.addAll(RUNNING_JOB_STATUSES);
-                    }
-                    if (finished) {
-                        status.addAll(FINISHED_JOB_STATUSES);
-                    }
-                    criteria.add(Restrictions.in("status", status.toArray(new JobStatus[status.size()])));
+                    criteria.add(Restrictions.in("status", jobStatuses));
                 }
 
                 criteria.add(Restrictions.eq("removedTime", -1L));
@@ -246,8 +263,129 @@ public class SchedulerDBManager {
             }
 
         });
+        
+        return new Page(lJobs, totalNbJobs);
     }
+    
 
+    public Page<TaskState> getTaskStates(final long from, final long to, final String tag,
+            final int offset, final int limit,
+            final String user, final boolean pending, final boolean running,
+            final boolean finished, final List<SortParameter<TaskSortParameter>> sortParameters) {
+
+        DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
+            pending, running, finished, sortParameters);
+        int totalNbTasks = getTotalNumberOfTasks(parameters);
+        List<TaskState> lTasks = runWithoutTransaction(TaskDBUtils.taskStateSessionWork(parameters));
+        
+        return new Page<TaskState>(lTasks, totalNbTasks);
+    }
+    
+    public Page<TaskInfo> getTasks(final long from, final long to, final String tag,
+            final int offset, final int limit,
+            final String user, final boolean pending, final boolean running,
+            final boolean finished, final List<SortParameter<TaskSortParameter>> sortParameters) {
+
+        DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
+                pending, running, finished, sortParameters);
+        int totalNbTasks = getTotalNumberOfTasks(parameters);
+        List<TaskInfo> lTaskInfo =  runWithoutTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
+        
+        return new Page<TaskInfo>(lTaskInfo, totalNbTasks);
+    }
+    
+    private int getTotalNumberOfTasks(final DBTaskDataParameters params) {
+
+        return runWithoutTransaction(new SessionWork<Integer>() {
+
+            @Override
+            public Integer executeWork(Session session) {
+
+                Set<TaskStatus> lStatuses = params.getStatuses();
+
+                if (lStatuses.isEmpty()) {
+                    return 0;
+                } else {
+
+                    boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
+                    boolean hasTag = params.getTag() != null && "".compareTo(params.getTag()) != 0;
+                    boolean hasDateFrom = params.getFrom() != 0;
+                    boolean hasDateTo = params.getTo() != 0;
+
+                    StringBuilder queryString = new StringBuilder(
+                        "select count(*) from TaskData T where T.jobData.removedTime = -1 ");
+
+                    if (hasDateFrom)
+                        queryString.append("and startTime >= :dateFrom ");
+
+                    if (hasDateTo)
+                        queryString.append("and finishedTime <= :dateTo ");
+
+                    if (hasUser)
+                        queryString.append("and T.jobData.owner = :user ");
+
+                    if (hasTag)
+                        queryString.append("and tag = :taskTag ");
+
+                    queryString.append("and taskStatus in (:taskStatus) ");
+
+                    Query query = session.createQuery(queryString.toString());
+                    query.setParameterList("taskStatus", lStatuses);
+                    if (hasUser) {
+                        query.setParameter("user", params.getUser());
+                    }
+
+                    if (hasDateFrom)
+                        query.setParameter("dateFrom", params.getFrom());
+                    if (hasDateTo)
+                        query.setParameter("dateTo", params.getTo());
+                    if (hasTag)
+                        query.setParameter("taskTag", params.getTag());
+                    Long count = (Long) query.uniqueResult();
+                    
+                    return count.intValue();
+                }
+            }
+        });
+    }
+    
+    private int getTotalNumberOfJobs(final DBJobDataParameters params) {
+
+        return runWithoutTransaction(new SessionWork<Integer>() {
+
+            @Override
+            public Integer executeWork(Session session) {
+
+                Set<JobStatus> statuses = params.getStatuses();
+
+                if (statuses.isEmpty()) {
+                    return 0;
+                } else {
+
+                    boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
+
+                    StringBuilder queryString = new StringBuilder(
+                        "select count(*) from JobData where removedTime = -1 ");
+
+                    if (hasUser)
+                        queryString.append("and owner = :user ");
+
+                    queryString.append("and status in (:taskStatus) ");
+
+                    Query query = session.createQuery(queryString.toString());
+                    query.setParameterList("taskStatus", statuses);
+                    if (hasUser) {
+                        query.setParameter("user", params.getUser());
+                    }
+
+                    Long count = (Long) query.uniqueResult();
+                    
+                    return count.intValue();
+                }
+            }
+        });
+    }
+    
     private Order configureSortOrder(SortParameter<JobSortParameter> param, Property property) {
         if (param.getSortOrder().isAscending()) {
             return property.asc();
@@ -255,7 +393,7 @@ public class SchedulerDBManager {
             return property.desc();
         }
     }
-
+    
     public List<JobUsage> getUsage(final String userName, final Date startDate, final Date endDate) {
         return runWithoutTransaction(new SessionWork<List<JobUsage>>() {
             @Override

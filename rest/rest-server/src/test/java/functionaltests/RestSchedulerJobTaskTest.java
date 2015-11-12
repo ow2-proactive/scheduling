@@ -188,7 +188,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         setSessionHeader(httpGet);
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
-        JSONArray jsonArray = toJsonArray(response);
+        JSONObject jsonObject = toJsonObject(response);
+        JSONArray jsonArray = (JSONArray) jsonObject.get("list");
         assertTrue(jsonArray.isEmpty());
     }
 
@@ -241,7 +242,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONObject jsonObject = toJsonObject(response);
-        JSONArray jsonArray = (JSONArray) jsonObject.get("taskIds");
+        JSONArray jsonArray = (JSONArray) jsonObject.get("list");
         assertEquals(getDefaultTaskName(), jsonArray.get(0).toString());
     }
 
@@ -255,7 +256,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpResponse response = executeUriRequest(httpGet);
         assertHttpStatusOK(response);
         JSONObject jsonObject = toJsonObject(response);
-        JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
+        JSONArray jsonArray = (JSONArray) jsonObject.get("list");
         assertTrue(jsonArray.size() > 0);
     }
 

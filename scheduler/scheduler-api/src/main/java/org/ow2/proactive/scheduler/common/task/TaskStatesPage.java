@@ -6,19 +6,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 /**
- * This class is the super class of the every task that can be integrated in a job.<br>
- * A task contains some properties that can be set but also : <ul>
- * <li>A selection script that can be used to select a specific execution node for this task.</li>
- * <li>A preScript that will be launched before the real task (can be used to set environment vars).</li>
- * <li>A postScript that will be launched just after the end of the real task.
- * (this can be used to transfer files that have been created by the task).</li>
- * <li>A CleaningScript that will be launched by the resource manager to perform some cleaning. (deleting files or resources).</li>
- * </ul>
- * You will also be able to add dependences (if necessary) to
- * this task. The dependences mechanism are best describe below.
+ * This class holds a paginated list of <code>TaskState</code>
+ * server-wise and the total number of tasks.
  * 
- * TODO
- *
  */
 @XmlRootElement
 public class TaskStatesPage {

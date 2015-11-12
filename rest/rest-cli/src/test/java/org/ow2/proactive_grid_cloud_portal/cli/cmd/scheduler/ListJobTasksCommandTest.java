@@ -52,7 +52,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobTasksCommand;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdsPage;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 
 
 public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
@@ -80,7 +80,7 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdOnly() throws Exception {
-        when(restApi.getTasksNames(anyString(), eq(jobId))).thenReturn(new TaskIdsPage(this.taskNames, taskNames.size()));
+        when(restApi.getTasksNames(anyString(), eq(jobId))).thenReturn(new RestPage<String>(this.taskNames, taskNames.size()));
 
         executeTest(jobId);
 
@@ -93,7 +93,7 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
     @Test
     public void testCommandJobIdTag() throws Exception {
         when(restApi.getJobTasksIdsByTag(anyString(), eq(jobId), eq(tag)))
-                .thenReturn(new TaskIdsPage(this.filteredTaskNames, filteredTaskNames.size()));
+                .thenReturn(new RestPage<String>(this.filteredTaskNames, filteredTaskNames.size()));
         executeTest(jobId, tag);
 
         String out = capturedOutput.toString();
@@ -105,7 +105,7 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
     @Test
     public void testCommandJobIdUnknownTag() throws Exception {
         when(restApi.getJobTasksIdsByTag(anyString(), eq(jobId), eq(unknownTag)))
-                .thenReturn(new TaskIdsPage(new ArrayList<String>(), 0));
+                .thenReturn(new RestPage<String>(new ArrayList<String>(), 0));
 
         executeTest(jobId, unknownTag);
 
