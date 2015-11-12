@@ -1,20 +1,21 @@
 package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Page<T extends Serializable> implements Serializable {
     
     private int size;
 
-    private List<T> list;
+    private ArrayList<T> list;
     
     public Page() {
 
     }
     
     public Page(List<T> list, int size) {
-        this.list = list;
+        this.list = new ArrayList<T>(list);
         this.size = size;
     }
 
@@ -31,7 +32,7 @@ public class Page<T extends Serializable> implements Serializable {
     }
 
     public void setList(List<T> list) {
-        this.list = list;
+        this.list = new ArrayList<T>(list);
     }
 
     @Override
