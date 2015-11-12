@@ -430,6 +430,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             }
             catch (UnknownTaskException ex){
                 //never occurs because tasks are filtered by tag so they cannot be unknown.
+                logger.warn("Unknown task.", ex);
             }
         }
         return results;

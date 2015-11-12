@@ -69,8 +69,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.http.client.HttpClient;
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
@@ -142,6 +144,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private String password;
 
     private SchedulerEventReceiver schedulerEventReceiver;
+    
+    private static final Logger logger = ProActiveLogger.getLogger(SchedulerClient.class);
 
     private SchedulerClient() {
     }
@@ -377,6 +381,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             }
             catch(UnknownTaskException ex){
                 //never occurs because tasks are filtered by tag so they cannot be unknown.
+                logger.warn("Unknown task.", ex);
             }
         }
         return results;

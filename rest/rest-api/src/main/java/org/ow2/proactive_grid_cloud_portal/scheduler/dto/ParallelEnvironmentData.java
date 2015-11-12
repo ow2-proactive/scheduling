@@ -37,7 +37,9 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-public class ParallelEnvironmentData {
+import java.io.Serializable;
+
+public class ParallelEnvironmentData implements Serializable {
 
     private int nodesNumber;
 
