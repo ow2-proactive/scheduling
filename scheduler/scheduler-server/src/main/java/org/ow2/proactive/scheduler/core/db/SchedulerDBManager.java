@@ -35,6 +35,7 @@ import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryp
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.TaskSortParameter;
@@ -200,6 +201,8 @@ public class SchedulerDBManager {
         if (!pending && !running && !finished) {
             return new Page<JobInfo>(new ArrayList<JobInfo>(), 0);
         }
+        
+        JobFilterCriteria jfc = new JobFilterCriteria(false, true, true, true);
 
         DBJobDataParameters params = new DBJobDataParameters(offset, limit, user, pending, running, finished, sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);

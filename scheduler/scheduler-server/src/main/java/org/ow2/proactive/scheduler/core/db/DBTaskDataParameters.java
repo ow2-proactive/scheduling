@@ -42,9 +42,12 @@ public class DBTaskDataParameters {
         
         Set<TaskStatus> newStatus = new HashSet<TaskStatus>();
 
-        if (pending) newStatus.addAll(SchedulerDBManager.PENDING_TASKS);
-        if (running) newStatus.addAll(SchedulerDBManager.RUNNING_TASKS);
-        if (finished) newStatus.addAll(SchedulerDBManager.PENDING_TASKS);
+        if (pending)
+            newStatus.addAll(SchedulerDBManager.PENDING_TASKS);
+        if (running)
+            newStatus.addAll(SchedulerDBManager.RUNNING_TASKS);
+        if (finished)
+            newStatus.addAll(SchedulerDBManager.FINISHED_TASKS);
         
         this.status = Collections.unmodifiableSet(newStatus);
         
@@ -72,6 +75,18 @@ public class DBTaskDataParameters {
 
     public String getUser() {
         return user;
+    }
+    
+    public boolean isRunning() {
+        return running;
+    }
+
+    public boolean isPending() {
+        return pending;
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 
     public List<SortParameter<TaskSortParameter>> getSortParameters() {
