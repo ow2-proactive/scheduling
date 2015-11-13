@@ -25,7 +25,11 @@ public class TaskDBUtils {
             @SuppressWarnings("unchecked")
             public List<TaskState> executeWork(Session session) {
                 Criteria criteria = session.createCriteria(TaskData.class);
-
+                List<TaskState> result = null;
+                
+                if (params.getStatuses().isEmpty())
+                    return new ArrayList<TaskState>();
+                
                 if (params.getLimit() > 0)
                     criteria.setMaxResults(params.getLimit());
                 if (params.getOffset() >= 0)
@@ -67,7 +71,7 @@ public class TaskDBUtils {
                 }
 
                 List<TaskData> tasksList = criteria.list();
-                List<TaskState> result = new ArrayList<TaskState>(tasksList.size());
+                result = new ArrayList<TaskState>(tasksList.size());
                 for (TaskData taskData : tasksList) {
                     result.add(taskData.toTaskState());
                 }

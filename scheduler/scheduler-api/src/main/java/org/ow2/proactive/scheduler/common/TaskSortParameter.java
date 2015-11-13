@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common;
 
-public enum TaskSortParameter {
+import java.io.Serializable;
+
+public enum TaskSortParameter implements Serializable {
     ID, NAME
 }
