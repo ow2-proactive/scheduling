@@ -112,7 +112,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         jobs = (JSONArray) page.get("list");
         checkJob((JSONObject) jobs.get(2), JobStatus.RUNNING, 1, 0);
 
-        JSONObject map = getRequestJSONObject(getResourceUrl("revisionjobsinfo"));
+        page = getRequestJSONObject(getResourceUrl("revisionjobsinfo"));
+        JSONObject map = (JSONObject) page.get("map");
         Assert.assertEquals(1, map.keySet().size());
         jobs = (JSONArray) map.get(map.keySet().iterator().next());
         checkJob((JSONObject) jobs.get(2), JobStatus.RUNNING, 1, 0);
@@ -140,7 +141,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         jobs = (JSONArray) page.get("list");
         checkJob(findJob("1", jobs), JobStatus.KILLED, 0, 0);
 
-        map = getRequestJSONObject(getResourceUrl("revisionjobsinfo"));
+        page = getRequestJSONObject(getResourceUrl("revisionjobsinfo"));
+        map = (JSONObject) page.get("map");
         Assert.assertEquals(1, map.keySet().size());
         jobs = (JSONArray) map.get(map.keySet().iterator().next());
         checkJob(findJob("1", jobs), JobStatus.KILLED, 0, 0);
@@ -316,7 +318,8 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         Set<String> expected = new HashSet<>(Arrays.asList(expectedIds));
         Set<String> actual = new HashSet<>();
 
-        JSONObject map = getRequestJSONObject(url);
+        JSONObject page = getRequestJSONObject(url);
+        JSONObject map = (JSONObject) page.get("map");
         Assert.assertEquals(1, map.keySet().size());
         JSONArray jobs = (JSONArray) map.get(map.keySet().iterator().next());
         for (int i = 0; i < jobs.size(); i++) {
