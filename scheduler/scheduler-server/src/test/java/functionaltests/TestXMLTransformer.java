@@ -129,7 +129,7 @@ public class TestXMLTransformer extends FunctionalTest {
     public static void main(String args[]) throws Throwable {
         TestXMLTransformer test = new TestXMLTransformer();
         test.prepareForTest();
-        test.run();
+        test.action();
     }
 
     /**
