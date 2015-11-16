@@ -49,7 +49,7 @@ import functionaltests.executables.ComplexParamsExecutable;
 public class ComplexTypeArgsTest extends SchedulerConsecutive {
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         //creating job
         TaskFlowJob submittedJob = new TaskFlowJob();

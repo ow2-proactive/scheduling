@@ -75,7 +75,7 @@ public class TestJobFactory {
             .getResource("/unitTests/descriptors/Job_MultiNodes.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         //test default behavior as well (null is STAX)
         log("TEST jobFactory STAX");
         run_(null);

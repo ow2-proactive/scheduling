@@ -71,7 +71,7 @@ public class TestJobSelScriptSubmission extends SchedulerConsecutive {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
     }

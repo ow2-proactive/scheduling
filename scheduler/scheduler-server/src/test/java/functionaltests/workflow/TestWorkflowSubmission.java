@@ -65,7 +65,7 @@ public class TestWorkflowSubmission extends SchedulerConsecutive {
     private static final int jobs_fail = 44;
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         testFail();
         testValid();
     }

@@ -50,7 +50,7 @@ import static org.junit.Assert.*;
 public class TestPropagatedVariablesWalltime extends SchedulerConsecutive {
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         JobId jobId = SchedulerTHelper.submitJob(absolutePath(
           TestPropagatedVariablesWalltime.class.getResource(
             "/functionaltests/descriptors/Job_PropagatedVariables_Timeout.xml")));

@@ -74,7 +74,7 @@ public class TestJobFork extends SchedulerConsecutive {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         String task1Name = "Task1";
         String task2Name = "Task2";

@@ -72,7 +72,7 @@ public class TestGenericInformation extends SchedulerConsecutive {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         testRegularJob();
         testWithReplication();
     }

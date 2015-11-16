@@ -60,7 +60,7 @@ public class TestLoggers extends FunctionalTest {
     private final static int TEST_TIMEOUT = 10000;
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         // socket loggers
         LogForwardingService lfsPA = new LogForwardingService(

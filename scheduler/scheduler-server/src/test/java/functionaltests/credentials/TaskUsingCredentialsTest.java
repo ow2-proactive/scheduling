@@ -60,7 +60,7 @@ public class TaskUsingCredentialsTest extends SchedulerConsecutive {
             .getResource("/functionaltests/descriptors/Job_UsingCredentials.xml");
 
     @Test
-    public void run() throws Exception {
+    public void action() throws Exception {
         jobs_using_third_party_credentials();
         third_party_credentials_api();
     }

@@ -56,7 +56,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 public class TestForkEnvironment {
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         ForkEnvironment fe = new ForkEnvironment();
         //test initial values
         Assert.assertEquals(0, fe.getSystemEnvironment().size());

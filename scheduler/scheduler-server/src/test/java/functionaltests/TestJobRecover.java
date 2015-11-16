@@ -72,7 +72,7 @@ public class TestJobRecover extends FunctionalTest {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         JobId idJ1 = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         JobId idJ2 = SchedulerTHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());

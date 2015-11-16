@@ -75,7 +75,7 @@ public class TestNativeTaskPaths extends FunctionalTest {
         OutVarsFileD + "\n";
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         File in = File.createTempFile("input", "space");
         in.delete();

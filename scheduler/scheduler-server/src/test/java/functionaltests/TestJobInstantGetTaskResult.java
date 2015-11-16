@@ -66,7 +66,7 @@ public class TestJobInstantGetTaskResult extends SchedulerConsecutive {
     * @throws Throwable any exception that can be thrown during the test.
     */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         //create Scheduler client as an active object
         SubmitJob client = (SubmitJob) PAActiveObject.newActive(SubmitJob.class.getName(), new Object[] {});
         //begin to use the client : must be a futur result in order to start the scheduler at next step

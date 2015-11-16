@@ -91,7 +91,7 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
      * the Input/Output/Local space, copies its content, and checks both are identical
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         /**
          * creates input and output spaces in temporary dirs

@@ -31,35 +31,6 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="Controller2">
-			<description>Will control the workers in order to find the prime number</description>
-			<parallel numberOfNodes="4">
-				<topology>
-					<bestProximity/>
-				</topology>
-			</parallel>
-			<javaExecutable
-				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
-				<parameters>
-					<parameter name="numberToFind" value="100"/>
-				</parameters>
-			</javaExecutable>
-		</task>
-
-		<task name="Controller3">
-			<description>Will control the workers in order to find the prime number</description>
-			<parallel numberOfNodes="4">
-				<topology>
-					<thresholdProximity threshold="100"/>
-				</topology>
-			</parallel>
-			<javaExecutable
-				class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
-				<parameters>
-					<parameter name="numberToFind" value="100"/>
-				</parameters>
-			</javaExecutable>
-		</task>
 
 		<task name="Controller4">
 			<description>Will control the workers in order to find the prime number</description>

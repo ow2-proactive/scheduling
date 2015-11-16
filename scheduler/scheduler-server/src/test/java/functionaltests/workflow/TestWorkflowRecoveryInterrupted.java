@@ -82,7 +82,7 @@ public class TestWorkflowRecoveryInterrupted extends FunctionalTest {
             "T3#2 103 (T2#2 T2#2*1 T2#2*2)" };
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         job1();
         job2();
         job3();

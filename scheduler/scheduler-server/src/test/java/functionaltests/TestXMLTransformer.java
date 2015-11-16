@@ -99,7 +99,7 @@ public class TestXMLTransformer extends FunctionalTest {
     }
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         File folder = new File(jobDescriptorsFolder.toURI());
         Collection<File> testJobDescrFiles = FileUtils.listFiles(folder, new String[] { "xml" }, true);

@@ -44,7 +44,7 @@ package functionaltests.workflow;
  */
 public class TestWorkflowReplicateJobs2 extends TRepJobs {
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         String prefix = "/functionaltests/workflow/descriptors/flow_duplicate_2_";
 
         TRepCase t1 = new TRepCase(prefix + "1.xml", 38,

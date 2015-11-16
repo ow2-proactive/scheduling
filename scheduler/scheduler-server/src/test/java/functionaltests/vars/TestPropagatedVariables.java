@@ -53,7 +53,7 @@ import functionaltests.executables.PropagateVariablesExec;
 public class TestPropagatedVariables extends SchedulerConsecutive {
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         SchedulerTHelper.testJobSubmissionAndVerifyAllResults(createTaskFlowJob(),
                 "TestPropagatedVariables.TestFlowJob");
     }

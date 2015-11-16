@@ -65,7 +65,7 @@ public class TestJobRemoved extends SchedulerConsecutive {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         SchedulerState state = SchedulerTHelper.getSchedulerInterface().getState();
         int jobsNumber = state.getFinishedJobs().size() + state.getPendingJobs().size() +

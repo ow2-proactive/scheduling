@@ -86,7 +86,7 @@ public class TestWorkingDirStaticCommand extends SchedulerConsecutive {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         String task1Name = "task1";
 

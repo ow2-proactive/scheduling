@@ -83,7 +83,7 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends FunctionalTest {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         SchedulerTHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
     }

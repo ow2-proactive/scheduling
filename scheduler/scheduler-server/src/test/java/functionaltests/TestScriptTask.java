@@ -64,7 +64,7 @@ public class TestScriptTask extends SchedulerConsecutive {
             .getResource("/functionaltests/descriptors/Job_null_returning_script_task.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         forkedTasks();
         test_getTaskResult_nullReturningScriptTask_shouldSucceed();
     }

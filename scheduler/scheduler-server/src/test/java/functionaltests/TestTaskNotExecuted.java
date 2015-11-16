@@ -86,7 +86,7 @@ public class TestTaskNotExecuted extends SchedulerConsecutive {
     * @throws Throwable any exception that can be thrown during the test.
     */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         SchedulerTHelper.log("Submitting job 1");
         JobId id1 = SchedulerTHelper.submitJob(new File(jobDescriptor1.toURI()).getAbsolutePath(),

@@ -52,7 +52,7 @@ import org.junit.Test;
 public class SelectionUtilsTest {
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         String scriptPath;
         String propertyPath = new File(getClass().getResource("scripts/SampleCheckProperties").toURI())
                 .getAbsolutePath();

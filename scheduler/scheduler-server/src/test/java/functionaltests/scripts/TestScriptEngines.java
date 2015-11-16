@@ -61,7 +61,7 @@ public class TestScriptEngines extends SchedulerConsecutive {
         jobDescriptorsLoc);
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         logger.info("Testing submission of job descriptor : " + jobDescriptor);
         JobId id = SchedulerTHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
 

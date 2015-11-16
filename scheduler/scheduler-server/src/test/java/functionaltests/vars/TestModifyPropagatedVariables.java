@@ -59,7 +59,7 @@ public class TestModifyPropagatedVariables extends SchedulerConsecutive {
             .getResource("/functionaltests/vars/test-vars.sh");
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         testJobSubmissionAndVerifyAllResults(absolutePath(job_desc));
         OperatingSystem os = OperatingSystem.getOperatingSystem();
         if (unix == os) {

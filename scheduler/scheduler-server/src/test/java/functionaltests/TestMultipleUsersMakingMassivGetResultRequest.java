@@ -72,7 +72,7 @@ public class TestMultipleUsersMakingMassivGetResultRequest extends SchedulerCons
     * @throws Throwable any exception that can be thrown during the test.
     */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         final SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
 

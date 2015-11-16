@@ -82,7 +82,7 @@ public class TestJobMultiNodesSubmission extends SchedulerConsecutive {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         SchedulerTHelper.getSchedulerAuth();
         //connect to RM
         RMTHelper rmHelper = RMTHelper.getDefaultInstance();

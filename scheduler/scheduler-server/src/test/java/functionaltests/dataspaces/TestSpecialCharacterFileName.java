@@ -113,7 +113,7 @@ public class TestSpecialCharacterFileName extends FunctionalTest {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         // Start the scheduler
         ArrayList<String> schedulerCommand = new ArrayList<>();

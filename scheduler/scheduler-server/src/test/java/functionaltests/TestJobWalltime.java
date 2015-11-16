@@ -87,7 +87,7 @@ public class TestJobWalltime extends FunctionalTest {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         walltimeJavaTask();
         walltimeForkedJavaTask();
         walltimeNativeTask();

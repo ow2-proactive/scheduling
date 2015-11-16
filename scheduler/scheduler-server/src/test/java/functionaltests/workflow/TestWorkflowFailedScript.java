@@ -65,7 +65,7 @@ public class TestWorkflowFailedScript extends SchedulerConsecutive {
     private static final String ifScriptContent = "throw new java.lang.Exception(\"test exception\");";
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         testIf();
     }
 

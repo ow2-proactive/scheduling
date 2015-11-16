@@ -53,7 +53,7 @@ public class Test_SCHEDULING_2034 extends SchedulerConsecutive {
             .getResource("/functionaltests/descriptors/Job_SCHEDULING_2034_unix.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         if (OperatingSystem.unix == OperatingSystem.getOperatingSystem()) {
             SchedulerTHelper.testJobSubmissionAndVerifyAllResults(absolutePath(job_desc_unix));
         }

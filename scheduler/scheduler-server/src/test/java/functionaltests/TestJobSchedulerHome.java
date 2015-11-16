@@ -87,7 +87,7 @@ public class TestJobSchedulerHome extends FunctionalTest {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         pahomeJavaTask();
         pahomeForkedJavaTask();
         pahomeNativeTask();

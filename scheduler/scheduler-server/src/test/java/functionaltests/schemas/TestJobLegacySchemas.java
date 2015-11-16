@@ -79,7 +79,7 @@ public class TestJobLegacySchemas extends SchedulerConsecutive {
     }
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         for (URL jobDescriptor : jobDescriptors) {
             logger.info("Testing submission of job descriptor : " + jobDescriptor);
             prepareDataspaceFolder();

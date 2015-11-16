@@ -126,7 +126,7 @@ public class TestWorkflowIterationAwareness extends SchedulerConsecutive {
      * @throws Throwable
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         File tmpDir = new File(tmp_dir_Windows);
         if (!tmpDir.exists()) {

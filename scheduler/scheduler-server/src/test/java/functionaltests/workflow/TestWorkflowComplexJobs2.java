@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
  */
 public class TestWorkflowComplexJobs2 extends TRepJobs {
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         String prefix = "/functionaltests/workflow/descriptors/flow_complex_2_";
 
         TRepCase t1 = new TRepCase(prefix + "1.xml", 87,

@@ -100,7 +100,7 @@ public class TestJobCoverage extends FunctionalTest {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         JobState jstate;
         TaskInfo tinfo;
         JobInfo jinfo;

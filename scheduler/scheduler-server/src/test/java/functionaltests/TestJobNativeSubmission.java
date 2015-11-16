@@ -74,7 +74,7 @@ import static org.junit.Assert.*;
 public class TestJobNativeSubmission extends SchedulerConsecutive {
 
     @Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         //test submission and event reception
         TaskFlowJob job = new TaskFlowJob();

@@ -66,7 +66,7 @@ import functionaltests.SchedulerTHelper;
 public class TestWorkflowDataspace extends SchedulerConsecutive {
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         testJavaTask();
     }
 

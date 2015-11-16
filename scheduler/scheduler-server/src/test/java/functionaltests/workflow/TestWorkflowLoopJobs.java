@@ -104,7 +104,7 @@ public class TestWorkflowLoopJobs extends TWorkflowJobs {
     }
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         internalRun();
     }
 }

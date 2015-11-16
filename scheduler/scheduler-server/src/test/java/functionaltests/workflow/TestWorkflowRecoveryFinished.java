@@ -73,7 +73,7 @@ public class TestWorkflowRecoveryFinished extends FunctionalTest {
     };
 
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         Map<Integer, JobId> jobs = new HashMap<Integer, JobId>();
         for (int i = 0; i < jobs_1.length; i++) {

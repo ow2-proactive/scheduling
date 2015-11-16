@@ -104,7 +104,7 @@ public class TestJobDataspaceSubmission extends SchedulerConsecutive {
     * @throws Throwable any exception that can be thrown during the test.
     */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         //create initial directories and files
         setup();

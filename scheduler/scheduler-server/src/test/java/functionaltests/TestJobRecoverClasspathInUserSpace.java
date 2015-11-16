@@ -55,7 +55,7 @@ public class TestJobRecoverClasspathInUserSpace extends FunctionalTest {
 
     @Test
     // SCHEDULING-2077
-    public void run() throws Throwable {
+    public void action() throws Throwable {
         ProActiveLock controlJobExecution = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
 
         TaskFlowJob job = createJob(PAActiveObject.getUrl(controlJobExecution));

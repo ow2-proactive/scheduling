@@ -56,7 +56,7 @@ import static org.junit.Assert.*;
 public class SchedulerUsageTest extends SchedulerConsecutive {
 
     @Test
-    public void run() throws Exception {
+    public void action() throws Exception {
 
         SchedulerAuthenticationInterface auth = SchedulerTHelper.getSchedulerAuth();
         PublicKey pubKey = auth.getPublicKey();

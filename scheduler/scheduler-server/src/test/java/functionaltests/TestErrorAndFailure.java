@@ -74,7 +74,7 @@ public class TestErrorAndFailure extends SchedulerConsecutive {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void action() throws Throwable {
 
         String javaCmd = System.getProperty("java.home") + "/bin/java";
         SchedulerTHelper.log("Test 1 : Creating job...");
