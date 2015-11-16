@@ -36,7 +36,8 @@
  */
 package functionaltests.topology;
 
-import functionaltests.utils.RMFunctionalTest;
+import functionaltests.RMConsecutive;
+import functionaltests.RMTHelper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,11 +55,12 @@ import java.util.Collection;
  * Local version of SelectionTest which tests only a few scenarios and verify
  * that they work when topology distance is disabled
  **/
-public class LocalSelectionTest extends RMFunctionalTest {
+public class LocalSelectionTest extends RMConsecutive {
 
     private ResourceManager resourceManager = null;
 
     private static final int NODE_NUMBER = 4;
+    private RMTHelper rmHelper;
 
     private void getNodesAndReleaseThem(int number, TopologyDescriptor descriptor, int expectedReceived, int expectedExtraNodesSize) {
         Criteria c = new Criteria(number);
@@ -76,6 +78,7 @@ public class LocalSelectionTest extends RMFunctionalTest {
 
     @Before
     public void getRM() throws Exception {
+        rmHelper = RMTHelper.getDefaultInstance();
         //rmHelper.startRM(null, TestRM.PA_PNP_PORT, "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5007");
         resourceManager = rmHelper.getResourceManager();
 
