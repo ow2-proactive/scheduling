@@ -984,7 +984,7 @@ public class TaskData {
     
 
     TaskInfoImpl createTaskInfo(JobIdImpl jobId) {
-        TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId(), getTag());
         TaskInfoImpl taskInfo = new TaskInfoImpl();
         taskInfo.setTaskId(taskId);
         taskInfo.setStatus(getTaskStatus());
