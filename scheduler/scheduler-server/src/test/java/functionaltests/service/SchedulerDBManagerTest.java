@@ -275,6 +275,51 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         actualPageInfo = getTasks(crit);
         assertTaskPageSizes(actualPageInfo, 0, 0);
     }
+
+    @Test
+    public void testDatesTaskCentric() throws Throwable {
+
+        int nbJobs = 5;
+        int nbTasksPerJob = 10;
+        int totalNbTasks = nbJobs * nbTasksPerJob;
+
+        // These only should come up
+        actualInternalJobs = createTestJobs("Job-hier", "TAG-HIER", nbJobs, nbTasksPerJob);
+        for (InternalJob j : actualInternalJobs) {
+            service.submitJob(j);
+        }
+
+        // These should NOT come up
+        List<InternalJob> todayJobs = createTestJobs("Job-today", "TAG-TODAY", nbJobs, nbTasksPerJob);
+        for (InternalJob j : todayJobs) {
+            service.submitJob(j);
+        }
+
+        for (InternalJob j : actualInternalJobs) {
+            j.start();
+            j.setStartTime(100L);
+            for (InternalTask t : j.getITasks()) {
+                t.setStartTime(100L);
+                dbManager.jobTaskStarted(j, t, true);
+            }
+        }
+
+        for (int i = 0; i < todayJobs.size(); i++) {
+            terminateJob(i, 500L);
+        }
+
+        crit = TaskFilterCriteria.TFCBuilder.newInstance().from(100L).criterias();
+        actualPageState = getTaskStates(crit);
+
+        for (TaskState ts : actualPageState.getList()) {
+            String taskStr = "Results from criteria:" + ts.getName() + "," + ts.getTag() + "," +
+                String.valueOf(ts.getStartTime()) + "," + String.valueOf(ts.getFinishedTime()) + "," +
+                ts.getStatus();
+            System.out.println(taskStr);
+        }
+        assertEquals("Incorrect tasks list size due to coupled dates from/to", totalNbTasks,
+                actualPageState.getList().size());
+    }
     
     private void initExpectedResults(String jobName, String tag) throws Throwable {
         actualInternalJobs = createTestJobs(jobName, tag, nbJobs, nbTasksPerJob);

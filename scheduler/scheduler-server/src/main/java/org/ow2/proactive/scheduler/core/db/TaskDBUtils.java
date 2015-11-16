@@ -57,8 +57,10 @@ public class TaskDBUtils {
                             .add(Restrictions.eq("job.owner", params.getUser()));
                 }
 
-                if (params.getFrom() != 0 && params.getTo() != 0) {
+                if (params.getFrom() > 0) {
                     criteria.add(Restrictions.ge("startTime", params.getFrom()));
+                }
+                if (params.getTo() > 0) {
                     criteria.add(Restrictions.le("finishedTime", params.getTo()));
                 }
 
@@ -120,8 +122,10 @@ public class TaskDBUtils {
                             .add(Restrictions.eq("job.owner", params.getUser()));
                 }
 
-                if (params.getFrom() != 0 && params.getTo() != 0) {
+                if (params.getFrom() > 0) {
                     criteria.add(Restrictions.ge("startTime", params.getFrom()));
+                }
+                if (params.getTo() > 0) {
                     criteria.add(Restrictions.le("finishedTime", params.getTo()));
                 }
 
