@@ -65,7 +65,6 @@ public class InfrastructureManagerFactory {
      * @param infrastructureType a full class name of an infrastructure manager
      * @param infrastructureParameters parameters for nodes acquisition
      * @return new infrastructure manager
-     * @throws RMException if any problems occurred
      */
     public static InfrastructureManager create(String infrastructureType, Object[] infrastructureParameters) {
 

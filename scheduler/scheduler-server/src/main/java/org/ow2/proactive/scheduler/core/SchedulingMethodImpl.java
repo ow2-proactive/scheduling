@@ -338,7 +338,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * will terminate the corresponding tasks and jobs. As the selection scripts contain errors, the task
      * and its surrounding jobs must be stopped.
      *
-     * @param neededResourcesNumber the number of resources to ask for (must be > 0).
+     * @param neededResourcesNumber the number of resources to ask for (must be &gt; 0).
      * @param tasksToSchedule the task to be scheduled
      * @return A nodeSet that contains at most 'neededResourcesNumber' available compatible resources.
      * 		   An empty nodeSet if no nodes could be found

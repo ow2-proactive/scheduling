@@ -178,8 +178,6 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * check group membership from group file.
      * @param username user's login
      * @param password user's password
-     * @param reqGroup requested level
-     * @param groupsHierarchy Group hierarchy used for authentication.
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication or group membership fails.
      */
@@ -225,7 +223,6 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     /**
      * Return corresponding group for an user from the group file.
      * @param username user's login
-     * @return a String representing user's group, or null if no group is found for the user.
      * @throws LoginException if group file is not found or unreadable.
      */
     protected void groupMembershipFromFile(String username) throws LoginException {

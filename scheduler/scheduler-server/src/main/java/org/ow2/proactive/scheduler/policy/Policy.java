@@ -76,13 +76,13 @@ public abstract class Policy implements Serializable {
     protected Properties configProperties = null;
 
     /**
-     * Create a new instance of Policy. (must be public)
+     * Create a new instance of Policy (must be public).
      * Called by class.forname when instantiating the policy.
-     *<br/><br/>
+     * <p>
      * The {@link #reloadConfig()} method is called by the scheduler after the creation of this policy instance
      * This empty constructor remains mandatory to enable the core to instantiate the policy but SchedulerCore
      * does not wait for any special or mandatory behavior inside.
-     * <br/><br/>
+     * <p>
      * This constructor can/should be empty.
      */
     public Policy() {
@@ -102,14 +102,14 @@ public abstract class Policy implements Serializable {
     /**
      * Set the RM state
      *
-     * @param RM state
+     * @param state resource manager state
      */
     public final void setRMState(RMState state) {
         this.RMState = state;
     }
 
     /**
-     * Return the configuration as properties (key->value) read in the policy config file.
+     * Return the configuration as properties (key-&gt;value) read in the policy config file.
      * The returned value can be null or empty if no property has been loaded.
      *
      * @return the configuration read in the policy config file.
@@ -132,21 +132,20 @@ public abstract class Policy implements Serializable {
     }
 
     /**
-     * Reload the configuration file of the corresponding policy.<br/>
+     * Reload the configuration file of the corresponding policy.
      * This method is called each time a reload action is performed for the policy
-     * (ie. {@link Scheduler#reloadPolicyConfiguration()} method is called from client side)<br/>
-     * <br/>
+     * (ie. {@link Scheduler#reloadPolicyConfiguration()} method is called from client side)
+     * <p>
      * This method just call {@link #getConfigFile()} method and then, load the content of the returned file
-     * in this policy properties.<br/>
-     * <br/>
+     * in this policy properties.
+     * <p>
      * Override this method to have a fully custom reload, override only the {@link #getConfigFile()} method to
      * change the properties file location.
-     * <br/>
+     * <p>
      * This method will reload the whole content of the properties. Every old properties will be erased and new one from file
      * will be set.
-     * <br/>
-     * <br/>
-     * Note : this method is also called once at Scheduler startup.
+     * <p>
+     * Note: this method is also called once at Scheduler startup.
      *
      * @return true if the configuration has been successfully reload, false otherwise.
      *
@@ -167,11 +166,11 @@ public abstract class Policy implements Serializable {
     }
 
     /**
-     * Return the configuration file for this policy.<br/>
-     * Default configuration file is config/policy/[SimpleClassName].conf.<br/>
-     * <br/>
-     * In the default behavior, this method is called by {@link #reloadConfig()} method each time a policy reload is performed.<br/>
-     * <br/>
+     * Return the configuration file for this policy.
+     * Default configuration file is config/policy/[SimpleClassName].conf.
+     * <p>
+     * In the default behavior, this method is called by {@link #reloadConfig()} method each time a policy reload is performed.
+     * <p>
      * Override this method to change the default path where to find the configuration file.
      */
     protected File getConfigFile() {

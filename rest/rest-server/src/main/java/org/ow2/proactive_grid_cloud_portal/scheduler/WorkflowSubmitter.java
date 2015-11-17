@@ -70,22 +70,18 @@ public class WorkflowSubmitter {
      * Submits a workflow to the scheduler (XML or archive).
      *
      * @param workflowFile a workflow file (XML or archive)
-     * @param isXml        flag indicating if XML workflow or archive
      * @param variables    variables to be replaced on submission
-     * @return
-     * @throws JobCreationException
-     * @throws NotConnectedException
-     * @throws PermissionException
-     * @throws SubmissionClosedException
+     * @return job ID of the job created for the specified workflow and associated variables.
+     * @throws JobCreationRestException
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
      */
-    public JobId submit(
-            File workflowFile,
-            Map<String, String> variables
-    ) throws NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, JobCreationRestException {
-
-        JobId jobId;
+    public JobId submit(File workflowFile, Map<String, String> variables)
+            throws NotConnectedRestException, PermissionRestException,
+                    SubmissionClosedRestException, JobCreationRestException {
         try {
-            jobId = scheduler.submit(createJobObject(workflowFile, variables));
+            JobId jobId = scheduler.submit(createJobObject(workflowFile, variables));
             storeWorkflowFile(jobId);
             return jobId;
         } catch (NotConnectedException e) {

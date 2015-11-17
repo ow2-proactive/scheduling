@@ -51,8 +51,8 @@ import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 
 
 /**
- * Hibernate natively maps blob columns to java.sql.Blob.<br />
- * However, it's sometimes useful to read the whole blob into memory and deal with it as a byte array.<br />
+ * Hibernate natively maps blob columns to java.sql.Blob.
+ * However, it's sometimes useful to read the whole blob into memory and deal with it as a byte array.
  * BinaryLargeOBject is made to fix this issue.
  *
  * @author The ProActive Team
@@ -83,9 +83,6 @@ public class BinaryLargeOBject implements UserType {
         return (x == y) || (x != null && y != null && java.util.Arrays.equals((byte[]) x, (byte[]) y));
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#nullSafeGet(java.sql.ResultSet, java.lang.String[], java.lang.Object)
-     */
     public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor s, Object owner)
             throws HibernateException, SQLException {
         /*Blob blob = rs.getBlob(names[0]);
@@ -99,9 +96,6 @@ public class BinaryLargeOBject implements UserType {
 
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#nullSafeSet(java.sql.PreparedStatement, java.lang.Object, int)
-     */
     public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor s)
             throws HibernateException, SQLException {
         try {

@@ -181,8 +181,8 @@ public class Tools {
 
     /**
      * Format the given string and return a long that correspond
-     * to the time represented by the given string.<br />
-     * If the string is not proper, 0 will be returned.
+     * to the time represented by the given string.
+     * If the string is not proper, {@code 0} will be returned.
      *
      * @param pattern a time pattern that must be in [[HH:]MM:]SS
      * 			where HH, MM, and SS are numbers
@@ -225,13 +225,14 @@ public class Tools {
 
     /**
      * Parse a command line in order to split it into a string array.
-     * This method provides the parsing as followed :<br />
-     *  - It is split according to the 'white space' character.<br />
-     *  - It is possible to escape white space character using the '%' character.<br />
-     *  - To write this '%' special char, just escape it ( '%%' ).<br />
-     * For example, the string "cmd arg1 arg% 2 arg%%% 3 arg4%% 5" will return the following string array :<br />
-     *   [cmd,arg1,arg 2,arg% 3,arg4%,5]<br />
-     * <br />This method can be mostlikely used for Runtime.exec(String[]) method.
+     * This method provides the parsing as followed :<br>
+     *  - It is split according to the 'white space' character.<br>
+     *  - It is possible to escape white space character using the '%' character.<br>
+     *  - To write this '%' special char, just escape it ( '%%' ).<br>
+     * For example, the string "cmd arg1 arg% 2 arg%%% 3 arg4%% 5" will return the following string array :<br>
+     *   [cmd,arg1,arg 2,arg% 3,arg4%,5]
+     * <p>
+     * This method can be mostlikely used for Runtime.exec(String[]) method.
      *
      * @param cmdLine The command line to parse.
      * @return a string array that represents the parsed command line.

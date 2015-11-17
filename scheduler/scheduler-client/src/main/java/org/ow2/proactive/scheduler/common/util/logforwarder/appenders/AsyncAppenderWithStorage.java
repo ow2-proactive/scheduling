@@ -67,7 +67,7 @@ public class AsyncAppenderWithStorage extends AsyncAppender {
     private long nbFiredEvents = 0;
 
     /**
-     * Create a AsyncAppenderWithStorage with default parameters.<br />
+     * Create a AsyncAppenderWithStorage with default parameters.
      * See DEFAULT_BUFFER_SIZE for details.
      */
     public AsyncAppenderWithStorage() {

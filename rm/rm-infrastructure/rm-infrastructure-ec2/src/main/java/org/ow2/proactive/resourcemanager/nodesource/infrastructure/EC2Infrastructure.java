@@ -561,7 +561,7 @@ public class EC2Infrastructure extends InfrastructureManager {
      * Cleanup deployed instances,
      * so that instances that did not register to the nodesource be removed as well
      * 
-     * @see org.ow2.proactive.resourcemanager.nodesource.infrastructure.manager.InfrastructureManager#shutDown()
+     * @see InfrastructureManager#shutDown()
      */
     @Override
     public void shutDown() {

@@ -291,9 +291,10 @@ public class ForkEnvironment implements Serializable {
     }
 
     /**
-     * Set the environment script value to the given script value.<br/>
-     * This script allows the user to programmatically set system variables, JVM arguments, additional classpath
-     * Use the binding variable name <b>forkEnvironment</b> to fill this object in this given script.
+     * Set the environment script value to the given script value.
+     * <p>
+     * This script allows the user to programmatically set system variables, JVM arguments, additional classpath, etc.
+     * Use the binding variable name {@code forkEnvironment} to fill this object in this given script.
      *
      * @param script the script to set
      */

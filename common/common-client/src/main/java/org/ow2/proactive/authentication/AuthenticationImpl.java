@@ -126,10 +126,8 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
     }
 
     /**
-     * Performs login
+     * Performs login.
      * 
-     * @param role the role of the user to connect, can be admin or user
-     * @param groups the group in which the user is
      * @param cred encrypted username and password
      * @return the name of the user logged
      * @throws LoginException if username or password is incorrect.
@@ -179,11 +177,10 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
     }
 
     /**
-     * Request this AuthenticationImpl's public key
+     * Request this AuthenticationImpl's public key.
      * <p>
      * The public key provided by this method can be used to create encrypted credentials with
-     * {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, PublicKey)},
-     * which can then be used for further calls to {@link #loginAs(String, String[], Credentials)}.
+     * {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, PublicKey)}.
      * The private key corresponding to this public key will be used for decryption.
      * 
      * @return this AuthenticationImpl's public key

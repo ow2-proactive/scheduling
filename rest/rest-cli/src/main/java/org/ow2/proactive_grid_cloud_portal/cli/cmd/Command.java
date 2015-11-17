@@ -51,7 +51,7 @@ public interface Command {
     /**
      * Executes the specific REST CLI command.
      * 
-     * @throws Exception
+     * @throws CLIException
      *             if an error occurred while executing the command.
      */
     void execute(ApplicationContext currentContext) throws CLIException;

@@ -131,7 +131,7 @@ public class Client implements Serializable {
 
     /**
      * Sets the id of the client
-     * @param the new client's id
+     * @param id new client's id
      */
     public void setId(UniqueID id) {
         this.id = id;

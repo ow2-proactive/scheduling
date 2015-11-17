@@ -71,8 +71,9 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 
 /**
- * SchedulerAuthenticationHelper provides a graphical user interface to connect to the ProActiveScheduler.<br />
- * Use one of the two provided method to connect the scheduler as an administrator or as a user. <br />
+ * SchedulerAuthenticationHelper provides a graphical user interface to connect to the ProActiveScheduler.
+ * <p>
+ * Use one of the two provided method to connect the scheduler as an administrator or as a user.
  * This class will request username and password to the user using the graphical interface.
  *
  * @author The ProActive Team
@@ -123,7 +124,7 @@ public class SchedulerAuthenticationGUIHelper {
 
     /**
      * This method will log a client to the scheduler by requesting his URL, username and password from a
-     * graphical interface.<br/>
+     * graphical interface.
      *
      * @param schedulerURL The default URL of the scheduler to connect
      * @return The connection to the scheduler as a {@link Scheduler} if logging successful.

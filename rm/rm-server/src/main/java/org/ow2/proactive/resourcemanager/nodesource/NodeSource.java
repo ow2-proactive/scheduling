@@ -266,7 +266,7 @@ public class NodeSource implements InitActive, RunActive {
      * Acquires the existing node with specific url. The node have to be up and running.
      *
      * @param nodeUrl the url of the node
-     * @param client
+     * @param provider
      */
     public BooleanWrapper acquireNode(String nodeUrl, Client provider) {
 
@@ -643,7 +643,7 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Marks node as down. Remove it from node source node set. It remains in rmcore nodes list until
      * user decides to remove them or node source is shutdown.
-     * @see org.ow2.proactive.resourcemanager.nodesource.frontend.NodeSource#detectedPingedDownNode(java.lang.String)
+     * @see NodeSource#detectedPingedDownNode(String)
      */
     public void detectedPingedDownNode(String nodeUrl) {
 
@@ -668,7 +668,7 @@ public class NodeSource implements InitActive, RunActive {
 
     /**
      * Gets resource manager core. Used by policies.
-     * @return {@link RMCoreInterface}
+     * @return {@link RMCore} instance.
      */
     @ImmediateService
     public RMCore getRMCore() {
@@ -676,8 +676,8 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Executed command in parallel using thread pool
-     * @param command to execute
+     * Executed command in parallel using thread pool.
+     * @param task to execute
      */
     @ImmediateService
     public void executeInParallel(Runnable task) {

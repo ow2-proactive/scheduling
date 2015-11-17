@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
 
 
 /**
- * 
  * Acquires nodes provided by an existing PBS cluster
  * <p>
  * The point of this Infrastructure is to interface with
@@ -55,13 +54,11 @@ import java.util.regex.Pattern;
  * the node is up.
  * <p>
  * If you need more control over you deployment, you may consider
- * using {@link GCMInfrastructure} instead, which contains the 
+ * using {@code GCMInfrastructure} instead, which contains the
  * functionalities of this Infrastructure, but requires more configuration.
- * 
  * 
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
- * 
  */
 public class PBSInfrastructure extends BatchJobInfrastructure {
 

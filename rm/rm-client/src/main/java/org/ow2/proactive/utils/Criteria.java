@@ -177,7 +177,7 @@ public class Criteria implements Serializable {
      * If key is specified the resource manager only looks for nodes having this token.
      * If no token is specified in the criteria, nodes protected by token will not be selected.
      *
-     * @param nodeAccessKey
+     * @param nodeAccessToken
      */
     public void setNodeAccessToken(String nodeAccessToken) {
         this.nodeAccessToken = nodeAccessToken;

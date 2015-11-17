@@ -16,14 +16,18 @@ import org.ow2.proactive.utils.Formatter;
 /**
  *
  * An infrastructure manager that operates custom scripts in order to deploy/remove nodes.
+ * <p>
  * Deployment phase:
- * 	- launch the script by providing host name, node name, node source name, rm url.
- *  - if no node within timeout => terminates the script
- *
+ * <ul>
+ *     <li>launch the script by providing host name, node name, node source name, rm url</li>
+ *     <li>if no node within timeout =&gt; terminates the script.</li>
+ * </ul>
+ * <p>
  * Removal phase:
- * 	- remove node from the resource manager
- *  - launch removal script giving host name and node url.
- *
+ * <ul>
+ *     <li>remove node from the resource manager</li>
+ *     <li>launch removal script giving host name and node url.</li>
+ * </ul>
  */
 public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
 

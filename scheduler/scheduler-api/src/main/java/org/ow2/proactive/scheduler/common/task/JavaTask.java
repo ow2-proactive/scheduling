@@ -49,8 +49,13 @@ import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 
 
 /**
- * Use this class to build a java task that will use a {@link JavaExecutable} and be integrated in a {@link TaskFlowJob}.<br>
- * A java task includes an {@link JavaExecutable} that can be set as a .class file or instance.<br>
+ * Use this class to build a java task that will use a
+ * {@link org.ow2.proactive.scheduler.common.task.executable.JavaExecutable} and be integrated in a
+ * {@link TaskFlowJob}.
+ * <p>
+ * A java task includes an {@link org.ow2.proactive.scheduler.common.task.executable.JavaExecutable} that can be set
+ * as a .class file or instance.
+ * <p>
  * It also provides method to personalize it.
  *
  * @author The ProActive Team
@@ -86,7 +91,7 @@ public class JavaTask extends Task {
 
     /**
      * To set the executable task class name.
-     * It must be a class that extends {@link JavaExecutable}.
+     * It must be a class that extends {@link org.ow2.proactive.scheduler.common.task.executable.JavaExecutable}.
      *
      * @param executableClassName the task Class to set.
      */
@@ -190,4 +195,5 @@ public class JavaTask extends Task {
         return answer + nl + "\tExecutableClassName = '" + executableClassName + '\'' + nl +
             "\tArguments = " + serializedArguments.keySet() + nl + "\tForkEnvironment = " + forkEnvironment;
     }
+
 }

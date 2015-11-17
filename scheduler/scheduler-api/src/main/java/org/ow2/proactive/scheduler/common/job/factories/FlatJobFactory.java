@@ -123,7 +123,6 @@ public class FlatJobFactory {
      * {@link FlatJobFactory#JOB_DEFAULT_NAME_PREFIX} + userName parameter.
      * @param selectionScriptPath a Path to a file containing a selection script, or null if
      * no script is needed.
-     * @param outputFile a path to file that will contain log of STDOUT and STDERR of job's tasks execution.
      * @param userName name of connected user that asked job creation, null otherwise. This parameter
      * is only used for default job's name creation.
      * @return a job object representing created job and ready-to-schedule job.

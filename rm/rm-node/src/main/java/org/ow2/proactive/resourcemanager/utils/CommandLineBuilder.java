@@ -228,7 +228,7 @@ public final class CommandLineBuilder implements Cloneable {
 
     /**
      * Build the command to launch the RMNode.
-     * The required pieces of information that need to be set in order to allow the RMNode to start properly are:<br />
+     * The required pieces of information that need to be set in order to allow the RMNode to start properly are:
      * <ul><li>{@link CommandLineBuilder#rmURL}</li><li>{@link CommandLineBuilder#nodeName}</li>
      * <li>one of {@link CommandLineBuilder#credentialsEnv}, {@link CommandLineBuilder#credentialsFile} or {@link CommandLineBuilder#credentialsValue}</li></ul>
      * @param displayCredentials if true displays the credentials in the command line if false, obfuscates them

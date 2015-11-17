@@ -51,18 +51,15 @@ import org.apache.log4j.Logger;
 
 
 /**
- * Periodically request {@link RMCore#getMonitoring()}, store it locally
+ * Periodically request {@link RMProxyUserInterface#getMonitoring()} and store it locally.
  * <p>
- * the {@link RMInitialState} fetched from {@link RMCore} is a large object
+ * The {@link RMInitialState} fetched from {@link RMProxyUserInterface} is a large object
  * that is long to serialize, but is always the same for every client.
  * <p>
  * Use this class to start a thread that will periodically get this object
  * using a watcher account, making the cached version available to any client instantly.
  * <p>
  * Refresh rate can be configured using {@link PortalConfiguration#rm_cache_refreshrate}
- * 
- * 
- * 
  */
 public class RMStateCaching {
 
@@ -77,20 +74,19 @@ public class RMStateCaching {
     private static boolean kill = false;
 
     /**
-     * Start a thread that will periodically fetch {@link RMCore#getMonitoring()}
+     * Start a thread that will periodically fetch {@link RMProxyUserInterface#getMonitoring()}.
      * <p>
-     * Thread frequency can be customized using {@link PortalConfiguration#rm_cache_refreshrate}
+     * Thread frequency can be customized using {@link PortalConfiguration#rm_cache_refreshrate}.
      * <p>
-     * Cached object can be retrieved using {@link #getRMInitialState()}
+     * Cached object can be retrieved using {@link #getRMInitialState()}.
      * <p>
-     * Stop this thread by calling {@link #kill()}
+     * Stop this thread by calling {@link #kill()}.
      */
     public synchronized static void init() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 state = new RMInitialState();
-
                 init_();
                 run_();
             }
@@ -136,12 +132,11 @@ public class RMStateCaching {
             @Override
             public void run() {
                 while (!kill) {
-
                     try {
                         long t1 = System.currentTimeMillis();
                         state = PAFuture.getFutureValue(rm.getRMInitialState());
                         long t2 = System.currentTimeMillis();
-                        logger.debug("updated RM initial state in " + (t2 - t1) + "ms");
+                        logger.debug("Updated RM initial state in " + (t2 - t1) + "ms");
                     } catch (Throwable t) {
                         logger
                                 .error("Exception occurrend while updating RM state cache, connection reset",
@@ -159,14 +154,14 @@ public class RMStateCaching {
     }
 
     /**
-     * @return cached RM State as returned by {@link RMCore#getMonitoring()}
+     * @return cached RM State as returned by {@link RMProxyUserInterface#getMonitoring()}
      */
     public static RMInitialState getRMInitialState() {
         return state;
     }
 
     /**
-     * @return stop the RM State polling thread
+     * Stop the RM State polling thread.
      */
     public static void kill() {
         RMStateCaching.kill = true;

@@ -43,8 +43,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
 /**
- * WaitAndPrint is a task that will wait and print something.<br/>
- * Also use for test.
+ * WaitAndPrint is a task that will wait and print something.
  *
  * @author The ProActive Team
  */

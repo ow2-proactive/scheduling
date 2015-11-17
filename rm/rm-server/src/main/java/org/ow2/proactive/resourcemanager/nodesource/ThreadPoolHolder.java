@@ -75,7 +75,7 @@ public class ThreadPoolHolder {
     /**
      * Submits a task to the specified thread pool
      * 
-     * @param number of thread pool
+     * @param num thread pool index
      * @param task to be submitted
      * @return the future result of the task
      */
@@ -88,7 +88,7 @@ public class ThreadPoolHolder {
     /**
      * Executes a task in the specified thread pool
      *
-     * @param number of the thread pool
+     * @param num thread pool index
      * @param task to be executed
      */
     public synchronized void execute(int num, Runnable task) {

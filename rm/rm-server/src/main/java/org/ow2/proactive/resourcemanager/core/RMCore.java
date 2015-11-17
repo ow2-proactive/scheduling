@@ -129,39 +129,38 @@ import org.apache.log4j.Logger;
 /**
  * The main active object of the Resource Manager (RM), the RMCore has to
  * provide nodes to clients.
- * 
- * The RMCore functions are :<BR>
- * - Create Resource Manager's active objects at its initialization ;
- * {@link RMAdmin}, {@link RMUser}, {@link RMMonitoring}.<BR>
- * - keep an up-to-date list of nodes able to perform scheduler's tasks.<BR>
- * - give nodes to the Scheduler asked by {@link RMUser} object, with a node
- * selection mechanism performed by {@link SelectionScript}.<BR>
- * - dialog with node sources which add and remove nodes to the Core. - perform
- * creation and removal of NodeSource objects. <BR>
- * - treat removing nodes and adding nodes request coming from {@link RMAdmin}.
- * - create and launch RMEvents concerning nodes and nodes Sources To
- * RMMonitoring active object.<BR>
- * <BR>
- * 
+ * <p>
+ * The RMCore functions are:
+ * <ul>
+ *     <li>Create Resource Manager's active objects at its initialization</li>
+ *     <li>Keep an up-to-date list of nodes able to perform scheduler's tasks.</li>
+ *     <li>Give nodes to the Scheduler asked by {@link org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface} object, with a node selection mechanism performed by {@link SelectionScript}.</li>
+ *     <li>Dialog with node sources which add and remove nodes to the Core.</li>
+ *     <li>Perform creation and removal of NodeSource objects.</li>
+ *     <li>Treat removing nodes and adding nodes requests</li>
+ *     <li>Create and launch RMEvents concerning nodes and nodes sources to {@link RMMonitoring} active object.</li>
+ * </ul>
+ *
  * Nodes in Resource Manager are represented by {@link RMNode objects}. RMcore
- * has to manage different states of nodes : -free : node is ready to perform a
- * task.<BR>
- * -busy : node is executing a task.<BR>
- * -to be removed : node is busy and have to be removed at the end of the its
- * current task.<BR>
- * -down : node is broken, and not anymore able to perform tasks.<BR>
- * <BR>
- * 
+ * has to manage different states of nodes:
+ * <ul>
+ *     <li>Free: node is ready to perform a task.</li>
+ *     <li>Busy: node is executing a task.</li>
+ *     <li>To be removed: node is busy and have to be removed at the end of the its current task.</li>
+ *     <li>Down: node is broken, and not anymore able to perform tasks.</li>
+ * </ul>
+ *
  * RMCore is not responsible of creation, acquisition and monitoring of nodes,
- * these points are performed by {@link NodeSource} objects.<BR>
- * <BR>
+ * these points are performed by {@link NodeSource} objects.
+ * <p>
+ * WARNING: you must instantiate this class as an Active Object!
  * 
- * WARNING : you must instantiate this class as an Active Object !
- * 
- * RmCore should be non-blocking which means <BR>
- * - no direct access to nodes <BR>
- * - all method calls to other active objects should be either asynchronous or non-blocking immediate services <BR>
- * - methods which have to return something depending on another active objects should use an automatic continuation <BR>
+ * RmCore should be non-blocking which means:
+ * <ul>
+ *     <li>No direct access to nodes.</li>
+ *     <li>All method calls to other active objects should be either asynchronous or non-blocking immediate services.</li>
+ *     <li>Methods which have to return something depending on another active objects should use an automatic continuation.</li>
+ * </ul>
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -266,18 +265,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * Initialization part of the RMCore active object. <BR>
-     * Create RM's active objects :<BR>
-     * -{@link RMAdmin},<BR>
-     * -{@link RMUser},<BR>
-     * -{@link RMMonitoring},<BR>
-     * and creates the default static Node Source named
-     * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}. Finally throws the RM
+     * Initialization part of the RMCore active object.
+     * Create RM's active objects and the default static Node Source named
+     * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}. Finally, it throws the RM
      * started event.
      * 
      * @param body
      *            the active object's body.
-     * 
      */
     public void initActivity(Body body) {
 
@@ -552,7 +546,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Internal operation of registering a new node in the Core
      * This step is done after node configuration ran by {@link RMNodeConfigurator} active object.
      * 
-     * @param nodeURL the node's url of the node that is going to be added
+     * @param configuredNode the node that is going to be added.
      */
     public void internalAddNodeToCore(RMNode configuredNode) {
         String nodeURL = configuredNode.getNodeURL();
@@ -736,7 +730,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Removes "number" of nodes from the node source.
      *
      * @param number amount of nodes to be released
-     * @param name a node source name
+     * @param nodeSourceName a node source name
      * @param preemptive if true remove nodes immediately without waiting while they will be freed
      */
     public void removeNodes(int number, String nodeSourceName, boolean preemptive) {
@@ -846,7 +840,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * and acquisition policy {@link NodeSourcePolicy}.
      *
      * @param nodeSourceName the name of the node source
-     * @param infrastructureType type of the underlying infrastructure {@link InfrastructureType}
+     * @param infrastructureType type of the underlying infrastructure
      * @param infrastructureParameters parameters for infrastructure creation
      * @param policyType name of the policy type. It passed as a string due to pluggable approach {@link NodeSourcePolicyFactory}
      * @param policyParameters parameters for policy creation
@@ -1239,9 +1233,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Set a node state to busy. Set the node to busy, and move the node to the
      * internal busy nodes list. An event informing the node state's change is
      * thrown to RMMonitoring.
-     * @param client
+     * @param owner
      *
-     * @param rmnode
+     * @param nodeUrl
      *            node to set
      */
     public void setBusyNode(final String nodeUrl, Client owner) throws NotConnectedException {

@@ -126,12 +126,11 @@ public class SchedulerFactory {
      *
      * @param rmURL the URL of a started Resource Manager
      * @param initializer Use to configure the Scheduler before starting it.
-     * 		This parameter cannot be null, if you want to start the Scheduler using JVM properties
-     * 		use the {@link #} to start the Scheduler without configuration
+     * 		This parameter cannot be null.
      *
      * @return a Scheduler authentication that allow you to administer it or get its connection URL.
      *
-     * @throws ActiveObjectCreationException If Scheduler cannot be created
+     * @throws InternalSchedulerException If Scheduler cannot be created
      */
     public static synchronized SchedulerAuthenticationInterface startLocal(URI rmURL,
             SchedulerInitializer initializer) throws InternalSchedulerException {
@@ -141,11 +140,11 @@ public class SchedulerFactory {
                     //configure application
                     configure(initializer);
                 } else {
-                    throw new IllegalArgumentException("Initializer cannot be null !");
+                    throw new IllegalArgumentException("Initializer cannot be null!");
                 }
             }
             if (rmURL == null) {
-                throw new IllegalArgumentException("RM url is null !");
+                throw new IllegalArgumentException("RM url is null!");
             }
             try {
                 String policy = initializer.getPolicyFullClassName();

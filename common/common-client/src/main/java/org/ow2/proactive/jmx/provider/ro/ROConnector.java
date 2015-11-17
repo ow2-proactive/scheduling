@@ -99,7 +99,7 @@ public class ROConnector implements JMXConnector, NotificationListener, Serializ
 
     /**
      * <p>Constructs an <code>ROConnector</code> that will connect the RO
-     * connector server with the given address.</p>
+     * connector server with the given address.
      *
      * @param url
      *            the address of the RO connector server.	 
@@ -137,7 +137,7 @@ public class ROConnector implements JMXConnector, NotificationListener, Serializ
     }
 
     /**
-     * @see javax.management.remote.JMXConnector#connect(java.util.Map<String,?>)
+     * @see javax.management.remote.JMXConnector#connect(Map)
      */
     public synchronized void connect(final Map<String, ?> env) throws IOException {
         // Check if already connected

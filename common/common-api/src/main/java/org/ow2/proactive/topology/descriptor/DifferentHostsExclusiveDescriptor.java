@@ -42,17 +42,16 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * This descriptor allows to select one node per host exclusively.
  * Hosts with selected nodes will be reserved for the user.
- *
- * By specifying this descriptor in {@link ResourceManager.getAtMostNodes} user may get
+ * <p>
+ * By specifying this descriptor in {@code ResourceManager.getAtMostNodes} user may get
  * more nodes than it asked for due to the fact that total capacity of all machines is
  * bigger.
- *
+ * <p>
  * The resource manager first will try to find hosts with only one node
  * to optimize the utilization of resources. If there no such hosts (or their quantity is
  * below required) it will continue looking for hosts with 2 nodes and so on.
  *
  * If number of hosts is not enough the found subset will be provided.
- *
  */
 @PublicAPI
 public class DifferentHostsExclusiveDescriptor extends TopologyDescriptor {

@@ -574,7 +574,6 @@ public class RMRest implements RMRestInterface {
      * @throws IOException
      * @throws MalformedObjectNameException
      * @throws NullPointerException
-     * @throws InterruptedException
      * @throws NotConnectedException
      */
     @Override
@@ -710,7 +709,7 @@ public class RMRest implements RMRestInterface {
 
     /**
      * Returns the attributes <code>attr</code> of the mbean
-     * registered as <code>name<code>
+     * registered as <code>name</code>.
      * @param sessionId a valid session
      * @param name mbean's object name
      * @param attrs attributes to enumerate

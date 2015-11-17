@@ -66,36 +66,25 @@ import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExten
  * <ul>
  * <li>the client application needs to submit to the scheduler jobs which
  * require data transfer to the execution nodes</li>
- * <p>
  * <li>the input data is accessible by the client on the local file system (or
  * on location accessible on NFS)</li>
- * <p>
  * <li>the output data is to be copied to the local file system (or on location
  * accessible on NFS)</li>
- * <p>
  * <li>the local file system is not visible from the computation nodes side</li>
- * <p>
- * *
  * <li>There is a location (let's call it SHARED_INPUT_LOCATION), for transferring
  * input data, accessible from both sides, client side and computation node
  * side. Same for output data (let's call it SHARED_OUTPUT_LOCATION). These
  * locations could be the same. It might be a shared folder or a data server.
- * <p>
  * Let´s call push_url the url used by the client application in order to push
  * the input data to SHARED_INPUT_LOCATION.
- * <p>
  * Let´s call pull_url the url used by the client application in order to pull
  * the output data from SHARED_OUTPUT_LOCATION.
- * <p>
  * The job needs to specify, as input space, an url pointing to
  * SHARED_INPUT_LOCATION. The job needs to specify, as output space, an url
  * pointing to SHARED_OUTPUT_LOCATION. These urls might or not be the same as
  * push_url and pull_url.
  * </li>
- * <p>
  * </ul>
- * <p>
- * <p>
  * The client application will use this Proxy for communicating with the
  * Scheduler. This Proxy is an ActiveObject.
  * <p>
@@ -118,7 +107,6 @@ import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExten
  * schedProxy.addEventListener(myListenerRemoteReference);
  * }
  * <p>
- * <p>
  * When a listener is added by the client, no new connection will be established
  * with the scheduler. This Proxy object broadcasts events received from the
  * Scheduler to its own listeners. In addition, it adds events related to data
@@ -130,27 +118,18 @@ import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExten
  * <li>A temporary folder, for this execution, is created on the
  * SHARED_INPUT_LOCATION and the
  * SHARED_OUTPUT_LOCATION (if SHARED_INPUT_LOCATION!=SHARED_OUTPUT_LOCATION).</li>
- * <p>
  * <li>The job INPUT_SPACE and OUTPUT_SPACE urls are updated with the new
  * created temporary folders.</li>
- * <p>
- * <p>
  * <li>The input data is pushed, via the push_url, from the local file system,
  * to the temporary folder</li>
- * <p>
  * <li>The job is added to a list of awaited jobs, in order to pull the output
  * data once the job is finished. This list is persisted on disk and will be
  * restored after an application restart.</li>
- * <p>
  * <li>When the job is finished, the output data is pulled form the
  * TMP_OUTPUT_LOCATION</li>
- * <p>
- * <p>
  * <li>The client application will be notified, via the listener, about the
  * evolution of the submitted jobs and about data transfer operations.</li>
- * <p>
  * </ul>
- * <p>
  * Each time this object is initialized, it recovers the awaited_jobs list from
  * the persisted file and, for each finished job, it pulls the output data from
  * the TMP_OUTPUT_LOCATION to the local file system

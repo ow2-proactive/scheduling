@@ -228,9 +228,9 @@ public class GCMInfrastructure extends DefaultInfrastructureManager {
     /**
      * Creates a GCM application object from an Array of bytes representing a GCM deployment xml file for a given host.
      * Creates a temporary file, write the content of gcmDeploymentData array in the file. Then it creates
-     * a GCM Application from the Resource manager GCM application template (corresponding to
-     * {@link RMConstants.templateGCMApplication}) with a node provider which is gcmDeploymentData
-     * passed in parameter. Sets "HOST" java variable. <br>
+     * a GCM Application from the Resource manager GCM application template with a node provider which is gcmDeploymentData
+     * passed in parameter. Sets "HOST" java variable.
+     *
      * @param gcmDeploymentData array of bytes representing a GCM deployment file.
      * @param host a value of "HOST" java variable contract
      * @return GCMApplication object ready to be deployed

@@ -40,8 +40,8 @@ import java.sql.Types;
 
 
 /**
- * Hibernate natively maps clob columns to java.sql.Clob.<br />
- * However, it's sometimes useful to read the whole clob into memory and deal with it as a String array.<br />
+ * Hibernate natively maps clob columns to java.sql.Clob.
+ * However, it's sometimes useful to read the whole clob into memory and deal with it as a String array.
  * CharacterLargeOBject is made to fix this issue.
  *
  * @author The ProActive Team

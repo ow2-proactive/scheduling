@@ -408,7 +408,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     }
 
     /**
-     * @returns false
+     * @return false
      */
     public boolean isLocked() {
         return false;

@@ -88,7 +88,7 @@ public final class JMXClientHelper {
      * Creates a new instance of this helper.
      * 
      * @param auth the authentication interface
-     * @param creds the environment used by the JMXConnector 
+     * @param env the environment used by the JMXConnector
      */
     public JMXClientHelper(final Authentication auth, final Map<String, Object> env) {
         this.auth = auth;

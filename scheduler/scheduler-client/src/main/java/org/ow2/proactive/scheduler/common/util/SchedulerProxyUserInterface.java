@@ -513,7 +513,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * @param mbeanName the object name of the MBean
      * @return the informations about the MBean as a formatted string
      *
-     * @see org.ow2.proactive.utils.MBeanInfoViewer#getInfo(String)
+     * @see MBeanInfoViewer#getInfo(String)
      */
     @Deprecated
     public String getInfo(String mbeanName) {

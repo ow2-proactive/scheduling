@@ -223,7 +223,6 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     /**
      * Changes the state of this node to {@link NodeState#BUSY}.
-     * @throws NodeException if the node is down.
      */
     public void setBusy(Client owner) {
         this.state = NodeState.BUSY;
@@ -233,7 +232,6 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     /**
      * Changes the state of this node to {@link NodeState#FREE}.
-     * @throws NodeException if the node is down.
      */
     public void setFree() {
         this.state = NodeState.FREE;
@@ -260,8 +258,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * Changes the state of this node to {@link NodeState#TO_BE_RELEASED}.
-     * @throws NodeException if the node is down.
+     * Changes the state of this node to {@link NodeState#TO_BE_REMOVED}.
      */
     public void setToRemove() {
         this.state = NodeState.TO_BE_REMOVED;
@@ -370,7 +367,6 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * Clean the node.
      * kill all active objects on the node.
-     * @throws IOException
      * @throws NodeException
      */
     public synchronized void clean() throws NodeException {

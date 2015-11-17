@@ -95,17 +95,17 @@ public class FileUtils {
     }
 
     /**
-     * Creates a new temp directory in the specified directory, using the given prefix and suffix strings to generate its name.<br/>
-     * If this method returns successfully then it is guaranteed that the directory is created.<br/>
-     * <br/>
-     * The prefix argument must be at least three characters long. <br/>
-     * It is recommended that the prefix be a short, meaningful string such as "hjb" or "mail". <br/>
-     * The suffix argument may be null, in which case the suffix ".tmpdir" will be used. <br/>
-     * <br/>
+     * Creates a new temp directory in the specified directory, using the given prefix and suffix strings to generate its name.
+     * If this method returns successfully then it is guaranteed that the directory is created.
+     * <p>
+     * The prefix argument must be at least three characters long.
+     * It is recommended that the prefix be a short, meaningful string such as "hjb" or "mail".
+     * The suffix argument may be null, in which case the suffix ".tmpdir" will be used.
+     * <p>
      * @param prefix The prefix string to be used in generating the directory's name; must be at least three characters long
      * @param suffix The suffix string to be used in generating the directory's name; may be null, in which case the suffix ".tmpdir" will be used
      * @param directory The directory in which the temp directory is to be created, or null if the default temporary-file directory is to be used
-     * @throw IOException if the directory cannot be created
+     * @exception  IOException if the directory cannot be created
      * @return the created temp directory
      */
     public static File createTempDirectory(String prefix, String suffix, File directory) throws IOException {

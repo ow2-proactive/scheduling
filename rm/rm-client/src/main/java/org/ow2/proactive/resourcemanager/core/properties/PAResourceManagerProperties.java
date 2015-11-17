@@ -84,8 +84,10 @@ public enum PAResourceManagerProperties {
      */
     RM_SELECT_SCRIPT_NODE_DYNAMICITY("pa.rm.select.node.dynamicity", PropertyType.INTEGER),
 
-    /** Timeout in ms for remote script execution using
-     *  {@link SelectionManager#executeScript(org.ow2.proactive.scripting.Script, java.util.HashMap)}*/
+    /**
+     * Timeout in ms for remote script execution using
+     * {@code SelectionManager#executeScript(org.ow2.proactive.scripting.Script, java.util.HashMap)}
+     */
     RM_EXECUTE_SCRIPT_TIMEOUT("pa.rm.execute.script.timeout", PropertyType.INTEGER),
 
     /** 
@@ -272,7 +274,7 @@ public enum PAResourceManagerProperties {
     }
 
     /**
-     * Get the absolute path of the given path.<br/>
+     * Get the absolute path of the given path.<br>
      * It the path is absolute, then it is returned. If the path is relative, then the RM_home directory is
      * concatenated in front of the given string.
      *

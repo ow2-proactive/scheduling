@@ -44,18 +44,21 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
 
 /**
- * This class implements Event object related to an {@link RMNode}
+ * This class implements Event object related to an {@code RMNode}
  * This immutable event object is thrown to all Resource Manager Monitors to inform them
- * about a Node's state modification.<BR>
- * This event can be :<BR>
- * -a new Node acquisition.<BR>
- * -a node becoming free.<BR>
- * -a node becoming busy.<BR>
- * -a node becoming to release.<BR>
- * -a node becoming to down.<BR>
- * -a node removed from the Resource Manager.<BR><BR>
+ * about a Node's state modification.
+ * <p>
+ * This event can be:
+ * <ul>
+ *     <li>a new Node acquisition.</li>
+ *     <li>a node becoming free.</li>
+ *     <li>a node becoming busy.</li>
+ *     <li>a node becoming to release.</li>
+ *     <li>a node becoming to down.</li>
+ *     <li>a node removed from the Resource Manager.</li>
+ * </ul>
  *
- * An RMNodesourceEvent contains all information about its related {@link RMNode}.
+ * An {@link RMNodeSourceEvent} contains all information about its related {@code RMNode}.
  * 
  * @see RMMonitoring
  *
@@ -68,7 +71,7 @@ public final class RMNodeEvent extends RMEvent {
     /** URL of the related node */
     private final String nodeUrl;
 
-    /** {@link NodeSource} name of the node */
+    /** Node source name of the node */
     private final String nodeSource;
 
     /** {@link ProActiveDescriptor} name of the node */
@@ -188,7 +191,7 @@ public final class RMNodeEvent extends RMEvent {
     }
 
     /**
-     * Returns {@link NodeSource} name of the node
+     * Returns {@code NodeSource} name of the node
      *
      * @return name of the node.
      */

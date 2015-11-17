@@ -123,7 +123,6 @@ public interface RemoteSpace {
     /**
      * Returns the root URL of the RemoteSpace
      * @return URL to the space
-     * @throws FileSystemException
      */
     String getSpaceURL();
 

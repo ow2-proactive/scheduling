@@ -69,7 +69,7 @@ public class JobCreationException extends SchedulerException {
     /**
      * Create a new instance of JobCreationException using the given message string
      *
-     * @param message the reason of the exception
+     * @param cause the reason of the exception
      */
     public JobCreationException(Throwable cause) {
         super(cause.getMessage(), cause);

@@ -67,7 +67,6 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
     /**
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
-     * @throws RMException
      */
     @Override
     public BooleanWrapper configure(Object... policyParameters) {

@@ -43,7 +43,7 @@ public class NamesConvertor {
 
     /**
      * Converts names to user readable format.
-     * GCMClassName -> GCM Class Name
+     * GCMClassName -&gt; GCM Class Name
      */
     public static String beautifyName(String name) {
         StringBuffer buffer = new StringBuffer();

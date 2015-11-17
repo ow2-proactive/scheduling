@@ -9,13 +9,13 @@ import org.ow2.proactive.db.SortParameter;
 
 /**
  * Default values for the embedded criterias are the following:
- * <li>
- *     <ul>no tag filtering</ul>
- *     <ul>no dates filtering</ul>
- *     <ul>no pagination</ul>
- *     <ul>all status are selected</ul>
- *     <ul>no sort parameter</ul>
- * </li>
+ * <ul>
+ *     <li>no tag filtering</li>
+ *     <li>no dates filtering</li>
+ *     <li>no pagination</li>
+ *     <li>all status are selected</li>
+ *     <li>no sort parameter</li>
+ * </ul>
  */
 public class TaskFilterCriteria implements Serializable {
 

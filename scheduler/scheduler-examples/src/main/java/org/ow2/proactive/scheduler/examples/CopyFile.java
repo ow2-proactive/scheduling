@@ -45,7 +45,7 @@ import java.io.Serializable;
 
 /**
  * CopyFile, copy a single input File to an output File
- * <p/>
+ * <p>
  * A wildcard can be used if parts of the names of the input file is not known
  *
  * @author The ProActive Team

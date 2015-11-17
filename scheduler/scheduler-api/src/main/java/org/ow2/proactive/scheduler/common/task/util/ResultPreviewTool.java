@@ -56,7 +56,8 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 
 
 /**
- * Static util methods for result preview definition
+ * Static util methods for result preview definition.
+ *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */

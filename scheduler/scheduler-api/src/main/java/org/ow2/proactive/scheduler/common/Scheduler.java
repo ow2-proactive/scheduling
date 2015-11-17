@@ -63,16 +63,14 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
 
-//import org.ow2.proactive.scheduler.policy.Policy;
-
 /**
  * Scheduler interface for someone connected to the scheduler. This is suitable for every role in the Scheduler<br>
- * This interface provides methods to managed the user task and jobs on the scheduler.<br>
- *
- * Scheduler currently has 2 roles :
+ * This interface provides methods to managed the user task and jobs on the scheduler.
+ * <p>
+ * Scheduler currently has 2 roles:
  * <ul>
- * <li>User : </li>will only be able to managed his jobs and tasks, and also see the entire scheduling process.
- * <li>Admin : </li>Should do what user can do + administration stuffs
+ * <li>User: will only be able to managed his jobs and tasks, and also see the entire scheduling process.</li>
+ * <li>Admin: should do what user can do + administration stuffs.</li>
  * </ul>
  *
  * @author The ProActive Team
@@ -113,13 +111,17 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             UnknownJobException;
 
     /**
-     * Get the result for the given task name and the given incarnation in the given jobId. <br >
-     * A user can only get HIS result back.<br>
+     * Get the result for the given task name and the given incarnation in the given jobId.
+     * <p>
+     * A user can only get HIS result back.
+     * <p>
      * The incarnation argument represents the task result to get. If the task has failed 3 times and then has worked,
-     * then 0 represents the last result, 1 the previous, ..., and 3 represents the result of the first execution.<br/><br/>
-     * If the job does not exist, a schedulerException is sent with the proper message.<br>
+     * then 0 represents the last result, 1 the previous, ..., and 3 represents the result of the first execution.
+     * <p>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     * <p>
      * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,
-     * so you will receive the result. In any other cases a schedulerException will be thrown.<br>
+     * so you will receive the result. In any other cases a schedulerException will be thrown.
      *
      * @param jobId the job in which the task result is.
      * @param taskName the name of the task in which the result is.
@@ -137,11 +139,13 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Try to kill the task with the given task name in the given jobId.
-     * A user can only kill HIS task.<br>
-     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
+     * A user can only kill HIS task.
+     * <p>
+     * If the job does not exist, an UnknownJobException is sent with the proper message.
+     * <p>
      * So, if you have the right to kill this task and if the job and task name exist and is running,
-     * the task will be killed and this method will return <code>true</code>.<br/>
-     * In any other cases a {@link SchedulerException} will be thrown.<br>
+     * the task will be killed and this method will return <code>true</code>.
+     * In any other cases a {@link SchedulerException} will be thrown.
      *
      * @param jobId the job containing the task to be killed.
      * @param taskName the name of the task to kill.
@@ -157,13 +161,15 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Try to restart the task represented by the given task name in the given jobId.
-     * A user can only restart HIS task.<br>
-     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
+     * A user can only restart HIS task.
+     * <p>
+     * If the job does not exist, an UnknownJobException is sent with the proper message.
      * So, if you have the right to restart this task and if the job and task name exist and is running,
-     * the task will be restarted and this method will return <code>true</code>.<br/>
+     * the task will be restarted and this method will return <code>true</code>.
+     * <p>
      * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
-     * In any other cases a {@link SchedulerException} will be thrown.<br><br/>
-     *
+     * In any other cases a {@link SchedulerException} will be thrown.
+     * <p>
      * After this call, the following situations can occur :
      * <ul>
      *  <li>The task has not yet reached its max number of execution : it will be re-scheduled after delay</li>
@@ -185,12 +191,15 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
-     * Try to stop the task execution represented by the given task name in the given jobId.<br/>
-     * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
+     * Try to stop the task execution represented by the given task name in the given jobId.
+     * <p>
+     * If the job does not exist, an UnknownJobException is sent with the proper message.
+     * <p>
      * So, if you have the right to stop this task and if the job and task name exist and is running,
-     * the task will be stopped and restarted later and this method will return <code>true</code>.<br/>
+     * the task will be stopped and restarted later and this method will return <code>true</code>.
+     * <p>
      * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
-     * In any other cases a {@link SchedulerException} will be thrown.<br><br/>
+     * In any other cases a {@link SchedulerException} will be thrown.
      *
      * @param jobId the job containing the task to be stopped.
      * @param taskName the name of the task to stop.
@@ -217,7 +226,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             PermissionException;
 
     /**
-     * Listen for the tasks user logs.<br>
+     * Listen for the tasks user logs.
+     * <p>
      * A user can only listen to HIS jobs.
      *
      * @param jobId the id of the job to listen to.
@@ -285,12 +295,12 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             UnknownJobException, PermissionException, JobAlreadyFinishedException;
 
     /**
-     * For administrator only, change the policy of the scheduler.<br>
+     * For administrator only, change the policy of the scheduler.
+     * <p>
      * This method will immediately change the policy and so the whole scheduling process.
      *
      * @param policyClassName the new policy full class name.
      * @return true if the policy has been correctly change, false if not.
-     * @throws SchedulerException if an exception occurs while serving the request.
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you have not enough permission to access this method.
      */
@@ -365,11 +375,11 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean kill() throws NotConnectedException, PermissionException;
 
     /**
-     * For administrator only, Reconnect a new Resource Manager to the scheduler.<br>
+     * For administrator only, Reconnect a new Resource Manager to the scheduler.
+     * <p>
      * Can be used if the resource manager has crashed.
      *
-     * @param rmURL the URL of the new Resource Manager to link to the scheduler.<br>
-     *      Example : //host/RM_node_name
+     * @param rmURL the URL of the new Resource Manager to link to the scheduler. Example: {@code //host/RM_node_name}
      * @return true if success, false otherwise.
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you have not enough permission to access this method.
@@ -377,10 +387,11 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException;
 
     /**
-     * For administrator only, order a reload to the policy.<br/>
+     * For administrator only, order a reload to the policy.
+     * <p>
      * The default behavior reload the configuration file and update the properties available in policy.
      *
-     * This will cause the {@link Policy#reloadConfig()} method to be called.
+     * This will cause the {@code Policy#reloadConfig()} method to be called.
      * This last method can be overridden in the policy to perform a custom behavior on reload.
      *
      * @return true if success, false otherwise.
@@ -395,9 +406,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * <p>
      * It will execute the tasks of the jobs as soon as resources are available.
      * The job will be considered as finished once every tasks have finished (error or success).
-     * </p>
      * Thus, user could get the job result according to the precious result.
-     * <br /><br />
+     * <p>
      * It is possible to get a listener on the scheduler.
      * (see {@link Scheduler#addEventListener(SchedulerEventListener, boolean, SchedulerEvent...)} for more details)
      *
@@ -507,14 +517,15 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
-     * Get the result for the given task name and the given incarnation in the given jobId. <br >
-     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
-     * A user can only get HIS result back.<br>
+     * Get the result for the given task name and the given incarnation in the given jobId.
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.
+     * A user can only get HIS result back.
      * The incarnation argument represents the task result to get. If the task has failed 3 times and then has worked,
-     * then 0 represents the last result, 1 the previous, ..., and 3 represents the result of the first execution.<br/><br/>
-     * If the job does not exist, a schedulerException is sent with the proper message.<br>
+     * then 0 represents the last result, 1 the previous, ..., and 3 represents the result of the first execution.
+     * <p>
+     * If the job does not exist, a schedulerException is sent with the proper message.
      * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,
-     * so you will receive the result. In any other cases a schedulerException will be thrown.<br>
+     * so you will receive the result. In any other cases a schedulerException will be thrown.
      *
      * @param jobId the job in which the task result is.
      * @param taskName the name of the task in which the result is.
@@ -531,7 +542,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
-     * Remove the job from the scheduler. <br>
+     * Remove the job from the scheduler.
+     * <p>
      * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
      * A user can only remove HIS job.<br>
      * If the job does not exist, a schedulerException is sent with the proper message.
@@ -581,7 +593,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * A user can only kill HIS task.<br>
      * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
      * So, if you have the right to kill this task and if the job and task name exist and is running,
-     * the task will be killed and this method will return <code>true</code>.<br/>
+     * the task will be killed and this method will return <code>true</code>.<br>
      * In any other cases a {@link SchedulerException} will be thrown.<br>
      *
      * @param jobId the job containing the task to be killed.
@@ -601,10 +613,10 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * A user can only restart HIS task.<br>
      * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
      * So, if you have the right to restart this task and if the job and task name exist and is running,
-     * the task will be restarted and this method will return <code>true</code>.<br/>
+     * the task will be restarted and this method will return <code>true</code>.<br>
      * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
-     * In any other cases a {@link SchedulerException} will be thrown.<br><br/>
-     *
+     * In any other cases a {@link SchedulerException} will be thrown.
+     * <p>
      * After this call, the following situations can occur :
      * <ul>
      * 	<li>The task has not yet reached its max number of execution : it will be re-scheduled after delay</li>
@@ -626,12 +638,12 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
-     * Try to stop the task execution represented by the given task name in the given jobId.<br/>
+     * Try to stop the task execution represented by the given task name in the given jobId.<br>
      * If the job does not exist, an UnknownJobException is sent with the proper message.<br>
      * So, if you have the right to stop this task and if the job and task name exist and is running,
-     * the task will be stopped and restarted later and this method will return <code>true</code>.<br/>
+     * the task will be stopped and restarted later and this method will return <code>true</code>.<br>
      * The given delay is the delay between the task termination and it's eligibility to be re-scheduled.
-     * In any other cases a {@link SchedulerException} will be thrown.<br><br/>
+     * In any other cases a {@link SchedulerException} will be thrown.
      *
      * @param jobId the job containing the task to be stopped.
      * @param taskName the name of the task to stop.
@@ -741,8 +753,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     /**
      * Get the list of job states that describe every jobs in the Scheduler.
      * The SchedulerState contains 3 list of jobs, pending, running, and finished.
-     * Every jobs will be returned depending on your right. <br/>
-     * If a PermissionException is thrown, try using {@link #getState(boolean)} method with argument 'true'.
+     * Every jobs will be returned depending on your right.
+     * <p>
+     * If a PermissionException is thrown, try using {@link #getState(boolean)} method with argument {@code true}.
      *
      * @return the list of every jobs in the Scheduler
      * @throws NotConnectedException if you are not authenticated.
@@ -931,7 +944,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     /**
      * Retrieve a tasks names list from the scheduler.
      * 
-     * @param sessionId  a valid session id
      * @param taskTag  a complete tag to use to filter tasks
      * @param from  the starting date to fetch tasks from. The format is in Epoch time.
      * @param to  the end date to stop fetching tasks. The format is in Epoch time.
@@ -952,7 +964,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     /**
      * Retrieve a taskstates list from the scheduler.
      * 
-     * @param sessionId  a valid session id
      * @param taskTag  a complete tag to use to filter tasks
      * @param from  the starting date to fetch tasks from. The format is in Epoch time.
      * @param to  the end date to stop fetching tasks. The format is in Epoch time.

@@ -54,7 +54,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
  * Provides a generic way to create a node source policy.
  * Loads all supported policies names from a config file. Checks
  * that required policy is supported at creation time and also
- * that it is compatible with specified infrastructure (see {@link PolicyRestriction}).
+ * that it is compatible with specified infrastructure.
  *
  */
 public class NodeSourcePolicyFactory {
@@ -69,7 +69,6 @@ public class NodeSourcePolicyFactory {
      * @param infrastructureType infrastructure class name (for compatibility check)
      * @param policyParameters policy parameters
      * @return new instance of the node source policy
-     * @throws RMException if any problems occurred
      */
     public static NodeSourcePolicy create(String policyClassName, String infrastructureType,
             Object[] policyParameters) {

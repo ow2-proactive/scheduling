@@ -60,7 +60,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 
 /**
  * A target resolved for websocket proxy capable of reading parameters from the websocket path.
- * <br/>
+ * <p>
  * The parameters are used to retrieve a task's logs and check for the "PA_REMOTE_CONNECTION" string to appear.
  * Then parameters of "PA_REMOTE_CONNECTION" are used to proxy the websocket connection.
  */

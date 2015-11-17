@@ -125,7 +125,7 @@ public abstract class AbstractAccountsManager<E extends Account> {
     /**
      * Sets the refresh rate of the accounts refresher.
      *
-     * @param refreshRateInSeconds the refresh rate
+     * @param cacheValidTimeInSeconds the refresh rate
      */
     public void setCacheValidityTimeInSeconds(final int cacheValidTimeInSeconds) {
         this.cacheValidTimeInSeconds = cacheValidTimeInSeconds;

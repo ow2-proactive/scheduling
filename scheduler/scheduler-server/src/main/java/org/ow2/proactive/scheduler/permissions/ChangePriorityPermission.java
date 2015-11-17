@@ -70,7 +70,7 @@ public class ChangePriorityPermission extends ClientPermission {
     /**
      * Construct the permission with specified priority.
      *
-     * @param allowed priority
+     * @param priority priority
      */
     public ChangePriorityPermission(int priority) {
         super("change priority");

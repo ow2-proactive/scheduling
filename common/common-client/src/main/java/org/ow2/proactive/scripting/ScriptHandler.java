@@ -85,7 +85,7 @@ public class ScriptHandler implements Serializable {
     }
 
     /**
-     * Execute a script using {@link System.out} as the output.
+     * Execute a script using standard error and output as the output sink.
      * @param script a script to execute
      * @return a ScriptResult object containing the result.
      */

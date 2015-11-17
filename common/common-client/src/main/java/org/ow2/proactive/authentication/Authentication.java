@@ -97,10 +97,8 @@ public interface Authentication extends Loggable, Serializable {
     String getHostURL();
 
     /**
-     * Performs login
+     * Performs login.
      * 
-     * @param role the role of the user to connect, can be admin or user
-     * @param groups the group in which the user is
      * @param cred encrypted username and password
      * @return the name of the user logged
      * @throws LoginException if username or password is incorrect.

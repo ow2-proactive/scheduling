@@ -42,12 +42,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  * This descriptor allows to select nodes on the single hosts exclusively.
  * The host with selected nodes will be reserved for the user.
- *
- * By specifying this descriptor in {@link ResourceManager.getAtMostNodes} user may get
+ * <p>
+ * By specifying this descriptor in {@code ResourceManager.getAtMostNodes} user may get
  * more nodes than it asked for due to the fact that total capacity of hosts is
  * bigger (even thought the resource manager tries to find the optimal host
  * minimizing the waist of resources), namely
- *
+ * <p>
  * if user requested k nodes
  *
  * - the machine with exact capacity will be selected if exists

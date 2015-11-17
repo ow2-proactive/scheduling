@@ -2750,14 +2750,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * login to the scheduler using an form containing 2 fields (username &
-     * password)
+     * Login to the scheduler using a form containing 2 fields (username and
+     * password).
      *
      * @param username
      *            username
      * @param password
      *            password
-     * @return the session id associated to the login
+     * @return the session id associated to the login.
      * @throws LoginException
      */
     @Override
@@ -2771,11 +2771,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     throws LoginException, SchedulerRestException {
         try {
             if ((username == null) || (password == null)) {
-                throw new LoginException("empty login/password");
+                throw new LoginException("Empty login/password");
             }
             Session session = sessionStore.create(username);
             session.connectToScheduler(new CredData(username, password));
-            logger.info("binding user " + username + " to session " + session.getSessionId());
+            logger.info("Binding user " + username + " to session " + session.getSessionId());
             return session.getSessionId();
         } catch (ActiveObjectCreationException e) {
             throw new SchedulerRestException(e);
@@ -2812,11 +2812,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * login to the scheduler using a multipart form can be used either by
-     * submitting - 2 fields username & password - a credential file with field
-     * name 'credential'
+     * Login to the scheduler using a multipart form can be used either by
+     * submitting 2 fields ({@code username} and {@code password}) or by sending a credential
+     * file with field name {@code credential}.
      *
-     * @return the session id associated to this new connection
+     * @return the session id associated to this new connection.
      * @throws KeyException
      * @throws LoginException
      * @throws SchedulerRestException

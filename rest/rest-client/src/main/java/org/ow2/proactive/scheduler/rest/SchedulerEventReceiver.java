@@ -47,21 +47,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
-import org.atmosphere.wasync.Client;
-import org.atmosphere.wasync.ClientFactory;
-import org.atmosphere.wasync.Decoder;
-import org.atmosphere.wasync.Encoder;
-import org.atmosphere.wasync.Event;
-import org.atmosphere.wasync.Function;
-import org.atmosphere.wasync.Request;
-import org.atmosphere.wasync.RequestBuilder;
-import org.atmosphere.wasync.Socket;
+import org.atmosphere.wasync.*;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
 import org.ow2.proactive.scheduler.rest.utils.EventCodecUtil;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -77,7 +67,6 @@ import com.google.common.collect.Lists;
 /**
  * Utility class to subscribe and receive scheduler events from REST server. It
  * utilizes Atmosphere 2.0 framework
- * 
  */
 public class SchedulerEventReceiver {
 

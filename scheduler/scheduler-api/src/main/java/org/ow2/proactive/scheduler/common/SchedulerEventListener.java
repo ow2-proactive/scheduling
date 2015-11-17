@@ -55,8 +55,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public interface SchedulerEventListener {
 
     /**
-     * Invoked each time a scheduler event occurs.<br />
-     * Scheduler events are stopped,started, paused, frozen, ...
+     * Invoked each time a scheduler event occurs.<br>
+     * Scheduler events are stopped,started, paused, frozen, etc.
      *
      * @param eventType the type of the event received.
      */

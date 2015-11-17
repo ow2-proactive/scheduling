@@ -230,7 +230,7 @@ public class SelectionScript extends Script<Boolean> {
     /**
      * SelectionScript must give its result in the 'result_script' variable.
      *
-     * @see org.ow2.proactive.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
+     * @see org.ow2.proactive.scripting.Script#getResult(Object, Bindings)
      */
     @Override
     protected ScriptResult<Boolean> getResult(Object evalResult, Bindings bindings) {

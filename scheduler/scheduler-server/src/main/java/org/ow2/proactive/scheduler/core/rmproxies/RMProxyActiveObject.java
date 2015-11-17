@@ -167,8 +167,8 @@ public class RMProxyActiveObject {
 
     /**
      * Called when a script has returned (call is made as an active object call)
-     *
-     * Check the nodes to release and release the one that have to (clean script has returned)<br/>
+     * <p>
+     * Check the nodes to release and release the one that have to (clean script has returned)
      * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(Node, Script)}
      */
     @ImmediateService

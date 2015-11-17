@@ -65,15 +65,17 @@ public class LDAPProperties {
     /** path in the LDAP tree groups containing */
     public static final String LDAP_GROUPS_SUBTREE = "pa.ldap.groupssubtree";
 
-    /** filter that allows to find the user dn given its scheduler login
-     *  pa.ldap.user.filter=(&(objectclass=inetOrgPerson)(uid=%s))
-     *  the '%s' parameter is the login used during the scheduler authentication process
+    /**
+     * Filter that allows to find the user dn given its scheduler login
+     * {@code pa.ldap.user.filter=(&(objectclass=inetOrgPerson)(uid=%s))}
+     * the {@code %s} parameter is the login used during the scheduler authentication process
      **/
     public static final String LDAP_USER_FILTER = "pa.ldap.user.filter";
 
-    /** retrieves the group the user dn belongs to
-     *  pa.ldap.group.filter=(&(objectclass=groupOfUniqueNames)(uniqueMember=%s))
-     *  the '%s' parameter is the user dn
+    /**
+     * Retrieves the group the user dn belongs to
+     * {@code pa.ldap.group.filter=(&(objectclass=groupOfUniqueNames)(uniqueMember=%s))}
+     * the {@code %s} parameter is the user dn.
      **/
     public static final String LDAP_GROUP_FILTER = "pa.ldap.group.filter";
 

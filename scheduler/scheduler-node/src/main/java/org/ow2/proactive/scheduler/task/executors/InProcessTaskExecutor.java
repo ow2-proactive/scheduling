@@ -67,7 +67,7 @@ import org.apache.commons.io.FileUtils;
 
 /**
  * Run a task through a script handler.
- * </p>
+ * <p>
  * Responsible for:
  * - running the different scripts
  * - variable propagation

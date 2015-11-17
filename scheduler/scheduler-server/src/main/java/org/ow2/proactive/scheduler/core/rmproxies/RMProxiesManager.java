@@ -115,7 +115,6 @@ public abstract class RMProxiesManager {
      * Rebind a RMProxiesManager to another RM using its URI (example : "rmi://localhost:1099/" ).
      *
      * @param rmURI The URI of a started Resource Manager
-     * @return an instance of RMProxiesManager joined to the Resource Manager at the given URI
      */
     public abstract void rebindRMProxiesManager(final URI rmURI) throws RMException, RMProxyCreationException;
 

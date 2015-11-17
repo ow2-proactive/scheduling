@@ -61,15 +61,17 @@ import org.ow2.proactive.utils.appenders.MultipleFileAppender;
 
 
 /**
- * Object which performs the Resource Manager (RM)creation,
- * and provides RM's front-end active objects. :<BR>
- * -{@link RMAdmin}.<BR>
- * -{@link RMMonitoring}.<BR>
- * -{@Link RMUSer}.<BR>
+ * Object which performs the Resource Manager (RM) creation,
+ * and provides RM's front-end active objects:
+ *
+ * <ul>
+ *     <li>{@link RMAuthentication}</li>
+ *     <li>{@link RMMonitoring}</li>
+ *     <li>{@link org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface}</li>
+ * </ul>
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- *
  */
 @PublicAPI
 public class RMFactory {

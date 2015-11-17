@@ -44,7 +44,7 @@ import com.sun.jna.Native;
 
 /**
  * Environment this class uses JNA to change the System Environment variables from the current JVM
- * <p/>
+ * <p>
  * It changes both the shallow HashMap copy of the environment held by Java and the real libC environment
  *
  * @author The ProActive Team

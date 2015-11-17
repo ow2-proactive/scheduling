@@ -72,8 +72,7 @@ public final class JMXAuthenticatorImpl implements JMXAuthenticator {
 
     /**
      * This method is automatically called when a JMX client tries to connect to the MBean Server referred
-     * by the connector, it first tries to authenticate as {@link JMXProperties#JMX_ADMIN} role and if it fails 
-     * the method tries as {@link JMXProperties#JMX_USER} role.
+     * by the connector.
      * <p>
      * The only allowed credentials structure provided by the client is Object[] that contains
      * username/password (String/String) or username/{@link org.ow2.proactive.authentication.crypto.Credentials} 

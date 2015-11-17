@@ -1042,7 +1042,6 @@ public interface SchedulerRestInterface {
      *   - fileName the name of the file that will be created on the DataSpace
      *   - fileContent the content of the file
      * @return true if the transfer succeeded
-     * @see org.ow2.proactive.scheduler.common.SchedulerConstants for spaces names
      **/
     @POST
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
@@ -1265,7 +1264,7 @@ public interface SchedulerRestInterface {
                     throws NotConnectedRestException;
 
     /**
-     * login to the scheduler using an form containing 2 fields (username & password)
+     * login to the scheduler using an form containing 2 fields (username and password)
      *  
      * @param username username
      * @param password password 
@@ -1304,7 +1303,7 @@ public interface SchedulerRestInterface {
     /**
      * login to the scheduler using a multipart form
      *  can be used either by submitting 
-     *   - 2 fields username & password
+     *   - 2 fields: username and password
      *   - a credential file with field name 'credential'
      * @return the session id associated to this new connection
      * @throws KeyException
@@ -1400,7 +1399,7 @@ public interface SchedulerRestInterface {
      * Returns details on job and task execution times for the caller's executions.
      * <p>
      * Only the jobs finished between the start date and the end date will be returned:
-     * i.e startDate <= job.finishedTime <= endDate.
+     * i.e {@code startDate <= job.finishedTime <= endDate}.
      *</p>
      * @param sessionId a valid session id to identify the caller
      * @param startDate must not be null, inclusive
@@ -1408,8 +1407,6 @@ public interface SchedulerRestInterface {
      * @return a list of {@link org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData} objects where job finished times are between start date and end date
      * @throws NotConnectedRestException if user not logger in
      * @throws PermissionRestException if user has insufficient rights
-     *
-     * @see org.ow2.proactive.scheduler.common.usage.SchedulerUsage#getMyAccountUsage(java.util.Date, java.util.Date)
      */
     @GET
     @Path("usage/myaccount")
@@ -1424,7 +1421,7 @@ public interface SchedulerRestInterface {
      * Returns details on job and task execution times for the caller's executions.
      * <p>
      * Only the jobs finished between the start date and the end date will be returned:
-     * i.e startDate <= job.finishedTime <= endDate.
+     * i.e {@code startDate <= job.finishedTime <= endDate}.
      *</p>
      * @param sessionId a valid session id to identify the caller
      * @param user name
@@ -1433,8 +1430,6 @@ public interface SchedulerRestInterface {
      * @return a list of {@link org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData} objects where job finished times are between start date and end date
      * @throws NotConnectedRestException if user not logger in
      * @throws PermissionRestException if user has insufficient rights
-     *
-     * @see org.ow2.proactive.scheduler.common.usage.SchedulerUsage#getMyAccountUsage(java.util.Date, java.util.Date)
      */
     @GET
     @Path("usage/account")
