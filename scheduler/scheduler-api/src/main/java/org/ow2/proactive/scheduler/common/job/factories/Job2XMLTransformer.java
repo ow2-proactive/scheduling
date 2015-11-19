@@ -125,8 +125,8 @@ public class Job2XMLTransformer {
         trans.setOutputProperty(OutputKeys.INDENT, "yes");
         // If the encoding property is set on the client JVM, use it (it has to match the server-side encoding),
         // otherwise use UTF-8
-        if (PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.isSet()) {
-            trans.setOutputProperty(OutputKeys.ENCODING, PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.getValueAsString());
+        if (PASchedulerProperties.FILE_ENCODING.isSet()) {
+            trans.setOutputProperty(OutputKeys.ENCODING, PASchedulerProperties.FILE_ENCODING.getValueAsString());
         } else {
             trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         }
