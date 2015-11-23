@@ -102,7 +102,8 @@ public class RMInitializer {
 
     /**
      * Set the home directory for the Resource Manager.
-     * This property is used to resolve every relative paths in the configuration file.<br />
+     * This property is used to resolve every relative paths in the configuration file.
+     * <p>
      * You can leave this property without value if every specified paths are absolute in the configuration file.
      * The default value is the current directory.
      *

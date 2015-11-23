@@ -511,8 +511,9 @@ public enum PASchedulerProperties {
     }
 
     /**
-     * Get the absolute path of the given path.<br/>
-     * It the path is absolute, then it is returned. If the path is relative, then the Scheduler_home directory is 
+     * Get the absolute path of the given path.
+     * <p>
+     * It the path is absolute, then it is returned. If the path is relative, then {@code SCHEDULER_HOME} directory is
      * concatenated in front of the given string.
      *
      * @param userPath the path to check transform.
@@ -532,4 +533,5 @@ public enum PASchedulerProperties {
     public enum PropertyType {
         STRING, BOOLEAN, INTEGER, LIST
     }
+
 }

@@ -36,8 +36,14 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
@@ -46,24 +52,25 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
-import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
 
+    private SchedulerRestInterface restInterface = null;
+    private SchedulerProxyUserInterface mockOfScheduler = null;
+    private String sessionId = null;
+    
+    @Before
+    public void setUp() throws Throwable {
+        restInterface = new SchedulerStateRest();
+        mockOfScheduler = mock(SchedulerProxyUserInterface.class);
+        sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
+    }
+    
     @Test
     public void testValueOfTaskResult_ExceptionNoMessage() throws Throwable {
-        SchedulerRestInterface restInterface = new SchedulerStateRest();
-
-        SchedulerProxyUserInterface mockOfScheduler = mock(SchedulerProxyUserInterface.class);
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
-
-        TaskResultImpl taskResultWithException = new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl
-                .makeJobId("42"), "mytask", 1), null, new byte[0], null);
+        TaskResultImpl taskResultWithException = new TaskResultImpl(
+            TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "mytask", 1), null, new byte[0], null);
         when(mockOfScheduler.getTaskResult("42", "mytask")).thenReturn(taskResultWithException);
 
         String exceptionStackTrace = (String) restInterface.valueOfTaskResult(sessionId, "42", "mytask");
@@ -73,13 +80,8 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
 
     @Test
     public void testValueOfJobResult_ExceptionNoMessage() throws Throwable {
-        SchedulerRestInterface restInterface = new SchedulerStateRest();
-
-        SchedulerProxyUserInterface mockOfScheduler = mock(SchedulerProxyUserInterface.class);
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
-
-        TaskResultImpl taskResultWithException = new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl
-                .makeJobId("42"), "mytask", 1), null, new byte[0], null);
+        TaskResultImpl taskResultWithException = new TaskResultImpl(
+            TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "mytask", 1), null, new byte[0], null);
         JobResultImpl jobResultWithException = new JobResultImpl();
         jobResultWithException.addTaskResult("mytask", taskResultWithException, false);
         when(mockOfScheduler.getJobResult("42")).thenReturn(jobResultWithException);

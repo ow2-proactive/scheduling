@@ -100,6 +100,18 @@ public enum JobStatus implements java.io.Serializable {
         this.jobAlive = jobAlive;
     }
 
+    public static JobStatus findPriority(String name) {
+
+        for (JobStatus jobStatus : JobStatus.values()) {
+            if (name.equalsIgnoreCase(jobStatus.toString()))
+                return jobStatus;
+        }
+
+        // default case
+        return KILLED;
+
+    }
+
     /**
      * @see java.lang.Enum#toString()
      */
@@ -112,4 +124,6 @@ public enum JobStatus implements java.io.Serializable {
         return jobAlive;
     }
 
+    
+    
 }

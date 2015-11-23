@@ -37,12 +37,12 @@
 package org.ow2.proactive.scheduler.task;
 
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 
 
 /**
@@ -85,6 +85,21 @@ public final class TaskIdImpl implements TaskId {
      */
     public static TaskId createTaskId(JobId jobId, String readableName, long taskId) {
         return new TaskIdImpl(jobId, readableName, taskId);
+    }
+    
+    /**
+     * Create task id, and set task name + tag.
+     *
+     * @param jobId        the id of the enclosing job.
+     * @param readableName the human readable name of the task.
+     * @param taskId       the task identifier value.
+     * @param tag          the tag of the task.
+     * @return new TaskId instance.
+     */
+    public static TaskId createTaskId(JobId jobId, String readableName, long taskId, String tag) {
+        TaskIdImpl t = new TaskIdImpl(jobId, readableName, taskId);
+        t.setTag(tag);
+        return t;
     }
 
     /**

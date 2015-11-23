@@ -44,7 +44,7 @@ import org.ow2.proactive.policy.ClientsPolicy;
  * It is an equivalent of java.security.AllPermission and could be granted
  * to the resource manager of scheduler clients. java.security.AllPermission
  * cannot be granted to them.
- * @see {@link ClientsPolicy}
+ * @see ClientsPolicy
  */
 public class AllPermission extends ClientPermission {
 }

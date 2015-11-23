@@ -46,7 +46,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * IntegerWrapper is the Scheduler Wrapper object for Integer.<br />
+ * IntegerWrapper is the Scheduler Wrapper object for Integer.
  * It is mostly used for Hibernate when using Integer with parametric type.
  *
  * @author The ProActive Team

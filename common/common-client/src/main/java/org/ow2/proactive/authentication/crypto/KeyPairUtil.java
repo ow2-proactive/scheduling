@@ -52,8 +52,7 @@ import javax.crypto.Cipher;
 /**
  * Asymmetric cryptography utilities for KeyPair generation, encryption and decryption
  * <p>
- * Refer to the Java Cryptography Extension Reference Guide
- * {@link http://java.sun.com/j2se/1.5.0/docs/guide/security/jce/JCERefGuide.html} to
+ * Refer to the <a href="http://java.sun.com/j2se/1.5.0/docs/guide/security/jce/JCERefGuide.html">Java Cryptography Extension Reference Guide</a> to
  * determine which parameters are best for key algorithm, key size and cipher;
  * although "RSA", 1024 and "RSA/ECB/PKCS1Padding" should be good enough in most
  * cases.

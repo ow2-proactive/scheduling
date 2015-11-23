@@ -43,8 +43,10 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
 
 /**
- * Use this class to build a native task that will use a 'org.ow2.proactive.scheduler.task.NativeExecutable' and be integrated in a {@link TaskFlowJob}.</br>
- * A native task just includes a command line that can be set using {@link #setCommandLine(String[])}.</br>
+ * Use this class to build a native task that will use a 'org.ow2.proactive.scheduler.task.NativeExecutable' and be integrated in a {@link TaskFlowJob}.
+ * <p>
+ * A native task just includes a command line that can be set using {@link #setCommandLine(String[])}.
+ * <p>
  * You don't have to extend this class to launch your own native executable.
  *
  * @author The ProActive Team

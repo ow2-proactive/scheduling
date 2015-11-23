@@ -44,8 +44,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 /**
  *
  * Class represents the descriptor of the nodes topology (network location)
- * which could be used with {@link ResourceManager.getAtMostNodes} request.
- *
+ * which could be used with {@code ResourceManager.getAtMostNodes} request.
+ * <p>
  * User may create its own instance of available descriptors and parameterize it or
  * use one of predefined constants when it is sufficient.
  */

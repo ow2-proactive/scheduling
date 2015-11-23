@@ -40,13 +40,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * constant types in the Resource Manager.<BR>
+ * Constant types in the Resource Manager.
+ * <p>
  * These interface define names for Resource manager active objects
  * and defines type names for the different node sources types.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- *
  */
 @PublicAPI
 public interface RMConstants {

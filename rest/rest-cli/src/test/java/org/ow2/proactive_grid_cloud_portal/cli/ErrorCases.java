@@ -20,6 +20,7 @@ import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 
+@Ignore
 public class ErrorCases {
 
     private static final String EXPECTED_ERROR_MSG =
@@ -40,6 +42,7 @@ public class ErrorCases {
 
     @BeforeClass
     public static void startHttpsServer() throws Exception {    	
+    	skipIfHeadlessEnvironment();
         server = new Server();
 
         SslContextFactory sslContextFactory = new SslContextFactory();

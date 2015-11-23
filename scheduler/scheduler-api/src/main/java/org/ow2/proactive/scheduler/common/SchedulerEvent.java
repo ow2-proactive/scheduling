@@ -40,12 +40,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Enumeration of all different events that scheduler can invoke.<br>
+ * Enumeration of all different events that scheduler can invoke.
+ * <p>
  * This is also used to choose which events you want to received from the scheduler.
- * See {@link UserSchedulerInterface#addEventListener}. for more details.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
+ * @see Scheduler#addEventListener for more details.
  *
  * $Id$
  */

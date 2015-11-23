@@ -72,7 +72,7 @@ public class TaskLauncherInitializer implements Serializable {
     private Script<?> post;
     /** The script executed after the task */
     private FlowScript flowScript;
-    /** The walltime defined for the task (it is considered as defined if it is > 0) */
+    /** The walltime defined for the task (it is considered as defined if it is &gt; 0) */
     private long walltime;
 
     private String jobOwner = "Unknown";

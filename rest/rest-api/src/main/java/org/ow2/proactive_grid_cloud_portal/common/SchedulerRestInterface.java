@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.security.KeyException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,16 +67,17 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdsPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateDataPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
@@ -102,7 +104,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs")
     @Produces("application/json")
-    List<String> jobs(
+    RestPage<String> jobs(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
             @QueryParam("range") @DefaultValue("-1") int range)
@@ -123,7 +125,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobsinfo")
     @Produces({ "application/json", "application/xml" })
-    List<UserJobData> jobsInfo(
+    RestPage<UserJobData> jobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
             @QueryParam("range") @DefaultValue("-1") int range)
@@ -150,7 +152,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("revisionjobsinfo")
     @Produces({ "application/json", "application/xml" })
-    Map<Long, List<UserJobData>> revisionAndJobsInfo(
+    RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
             @QueryParam("range") @DefaultValue("-1") int range,
@@ -197,7 +199,22 @@ public interface SchedulerRestInterface {
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
-
+    
+    /**
+     * Returns the job info associated to the job referenced by the 
+     * id <code>jobid</code>
+     * @param sessionId  a valid session id
+     * @return  the job info of the corresponding job
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/info")
+    @Produces("application/json")
+    JobInfoData jobInfo(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+    
     /**
      * Returns all the task results of this job as a map whose the key is the
      * name of the task and its task result.<br>
@@ -272,7 +289,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks")
     @Produces("application/json")
-    TaskIdsPage getTasksNames(
+    RestPage<String> getTasksNames(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
@@ -288,7 +305,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/paginated")
     @Produces("application/json")
-    TaskIdsPage getTasksNamesPaginated(
+    RestPage<String> getTasksNamesPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @QueryParam("offset") @DefaultValue("0") int offset,
@@ -305,7 +322,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/tasks/tag/{tasktag}")
     @Produces("application/json")
-    TaskIdsPage getJobTasksIdsByTag(
+    RestPage<String> getJobTasksIdsByTag(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag)
@@ -324,7 +341,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/paginated")
     @Produces("application/json")
-    TaskIdsPage getJobTasksIdsByTagPaginated(
+    RestPage<String> getJobTasksIdsByTagPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag,
@@ -332,6 +349,74 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+    /**
+     * Returns all tasks name regarding the given parameters (decoupled from the associated jobs).
+     * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
+     * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
+     * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
+     * 
+     * @param sessionId  a valid session id.
+     * @param from  the scheduled date to which we start fetching tasks. The format is in Epoch time.
+     * @param to  the end scheduled end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks  <code>True</code> if you want to fetch only the user's tasks. Default value is <code>False</code>.
+     * @param running  fetch running tasks. Default value is <code>True</code>.
+     * @param pending  fetch pending tasks. Default value is <code>True</code>.
+     * @param finished  fetch finished tasks. Default value is <code>True</code>.
+     * @param offset  the index of the first task to fetch (for pagination).
+     * @param limit  the index of the last (excluded) task to fetch (for pagination).
+     * @return a list of task ids and the total number of tasks ids
+     */
+    @GET
+    @GZIP
+    @Path("tasks")
+    @Produces("application/json")
+    RestPage<String> getTaskIds(
+            @HeaderParam("sessionid") String sessionId,
+            @QueryParam("from") @DefaultValue("0") long from,
+            @QueryParam("to") @DefaultValue("0") long to,
+            @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("-1") int limit)
+                    throws NotConnectedRestException, PermissionRestException;
+    
+    /**
+     * Returns all tasks name regarding the given parameters (decoupled from the associated jobs).
+     * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
+     * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
+     * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
+     * 
+     * @param sessionId  a valid session id.
+     * @param taskTag  tag to filter the tasks. The tag should be complete as the criteria is strict.
+     * @param from  the scheduled date to which we start fetching tasks. The format is in Epoch time.
+     * @param to  the end scheduled end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks  <code>True</code> if you want to fetch only the user's tasks. Default value is <code>False</code>.
+     * @param running  fetch running tasks. Default value is <code>True</code>.
+     * @param pending  fetch pending tasks. Default value is <code>True</code>.
+     * @param finished  fetch finished tasks. Default value is <code>True</code>.
+     * @param offset  the index of the first task to fetch (for pagination).
+     * @param limit  the index of the last (excluded) task to fetch (for pagination).
+     * @return a list of task ids and the total number of tasks ids
+     */
+    @GET
+    @GZIP
+    @Path("tasks/tag/{tasktag}")
+    @Produces("application/json")
+    RestPage<String> getTaskIdsByTag(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("tasktag") String taskTag,
+            @QueryParam("from") @DefaultValue("0") long from,
+            @QueryParam("to") @DefaultValue("0") long to,
+            @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("-1") int limit)
+                    throws NotConnectedRestException, PermissionRestException;
+    
     /**
      * Returns a list of the tags of the tasks belonging to job <code>jobId</code>
      * @param sessionId a valid session id
@@ -393,7 +478,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates")
     @Produces("application/json")
-    TaskStateDataPage getJobTaskStates(
+    RestPage<TaskStateData> getJobTaskStates(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
@@ -410,7 +495,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/paginated")
     @Produces("application/json")
-    TaskStateDataPage getJobTaskStatesPaginated(
+    RestPage<TaskStateData> getJobTaskStatesPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @QueryParam("offset") @DefaultValue("0") int offset,
@@ -428,7 +513,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}")
     @Produces("application/json")
-    TaskStateDataPage getJobTaskStatesByTag(
+    RestPage<TaskStateData> getJobTaskStatesByTag(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag)
@@ -447,7 +532,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
     @Produces("application/json")
-    TaskStateDataPage getJobTaskStatesByTagPaginated(
+    RestPage<TaskStateData> getJobTaskStatesByTagPaginated(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId,
             @PathParam("tasktag") String taskTag,
@@ -455,6 +540,75 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("50") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+    /**
+     * Returns a paginated list of <code>TaskStateData</code> regarding the given parameters (decoupled from the associated jobs).
+     * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
+     * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
+     * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
+     * 
+     * @param sessionId  a valid session id.
+     * @param from  the scheduled date to which we start fetching tasks. The format is in Epoch time.
+     * @param to  the end scheduled end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks  <code>True</code> if you want to fetch only the user's tasks. Default value is <code>False</code>.
+     * @param running  fetch running tasks. Default value is <code>True</code>.
+     * @param pending  fetch pending tasks. Default value is <code>True</code>.
+     * @param finished  fetch finished tasks. Default value is <code>True</code>.
+     * @param offset  the index of the first task to fetch (for pagination).
+     * @param limit  the index of the last (excluded) task to fetch (for pagination).
+     * @return a list of <code>TaskStateData</code>  and the total number of them.
+     */
+    @GET
+    @GZIP
+    @Path("taskstates")
+    @Produces("application/json")
+    RestPage<TaskStateData> getTaskStates (
+            @HeaderParam("sessionid") String sessionId,
+            @QueryParam("from") @DefaultValue("0") long from,
+            @QueryParam("to") @DefaultValue("0") long to,
+            @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("-1") int limit)
+                    throws NotConnectedRestException, PermissionRestException;
+    
+    /**
+     * Returns a paginated list of <code>TaskStateData</code> regarding the given parameters (decoupled from the associated jobs).
+     * The result is paginated using the optional <code>offset</code> and <code>limit</code> parameters.
+     * If those parameters are not specified, the following values will be used: [0, DEFAULT_VALUE[
+     * The DEFAULT_VALUE can be set in the scheduler config file as the <code>pa.scheduler.tasks.page.size</code> parameter.
+     * 
+     * @param sessionId  a valid session id.
+     * @param taskTag  tag to filter the tasks. The tag should be complete as the criteria is strict.
+     * @param from  the scheduled date to which we start fetching tasks. The format is in Epoch time.
+     * @param to  the end scheduled end date to stop fetching tasks. The format is in Epoch time.
+     * @param mytasks <code>True</code> if you want to fetch only the user's tasks. <code>False</code> will fetch everything.
+     * @param running  fetch running tasks. Default value is <code>True</code>.
+     * @param pending  fetch pending tasks. Default value is <code>True</code>.
+     * @param finished  fetch finished tasks. Default value is <code>True</code>.
+     * @param offset  the index of the first task to fetch (for pagination).
+     * @param limit  the index of the last (excluded) task to fetch (for pagination).
+     * @return a list of <code>TaskStateData</code>  and the total number of them.
+     */
+    @GET
+    @GZIP
+    @Path("taskstates/tag/{tasktag}")
+    @Produces("application/json")
+    RestPage<TaskStateData> getTaskStatesByTag (
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("tasktag") String taskTag,
+            @QueryParam("from") @DefaultValue("0") long from,
+            @QueryParam("to") @DefaultValue("0") long to,
+            @QueryParam("mytasks") @DefaultValue("false") boolean mytasks,
+            @QueryParam("running") @DefaultValue("true") boolean running,
+            @QueryParam("pending") @DefaultValue("true") boolean pending,
+            @QueryParam("finished") @DefaultValue("true") boolean finished,
+            @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("-1") int limit)
+                    throws NotConnectedRestException, PermissionRestException;
+    
+    
     /**
      *  Returns full logs generated by tasks in job.
      *
@@ -888,7 +1042,6 @@ public interface SchedulerRestInterface {
      *   - fileName the name of the file that will be created on the DataSpace
      *   - fileContent the content of the file
      * @return true if the transfer succeeded
-     * @see org.ow2.proactive.scheduler.common.SchedulerConstants for spaces names
      **/
     @POST
     @Path("dataspace/{spaceName:[a-zA-Z][a-zA-Z_0-9]*}{filePath:.*}")
@@ -1111,7 +1264,7 @@ public interface SchedulerRestInterface {
                     throws NotConnectedRestException;
 
     /**
-     * login to the scheduler using an form containing 2 fields (username & password)
+     * login to the scheduler using an form containing 2 fields (username and password)
      *  
      * @param username username
      * @param password password 
@@ -1150,7 +1303,7 @@ public interface SchedulerRestInterface {
     /**
      * login to the scheduler using a multipart form
      *  can be used either by submitting 
-     *   - 2 fields username & password
+     *   - 2 fields: username and password
      *   - a credential file with field name 'credential'
      * @return the session id associated to this new connection
      * @throws KeyException
@@ -1246,7 +1399,7 @@ public interface SchedulerRestInterface {
      * Returns details on job and task execution times for the caller's executions.
      * <p>
      * Only the jobs finished between the start date and the end date will be returned:
-     * i.e startDate <= job.finishedTime <= endDate.
+     * i.e {@code startDate <= job.finishedTime <= endDate}.
      *</p>
      * @param sessionId a valid session id to identify the caller
      * @param startDate must not be null, inclusive
@@ -1254,8 +1407,6 @@ public interface SchedulerRestInterface {
      * @return a list of {@link org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData} objects where job finished times are between start date and end date
      * @throws NotConnectedRestException if user not logger in
      * @throws PermissionRestException if user has insufficient rights
-     *
-     * @see org.ow2.proactive.scheduler.common.usage.SchedulerUsage#getMyAccountUsage(java.util.Date, java.util.Date)
      */
     @GET
     @Path("usage/myaccount")
@@ -1270,7 +1421,7 @@ public interface SchedulerRestInterface {
      * Returns details on job and task execution times for the caller's executions.
      * <p>
      * Only the jobs finished between the start date and the end date will be returned:
-     * i.e startDate <= job.finishedTime <= endDate.
+     * i.e {@code startDate <= job.finishedTime <= endDate}.
      *</p>
      * @param sessionId a valid session id to identify the caller
      * @param user name
@@ -1279,8 +1430,6 @@ public interface SchedulerRestInterface {
      * @return a list of {@link org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData} objects where job finished times are between start date and end date
      * @throws NotConnectedRestException if user not logger in
      * @throws PermissionRestException if user has insufficient rights
-     *
-     * @see org.ow2.proactive.scheduler.common.usage.SchedulerUsage#getMyAccountUsage(java.util.Date, java.util.Date)
      */
     @GET
     @Path("usage/account")

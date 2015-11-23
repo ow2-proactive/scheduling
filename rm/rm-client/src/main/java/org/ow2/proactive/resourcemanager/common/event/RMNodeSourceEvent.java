@@ -43,21 +43,22 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
 
 /**
- * This class implements the Event object related to a {@link NodeSource}
+ * This class implements the Event object related to a {@code NodeSource}.
+ * <p>
  * This event objects is thrown to all Resource Manager Monitors to inform them
- * about a NodeSource event. Events can be :<BR>
- * -new NodeSource added to the {@link RMCore}.<BR>
- * -NodeSource removed from the {@link RMCore}.<BR><BR>
+ * about a NodeSource event. Events can be:
+ * <ul>
+ *     <li>new NodeSource added to the {@code RMCore}</li>
+ *     <li>the NodeSource removed from the {@code RMCore}</li>
+ * </ul>
  *
- * A node source has to aspects in a Monitor's point of view :<BR>
- * -A name, its sourceID.<BR>
+ * A node source has to aspects in a Monitor's point of view a name, its sourceID.
  * NodeSource types are defined in {@link RMConstants}.
  *
  * @see RMMonitoring
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- *
  */
 @PublicAPI
 public class RMNodeSourceEvent extends RMEvent {
@@ -112,7 +113,7 @@ public class RMNodeSourceEvent extends RMEvent {
     }
 
     /**
-     * Returns the {@link NodeSource} name of the event.
+     * Returns Node source name of the event.
      * @return node source name of the event.
      */
     public String getSourceName() {
@@ -120,7 +121,7 @@ public class RMNodeSourceEvent extends RMEvent {
     }
 
     /**
-     * Returns the {@link NodeSource} type of the event.
+     * Returns Node source type of the event.
      * @return node source type of the event.
      */
     public String getSourceDescription() {

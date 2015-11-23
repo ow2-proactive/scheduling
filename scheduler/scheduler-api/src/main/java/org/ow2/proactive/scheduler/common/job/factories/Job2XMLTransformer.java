@@ -86,9 +86,9 @@ import org.w3c.dom.Text;
 
 /**
  * Helper class to transform a job into its xml representation.
- * <p/>
+ * <p>
  * The xml produced conforms to the definition in {@link Schemas}.
- * <p/>
+ * <p>
  * The order of elements is sensitive.
  *
  * @author esalagea

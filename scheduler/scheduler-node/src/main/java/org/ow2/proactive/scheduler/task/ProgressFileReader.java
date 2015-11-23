@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * - detecting changes on a progress file efficiently
  * - reading new value and saving it in memory
  * - exposing the last read value
- * <p/>
+ * <p>
  * Instances of this class are NOT thread-safe.
  *
  * @author The ProActive Team

@@ -324,7 +324,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param initiator Task initiating the IF action
      * @param branchStart START task of the IF branch
      * @param branchEnd END task of the IF branch
-     * @param join JOIN task of the IF action, or null
+     * @param ifJoin JOIN task of the IF action, or null
      * @param elseTarget the START task of the ELSE branch that will not be executed
      * @param elseTasks list of tasks contained in the not executed ELSE branch
      */

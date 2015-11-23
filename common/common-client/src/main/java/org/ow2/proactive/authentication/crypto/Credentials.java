@@ -76,14 +76,12 @@ import org.apache.commons.codec.binary.Base64;
  * the corresponding private key is required to decrypt the secret AES
  * key, and then decrypt the data.
  * <p>
- * Extensive documentation for these parameters can be found in the Java
- * Cryptography Extension Reference Guide {@link http://java.sun.com/j2se/1.5.0/docs/guide/security/jce/JCERefGuide.html}
- * 
+ * Extensive documentation for these parameters can be found in the
+ * <a href="http://java.sun.com/j2se/1.5.0/docs/guide/security/jce/JCERefGuide.html">Java Cryptography Extension Reference Guide</a>.
  * 
  * @see org.ow2.proactive.authentication.crypto.KeyPairUtil
  * @author The ProActive Team
  * @since ProActive Scheduling 1.1
- * 
  */
 @PublicAPI
 public class Credentials implements Serializable {
@@ -128,7 +126,7 @@ public class Credentials implements Serializable {
      * Default constructor
      * <p>
      * Constructor is kept private, use {@link org.ow2.proactive.authentication.crypto.Credentials#getCredentials()} or
-     * {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String)} to get intances
+     * {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(CredData, String)} to get instances
      *
      * @param algo Key generation algorithm
      * @param size Key size in bits
@@ -231,14 +229,14 @@ public class Credentials implements Serializable {
      * Retrieves a private key stored in a local file
      * <p>
      * Tries to guess the algorithm used for keypair generation which
-     * is not included in the file. According to {@link http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html#AppA},
+     * is not included in the file. According to <a href="http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html#AppA">Java Cryptography Specification</a>,
      * the algorithm can be only one of "RSA" or "DSA", so this method will try using both.
      * If the algorithm used to generate the key is neither RSA or DSA
      * (highly unlikely), this method cannot recreate the private key, but {@link #decrypt(String)}
      * maybe will.
      * 
-     * @param pubPath
-     *            path to the public key on the local filesystem
+     * @param privPath
+     *            path to the private key on the local filesystem
      * @return the key encapsulated in a regular JCE container
      * @throws KeyException
      *             the key could not be retrieved or is malformed, or the algorithm used
@@ -252,14 +250,14 @@ public class Credentials implements Serializable {
      * Retrieves a private key stored in a local file
      * <p>
      * Tries to guess the algorithm used for keypair generation which
-     * is not included in the file. According to {@link http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html#AppA},
+     * is not included in the file. According to <a href="http://download.oracle.com/javase/1.5.0/docs/guide/security/CryptoSpec.html#AppA">Java Cryptography Specification</a>,
      * the algorithm can be only one of "RSA" or "DSA", so we can just try both using the
      * <code>algorithms</code> param. If the algorithm used to generate the key is neither RSA or DSA
      * (highly unlikely), this method cannot recreate the private key, but {@link #decrypt(String)}
      * maybe will.
      * 
-     * @param pubPath
-     *            path to the public key on the local filesystem
+     * @param privPath
+     *            path to the private key on the local filesystem
      * @param algorithms a list of algorithms to try for creating the PK. Recommanded value:
      * 			{"RSA","DSA"}
      * @return the key encapsulated in a regular JCE container
@@ -314,7 +312,7 @@ public class Credentials implements Serializable {
     /**
      * Retrieves a credentials from disk
      * <p>
-     * See {@link org.ow2.proactive.authentication.crypto.Credentials#writeToDisk()} for details on how information is
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#writeToDisk(String)} for details on how information is
      * stored on disk.
      * 
      * @return the Credentials object represented by the file saved at the file
@@ -328,7 +326,7 @@ public class Credentials implements Serializable {
     /**
      * Retrieves a credentials from disk
      * <p>
-     * See {@link org.ow2.proactive.authentication.crypto.Credentials#writeToDisk()} for details on how information is
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#writeToDisk(String)} for details on how information is
      * stored on disk.
      * 
      * @param path to the file in which credentials are stored
@@ -494,9 +492,9 @@ public class Credentials implements Serializable {
     }
 
     /**
-     * Creates new encrypted credentials
+     * Creates new encrypted credentials.
      * <p>
-     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(CredData, PublicKey))
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(CredData, PublicKey)}
      *
      * @param cc the data to be encrypted
      * @param pubPath path to the public key
@@ -509,9 +507,9 @@ public class Credentials implements Serializable {
     }
 
     /**
-     * Creates new encrypted credentials
+     * Creates new encrypted credentials.
      * <p>
-     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(CredData, PublicKey, String)
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(CredData, PublicKey, String)}
      *
      * @param cc the data to be encrypted
      * @param pubKey the public key
@@ -530,7 +528,7 @@ public class Credentials implements Serializable {
      * public key <code>pubKey</code> and <code>cipher</code>
      * and store it in a new Credentials object.
      *
-     * @see KeyPairUtil#encrypt(String, String, String, byte[])
+     * @see KeyPairUtil#encrypt(PublicKey, String, byte[])
      * @param cc, the class containing the data to be crypted
      * @param pubKey public key used for encryption
      * @param cipher cipher parameters: combination of transformations
@@ -559,7 +557,7 @@ public class Credentials implements Serializable {
     /**
      * Decrypts the encapsulated credentials
      *
-     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(String, String, String, byte[])
+     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(PrivateKey, String, byte[])
      * @param privPath path to the private key file
      * @return the credential data containing the clear data:login, password and key
      * @throws KeyException decryption failure, malformed data
@@ -572,7 +570,7 @@ public class Credentials implements Serializable {
     /**
      * Decrypts the encapsulated credentials
      *
-     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(String, String, String, byte[])
+     * @see org.ow2.proactive.authentication.crypto.KeyPairUtil#decrypt(PrivateKey, String, byte[])
      * @param privKey the private key
      * @return the credential data containing the clear data:login, password and key
      * @throws KeyException decryption failure, malformed data
@@ -601,7 +599,7 @@ public class Credentials implements Serializable {
     /**
      * Creates new encrypted credentials
      * <p>
-     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, String, String)
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, String, String)}
      * 
      * @param login the login to encrypt
      * @param password the corresponding password to encrypt
@@ -618,7 +616,7 @@ public class Credentials implements Serializable {
     /**
      * Creates new encrypted credentials
      * <p>
-     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, String, String)
+     * See {@link org.ow2.proactive.authentication.crypto.Credentials#createCredentials(String, String, String, String)}
      * 
      * @param login the login to encrypt
      * @param password the corresponding password to encrypt
@@ -639,7 +637,7 @@ public class Credentials implements Serializable {
      * public key at <code>pubPath</code> and <code>cipher</code>
      * and store it in a new Credentials object.
      * 
-     * @see KeyPairUtil#encrypt(String, String, String, byte[])
+     * @see KeyPairUtil#encrypt(PublicKey, String, byte[])
      * @param login the login to encrypt
      * @param password the corresponding password to encrypt
      * @param pubPath path to the public key used for encryption
@@ -661,7 +659,7 @@ public class Credentials implements Serializable {
      * public key <code>pubKey</code> and <code>cipher</code>
      * and store it in a new Credentials object.
      * 
-     * @see KeyPairUtil#encrypt(String, String, String, byte[])
+     * @see KeyPairUtil#encrypt(PublicKey, String, byte[])
      * @param login the login to encrypt
      * @param password the corresponding password to encrypt
      * @param pubKey public key used for encryption

@@ -72,7 +72,7 @@ import org.apache.log4j.Logger;
 /**
  * Acquires nodes over SSH given a list of hosts, this implementation uses jsch.
  * <p>
- * Also assumes JRE & Scheduling installation paths are identical on all hosts.
+ * Also assumes JRE and Scheduling installation paths are the same on all hosts.
  * <p>
  * If you need more control over you deployment, you may consider using
  * {@link CLIInfrastructure} instead.

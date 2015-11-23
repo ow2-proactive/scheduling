@@ -55,7 +55,7 @@ public interface SchedulerUsage {
      * Returns details on job and task execution times for the caller's executions.
      * <p>
      * Only the jobs finished between the start date and the end date will be returned:
-     * i.e startDate <= job.finishedTime <= endDate.
+     * i.e {@code startDate <= job.finishedTime <= endDate}.
      *</p>
      * @param startDate must not be null, inclusive
      * @param endDate must not be null, inclusive
@@ -70,11 +70,10 @@ public interface SchedulerUsage {
      * Returns details on job and task execution times for a given user's executions.
      * <p>
      * Only the jobs finished between the start date and the end date will be returned:
-     * i.e startDate <= job.finishedTime <= endDate.
-     *</p>
+     * i.e {@code startDate <= job.finishedTime <= endDate}.
      * <p>
-     *     if user is the same as the caller, then it will fallback to to {@link #getMyAccountUsage(Date, Date)}
-     * </p>
+     * If user is the same as the caller, then it will fallback to to {@link #getMyAccountUsage(Date, Date)}.
+     *
      * @param user must match a username as defined in the Scheduler's users
      * @param startDate must not be null, inclusive
      * @param endDate must not be null, inclusive

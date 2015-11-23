@@ -111,7 +111,6 @@ public interface RMNode extends Comparable<RMNode> {
 
     /** Gives the node object related. 
      * @return a node Object.
-     * @throws NodeException if the node is down.
      */
     Node getNode();
 
@@ -283,7 +282,7 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * Sets the jmx url of the node.
      * 
-     * @param jmx protocol to be used for accessing the node
+     * @param protocol protocol to be used for accessing the node
      * @param address url of the jmx server
      * 
      */
@@ -292,7 +291,7 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      * Gets the JMX url of the node.
      * 
-     * @param jmx protocol to be used for accessing the node
+     * @param protocol protocol to be used for accessing the node
      * 
      * @return a jmx url 
      */

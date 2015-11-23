@@ -41,9 +41,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
- * An exception thrown by {@link ResourceManager.getAtMostNodes} request when
+ * An exception thrown by {@link ResourceManager#getAtMostNodes} request when
  * the topology information is missing.
- *
  */
 @PublicAPI
 public class TopologyException extends IllegalArgumentException {

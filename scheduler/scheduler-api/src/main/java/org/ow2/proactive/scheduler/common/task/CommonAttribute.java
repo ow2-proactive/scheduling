@@ -65,22 +65,26 @@ public abstract class CommonAttribute implements Serializable {
     public static final String GENERIC_INFO_START_AT_KEY = "START_AT";
 
     /**
-     * Do the job has to cancel when an exception occurs in a task. (default is false) <br />
+     * Do the job has to cancel when an exception occurs in a task (default is false).
+     * <p>
      * You can override this property inside each task.
      */
     protected UpdatableProperties<BooleanWrapper> cancelJobOnError = new UpdatableProperties<BooleanWrapper>(
         new BooleanWrapper(false));
 
     /**
-     * Where will a task be restarted if an error occurred. (default is ANYWHERE)<br />
-     * It will be restarted according to the number of execution remaining.<br />
+     * Define where will a task be restarted if an error occurred (default is ANYWHERE).
+     * <p>
+     * It will be restarted according to the number of execution remaining.
+     * <p>
      * You can override this property inside each task.
      */
     protected UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(
         RestartMode.ANYWHERE);
 
     /**
-     * The maximum number of execution for a task (default 1). <br />
+     * The maximum number of execution for a task (default 1).
+     * <p>
      * You can override this property inside each task.
      */
     protected UpdatableProperties<IntegerWrapper> maxNumberOfExecution = new UpdatableProperties<IntegerWrapper>(
@@ -176,7 +180,7 @@ public abstract class CommonAttribute implements Serializable {
 
     /**
      * Returns generic information.
-     * <p/>
+     * <p>
      * These information are transmitted to the policy that can use it for the scheduling.
      *
      * @return generic information.

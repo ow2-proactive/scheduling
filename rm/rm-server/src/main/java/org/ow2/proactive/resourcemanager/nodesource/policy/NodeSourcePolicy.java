@@ -50,19 +50,19 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
 
 /**
- *
  * A node source policy is a set of rules of acquiring/releasing nodes.
  * It describes a time and conditions when and how many nodes have to be
- * acquired from the infrastructure.<br>
- *
- * NOTE: NodeSourcePolicy will be an active object. <br>
- *
- * To define a new node source policy
- * - implement {@link NodeSourcePolicy#configure(Object...)} and setup there all policy parameters which are available through UI
- * - define activation and disactivation policy behavior by implementing corresponding methods
- * - define how policy should react on nodes adding request initiated by user in {@link NodeSourcePolicy#handleUserChanges()}
- * - add the name of new policy class to the resource manager configuration file (config/rm/nodesource/policies).
- *
+ * acquired from the infrastructure.
+ * <p>
+ * NOTE: NodeSourcePolicy will be an active object.
+ * <p>
+ * To define a new node source policy:
+ * <ul>
+ *     <li>implement {@link NodeSourcePolicy#configure(Object...)} and setup there all policy parameters which are available through UI</li>
+ *     <li>define activation and disactivation policy behavior by implementing corresponding methods</li>
+ *     <li>define how policy should react on nodes adding request initiated by user</li>
+ *     <li>add the name of new policy class to the resource manager configuration file (config/rm/nodesource/policies).</li>
+ * </ul>
  */
 @ActiveObject
 public abstract class NodeSourcePolicy implements Serializable {

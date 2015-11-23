@@ -351,7 +351,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     /** Register a new Resource manager listener.
      * Way to a monitor object to ask at RMMonitoring to throw
      * RM events to it.
-     * @param listener a listener object which implements {@link RMEventListener}
+     * @param stub a listener object which implements {@link RMEventListener}
      * interface.
      * @param events list of wanted events that must be received.
      * @return RMInitialState snapshot of RM's current state : nodes and node sources.

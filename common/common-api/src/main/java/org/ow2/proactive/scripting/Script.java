@@ -365,7 +365,10 @@ public abstract class Script<E> implements Serializable {
         return null;
     }
 
-    /** Specify the variable awaited from the script execution */
+    /**
+     * Specify the variable awaited from the script execution
+     * @param bindings
+     **/
     protected abstract void prepareSpecialBindings(Bindings bindings);
 
     /** Return the variable awaited from the script execution */

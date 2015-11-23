@@ -63,27 +63,22 @@ import org.apache.log4j.Logger;
  * ssh username, key directory, etc. This class won't handle it,
  * see {@link org.objectweb.proactive.core.ssh.SSHClient}.
  * <p>
- * Also assumes JRE & Scheduling installation paths are identical
+ * Also assumes JRE and Scheduling installation paths are the same
  * on all hosts.
  * <p>
  * If you need more control over you deployment, you may consider
- * using {@link GCMInfrastructure} instead, which contains the
+ * using {@code GCMInfrastructure} instead, which contains the
  * functionalities of this Infrastructure, but requires more configuration.
- *
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
- *
  */
 public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
-    /**
-     * class' logger
-     */
     private static final Logger logger = Logger.getLogger(SSHInfrastructure.class);
 
     /**
-     * ShhClient options (@see {@link SSHClient})
+     * SshClient options (@see {@link SSHClient})
      */
     @Configurable(description = "Options for the ssh command\nto log in the remote hosts")
     protected String sshOptions;

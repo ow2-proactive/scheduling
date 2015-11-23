@@ -110,7 +110,7 @@ public interface RuntimeDataMBean {
     int getBusyNodesCount();
 
     /**
-     * Returns the current number of nodes in {@link NodeState#TO_BE_RELEASED} state.
+     * Returns the current number of nodes in {@link NodeState#TO_BE_REMOVED} state.
      * @return the current number of busy nodes
      */
     int getToBeReleasedNodesCount();
@@ -157,7 +157,7 @@ public interface RuntimeDataMBean {
     int getMaxBusyNodes();
 
     /**
-     * Returns the maximum number of nodes in {@link NodeState#TO_BE_RELEASED} state.
+     * Returns the maximum number of nodes in {@link NodeState#TO_BE_REMOVED} state.
      *
      * @return the maximum number of busy nodes
      */

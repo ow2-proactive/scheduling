@@ -61,11 +61,12 @@ import java.util.Set;
 public class TopologyImpl implements Topology, Cloneable {
 
     /**
-     * Host -> Hosts -> Distance
+     * Host -&gt; Hosts -&gt; Distance
      * Store here only half of matrix - each host have distances to hosts added before.
      * Assume that they are symmetrical.
      */
     private HashMap<InetAddress, HashMap<InetAddress, Long>> distances = new HashMap<>();
+
     /**
      * This map is needed to store the dependency between host name and address.
      * All listeners of the RM receive only host name in events, so for them it's simpler to

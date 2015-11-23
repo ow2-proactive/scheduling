@@ -155,9 +155,11 @@ public abstract class Task extends CommonAttribute {
 
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
-     * important.</font><br>
-     * In fact, it is in this order that you will get back the result in the children task.<br>
-     * For example : if you add to the task t3, the dependences t1 then t2, the parents of t3 will be t1 and t2 in this order
+     * important.</font>
+     * <p>
+     * In fact, it is in this order that you will get back the result in the children task.
+     * <p>
+     * For example: if you add to the task t3, the dependences t1 then t2, the parents of t3 will be t1 and t2 in this order
      * and the parameters of t3 will be the results of t1 and t2 in this order.
      *
      * @param task
@@ -299,7 +301,7 @@ public abstract class Task extends CommonAttribute {
 
     /**
      * Set the tag of this task.
-     * @param the tag value
+     * @param tag tag value
      */
     public void setTag(String tag) {
         this.tag = tag;
@@ -562,9 +564,10 @@ public abstract class Task extends CommonAttribute {
     }
 
     /**
-     * Set the number of nodes needed for this task.<br />
+     * Set the number of nodes needed for this task.
+     * <p>
      * This number represents the total number of nodes that you need. You may remember that
-     * (Default number is 1)
+     * default number is 1.
      *
      * @param numberOfNodesNeeded the number Of Nodes Needed to set.
      */
@@ -579,8 +582,9 @@ public abstract class Task extends CommonAttribute {
 
     /**
      * Add the files value to the given files value
-     * according to the provided access mode.<br />
-     * mode define the way the files will be bring to LOCAL space.
+     * according to the provided access mode.
+     * <p>
+     * Mode define the way the files will be bring to LOCAL space.
      *
      * @param files the input Files to add
      * @param mode the way to provide files to LOCAL space
@@ -599,8 +603,9 @@ public abstract class Task extends CommonAttribute {
 
     /**
      * Add the files value to the given files value
-     * according to the provided access mode.<br />
-     * mode define the way the files will be send to OUTPUT space.
+     * according to the provided access mode.
+     * <p>
+     * Mode define the way the files will be send to OUTPUT space.
      *
      * @param files the output Files to add
      * @param mode the way to send files to OUTPUT space
@@ -619,8 +624,9 @@ public abstract class Task extends CommonAttribute {
 
     /**
      * Add the files to the given filesToInclude value
-     * according to the provided access mode.<br />
-     * mode define the way the files will be bring to LOCAL space.
+     * according to the provided access mode.
+     * <p>
+     * Mode define the way the files will be bring to LOCAL space.
      * filesToInclude can represent one file or many files defined by a regular expression.
      * @see FileSelector for details
      *
@@ -639,8 +645,9 @@ public abstract class Task extends CommonAttribute {
 
     /**
      * Add the files to the given filesToInclude value
-     * according to the provided access mode.<br />
-     * mode define the way the files will be send to OUTPUT space.
+     * according to the provided access mode.
+     * <p>
+     * Mode define the way the files will be send to OUTPUT space.
      * filesToInclude can represent one file or many files defined by a regular expression.
      * @see FileSelector for details
      *

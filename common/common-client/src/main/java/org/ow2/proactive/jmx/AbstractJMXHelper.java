@@ -78,7 +78,7 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
  * <li><code>NAME</code> is provided by sub-classes by the {@link #getConnectorServerName()} method.
  * </ul>
  * <p>
- * Once booted with {@link #boot(AuthenticationImpl)} infrastructure can be shutdown with the {@link #shutdown()} method.
+ * Once booted with {@link #boot(Authentication)} infrastructure can be shutdown with the {@link #shutdown()} method.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
@@ -363,7 +363,7 @@ public abstract class AbstractJMXHelper {
 
     /**
      * Sets the rrd data store.
-     * @param dataStore
+     * @param rrdDataStore
      */
     public void setDataStore(RRDDataStore rrdDataStore) {
         this.dataStore = rrdDataStore;

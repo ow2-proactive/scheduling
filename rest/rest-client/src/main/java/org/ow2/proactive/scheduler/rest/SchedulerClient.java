@@ -69,11 +69,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.http.client.HttpClient;
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -90,33 +93,43 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
+import org.ow2.proactive.scheduler.rest.data.JobInfoImpl;
 import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
+import org.ow2.proactive.scheduler.rest.data.TaskStateImpl;
 import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
 import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
 import org.ow2.proactive.scheduler.rest.utils.HttpUtility;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -131,6 +144,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private String password;
 
     private SchedulerEventReceiver schedulerEventReceiver;
+    
+    private static final Logger logger = ProActiveLogger.getLogger(SchedulerClient.class);
 
     private SchedulerClient() {
     }
@@ -284,12 +299,12 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<JobInfo> getJobs(int index, int range, JobFilterCriteria criteria,
+    public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria criteria,
             List<SortParameter<JobSortParameter>> arg3) throws NotConnectedException, PermissionException {
-        List<JobInfo> jobInfos = null;
+        Page<JobInfo> jobInfos = null;
         try {
-            List<UserJobData> userJobDataList = restApi().jobsInfo(sid, index, range);
-            jobInfos = toJobInfos(userJobDataList);
+            RestPage<UserJobData> userJobDataList = restApi().jobsInfo(sid, index, range);
+            jobInfos = new Page<JobInfo>(toJobInfos(userJobDataList.getList()), userJobDataList.getSize());
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -366,6 +381,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             }
             catch(UnknownTaskException ex){
                 //never occurs because tasks are filtered by tag so they cannot be unknown.
+                logger.warn("Unknown task.", ex);
             }
         }
         return results;
@@ -926,5 +942,78 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         } catch (PermissionRestException e) {
             throw new PermissionException(e);
         }
+    }
+
+    @Override
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        RestPage<TaskStateData> page = null;
+        try {
+            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset, limit);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
+        List<TaskId> lTaskIds = new ArrayList<TaskId>(page.getList().size());
+        for (TaskStateData taskStateData : page.getList()) {
+            TaskInfoData taskInfo = taskStateData.getTaskInfo();
+            TaskIdData taskIdData = taskInfo.getTaskId();
+            JobId jobId = new JobIdImpl(taskInfo.getJobId().getId(), taskInfo.getJobId().getReadableName());
+            TaskId taskId = TaskIdImpl.createTaskId(jobId, taskIdData.getReadableName(), taskIdData.getId());
+            lTaskIds.add(taskId);
+        }
+        return new Page<TaskId>(lTaskIds, page.getSize());
+    }
+
+    @Override
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        RestPage<TaskStateData> page = null;
+        try {
+            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset,
+                    limit);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
+        List<TaskState> lTaskStates = new ArrayList<TaskState>(page.getList().size());
+        for (TaskStateData taskStateData : page.getList()) {
+            lTaskStates.add(new TaskStateImpl(taskStateData));
+        }
+        return new Page<TaskState>(lTaskStates, page.getSize());
+    }
+
+    @Override
+    public JobInfo getJobInfo(String jobId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        JobInfoData jobInfoData = null;
+        try {
+            jobInfoData = restApi().jobInfo(sid, jobId);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        } catch (UnknownJobRestException e) {
+            throw new UnknownJobException(e);
+        }
+        JobInfoImpl jobInfoImpl = new JobInfoImpl();
+        JobId newJobId = JobIdImpl.makeJobId(jobId);
+        jobInfoImpl.setJobId(newJobId);
+        jobInfoImpl.setJobOwner(jobInfoData.getJobOwner());
+        jobInfoImpl.setFinishedTime(jobInfoData.getFinishedTime());
+        jobInfoImpl.setRemovedTime(jobInfoData.getRemovedTime());
+        jobInfoImpl.setStartTime(jobInfoData.getStartTime());
+        jobInfoImpl.setSubmittedTime(jobInfoData.getSubmittedTime());
+        jobInfoImpl.setNumberOfFinishedTasks(jobInfoData.getNumberOfFinishedTasks());
+        jobInfoImpl.setNumberOfPendingTasks(jobInfoData.getNumberOfPendingTasks());
+        jobInfoImpl.setNumberOfRunningTasks(jobInfoData.getNumberOfRunningTasks());
+        jobInfoImpl.setJobPriority(JobPriority.findPriority(jobInfoData.getPriority().toString()));
+        jobInfoImpl.setJobStatus(JobStatus.findPriority(jobInfoData.getStatus().toString()));
+        if (jobInfoData.isToBeRemoved()) jobInfoImpl.setToBeRemoved();
+        return jobInfoImpl;
     }
 }

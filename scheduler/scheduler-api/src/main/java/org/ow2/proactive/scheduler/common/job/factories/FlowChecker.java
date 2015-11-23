@@ -176,7 +176,7 @@ public class FlowChecker {
      * nor the tasks contained.
      * 
      * @param job the job to validate
-     * @param an empty list that will be filled by this method with
+     * @param blocks empty list that will be filled by this method with
      *        the validated task blocks (pair of tasks) detected by the validator
      * @return a FlowError if the Job is not valid, or null if it is valid.
      */

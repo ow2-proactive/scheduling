@@ -1,5 +1,7 @@
 package functionaltests.jmx;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +13,8 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -26,13 +30,9 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBean;
-import org.junit.Assert;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestUsers;
-
-import static org.junit.Assert.*;
 
 
 /**
@@ -68,7 +68,7 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTest {
                 new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
 
         List<JobInfo> existingFinishedJobs = schedulerHelper.getSchedulerInterface().getJobs(0, 1000,
-                new JobFilterCriteria(false, false, true, true), null);
+                new JobFilterCriteria(false, false, true, true), null).getList();
 
         int nbFinishedTasks = 0;
         int nbTotalTasks = 0;

@@ -57,21 +57,15 @@ import it.sauronsoftware.cron4j.Predictor;
  * Dynamic evaluation of this script determines at runtime if a specific 
  * Control Flow operation should be performed in a TaskFlow.
  * <p>
- * This class wraps information around a {@link  org.ow2.proactive.scripting.Script}
- * to determine which {@link FlowAction} is attached to this script
- * <p>
- * Available after the execution of the script with {@link FlowScript#execute()}, 
- * the method {@link org.ow2.proactive.scripting.Script#getResult(Object, javax.script.Bindings)} returns the {@link FlowAction} which is enabled
- * or disabled depending the value of the {@link FlowScript#enabledVariable} variable set in the script.
+ * This class wraps information around a {@link org.ow2.proactive.scripting.Script}
+ * to determine which {@link FlowAction} is attached to this script.
  * <p>
  * When using the action type {@link FlowActionType#REPLICATE}, the value of the 
  * {@link FlowScript#replicateRunsVariable} determines the number of parallel runs.
  * 
- * 
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  * @see FlowAction
- * 
  */
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -319,7 +313,7 @@ public class FlowScript extends Script<FlowAction> {
      * should be performed on the TaskFlow.
      * 
      * @param actionType the String representation of the new ActionType of this script,
-     * @see {@link FlowActionType#parse(String)}
+     * @see FlowActionType#parse(String)
      */
     public void setActionType(String actionType) {
         this.actionType = actionType;
@@ -342,7 +336,7 @@ public class FlowScript extends Script<FlowAction> {
      * should be performed on the TaskFlow.
      * 
      * @return the String representation of the ActionType of this script,
-     * @see {@link FlowActionType#parse(String)}
+     * @see FlowActionType#parse(String)
      */
     public String getActionType() {
         return this.actionType;

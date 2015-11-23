@@ -42,7 +42,7 @@ import java.io.Serializable;
 
 
 /**
- * PropertyTask is a task that can display a property.<br/>
+ * PropertyTask is a task that can display a property.
  * It will also wait for 10 seconds before.
  *
  * @author The ProActive Team

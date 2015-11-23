@@ -87,8 +87,8 @@ import org.apache.log4j.Logger;
 
 /**
  * Internal and global description of a job.
- * This class contains all informations about the job to launch.
- * It also provides method to manage the content regarding the scheduling process.<br/>
+ * This class contains all information about the job to launch.
+ * It also provides method to manage the content regarding the scheduling process.
  * Specific internal job may extend this abstract class.
  *
  * @author The ProActive Team
@@ -141,8 +141,8 @@ public abstract class InternalJob extends JobState {
     }
 
     /**
-     * This method will do two things :<br />
-     * First, it will update the job with the informations contained in the given taskInfo<br />
+     * This method will perform two actions. First, it will update the job
+     * with the information contained in the givem taskInfo.
      * Then, it will update the proper task using the same given taskInfo.
      *
      * @param info a taskInfo containing new information about the task.

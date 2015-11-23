@@ -74,19 +74,19 @@ public class ListTaskStatesCommand extends AbstractJobTagPaginatedCommand implem
             List<TaskStateData> tasks = null;
             if (this.tag == null) {
                 if (this.limit == 0) {
-                    tasks = scheduler.getJobTaskStates(currentContext.getSessionId(), jobId).getTasks();
+                    tasks = scheduler.getJobTaskStates(currentContext.getSessionId(), jobId).getList();
                 } else {
                     tasks = scheduler
                             .getJobTaskStatesPaginated(currentContext.getSessionId(), jobId, offset, limit)
-                            .getTasks();
+                            .getList();
                 }
             } else {
                 if (this.limit == 0) {
                     tasks = scheduler.getJobTaskStatesByTag(currentContext.getSessionId(), jobId, tag)
-                            .getTasks();
+                            .getList();
                 } else {
                     tasks = scheduler.getJobTaskStatesByTagPaginated(currentContext.getSessionId(), jobId,
-                            tag, offset, limit).getTasks();
+                            tag, offset, limit).getList();
                 }
 
             }

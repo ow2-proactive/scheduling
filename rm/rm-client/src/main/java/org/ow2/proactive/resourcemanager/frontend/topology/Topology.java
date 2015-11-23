@@ -51,7 +51,7 @@ import org.ow2.proactive.topology.descriptor.DistanceFunction;
 /**
  *
  * Interface represents hosts topology handled by resource manager.
- * Users may receive the topology information using {@link ResourceManager.getTopology()} method.
+ * Users may receive the topology information using {@code ResourceManager.getTopology()} method.
  */
 @PublicAPI
 public interface Topology extends Serializable {

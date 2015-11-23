@@ -77,7 +77,7 @@ import org.ow2.proactive.utils.NodeSet;
 /**
  * Internal and global description of a task.
  * This class contains all information about the task to launch.
- * It also provides methods to create its own launcher and manage the content regarding the scheduling order.<br/>
+ * It also provides methods to create its own launcher and manage the content regarding the scheduling order.
  * Specific internal task may extend this abstract class.
  *
  * @author The ProActive Team
@@ -731,8 +731,8 @@ public abstract class InternalTask extends TaskState {
      * To set the name of this task.
      * <p>
      * The provided String will be appended the iteration and replication index
-     * if > 0, so that: <br>
-     * <code>name = name [ITERATION_SEPARATOR iteration] [REPLICATION_SEPARATOR replication]</code>
+     * if &gt; 0, so that
+     * <code>name = name [ITERATION_SEPARATOR iteration] [REPLICATION_SEPARATOR replication]</code>.
      *
      * @param newName
      *            the name to set.
@@ -893,7 +893,7 @@ public abstract class InternalTask extends TaskState {
      * <p>
      * Updates the Task's name consequently, see {@link Task#setName(String)}
      *
-     * @param it iteration number, must be >= 0
+     * @param it iteration number, must be {@code >= 0}.
      */
     public void setIterationIndex(int it) {
         if (it < 0) {
@@ -905,7 +905,7 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * @return the iteration number of this task if it was replicated by a LOOP flow operations (>= 0)
+     * @return the iteration number of this task if it was replicated by a LOOP flow operations ({@code >= 0})
      */
     @Override
     public int getIterationIndex() {
@@ -915,7 +915,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * Set the replication number of this task if it was replicated by a REPLICATE flow operations
      *
-     * @param it iteration number, must be >= 0
+     * @param it iteration number, must be {@code >= 0}
      */
     public void setReplicationIndex(int it) {
         if (it < 0) {
@@ -927,7 +927,7 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * @return the replication number of this task if it was replicated by a REPLICATE flow operations (>= 0)
+     * @return the replication number of this task if it was replicated by a REPLICATE flow operations ({@code >= 0})
      */
     @Override
     public int getReplicationIndex() {
@@ -1001,8 +1001,6 @@ public abstract class InternalTask extends TaskState {
      * there exist no hard dependency between the initiator of the action and the IF or ELSE
      * branch. Similarly, there exist no dependency between the IF or ELSE branches
      * and the JOIN task.
-     *
-     * @return the name of the initiator of the IF action that this task is a branch of
      */
     public void setIfBranch(InternalTask branch) {
         this.ifBranch = branch;

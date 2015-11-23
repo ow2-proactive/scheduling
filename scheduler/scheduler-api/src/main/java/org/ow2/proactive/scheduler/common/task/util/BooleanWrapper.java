@@ -46,7 +46,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * BooleanWrapper is the Scheduler Wrapper object for boolean.<br />
+ * BooleanWrapper is the Scheduler Wrapper object for boolean.
  * It is mostly used for Hibernate when using boolean with parametric type.
  *
  * @author The ProActive Team

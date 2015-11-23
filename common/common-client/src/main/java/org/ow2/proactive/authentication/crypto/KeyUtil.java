@@ -48,9 +48,8 @@ import javax.crypto.SecretKey;
 /**
  * Symmetric cryptography utilities for Key generation, encryption and decryption
  * <p>
- * Refer to the Java Cryptography Extension Reference Guide at
- * {@link http://java.sun.com/j2se/1.5.0/docs/guide/security/jce/JCERefGuide.html} to
- * determine which parameters are best for key algorithm, key size and cipher;
+ * Refer to the <a href="http://java.sun.com/j2se/1.5.0/docs/guide/security/jce/JCERefGuide.html">Java Cryptography Extension Reference Guide</a> at
+ * to determine which parameters are best for key algorithm, key size and cipher;
  * although "AES", 128 and "AES" should be good enough in most
  * cases.
  * 

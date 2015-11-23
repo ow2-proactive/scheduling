@@ -97,7 +97,7 @@ public class ROConnection implements MBeanServerConnection, Serializable {
     }
 
     /**
-     * Creates a new <code>ROConnection</code> that forwards remote calls to the attached MBean server.</p>
+     * Creates a new <code>ROConnection</code> that forwards remote calls to the attached MBean server.
      * @param mbs the MBean server the connection is attached to
      * @param connectionId the MBean server the connection is attached to
      * @param server the MBean server the connection is attached to

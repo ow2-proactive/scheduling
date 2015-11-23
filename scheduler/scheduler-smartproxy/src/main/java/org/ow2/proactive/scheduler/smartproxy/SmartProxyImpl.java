@@ -1,5 +1,17 @@
 package org.ow2.proactive.scheduler.smartproxy;
 
+import java.io.Serializable;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
@@ -15,31 +27,35 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.smartproxy.common.AbstractSmartProxy;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
-
-import javax.security.auth.login.LoginException;
-import java.io.Serializable;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Smart proxy implementation that relies on active objects for communicating with dataspaces
@@ -50,36 +66,25 @@ import java.util.concurrent.Future;
  * <ul>
  * <li>the client application needs to submit to the scheduler jobs which
  * require data transfer to the execution nodes</li>
- * <p>
  * <li>the input data is accessible by the client on the local file system (or
  * on location accessible on NFS)</li>
- * <p>
  * <li>the output data is to be copied to the local file system (or on location
  * accessible on NFS)</li>
- * <p>
  * <li>the local file system is not visible from the computation nodes side</li>
- * <p>
- * *
  * <li>There is a location (let's call it SHARED_INPUT_LOCATION), for transferring
  * input data, accessible from both sides, client side and computation node
  * side. Same for output data (let's call it SHARED_OUTPUT_LOCATION). These
  * locations could be the same. It might be a shared folder or a data server.
- * <p>
  * Let´s call push_url the url used by the client application in order to push
  * the input data to SHARED_INPUT_LOCATION.
- * <p>
  * Let´s call pull_url the url used by the client application in order to pull
  * the output data from SHARED_OUTPUT_LOCATION.
- * <p>
  * The job needs to specify, as input space, an url pointing to
  * SHARED_INPUT_LOCATION. The job needs to specify, as output space, an url
  * pointing to SHARED_OUTPUT_LOCATION. These urls might or not be the same as
  * push_url and pull_url.
  * </li>
- * <p>
  * </ul>
- * <p>
- * <p>
  * The client application will use this Proxy for communicating with the
  * Scheduler. This Proxy is an ActiveObject.
  * <p>
@@ -102,7 +107,6 @@ import java.util.concurrent.Future;
  * schedProxy.addEventListener(myListenerRemoteReference);
  * }
  * <p>
- * <p>
  * When a listener is added by the client, no new connection will be established
  * with the scheduler. This Proxy object broadcasts events received from the
  * Scheduler to its own listeners. In addition, it adds events related to data
@@ -114,27 +118,18 @@ import java.util.concurrent.Future;
  * <li>A temporary folder, for this execution, is created on the
  * SHARED_INPUT_LOCATION and the
  * SHARED_OUTPUT_LOCATION (if SHARED_INPUT_LOCATION!=SHARED_OUTPUT_LOCATION).</li>
- * <p>
  * <li>The job INPUT_SPACE and OUTPUT_SPACE urls are updated with the new
  * created temporary folders.</li>
- * <p>
- * <p>
  * <li>The input data is pushed, via the push_url, from the local file system,
  * to the temporary folder</li>
- * <p>
  * <li>The job is added to a list of awaited jobs, in order to pull the output
  * data once the job is finished. This list is persisted on disk and will be
  * restored after an application restart.</li>
- * <p>
  * <li>When the job is finished, the output data is pulled form the
  * TMP_OUTPUT_LOCATION</li>
- * <p>
- * <p>
  * <li>The client application will be notified, via the listener, about the
  * evolution of the submitted jobs and about data transfer operations.</li>
- * <p>
  * </ul>
- * <p>
  * Each time this object is initialized, it recovers the awaited_jobs list from
  * the persisted file and, for each finished job, it pulls the output data from
  * the TMP_OUTPUT_LOCATION to the local file system
@@ -699,6 +694,28 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
             return true;
         }
+    }
+
+    @Override
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to,
+            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        return schedulerProxy.getTaskIds(taskTag, from, to, mytasks, running, pending, finished,
+                offset, limit);
+    }
+
+    @Override
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to,
+            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        return schedulerProxy.getTaskStates(taskTag, from, to, mytasks, running, pending, finished,
+                offset, limit);
+    }
+
+    @Override
+    public JobInfo getJobInfo(String jobId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        return schedulerProxy.getJobInfo(jobId);
     }
 
 }

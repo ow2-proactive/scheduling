@@ -65,12 +65,12 @@ public interface RMEventListener {
     void rmEvent(RMEvent event);
 
     /** new node source available in RM.
-     * @param event node source event containing new {@link NodeSource} properties.
+     * @param event node source event containing new {@code NodeSource} properties.
      */
     void nodeSourceEvent(RMNodeSourceEvent event);
 
     /** new node available in RM.
-     * @param event node event containing new {@link RMNode} properties.
+     * @param event node event containing new {@code RMNode} properties.
      */
     void nodeEvent(RMNodeEvent event);
 }

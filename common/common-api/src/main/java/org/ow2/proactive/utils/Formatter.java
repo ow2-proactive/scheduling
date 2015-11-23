@@ -52,17 +52,17 @@ public final class Formatter {
     /**
      * Return the stack trace of the given exception in a string.
      *
-     * @param e
+     * @param throwable
      *            an exception or throwable
      * @return the stack trace of the given exception in a string.
      */
-    public static String stackTraceToString(Throwable aThrowable) {
+    public static String stackTraceToString(Throwable throwable) {
         Writer result = null;
         PrintWriter printWriter = null;
         try {
             result = new StringWriter();
             printWriter = new PrintWriter(result);
-            aThrowable.printStackTrace(printWriter);
+            throwable.printStackTrace(printWriter);
         } finally {
             if (printWriter != null)
                 printWriter.close();
@@ -72,7 +72,7 @@ public final class Formatter {
                 } catch (Exception e) {
                     //was not able to produce the String representing the exception
                     System.out.println("Could not get the stacktrace for the following ex: ");
-                    aThrowable.printStackTrace();
+                    throwable.printStackTrace();
                     System.out
                             .println("An exception occured while constructing the String representation of the exception above: ");
                     e.printStackTrace();

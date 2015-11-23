@@ -42,9 +42,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 
 
 /**
- *
  * A policy defined static nodes acquisition.
- *
  */
 @ActiveObject
 public class StaticPolicy extends NodeSourcePolicy {
@@ -52,7 +50,6 @@ public class StaticPolicy extends NodeSourcePolicy {
     /**
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
-     * @throws RMException
      */
     @Override
     public BooleanWrapper configure(Object... policyParameters) {

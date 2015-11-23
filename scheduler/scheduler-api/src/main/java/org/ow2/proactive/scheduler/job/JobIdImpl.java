@@ -144,8 +144,9 @@ public final class JobIdImpl implements JobId {
     }
 
     /**
-     * <font color="red"><b>Do not use this method to get the value as an INTEGER.<br />
-     * It does not ensure that this integer value is the real Job ID Value.</b></font><br />
+     * <font color="red"><b>Do not use this method to get the value as an INTEGER.
+     * It does not ensure that this integer value is the real Job ID Value.</b></font>
+     * <p>
      * Use the {@link org.ow2.proactive.scheduler.common.job.JobId#value()} method instead.
      *
      * @see java.lang.Object#hashCode()

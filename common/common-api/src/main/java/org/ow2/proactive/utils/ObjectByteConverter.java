@@ -48,7 +48,8 @@ import java.util.zip.Inflater;
 
 /**
  * Utility functions for converting object to a byte array,
- * and vis versa.<br/>
+ * and vis versa.
+ * <p>
  * This class can also compress stream
  *
  * @author The ProActive Team
@@ -57,7 +58,7 @@ import java.util.zip.Inflater;
 public final class ObjectByteConverter {
 
     /**
-     * Convert the given Serializable Object into a byte array.<br/>
+     * Convert the given Serializable Object into a byte array.
      * 
      * @param obj the Serializable object to be compressed
      * @return a byteArray representing the Serialization of the given object.
@@ -68,7 +69,8 @@ public final class ObjectByteConverter {
     }
 
     /**
-     * Convert the given Serializable Object into a byte array.<br/>
+     * Convert the given Serializable Object into a byte array.
+     * <p>
      * The returned byteArray can be compressed by setting compress boolean argument value to <code>true</code>.
      * 
      * @param obj the Serializable object to be compressed
@@ -124,7 +126,7 @@ public final class ObjectByteConverter {
     }
 
     /**
-     * Convert the given byte array into the corresponding object.<br/>
+     * Convert the given byte array into the corresponding object.
      * 
      * @param input the byteArray to be convert as an object.
      * @return the object corresponding to the given byteArray.
@@ -136,7 +138,8 @@ public final class ObjectByteConverter {
     }
 
     /**
-     * Convert the given byte array into the corresponding object.<br/>
+     * Convert the given byte array into the corresponding object.
+     * <p>
      * The given byteArray can be uncompressed if it has been compressed before.
      * 
      * @param input the byteArray to be convert as an object.

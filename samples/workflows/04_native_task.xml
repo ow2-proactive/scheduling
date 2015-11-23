@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xmlns="urn:proactive:jobdescriptor:3.2"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
+     xmlns="urn:proactive:jobdescriptor:3.3"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
      name="04_native_task">
     <description>
         Simple native command printing the current datetime.

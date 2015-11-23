@@ -41,9 +41,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
- * An exception thrown by {@link ResourceManager.getAtMostNodes} request when
+ * An exception thrown by {@link ResourceManager#getAtMostNodes} request when
  * a particular topology is demanded and not active.
- *
  */
 @PublicAPI
 public class TopologyDisabledException extends TopologyException {

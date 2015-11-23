@@ -88,7 +88,7 @@ public class ObjectArrayFormatter {
      * Set the space value to the given space value.
      * It represent the space between each column.
      *
-     * @param space the space to set
+     * @param spaces the space to set
      */
     public void setSpace(int spaces) {
         if (spaces < 1) {

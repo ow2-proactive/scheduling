@@ -98,7 +98,7 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      * This index is reflected in the readable name of the Task's id ({@link #getReadableName()}),
      * this methods safely extracts it and returns it as an int.
      * 
-     * @return the iteration number of this task if it was replicated by a IF flow operation (>= 0)
+     * @return the iteration number of this task if it was replicated by a IF flow operation ({@code >= 0})
      */
     int getIterationIndex();
 
@@ -109,7 +109,7 @@ public interface TaskId extends Comparable<TaskId>, Serializable {
      * This index is reflected in the readable name of the Task's id ({@link #getReadableName()}),
      * this methods safely extracts it and returns it as an int.
      * 
-     * @return the iteration number of this task if it was replicated by a IF flow operation (>= 0)
+     * @return the iteration number of this task if it was replicated by a IF flow operation ({@code >= 0})
      */
     int getReplicationIndex();
 

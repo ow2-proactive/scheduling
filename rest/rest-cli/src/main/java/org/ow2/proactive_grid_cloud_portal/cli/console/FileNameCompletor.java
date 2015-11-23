@@ -32,7 +32,7 @@ import jline.console.completer.Completer;
  *  not provide any way of determining that easily</li>
  *  </ul>
  *
- *  <p>TODO</p>
+ *  <p>TODO:</p>
  *  <ul>
  *  <li>Handle files with spaces in them</li>
  *  <li>Have an option for file type color highlighting</li>
@@ -117,7 +117,7 @@ public class FileNameCompletor implements Completer {
      *
      *  @param        buffer                the untranslated buffer
      *  @param        translated        the buffer with common characters replaced
-     *  @param        entries                the list of files to match
+     *  @param        files                the list of files to match
      *  @param        candidates        the list of candidates to populate
      *
      *  @return  the offset of the match

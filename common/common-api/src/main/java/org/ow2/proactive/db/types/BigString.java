@@ -46,7 +46,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * BigString is the Scheduler Wrapper object for String.<br />
+ * BigString is the Scheduler Wrapper object for String.
  * It is mostly used for Hibernate when using string as value in a hashMap.
  *
  * @author The ProActive Team

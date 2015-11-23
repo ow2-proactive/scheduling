@@ -68,6 +68,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -94,6 +95,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
@@ -113,6 +115,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
+
 
 
 /**
@@ -427,6 +430,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             }
             catch (UnknownTaskException ex){
                 //never occurs because tasks are filtered by tag so they cannot be unknown.
+                logger.warn("Unknown task.", ex);
             }
         }
         return results;
@@ -1007,7 +1011,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
-    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
+    public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getJobs",
@@ -1120,4 +1124,42 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 "You do not have permission to remove third-party credentials from the scheduler!");
         dbManager.removeThirdPartyCredential(ident.getUsername(), key);
     }
+    
+    @Override
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        RestPageParameters params = new RestPageParameters(frontendState, "getTaskIds", from, to, mytasks,
+                running, pending, finished, offset, limit, taskTag);
+        Page<TaskInfo> pTaskInfo;
+        pTaskInfo = dbManager.getTasks(params.getFrom(), params.getTo(), params.getTag(),
+                params.getOffset(), params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
+                params.isFinished(), null);
+        List<TaskId> lTaskId = new ArrayList<TaskId>(pTaskInfo.getList().size());
+        for (TaskInfo taskInfo : pTaskInfo.getList()) {
+            lTaskId.add(taskInfo.getTaskId());
+        }
+        return new Page<TaskId>(lTaskId, pTaskInfo.getSize());
+    }
+
+    @Override
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to,
+            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        RestPageParameters params = new RestPageParameters(frontendState, "getTaskStates", from, to, mytasks,
+            running, pending, finished, offset, limit, taskTag);
+        Page<TaskState> pTasks;
+        pTasks = dbManager.getTaskStates(params.getFrom(), params.getTo(), params.getTag(), params.getOffset(),
+                params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
+                params.isFinished(), null);
+        return pTasks;
+        
+    }
+
+    @Override
+    public JobInfo getJobInfo(String jobId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        return getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
+    }
+    
 }

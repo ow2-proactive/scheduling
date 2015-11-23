@@ -42,7 +42,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * ByteArrayWrapper is the Scheduler Wrapper object for byte[].<br />
+ * ByteArrayWrapper is the Scheduler Wrapper object for byte[].
  * It is mostly used for Hibernate when using byte array with parametric type.
  *
  * @author The ProActive Team

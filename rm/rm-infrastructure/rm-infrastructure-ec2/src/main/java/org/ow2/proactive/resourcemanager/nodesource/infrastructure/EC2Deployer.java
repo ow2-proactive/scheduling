@@ -468,10 +468,7 @@ public class EC2Deployer implements java.io.Serializable {
     /**
      * Try to terminate an instance from EC2 with IP/Host addr
      *
-     * @param hostname
-     *            hostname of the node
-     * @param ip
-     *            ip of the node
+     * @param addr
      *
      * @return True on success, false otherwise
      */

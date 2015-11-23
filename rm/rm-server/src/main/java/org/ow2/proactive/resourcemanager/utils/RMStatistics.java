@@ -67,7 +67,7 @@ public final class RMStatistics {
     private int freeNodesCount;
     /** The count of nodes in {@link NodeState#BUSY} state */
     private int busyNodesCount;
-    /** The count of nodes in {@link NodeState#TO_BE_RELEASED} state */
+    /** The count of nodes in {@link NodeState#TO_BE_REMOVED} state */
     private int toBeRemovedNodesCount;
     /** The count of nodes in {@link NodeState#DOWN} state */
     private int downNodesCount;
@@ -472,7 +472,7 @@ public final class RMStatistics {
     }
 
     /**
-     * Returns the current number of nodes in {@link NodeState#TO_BE_RELEASED} state.
+     * Returns the current number of nodes in {@link NodeState#TO_BE_REMOVED} state.
      * @return the current number of busy nodes
      */
     public int getToBeRemovedNodesCount() {
@@ -572,4 +572,5 @@ public final class RMStatistics {
         }
         return (((double) v2 / total) * 100);
     }
+
 }

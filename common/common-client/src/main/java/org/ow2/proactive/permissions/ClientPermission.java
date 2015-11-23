@@ -44,7 +44,7 @@ import org.ow2.proactive.policy.ClientsPolicy;
 /**
  * Base class of client specific permissions.
  * Allows to user wildcard in names and actions.
- * @see {@link ClientsPolicy}
+ * @see ClientsPolicy
  */
 public class ClientPermission extends BasicPermission {
 

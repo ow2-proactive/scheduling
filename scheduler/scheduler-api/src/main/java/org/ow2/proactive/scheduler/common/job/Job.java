@@ -188,7 +188,6 @@ public abstract class Job extends CommonAttribute {
      * Set the input Space value to the given inputSpace value
      *
      * @param inputSpace the input Space to set
-     * @throws MalformedURLException
      */
     public void setInputSpace(String inputSpace) {
         this.inputSpace = inputSpace;

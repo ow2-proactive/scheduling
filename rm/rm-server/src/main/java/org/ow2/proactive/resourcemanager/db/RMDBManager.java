@@ -377,9 +377,6 @@ public class RMDBManager {
         });
     }
 
-    /**
-     * @return prev alive time
-     */
     protected void updateRmAliveTime() {
         runWithTransaction(new SessionWork<Void>() {
             @Override

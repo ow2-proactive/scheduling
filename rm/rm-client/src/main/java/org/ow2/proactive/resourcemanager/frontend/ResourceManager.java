@@ -63,14 +63,12 @@ import org.ow2.proactive.utils.NodeSet;
  * Its main features are
  * <ul>
  * <li> deployment, acquisition and release of ProActive nodes to/from an underlying infrastructure</li>
- * </li> providing nodes for computations, based on clients criteria (@see {@link SelectionScript})</li>
- * </li> maintaining and monitoring its list of resources and managing their states (free, busy, down...)</li>
+ * <li> providing nodes for computations, based on clients criteria (@see {@link SelectionScript})</li>
+ * <li> maintaining and monitoring its list of resources and managing their states (free, busy, down...)</li>
  * </ul>
- *
  * <p>
  * This interface provides means to create/remove node sources in the resource manager, add remove nodes to node sources,
  * track the state of the resource manager and get nodes for computations.
- *
  * <p>
  * All the methods of this interface are asynchronous.
  */
@@ -304,7 +302,7 @@ public interface ResourceManager {
      *
      * @param number the number of nodes
      * @param descriptor the topology descriptor of nodes 
-     * @see {@link TopologyDescriptor}
+     * @see TopologyDescriptor
      * @param selectionScriptsList criteria to be verified by the returned nodes
      * @param exclusion a list of node which should not be in the result set
      * @return a list of nodes
@@ -327,7 +325,7 @@ public interface ResourceManager {
      *
      * @param number the number of nodes
      * @param descriptor the topology descriptor of nodes 
-     * @see {@link TopologyDescriptor}
+     * @see TopologyDescriptor
      * @param selectionScriptsList criteria to be verified by the returned nodes
      * @param exclusion a list of node which should not be in the result set
      * @param bestEffort the mode of node aggregation
@@ -343,7 +341,7 @@ public interface ResourceManager {
      * Nodes should satisfy specified criteria. 
      * 
      * @param criteria criteria to select nodes
-     * @see {@link Criteria}
+     * @see Criteria
      * @return a list of nodes according to the criteria
      */
     NodeSet getNodes(Criteria criteria);

@@ -56,6 +56,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -78,7 +79,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -510,7 +513,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * @param mbeanName the object name of the MBean
      * @return the informations about the MBean as a formatted string
      *
-     * @see org.ow2.proactive.utils.MBeanInfoViewer#getInfo(String)
+     * @see MBeanInfoViewer#getInfo(String)
      */
     @Deprecated
     public String getInfo(String mbeanName) {
@@ -555,7 +558,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public List<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria,
+    public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException,
             PermissionException {
         return uischeduler.getJobs(index, range, filterCriteria, sortParameters);
@@ -598,4 +601,25 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
         uischeduler.removeThirdPartyCredential(key);
     }
+
+    @Override
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        return uischeduler.getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+    }
+
+    @Override
+    public Page<TaskState>  getTaskStates(String taskTag, long from, long to, boolean mytasks,
+            boolean running, boolean pending, boolean finished, int offset, int limit)
+                    throws NotConnectedException, PermissionException {
+        return uischeduler.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+    }
+
+    @Override
+    public JobInfo getJobInfo(String jobId)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        return uischeduler.getJobInfo(jobId);
+    }
+
 }

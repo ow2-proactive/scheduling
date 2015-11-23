@@ -62,9 +62,9 @@ import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
  * This class implements the basics common operations that can be performed on a resource manager (i.e batching job system like PBS, Torque, LSF...).
  * It ensures that the internal number of nodes is coherent regarding acquisition a removal requests after timeouts occur. For instance, even if a {@link #getDeleteJobCommand()}
  * fails, the node is removed from the core anyway, if the SSH command to the frontend or {@link #getSubmitJobCommand()} fail, this IM ensure that after the {@link #nodeTimeOut} occurs
- * no more nodes will be registered (this IM maintains an internal "black list").<br /><br />
- *
- * Service Providers have to implements 3 methods:<br />
+ * no more nodes will be registered (this IM maintains an internal "black list").
+ * <p>
+ * Service Providers have to implements 3 methods:
  * <ul>
  * 	<li>{@link #getBatchinJobSystemName()}: The name of the target resource manager, PBS, Torque, LSF are such examples. The returned string is not really significant, it is only used to build meaningful nodes' name or for logging.</li>
  *  <li>{@link #getDeleteJobCommand()}: The command required to delete a job on the target resource manager.</li>
@@ -147,11 +147,11 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     private Credentials credentials = null;
 
     /**
-     * nodes currently up and running, nodeName -> jobID
+     * Nodes currently up and running, nodeName -&gt; jobID
      */
     private Hashtable<String, String> currentNodes = new Hashtable<>();
     /**
-     * the number of pending nodes
+     * The number of pending nodes
      */
     private volatile Integer deployingNodes = 0;
     /**

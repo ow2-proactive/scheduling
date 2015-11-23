@@ -356,6 +356,11 @@ def exportedProjects= [
         ":common:common-client",
         ":scheduler:scheduler-api",
         ":scheduler:scheduler-client",
+        ":scheduler:scheduler-examples",
+        ":scheduler:scheduler-smartproxy",
+        ":scheduler:scheduler-smartproxy-common",
+        ":rest:rest-client",
+        ":rest:rest-smartproxy",
         ":rm:rm-client",
 ]
 

@@ -56,8 +56,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * SelectionUtils provides static methods for selection script.<br />
- * This class also defines the public operator that can be used in a script.<br />
+ * SelectionUtils provides static methods for selection script.
+ * This class also defines the public operator that can be used in a script.
  * So, when creating a Condition object pleased used LESS_THAN, GREATER_THAN, EQUAL or MATCH.
  *
  * @author The ProActive Team
@@ -86,7 +86,7 @@ public class SelectionUtils {
      * This method returns true if (and only if) every conditions match the given file.
      *
      * @param configFilePath configuration path
-     * @param params the conditions object (which is a collection of condition objects )
+     * @param conditions the conditions object (which is a collection of condition objects )
      * @return true if every conditions match the given file.
      */
     public static boolean checkProperties(String configFilePath, Conditions conditions) {
@@ -144,7 +144,7 @@ public class SelectionUtils {
     }
 
     /**
-     * Check the condition in the given configuration file. <br />
+     * Check the condition in the given configuration file.
      * Return true if the condition is accepted according to the given configuration file.
      *
      * @param configFilePath configuration file path

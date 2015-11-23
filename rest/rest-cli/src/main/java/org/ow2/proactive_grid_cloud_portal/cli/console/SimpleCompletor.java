@@ -26,7 +26,7 @@ import java.util.TreeSet;
 
 /**
  *  <p>
- *  A simple {@link jline.Completor} implementation that handles a pre-defined
+ *  A simple {@link Completer} implementation that handles a pre-defined
  *  list of completion words.
  *  </p>
  *

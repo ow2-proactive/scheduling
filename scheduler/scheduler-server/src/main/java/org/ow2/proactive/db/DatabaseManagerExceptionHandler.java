@@ -37,7 +37,7 @@
 package org.ow2.proactive.db;
 
 /**
- * ExceptionHandler is used by database manager to handle the raised exception.<br/>
+ * ExceptionHandler is used by database manager to handle the raised exception.
  * This class just contains a handle method that will throw an exception (or not) depending on the status
  * of the handler.
  *
@@ -61,25 +61,26 @@ public class DatabaseManagerExceptionHandler {
     private FilteredExceptionCallback callback;
 
     /**
-     * Create a new instance of DatabaseManagerExceptionHandler with a list of exception to be filtered.<br/>
+     * Create a new instance of DatabaseManagerExceptionHandler with a list of exception to be filtered.
      * If filteredException is empty, the behavior of the {@link #handle(String, Throwable)} method
-     * will be the {@link DBMEHandler#THROW_ALL} one.<br/>
-     * <br/>
-     * If filteredException contains at least one element, the behavior will depend on the state of the handler.<br/>
+     * will be the {@link DBMEHandler#THROW_ALL} one.
+     * <p>
+     * If {@code filteredException} contains at least one element, the behavior will depend on the state of the handler:
      * <ul>
      * <li>If the state is {@link DBMEHandler#THROW_ALL}, the {@link #handle(String, Throwable)} method
      * will always throw an exception, and the callback will never be notified.</li>
      * <li>If the state is {@link DBMEHandler#FILTER_TOP} or {@link DBMEHandler#FILTER_ALL},
      * the {@link #handle(String, Throwable)} method will not throw an exception, but the callback will be
-     * notified with the raised exception as argument.<br/>
+     * notified with the raised exception as argument.
      * It remains possible to throw the passed exception at the end of the notify method. The effect will then
-     * be the same as the {@link DBMEHandler#THROW_ALL} behavior.<br/>
+     * be the same as the {@link DBMEHandler#THROW_ALL} behavior.
      * For example, with a <code>"notify(e){throw e;}"</code> method, then
      * the behavior will be the same as the one if state would be {@link DBMEHandler#THROW_ALL}.
      * </ul>
-     * <br/>
+     * <p>
      * <i>Note 1</i> : The raised exception in {@link #handle(String, Throwable)} method will be
-     * the message and cause wrapped in a DatabaseManagerException<br/>
+     * the message and cause wrapped in a DatabaseManagerException.
+     * <p>
      * <i>Note 2</i> : If the state is {@link DBMEHandler#IGNORE_ALL}, no exception will be raised at all and
      * the callback won't be notified
      *
@@ -98,7 +99,7 @@ public class DatabaseManagerExceptionHandler {
     }
 
     /**
-     * Handle the given message as an exception.<br/>
+     * Handle the given message as an exception.
      * A call to this method will always throw a DatabaseManagerException with the given message,
      * except if the state is {@link DBMEHandler#IGNORE_ALL}. In this last case, the method will just return
      * dong nothing.
@@ -110,7 +111,7 @@ public class DatabaseManagerExceptionHandler {
     }
 
     /**
-     * Handle the given message and cause as an exception.<br/>
+     * Handle the given message and cause as an exception.
      * <ul>
      * <li>If the state of the handler is {@link DBMEHandler#THROW_ALL}, a DatabaseManagerException is raised
      * with the given message and cause, the callback is not notified.</li>
@@ -120,17 +121,17 @@ public class DatabaseManagerExceptionHandler {
      * (checked exception is every causes recursively), the callback will be notified only if the exception was in the filter.</li>
      * <li>If the state is {@link DBMEHandler#IGNORE_ALL}, it will not throw any exception, the callback will NOT be notified.</li>
      * </ul>
-     * <br/>
-     * <i>Note 1</i> : The raised exception is the message and cause wrapped in a DatabaseManagerException
-     * <br/>
-     * <i>Note 2</i> : If the given cause does not match the filter or the state is {@link DBMEHandler#THROW_ALL},
+     * <p>
+     * <i>Note 1</i>: The raised exception is the message and cause wrapped in a DatabaseManagerException.
+     * <p>
+     * <i>Note 2</i>: If the given cause does not match the filter or the state is {@link DBMEHandler#THROW_ALL},
      * the callback will not be notified and the exception will be thrown.
      *
      * @param message the message of the exception to handle
      * @param cause the cause of the exception (A <tt>null</tt> value is
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown. In such a case, the call is the same as calling the {@link #handle(String)} method.)
-     * @throw DatabaseManagerException as explained above
+     * @throws DatabaseManagerException as explained above
      */
     public void handle(String message, Throwable cause) {
         if (cause == null && this.state != DBMEHandler.IGNORE_ALL) {

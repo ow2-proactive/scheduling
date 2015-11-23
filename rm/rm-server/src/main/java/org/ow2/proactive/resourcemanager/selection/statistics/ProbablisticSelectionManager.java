@@ -98,9 +98,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * Find appropriate candidates nodes for script execution, taking into
      * account "free" and "exclusion" nodes lists.
      *
-     * @param selectionScriptList - set of scripts to execute
-     * @param freeNodes - free nodes list provided by resource manager
-     * @param exclusionNodes - exclusion nodes list
+     * @param scripts set of scripts to execute
+     * @param nodes free nodes list provided by resource manager
      * @return candidates node list for script execution
      */
     @Override

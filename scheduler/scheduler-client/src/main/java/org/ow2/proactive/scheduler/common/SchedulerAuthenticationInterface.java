@@ -45,9 +45,10 @@ import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 
 
 /**
- * Scheduler Authentication Interface provides method to connect to the scheduler.<br>
- * Before using the scheduler communication interface {@link org.ow2.proactive.scheduler.core.UserScheduler}, you have to connect it using a login/password using this interface.<br>
- * You can get this interface by using the scheduler connection {@link SchedulerConnection}
+ * Scheduler Authentication Interface provides method to connect to the scheduler.
+ * <p>
+ * Before using the scheduler communication interface, you have to connect it using a login/password using this interface.
+ * You can get this interface by using the scheduler connection {@link SchedulerConnection}.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9

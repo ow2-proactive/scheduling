@@ -320,7 +320,6 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Notify this infrastructure it is going to be shut down along with
      * its nodesource. All necessary cleanup should be done here.
-     * @return mainly to be able to put a checkpoint and to be sure that
      */
     protected void shutDown() {
     }

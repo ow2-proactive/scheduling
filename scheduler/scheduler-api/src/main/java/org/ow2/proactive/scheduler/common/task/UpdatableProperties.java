@@ -47,8 +47,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * UpdatableProperties allow to know if a specified value has been modified or not.<br />
- * Useful to know if the default value has been kept.<br/> <br/>
+ * UpdatableProperties allow to know if a specified value has been modified or not.
+ * <p>
+ * Useful to know if the default value has been kept.
+ * <p>
  * Managed parameter entities are RestartMode, BooleanWrapper, IntegerWrapper.
  * If you want to add more entities, just add it in the @anyMetaDef annotation.
  *
@@ -73,7 +75,8 @@ public class UpdatableProperties<T> implements Serializable {
     }
 
     /**
-     * Create a new instance of UpdatableProperties using a specified value.<br />
+     * Create a new instance of UpdatableProperties using a specified value.
+     * <p>
      * This value will be considered has the default one.
      */
     public UpdatableProperties(T defaultValue) {
