@@ -70,7 +70,7 @@ public class TopologyManager {
     // hosts distances
     private TopologyImpl topology = new TopologyImpl();
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
-    private HashMap<InetAddress, List<Node>> nodesOnHost = new HashMap<>();
+    private HashMap<InetAddress, LinkedHashSet<Node>> nodesOnHost = new HashMap<>();
     // class using for pinging
     private Class<? extends Pinger> pingerClass;
 
@@ -145,7 +145,9 @@ public class TopologyManager {
                 // adding one node from each host
                 for (InetAddress h : nodesOnHost.keySet()) {
                     // always have at least one node on each host
-                    toPing.add(nodesOnHost.get(h).iterator().next());
+                    if (nodesOnHost.get(h) != null && nodesOnHost.get(h).size() > 0) {
+                        toPing.add(nodesOnHost.get(h).iterator().next());
+                    }
                 }
             }
             HashMap<InetAddress, Long> hostsTopology = null;
@@ -155,7 +157,7 @@ public class TopologyManager {
             }
             synchronized (topology) {
                 topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-                List<Node> nodesList = new LinkedList<>();
+                LinkedHashSet<Node> nodesList = new LinkedHashSet<>();
                 nodesList.add(node);
                 nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
             }
@@ -243,6 +245,38 @@ public class TopologyManager {
         synchronized (topology) {
             return (Topology) ((TopologyImpl) topology).clone();
         }
+    }
+
+    private NodeSet getNodeSetWithExtraNodes(LinkedHashSet<Node> nodes, int number) {
+        LinkedHashSet<Node> main = new LinkedHashSet<Node>();
+        LinkedHashSet<Node> extra = new LinkedHashSet<Node>();
+        int i = 0;
+        for (Node n : nodes) {
+            if (i < number) {
+                main.add(n);
+            } else {
+                extra.add(n);
+            }
+            i++;
+        }
+        NodeSet result = new NodeSet(main);
+        result.setExtraNodes(extra);
+        return result;
+    }
+
+    private LinkedHashSet<Node> subListLHS(LinkedHashSet<Node> lhs, int begin, int end) {
+        LinkedHashSet<Node> result = new LinkedHashSet<Node>();
+        if (begin > end) {
+            throw new IllegalArgumentException("First index must be smaller.");
+        }
+        int i = 0;
+        for (Node n : lhs) {
+            if ((i >= begin) && (i < end)) {
+                result.add(n);
+            }
+            i++;
+        }
+        return result;
     }
 
     // Handlers implementations
@@ -393,10 +427,8 @@ public class TopologyManager {
                         // found enough nodes on the same host
                         if (nodesOnHost.get(host).size() > number) {
                             // some extra nodes will be provided
-                            List<Node> nodes = nodesOnHost.get(host);
-                            NodeSet result = new NodeSet(nodes.subList(0, number));
-                            result.setExtraNodes(new LinkedList<>(nodes.subList(number, nodes.size())));
-                            return result;
+                            LinkedHashSet<Node> nodes = nodesOnHost.get(host);
+                            return getNodeSetWithExtraNodes(nodes, number);
                         } else {
                             // all nodes required for computation
                             return new NodeSet(nodesOnHost.get(host));
@@ -472,11 +504,9 @@ public class TopologyManager {
             // complexity is log(n)
             InetAddress closestHost = removeClosest(number, freeHosts);
 
-            List<Node> nodes = nodesOnHost.get(closestHost);
+            LinkedHashSet<Node> nodes = nodesOnHost.get(closestHost);
             if (nodes.size() > number) {
-                NodeSet result = new NodeSet(nodes.subList(0, number));
-                result.setExtraNodes(new LinkedList<>(nodes.subList(number, nodes.size())));
-                return result;
+                return getNodeSetWithExtraNodes(nodes, number);
             } else {
                 NodeSet curNodes = new NodeSet(nodes);
                 NodeSet result = selectRecursively(number - nodes.size(), freeHosts);
@@ -585,19 +615,21 @@ public class TopologyManager {
             NodeSet result = new NodeSet();
             for (Integer i : sortedCapacities) {
                 for (InetAddress host : hostsMap.get(i)) {
-                    List<Node> hostNodes = nodesOnHost.get(host);
-                    result.add(hostNodes.get(0));
-                    if (hostNodes.size() > 1) {
-                        List<Node> newExtraNodes = new LinkedList<>(hostNodes
-                                .subList(1, hostNodes.size()));
-                        if (result.getExtraNodes() == null) {
-                            result.setExtraNodes(new LinkedList<Node>());
+                    LinkedHashSet<Node> hostNodes = nodesOnHost.get(host);
+                    if (hostNodes.size() > 0) {
+                        result.add(hostNodes.iterator().next());
+                        if (hostNodes.size() > 1) {
+                            List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes,
+                                    1, hostNodes.size()));
+                            if (result.getExtraNodes() == null) {
+                                result.setExtraNodes(new LinkedList<Node>());
+                            }
+                            result.getExtraNodes().addAll(newExtraNodes);
                         }
-                        result.getExtraNodes().addAll(newExtraNodes);
-                    }
-                    if (--number <= 0) {
-                        // found required node set
-                        return result;
+                        if (--number <= 0) {
+                            // found required node set
+                            return result;
+                        }
                     }
                 }
             }
