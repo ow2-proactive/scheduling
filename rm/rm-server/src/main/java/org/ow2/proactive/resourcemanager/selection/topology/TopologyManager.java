@@ -65,14 +65,12 @@ public class TopologyManager {
 
     // logger
     private final static Logger logger = Logger.getLogger(TopologyManager.class);
-
+    // list of handlers corresponded to topology descriptors
+    private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<>();
     // hosts distances
     private TopologyImpl topology = new TopologyImpl();
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
-    private HashMap<InetAddress, List<Node>> nodesOnHost = new HashMap<InetAddress, List<Node>>();
-    // list of handlers corresponded to topology descriptors
-    private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<Class<? extends TopologyDescriptor>, TopologyHandler>();
-
+    private HashMap<InetAddress, LinkedHashSet<Node>> nodesOnHost = new HashMap<>();
     // class using for pinging
     private Class<? extends Pinger> pingerClass;
 
@@ -147,7 +145,9 @@ public class TopologyManager {
                 // adding one node from each host
                 for (InetAddress h : nodesOnHost.keySet()) {
                     // always have at least one node on each host
-                    toPing.add(nodesOnHost.get(h).iterator().next());
+                    if (nodesOnHost.get(h) != null && nodesOnHost.get(h).size() > 0) {
+                        toPing.add(nodesOnHost.get(h).iterator().next());
+                    }
                 }
             }
             HashMap<InetAddress, Long> hostsTopology = null;
@@ -157,7 +157,7 @@ public class TopologyManager {
             }
             synchronized (topology) {
                 topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-                List<Node> nodesList = new LinkedList<Node>();
+                LinkedHashSet<Node> nodesList = new LinkedHashSet<>();
                 nodesList.add(node);
                 nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
             }
@@ -245,6 +245,38 @@ public class TopologyManager {
         synchronized (topology) {
             return (Topology) ((TopologyImpl) topology).clone();
         }
+    }
+
+    private NodeSet getNodeSetWithExtraNodes(LinkedHashSet<Node> nodes, int number) {
+        LinkedHashSet<Node> main = new LinkedHashSet<Node>();
+        LinkedHashSet<Node> extra = new LinkedHashSet<Node>();
+        int i = 0;
+        for (Node n : nodes) {
+            if (i < number) {
+                main.add(n);
+            } else {
+                extra.add(n);
+            }
+            i++;
+        }
+        NodeSet result = new NodeSet(main);
+        result.setExtraNodes(extra);
+        return result;
+    }
+
+    private LinkedHashSet<Node> subListLHS(LinkedHashSet<Node> lhs, int begin, int end) {
+        LinkedHashSet<Node> result = new LinkedHashSet<Node>();
+        if (begin > end) {
+            throw new IllegalArgumentException("First index must be smaller.");
+        }
+        int i = 0;
+        for (Node n : lhs) {
+            if ((i >= begin) && (i < end)) {
+                result.add(n);
+            }
+            i++;
+        }
+        return result;
     }
 
     // Handlers implementations
@@ -355,7 +387,7 @@ public class TopologyManager {
                 return new NodeSet();
             }
 
-            List<InetAddress> sortedByNodesNumber = new LinkedList<InetAddress>(nodesOnHost.keySet());
+            List<InetAddress> sortedByNodesNumber = new LinkedList<>(nodesOnHost.keySet());
 
             Collections.sort(sortedByNodesNumber, new Comparator<InetAddress>() {
                 public int compare(InetAddress host, InetAddress host2) {
@@ -377,7 +409,7 @@ public class TopologyManager {
                 number = matchedNodes.size();
             }
 
-            List<InetAddress> busyHosts = new LinkedList<InetAddress>();
+            List<InetAddress> busyHosts = new LinkedList<>();
             for (InetAddress host : hostsSortedByNodesNumber) {
                 if (nodesOnHost.get(host).size() >= number) {
                     // found the host with required capacity
@@ -395,10 +427,8 @@ public class TopologyManager {
                         // found enough nodes on the same host
                         if (nodesOnHost.get(host).size() > number) {
                             // some extra nodes will be provided
-                            List<Node> nodes = nodesOnHost.get(host);
-                            NodeSet result = new NodeSet(nodes.subList(0, number));
-                            result.setExtraNodes(new LinkedList<Node>(nodes.subList(number, nodes.size())));
-                            return result;
+                            LinkedHashSet<Node> nodes = nodesOnHost.get(host);
+                            return getNodeSetWithExtraNodes(nodes, number);
                         } else {
                             // all nodes required for computation
                             return new NodeSet(nodesOnHost.get(host));
@@ -434,7 +464,7 @@ public class TopologyManager {
 
             // first we need to understand which hosts have busy nodes and filter them out
             // building a map from matched nodes: host -> "number of matched nodes"
-            HashMap<InetAddress, Integer> matchedHosts = new HashMap<InetAddress, Integer>();
+            HashMap<InetAddress, Integer> matchedHosts = new HashMap<>();
             for (Node matchedNode : matchedNodes) {
                 InetAddress host = matchedNode.getVMInformation().getInetAddress();
                 if (matchedHosts.containsKey(host)) {
@@ -446,7 +476,7 @@ public class TopologyManager {
 
             // freeHosts contains hosts sorted by nodes number and allows
             // to quickly find a host with given number of nodes (or closest if it is not in the tree)
-            TreeSet<Host> freeHosts = new TreeSet<Host>();
+            TreeSet<Host> freeHosts = new TreeSet<>();
             // if a host in matchedHosts map has the same number of nodes
             // as in nodesOnHost map it means there no busy nodes on this host
             for (InetAddress matchedHost : matchedHosts.keySet()) {
@@ -474,11 +504,9 @@ public class TopologyManager {
             // complexity is log(n)
             InetAddress closestHost = removeClosest(number, freeHosts);
 
-            List<Node> nodes = nodesOnHost.get(closestHost);
+            LinkedHashSet<Node> nodes = nodesOnHost.get(closestHost);
             if (nodes.size() > number) {
-                NodeSet result = new NodeSet(nodes.subList(0, number));
-                result.setExtraNodes(new LinkedList<Node>(nodes.subList(number, nodes.size())));
-                return result;
+                return getNodeSetWithExtraNodes(nodes, number);
             } else {
                 NodeSet curNodes = new NodeSet(nodes);
                 NodeSet result = selectRecursively(number - nodes.size(), freeHosts);
@@ -556,7 +584,7 @@ public class TopologyManager {
             }
 
             // create the map of free hosts: nodes_number -> list of hosts
-            HashMap<Integer, List<InetAddress>> hostsMap = new HashMap<Integer, List<InetAddress>>();
+            HashMap<Integer, List<InetAddress>> hostsMap = new HashMap<>();
             for (InetAddress host : nodesOnHost.keySet()) {
                 boolean busyNode = false;
                 for (Node nodeOnHost : nodesOnHost.get(host)) {
@@ -581,25 +609,27 @@ public class TopologyManager {
             }
 
             // sort by nodes number and accumulate the result
-            List<Integer> sortedCapacities = new LinkedList<Integer>(hostsMap.keySet());
+            List<Integer> sortedCapacities = new LinkedList<>(hostsMap.keySet());
             Collections.sort(sortedCapacities);
 
             NodeSet result = new NodeSet();
             for (Integer i : sortedCapacities) {
                 for (InetAddress host : hostsMap.get(i)) {
-                    List<Node> hostNodes = nodesOnHost.get(host);
-                    result.add(hostNodes.get(0));
-                    if (hostNodes.size() > 1) {
-                        List<Node> newExtraNodes = new LinkedList<Node>(hostNodes
-                                .subList(1, hostNodes.size()));
-                        if (result.getExtraNodes() == null) {
-                            result.setExtraNodes(new LinkedList<Node>());
+                    LinkedHashSet<Node> hostNodes = nodesOnHost.get(host);
+                    if (hostNodes.size() > 0) {
+                        result.add(hostNodes.iterator().next());
+                        if (hostNodes.size() > 1) {
+                            List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes,
+                                    1, hostNodes.size()));
+                            if (result.getExtraNodes() == null) {
+                                result.setExtraNodes(new LinkedList<Node>());
+                            }
+                            result.getExtraNodes().addAll(newExtraNodes);
                         }
-                        result.getExtraNodes().addAll(newExtraNodes);
-                    }
-                    if (--number <= 0) {
-                        // found required node set
-                        return result;
+                        if (--number <= 0) {
+                            // found required node set
+                            return result;
+                        }
                     }
                 }
             }
