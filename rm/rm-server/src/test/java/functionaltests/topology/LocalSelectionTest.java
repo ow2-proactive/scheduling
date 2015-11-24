@@ -94,7 +94,6 @@ public class LocalSelectionTest extends RMFunctionalTest {
     @Test
     public void action() throws Exception {
         Assert.assertTrue("Topology must be enabled", PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean());
-        Assert.assertFalse("Topology distance must be disabled", PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean());
         Assert.assertTrue("Ressource manager must be deployed without nodes", resourceManager.getState().getFreeNodesNumber() == 0);
 
         rmHelper.createNodeSource(this.getClass().getSimpleName(), NODE_NUMBER);
@@ -133,11 +132,9 @@ public class LocalSelectionTest extends RMFunctionalTest {
         getNodesAndReleaseThem(2, TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE, 1, NODE_NUMBER - 1);
         getNodesAndReleaseThem(100, TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE, 1, NODE_NUMBER - 1);
 
-        try {
-            getNodesAndReleaseThem(1, TopologyDescriptor.BEST_PROXIMITY, 0, 0);
-            Assert.fail("An exception should be thrown when proximity is used");
-        } catch (Exception e) {
+        getNodesAndReleaseThem(1, TopologyDescriptor.BEST_PROXIMITY, 1, 0);
+        getNodesAndReleaseThem(NODE_NUMBER, TopologyDescriptor.BEST_PROXIMITY, NODE_NUMBER, 0);
+        getNodesAndReleaseThem(100, TopologyDescriptor.BEST_PROXIMITY, NODE_NUMBER, 0);
 
-        }
     }
 }
