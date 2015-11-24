@@ -274,30 +274,21 @@ public class TopologyManager {
         }
     }
 
-    private NodeSet getNodeSetWithExtraNodes(Set<Node> nodes, int number) {
-        Set<Node> main = new LinkedHashSet<>();
-        Set<Node> extra = new LinkedHashSet<>();
-        int i = 0;
-        for (Node n : nodes) {
-            if (i < number) {
-                main.add(n);
-            } else {
-                extra.add(n);
-            }
-            i++;
-        }
+    private NodeSet getNodeSetWithExtraNodes(Set<Node> nodes, int numberOfNodesToExtract) {
+        Set<Node> main = subListLHS(nodes, 0, numberOfNodesToExtract);
+        Set<Node> extra = subListLHS(nodes, numberOfNodesToExtract, nodes.size());
         NodeSet result = new NodeSet(main);
         result.setExtraNodes(extra);
         return result;
     }
 
-    private Set<Node> subListLHS(Set<Node> lhs, int begin, int end) {
+    private Set<Node> subListLHS(Set<Node> nodes, int begin, int end) {
         Set<Node> result = new LinkedHashSet<>();
         if (begin > end) {
             throw new IllegalArgumentException("First index must be smaller.");
         }
         int i = 0;
-        for (Node n : lhs) {
+        for (Node n : nodes) {
             if ((i >= begin) && (i < end)) {
                 result.add(n);
             }
@@ -438,11 +429,13 @@ public class TopologyManager {
 
             List<InetAddress> busyHosts = new LinkedList<>();
             for (InetAddress host : hostsSortedByNodesNumber) {
-                if (nodesOnHost.get(host).size() >= number) {
+                Set<Node> nodes = nodesOnHost.get(host);
+                int nbNodes;
+                if (nodes != null && (nbNodes = nodes.size()) >= number) {
                     // found the host with required capacity
                     // checking that all nodes are free
                     boolean busyNode = false;
-                    for (Node nodeOnHost : nodesOnHost.get(host)) {
+                    for (Node nodeOnHost : nodes) {
                         if (!matchedNodes.contains(nodeOnHost)) {
                             busyNode = true;
                             busyHosts.add(host);
@@ -452,13 +445,12 @@ public class TopologyManager {
                     // all nodes are free on host
                     if (!busyNode) {
                         // found enough nodes on the same host
-                        if (nodesOnHost.get(host).size() > number) {
+                        if (nbNodes > number) {
                             // some extra nodes will be provided
-                            Set<Node> nodes = nodesOnHost.get(host);
                             return getNodeSetWithExtraNodes(nodes, number);
                         } else {
                             // all nodes required for computation
-                            return new NodeSet(nodesOnHost.get(host));
+                            return new NodeSet(nodes);
                         }
                     }
                 }
@@ -643,12 +635,12 @@ public class TopologyManager {
             for (Integer i : sortedCapacities) {
                 for (InetAddress host : hostsMap.get(i)) {
                     Set<Node> hostNodes = nodesOnHost.get(host);
-                    int sz = hostNodes.size();
-                    if (sz > 0) {
+                    int nbNodes = hostNodes.size();
+                    if (nbNodes > 0) {
                         result.add(hostNodes.iterator().next());
-                        if (sz > 1) {
+                        if (nbNodes > 1) {
                             List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes,
-                                    1, sz));
+                                    1, nbNodes));
                             if (result.getExtraNodes() == null) {
                                 result.setExtraNodes(new LinkedList<Node>());
                             }
