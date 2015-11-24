@@ -250,6 +250,16 @@ public class TopologyManager {
         return null;
     }
 
+    public Set<Node> getNodesOnHost(InetAddress addr) {
+        synchronized (topology) {
+            if (nodesOnHost.get(addr) != null) {
+                return new LinkedHashSet<>(nodesOnHost.get(addr));
+            } else {
+                return null;
+            }
+        }
+    }
+
     /**
      * Returns the topology representation. As the Topology is not a thread-safe class
      * and all synchronization happens on TopologyManager level, the topology is cloned.
