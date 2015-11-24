@@ -70,7 +70,7 @@ public class TopologyManager {
     // hosts distances
     private final TopologyImpl topology = new TopologyImpl();
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
-    private HashMap<InetAddress, LinkedHashSet<Node>> nodesOnHost = new HashMap<>();
+    private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<>();
     // class using for pinging
     private Class<? extends Pinger> pingerClass;
 
@@ -152,7 +152,7 @@ public class TopologyManager {
                 // adding one node from each host
                 for (InetAddress h : nodesOnHost.keySet()) {
                     // always have at least one node on each host
-                    if (nodesOnHost.get(h) != null && nodesOnHost.get(h).size() > 0) {
+                    if (nodesOnHost.get(h) != null && !nodesOnHost.get(h).isEmpty()) {
                         toPing.add(nodesOnHost.get(h).iterator().next());
                         hostsTopology.put(h, Long.MAX_VALUE);
                     }
@@ -166,7 +166,7 @@ public class TopologyManager {
 
             synchronized (topology) {
                 topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-                LinkedHashSet<Node> nodesList = new LinkedHashSet<>();
+                Set<Node> nodesList = new LinkedHashSet<>();
                 nodesList.add(node);
                 nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
             }
@@ -198,7 +198,7 @@ public class TopologyManager {
                                 node.getNodeInformation().getURL());
                 } else {
                     nodesOnHost.get(host).remove(node);
-                    if (nodesOnHost.get(host).size() == 0) {
+                    if (nodesOnHost.get(host).isEmpty()) {
                         // no more nodes on the host
                         topology.removeHostTopology(node.getVMInformation().getHostName(), host);
                         nodesOnHost.remove(host);
@@ -264,9 +264,9 @@ public class TopologyManager {
         }
     }
 
-    private NodeSet getNodeSetWithExtraNodes(LinkedHashSet<Node> nodes, int number) {
-        LinkedHashSet<Node> main = new LinkedHashSet<Node>();
-        LinkedHashSet<Node> extra = new LinkedHashSet<Node>();
+    private NodeSet getNodeSetWithExtraNodes(Set<Node> nodes, int number) {
+        Set<Node> main = new LinkedHashSet<>();
+        Set<Node> extra = new LinkedHashSet<>();
         int i = 0;
         for (Node n : nodes) {
             if (i < number) {
@@ -281,8 +281,8 @@ public class TopologyManager {
         return result;
     }
 
-    private LinkedHashSet<Node> subListLHS(LinkedHashSet<Node> lhs, int begin, int end) {
-        LinkedHashSet<Node> result = new LinkedHashSet<Node>();
+    private Set<Node> subListLHS(Set<Node> lhs, int begin, int end) {
+        Set<Node> result = new LinkedHashSet<>();
         if (begin > end) {
             throw new IllegalArgumentException("First index must be smaller.");
         }
@@ -444,7 +444,7 @@ public class TopologyManager {
                         // found enough nodes on the same host
                         if (nodesOnHost.get(host).size() > number) {
                             // some extra nodes will be provided
-                            LinkedHashSet<Node> nodes = nodesOnHost.get(host);
+                            Set<Node> nodes = nodesOnHost.get(host);
                             return getNodeSetWithExtraNodes(nodes, number);
                         } else {
                             // all nodes required for computation
@@ -521,7 +521,7 @@ public class TopologyManager {
             // complexity is log(n)
             InetAddress closestHost = removeClosest(number, freeHosts);
 
-            LinkedHashSet<Node> nodes = nodesOnHost.get(closestHost);
+            Set<Node> nodes = nodesOnHost.get(closestHost);
             if (nodes.size() > number) {
                 return getNodeSetWithExtraNodes(nodes, number);
             } else {
@@ -632,12 +632,13 @@ public class TopologyManager {
             NodeSet result = new NodeSet();
             for (Integer i : sortedCapacities) {
                 for (InetAddress host : hostsMap.get(i)) {
-                    LinkedHashSet<Node> hostNodes = nodesOnHost.get(host);
-                    if (hostNodes.size() > 0) {
+                    Set<Node> hostNodes = nodesOnHost.get(host);
+                    int sz = hostNodes.size();
+                    if (sz > 0) {
                         result.add(hostNodes.iterator().next());
-                        if (hostNodes.size() > 1) {
+                        if (sz > 1) {
                             List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes,
-                                    1, hostNodes.size()));
+                                    1, sz));
                             if (result.getExtraNodes() == null) {
                                 result.setExtraNodes(new LinkedList<Node>());
                             }
