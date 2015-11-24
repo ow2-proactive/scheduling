@@ -68,7 +68,7 @@ public class TopologyManager {
     // list of handlers corresponded to topology descriptors
     private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<>();
     // hosts distances
-    private TopologyImpl topology = new TopologyImpl();
+    private final TopologyImpl topology = new TopologyImpl();
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
     private HashMap<InetAddress, LinkedHashSet<Node>> nodesOnHost = new HashMap<>();
     // class using for pinging
@@ -125,13 +125,18 @@ public class TopologyManager {
             // do not do anything if topology disabled
             return;
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Adding Node " + node.getNodeInformation().getURL() + " to topology");
+        }
 
         InetAddress host = node.getVMInformation().getInetAddress();
         synchronized (topology) {
             if (topology.knownHost(host)) {
                 // host topology is already known
-                logger.debug("The topology information has been already added for node " +
-                    node.getNodeInformation().getURL());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The topology information has been already added for node " +
+                            node.getNodeInformation().getURL());
+                }
                 nodesOnHost.get(host).add(node);
                 return;
             }
@@ -141,25 +146,32 @@ public class TopologyManager {
         synchronized (node.getNodeInformation().getURL().intern()) {
             // unknown host => start pinging process
             NodeSet toPing = new NodeSet();
+            HashMap<InetAddress, Long> hostsTopology = new HashMap<>();
+
             synchronized (topology) {
                 // adding one node from each host
                 for (InetAddress h : nodesOnHost.keySet()) {
                     // always have at least one node on each host
                     if (nodesOnHost.get(h) != null && nodesOnHost.get(h).size() > 0) {
                         toPing.add(nodesOnHost.get(h).iterator().next());
+                        hostsTopology.put(h, Long.MAX_VALUE);
                     }
                 }
             }
-            HashMap<InetAddress, Long> hostsTopology = null;
+
 
             if (PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
                 hostsTopology = pingNode(node, toPing);
             }
+
             synchronized (topology) {
                 topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
                 LinkedHashSet<Node> nodesList = new LinkedHashSet<>();
                 nodesList.add(node);
                 nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Node " + node.getNodeInformation().getURL() + " added.");
             }
         }
     }
@@ -172,6 +184,9 @@ public class TopologyManager {
             // do not do anything if topology disabled
             return;
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Removing Node " + node.getNodeInformation().getURL() + " from topology");
+        }
 
         // if the node we're trying to remove is in process of pinging => wait
         synchronized (node.getNodeInformation().getURL().intern()) {
@@ -182,7 +197,6 @@ public class TopologyManager {
                             .warn("Topology info does not exist for node " +
                                 node.getNodeInformation().getURL());
                 } else {
-
                     nodesOnHost.get(host).remove(node);
                     if (nodesOnHost.get(host).size() == 0) {
                         // no more nodes on the host
@@ -191,6 +205,9 @@ public class TopologyManager {
                     }
                 }
             }
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Node " + node.getNodeInformation().getURL() + " removed.");
         }
     }
 
