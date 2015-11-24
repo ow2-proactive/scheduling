@@ -27,6 +27,9 @@ public class TaskDBUtils {
                 Criteria criteria = session.createCriteria(TaskData.class);
                 List<TaskState> result = null;
                 
+                // only fetch non-removed tasks
+                criteria.createAlias("jobData", "job").add(Restrictions.eq("job.removedTime", -1L));
+                
                 if (params.getStatuses().isEmpty())
                     return new ArrayList<TaskState>();
                 
@@ -94,6 +97,9 @@ public class TaskDBUtils {
                 if (params.getStatuses().isEmpty()) return new ArrayList<TaskInfo>();
                 
                 Criteria criteria = session.createCriteria(TaskData.class);
+
+                // only fetch non-removed tasks
+                criteria.createAlias("jobData", "job").add(Restrictions.eq("job.removedTime", -1L));
 
                 if (params.getLimit() > 0)
                     criteria.setMaxResults(params.getLimit());
