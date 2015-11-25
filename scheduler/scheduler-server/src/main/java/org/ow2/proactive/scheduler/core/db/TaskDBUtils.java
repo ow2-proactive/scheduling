@@ -24,15 +24,15 @@ public class TaskDBUtils {
             @Override
             @SuppressWarnings("unchecked")
             public List<TaskState> executeWork(Session session) {
-                Criteria criteria = session.createCriteria(TaskData.class);
-                List<TaskState> result = null;
-                
-                // only fetch non-removed tasks
-                criteria.createAlias("jobData", "job").add(Restrictions.eq("job.removedTime", -1L));
-                
+
                 if (params.getStatuses().isEmpty())
                     return new ArrayList<TaskState>();
-                
+
+                Criteria criteria = session.createCriteria(TaskData.class);
+
+                // only fetch non-removed tasks
+                criteria.createAlias("jobData", "job").add(Restrictions.eq("job.removedTime", -1L));
+
                 if (params.getLimit() > 0)
                     criteria.setMaxResults(params.getLimit());
                 if (params.getOffset() >= 0)
@@ -76,7 +76,7 @@ public class TaskDBUtils {
                 }
 
                 List<TaskData> tasksList = criteria.list();
-                result = new ArrayList<TaskState>(tasksList.size());
+                List<TaskState> result = new ArrayList<TaskState>(tasksList.size());
                 for (TaskData taskData : tasksList) {
                     result.add(taskData.toTaskState());
                 }
@@ -85,7 +85,7 @@ public class TaskDBUtils {
         };
 
     }
-    
+
     public static SessionWork<List<TaskInfo>> taskInfoSessionWork(final DBTaskDataParameters params) {
 
         return new SessionWork<List<TaskInfo>>() {
@@ -93,9 +93,10 @@ public class TaskDBUtils {
             @Override
             @SuppressWarnings("unchecked")
             public List<TaskInfo> executeWork(Session session) {
-                
-                if (params.getStatuses().isEmpty()) return new ArrayList<TaskInfo>();
-                
+
+                if (params.getStatuses().isEmpty())
+                    return new ArrayList<TaskInfo>();
+
                 Criteria criteria = session.createCriteria(TaskData.class);
 
                 // only fetch non-removed tasks
