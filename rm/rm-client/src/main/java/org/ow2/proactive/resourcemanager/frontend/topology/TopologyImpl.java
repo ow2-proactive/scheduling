@@ -150,7 +150,7 @@ public class TopologyImpl implements Topology, Cloneable {
     /**
      * Removes all information about host from the topology.
      * As it stores internally names and addresses we do not try to convert one into
-     * another (as it may lead to network call) but rather pass them is parameters.
+     * another (as it may lead to network call) but rather pass them as parameters.
      *
      * @param hostName name of host to be removed
      * @param hostAddress host address to be removed

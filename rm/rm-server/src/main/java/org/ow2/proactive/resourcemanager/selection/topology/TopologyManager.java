@@ -68,9 +68,9 @@ public class TopologyManager {
     // list of handlers corresponded to topology descriptors
     private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<>();
     // hosts distances
-    private TopologyImpl topology = new TopologyImpl();
+    private final TopologyImpl topology = new TopologyImpl();
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
-    private HashMap<InetAddress, List<Node>> nodesOnHost = new HashMap<>();
+    private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<>();
     // class using for pinging
     private Class<? extends Pinger> pingerClass;
 
@@ -125,13 +125,18 @@ public class TopologyManager {
             // do not do anything if topology disabled
             return;
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Adding Node " + node.getNodeInformation().getURL() + " to topology");
+        }
 
         InetAddress host = node.getVMInformation().getInetAddress();
         synchronized (topology) {
             if (topology.knownHost(host)) {
                 // host topology is already known
-                logger.debug("The topology information has been already added for node " +
-                    node.getNodeInformation().getURL());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The topology information has been already added for node " +
+                            node.getNodeInformation().getURL());
+                }
                 nodesOnHost.get(host).add(node);
                 return;
             }
@@ -141,23 +146,32 @@ public class TopologyManager {
         synchronized (node.getNodeInformation().getURL().intern()) {
             // unknown host => start pinging process
             NodeSet toPing = new NodeSet();
+            HashMap<InetAddress, Long> hostsTopology = new HashMap<>();
+
             synchronized (topology) {
                 // adding one node from each host
                 for (InetAddress h : nodesOnHost.keySet()) {
                     // always have at least one node on each host
-                    toPing.add(nodesOnHost.get(h).iterator().next());
+                    if (nodesOnHost.get(h) != null && !nodesOnHost.get(h).isEmpty()) {
+                        toPing.add(nodesOnHost.get(h).iterator().next());
+                        hostsTopology.put(h, Long.MAX_VALUE);
+                    }
                 }
             }
-            HashMap<InetAddress, Long> hostsTopology = null;
+
 
             if (PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
                 hostsTopology = pingNode(node, toPing);
             }
+
             synchronized (topology) {
                 topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-                List<Node> nodesList = new LinkedList<>();
+                Set<Node> nodesList = new LinkedHashSet<>();
                 nodesList.add(node);
                 nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Node " + node.getNodeInformation().getURL() + " added.");
             }
         }
     }
@@ -170,6 +184,9 @@ public class TopologyManager {
             // do not do anything if topology disabled
             return;
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Removing Node " + node.getNodeInformation().getURL() + " from topology");
+        }
 
         // if the node we're trying to remove is in process of pinging => wait
         synchronized (node.getNodeInformation().getURL().intern()) {
@@ -180,15 +197,17 @@ public class TopologyManager {
                             .warn("Topology info does not exist for node " +
                                 node.getNodeInformation().getURL());
                 } else {
-
                     nodesOnHost.get(host).remove(node);
-                    if (nodesOnHost.get(host).size() == 0) {
+                    if (nodesOnHost.get(host).isEmpty()) {
                         // no more nodes on the host
                         topology.removeHostTopology(node.getVMInformation().getHostName(), host);
                         nodesOnHost.remove(host);
                     }
                 }
             }
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Node " + node.getNodeInformation().getURL() + " removed.");
         }
     }
 
@@ -231,6 +250,16 @@ public class TopologyManager {
         return null;
     }
 
+    public Set<Node> getNodesOnHost(InetAddress addr) {
+        synchronized (topology) {
+            if (nodesOnHost.get(addr) != null) {
+                return new LinkedHashSet<>(nodesOnHost.get(addr));
+            } else {
+                return null;
+            }
+        }
+    }
+
     /**
      * Returns the topology representation. As the Topology is not a thread-safe class
      * and all synchronization happens on TopologyManager level, the topology is cloned.
@@ -243,6 +272,29 @@ public class TopologyManager {
         synchronized (topology) {
             return (Topology) ((TopologyImpl) topology).clone();
         }
+    }
+
+    private NodeSet getNodeSetWithExtraNodes(Set<Node> nodes, int numberOfNodesToExtract) {
+        Set<Node> main = subListLHS(nodes, 0, numberOfNodesToExtract);
+        Set<Node> extra = subListLHS(nodes, numberOfNodesToExtract, nodes.size());
+        NodeSet result = new NodeSet(main);
+        result.setExtraNodes(extra);
+        return result;
+    }
+
+    private Set<Node> subListLHS(Set<Node> nodes, int begin, int end) {
+        Set<Node> result = new LinkedHashSet<>();
+        if (begin > end) {
+            throw new IllegalArgumentException("First index must be smaller.");
+        }
+        int i = 0;
+        for (Node n : nodes) {
+            if ((i >= begin) && (i < end)) {
+                result.add(n);
+            }
+            i++;
+        }
+        return result;
     }
 
     // Handlers implementations
@@ -377,11 +429,13 @@ public class TopologyManager {
 
             List<InetAddress> busyHosts = new LinkedList<>();
             for (InetAddress host : hostsSortedByNodesNumber) {
-                if (nodesOnHost.get(host).size() >= number) {
+                Set<Node> nodes = nodesOnHost.get(host);
+                int nbNodes;
+                if (nodes != null && (nbNodes = nodes.size()) >= number) {
                     // found the host with required capacity
                     // checking that all nodes are free
                     boolean busyNode = false;
-                    for (Node nodeOnHost : nodesOnHost.get(host)) {
+                    for (Node nodeOnHost : nodes) {
                         if (!matchedNodes.contains(nodeOnHost)) {
                             busyNode = true;
                             busyHosts.add(host);
@@ -391,15 +445,12 @@ public class TopologyManager {
                     // all nodes are free on host
                     if (!busyNode) {
                         // found enough nodes on the same host
-                        if (nodesOnHost.get(host).size() > number) {
+                        if (nbNodes > number) {
                             // some extra nodes will be provided
-                            List<Node> nodes = nodesOnHost.get(host);
-                            NodeSet result = new NodeSet(nodes.subList(0, number));
-                            result.setExtraNodes(new LinkedList<>(nodes.subList(number, nodes.size())));
-                            return result;
+                            return getNodeSetWithExtraNodes(nodes, number);
                         } else {
                             // all nodes required for computation
-                            return new NodeSet(nodesOnHost.get(host));
+                            return new NodeSet(nodes);
                         }
                     }
                 }
@@ -472,11 +523,9 @@ public class TopologyManager {
             // complexity is log(n)
             InetAddress closestHost = removeClosest(number, freeHosts);
 
-            List<Node> nodes = nodesOnHost.get(closestHost);
+            Set<Node> nodes = nodesOnHost.get(closestHost);
             if (nodes.size() > number) {
-                NodeSet result = new NodeSet(nodes.subList(0, number));
-                result.setExtraNodes(new LinkedList<>(nodes.subList(number, nodes.size())));
-                return result;
+                return getNodeSetWithExtraNodes(nodes, number);
             } else {
                 NodeSet curNodes = new NodeSet(nodes);
                 NodeSet result = selectRecursively(number - nodes.size(), freeHosts);
@@ -585,19 +634,22 @@ public class TopologyManager {
             NodeSet result = new NodeSet();
             for (Integer i : sortedCapacities) {
                 for (InetAddress host : hostsMap.get(i)) {
-                    List<Node> hostNodes = nodesOnHost.get(host);
-                    result.add(hostNodes.get(0));
-                    if (hostNodes.size() > 1) {
-                        List<Node> newExtraNodes = new LinkedList<>(hostNodes
-                                .subList(1, hostNodes.size()));
-                        if (result.getExtraNodes() == null) {
-                            result.setExtraNodes(new LinkedList<Node>());
+                    Set<Node> hostNodes = nodesOnHost.get(host);
+                    int nbNodes = hostNodes.size();
+                    if (nbNodes > 0) {
+                        result.add(hostNodes.iterator().next());
+                        if (nbNodes > 1) {
+                            List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes,
+                                    1, nbNodes));
+                            if (result.getExtraNodes() == null) {
+                                result.setExtraNodes(new LinkedList<Node>());
+                            }
+                            result.getExtraNodes().addAll(newExtraNodes);
                         }
-                        result.getExtraNodes().addAll(newExtraNodes);
-                    }
-                    if (--number <= 0) {
-                        // found required node set
-                        return result;
+                        if (--number <= 0) {
+                            // found required node set
+                            return result;
+                        }
                     }
                 }
             }
