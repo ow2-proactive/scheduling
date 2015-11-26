@@ -151,7 +151,7 @@ task wrapper(type: Wrapper) {
 ext.encoding = {
     Properties props = new Properties()
     props.load(new FileInputStream("$rootDir/config/scheduler/settings.ini"))
-    props.getProperty('pa.scheduler.job.file.encoding')
+    props.getProperty('pa.file.encoding')
 }
 
 ext.schedulingFunctionalTestConfiguration = {
@@ -266,7 +266,7 @@ class CustomCreateStartScripts extends CreateStartScripts {
 	    Properties props = new Properties()
         props.load(new FileInputStream(new File(project.rootDir, "config/scheduler/settings.ini")))
 
-        String encoding = props.getProperty('pa.scheduler.job.file.encoding')
+        String encoding = props.getProperty('pa.file.encoding')
 
         def generator = new org.gradle.api.internal.plugins.StartScriptGenerator()
         generator.applicationName = getApplicationName()

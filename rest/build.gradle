@@ -1,7 +1,7 @@
 ext.encoding = {
     Properties props = new Properties()
     props.load(new FileInputStream("$rootDir/config/scheduler/settings.ini"))
-    props.getProperty('pa.scheduler.job.file.encoding')
+    props.getProperty('pa.file.encoding')
 }
 
 ext.functionalTestConfiguration = {

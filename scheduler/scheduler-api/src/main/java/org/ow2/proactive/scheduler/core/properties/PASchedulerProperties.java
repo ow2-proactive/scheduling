@@ -45,6 +45,7 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.PAProperties;
 import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
@@ -170,8 +171,8 @@ public enum PASchedulerProperties {
     /** Remove job in dataBase when removing it from scheduler. */
     JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PropertyType.BOOLEAN),
 
-    /** Specific character encoding when parsing the job xml file */
-    SCHEDULER_JOB_FILE_ENCODING("pa.scheduler.job.file.encoding", PropertyType.STRING),
+    /** File encoding used by the scheduler */
+    FILE_ENCODING(PAProperties.KEY_PA_FILE_ENCODING, PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************ TASKS PROPERTIES *********************** */

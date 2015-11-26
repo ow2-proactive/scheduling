@@ -520,8 +520,8 @@ public class RMTHelper {
      * @return the resource manager
      * @throws Exception
      */
-    public ResourceManager getResourceManager(TestUsers user) throws Exception {
-        startRM(currentTestConfiguration, TestRM.PA_PNP_PORT);
+    public ResourceManager getResourceManager(TestUsers user, String... jvmArgs) throws Exception {
+        startRM(currentTestConfiguration, TestRM.PA_PNP_PORT, jvmArgs);
 
         if (!connectedUser.is(user)) { // changing user on the fly
             if (connectedUser != null) {

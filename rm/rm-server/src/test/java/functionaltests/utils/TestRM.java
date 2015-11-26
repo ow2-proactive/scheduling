@@ -52,7 +52,7 @@ import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 
 public class TestRM {
 
-    public static final URL functionalTestRMProperties = RMTHelper.class
+    public static final URL FUNCTIONAL_TEST_RM_PROPERTIES = RMTHelper.class
             .getResource("/functionaltests/config/functionalTRMProperties.ini");
 
     // default RMI port
@@ -65,7 +65,7 @@ public class TestRM {
     private static String DEFAULT_CONFIGURATION;
     static {
         try {
-            DEFAULT_CONFIGURATION = new File(functionalTestRMProperties.toURI()).getAbsolutePath();
+            DEFAULT_CONFIGURATION = new File(FUNCTIONAL_TEST_RM_PROPERTIES.toURI()).getAbsolutePath();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

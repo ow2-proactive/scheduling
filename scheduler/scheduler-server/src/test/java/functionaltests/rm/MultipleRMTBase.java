@@ -36,7 +36,7 @@ public class MultipleRMTBase extends ProActiveTest {
          * then change the path to the directory used by the database.
          * Two resource managers should use two different directories.
          */
-        File configurationFile = new File(TestRM.functionalTestRMProperties.toURI());
+        File configurationFile = new File(TestRM.FUNCTIONAL_TEST_RM_PROPERTIES.toURI());
 
         Properties config = new Properties();
 
