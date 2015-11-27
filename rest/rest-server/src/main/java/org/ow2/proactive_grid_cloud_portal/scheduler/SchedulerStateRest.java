@@ -3310,13 +3310,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
     
-    private PageBoundariesRest getBoundaries(int offset, int limit) {
-        
-        if (offset < 0) offset = 0;
-        if (limit < 0 || offset > limit) limit = offset + TASKS_PAGE_SIZE;
+    protected PageBoundariesRest getBoundaries(int offset, int limit) {
+        if (offset < 0) {
+            offset = 0;
+        }
+
+        if (limit < 0) {
+            limit = TASKS_PAGE_SIZE;
+        }
         
         return new PageBoundariesRest(offset, limit);
-        
     }
 
     /*
