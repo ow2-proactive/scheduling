@@ -236,8 +236,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
-     * @param range
-     *            optional, if a sublist has to be returned, the range of the
+     * @param limit
+     *            optional, if a sublist has to be returned, the limit of the
      *            sublist
      * @return a list of jobs' ids under the form of a list of string
      */
@@ -248,12 +248,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public RestPage<String> jobs(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range)
+            @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs");
 
-            Page<JobInfo> page = s.getJobs(index, range, new JobFilterCriteria(false, true, true, true),
+            Page<JobInfo> page = s.getJobs(index, limit, new JobFilterCriteria(false, true, true, true),
                     DEFAULT_JOB_SORT_PARAMS);
 
             List<String> ids = new ArrayList<String>(page.getList().size());
@@ -290,8 +290,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
-     * @param range
-     *            optional, if a sublist has to be returned, the range of the
+     * @param limit
+     *            optional, if a sublist has to be returned, the limit of the
      *            sublist
      * @param sessionId
      *            a valid session id
@@ -304,12 +304,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public RestPage<UserJobData> jobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range)
+            @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws PermissionRestException, NotConnectedRestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
 
-            Page<JobInfo> page = s.getJobs(index, range,
+            Page<JobInfo> page = s.getJobs(index, limit,
                     new JobFilterCriteria(false, true, true, true), DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<UserJobData>(page.getList().size());
             for (JobInfo jobInfo : page.getList()) {
@@ -334,8 +334,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
-     * @param range
-     *            optional, if a sublist has to be returned, the range of the
+     * @param limit
+     *            optional, if a sublist has to be returned, the limit of the
      *            sublist
      * @param myJobs
      *            fetch only the jobs for the user making the request
@@ -356,19 +356,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range,
+            @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("running") @DefaultValue("true") boolean running,
             @QueryParam("finished") @DefaultValue("true") boolean finished)
                     throws PermissionRestException, NotConnectedRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&range=" + range);
+            Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
 
             boolean onlyUserJobs = (myJobs && user != null && user.trim().length() > 0);
 
-            Page<JobInfo> page = s.getJobs(index, range, new JobFilterCriteria(onlyUserJobs, pending, running, finished), DEFAULT_JOB_SORT_PARAMS);
+            Page<JobInfo> page = s.getJobs(index, limit, new JobFilterCriteria(onlyUserJobs, pending, running, finished), DEFAULT_JOB_SORT_PARAMS);
             List<JobInfo> jobsInfo = page.getList();
             ArrayList<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
             for (JobInfo jobInfo : jobsInfo) {

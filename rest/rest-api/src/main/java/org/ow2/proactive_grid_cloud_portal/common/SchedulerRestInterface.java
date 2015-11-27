@@ -98,7 +98,7 @@ public interface SchedulerRestInterface {
      * Returns the ids of the current jobs under a list of string.
      * @param sessionId a valid session id
      * @param index optional, if a sublist has to be returned the index of the sublist
-     * @param range optional, if a sublist has to be returned, the range of the sublist
+     * @param limit optional, if a sublist has to be returned, the limit of the sublist
      * @return a list of jobs' ids under the form of a list of string
     */
     @GET
@@ -107,7 +107,7 @@ public interface SchedulerRestInterface {
     RestPage<String> jobs(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range)
+            @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -118,7 +118,7 @@ public interface SchedulerRestInterface {
      *   - its owner
      *   - the JobInfo class
      * @param index optional, if a sublist has to be returned the index of the sublist
-     * @param range optional, if a sublist has to be returned, the range of the sublist
+     * @param limit optional, if a sublist has to be returned, the limit of the sublist
      * @param sessionId a valid session id
      * @return a list of UserJobData
      */
@@ -128,7 +128,7 @@ public interface SchedulerRestInterface {
     RestPage<UserJobData> jobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range)
+            @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws PermissionRestException, NotConnectedRestException;
 
     /**
@@ -140,7 +140,7 @@ public interface SchedulerRestInterface {
      *   - the JobInfo class
      * @param sessionId a valid session id
      * @param index optional, if a sublist has to be returned the index of the sublist
-     * @param range optional, if a sublist has to be returned, the range of the sublist
+     * @param limit optional, if a sublist has to be returned, the limit of the sublist
      * @param myJobs fetch only the jobs owned by the user making the request
      * @param pending fetch pending jobs
      * @param running fetch running jobs
@@ -155,7 +155,7 @@ public interface SchedulerRestInterface {
     RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range,
+            @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("running") @DefaultValue("true") boolean running,
