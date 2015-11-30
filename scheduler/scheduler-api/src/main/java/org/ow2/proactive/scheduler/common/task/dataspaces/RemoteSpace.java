@@ -52,10 +52,26 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public interface RemoteSpace {
 
     /**
+     * Returns a list of files found by resolving the pattern given in parameter  <br>
+     * The following special characters can be used : <br>
+     *  ** matches zero or more directories <br>
+     *  * matches zero or more characters<br>
+     *  ? matches one character
+     *
+     *
+     * @param pattern pattern to locate files
+     * @return a set of remote paths corresponding to the files found
+     * @throws FileSystemException
+     */
+    Set<String> listFiles(String pattern) throws FileSystemException;
+
+
+    /**
      * Push the given file or directory(including its content) from the local space to the remote space.
      *
-     * Several scenarios can occur :
+     * Several scenarios can occur depending if the remote path exists and is a directory or a file, for example :
      * - If the localPath is a file and the remotePath represents a directory, the file will be copied inside the remote directory
+     * - If the localPath is a directory and the remotePath is a directory, all files from the local directory will be put in the remote directory.
      * @param localPath path to the local file or folder
      * @param remotePath path in the RemoteSpace where to put the file or folder
      * @throws FileSystemException
@@ -142,5 +158,12 @@ public interface RemoteSpace {
      * @throws FileSystemException
      */
     OutputStream getOutputStream(String remotePath) throws FileSystemException;
+
+    /**
+     * returns the underlying space implementation
+     *
+     * @return
+     */
+    Object getSpace();
 
 }

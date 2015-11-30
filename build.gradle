@@ -207,6 +207,7 @@ project('common-api') {
     dependencies {
         compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
         compile "org.objectweb.proactive:programming-util:${programmingVersion}"
+        compile 'commons-codec:commons-codec:1.6'
     }
 
     task stub(type: StubTask) {

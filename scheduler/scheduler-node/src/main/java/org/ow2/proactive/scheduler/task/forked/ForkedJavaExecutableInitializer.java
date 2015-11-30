@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.task.forked;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.authentication.crypto.Decrypter;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
@@ -61,8 +61,6 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializerIm
     /** Java executable container for the forked java task */
     private JavaExecutableContainer javaExecutableContainer;
 
-    /** Decrypter from launcher */
-    private Decrypter decrypter = null;
 
     /** Dataspaces on forking JVM side */
     private DataSpacesFileObject local, input, output, global;
@@ -130,20 +128,6 @@ public class ForkedJavaExecutableInitializer extends JavaExecutableInitializerIm
      */
     public void setJavaExecutableContainer(JavaExecutableContainer javaExecutableContainer) {
         this.javaExecutableContainer = javaExecutableContainer;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Decrypter getDecrypter() {
-        return decrypter;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDecrypter(Decrypter decrypter) {
-        this.decrypter = decrypter;
     }
 
     /**

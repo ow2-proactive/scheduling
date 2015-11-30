@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
+import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.ExecutableContainer;
@@ -145,7 +146,7 @@ public class ScriptTaskLauncher extends TaskLauncher {
 
             setPropagatedVariables(initializer, getPropagatedVariables());
 
-            executableGuard.callInternalInit(ScriptExecutable.class, JavaExecutableInitializerImpl.class,
+            executableGuard.callInternalInit(ScriptExecutable.class, JavaStandaloneExecutableInitializer.class,
                     initializer);
 
             sample = System.nanoTime();

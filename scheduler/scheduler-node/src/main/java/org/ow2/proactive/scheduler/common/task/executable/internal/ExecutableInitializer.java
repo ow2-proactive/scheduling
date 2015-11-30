@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.common.task.executable.internal;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.authentication.crypto.Decrypter;
 import org.ow2.proactive.utils.NodeSet;
 
 

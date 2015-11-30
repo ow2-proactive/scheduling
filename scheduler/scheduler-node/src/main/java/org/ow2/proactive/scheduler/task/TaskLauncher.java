@@ -63,6 +63,7 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesExcept
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.objectweb.proactive.utils.StackTraceUtil;
+import org.ow2.proactive.authentication.crypto.Decrypter;
 import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -734,11 +735,11 @@ public abstract class TaskLauncher implements InitActive {
      * @param script the ScriptHandler in which bindings will be added
      */
     private void addDataspaceBinding(ScriptHandler script) {
-        script.addBinding(DS_SCRATCH_BINDING_NAME, this.SCRATCH);
-        script.addBinding(DS_INPUT_BINDING_NAME, this.INPUT);
-        script.addBinding(DS_OUTPUT_BINDING_NAME, this.OUTPUT);
-        script.addBinding(DS_GLOBAL_BINDING_NAME, this.GLOBAL);
-        script.addBinding(DS_USER_BINDING_NAME, this.USER);
+        script.addBinding(DS_SCRATCH_BINDING_NAME, new LocalSpaceAdapter(this.SCRATCH));
+        script.addBinding(DS_INPUT_BINDING_NAME, new RemoteSpaceAdapter(this.SCRATCH, this.INPUT));
+        script.addBinding(DS_OUTPUT_BINDING_NAME, new RemoteSpaceAdapter(this.SCRATCH, this.OUTPUT));
+        script.addBinding(DS_GLOBAL_BINDING_NAME, new RemoteSpaceAdapter(this.SCRATCH, this.GLOBAL));
+        script.addBinding(DS_USER_BINDING_NAME, new RemoteSpaceAdapter(this.SCRATCH, this.USER));
     }
 
     public static String convertDataSpaceToFileIfPossible(DataSpacesFileObject fo, boolean errorIfNotFile)

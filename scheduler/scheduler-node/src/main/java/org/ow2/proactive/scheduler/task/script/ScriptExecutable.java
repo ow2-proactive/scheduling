@@ -42,10 +42,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ow2.proactive.scheduler.common.exception.UserException;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.authentication.crypto.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.common.task.executable.internal.JavaExecutableInitializerImpl;
+import org.ow2.proactive.scheduler.common.task.executable.JavaStandaloneExecutable;
+import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.util.VariablesUtil;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -62,7 +62,7 @@ import org.apache.log4j.Logger;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.4
  */
-public class ScriptExecutable extends JavaExecutable {
+public class ScriptExecutable extends JavaStandaloneExecutable {
 
     public static final Logger logger = Logger.getLogger(ScriptExecutable.class);
 
@@ -82,7 +82,7 @@ public class ScriptExecutable extends JavaExecutable {
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
     // WARNING WHEN REMOVE OR RENAME, called by task launcher by introspection
-    protected void internalInit(JavaExecutableInitializerImpl execInitializer) throws Exception {
+    protected void internalInit(JavaStandaloneExecutableInitializer execInitializer) throws Exception {
         super.internalInit(execInitializer);
         this.decrypter = execInitializer.getDecrypter();
         this.outputSink = execInitializer.getOutputSink();
@@ -100,7 +100,6 @@ public class ScriptExecutable extends JavaExecutable {
         handler.addBinding(TaskLauncher.DS_SCRATCH_BINDING_NAME, getLocalSpace());
         handler.addBinding(TaskLauncher.DS_USER_BINDING_NAME, getUserSpace());
 
-        handler.addBinding(TaskLauncher.MULTI_NODE_TASK_NODESET_BINDING_NAME, getNodes());
         handler.addBinding(TaskLauncher.MULTI_NODE_TASK_NODESURL_BINDING_NAME, getNodesURL());
 
         handler.addBinding(TaskScript.RESULTS_VARIABLE, results);
