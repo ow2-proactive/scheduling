@@ -47,6 +47,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -60,6 +61,8 @@ public class LocalSpaceAdapter implements LocalSpace {
     public static final Logger logger = Logger.getLogger(RemoteSpaceAdapter.class);
 
     private final DataSpacesFileObject localDataSpace;
+
+    private String tostring;
 
     public LocalSpaceAdapter(DataSpacesFileObject localDataSpace) {
         this.localDataSpace = localDataSpace;
@@ -89,7 +92,7 @@ public class LocalSpaceAdapter implements LocalSpace {
         if (logger.isDebugEnabled()) {
             logger.debug("Looking for pattern : " + pattern + " in " + localDataSpace.getRealURI());
         }
-        HashSet<File> fileResuls = new HashSet<File>();
+        LinkedHashSet<File> fileResuls = new LinkedHashSet<File>();
         try {
             ArrayList<DataSpacesFileObject> results = null;
             results = RemoteSpaceAdapter.getFilesFromPattern(localDataSpace, pattern);
@@ -140,5 +143,23 @@ public class LocalSpaceAdapter implements LocalSpace {
         } catch (Exception e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
         }
+    }
+
+    @Override
+    public DataSpacesFileObject getSpace() {
+        return localDataSpace;
+    }
+
+    @Override
+    public String toString() {
+        if (tostring == null) {
+            try {
+                tostring = getLocalRoot().toString();
+            } catch (FileSystemException e) {
+                logger.error(e);
+                tostring = super.toString();
+            }
+        }
+        return tostring;
     }
 }

@@ -106,10 +106,10 @@ public class TestUserSpace extends FunctionalTest {
         "def out;                                              \n" + //
         "def arr = " + inFileArr + ";                          \n" + //
         "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = localspace.resolveFile(arr[i]);         \n" + //
+            "  def input = localspace.getSpace().resolveFile(arr[i]);         \n" + //
         "  if (! input) continue;                              \n" + //
         "  def br = input.getContent().getInputStream();       \n" + //
-        "  def ff = localspace.resolveFile(                    \n" + //
+            "  def ff = localspace.getSpace().resolveFile(                    \n" + //
         "     arr[i] + \".glob.A\");\n                         \n" + //
         "  ff.createFile();                                    \n" + //
         "  out = ff.getContent().getOutputStream();            \n" + //
@@ -126,13 +126,13 @@ public class TestUserSpace extends FunctionalTest {
         "def out;                                              \n" + //
         "def arr = " + inFileArr + ";                          \n" + //
         "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = localspace.resolveFile(                 \n" + //
+            "  def input = localspace.getSpace().resolveFile(                 \n" + //
         "      arr[i] + \".glob.A\");                          \n" + //
         "  if (! input.exists()) {                             \n" + //
         "    continue;                                         \n" + //
         "  }                                                   \n" + //
         "  def br = input.getContent().getInputStream();       \n" + //
-        "  def ff = localspace.resolveFile(                    \n" + //
+            "  def ff = localspace.getSpace().resolveFile(                    \n" + //
         "     arr[i] + \".out\");\n                            \n" + //
         "  ff.createFile();                                    \n" + //
         "  out = ff.getContent().getOutputStream();            \n" + //

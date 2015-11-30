@@ -51,6 +51,7 @@ import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -66,6 +67,8 @@ public class RemoteSpaceAdapter implements RemoteSpace {
     protected final DataSpacesFileObject remoteDataSpace;
 
     protected final DataSpacesFileObject localDataSpace;
+
+    protected String tostring;
 
     public RemoteSpaceAdapter(DataSpacesFileObject remoteDataSpace, DataSpacesFileObject localDataSpace) {
         this.remoteDataSpace = remoteDataSpace;
@@ -153,6 +156,20 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             relPath = relPath.substring(1);
         }
         return new File(relPath);
+    }
+
+    @Override
+    public Set<String> listFiles(String pattern) throws FileSystemException {
+        LinkedHashSet<String> found = new LinkedHashSet<>();
+        try {
+            ArrayList<DataSpacesFileObject> foundfo = getFilesFromPattern(remoteDataSpace, pattern);
+            for (DataSpacesFileObject dest : foundfo) {
+                found.add(stripLeadingSlash(dest.getPath()));
+            }
+        } catch (org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException e) {
+            throw new FileSystemException(StackTraceUtil.getStackTrace(e));
+        }
+        return found;
     }
 
     @Override
@@ -297,6 +314,19 @@ public class RemoteSpaceAdapter implements RemoteSpace {
     }
 
     @Override
+    public String toString() {
+        if (tostring == null) {
+            try {
+                tostring = TaskLauncher.convertDataSpaceToFileIfPossible(remoteDataSpace, false);
+            } catch (Exception e) {
+                logger.error(e);
+                tostring = remoteDataSpace.getRealURI();
+            }
+        }
+        return tostring;
+    }
+
+    @Override
     public InputStream getInputStream(String remotePath) throws FileSystemException {
         try {
             DataSpacesFileObject tostream = remoteDataSpace.resolveFile(stripLeadingSlash(remotePath));
@@ -334,6 +364,11 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         } catch (org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
         }
+    }
+
+    @Override
+    public DataSpacesFileObject getSpace() {
+        return remoteDataSpace;
     }
 
 }

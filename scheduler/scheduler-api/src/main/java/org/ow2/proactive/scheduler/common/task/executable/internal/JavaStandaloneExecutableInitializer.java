@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.ow2.proactive.authentication.crypto.Decrypter;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 
 
@@ -58,6 +59,8 @@ public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecut
     protected Map<String, byte[]> propagatedVariables;
 
     private Map<String, String> thirdPartyCredentials;
+
+    protected Decrypter decrypter;
 
     /**
      * @throws java.io.IOException if the deserialization of the value cannot be performed.
@@ -120,6 +123,20 @@ public class JavaStandaloneExecutableInitializer extends DefaultStandaloneExecut
 
     public void setThirdPartyCredentials(Map<String, String> thirdPartyCredentials) {
         this.thirdPartyCredentials = thirdPartyCredentials;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Decrypter getDecrypter() {
+        return decrypter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setDecrypter(Decrypter decrypter) {
+        this.decrypter = decrypter;
     }
 
 }

@@ -71,11 +71,11 @@
 				<script>
 					<code language="groovy">
 						<![CDATA[
-						print('user=' + user.getVirtualURI())
-						print('global=' + global.getVirtualURI())
-						print('input=' + input.getVirtualURI())
-						print('output=' + output.getVirtualURI())
-						print('localspace=' + localspace.getVirtualURI())
+						print('user=' + user.getSpace().getVirtualURI())
+						print('global=' + global.getSpace().getVirtualURI())
+						print('input=' + input.getSpace().getVirtualURI())
+						print('output=' + output.getSpace().getVirtualURI())
+						print('localspace=' + localspace.getSpace().getVirtualURI())
 						]]>
 					</code>
 				</script>
@@ -85,7 +85,6 @@
 			<scriptExecutable>
 				<script>
 					<code language="groovy">
-						print 'nodeset='+nodeset.size()
 						print 'nodesurl='+nodesurl.size()
 					</code>
 				</script>

@@ -32,7 +32,7 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.task;
+package org.ow2.proactive.authentication.crypto;
 
 import java.security.KeyException;
 import java.security.PrivateKey;

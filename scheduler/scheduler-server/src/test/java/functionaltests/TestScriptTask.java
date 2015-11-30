@@ -120,8 +120,6 @@ public class TestScriptTask extends SchedulerConsecutive {
 
         TaskResult multiNodeTaskResult = jobResult.getResult("multi-node");
         String mnLogs = multiNodeTaskResult.getOutput().getAllLogs(false);
-        assertTrue("Invalid binding for nodeset", mnLogs.contains("nodeset=" +
-            (SchedulerTStarter.RM_NODE_NUMBER - 1)));
         assertTrue("Invalid binding for nodesurl", mnLogs.contains("nodesurl=" +
             (SchedulerTStarter.RM_NODE_NUMBER - 1)));
 

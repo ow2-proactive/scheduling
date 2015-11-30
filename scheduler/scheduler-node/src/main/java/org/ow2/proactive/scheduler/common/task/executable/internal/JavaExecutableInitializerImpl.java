@@ -37,7 +37,7 @@
 package org.ow2.proactive.scheduler.common.task.executable.internal;
 
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.ow2.proactive.scheduler.common.task.Decrypter;
+import org.ow2.proactive.authentication.crypto.Decrypter;
 import org.ow2.proactive.utils.NodeSet;
 
 
@@ -57,14 +57,7 @@ public class JavaExecutableInitializerImpl extends JavaStandaloneExecutableIniti
     private DataSpacesFileObject outputSpaceFO;
     private DataSpacesFileObject globalSpaceFO;
     private DataSpacesFileObject userSpaceFO;
-    private Decrypter decrypter;
 
-    /**
-     * {@inheritDoc}
-     */
-    public Decrypter getDecrypter() {
-        return decrypter;
-    }
 
     @Override
     public NodeSet getNodes() {
@@ -74,13 +67,6 @@ public class JavaExecutableInitializerImpl extends JavaStandaloneExecutableIniti
     @Override
     public void setNodes(NodeSet nodes) {
         this.nodes = nodes;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setDecrypter(Decrypter decrypter) {
-        this.decrypter = decrypter;
     }
 
     public DataSpacesFileObject getLocalSpaceFileObject() {

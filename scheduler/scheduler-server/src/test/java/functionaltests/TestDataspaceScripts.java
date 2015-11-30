@@ -72,7 +72,7 @@ public class TestDataspaceScripts extends SchedulerConsecutive {
 
     private static final String scriptContent = "" +
         "def spaces = [input:input, localspace:localspace, output:output, user:user, global:global]; \n" +
-        "spaces.each { " + "  def f = it.value.resolveFile(\"" + fileName +
+            "spaces.each { " + "  def f = it.value.getSpace().resolveFile(\"" + fileName +
         "\"); \n" //
         +
         "  def br = new BufferedReader(new InputStreamReader(f.getContent().getInputStream())); \n" //
