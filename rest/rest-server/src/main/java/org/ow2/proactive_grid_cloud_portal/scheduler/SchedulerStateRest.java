@@ -145,6 +145,8 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.util.PageBoundaries;
+import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -206,7 +208,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static FileSystemManager fsManager = null;
-    
+
     private static final int TASKS_PAGE_SIZE = PASchedulerProperties.TASKS_PAGE_SIZE.getValueAsInt();
 
     static {
@@ -3267,7 +3269,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks");
-        PageBoundariesRest boundaries = getBoundaries(offset, limit);
+
+        PageBoundaries boundaries = Pagination.getTasksPageBoundaries(offset, limit, TASKS_PAGE_SIZE);
+
         Page<TaskId> page = null;
         try {
             page = s.getTaskIds(taskTag, from, to, mytasks, running, pending, finished,
@@ -3297,7 +3301,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks/tag/" + taskTag);
-        PageBoundariesRest boundaries = getBoundaries(offset, limit);
+
+        PageBoundaries boundaries = Pagination.getTasksPageBoundaries(offset, limit, TASKS_PAGE_SIZE);
+
         Page<TaskState> page = null;
         try {
             page = s.getTaskStates(taskTag, from, to, mytasks, running, pending, finished,
@@ -3310,40 +3316,5 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new PermissionRestException(e);
         }
     }
-    
-    protected PageBoundariesRest getBoundaries(int offset, int limit) {
-        if (offset < 0) {
-            offset = 0;
-        }
 
-        if (limit < 0) {
-            limit = TASKS_PAGE_SIZE;
-        }
-        
-        return new PageBoundariesRest(offset, limit);
-    }
-
-    /*
-     * Utility class to pass REST boundaries easily.
-     */
-    private static class PageBoundariesRest {
-
-        private int offset;
-        private int limit;
-
-        public PageBoundariesRest(int offset, int limit) {
-            this.offset = offset;
-            this.limit = limit;
-        }
-
-        public int getOffset() {
-            return offset;
-        }
-
-        public int getLimit() {
-            return limit;
-        }
-
-    }
-    
 }

@@ -40,8 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -54,12 +52,14 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
 
 public class JobStateImpl extends JobState {
+
     private static final long serialVersionUID = 1L;
 
-    private JobStateData d;
+    private JobStateData jobStateData;
+
 
     JobStateImpl(JobStateData d) {
-        this.d = d;
+        this.jobStateData = d;
     }
 
     @Override
@@ -69,18 +69,18 @@ public class JobStateImpl extends JobState {
 
     @Override
     public JobInfo getJobInfo() {
-        return toJobInfo(d.getJobInfo());
+        return toJobInfo(jobStateData.getJobInfo());
     }
 
     @Override
     public String getOwner() {
-        return d.getOwner();
+        return jobStateData.getOwner();
     }
 
     @Override
     public ArrayList<TaskState> getTasks() {
-        ArrayList<TaskState> taskStateList = new ArrayList<>();
-        Map<String, TaskStateData> taskStateMap = d.getTasks();
+        Map<String, TaskStateData> taskStateMap = jobStateData.getTasks();
+        ArrayList<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());
         for (TaskStateData ts : taskStateMap.values()) {
             taskStateList.add(DataUtility.taskState(ts));
         }
@@ -89,8 +89,8 @@ public class JobStateImpl extends JobState {
 
     @Override
     public List<TaskState> getTasksByTag(String tag) {
-        ArrayList<TaskState> taskStateList = new ArrayList<>();
-        Map<String, TaskStateData> taskStateMap = d.getTasks();
+        Map<String, TaskStateData> taskStateMap = jobStateData.getTasks();
+        ArrayList<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());
         for (TaskStateData ts : taskStateMap.values()) {
             String taskTag = ts.getTag();
             if(taskTag != null && taskTag.equals(tag)) {
@@ -119,11 +119,11 @@ public class JobStateImpl extends JobState {
 
     @Override
     public String getName() {
-        return d.getName();
+        return jobStateData.getName();
     }
 
     @Override
     public JobPriority getPriority() {
-        return JobPriority.valueOf(d.getPriority());
+        return JobPriority.valueOf(jobStateData.getPriority());
     }
 }
