@@ -145,7 +145,6 @@ public class LocalSpaceAdapter implements LocalSpace {
         }
     }
 
-    @Override
     public DataSpacesFileObject getSpace() {
         return localDataSpace;
     }

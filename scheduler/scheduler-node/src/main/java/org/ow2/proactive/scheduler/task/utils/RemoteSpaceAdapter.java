@@ -366,7 +366,6 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         }
     }
 
-    @Override
     public DataSpacesFileObject getSpace() {
         return remoteDataSpace;
     }

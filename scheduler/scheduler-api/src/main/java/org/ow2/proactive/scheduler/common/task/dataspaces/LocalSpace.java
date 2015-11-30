@@ -96,10 +96,4 @@ public interface LocalSpace {
      */
     File getLocalRoot() throws FileSystemException;
 
-    /**
-     * returns the underlying space implementation
-     *
-     * @return
-     */
-    Object getSpace();
 }
