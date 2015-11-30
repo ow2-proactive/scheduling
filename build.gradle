@@ -712,3 +712,11 @@ task alljavadoc(type: org.gradle.api.tasks.javadoc.Javadoc) {
     classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
 }
+
+task alljavadocZip(type: Zip, dependsOn: alljavadoc) {
+    from "${buildDir}/docs/javadoc"
+    archiveName project.archivesBaseName + '-' + project.version + '-javadoc.zip'
+    destinationDir file("${buildDir}/distributions")
+}
+
+
