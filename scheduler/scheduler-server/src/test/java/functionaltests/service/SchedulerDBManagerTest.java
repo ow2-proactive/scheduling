@@ -182,8 +182,8 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
     }
     
     @Test
-    public void testgetTotalJobsCount() throws Throwable {
-        initExpectedResults("testgetTotalJobsCount-Job", "TEST-TAG");
+    public void testGetTotalJobsCount() throws Throwable {
+        initExpectedResults("testGetTotalJobsCount-Job", "TEST-TAG");
         
         // default parameters
         actualJobPage = dbManager.getJobs(0, 0, null, true, true, true, null);
