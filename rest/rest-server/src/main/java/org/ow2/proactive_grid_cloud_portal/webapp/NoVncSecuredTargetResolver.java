@@ -109,8 +109,8 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
             TaskResult taskResult = scheduler.getTaskResult(jobId, taskName);
             List<String> paRemoteConnectionLines = retrievePaRemoteConnectionLines(session, jobId, taskResult);
 
-            String taskIdFromTaskName = retrieveTaskId(taskName, scheduler.getJobState(jobId));
-            return resolveVncTargetFromLogs(paRemoteConnectionLines, taskIdFromTaskName);
+            String taskId = retrieveTaskId(taskName, scheduler.getJobState(jobId));
+            return resolveVncTargetFromLogs(paRemoteConnectionLines, jobId, taskId);
 
         } catch (NotConnectedException e) {
             LOGGER.warn("Failed to connect to scheduler", e);
@@ -125,17 +125,19 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
     }
 
     private InetSocketAddress resolveVncTargetFromLogs(List<String> paRemoteConnectionLines,
-            String taskIdFromTaskName) {
+            String jobId,
+            String taskId) {
         for (String paRemoteConnectionLine : paRemoteConnectionLines) {
             String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(PA_REMOTE_CONNECTION);
             if (paRemoteConnectionArgs.length == 2) {
                 paRemoteConnectionArgs = paRemoteConnectionArgs[1].split(PA_REMOTE_CONNECTION_SEPARATOR);
-                if (paRemoteConnectionArgs.length == 4) {
-                    String taskId = paRemoteConnectionArgs[1];
-                    String type = paRemoteConnectionArgs[2];
-                    String args = paRemoteConnectionArgs[3];
+                if (paRemoteConnectionArgs.length == 5) {
+                    String jobIdFromRemoteConnectionArgs = paRemoteConnectionArgs[1];
+                    String taskIdFromRemoteConnectionArgs = paRemoteConnectionArgs[2];
+                    String type = paRemoteConnectionArgs[3];
+                    String args = paRemoteConnectionArgs[4];
 
-                    if (taskId.equals(taskIdFromTaskName) && VNC_PROTOCOL.equals(type)) {
+                    if (jobIdFromRemoteConnectionArgs.equals(jobId) && taskIdFromRemoteConnectionArgs.equals(taskId) && VNC_PROTOCOL.equals(type)) {
                         String[] targetHostAndPort = args.split(PA_REMOTE_CONNECTION_HOST_PORT_SEPARATOR);
                         String vncHost = targetHostAndPort[0].trim();
                         String vncPort = targetHostAndPort[1].trim();
