@@ -186,7 +186,8 @@ public enum PASchedulerProperties {
 
     /** If true script tasks are ran in a forked JVM, if false they are ran in the node's JVM */
     TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN),
-    
+
+    /** Number of tasks to fetch per page when pagination is used */
     TASKS_PAGE_SIZE("pa.scheduler.tasks.page.size", PropertyType.INTEGER),
 
     /* ***************************************************************** */

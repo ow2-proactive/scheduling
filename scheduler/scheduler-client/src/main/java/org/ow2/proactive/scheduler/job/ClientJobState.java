@@ -62,7 +62,7 @@ public final class ClientJobState extends JobState {
 
         this.clientJobSerializationHelper = new ClientJobSerializationHelper();
 
-        ArrayList<TaskState> taskStates = jobState.getTasks();
+        List<TaskState> taskStates = jobState.getTasks();
         List<ClientTaskState> clientTaskStates = new ArrayList<>(taskStates.size());
         for (TaskState ts : taskStates) {
             clientTaskStates.add(new ClientTaskState(ts));
