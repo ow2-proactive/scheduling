@@ -158,13 +158,32 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         return new File(relPath);
     }
 
+    /**
+     * Only getAllRealURIs() is reliable when trying to relativize the path,
+     * as it as been created against the dataspace root uris. The standard getRealURI()
+     * method may contain path which don't match with the root (e.g. file:/// vs file:/)
+     *
+     * @param dsfo
+     * @return
+     */
+    private String getRelativePath(DataSpacesFileObject dsfo) {
+        for (String realuri : dsfo.getAllRealURIs()) {
+            String rooturi = dsfo.getSpaceRootURI();
+            if (realuri.contains(rooturi)) {
+                logger.info("replacing " + rooturi + " in " + realuri);
+                return stripLeadingSlash(realuri.replace(rooturi, ""));
+            }
+        }
+        throw new IllegalStateException("Unable to relativize file object : " + dsfo.getRealURI());
+    }
+
     @Override
     public Set<String> listFiles(String pattern) throws FileSystemException {
         LinkedHashSet<String> found = new LinkedHashSet<>();
         try {
             ArrayList<DataSpacesFileObject> foundfo = getFilesFromPattern(remoteDataSpace, pattern);
             for (DataSpacesFileObject dest : foundfo) {
-                found.add(stripLeadingSlash(dest.getPath()));
+                found.add(getRelativePath(dest));
             }
         } catch (org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
