@@ -3277,7 +3277,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             page = s.getTaskIds(taskTag, from, to, mytasks, running, pending, finished,
                     boundaries.getOffset(), boundaries.getLimit());
             List<TaskId> taskIds = page.getList();
-            ArrayList<String> taskNames = new ArrayList<>(taskIds.size());
+            List<String> taskNames = new ArrayList<>(taskIds.size());
             for (TaskId taskId : taskIds) {
                 taskNames.add(taskId.getReadableName());
             }

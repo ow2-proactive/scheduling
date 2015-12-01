@@ -194,7 +194,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      *
      * @return the tasks contains in this job.
      */
-    public abstract ArrayList<TaskState> getTasks();
+    public abstract List<TaskState> getTasks();
 
     /**
      * To get the tasks as a hash map.

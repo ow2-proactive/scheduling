@@ -78,9 +78,9 @@ public class JobStateImpl extends JobState {
     }
 
     @Override
-    public ArrayList<TaskState> getTasks() {
+    public List<TaskState> getTasks() {
         Map<String, TaskStateData> taskStateMap = jobStateData.getTasks();
-        ArrayList<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());
+        List<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());
         for (TaskStateData ts : taskStateMap.values()) {
             taskStateList.add(DataUtility.taskState(ts));
         }
@@ -90,13 +90,14 @@ public class JobStateImpl extends JobState {
     @Override
     public List<TaskState> getTasksByTag(String tag) {
         Map<String, TaskStateData> taskStateMap = jobStateData.getTasks();
-        ArrayList<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());
+        List<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());
         for (TaskStateData ts : taskStateMap.values()) {
             String taskTag = ts.getTag();
             if(taskTag != null && taskTag.equals(tag)) {
                 taskStateList.add(DataUtility.taskState(ts));
             }
         }
+
         return taskStateList;
     }
 
