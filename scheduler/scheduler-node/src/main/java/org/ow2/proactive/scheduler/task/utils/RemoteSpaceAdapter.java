@@ -170,7 +170,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         for (String realuri : dsfo.getAllRealURIs()) {
             String rooturi = dsfo.getSpaceRootURI();
             if (realuri.contains(rooturi)) {
-                logger.info("replacing " + rooturi + " in " + realuri);
+                logger.debug("replacing " + rooturi + " in " + realuri);
                 return stripLeadingSlash(realuri.replace(rooturi, ""));
             }
         }
