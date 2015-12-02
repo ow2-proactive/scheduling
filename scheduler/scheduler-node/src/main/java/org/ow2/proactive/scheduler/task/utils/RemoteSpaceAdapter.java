@@ -166,7 +166,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
      * @param dsfo
      * @return
      */
-    private String getRelativePath(DataSpacesFileObject dsfo) {
+    private String getRelativeDSFOPath(DataSpacesFileObject dsfo) {
         for (String realuri : dsfo.getAllRealURIs()) {
             String rooturi = dsfo.getSpaceRootURI();
             if (realuri.contains(rooturi)) {
@@ -183,7 +183,7 @@ public class RemoteSpaceAdapter implements RemoteSpace {
         try {
             ArrayList<DataSpacesFileObject> foundfo = getFilesFromPattern(remoteDataSpace, pattern);
             for (DataSpacesFileObject dest : foundfo) {
-                found.add(getRelativePath(dest));
+                found.add(getRelativeDSFOPath(dest));
             }
         } catch (org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException e) {
             throw new FileSystemException(StackTraceUtil.getStackTrace(e));
@@ -214,8 +214,8 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             DataSpacesFileObject destinationRoot = remoteDataSpace.resolveFile(remotePath);
 
             for (DataSpacesFileObject source : sources) {
-                DataSpacesFileObject destination = destinationRoot.resolveFile(stripLeadingSlash(source
-                        .getPath()));
+                DataSpacesFileObject destination = destinationRoot.resolveFile(stripLeadingSlash(getRelativeDSFOPath(source
+                )));
                 if (logger.isDebugEnabled()) {
                     logger.debug("Copying " + source.getRealURI() + " to " + destination.getRealURI());
                 }
@@ -288,8 +288,8 @@ public class RemoteSpaceAdapter implements RemoteSpace {
             DataSpacesFileObject destinationRoot = localDataSpace.resolveFile(localPath);
 
             for (DataSpacesFileObject source : sources) {
-                DataSpacesFileObject destination = destinationRoot.resolveFile(stripLeadingSlash(source
-                        .getPath()));
+                DataSpacesFileObject destination = destinationRoot.resolveFile(stripLeadingSlash(getRelativeDSFOPath(source
+                )));
                 if (logger.isDebugEnabled()) {
                     logger.debug("Copying " + source.getRealURI() + " to " + destination.getRealURI());
                 }
