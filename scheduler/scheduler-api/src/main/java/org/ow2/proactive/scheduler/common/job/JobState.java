@@ -50,6 +50,9 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.util.PageBoundaries;
+import org.ow2.proactive.scheduler.common.util.Pagination;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -191,7 +194,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      *
      * @return the tasks contains in this job.
      */
-    public abstract ArrayList<TaskState> getTasks();
+    public abstract List<TaskState> getTasks();
 
     /**
      * To get the tasks as a hash map.
@@ -226,11 +229,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return a TaskStatePage which includes subset of tasks and the total number of all tasks
      */
     public TaskStatesPage getTasksPaginated(final int offset, final int limit) {
-
-        int total_size = getTasks().size();
-        PageBoundaries pb = sanitizeBoundaries(getTasks(), offset, limit);
-
-        return new TaskStatesPage(getTasks().subList(pb.getOffset(), pb.getLimit()), total_size);
+        return getTaskStatesPage(offset, limit, getTasks());
     }
 
     /**
@@ -242,10 +241,27 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return a TaskStatePage which includes subset of filtered tasks and the total number of all filtered tasks
      */
     public TaskStatesPage getTaskByTagPaginated(final String tag, final int offset, final int limit) {
-        List<TaskState> tasks = getTasksByTag(tag);
-        int total_size = tasks.size();
-        PageBoundaries pb = sanitizeBoundaries(tasks, offset, limit);
-        return new TaskStatesPage(tasks.subList(pb.getOffset(), pb.getLimit()), total_size);
+        return getTaskStatesPage(offset, limit, getTasksByTag(tag));
+    }
+
+    private TaskStatesPage getTaskStatesPage(int offset, int limit, List<TaskState> tasks) {
+        PageBoundaries pageBoundaries =
+                Pagination.getTasksPageBoundaries(
+                        offset, limit, PASchedulerProperties.TASKS_PAGE_SIZE.getValueAsInt());
+
+        int nbTasks = tasks.size();
+        int indexLastItemToReturn =  pageBoundaries.getOffset() + pageBoundaries.getLimit();
+
+        offset = pageBoundaries.getOffset();
+        if (offset >= nbTasks) {
+            offset = 0;
+        }
+
+        if (indexLastItemToReturn >= nbTasks) {
+            indexLastItemToReturn = nbTasks;
+        }
+
+        return new TaskStatesPage(tasks.subList(offset, indexLastItemToReturn), nbTasks);
     }
 
     /**
@@ -421,27 +437,6 @@ public abstract class JobState extends Job implements Comparable<JobState> {
 
         return false;
     }
-
-
-    /*
-     * Returns sanitized boundaries.
-     * If the provided indexes are not valid, they are translated to
-     * valid ones.
-     */
-    private PageBoundaries sanitizeBoundaries(List<?> tasksList, int offset, int limit) {
-        int _offset = 0;
-        int total_size = tasksList.size();
-        int _limit = total_size;
-        
-        if (offset > 0 && offset < _limit) _offset = offset;
-        if (limit > 0 && limit < _limit) _limit = limit;
-        if (_offset > _limit) {
-            int tmp = _offset;
-            _offset = _limit;
-            _limit = tmp;
-        }
-        return new PageBoundaries(_offset, _limit);
-    }
     
     /**
      * @see java.lang.Object#toString()
@@ -449,29 +444,6 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[" + getId() + "]";
-    }
-
-    /*
-     * Utility class to pass boundaries easily.
-     */
-    private static class PageBoundaries {
-
-        private int offset;
-        private int limit;
-
-        public PageBoundaries(int offset, int limit) {
-            this.offset = offset;
-            this.limit = limit;
-        }
-
-        public int getOffset() {
-            return offset;
-        }
-
-        public int getLimit() {
-            return limit;
-        }
-
     }
     
 }

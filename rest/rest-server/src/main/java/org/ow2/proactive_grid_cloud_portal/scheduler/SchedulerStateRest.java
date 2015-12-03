@@ -145,6 +145,8 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.util.PageBoundaries;
+import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -206,7 +208,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static FileSystemManager fsManager = null;
-    
+
     private static final int TASKS_PAGE_SIZE = PASchedulerProperties.TASKS_PAGE_SIZE.getValueAsInt();
 
     static {
@@ -236,8 +238,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
-     * @param range
-     *            optional, if a sublist has to be returned, the range of the
+     * @param limit
+     *            optional, if a sublist has to be returned, the limit of the
      *            sublist
      * @return a list of jobs' ids under the form of a list of string
      */
@@ -248,12 +250,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public RestPage<String> jobs(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range)
+            @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs");
 
-            Page<JobInfo> page = s.getJobs(index, range, new JobFilterCriteria(false, true, true, true),
+            Page<JobInfo> page = s.getJobs(index, limit, new JobFilterCriteria(false, true, true, true),
                     DEFAULT_JOB_SORT_PARAMS);
 
             List<String> ids = new ArrayList<String>(page.getList().size());
@@ -290,8 +292,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
-     * @param range
-     *            optional, if a sublist has to be returned, the range of the
+     * @param limit
+     *            optional, if a sublist has to be returned, the limit of the
      *            sublist
      * @param sessionId
      *            a valid session id
@@ -304,12 +306,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public RestPage<UserJobData> jobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range)
+            @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws PermissionRestException, NotConnectedRestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
 
-            Page<JobInfo> page = s.getJobs(index, range,
+            Page<JobInfo> page = s.getJobs(index, limit,
                     new JobFilterCriteria(false, true, true, true), DEFAULT_JOB_SORT_PARAMS);
             List<UserJobData> userJobInfoList = new ArrayList<UserJobData>(page.getList().size());
             for (JobInfo jobInfo : page.getList()) {
@@ -334,8 +336,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param index
      *            optional, if a sublist has to be returned the index of the
      *            sublist
-     * @param range
-     *            optional, if a sublist has to be returned, the range of the
+     * @param limit
+     *            optional, if a sublist has to be returned, the limit of the
      *            sublist
      * @param myJobs
      *            fetch only the jobs for the user making the request
@@ -356,19 +358,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public RestMapPage<Long, ArrayList<UserJobData>> revisionAndJobsInfo(
             @HeaderParam("sessionid") String sessionId,
             @QueryParam("index") @DefaultValue("-1") int index,
-            @QueryParam("range") @DefaultValue("-1") int range,
+            @QueryParam("limit") @DefaultValue("-1") int limit,
             @QueryParam("myjobs") @DefaultValue("false") boolean myJobs,
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("running") @DefaultValue("true") boolean running,
             @QueryParam("finished") @DefaultValue("true") boolean finished)
                     throws PermissionRestException, NotConnectedRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&range=" + range);
+            Scheduler s = checkAccess(sessionId, "revisionjobsinfo?index=" + index + "&limit=" + limit);
             String user = sessionStore.get(sessionId).getUserName();
 
             boolean onlyUserJobs = (myJobs && user != null && user.trim().length() > 0);
 
-            Page<JobInfo> page = s.getJobs(index, range, new JobFilterCriteria(onlyUserJobs, pending, running, finished), DEFAULT_JOB_SORT_PARAMS);
+            Page<JobInfo> page = s.getJobs(index, limit, new JobFilterCriteria(onlyUserJobs, pending, running, finished), DEFAULT_JOB_SORT_PARAMS);
             List<JobInfo> jobsInfo = page.getList();
             ArrayList<UserJobData> jobs = new ArrayList<>(jobsInfo.size());
             for (JobInfo jobInfo : jobsInfo) {
@@ -2959,7 +2961,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     private static <T> List<T> map(List<?> toMaps, Class<T> type) {
-        List<T> result = new ArrayList<>();
+        List<T> result = new ArrayList<>(toMaps.size());
         for (Object toMap : toMaps) {
             result.add(mapper.map(toMap, type));
         }
@@ -3267,13 +3269,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks");
-        PageBoundariesRest boundaries = getBoundaries(offset, limit);
+
+        PageBoundaries boundaries = Pagination.getTasksPageBoundaries(offset, limit, TASKS_PAGE_SIZE);
+
         Page<TaskId> page = null;
         try {
             page = s.getTaskIds(taskTag, from, to, mytasks, running, pending, finished,
                     boundaries.getOffset(), boundaries.getLimit());
-            ArrayList<String> taskNames = new ArrayList<String>(page.getList().size());
-            for (TaskId taskId : page.getList()) {
+            List<TaskId> taskIds = page.getList();
+            List<String> taskNames = new ArrayList<>(taskIds.size());
+            for (TaskId taskId : taskIds) {
                 taskNames.add(taskId.getReadableName());
             }
             return new RestPage<String>(taskNames, page.getSize());
@@ -3296,7 +3301,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks/tag/" + taskTag);
-        PageBoundariesRest boundaries = getBoundaries(offset, limit);
+
+        PageBoundaries boundaries = Pagination.getTasksPageBoundaries(offset, limit, TASKS_PAGE_SIZE);
+
         Page<TaskState> page = null;
         try {
             page = s.getTaskStates(taskTag, from, to, mytasks, running, pending, finished,
@@ -3309,37 +3316,5 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new PermissionRestException(e);
         }
     }
-    
-    private PageBoundariesRest getBoundaries(int offset, int limit) {
-        
-        if (offset < 0) offset = 0;
-        if (limit < 0 || offset > limit) limit = offset + TASKS_PAGE_SIZE;
-        
-        return new PageBoundariesRest(offset, limit);
-        
-    }
 
-    /*
-     * Utility class to pass REST boundaries easily.
-     */
-    private static class PageBoundariesRest {
-
-        private int offset;
-        private int limit;
-
-        public PageBoundariesRest(int offset, int limit) {
-            this.offset = offset;
-            this.limit = limit;
-        }
-
-        public int getOffset() {
-            return offset;
-        }
-
-        public int getLimit() {
-            return limit;
-        }
-
-    }
-    
 }

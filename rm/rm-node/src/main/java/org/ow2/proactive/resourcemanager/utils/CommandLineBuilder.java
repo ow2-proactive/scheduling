@@ -46,6 +46,7 @@ import java.util.Set;
 
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.utils.PAProperties;
 import org.ow2.proactive.utils.Tools;
 
 
@@ -265,7 +266,7 @@ public final class CommandLineBuilder implements Cloneable {
         if (javaPath != null) {
             command.add(javaPath);
         } else {
-            RMNodeStarter.logger.warn("java path isn't set in RMNodeStarter configuration.");
+            RMNodeStarter.logger.warn("Java path isn't set in RMNodeStarter configuration.");
             command.add("java");
         }
 
@@ -280,6 +281,12 @@ public final class CommandLineBuilder implements Cloneable {
                 command.addAll(this.paPropList);
             }
         }
+
+        // forward current charset to the forked JVM
+        String currentJvmCharset = PAProperties.getFileEncoding();
+        command.add("-Dfile.encoding=" + currentJvmCharset);
+        RMNodeStarter.logger.info("Using '" + currentJvmCharset + "' as file encoding");
+
         //building classpath
         command.add("-cp");
         final StringBuilder classpath = new StringBuilder(".");

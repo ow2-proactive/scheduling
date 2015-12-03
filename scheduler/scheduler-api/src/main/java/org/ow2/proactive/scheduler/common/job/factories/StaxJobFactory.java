@@ -182,9 +182,9 @@ public class StaxJobFactory extends JobFactory {
             //create and get XML STAX reader
             XMLStreamReader xmlsr;
             // use the server side property to accept encoding
-            if (PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.isSet()) {
+            if (PASchedulerProperties.FILE_ENCODING.isSet()) {
                 xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(file),
-                        PASchedulerProperties.SCHEDULER_JOB_FILE_ENCODING.getValueAsString());
+                        PASchedulerProperties.FILE_ENCODING.getValueAsString());
             } else {
                 xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(file));
             }

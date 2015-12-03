@@ -256,18 +256,18 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
     }
 
     private void checkPagingRequests1() throws Exception {
-        checkJobIds(false, 0, 0, "1", "2", "3");
-        checkJobIds(true, 0, 10, "1", "2", "3");
-        checkJobIds(true, 0, 2, "2", "3");
+        checkJobIds(false, 0, 0, "3", "2", "1");
+        checkJobIds(true, 0, 10, "3", "2", "1");
+        checkJobIds(true, 0, 2, "3", "2");
         checkJobIds(true, 2, 10, "1");
     }
 
     private void checkPagingRequests2() throws Exception {
-        checkJobIds(false, 0, 0, "1", "2", "3");
-        checkJobIds(true, 0, 10, "1", "2", "3");
+        checkJobIds(false, 0, 0, "3", "2", "1");
+        checkJobIds(true, 0, 10, "3", "2", "1");
     }
 
-    private void checkJobIds(boolean indexAndRange, int index, int range, String... expectedIds)
+    private void checkJobIds(boolean indexAndRange, int index, int limit, String... expectedIds)
             throws Exception {
         JSONObject page;
         JSONArray jobs;
@@ -279,7 +279,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
         // test 'jobs' request
         if (indexAndRange) {
-            url = getResourceUrl("jobs?index=" + index + "&range=" + range);
+            url = getResourceUrl("jobs?index=" + index + "&limit=" + limit);
         } else {
             url = getResourceUrl("jobs");
         }
@@ -288,11 +288,12 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         for (int i = 0; i < jobs.size(); i++) {
             actual.add((String) jobs.get(i));
         }
+
         Assert.assertEquals("Unexpected result of 'jobs' request (" + url + ")", expected, actual);
 
         // test 'jobsinfo' request
         if (indexAndRange) {
-            url = getResourceUrl("jobsinfo?index=" + index + "&range=" + range);
+            url = getResourceUrl("jobsinfo?index=" + index + "&limit=" + limit);
         } else {
             url = getResourceUrl("jobsinfo");
         }
@@ -307,7 +308,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
         // test 'revisionjobsinfo' request
         if (indexAndRange) {
-            url = getResourceUrl("revisionjobsinfo?index=" + index + "&range=" + range);
+            url = getResourceUrl("revisionjobsinfo?index=" + index + "&limit=" + limit);
         } else {
             url = getResourceUrl("revisionjobsinfo");
         }
