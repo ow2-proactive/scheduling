@@ -38,6 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -54,6 +55,7 @@ public class TaskStateData implements Serializable {
     private int maxNumberOfExecutionOnFailure;
     private TaskInfoData taskInfo;
     private ParallelEnvironmentData parallelEnvironment;
+    private Map<String, String> genericInformations;
 
     public String getName() {
         return name;
@@ -121,6 +123,12 @@ public class TaskStateData implements Serializable {
 
     public void setParallelEnvironment(ParallelEnvironmentData parallelEnvironment) {
         this.parallelEnvironment = parallelEnvironment;
+    }
+
+    public Map<String, String> getGenericInformations() { return genericInformations; }
+
+    public void setGenericInformations(Map<String, String> genericInformations) {
+        this.genericInformations = genericInformations;
     }
 
     public int getNumberOfNodesNeeded() {

@@ -1017,6 +1017,7 @@ public class TaskData {
         taskState.setReplicationIndex(getReplication());
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
         taskState.setParallelEnvironment(getParallelEnvironment());
+        taskState.setGenericInformations(getGenericInformation());
         return taskState;
     }
     
