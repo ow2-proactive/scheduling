@@ -251,6 +251,15 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     }
 
     /**
+     * To get the scheduledTime
+     *
+     * @return the scheduledTime
+     */
+    public long getScheduledTime() {
+        return getTaskInfo().getScheduledTime();
+    }
+
+    /**
      * To get the taskId
      *
      * @return the taskID

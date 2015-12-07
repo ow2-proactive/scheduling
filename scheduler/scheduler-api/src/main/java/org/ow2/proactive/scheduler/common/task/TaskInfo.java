@@ -150,4 +150,10 @@ public interface TaskInfo extends Serializable {
      */
     long getExecutionDuration();
 
+    /**
+     * Get the scheduled time.
+     * @return the scheduled time value in millis
+     */
+    long getScheduledTime();
+
 }
