@@ -160,8 +160,13 @@ public class InProcessTaskExecutor implements TaskExecutor {
         if (nodesHosts.isEmpty()) {
             return "";
         } else {
-            File nodesFile = File.createTempFile(NODES_FILE_DIRECTORY_NAME, null, new File("."));
-            nodesFile.deleteOnExit();
+            File directory;
+            if (context.getScratchURI() == null || context.getScratchURI().isEmpty()) {
+                directory = new File(".");
+            } else {
+                directory = new File(context.getScratchURI());
+            }
+            File nodesFile = File.createTempFile(NODES_FILE_DIRECTORY_NAME, null, directory);
 
             FileWriter outputWriter = new FileWriter(nodesFile);
             for (String nodeHost : nodesHosts) {

@@ -68,12 +68,14 @@ public class TaskContext implements Serializable {
 
     private final String progressFilePath;
 
+    // for testing purpose only
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer) throws
       NodeException {
         this(executableContainer, initializer, null, "", "", "", "", "", "",
           "");
     }
 
+    // for testing purpose only
     public TaskContext(ExecutableContainer executableContainer,
             TaskLauncherInitializer initializer, TaskResult[] previousTasksResults) throws NodeException {
         this(executableContainer, initializer, previousTasksResults, "", "", "", "", "", "",

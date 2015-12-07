@@ -346,7 +346,7 @@ public class InProcessTaskExecutorTest {
         printNodesFileTask.setNodes(mockedNodeSet());
 
         TaskContext context = new TaskContext(printNodesFileTask, initializer, null, tmpFolder.newFolder()
-                .toURI().toString(), "", "", "", "", "", "thisHost");
+                .getAbsolutePath(), "", "", "", "", "", "thisHost");
         TaskResultImpl taskResult = new InProcessTaskExecutor().execute(context, taskOutput.outputStream,
           taskOutput.error);
 
@@ -365,8 +365,7 @@ public class InProcessTaskExecutorTest {
           new TaskScript(new SimpleScript("println nodesurl.size()", "groovy")));
         printNodesFileTask.setNodes(mockedNodeSet());
 
-        TaskContext context = new TaskContext(printNodesFileTask, initializer, null, tmpFolder.newFolder()
-          .toURI().toString(), "", "", "", "", "", "thisHost");
+        TaskContext context = new TaskContext(printNodesFileTask, initializer, null, tmpFolder.newFolder().getAbsolutePath(), "", "", "", "", "", "thisHost");
         TaskResultImpl taskResult = new InProcessTaskExecutor().execute(context, taskOutput.outputStream,
           taskOutput.error);
 
