@@ -36,9 +36,10 @@
  */
 package org.ow2.proactive.scheduler.util.policy;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 
 /**
@@ -50,17 +51,6 @@ import java.util.Date;
  * -string-to-java-util-date
  */
 public class ISO8601DateUtil {
-
-    /*
-     * Provides thread-safe access for a SimpleDateFormat instance.
-     */
-    private static final ThreadLocal<SimpleDateFormat> df = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        }
-
-    };
 
     // non-instantiable
     private ISO8601DateUtil() {
@@ -74,27 +64,25 @@ public class ISO8601DateUtil {
      * @return ISO8601 complaint string
      */
     public static final String parse(final Date date) {
-        String formatted = df.get().format(date);
-        return formatted.substring(0, 22) + ":" + formatted.substring(22);
+        return new DateTime(date).toString();
     }
 
     /**
-     * Convert ISO8601 complaint string into a java.util.Date instance.
+     * Convert ISO8601 complaint string into a java.util.Date instance. In case
+     * no timezone information is passed, the default local time will be used
      * 
      * @param source
      *            ISO8601 complaint string
      * @return a java.util.Date instance
-     * @throws ParseException
-     *             if the string does not have required length
+     * @throws IllegalArgumentException
+     *             if the string does not have a correct format
      */
-    public static final Date toDate(final String source) throws ParseException {
-        String s = source.replace("Z", "+00:00");
-        try {
-            s = s.substring(0, 22) + s.substring(23);
-        } catch (IndexOutOfBoundsException e) {
-            throw new ParseException("Invalid length", 0);
-        }
-        return df.get().parse(s);
+    public static final Date toDate(final String source) throws IllegalArgumentException {
+        return parseWithISO8601Time(source);
+    }
+
+    private static final Date parseWithISO8601Time(String dateString) {
+        return ISODateTimeFormat.dateTimeParser().parseDateTime(dateString).toDate();
 
     }
 
