@@ -86,12 +86,6 @@ public class JettyStarter {
             boolean httpsEnabled = Boolean.parseBoolean(properties.getProperty("web.https", "false"));
             String httpProtocol = httpsEnabled ? "https" : "http";
 
-            // for web portals
-            String defaultRestUrl = httpProtocol + "://localhost:" + restPort + "/rest";
-            setSystemPropertyIfNotDefined("rest.url", defaultRestUrl);
-            setSystemPropertyIfNotDefined("sched.rest.url", defaultRestUrl);
-            setSystemPropertyIfNotDefined("rm.rest.url", defaultRestUrl);
-
             Server server = createHttpServer(properties, restPort, httpsEnabled);
             server.setStopAtShutdown(true);
 
