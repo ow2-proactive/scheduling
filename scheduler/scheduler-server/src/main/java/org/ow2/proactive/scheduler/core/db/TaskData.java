@@ -1,7 +1,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +31,15 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.CommonAttribute;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
+import org.ow2.proactive.scheduler.common.task.PropertyModifier;
+import org.ow2.proactive.scheduler.common.task.RestartMode;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
@@ -170,7 +177,7 @@ public class TaskData {
     }
 
     @Column(name = "JVM_ARGUMENTS")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public List<String> getJvmArguments() {
         return jvmArguments;
     }
@@ -180,7 +187,7 @@ public class TaskData {
     }
 
     @Column(name = "CLASSPATH")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public List<String> getAdditionalClasspath() {
         return additionalClasspath;
     }
@@ -298,12 +305,15 @@ public class TaskData {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
 
             DBTaskId dbTaskId = (DBTaskId) o;
 
-            if (jobId != dbTaskId.jobId) return false;
+            if (jobId != dbTaskId.jobId)
+                return false;
             return taskId == dbTaskId.taskId;
         }
 
@@ -400,22 +410,18 @@ public class TaskData {
         taskData.setCancelJobOnError(task.isCancelJobOnError());
         taskData.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         taskData.setJobData(jobRuntimeData);
-        taskData.setNumberOfExecutionOnFailureLeft(PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
-                .getValueAsInt());
+        taskData.setNumberOfExecutionOnFailureLeft(
+                PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
         taskData.setGenericInformation(task.getGenericInformations(false));
 
         // set the scheduledTime if the START_AT property exists
         Map<String, String> genericInfos = taskData.getGenericInformation();
         if (genericInfos != null && genericInfos.containsKey(CommonAttribute.GENERIC_INFO_START_AT_KEY)) {
-            try {
-                long scheduledTime = ISO8601DateUtil.toDate(genericInfos.get(
-                        CommonAttribute.GENERIC_INFO_START_AT_KEY)).getTime();
-                taskData.setScheduledTime(scheduledTime);
-                task.setScheduledTime(scheduledTime);
-            } catch (ParseException e) {
-                throw new IllegalArgumentException(e);
-            }
+            long scheduledTime = ISO8601DateUtil
+                    .toDate(genericInfos.get(CommonAttribute.GENERIC_INFO_START_AT_KEY)).getTime();
+            taskData.setScheduledTime(scheduledTime);
+            task.setScheduledTime(scheduledTime);
         }
         taskData.updateMutableAttributes(task);
 
@@ -470,13 +476,11 @@ public class TaskData {
             Map<String, String> systemEnvironment = forkEnvironment.getSystemEnvironment();
 
             if (systemEnvironment != null) {
-                List<EnvironmentModifierData> envModifiers =
-                        new ArrayList<>(systemEnvironment.size());
+                List<EnvironmentModifierData> envModifiers = new ArrayList<>(systemEnvironment.size());
 
                 for (Map.Entry<String, String> entry : systemEnvironment.entrySet()) {
-                    envModifiers.add(
-                            EnvironmentModifierData.create(
-                                    new PropertyModifier(entry.getKey(), entry.getValue()), taskData));
+                    envModifiers.add(EnvironmentModifierData
+                            .create(new PropertyModifier(entry.getKey(), entry.getValue()), taskData));
                 }
 
                 taskData.setEnvModifiers(envModifiers);
@@ -572,7 +576,7 @@ public class TaskData {
     }
 
     @Column(name = "GENERIC_INFO", updatable = false)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public Map<String, String> getGenericInformation() {
         return genericInformation;
     }
@@ -723,7 +727,7 @@ public class TaskData {
     }
 
     void initTaskType(InternalTask task) {
-       if (task.getClass().equals(InternalForkedScriptTask.class)) {
+        if (task.getClass().equals(InternalForkedScriptTask.class)) {
             taskType = FORKED_SCRIPT_TASK;
         } else if (task.getClass().equals(InternalScriptTask.class)) {
             taskType = SCRIPT_TASK;
@@ -743,9 +747,13 @@ public class TaskData {
 
     @Column(name = "TAG", updatable = false)
     @Index(name = "TASK_TAG")
-    public String getTag(){ return this.tag; }
+    public String getTag() {
+        return this.tag;
+    }
 
-    public void setTag(String tag) { this.tag = tag; }
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     @Column(name = "MAX_NUMBER_OF_EXEC", updatable = false)
     public int getMaxNumberOfExecution() {
@@ -1000,10 +1008,9 @@ public class TaskData {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
 
         return new TaskUsage(taskId.value(), getTaskName(), getStartTime(), getFinishedTime(),
-            getExecutionDuration(), getParallelEnvironment() == null ? 1 : getParallelEnvironment()
-                    .getNodesNumber());
+            getExecutionDuration(),
+            getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
     }
-    
 
     TaskInfoImpl createTaskInfo(JobIdImpl jobId) {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId(), getTag());
@@ -1022,13 +1029,13 @@ public class TaskData {
         taskInfo.setExecutionDuration(getExecutionDuration());
         return taskInfo;
     }
-    
+
     public TaskInfo toTaskInfo() {
         JobIdImpl jobId = new JobIdImpl(getJobData().getId(), getJobData().getJobName());
         TaskInfoImpl taskInfo = createTaskInfo(jobId);
         return taskInfo;
     }
-    
+
     public TaskState toTaskState() {
         TaskInfo taskInfo = toTaskInfo();
         TaskStateImpl taskState = new TaskStateImpl();
@@ -1043,6 +1050,5 @@ public class TaskData {
         taskState.setGenericInformations(getGenericInformation());
         return taskState;
     }
-    
-    
+
 }
