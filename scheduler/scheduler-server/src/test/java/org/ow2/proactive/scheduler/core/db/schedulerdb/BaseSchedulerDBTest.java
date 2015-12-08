@@ -55,6 +55,16 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
 	protected static final String DEFAULT_USER_NAME = "admin";
 
+	protected boolean inMemory = false;
+
+	public BaseSchedulerDBTest() {
+		this(false);
+	}
+
+	public BaseSchedulerDBTest(boolean inMemory) {
+		this.inMemory = inMemory;
+	}
+
 	public static class TestResult implements Serializable {
 
 		private int a;
@@ -348,9 +358,14 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 		PASchedulerProperties.SCHEDULER_HOME.updateProperty(ClasspathUtils.findSchedulerHome());
 		PASchedulerProperties.TASK_FORK.updateProperty("true");
 		CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
-		Configuration config = new Configuration()
-				.configure(new File(this.getClass().getResource("/functionaltests/config/hibernate.cfg.xml").toURI()));
-		dbManager = new SchedulerDBManager(config, true);
+
+		if (inMemory) {
+			dbManager = SchedulerDBManager.createInMemorySchedulerDBManager();
+		} else {
+			Configuration config = new Configuration()
+					.configure(new File(this.getClass().getResource("/functionaltests/config/hibernate.cfg.xml").toURI()));
+			dbManager = new SchedulerDBManager(config, true);
+		}
 	}
 
 	@After

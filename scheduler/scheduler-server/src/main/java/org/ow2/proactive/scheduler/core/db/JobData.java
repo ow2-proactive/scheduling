@@ -302,6 +302,7 @@ public class JobData {
     }
 
     @Column(name = "START_TIME")
+    @Index(name = "JOB_START_TIME")
     public long getStartTime() {
         return startTime;
     }
@@ -311,6 +312,7 @@ public class JobData {
     }
 
     @Column(name = "FINISH_TIME")
+    @Index(name = "JOB_FINISHED_TIME")
     public long getFinishedTime() {
         return finishedTime;
     }
@@ -320,6 +322,7 @@ public class JobData {
     }
 
     @Column(name = "REMOVE_TIME")
+    @Index(name = "JOB_REMOVED_TIME")
     public long getRemovedTime() {
         return removedTime;
     }

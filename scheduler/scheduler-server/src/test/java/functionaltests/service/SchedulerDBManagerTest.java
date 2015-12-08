@@ -383,13 +383,13 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
     private Page<TaskInfo> getTasks(TaskFilterCriteria criterias) {
         return dbManager.getTasks(criterias.getFrom(), criterias.getTo(), criterias.getTag(),
                 criterias.getOffset(), criterias.getLimit(), criterias.getUser(), criterias.isPending(),
-                criterias.isRunning(), criterias.isFinished(), criterias.getSortParameters());
+                criterias.isRunning(), criterias.isFinished());
     }
     
     private Page<TaskState> getTaskStates(TaskFilterCriteria criterias) {
         return dbManager.getTaskStates(criterias.getFrom(), criterias.getTo(), criterias.getTag(),
                 criterias.getOffset(), criterias.getLimit(), criterias.getUser(), criterias.isPending(),
-                criterias.isRunning(), criterias.isFinished(), criterias.getSortParameters());
+                criterias.isRunning(), criterias.isFinished());
     }
     
     private void assertTaskPageSizes(Page<?> page, int nbTasksInPage, int totalNbTasks) {

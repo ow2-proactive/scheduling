@@ -68,8 +68,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
 
 @Entity
-@Table(name = "TASK_DATA"/*, uniqueConstraints = { @UniqueConstraint(columnNames = {
-		"TASK_ID_JOB", "TASK_NAME" }) }*/)
+@Table(name = "TASK_DATA")
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
@@ -731,10 +730,10 @@ public class TaskData {
     }
 
     @Column(name = "TAG", updatable = false)
+    @Index(name = "TASK_TAG")
     public String getTag(){ return this.tag; }
 
     public void setTag(String tag) { this.tag = tag; }
-
 
     @Column(name = "MAX_NUMBER_OF_EXEC", updatable = false)
     public int getMaxNumberOfExecution() {
@@ -800,6 +799,7 @@ public class TaskData {
     }
 
     @Column(name = "START_TIME")
+    @Index(name = "TASK_START_TIME")
     public long getStartTime() {
         return startTime;
     }
@@ -809,6 +809,7 @@ public class TaskData {
     }
 
     @Column(name = "FINISH_TIME")
+    @Index(name = "TASK_FINISHED_TIME")
     public long getFinishedTime() {
         return finishedTime;
     }

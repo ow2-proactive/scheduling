@@ -1134,7 +1134,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         Page<TaskInfo> pTaskInfo;
         pTaskInfo = dbManager.getTasks(params.getFrom(), params.getTo(), params.getTag(),
                 params.getOffset(), params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
-                params.isFinished(), null);
+                params.isFinished());
         List<TaskId> lTaskId = new ArrayList<TaskId>(pTaskInfo.getList().size());
         for (TaskInfo taskInfo : pTaskInfo.getList()) {
             lTaskId.add(taskInfo.getTaskId());
@@ -1151,7 +1151,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         Page<TaskState> pTasks;
         pTasks = dbManager.getTaskStates(params.getFrom(), params.getTo(), params.getTag(), params.getOffset(),
                 params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
-                params.isFinished(), null);
+                params.isFinished());
         return pTasks;
         
     }
