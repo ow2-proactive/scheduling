@@ -36,20 +36,17 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
 import org.jetbrains.annotations.NotNull;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.TaskSortParameter;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.TransactionHelper.SessionWork;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Utility methods to fetch or update task related information from database.
@@ -163,13 +160,15 @@ public class TaskDBUtils {
 
         result.append("T.jobData.removedTime = -1 ");
 
+        // if 'from' and 'to' values are set
         if (hasDateFrom && hasDateTo) {
             result.append("and ( ( startTime >= :dateFrom and startTime <= :dateTo ) or ( finishedTime >= :dateFrom and finishedTime <= :dateTo ) ) ");
-        } else if (hasDateFrom && !hasDateTo) {
+        } else if (hasDateFrom && !hasDateTo) { // if 'from' only is set
             result.append("and ( startTime >= :dateFrom or finishedTime >= :dateFrom ) ");
-        } else if (!hasDateFrom && hasDateTo) {
+        } else if (!hasDateFrom && hasDateTo) { // if 'to' only is set
             result.append("and ( startTime <= :dateTo or finishedTime <= :dateTo ) ");
         } else {
+            // no datetime filtering required
             // nothing to do
         }
 
