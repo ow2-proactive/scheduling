@@ -162,11 +162,13 @@ public class TaskDBUtils {
 
         // if 'from' and 'to' values are set
         if (hasDateFrom && hasDateTo) {
-            result.append("and ( ( startTime >= :dateFrom and startTime <= :dateTo ) or ( finishedTime >= :dateFrom and finishedTime <= :dateTo ) ) ");
+            result.append("and ( ( startTime >= :dateFrom and startTime <= :dateTo ) " +
+                    "or ( scheduledTime >= :dateFrom and scheduledTime <= :dateTo ) " +
+                    "or ( finishedTime >= :dateFrom and finishedTime <= :dateTo ) ) ");
         } else if (hasDateFrom && !hasDateTo) { // if 'from' only is set
-            result.append("and ( startTime >= :dateFrom or finishedTime >= :dateFrom ) ");
+            result.append("and ( startTime >= :dateFrom or finishedTime >= :dateFrom or scheduledTime >= :dateFrom ) ");
         } else if (!hasDateFrom && hasDateTo) { // if 'to' only is set
-            result.append("and ( startTime <= :dateTo or finishedTime <= :dateTo ) ");
+            result.append("and ( startTime <= :dateTo or finishedTime <= :dateTo or scheduledTime >= :dateTo ) ");
         } else {
             // no datetime filtering required
             // nothing to do
