@@ -48,6 +48,7 @@ public class TaskInfoData implements Serializable {
     private TaskIdData taskId;
     private long startTime;
     private long finishedTime;
+    private long scheduledTime;
     private long executionDuration;
     private TaskStatusData taskStatus;
     private String executionHostName;
@@ -133,5 +134,13 @@ public class TaskInfoData implements Serializable {
 
     public void setExecutionDuration(long executionDuration) {
         this.executionDuration = executionDuration;
+    }
+
+    public long getScheduledTime() {
+        return scheduledTime;
+    }
+
+    public void setScheduledTime(long scheduledTime) {
+        this.scheduledTime = scheduledTime;
     }
 }

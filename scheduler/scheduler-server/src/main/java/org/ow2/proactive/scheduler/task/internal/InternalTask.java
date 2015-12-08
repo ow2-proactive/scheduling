@@ -250,7 +250,7 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Internal recursive delegate of {@link #replicateTree(Map, TaskId)} for task replication
+     * Internal recursive delegate of {@link #replicateTree(Map, TaskId, boolean, int, int)} for task replication
      *
      * @param acc accumulator
      * @param target end condition
@@ -307,7 +307,7 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * Internal recursive delegate of {@link #replicateTree(Map, TaskId)} for dependence replication
+     * Internal recursive delegate of {@link #replicateTree(Map, TaskId, boolean, int, int)} for dependence replication
      *
      * @param acc accumulator
      * @param target end condition
@@ -581,6 +581,15 @@ public abstract class InternalTask extends TaskState {
      */
     public void setStartTime(long startTime) {
         taskInfo.setStartTime(startTime);
+    }
+
+    /**
+     * To set the scheduledTime
+     *
+     * @param scheduledTime the scheduledTime to set
+     */
+    public void setScheduledTime(long scheduledTime) {
+        taskInfo.setScheduledTime(scheduledTime);
     }
 
     /**

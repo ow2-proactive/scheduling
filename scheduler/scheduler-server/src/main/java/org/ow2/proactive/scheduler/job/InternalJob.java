@@ -404,6 +404,7 @@ public abstract class InternalJob extends JobState {
                     Date startAt = (new Predictor(action.getCronExpr())).nextMatchingDate();
                     newTask.addGenericInformation(GENERIC_INFO_START_AT_KEY, ISO8601DateUtil
                             .parse(startAt));
+                    newTask.setScheduledTime(startAt.getTime());
                 } catch (InvalidPatternException e) {
                     // this will not happen as the cron expression is
                     // already being validated in FlowScript class.
@@ -1393,6 +1394,11 @@ public abstract class InternalJob extends JobState {
             replacements.put(SchedulerVars.PA_JOB_NAME.toString(), jobId.getReadableName());
         }
         return applyReplacementsOnGenericInformation(replacements);
+    }
+
+    @Override
+    public void setGenericInformations(Map<String, String> genericInformations) {
+        super.setGenericInformations(genericInformations);
     }
 
     /**
