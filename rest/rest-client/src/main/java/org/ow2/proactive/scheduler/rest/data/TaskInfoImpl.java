@@ -51,6 +51,8 @@ public class TaskInfoImpl implements TaskInfo {
 
     private long finishedTime = -1;
 
+    private long scheduledTime = -1;
+
     private JobId jobId;
 
     private JobInfo jobInfo;
@@ -181,6 +183,11 @@ public class TaskInfoImpl implements TaskInfo {
     @Override
     public TaskId getTaskId() {
         return taskId;
+    }
+
+    @Override
+    public long getScheduledTime() {
+        return this.scheduledTime;
     }
 
 }

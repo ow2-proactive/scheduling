@@ -76,6 +76,9 @@ public class TaskInfoImpl implements TaskInfo {
     /** task finished time : DEFAULT HAS TO BE SET TO -1 */
     private long finishedTime = -1;
 
+    /** task scheduled time : DEFAULT HAS TO BE SET TO -1 */
+    private long scheduledTime = -1;
+
     /** task real execution time : DEFAULT HAS TO BE SET TO -1 */
     private long executionDuration = -1;
 
@@ -106,6 +109,7 @@ public class TaskInfoImpl implements TaskInfo {
         this.jobInfo = new JobInfoImpl((JobInfoImpl) taskInfo.getJobInfo());
         this.startTime = taskInfo.getStartTime();
         this.finishedTime = taskInfo.getFinishedTime();
+        this.scheduledTime = taskInfo.getScheduledTime();
         this.executionDuration = taskInfo.getExecutionDuration();
         this.taskStatus = taskInfo.getStatus();
         this.progress = taskInfo.getProgress();
@@ -145,6 +149,16 @@ public class TaskInfoImpl implements TaskInfo {
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
     }
+
+    /**
+     * To set the scheduledTime
+     *
+     * @param scheduledTime the scheduledTime to set
+     */
+    public void setScheduledTime(long scheduledTime) {
+        this.scheduledTime = scheduledTime;
+    }
+
 
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getJobId()
@@ -331,6 +345,14 @@ public class TaskInfoImpl implements TaskInfo {
     public long getExecutionDuration() {
         return executionDuration;
     }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.TaskInfo#getScheduledTime()
+     */
+    public long getScheduledTime() {
+        return this.scheduledTime;
+    }
+
 
     /**
      * Set the execution duration value to the given executionDuration value
