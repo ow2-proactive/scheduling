@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -46,6 +45,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 
 
@@ -69,8 +69,8 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
     public static final String GENERIC_INFORMATION_KEY_START_AT = "START_AT";
 
     /*
-     * Utilize 'startAt' generic info and filter any tasks that should not be
-     * scheduled for current execution cycle.
+     * Utilize 'startAt' generic info and filter any tasks that should not be scheduled for current
+     * execution cycle.
      */
     @Override
     public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
@@ -93,21 +93,17 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
                         } else {
                             if (logger.isTraceEnabled()) {
                                 logger.trace(String.format(
-                                        "Task [jobId:\"%s\", taskId:\"%s\"] is scheduled to be executed at %s."
-                                            + " It will not be scheduled for this execution cycle at %s.",
-                                        jobDesc.getJobId(), candidate.getTaskId(), startAt, ISO8601DateUtil
-                                                .parse(now)));
+                                        "Task [jobId:\"%s\", taskId:\"%s\"] is scheduled to be executed at %s." +
+                                            " It will not be scheduled for this execution cycle at %s.",
+                                        jobDesc.getJobId(), candidate.getTaskId(), startAt,
+                                        ISO8601DateUtil.parse(now)));
                             }
                         }
-                    } catch (ParseException e) {
-                        logger
-                                .error(
-                                        String
-                                                .format(
-                                                        "An error occurred while processing 'startAt' generic info.%n"
-                                                            + "Task ([job-id:\"%s\", task-id:\"%s\"]) will be scheduled immediately for execution.",
-                                                        jobDesc.getJobId().toString(), candidate.getTaskId()
-                                                                .toString()), e);
+                    } catch (IllegalArgumentException e) {
+                        logger.error(String.format(
+                                "An error occurred while processing 'startAt' generic info.%n" +
+                                    "Task ([job-id:\"%s\", task-id:\"%s\"]) will be scheduled immediately for execution.",
+                                jobDesc.getJobId().toString(), candidate.getTaskId().toString()), e);
                         executionCycleTasks.add(candidate);
                     }
 
@@ -118,12 +114,11 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
     }
 
     /*
-     * START_AT property defined at task level always has the precedence over
-     * the same property defined job level.
+     * START_AT property defined at task level always has the precedence over the same property
+     * defined job level.
      */
     private String getStartAtValue(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) {
-        String startAt = taskDesc.getInternal().getGenericInformation()
-                .get(GENERIC_INFORMATION_KEY_START_AT);
+        String startAt = taskDesc.getInternal().getGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
         if (startAt == null) {
             startAt = jobDesc.getInternal().getGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
         }

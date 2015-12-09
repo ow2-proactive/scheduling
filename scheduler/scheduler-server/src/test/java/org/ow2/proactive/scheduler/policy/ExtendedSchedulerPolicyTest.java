@@ -36,6 +36,17 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_INFO_START_AT_KEY;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Vector;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -47,11 +58,6 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
-
-import java.util.*;
-
-import static org.junit.Assert.*;
-import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_INFO_START_AT_KEY;
 
 
 /**
@@ -158,7 +164,7 @@ public class ExtendedSchedulerPolicyTest {
     @Test
     public void testMalformedTaskStartAt() {
         List<JobDescriptor> jobDescList = asModifiableList(
-          createJobDescWithTwoTasks(later, now, "malformed-start-at"));
+                createJobDescWithTwoTasks(later, now, "malformed-start-at"));
         Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
     }
