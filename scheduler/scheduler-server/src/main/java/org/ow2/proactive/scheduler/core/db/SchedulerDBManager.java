@@ -1190,14 +1190,18 @@ public class SchedulerDBManager {
     }
 
     public void updateStartTime(long jobId, long taskId, long newStartTime) {
-        updateStartOrEndtime(jobId, taskId, "startTime", newStartTime);
+        updateStartOrEndOrScheduledtime(jobId, taskId, "startTime", newStartTime);
     }
 
     public void updateFinishedTime(long jobId, long taskId, long newFinishedTime) {
-        updateStartOrEndtime(jobId, taskId, "finishedTime", newFinishedTime);
+        updateStartOrEndOrScheduledtime(jobId, taskId, "finishedTime", newFinishedTime);
     }
 
-    private void updateStartOrEndtime(final long jobId, final long taskId, final String fieldName, final long time) {
+    public void updateScheduledTime(long jobId, long taskId, long newScheduledTime) {
+        updateStartOrEndOrScheduledtime(jobId, taskId, "scheduledTime", newScheduledTime);
+    }
+
+    private void updateStartOrEndOrScheduledtime(final long jobId, final long taskId, final String fieldName, final long time) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             public Void executeWork(Session session) {

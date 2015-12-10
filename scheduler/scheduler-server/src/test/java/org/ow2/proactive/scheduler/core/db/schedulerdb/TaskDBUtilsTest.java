@@ -73,9 +73,13 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
 
     private static final int NB_JOBS_AS_DEMO_USER = NB_JOBS / 2; // must be <= NB_JOBS
 
+    private static final int JOB_TO_BE_CROND = 2;
+
     private static final String DEMO_USERNAME = "demo";
 
     private static long REFERENCE_TIMESTAMP = System.currentTimeMillis();
+
+    private static final long SCHEDULED_TIME = 42L;
 
     @Before
     public void setUp() throws Exception {
@@ -94,10 +98,10 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
          *      .
          * t-n-1  t-n
          */
-        for (int i = 1; i <= NB_JOBS; i++) {
+        for (int jobCount = 1; jobCount <= NB_JOBS; jobCount++) {
             String user = DEFAULT_USER_NAME;
 
-            if (i <= NB_JOBS_AS_DEMO_USER) {
+            if (jobCount <= NB_JOBS_AS_DEMO_USER) {
                 user = DEMO_USERNAME;
             }
 
@@ -111,14 +115,19 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
 
             dbManager.updateJobAndTasksState(job);
 
-            long startTime = getTimeRelativeToReference(-i - 1);
-            long endTime = getTimeRelativeToReference(-i);
+            long startTime = getTimeRelativeToReference(-jobCount - 1);
+            long endTime = getTimeRelativeToReference(-jobCount);
 
             dbManager.updateStartTime(
                     job.getId().longValue(), task.getId().longValue(), startTime);
 
             dbManager.updateFinishedTime(
                     job.getId().longValue(), task.getId().longValue(),endTime);
+
+            if (jobCount == JOB_TO_BE_CROND) {
+                dbManager.updateScheduledTime(
+                        job.getId().longValue(), task.getId().longValue(), SCHEDULED_TIME);
+            }
 
             log.info("Job " + job.getId() + " with task " + task.getId()
                     + " has startTime=" + startTime
@@ -255,6 +264,17 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
 
         List<TaskState> result = run(taskStateSessionWork);
         assertThat(result).hasSize(NB_JOBS - 2);
+    }
+
+    @Test
+    public void testGetScheduledTasks() {
+        DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
+        builder.setFrom(SCHEDULED_TIME);
+        builder.setTo(SCHEDULED_TIME);
+        TransactionHelper.SessionWork<List<TaskState>> taskStateSessionWork =
+                TaskDBUtils.taskStateSessionWork(builder.build());
+        List<TaskState> result = run(taskStateSessionWork);
+        assertThat(result).hasSize(1);
     }
 
     private void assertTotalNumberOfTasks(DBTaskDataParameters parameters, int expectedNumberOfTasks) {
