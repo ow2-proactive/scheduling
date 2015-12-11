@@ -1139,8 +1139,9 @@ public abstract class InternalJob extends JobState {
      */
     @Override
     public Map<TaskId, TaskState> getHMTasks() {
-        Map<TaskId, TaskState> tmp = new HashMap<>();
-        for (Entry<TaskId, InternalTask> e : tasks.entrySet()) {
+        Set<Entry<TaskId, InternalTask>> entries = tasks.entrySet();
+        Map<TaskId, TaskState> tmp = new HashMap<>(entries.size());
+        for (Entry<TaskId, InternalTask> e : entries) {
             tmp.put(e.getKey(), e.getValue());
         }
         return tmp;
@@ -1315,7 +1316,7 @@ public abstract class InternalJob extends JobState {
             return restartWaitingTimer;
         } else if (executionNumber > 10) {
             //execution timer exceed 10, restart after 60 seconds
-            return 60 * 1000;
+            return 60000;
         } else {
             //else restart according to this function
             return (getNextWaitingTime(executionNumber - 1) + executionNumber * 1000);
