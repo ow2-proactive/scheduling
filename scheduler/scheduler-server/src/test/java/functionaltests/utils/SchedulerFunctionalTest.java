@@ -39,7 +39,10 @@ package functionaltests.utils;
 import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.tests.ProActiveTest;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -59,6 +62,8 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     protected SchedulerTHelper schedulerHelper;
 
+    protected JobFactory xmlParser = JobFactory.getFactory();
+
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
         TimeUnit.MILLISECONDS);
@@ -77,4 +82,9 @@ public class SchedulerFunctionalTest extends ProActiveTest {
         } catch (NotConnectedException alreadyDisconnected) {
         }
     }
+
+    protected Job parseXml(String workflowFile) throws JobCreationException {
+        return xmlParser.createJob(getClass().getResource(workflowFile).getPath());
+    }
+
 }
