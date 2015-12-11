@@ -38,8 +38,6 @@ package functionaltests.utils;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
@@ -65,9 +63,11 @@ import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
  */
 public class SchedulerStartForFunctionalTest implements Serializable {
 
-    public static final int RM_NODE_NUMBER = 2;
-    public static final String RM_NODE_NAME = "TEST";
     public static final int RM_NODE_DEPLOYMENT_TIMEOUT = 100000;
+
+    public static final int RM_NODE_NUMBER = 2;
+
+    public static final String RM_NODE_NAME = "TEST";
 
     protected static String schedulerUrl;
 
@@ -78,34 +78,35 @@ public class SchedulerStartForFunctionalTest implements Serializable {
      * <li>first argument: true if the RM started with the scheduler has to start some nodes
      * <li>second argument: path to a scheduler Properties file
      * <li>third argument: path to a RM Properties file
+     * <li>fourth argument (optional): URL to RM
      * </ul>
      */
     public static void main(String[] args) throws Exception {
         if (args.length < 3) {
             throw new IllegalArgumentException(
-                "SchedulerTStarter must be started with 3 parameters: localhodes schedPropPath rmPropPath");
+                "Invalid number of parameters, exactly 3 parameters are expected: localNodes schedPropPath rmPropPath");
         }
 
         if (args.length == 4) {
-            createWithExistingRM(args);
+            createWithExistingRm(args[1], args[3]);
         } else {
             createRMAndScheduler(args);
         }
-        System.out.println("Scheduler successfully created !");
+
+        System.out.println("Scheduler successfully created!");
     }
 
     private static void createRMAndScheduler(String[] args) throws Exception {
-        final boolean localnodes = Boolean.valueOf(args[0]);
+        final boolean deployLocalNodes = Boolean.valueOf(args[0]);
         String schedPropPath = args[1];
-        String RMPropPath = args[2];
+        String rmPropPath = args[2];
 
-        PAResourceManagerProperties.updateProperties(RMPropPath);
+        PAResourceManagerProperties.updateProperties(rmPropPath);
         PASchedulerProperties.updateProperties(schedPropPath);
 
-        //Starting a local RM
         RMFactory.setOsJavaProperty();
 
-        final Thread rmStarter = new Thread() {
+        new Thread() {
             public void run() {
                 try {
                     RMFactory.startLocal();
@@ -113,62 +114,66 @@ public class SchedulerStartForFunctionalTest implements Serializable {
                     // waiting the initialization
                     RMAuthentication rmAuth = RMConnection.waitAndJoin(schedulerUrl);
 
-                    if (localnodes) {
-                        Credentials creds = Credentials.getCredentials(PAResourceManagerProperties
-                                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
-                        ResourceManager rmAdmin = rmAuth.login(creds);
-                        Map<String, String> params = new HashMap<>();
+                    if (deployLocalNodes) {
+                        Credentials credentials =
+                                Credentials.getCredentials(PAResourceManagerProperties
+                                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
 
-                        String forkMethodKeyValue = System.getProperty(ForkerUtils.FORK_METHOD_KEY);
-                        if (forkMethodKeyValue != null) {
-                            params.put(ForkerUtils.FORK_METHOD_KEY, forkMethodKeyValue);
-                        }
-                        if (System.getProperty("proactive.test.runAsMe") != null) {
-                            params.put("proactive.test.runAsMe", "true");
-                        }
-
+                        ResourceManager rmAdmin = rmAuth.login(credentials);
                         rmAdmin.createNodeSource(
                                 RM_NODE_NAME,
                                 LocalInfrastructure.class.getName(),
                                 new Object[] {
-                                        creds.getBase64(),
+                                        credentials.getBase64(),
                                         RM_NODE_NUMBER,
                                         RM_NODE_DEPLOYMENT_TIMEOUT,
-                                        "-Dproactive.test=true " +
-                                            CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false },
-
-                                StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" });
+                                        getJavaPropertiesLine() },
+                                StaticPolicy.class.getName(),
+                                new Object[] { "ALL", "ALL" });
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        };
-        rmStarter.start();
+        }.start();
 
         schedulerUrl = "pnp://localhost:" + PNPConfig.PA_PNP_PORT.getValue() + "/";
-
-
 
         SchedulerFactory.createScheduler(new URI(schedulerUrl),
                 PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
 
         SchedulerConnection.waitAndJoin(schedulerUrl);
-
     }
 
-    private static void createWithExistingRM(String[] args) throws Exception {
-        String schedPropPath = args[1];
-        String rmUrl = args[3];
+    private static String getJavaPropertiesLine() {
+        StringBuilder line = new StringBuilder();
+        line.append("-Dproactive.test=true");
+        line.append(" ");
+        line.append(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + "false");
 
+        String forkMethodKeyValue = System.getProperty(ForkerUtils.FORK_METHOD_KEY);
+        if (forkMethodKeyValue != null) {
+            line.append(" ");
+            line.append("-D" + ForkerUtils.FORK_METHOD_KEY + "=" + forkMethodKeyValue);
+        }
+
+        if (System.getProperty("proactive.test.runAsMe") != null) {
+            line.append(" ");
+            line.append("-Dproactive.test.runAsMe=true");
+        }
+
+        return line.toString();
+    }
+
+    private static void createWithExistingRm(String schedulerPropertiesPath, String rmUrl) throws Exception {
         System.out.println("Creating with existing " + rmUrl);
 
-        PASchedulerProperties.updateProperties(schedPropPath);
+        PASchedulerProperties.updateProperties(schedulerPropertiesPath);
 
         SchedulerFactory.createScheduler(new URI(rmUrl), PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
                 .getValueAsString());
 
         SchedulerConnection.waitAndJoin(schedulerUrl);
-
     }
+
 }
