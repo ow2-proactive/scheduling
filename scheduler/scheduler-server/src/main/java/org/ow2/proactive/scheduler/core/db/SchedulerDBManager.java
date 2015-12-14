@@ -786,11 +786,10 @@ public class SchedulerDBManager {
             public List<InternalJob> executeWork(Session session) {
                 Query query;
                 if (period > 0) {
-                    long minSubmittedTime = System.currentTimeMillis() - period;
                     query = session
                             .createQuery(
                                     "select id from JobData where status in (:status) and removedTime = -1 and submittedTime >= :minSubmittedTime")
-                            .setParameter("minSubmittedTime", minSubmittedTime).setParameterList("status",
+                            .setParameter("minSubmittedTime", System.currentTimeMillis() - period).setParameterList("status",
                                     status);
                 } else {
                     query = session.createQuery(
