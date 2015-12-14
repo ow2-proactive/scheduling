@@ -5,11 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
-import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
@@ -23,53 +20,6 @@ public class SchedulerStateRecoverHelper {
     private static final JobLogger jobLogger = JobLogger.getInstance();
 
     private final SchedulerDBManager dbManager;
-
-    public static class RecoveredSchedulerState {
-
-        private final Vector<InternalJob> pendingJobs;
-
-        private final Vector<InternalJob> runningJobs;
-
-        private final Vector<InternalJob> finishedJobs;
-
-        private final SchedulerStateImpl schedulerState;
-
-        public RecoveredSchedulerState(Vector<InternalJob> pendingJobs, Vector<InternalJob> runningJobs,
-                Vector<InternalJob> finishedJobs) {
-            this.pendingJobs = pendingJobs;
-            this.runningJobs = runningJobs;
-            this.finishedJobs = finishedJobs;
-            schedulerState = new SchedulerStateImpl();
-            schedulerState.setPendingJobs(convertToClientJobState(pendingJobs));
-            schedulerState.setRunningJobs(convertToClientJobState(runningJobs));
-            schedulerState.setFinishedJobs(convertToClientJobState(finishedJobs));
-        }
-
-        public Vector<InternalJob> getPendingJobs() {
-            return pendingJobs;
-        }
-
-        public Vector<InternalJob> getRunningJobs() {
-            return runningJobs;
-        }
-
-        public Vector<InternalJob> getFinishedJobs() {
-            return finishedJobs;
-        }
-
-        public SchedulerStateImpl getSchedulerState() {
-            return schedulerState;
-        }
-
-        private Vector<JobState> convertToClientJobState(List<InternalJob> jobs) {
-            Vector<JobState> result = new Vector<>(jobs.size());
-            for (InternalJob internalJob : jobs) {
-                result.add(new ClientJobState(internalJob));
-            }
-            return result;
-        }
-
-    }
 
     public SchedulerStateRecoverHelper(SchedulerDBManager dbManager) {
         this.dbManager = dbManager;

@@ -7,6 +7,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -34,7 +35,7 @@ public class TestSchedulerTasksStateRecover extends BaseSchedulerDBTest {
         expectedJob = job(job.getId(), JobStatus.STALLED)
                 .withPending(task("task1", TaskStatus.PENDING), true).withEligible("task1");
 
-        SchedulerStateRecoverHelper.RecoveredSchedulerState state;
+        RecoveredSchedulerState state;
 
         state = checkRecoveredState(recoverHelper.recover(-1), state().withRunning(expectedJob));
 
@@ -59,7 +60,7 @@ public class TestSchedulerTasksStateRecover extends BaseSchedulerDBTest {
     @Test
     public void testRecover() throws Exception {
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
-        SchedulerStateRecoverHelper.RecoveredSchedulerState state = recoverHelper.recover(-1);
+        RecoveredSchedulerState state = recoverHelper.recover(-1);
         Assert.assertEquals(0, state.getFinishedJobs().size());
         Assert.assertEquals(0, state.getRunningJobs().size());
         Assert.assertEquals(0, state.getPendingJobs().size());
