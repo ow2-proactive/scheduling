@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.job;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -86,7 +87,7 @@ public class InternalTaskFlowJob extends InternalJob {
      * @return true if the list of tasks have been correctly added to the job,
      *         false if not.
      */
-    public boolean addTasks(ArrayList<InternalTask> tasks) {
+    public boolean addTasks(List<InternalTask> tasks) {
         for (InternalTask td : tasks) {
             if (!addTask(td)) {
                 return false;

@@ -42,6 +42,9 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * @author ActiveEon Team
+ */
 public class RecoveredSchedulerState {
 
     private final Vector<InternalJob> pendingJobs;
