@@ -1,16 +1,16 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
-import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 
 public class SchedulerStateRecoverHelper {
@@ -43,8 +43,9 @@ public class SchedulerStateRecoverHelper {
                     runningTasksToPending(job.getITasks());
                     break;
                 case PAUSED:
-                    if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() + job
-                            .getNumberOfFinishedTasks()) == 0) {
+                    if ((job.getNumberOfPendingTasks() +
+                            job.getNumberOfRunningTasks() +
+                            job.getNumberOfFinishedTasks()) == 0) {
                         pendingJobs.add(job);
                     } else {
                         runningJobs.add(job);
@@ -57,11 +58,11 @@ public class SchedulerStateRecoverHelper {
         }
 
         Vector<InternalJob> finishedJobs = new Vector<>();
-          
+
         for (Iterator<InternalJob> iterator = runningJobs.iterator(); iterator.hasNext(); ) {
             InternalJob job = iterator.next();
             try {
-                ArrayList<InternalTask> tasksList = copyAndSort(job.getITasks());
+                List<InternalTask> tasksList = copyAndSort(job.getITasks());
 
                 //simulate the running execution to recreate the tree.
                 for (InternalTask task : tasksList) {
@@ -82,14 +83,14 @@ public class SchedulerStateRecoverHelper {
 
                     //update the count of pending and running task.
                     job.setNumberOfPendingTasks(
-                      job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks());
+                            job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks());
                     job.setNumberOfRunningTasks(0);
                 }
             } catch (Exception e) {
                 logger.error("Failed to recover job " + job.getId() + " " + job.getName() +
-                    " job might be in a inconsistent state", e);
+                        " job might be in a inconsistent state", e);
                 jobLogger
-                        .error(job.getId(), "Failed to recover job, job might be in a inconsistent state", e);
+                        .error(job.getId(), "Failed to recover job, job might be in an inconsistent state", e);
                 // partially cancel job (not tasks) and move it to finished jobs to avoid running it
                 iterator.remove();
                 job.setStatus(JobStatus.CANCELED);
@@ -127,7 +128,7 @@ public class SchedulerStateRecoverHelper {
      * @param tasks the list of internal tasks to copy.
      * @return the sorted copy of the given argument.
      */
-    private ArrayList<InternalTask> copyAndSort(ArrayList<InternalTask> tasks) {
+    protected List<InternalTask> copyAndSort(List<InternalTask> tasks) {
         ArrayList<InternalTask> tasksList = new ArrayList<>();
 
         //copy the list with only the finished task.
@@ -145,6 +146,7 @@ public class SchedulerStateRecoverHelper {
                 task.setStatus(TaskStatus.PENDING);
             }
         }
+
         //sort parents before children
         return TopologicalTaskSorter.sortInternalTasks(tasksList);
     }

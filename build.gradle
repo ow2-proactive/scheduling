@@ -5,13 +5,10 @@ apply plugin: 'java'
 apply from: custom("sonar-scheduling")
 apply from: custom("jacoco-scheduling")
 
-
-
 archivesBaseName = 'scheduling' // in case current folder is not named scheduling
 
 project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
 project.ext.set('schedulingParentFolder', "$rootDir")
-
 
 configurations {
     nativeBundle
@@ -119,6 +116,7 @@ configure(javaSubprojects) {
         exclude 'functionaltests/**'
         exclude 'unittests/**'
         exclude 'unitTests/**'
+
         if(Boolean.valueOf(System.getProperty("java.awt.headless"))){
         	exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
         }
@@ -157,15 +155,13 @@ ext.encoding = {
 
 ext.schedulingFunctionalTestConfiguration = {
 
-	
     include 'functionaltests/**'  
     
     if(!project.hasProperty('regression')){
 	    def regression_tests = new File(project.rootDir, "/regression_tests.txt")
 	    regression_tests.readLines().each { exclude '**/'+it+'.class' }
     }
-    
-   
+
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['proactive.test.timeout': 600000]
@@ -192,11 +188,7 @@ ext.schedulingFunctionalTestConfiguration = {
 
     finalizedBy project.task(project.name + '-clean', { doLast clean })
     doFirst clean
-
-
 }
-
-
 
 dependencies {
     distLib(project(':scheduler:scheduler-server')) {
