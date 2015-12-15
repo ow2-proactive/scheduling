@@ -1,5 +1,11 @@
 package org.ow2.proactive.resourcemanager.selection;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.security.Permission;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -9,6 +15,10 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.junit.After;
+import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
@@ -25,15 +35,6 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.After;
-import org.junit.Test;
-import org.mockito.Matchers;
-
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class SelectionManagerTest {
@@ -69,7 +70,50 @@ public class SelectionManagerTest {
 
         assertEquals(1, nodes.size());
     }
+    
+    @Test
+    public void testSelectNodesWithNoNodes() {
+        RMCore rmCore = newMockedRMCore(0);
+        SelectionManager selectionManager = createSelectionManager(rmCore);
+        Criteria crit = new Criteria(1);
+        crit.setTopology(TopologyDescriptor.ARBITRARY);
+        crit.setScripts(null);
+        crit.setBlackList(null);
+        crit.setBestEffort(false);
+        NodeSet nodeSet = selectionManager.selectNodes(crit, null);
+        assertEquals(0, nodeSet.size());
+    }
 
+    @Test
+    public void testSelectNodesWith1Node() {
+        RMCore rmCore = newMockedRMCore(1);
+        SelectionManager selectionManager = createSelectionManager(rmCore);
+        Criteria crit = new Criteria(1);
+        crit.setTopology(TopologyDescriptor.ARBITRARY);
+        crit.setScripts(null);
+        crit.setBlackList(null);
+        crit.setBestEffort(true);
+        
+        Client mockedClient = mock(Client.class);
+        NodeSet nodeSet = selectionManager.selectNodes(crit, mockedClient);
+        assertEquals(1, nodeSet.size());
+    }
+    
+    @Test
+    public void testSelectNodesWith10Node() {
+        RMCore rmCore = newMockedRMCore(10);
+        SelectionManager selectionManager = createSelectionManager(rmCore);
+        Criteria crit = new Criteria(10);
+        crit.setTopology(TopologyDescriptor.ARBITRARY);
+        crit.setScripts(null);
+        crit.setBlackList(null);
+        crit.setBestEffort(true);
+        
+        Client mockedClient = mock(Client.class);
+        NodeSet nodeSet = selectionManager.selectNodes(crit, mockedClient);
+        assertEquals(10, nodeSet.size());
+    }
+    
     private SecurityManager securityManagerRejectingUser() {
         return new SecurityManager() {
 
@@ -123,13 +167,42 @@ public class SelectionManagerTest {
             }
         };
     }
+    
+    private RMCore newMockedRMCore() {
+        return newMockedRMCore(0);
+    }
+    
+    
+    private RMCore newMockedRMCore(int nbNodes) {
+        RMCore mockedRMCore = Mockito.mock(RMCore.class);
+        TopologyManager mockedTopologyManager = Mockito.mock(TopologyManager.class);
+        when(mockedTopologyManager.getHandler(Matchers.any(TopologyDescriptor.class))).thenReturn(selectAllTopology());
+        RMCore.topologyManager = mockedTopologyManager;
+        
+        if (nbNodes > 0) {
+            ArrayList<RMNode> freeNodes = new ArrayList<RMNode>(nbNodes);
+            for (int i = 0; i < nbNodes; i++) {
+                freeNodes.add(createMockeNode("user", "mocked-node-" + (i+1), "mocked-node-" + (i+1)));
+            }
+            when(mockedRMCore.getFreeNodes()).thenReturn(freeNodes);
+        }
+        
+        return mockedRMCore;
+    }
 
     private RMNode createMockedNode(String nodeUser) {
+        return createMockeNode(nodeUser, "", "");
+    }
+    
+    private RMNode createMockeNode(String nodeUser, String nodeName, String nodeUrl) {
         RMNode rmNode = mock(RMNode.class);
-        when(rmNode.getNodeSource()).thenReturn(new NodeSource());
-
+        NodeInformation mockedNodeInformation = mock(NodeInformation.class);
         Node node = mock(Node.class);
-        when(node.getNodeInformation()).thenReturn(mock(NodeInformation.class));
+        when(mockedNodeInformation.getURL()).thenReturn(nodeUrl);
+        when(mockedNodeInformation.getName()).thenReturn(nodeName);
+        when(node.getNodeInformation()).thenReturn(mockedNodeInformation);
+        when(rmNode.getNodeName()).thenReturn(nodeName);
+        when(rmNode.getNodeSource()).thenReturn(new NodeSource());
         when(rmNode.getNode()).thenReturn(node);
         when(rmNode.getUserPermission()).thenReturn(
                 new PrincipalPermission("permissions", singleton(new UserNamePrincipal(nodeUser))));
