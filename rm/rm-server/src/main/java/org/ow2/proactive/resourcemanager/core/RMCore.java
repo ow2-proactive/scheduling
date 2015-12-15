@@ -1825,5 +1825,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     protected void setMonitoring(RMMonitoringImpl monitoring) {
         this.monitoring = monitoring;
     }
+    
+    protected void setSelectionManager(SelectionManager manager) {
+        this.selectionManager = manager;
+    }
 
 }
