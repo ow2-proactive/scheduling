@@ -18,6 +18,10 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.selection.SelectionManager;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.Criteria;
+import org.ow2.proactive.utils.NodeSet;
 
 public class RMCoreTest {
 
@@ -27,7 +31,6 @@ public class RMCoreTest {
     private RMNode mockedUnremovableNodeInDeploy;
     private RMNode mockedRemovableNode;
     private RMNode mockedUnremovableNode;
-    
     
     
     @Before
@@ -40,6 +43,7 @@ public class RMCoreTest {
         NodeSource mockedNodeSource = Mockito.mock(NodeSource.class);
         mockedCaller = Mockito.mock(Client.class);
         RMMonitoringImpl mockedMonitoring = Mockito.mock(RMMonitoringImpl.class);
+        SelectionManager mockedSelectionManager = Mockito.mock(SelectionManager.class);
         Node mockedNode1 = Mockito.mock(Node.class);
         Node mockedNode2 = Mockito.mock(Node.class);
         Node mockedNode3 = Mockito.mock(Node.class);
@@ -78,10 +82,14 @@ public class RMCoreTest {
         when(mockedRemovableNodeInDeploy.getNode()).thenReturn(mockedNode3);
         when(mockedUnremovableNodeInDeploy.getNode()).thenReturn(mockedNode4);
         
+        //selectionManager.selectNodes(criteria, caller);
+        when(mockedSelectionManager.selectNodes(Matchers.any(Criteria.class), Matchers.any(Client.class))).thenReturn(new NodeSet());
+        
         rmCore.setMonitoring(mockedMonitoring);
         rmCore.setCaller(mockedCaller);
         rmCore.setNodeSources(new HashMap<String, NodeSource>());
         rmCore.setBrokenNodeSources(new ArrayList<String>());
+        rmCore.setSelectionManager(mockedSelectionManager);
         HashMap<String, RMNode> nodes = new HashMap<String, RMNode>();
         nodes.put(RMDeployingNode.PROTOCOL_ID + "://removableNode", mockedRemovableNodeInDeploy);
         nodes.put(RMDeployingNode.PROTOCOL_ID + "://unRemovableNode", mockedUnremovableNodeInDeploy);
@@ -202,6 +210,17 @@ public class RMCoreTest {
     public void testReleaseNode4() {
         boolean result = rmCore.releaseNode(mockedRemovableNodeInDeploy.getNode()).getBooleanValue();
         assertEquals(true, result);
+    }
+    
+    @Test
+    public void testGetNodes() {
+        rmCore.getNodes(1, TopologyDescriptor.ARBITRARY, null, null, false);
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void testGetNodesBadNodesNumber() {
+        rmCore.getNodes(-1, TopologyDescriptor.ARBITRARY, null, null, false);
+        
     }
     
 }
