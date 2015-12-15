@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
@@ -38,8 +39,8 @@ public class SchedulingServiceTest {
 	@Before
 	public void init() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		Mockito.when(recoveredState.getPendingJobs()).thenReturn(new Vector<>());
-		Mockito.when(recoveredState.getRunningJobs()).thenReturn(new Vector<>());
+		Mockito.when(recoveredState.getPendingJobs()).thenReturn(new Vector<InternalJob>());
+		Mockito.when(recoveredState.getRunningJobs()).thenReturn(new Vector<InternalJob>());
 		
 		Mockito.when(infrastructure.getRMProxiesManager()).thenReturn(rmProxiesManager);
 		Mockito.when(rmProxiesManager.getRmUrl()).thenReturn(null);
