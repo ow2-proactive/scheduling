@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -33,13 +34,12 @@ import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.apache.log4j.Logger;
 import org.ow2.proactive.utils.TaskIdWrapper;
 
 
@@ -120,7 +120,6 @@ class LiveJobs {
     }
 
     RunningTaskData getRunningTask(TaskId taskId) {
-        List<RunningTaskData> result = new ArrayList<>();
         for (RunningTaskData taskData : runningTasksData.values()) {
             if (taskData.getTask().getId().equals(taskId)) {
                 return taskData;
@@ -205,7 +204,7 @@ class LiveJobs {
         }
     }
 
-    void jobSubmitted(InternalJob job, SchedulerSpacesSupport spacesSupport) {
+    void jobSubmitted(InternalJob job) {
         job.prepareTasks();
         job.submitAction();
         dbManager.newJobSubmitted(job);

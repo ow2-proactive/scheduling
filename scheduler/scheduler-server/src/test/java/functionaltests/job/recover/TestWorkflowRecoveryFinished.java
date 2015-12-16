@@ -36,20 +36,21 @@
  */
 package functionaltests.job.recover;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
-import org.junit.Assert;
-import org.junit.Test;
-
-import static functionaltests.utils.SchedulerTHelper.log;
 
 
 /**
@@ -75,7 +76,7 @@ public class TestWorkflowRecoveryFinished extends SchedulerFunctionalTest {
     };
 
     @Test
-    public void run() throws Throwable {
+    public void runWorkflowRecoveryFinished() throws Throwable {
         Map<Integer, JobId> jobs = new HashMap<>();
         for (int i = 0; i < jobs_1.length; i++) {
             String job = new File(TestWorkflowRecoveryFinished.class.getResource(

@@ -36,6 +36,12 @@
  */
 package functionaltests.job;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -50,13 +56,9 @@ import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.Test;
 
 import functionaltests.executables.EndlessExecutable;
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -67,7 +69,7 @@ public class TestJobWalltime extends SchedulerFunctionalTest {
     private static final long TIMEOUT = 30000;
 
     @Test
-    public void run() throws Throwable {
+    public void testJobWalltime() throws Throwable {
         JobId walltimeJavaTask = walltimeJavaTask();
         JobId walltimeForkedJavaTask = walltimeForkedJavaTask();
         JobId walltimeNativeTask = walltimeNativeTask();

@@ -60,7 +60,7 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerFunctional
             .getResource("/functionaltests/dataspaces/schedulerPropertiesWrongSpaces.ini");
 
     @Test
-    public void run() throws Throwable {
+    public void testSubmitJobWithUnaccessibleDataSpaces() throws Throwable {
         schedulerHelper.startScheduler((new File(configFile.toURI())).getAbsolutePath());
         schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                 .getAbsolutePath());

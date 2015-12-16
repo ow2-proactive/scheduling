@@ -51,7 +51,7 @@ import org.junit.Test;
 public class TestSchedulerEvent {
 
     @Test
-    public void run() throws Throwable {
+    public void testSchedulerEvent() throws Throwable {
         Assert.assertEquals(SchedulerEvent.FROZEN.ordinal(), 0);
         Assert.assertEquals(SchedulerEvent.RESUMED.ordinal(), 1);
         Assert.assertEquals(SchedulerEvent.SHUTDOWN.ordinal(), 2);

@@ -36,6 +36,10 @@
  */
 package functionaltests.workflow.nativetask;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -45,12 +49,8 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -75,7 +75,7 @@ import static org.junit.Assert.*;
 public class TestJobNativeSubmission extends SchedulerFunctionalTest {
 
     @Test
-    public void run() throws Throwable {
+    public void testJobNativeSubmission() throws Throwable {
 
         //test submission and event reception
         TaskFlowJob job = new TaskFlowJob();

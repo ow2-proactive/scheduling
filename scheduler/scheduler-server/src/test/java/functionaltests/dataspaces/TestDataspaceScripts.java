@@ -36,6 +36,9 @@
  */
 package functionaltests.dataspaces;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +46,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -51,13 +57,8 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.*;
 
 
 /**
@@ -98,7 +99,7 @@ public class TestDataspaceScripts extends SchedulerFunctionalTest {
      * Creates a task with a Pre/Post/Flow scripts that copy files from input files to output files
      */
     @Test
-    public void run() throws Throwable {
+    public void testDataspaceScripts() throws Throwable {
         File input = tmpFolder.newFolder("input");
         File output = tmpFolder.newFolder("output");
         File global = tmpFolder.newFolder("global");

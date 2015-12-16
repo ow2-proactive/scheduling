@@ -34,20 +34,22 @@
  */
 package functionaltests.scripts;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.junit.Assert;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -65,7 +67,7 @@ public class TestScriptEngines extends SchedulerFunctionalTest {
         jobDescriptorsLoc);
 
     @Test
-    public void run() throws Throwable {
+    public void testScriptEngines() throws Throwable {
         log("Testing submission of job descriptor : " + jobDescriptor);
         JobId id = schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
 

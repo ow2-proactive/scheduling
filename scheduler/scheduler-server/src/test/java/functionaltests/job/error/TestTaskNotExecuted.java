@@ -36,9 +36,15 @@
  */
 package functionaltests.job.error;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.TaskCouldNotRestartException;
 import org.ow2.proactive.scheduler.common.exception.TaskCouldNotStartException;
 import org.ow2.proactive.scheduler.common.exception.TaskSkippedException;
@@ -47,13 +53,8 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.junit.Assert;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 public class TestTaskNotExecuted extends SchedulerFunctionalTest {
@@ -66,7 +67,7 @@ public class TestTaskNotExecuted extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_TaskSkipped.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testTaskNotExecuted() throws Throwable {
 
         log("Submitting job 1");
         JobId id1 = schedulerHelper.submitJob(new File(jobDescriptor1.toURI()).getAbsolutePath());

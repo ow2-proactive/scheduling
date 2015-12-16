@@ -39,6 +39,8 @@ package functionaltests.workflow;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -49,8 +51,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.junit.Assert;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
@@ -74,7 +74,7 @@ public class TestGenericInformation extends SchedulerFunctionalTest {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void testGenericInformation() throws Throwable {
         testRegularJob();
         testWithReplication();
     }

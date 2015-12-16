@@ -37,7 +37,6 @@
 package functionaltests.workflow.complex;
 
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
-import org.junit.Ignore;
 
 import functionaltests.workflow.TRepJobs;
 
@@ -51,7 +50,7 @@ import functionaltests.workflow.TRepJobs;
  */
 public class TestWorkflowComplexJobs4 extends TRepJobs {
     @org.junit.Test
-    public void run() throws Throwable {
+    public void testWorkflowComplexJobs4() throws Throwable {
         String prefix = "/functionaltests/workflow/descriptors/flow_complex_4_";
 
         TRepCase t1 = new TRepCase(prefix + "1.xml", 14, "T,1,0 T4,3,9 T5,1,10 T1,3,3 T3,3,-3 T2,3,6");

@@ -36,17 +36,17 @@
  */
 package functionaltests.job;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -65,7 +65,7 @@ public class TestJobRemoved extends SchedulerFunctionalTest {
     private final static int EVENT_TIMEOUT = 5000;
 
     @Test
-    public void run() throws Throwable {
+    public void testJobRemoved() throws Throwable {
 
         SchedulerState state = schedulerHelper.getSchedulerInterface().getState();
         int jobsNumber = state.getFinishedJobs().size() + state.getPendingJobs().size() +

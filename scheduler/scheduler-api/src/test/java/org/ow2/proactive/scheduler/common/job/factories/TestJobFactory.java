@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -43,6 +46,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -54,10 +59,6 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.junit.Assert;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 
 /**
@@ -75,13 +76,13 @@ public class TestJobFactory {
             .getResource("Job_MultiNodes.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testRun() throws Throwable {
         //test default behavior as well (null is STAX)
         log("TEST jobFactory STAX");
-        run_(null);
+        run(null);
     }
 
-    private void run_(String impl) throws Throwable {
+    private void run(String impl) throws Throwable {
         String scriptFolder = new File(getClass().getResource("scripts/").toURI()).getAbsolutePath();
         System.setProperty("jobName", "Job_TaskFlow");
         log("Test Job TASK_FLOW");

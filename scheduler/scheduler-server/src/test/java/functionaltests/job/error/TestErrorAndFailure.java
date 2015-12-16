@@ -36,8 +36,12 @@
  */
 package functionaltests.job.error;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -48,13 +52,9 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestScheduler;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -75,7 +75,7 @@ import static org.junit.Assert.*;
 public class TestErrorAndFailure extends SchedulerFunctionalTest {
 
     @Test
-    public void run() throws Throwable {
+    public void testErrorAndFailure() throws Throwable {
 
         String javaCmd = System.getProperty("java.home") + "/bin/java";
         log("Test 1 : Creating job...");

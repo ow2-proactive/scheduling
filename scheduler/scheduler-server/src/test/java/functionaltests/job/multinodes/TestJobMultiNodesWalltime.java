@@ -39,8 +39,8 @@ package functionaltests.job.multinodes;
 import java.io.File;
 import java.net.URL;
 
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.JobId;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 
@@ -57,7 +57,7 @@ public class TestJobMultiNodesWalltime extends SchedulerFunctionalTest {
     private static final long TIMEOUT = 30000;
 
     @Test
-    public void run() throws Throwable {
+    public void testJobMultiNodesWalltime() throws Throwable {
         //submit job
         JobId id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         //connect to RM

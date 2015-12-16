@@ -36,10 +36,16 @@
  */
 package functionaltests.job.error;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
+import org.junit.Test;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -48,12 +54,8 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.examples.FailTaskConditionally;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -75,7 +77,7 @@ public class TestJobCanceledWithReplication extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_Aborted_With_Replication.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testJobCanceledWithReplication() throws Throwable {
         schedulerHelper.addExtraNodes(3);
 
         String faultyTaskName = "task2*1";
