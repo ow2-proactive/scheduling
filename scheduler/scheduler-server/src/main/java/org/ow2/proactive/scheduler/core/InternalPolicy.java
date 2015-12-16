@@ -42,7 +42,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.utils.TaskIdWrapper;

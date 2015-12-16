@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -76,7 +77,6 @@ import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -110,8 +110,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private TaskTerminateNotification terminateNotification;
 
-    private String schedulerUrl = null;
-
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
 
@@ -134,8 +132,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     private void releaseNodes(InternalJob job, NodeSet nodeSet) throws RMProxyCreationException {
         getRMProxiesManager().getUserRMProxy(job.getOwner(), job.getCredentials()).releaseNodes(nodeSet);
     }
-
-    private long s = System.currentTimeMillis();
 
     /**
      * Scheduling process. For this implementation, steps are :<br>
