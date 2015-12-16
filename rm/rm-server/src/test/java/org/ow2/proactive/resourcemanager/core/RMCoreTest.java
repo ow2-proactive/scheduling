@@ -17,8 +17,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeInformation;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
+import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
@@ -232,9 +235,68 @@ public class RMCoreTest {
         assertEquals(false, result);
     }
     
+    /**
+     * New node to existing nodesource
+     */
+    @Test
+    public void testAddNodeNewNodeExistingNodeSource() {
+        boolean result = rmCore.addNode(
+                "NODE-testAddNodeNewNodeExistingNodeSource", mockedNodeSource.getName()).getBooleanValue();
+        assertEquals(true, result);
+    }
     
+    /**
+     * Existing node to existing nodesource
+     */
+    @Test
+    public void testAddNodeExistingNodeExistingNodeSource() {
+        boolean result = rmCore.addNode(
+                mockedRemovableNode.getNodeName(), mockedNodeSource.getName()).getBooleanValue();
+        assertEquals(true, result);
+    }
     
+    /**
+     * Existing node to new nodesource
+     */
+    @Test(expected=AddingNodesException.class)
+    public void testAddNodeExistingNodeNewNodeSource() {
+        rmCore.addNode(mockedRemovableNode.getNodeName(),
+                "NEW-NODESOURCE-testAddNodeNewNodeNewNodeSource").getBooleanValue();
+    }
     
+    /**
+     * New node to new nodesource
+     */
+    @Test(expected=AddingNodesException.class)
+    public void testAddNodeNewNodeNewNodeSource() {
+        rmCore.addNode("NODE-testAddNodeNewNodeNewNodeSource",
+                "NEW-NODESOURCE-testAddNodeNewNodeNewNodeSource").getBooleanValue();
+    }
+    
+    @Test
+    public void testRemoveNodeSourceExistingNodeSourceNoPreempt() {
+        boolean result = rmCore.removeNodeSource(mockedNodeSource.getName(), false).getBooleanValue();
+        assertEquals(true, result);
+    }
+    
+    @Test
+    public void testRemoveNodeSourceExistingNodeSourcePreempt() {
+        boolean result = rmCore.removeNodeSource(mockedNodeSource.getName(), true).getBooleanValue();
+        assertEquals(true, result);
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void testRemoveNodeSourceNonExistingNodeSource() {
+        rmCore.removeNodeSource("NON-EXISTING-NODESOURCE", true).getBooleanValue();
+    }
+    
+    @Test
+    public void testGetState() {
+        RMState rmState = rmCore.getState();
+        assertEquals(2, rmState.getFreeNodesNumber());
+        assertEquals(2, rmState.getTotalAliveNodesNumber());
+        assertEquals(5, rmState.getTotalNodesNumber());
+    }
     
     /**
      * 5 nodes (same nodesource):
@@ -279,6 +341,10 @@ public class RMCoreTest {
         when(mockedRemovableNodeInDeploy.getAdminPermission()).thenReturn(null);
         when(mockedRemovableNode.getAdminPermission()).thenReturn(null);
         
+        when(mockedNodeSource.getName()).thenReturn("NODESOURCE-test");
+        when(mockedNodeSource.acquireNode(Matchers.any(String.class), Matchers.any(Client.class)))
+        .thenReturn(new BooleanWrapper(true));
+        
         when(mockedRemovableNodeInDeploy.getNodeSource()).thenReturn(mockedNodeSource);
         when(mockedUnremovableNodeInDeploy.getNodeSource()).thenReturn(mockedNodeSource);
         when(mockedRemovableNode.getNodeSource()).thenReturn(mockedNodeSource);
@@ -297,9 +363,11 @@ public class RMCoreTest {
         
         when(mockedSelectionManager.selectNodes(Matchers.any(Criteria.class), Matchers.any(Client.class))).thenReturn(new NodeSet());
         
+        HashMap<String, NodeSource> nodeSources = new HashMap<String, NodeSource>(1);
+        nodeSources.put("NODESOURCE-test", mockedNodeSource);
         rmCore.setMonitoring(mockedMonitoring);
         rmCore.setCaller(mockedCaller);
-        rmCore.setNodeSources(new HashMap<String, NodeSource>());
+        rmCore.setNodeSources(nodeSources);
         rmCore.setBrokenNodeSources(new ArrayList<String>());
         rmCore.setSelectionManager(mockedSelectionManager);
         rmCore.setDataBaseManager(dataBaseManager);
@@ -317,5 +385,17 @@ public class RMCoreTest {
         freeNodes.add(mockedRemovableNode);
         rmCore.setFreeNodesList(freeNodes);
         
+    }
+    
+    private RMNode newMockedRMNode(String urlNode) {
+        RMNode mockedRMNode = Mockito.mock(RMNode.class);
+        Node mockedNode = Mockito.mock(Node.class);
+        NodeInformation mockedNodeInformation = Mockito.mock(NodeInformation.class);
+        when(mockedNodeInformation.getName()).thenReturn(urlNode);
+        when(mockedNodeInformation.getURL()).thenReturn(urlNode);
+        when(mockedNode.getNodeInformation()).thenReturn(mockedNodeInformation);
+        when(mockedRMNode.getNode()).thenReturn(mockedNode);
+        when(mockedRMNode.getNodeName()).thenReturn(urlNode);
+        return mockedRMNode;
     }
 }
