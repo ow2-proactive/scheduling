@@ -1830,4 +1830,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.selectionManager = manager;
     }
 
+    protected void setFreeNodesList(ArrayList<RMNode> freeNodesList) {
+        this.freeNodes = freeNodesList;
+    }
+    
+    protected void setDataBaseManager(RMDBManager newDataBaseManager) {
+        this.dataBaseManager = newDataBaseManager;
+    }
+    
 }
