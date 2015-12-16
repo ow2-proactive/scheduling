@@ -42,6 +42,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -52,7 +53,6 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.junit.Assert;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 
@@ -99,7 +99,7 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTest {
      * @throws Throwable any exception that can be thrown during the test.
      */
     @org.junit.Test
-    public void run() throws Throwable {
+    public void testJobDataspaceSubmission() throws Throwable {
 
         //create initial directories and files
         setup();

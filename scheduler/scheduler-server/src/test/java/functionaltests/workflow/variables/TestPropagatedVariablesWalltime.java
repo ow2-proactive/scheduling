@@ -34,22 +34,23 @@
  */
 package functionaltests.workflow.variables;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.*;
 
 
 public class TestPropagatedVariablesWalltime extends SchedulerFunctionalTest {
 
     @Test
-    public void run() throws Throwable {
+    public void testPropagatedVariablesWalltime() throws Throwable {
         JobId jobId = schedulerHelper.submitJob(absolutePath(
           TestPropagatedVariablesWalltime.class.getResource(
             "/functionaltests/descriptors/Job_PropagatedVariables_Timeout.xml")));

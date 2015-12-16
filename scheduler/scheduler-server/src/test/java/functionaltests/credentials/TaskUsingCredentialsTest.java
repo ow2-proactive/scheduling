@@ -34,10 +34,14 @@
  */
 package functionaltests.credentials;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Set;
 
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -46,11 +50,8 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import functionaltests.utils.SchedulerFunctionalTest;
-import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 
 public class TaskUsingCredentialsTest extends SchedulerFunctionalTest {
@@ -58,7 +59,7 @@ public class TaskUsingCredentialsTest extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_UsingCredentials.xml");
 
     @Test
-    public void run() throws Exception {
+    public void testTaskUsingCredentials() throws Exception {
         jobs_using_third_party_credentials();
         third_party_credentials_api();
     }

@@ -36,25 +36,24 @@
  */
 package functionaltests.workflow.javatask;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.Serializable;
 
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 
-import org.junit.Test;
-
-import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.executables.ComplexParamsExecutable;
-
-import static org.junit.Assert.assertFalse;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 
 public class ComplexTypeArgsTest extends SchedulerFunctionalTest {
 
     @Test
-    public void run() throws Throwable {
+    public void testComplexTypeArgs() throws Throwable {
         TaskFlowJob submittedJob = new TaskFlowJob();
         JavaTask task = new JavaTask();
         task.setName("t1");

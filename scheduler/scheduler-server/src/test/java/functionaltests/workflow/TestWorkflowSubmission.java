@@ -39,11 +39,11 @@ package functionaltests.workflow;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.junit.Assert;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerTHelper;
 
@@ -65,7 +65,7 @@ public class TestWorkflowSubmission extends TRepJobs {
     private static final int jobs_fail = 44;
 
     @Test
-    public void run() throws Throwable {
+    public void testWorkflowSubmission() throws Throwable {
         testFail();
         testValid();
     }

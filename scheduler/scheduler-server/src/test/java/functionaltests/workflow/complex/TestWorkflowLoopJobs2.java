@@ -36,8 +36,8 @@
  */
 package functionaltests.workflow.complex;
 
-import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 import functionaltests.workflow.TWorkflowJobs;
 
@@ -101,7 +101,7 @@ public class TestWorkflowLoopJobs2 extends TWorkflowJobs {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void testWorkflowLoopJobs2() throws Throwable {
         internalRun();
     }
 }

@@ -36,22 +36,25 @@
  */
 package functionaltests.scripts.selection;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
+import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -70,7 +73,7 @@ public class TestJobWithInvalidSelectionScript extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_invalidSS.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testJobWithInvalidSelectionScript() throws Throwable {
 
         String task1Name = "task1";
         String task2Name = "task2";

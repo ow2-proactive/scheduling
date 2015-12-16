@@ -36,18 +36,17 @@
  */
 package functionaltests.api;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 
-import org.junit.Test;
-
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.UserType;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -61,7 +60,7 @@ import static org.junit.Assert.assertTrue;
 public class TestSchedulerMiscEvents extends SchedulerFunctionalTest {
 
     @Test
-    public void run() throws Throwable {
+    public void testSchedulerMiscEvents() throws Throwable {
 
         Scheduler schedAdminInterface = schedulerHelper.getSchedulerInterface(UserType.ADMIN);
 
