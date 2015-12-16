@@ -144,7 +144,7 @@ configure(javaSubprojects) {
 
 
 task wrapper(type: Wrapper) {
-   gradleVersion = '2.7' //version required
+   gradleVersion = '2.9' //version required
 }
 
 ext.encoding = {
