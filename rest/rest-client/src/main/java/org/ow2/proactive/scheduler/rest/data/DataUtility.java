@@ -146,7 +146,7 @@ public class DataUtility {
     }
 
     public static List<JobUsage> toJobUsages(List<JobUsageData> dataList) {
-        List<JobUsage> jobUsages = new ArrayList<>();
+        List<JobUsage> jobUsages = new ArrayList<>(dataList.size());
         for (JobUsageData d : dataList) {
             jobUsages.add(jobUsage(d));
         }
@@ -168,7 +168,7 @@ public class DataUtility {
     }
 
     public static List<JobInfo> toJobInfos(List<UserJobData> dataList) {
-        List<JobInfo> jobInfos = new ArrayList<>();
+        List<JobInfo> jobInfos = new ArrayList<>(dataList.size());
         for (UserJobData ujd : dataList) {
             jobInfos.add(toJobInfo(ujd.getJobInfo()));
         }
@@ -176,7 +176,7 @@ public class DataUtility {
     }
 
     public static List<SchedulerUserInfo> toSchedulerUserInfos(List<SchedulerUserData> dataList) {
-        List<SchedulerUserInfo> schedulerUserInfos = new ArrayList<>();
+        List<SchedulerUserInfo> schedulerUserInfos = new ArrayList<>(dataList.size());
         for (SchedulerUserData sud : dataList) {
             schedulerUserInfos.add(new SchedulerUserInfo(sud.getHostName(), sud.getUsername(), sud
                     .getConnectionTime(), sud.getLastSubmitTime(), sud.getSubmitNumber()));
