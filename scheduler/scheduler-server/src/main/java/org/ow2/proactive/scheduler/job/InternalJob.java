@@ -1022,11 +1022,12 @@ public abstract class InternalJob extends JobState {
         setNumberOfRunningTasks(0);
         setStatus(JobStatus.RUNNING);
 
-        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>();
+        List<InternalTask> tasks = getITasks();
+        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>(tasks.size());
 
-        for (InternalTask td : getITasks()) {
-            td.setStatus(TaskStatus.PENDING);
-            taskStatus.put(td.getId(), TaskStatus.PENDING);
+        for (InternalTask internalTask : tasks) {
+            internalTask.setStatus(TaskStatus.PENDING);
+            taskStatus.put(internalTask.getId(), TaskStatus.PENDING);
         }
     }
 
@@ -1051,15 +1052,16 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been paused, false if not.
      */
     public Set<TaskId> setPaused() {
-        Set<TaskId> updatedTasks = new HashSet<>();
-
         if (jobInfo.getStatus() == JobStatus.PAUSED) {
-            return updatedTasks;
+            return new HashSet<>(0);
         }
 
         jobInfo.setStatus(JobStatus.PAUSED);
 
-        for (InternalTask td : tasks.values()) {
+        Collection<InternalTask> values = tasks.values();
+        Set<TaskId> updatedTasks = new HashSet<>(values.size());
+
+        for (InternalTask td : values) {
             if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
                 (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY)) {
                 td.setStatus(TaskStatus.PAUSED);
@@ -1078,10 +1080,8 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been unpaused, false if not.
      */
     public Set<TaskId> setUnPause() {
-        Set<TaskId> updatedTasks = new HashSet<>();
-
         if (jobInfo.getStatus() != JobStatus.PAUSED) {
-            return updatedTasks;
+            return new HashSet<>(0);
         }
 
         if ((getNumberOfPendingTasks() + getNumberOfRunningTasks() + getNumberOfFinishedTasks()) == 0) {
@@ -1092,6 +1092,7 @@ public abstract class InternalJob extends JobState {
             jobInfo.setStatus(JobStatus.RUNNING);
         }
 
+        Set<TaskId> updatedTasks = new HashSet<>();
         for (InternalTask td : tasks.values()) {
             if (jobInfo.getStatus() == JobStatus.PENDING) {
                 td.setStatus(TaskStatus.SUBMITTED);
@@ -1385,7 +1386,7 @@ public abstract class InternalJob extends JobState {
     public Map<String, String> getGenericInformation() {
         if (genericInformations == null) {
             // task is not yet properly initialized
-            return new HashMap<>();
+            return new HashMap<>(0);
         }
 
         Map<String, String> replacements = new HashMap<>();

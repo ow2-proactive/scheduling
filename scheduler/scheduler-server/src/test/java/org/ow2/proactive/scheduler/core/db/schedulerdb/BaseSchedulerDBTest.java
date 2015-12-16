@@ -260,7 +260,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 			Assert.assertEquals("Running tasks for " + id, running.size(), item.getNumberOfRunningTasks());
 			Assert.assertEquals("Finished tasks for " + id, finishedNumber, item.getNumberOfFinishedTasks());
 
-			Collection<TaskStateMatcher> all = new ArrayList<>();
+			Collection<TaskStateMatcher> all = new ArrayList<>(pending.size() + running.size() + finished.size());
 			all.addAll(pending);
 			all.addAll(running);
 			all.addAll(finished);

@@ -1,7 +1,6 @@
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -15,7 +14,7 @@ import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
-public class TestSchedulerTasksStateRecover extends BaseSchedulerDBTest {
+public class SchedulerTasksStateRecoverIntegrationTest extends BaseSchedulerDBTest {
 
     @Test
     public void testRecoverAfterRestart() throws Exception {
