@@ -71,7 +71,7 @@ public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_simple_with_token.xml");
     
     @Test
-    public void run() throws Throwable {
+    public void testJobNodeAccessToken() throws Throwable {
     	
         JobId id = schedulerHelper.submitJob(new File(simpleJob.toURI()).getAbsolutePath());
         SchedulerTHelper.log("Job submitted, id " + id.toString());

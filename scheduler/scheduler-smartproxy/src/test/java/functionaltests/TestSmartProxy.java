@@ -1,9 +1,12 @@
 package functionaltests;
 
-import functionaltests.monitor.EventMonitor;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestUsers;
+import static org.junit.Assume.assumeTrue;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,12 +26,10 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
-import static org.junit.Assume.assumeTrue;
+import functionaltests.monitor.EventMonitor;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -212,7 +213,7 @@ public class TestSmartProxy extends SchedulerFunctionalTest {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void testSmartProxy() throws Throwable {
         if (true) {
             return;
         }

@@ -42,6 +42,10 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -51,10 +55,6 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 
@@ -79,7 +79,7 @@ public class TestNativeTaskPaths extends SchedulerFunctionalTest {
         OutVarsFileD + "\n";
 
     @Test
-    public void run() throws Throwable {
+    public void testNativeTaskPaths() throws Throwable {
 
         File in = File.createTempFile("input", "space");
         in.delete();

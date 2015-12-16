@@ -36,16 +36,16 @@
  */
 package functionaltests.workflow.variables;
 
+import static functionaltests.utils.SchedulerTHelper.setExecutable;
+import static org.objectweb.proactive.utils.OperatingSystem.unix;
+
 import java.io.File;
 import java.net.URL;
 
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.setExecutable;
-import static org.objectweb.proactive.utils.OperatingSystem.unix;
 
 
 public class TestModifyPropagatedVariables extends SchedulerFunctionalTest {
@@ -58,7 +58,7 @@ public class TestModifyPropagatedVariables extends SchedulerFunctionalTest {
             .getResource("/functionaltests/vars/test-vars.sh");
 
     @Test
-    public void run() throws Throwable {
+    public void testModifyPropagatedVariables() throws Throwable {
         schedulerHelper.testJobSubmissionAndVerifyAllResults(absolutePath(job_desc));
         OperatingSystem os = OperatingSystem.getOperatingSystem();
         if (unix == os) {

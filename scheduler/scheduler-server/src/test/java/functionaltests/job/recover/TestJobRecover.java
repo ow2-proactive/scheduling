@@ -39,10 +39,10 @@ package functionaltests.job.recover;
 import java.io.File;
 import java.net.URL;
 
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
@@ -70,7 +70,7 @@ public class TestJobRecover extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_PI_recover.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testJobRecover() throws Throwable {
 
         JobId idJ1 = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         JobId idJ2 = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());

@@ -36,6 +36,9 @@
  */
 package functionaltests.dataspaces;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,6 +47,13 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URI;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -54,18 +64,8 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -137,7 +137,7 @@ public class TestUserSpace extends SchedulerFunctionalTest {
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @Test
-    public void run() throws Throwable {
+    public void testUserSpace() throws Throwable {
 
         File in = tmpFolder.newFolder("input_space");
         String inPath = in.getAbsolutePath();

@@ -34,21 +34,21 @@
  */
 package functionaltests.dataspaces;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.*;
 
 
 /**
@@ -93,7 +93,7 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerF
     }
 
     @Test
-    public void run() throws Throwable {
+    public void testPartiallyUnaccessibleDataSpaces() throws Throwable {
 
         schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                 .getAbsolutePath());

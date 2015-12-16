@@ -36,29 +36,28 @@
  */
 package functionaltests.job.recover;
 
+import static functionaltests.job.recover.TestPauseJobRecover.createJob;
+import static functionaltests.utils.SchedulerTHelper.log;
+
 import java.io.File;
 import java.nio.file.Path;
 
-import org.objectweb.proactive.api.PAActiveObject;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.util.FileLock;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static functionaltests.job.recover.TestPauseJobRecover.createJob;
 
 
 public class TestJobRecoverClasspathInUserSpace extends SchedulerFunctionalTest {
 
     // SCHEDULING-2077
     @Test
-    public void run() throws Throwable {
+    public void testJobRecoverClasspathInUserSpace() throws Throwable {
         FileLock controlJobExecution = new FileLock();
         Path controlJobExecutionPath = controlJobExecution.lock();
 

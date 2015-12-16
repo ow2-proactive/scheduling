@@ -50,6 +50,7 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -80,9 +81,9 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
+
 import it.sauronsoftware.cron4j.InvalidPatternException;
 import it.sauronsoftware.cron4j.Predictor;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -348,33 +349,6 @@ public abstract class InternalJob extends JobState {
                     logger.debug("Task flow Action CONTINUE on task " + initiator.getId().getReadableName());
                     break;
             }
-
-            /**
-            System.out.println("******** task dump ** " + this.getJobInfo().getJobId() + " " +
-                initiator.getName() + " does " + action.getType() + " " +
-                ((action.getTarget() == null) ? "." : action.getTarget()) + " " +
-                ((action.getTargetElse() == null) ? "." : action.getTargetElse()) + " " +
-                ((action.getTargetJoin() == null) ? "." : action.getTargetJoin()));
-            for (InternalTask it : this.tasks.values()) {
-                System.out.print(it.getName() + " ");
-                if (it.getIDependences() != null) {
-                    System.out.print("deps ");
-                    for (InternalTask parent : it.getIDependences()) {
-                        System.out.print(parent.getName() + " ");
-                    }
-                }
-                if (it.getIfBranch() != null) {
-                    System.out.print("if " + it.getIfBranch().getName() + " ");
-                }
-                if (it.getJoinedBranches() != null && it.getJoinedBranches().size() == 2) {
-                    System.out.print("join " + it.getJoinedBranches().get(0).getName() + " " +
-                        it.getJoinedBranches().get(1).getName());
-                }
-                System.out.println();
-            }
-            System.out.println("******** task dump ** " + this.getJobInfo().getJobId());
-            System.out.println();
-            **/
 
         }
 

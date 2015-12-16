@@ -36,14 +36,14 @@
  */
 package functionaltests.api;
 
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.executables.ResultAsArray;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 
 /**
@@ -58,7 +58,7 @@ import functionaltests.executables.ResultAsArray;
 public class TestJobInstantGetTaskResult extends SchedulerFunctionalTest {
 
     @Test
-    public void run() throws Throwable {
+    public void testTerminateActiveObject() throws Throwable {
         //create Scheduler client as an active object
         SubmitJob client = (SubmitJob) PAActiveObject.newActive(SubmitJob.class.getName(), new Object[] {});
         //begin to use the client : must be a futur result in order to start the scheduler at next step

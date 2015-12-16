@@ -50,7 +50,7 @@ public class TestJobSelScriptSubmission extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_with_select_script.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testJobSelScriptSubmission() throws Throwable {
         schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
         schedulerHelper.checkNodesAreClean();
