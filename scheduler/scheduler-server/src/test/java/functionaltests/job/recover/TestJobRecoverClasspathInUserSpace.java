@@ -36,22 +36,24 @@
  */
 package functionaltests.job.recover;
 
-import java.io.File;
-import java.nio.file.Path;
-
-import org.objectweb.proactive.api.PAActiveObject;
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.FileLock;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.File;
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static functionaltests.job.recover.TestPauseJobRecover.createJob;
 
 
 public class TestJobRecoverClasspathInUserSpace extends SchedulerFunctionalTest {
@@ -83,6 +85,46 @@ public class TestJobRecoverClasspathInUserSpace extends SchedulerFunctionalTest 
 
         log("Waiting for job 1 to finish");
         schedulerHelper.waitForEventJobFinished(idJ1, 30000);
+    }
+
+
+    public static TaskFlowJob createJob(String fileLockPath) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+
+        JavaTask task1 = new JavaTask();
+        task1.setName("task1");
+        task1.setExecutableClassName(TestJavaTask.class.getName());
+        task1.addArgument("fileLockPath", fileLockPath);
+
+        JavaTask task2 = new JavaTask();
+        task2.setName("task2");
+        task2.setExecutableClassName(SleepTask.class.getName());
+
+        task2.addDependence(task1);
+        job.addTask(task1);
+        job.addTask(task2);
+        return job;
+    }
+
+    public static class SleepTask extends JavaExecutable {
+
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            TimeUnit.MILLISECONDS.sleep(1);
+            return "OK";
+        }
+    }
+
+    public static class TestJavaTask extends JavaExecutable {
+
+        private String fileLockPath;
+
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            System.out.println("OK");
+            FileLock.waitUntilUnlocked(fileLockPath);
+            return "OK";
+        }
     }
 
 }
