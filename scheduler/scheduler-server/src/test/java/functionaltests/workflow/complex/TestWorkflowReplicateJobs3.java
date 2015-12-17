@@ -50,7 +50,7 @@ import functionaltests.workflow.TRepJobs;
  */
 public class TestWorkflowReplicateJobs3 extends TRepJobs {
     @Test
-    public void run() throws Throwable {
+    public void testWorkflowReplicateJobs3() throws Throwable {
         String prefix = "/functionaltests/workflow/descriptors/flow_duplicate_3_";
 
         TRepCase t1 = new TRepCase(prefix + "1.xml", 9, "A,1,0 B,2,2 C,3,6 D,2,8 E,1,9");

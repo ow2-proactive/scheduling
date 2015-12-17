@@ -34,10 +34,14 @@
  */
 package functionaltests.api;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -45,18 +49,15 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestUsers;
-
-import static org.junit.Assert.*;
 
 
 public class SchedulerUsageTest extends SchedulerFunctionalTest {
 
     @Test
-    public void run() throws Exception {
+    public void testSchedulerUsage() throws Exception {
 
         SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
         PublicKey pubKey = auth.getPublicKey();
