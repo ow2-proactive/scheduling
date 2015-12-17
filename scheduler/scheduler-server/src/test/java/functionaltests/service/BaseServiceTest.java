@@ -3,6 +3,7 @@ package functionaltests.service;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import functionaltests.utils.Jobs;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,6 +33,8 @@ public class BaseServiceTest extends ProActiveTest {
     protected MockSchedulingListener listener;
     protected SchedulingService service;
 
+    private static ExecutorService executorService = Executors.newCachedThreadPool();
+
     @Before
     public void init() throws Exception {
         dbManager = SchedulerDBManager.createInMemorySchedulerDBManager();
@@ -54,25 +57,8 @@ public class BaseServiceTest extends ProActiveTest {
     }
 
     public static InternalJob createJob(TaskFlowJob job) throws Exception {
-        InternalJob internalJob = InternalJobFactory.createJob(job, getDefaultCredentials());
-        internalJob.setOwner(DEFAULT_USER_NAME);
-        return internalJob;
+        return Jobs.createJob(job);
     }
-
-    private static Credentials defaultCredentials;
-
-    static final String DEFAULT_USER_NAME = "admin";
-
-    static Credentials getDefaultCredentials() throws Exception {
-        if (defaultCredentials == null) {
-            defaultCredentials = Credentials.createCredentials(DEFAULT_USER_NAME, "admin",
-                    PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH
-                            .getValueAsString()));
-        }
-        return defaultCredentials;
-    }
-
-    static ExecutorService executorService = Executors.newCachedThreadPool();
 
     interface TestRunnable {
         void run() throws Exception;

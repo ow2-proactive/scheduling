@@ -183,6 +183,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     /**
+     * Mainly there for testing purposes.
+     *
+     * It allows to create a SchedulerFrontend instance without breaking encapsulation.
+     *
+     * @param schedulerSpacesSupport
+     */
+    SchedulerFrontend(SchedulerFrontendState schedulerFrontendState, SchedulerSpacesSupport schedulerSpacesSupport) {
+        this.frontendState = schedulerFrontendState;
+        this.spacesSupport = schedulerSpacesSupport;
+    }
+
+    /**
      * Scheduler Front-end constructor.
      *
      * @param rmURL               a started Resource Manager URL which
