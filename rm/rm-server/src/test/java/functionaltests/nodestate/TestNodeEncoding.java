@@ -36,9 +36,9 @@
  */
 package functionaltests.nodestate;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestUsers;
+import java.io.File;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,8 +55,9 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.PAProperties;
 import org.python.google.common.collect.ImmutableSet;
 
-import java.io.File;
-import java.util.List;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -84,7 +85,7 @@ public class TestNodeEncoding extends RMFunctionalTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void testFileEncodingPropagationToRemoteJVM() throws Exception {
         String javaProperty = "-D" + PAProperties.KEY_PA_FILE_ENCODING + "=" + FILE_ENCODING_NAME;
 
         ResourceManager resourceManager = rmHelper.getResourceManager(TestUsers.TEST, javaProperty);

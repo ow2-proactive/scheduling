@@ -36,8 +36,11 @@
  */
 package functionaltests.nodestate;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -49,12 +52,9 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastr
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
-
-import static org.junit.Assert.*;
 
 
 /**
@@ -74,7 +74,7 @@ import static org.junit.Assert.*;
 public class TestNodeSourcesActions extends RMFunctionalTest {
 
     @Test
-    public void action() throws Exception {
+    public void testAddRemoveNodesPreemptively() throws Exception {
 
         String nodeSourceName = "TestNodeSourcesActions";
 

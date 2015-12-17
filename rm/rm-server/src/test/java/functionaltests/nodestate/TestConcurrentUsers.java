@@ -36,8 +36,15 @@
  */
 package functionaltests.nodestate;
 
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Collections;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
@@ -52,14 +59,9 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Assert;
-import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.TestUsers;
-
-import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -70,7 +72,7 @@ import static org.junit.Assert.*;
 public class TestConcurrentUsers extends RMFunctionalTest {
 
     @Test
-    public void action() throws Exception {
+    public void testConcurrency() throws Exception {
 
         ResourceManager resourceManager = rmHelper.getResourceManager();
         String nsName = "TestConcurrentUsers";
