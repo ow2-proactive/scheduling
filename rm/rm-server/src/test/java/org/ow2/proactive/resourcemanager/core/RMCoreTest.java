@@ -37,13 +37,13 @@ public class RMCoreTest {
     @Mock
     private Client mockedCaller;
     @Mock
-    NodeSource mockedNodeSource;
+    private NodeSource mockedNodeSource;
     @Mock
-    RMMonitoringImpl mockedMonitoring;
+    private RMMonitoringImpl mockedMonitoring;
     @Mock
-    SelectionManager mockedSelectionManager;
+    private SelectionManager mockedSelectionManager;
     @Mock
-    RMDBManager dataBaseManager;
+    private RMDBManager dataBaseManager;
     @Mock
     private RMNode mockedRemovableNodeInDeploy;
     @Mock
