@@ -36,8 +36,10 @@ package functionaltests.service;
 
 import functionaltests.utils.Jobs;
 import org.hibernate.cfg.Configuration;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -53,6 +55,15 @@ import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 
+/**
+ * The purpose of this class is to check that jobs' states are persisted in a database
+ * as they should and that all states can be reloaded properly without loosing some.
+ * <p>
+ * The database is closed in a clean manner since the goal is not to check
+ * the transaction feature of the database itself neither its durability property.
+ *
+ * @author ActiveEon Team
+ */
 public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
 
     private SchedulerDBManager dbManager;
@@ -62,8 +73,74 @@ public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
         dbManager = createDatabase(true);
     }
 
+    @Test
+    public void testJobRecoveryWithIf() throws Exception {
+        testJobRecovery("recovery_if.xml");
+    }
+
+    @Test
+    public void testJobRecoveryWithFor() throws Exception {
+        testJobRecovery("recovery_for.xml");
+    }
+
     /**
-     * Related to issue #1849.
+     * Regression test related to issue #1988:
+     * <p>
+     * https://github.com/ow2-proactive/scheduling/issues/1988
+     */
+    @Test
+    public void testJobRecoveryWithIfInALoop() throws Exception {
+        InternalJob reloadedJob = testJobRecovery("flow_if_in_a_loop.xml");
+
+        // joined branches should be saved and restored
+        InternalTask task = reloadedJob.getTask("Loop");
+
+        assertThat(task).isNotNull();
+        assertThat(task.getJoinedBranches()).isNotEmpty();
+    }
+
+    @Test
+    public void testJobRecoveryWithReplicate() throws Exception {
+        testJobRecovery("recovery_replicate.xml");
+    }
+
+    @Test
+    public void testJobRecoveryWithReplicate2() throws Exception {
+        testJobRecovery("recovery_replicate2.xml");
+    }
+
+    @Test
+    public void testJobRecoveryWithPendingJob() throws Exception {
+        testJobRecovery("recovery_pending_job.xml");
+    }
+
+    @Test
+    public void testJobRecoveryWithSeveralTasks() throws Exception {
+        testJobRecovery("recovery_tasks.xml");
+    }
+
+    private InternalJob testJobRecovery(String workflowFilename) throws Exception {
+        Job job = Jobs.parseXml(this.getClass().getResource("/functionaltests/workflow/descriptors/" + workflowFilename).getPath());
+
+        InternalJob submittedJob = Jobs.createJob(job);
+        dbManager.newJobSubmitted(submittedJob);
+
+        closeAndRestartDatabase();
+
+        List<InternalJob> internalJobs = dbManager.loadJobs(true, submittedJob.getId());
+
+        assertThat(internalJobs).hasSize(1);
+
+        InternalJob loadedJob = internalJobs.get(0);
+        loadedJob.equals(submittedJob);
+
+        assertThat(Jobs.areEqual(submittedJob, loadedJob)).isTrue();
+
+        return loadedJob;
+    }
+
+    /**
+     * Regression test related to issue #1849.
      * <p>
      * https://github.com/ow2-proactive/scheduling/issues/1849
      */
@@ -104,6 +181,11 @@ public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
             assertThat(additionalClasspath).hasSize(1);
             assertThat(additionalClasspath.get(0)).isEqualTo("$USERSPACE/test.jar");
         }
+    }
+
+    @After
+    public void tearDown() {
+        dbManager.close();
     }
 
     private void closeAndRestartDatabase() throws Exception {

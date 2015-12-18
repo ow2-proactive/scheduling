@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job name="NOT SET" priority="normal" projectName="Not Assigned" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev"
+     xmlns="urn:proactive:jobdescriptor:dev">
+    <description>No description</description>
+    <taskFlow>
+        <task name="T">
+            <javaExecutable class="functionaltests.job.recover.TestReplicateTaskRestore2$TestTask"/>
+            <controlFlow>
+                <replicate>
+                    <script>
+                        <code language="javascript"><![CDATA[runs = 2]]></code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="T1">
+            <depends>
+                <task ref="T"/>
+            </depends>
+            <javaExecutable class="functionaltests.job.recover.TestReplicateTaskRestore2$TestTask"/>
+            <controlFlow block="start">
+                <replicate>
+                    <script>
+                        <code language="javascript"><![CDATA[runs = 2]]></code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="T2">
+            <depends>
+                <task ref="T1"/>
+            </depends>
+            <javaExecutable class="functionaltests.job.recover.TestReplicateTaskRestore2$TestTask"/>
+        </task>
+        <task name="T3">
+            <depends>
+                <task ref="T2"/>
+            </depends>
+            <javaExecutable class="functionaltests.job.recover.TestReplicateTaskRestore2$TestTask"/>
+            <controlFlow block="end"/>
+        </task>
+        <task name="T4">
+            <depends>
+                <task ref="T3"/>
+            </depends>
+            <javaExecutable class="functionaltests.job.recover.TestReplicateTaskRestore2$TestTask"/>
+        </task>
+    </taskFlow>
+</job>

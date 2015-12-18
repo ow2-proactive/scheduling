@@ -62,8 +62,6 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     protected SchedulerTHelper schedulerHelper;
 
-    protected JobFactory xmlParser = JobFactory.getFactory();
-
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
         TimeUnit.MILLISECONDS);
@@ -84,7 +82,7 @@ public class SchedulerFunctionalTest extends ProActiveTest {
     }
 
     protected Job parseXml(String workflowFile) throws JobCreationException {
-        return xmlParser.createJob(getClass().getResource(workflowFile).getPath());
+        return Jobs.parseXml(getClass().getResource(workflowFile).getPath());
     }
 
 }
