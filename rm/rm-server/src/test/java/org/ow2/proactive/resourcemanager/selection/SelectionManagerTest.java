@@ -48,6 +48,7 @@ public class SelectionManagerTest {
     @Test
     public void selectWithDifferentPermissions() throws Exception {
         PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.updateProperty("10");
+        System.out.println("PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER=" + PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER);
         System.setSecurityManager(securityManagerRejectingUser());
 
         RMCore.topologyManager = mock(TopologyManager.class);
@@ -70,7 +71,7 @@ public class SelectionManagerTest {
 
         assertEquals(1, nodes.size());
     }
-    
+
     @Test
     public void testSelectNodesWithNoNodes() {
         RMCore rmCore = newMockedRMCore(0);
@@ -93,12 +94,12 @@ public class SelectionManagerTest {
         crit.setScripts(null);
         crit.setBlackList(null);
         crit.setBestEffort(true);
-        
+
         Client mockedClient = mock(Client.class);
         NodeSet nodeSet = selectionManager.selectNodes(crit, mockedClient);
         assertEquals(1, nodeSet.size());
     }
-    
+
     @Test
     public void testSelectNodesWith10Node() {
         RMCore rmCore = newMockedRMCore(10);
@@ -108,12 +109,12 @@ public class SelectionManagerTest {
         crit.setScripts(null);
         crit.setBlackList(null);
         crit.setBestEffort(true);
-        
+
         Client mockedClient = mock(Client.class);
         NodeSet nodeSet = selectionManager.selectNodes(crit, mockedClient);
         assertEquals(10, nodeSet.size());
     }
-    
+
     private SecurityManager securityManagerRejectingUser() {
         return new SecurityManager() {
 
@@ -125,7 +126,7 @@ public class SelectionManagerTest {
             @Override
             public void checkPermission(Permission perm) {
                 if (perm.getName().equals("Identities collection") &&
-                    ((PrincipalPermission) perm).hasPrincipal(new UserNamePrincipal("user"))) {
+                        ((PrincipalPermission) perm).hasPrincipal(new UserNamePrincipal("user"))) {
                     throw new SecurityException();
                 }
             }
@@ -142,7 +143,7 @@ public class SelectionManagerTest {
         return new SelectionManager(rmCore) {
             @Override
             public List<RMNode> arrangeNodesForScriptExecution(List<RMNode> nodes,
-                    List<SelectionScript> scripts) {
+                                                               List<SelectionScript> scripts) {
                 return nodes;
             }
 
@@ -153,7 +154,7 @@ public class SelectionManagerTest {
 
             @Override
             public boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
-                    RMNode rmnode) {
+                                               RMNode rmnode) {
                 return false;
             }
         };
@@ -167,18 +168,18 @@ public class SelectionManagerTest {
             }
         };
     }
-    
+
     private RMCore newMockedRMCore() {
         return newMockedRMCore(0);
     }
-    
-    
+
+
     private RMCore newMockedRMCore(int nbNodes) {
         RMCore mockedRMCore = Mockito.mock(RMCore.class);
         TopologyManager mockedTopologyManager = Mockito.mock(TopologyManager.class);
         when(mockedTopologyManager.getHandler(Matchers.any(TopologyDescriptor.class))).thenReturn(selectAllTopology());
         RMCore.topologyManager = mockedTopologyManager;
-        
+
         if (nbNodes > 0) {
             ArrayList<RMNode> freeNodes = new ArrayList<RMNode>(nbNodes);
             for (int i = 0; i < nbNodes; i++) {
@@ -186,14 +187,14 @@ public class SelectionManagerTest {
             }
             when(mockedRMCore.getFreeNodes()).thenReturn(freeNodes);
         }
-        
+
         return mockedRMCore;
     }
 
     private RMNode createMockedNode(String nodeUser) {
         return createMockeNode(nodeUser, "", "");
     }
-    
+
     private RMNode createMockeNode(String nodeUser, String nodeName, String nodeUrl) {
         RMNode rmNode = mock(RMNode.class);
         NodeInformation mockedNodeInformation = mock(NodeInformation.class);

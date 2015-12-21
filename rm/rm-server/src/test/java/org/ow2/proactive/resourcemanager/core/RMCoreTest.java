@@ -54,13 +54,11 @@ public class RMCoreTest {
     private RMNode mockedUnremovableNode;
     @Mock
     private RMNode mockedBusyNode;
-    
-    
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        rmCore = new RMCore();
-        populateNodes();
+        populateRMCore();
     }
 
     /*
@@ -214,7 +212,7 @@ public class RMCoreTest {
     @Test
     public void testLockNodes3() {
         Set<String> nodesToLock = new HashSet<String>(1);
-        nodesToLock.add("unRemovableNode");
+        nodesToLock.add("mockedUnremovableNode");
         boolean result = rmCore.lockNodes(nodesToLock).getBooleanValue();
         assertEquals(false, result);
     }
@@ -230,7 +228,7 @@ public class RMCoreTest {
     @Test
     public void testUnlockNodes2() {
         Set<String> nodesToUnlock = new HashSet<String>(1);
-        nodesToUnlock.add("removableNode");
+        nodesToUnlock.add("mockedRemovableNode");
         boolean result = rmCore.unlockNodes(nodesToUnlock).getBooleanValue();
         assertEquals(false, result);
     }
@@ -306,96 +304,113 @@ public class RMCoreTest {
      *  - not free, not deployed yet
      *  - locked
      */
-    private void populateNodes() {
-        Node mockedNode1 = Mockito.mock(Node.class);
-        Node mockedNode2 = Mockito.mock(Node.class);
-        Node mockedNode3 = Mockito.mock(Node.class);
-        Node mockedNode4 = Mockito.mock(Node.class);
-        Node mockedNode5 = Mockito.mock(Node.class);
-        NodeInformation mockedNodeInformation1 = Mockito.mock(NodeInformation.class);
-        NodeInformation mockedNodeInformation2 = Mockito.mock(NodeInformation.class);
-        NodeInformation mockedNodeInformation3 = Mockito.mock(NodeInformation.class);
-        NodeInformation mockedNodeInformation4 = Mockito.mock(NodeInformation.class);
-        NodeInformation mockedNodeInformation5 = Mockito.mock(NodeInformation.class);
-        
-        when(mockedNode1.getNodeInformation()).thenReturn(mockedNodeInformation1);
-        when(mockedNode2.getNodeInformation()).thenReturn(mockedNodeInformation2);
-        when(mockedNode3.getNodeInformation()).thenReturn(mockedNodeInformation3);
-        when(mockedNode4.getNodeInformation()).thenReturn(mockedNodeInformation4);
-        when(mockedNode5.getNodeInformation()).thenReturn(mockedNodeInformation5);
-        
-        when(mockedNodeInformation1.getURL()).thenReturn("mockedRemovableNode");
-        when(mockedNodeInformation2.getURL()).thenReturn("mockedUnremovableNode");
-        when(mockedNodeInformation3.getURL()).thenReturn(RMDeployingNode.PROTOCOL_ID + "://removableNode");
-        when(mockedNodeInformation4.getURL()).thenReturn(RMDeployingNode.PROTOCOL_ID + "://unRemovableNode");
-        when(mockedNodeInformation5.getURL()).thenReturn("mockedBusyNode");
-        
-        when(mockedCaller.checkPermission(Matchers.any(Permission.class), Matchers.any(String.class))).thenReturn(true);
-        
-        when(mockedRemovableNodeInDeploy.isDown()).thenReturn(true);
-        when(mockedUnremovableNodeInDeploy.isDown()).thenReturn(false);
-        when(mockedRemovableNode.isDown()).thenReturn(true);
-        when(mockedUnremovableNode.isDown()).thenReturn(true);
-        when(mockedBusyNode.isDown()).thenReturn(false);
-        
-        when(mockedRemovableNodeInDeploy.getAdminPermission()).thenReturn(null);
-        when(mockedRemovableNode.getAdminPermission()).thenReturn(null);
-        
-        when(mockedNodeSource.getName()).thenReturn("NODESOURCE-test");
-        when(mockedNodeSource.acquireNode(Matchers.any(String.class), Matchers.any(Client.class)))
-        .thenReturn(new BooleanWrapper(true));
-        
-        when(mockedRemovableNodeInDeploy.getNodeSource()).thenReturn(mockedNodeSource);
-        when(mockedUnremovableNodeInDeploy.getNodeSource()).thenReturn(mockedNodeSource);
-        when(mockedRemovableNode.getNodeSource()).thenReturn(mockedNodeSource);
-        when(mockedUnremovableNode.getNodeSource()).thenReturn(mockedNodeSource);
-        when(mockedBusyNode.getNodeSource()).thenReturn(mockedNodeSource);
-        
-        when(mockedRemovableNode.getNode()).thenReturn(mockedNode1);
-        when(mockedUnremovableNode.getNode()).thenReturn(mockedNode2);
-        when(mockedRemovableNodeInDeploy.getNode()).thenReturn(mockedNode3);
-        when(mockedUnremovableNodeInDeploy.getNode()).thenReturn(mockedNode4);
-        when(mockedBusyNode.getNode()).thenReturn(mockedNode5);
-        
-        when(mockedRemovableNode.isFree()).thenReturn(true);
-        when(mockedBusyNode.isFree()).thenReturn(false);
-        when(mockedBusyNode.isLocked()).thenReturn(true);
-        
-        when(mockedSelectionManager.selectNodes(Matchers.any(Criteria.class), Matchers.any(Client.class))).thenReturn(new NodeSet());
-        
+    private void populateRMCore() {
+
+        when(mockedCaller.checkPermission(Matchers.any(Permission.class), Matchers.any(String.class)))
+                .thenReturn(true);
+        when(mockedSelectionManager.selectNodes(Matchers.any(Criteria.class), Matchers.any(Client.class)))
+                .thenReturn(new NodeSet());
+
         HashMap<String, NodeSource> nodeSources = new HashMap<String, NodeSource>(1);
-        nodeSources.put("NODESOURCE-test", mockedNodeSource);
-        rmCore.setMonitoring(mockedMonitoring);
-        rmCore.setCaller(mockedCaller);
-        rmCore.setNodeSources(nodeSources);
-        rmCore.setBrokenNodeSources(new ArrayList<String>());
-        rmCore.setSelectionManager(mockedSelectionManager);
-        rmCore.setDataBaseManager(dataBaseManager);
-        
+        configureNodeSource(mockedNodeSource, "NODESOURCE-test");
+        nodeSources.put(mockedNodeSource.getName(), mockedNodeSource);
+
+        // MockedRMNodeParameters(String url, boolean isFree, boolean isDown, boolean isLocked, NodeSource nodeSource, RMNode rmNode)
+        configureRMNode(new MockedRMNodeParameters("mockedRemovableNode", true, true, false,
+                mockedNodeSource, "NODESOURCE-test", mockedRemovableNode));
+        configureRMNode(new MockedRMNodeParameters("mockedUnremovableNode", false, true, false,
+                mockedNodeSource, "NODESOURCE-test", mockedUnremovableNode));
+        configureRMNode(new MockedRMNodeParameters(RMDeployingNode.PROTOCOL_ID + "://removableNode", true, true, false,
+                mockedNodeSource, "NODESOURCE-test", mockedRemovableNodeInDeploy));
+        configureRMNode(new MockedRMNodeParameters(RMDeployingNode.PROTOCOL_ID + "://unRemovableNode", false, false, false,
+                mockedNodeSource, "NODESOURCE-test", mockedUnremovableNodeInDeploy));
+        configureRMNode(new MockedRMNodeParameters("mockedBusyNode", false, false, true,
+                mockedNodeSource, "NODESOURCE-test", mockedBusyNode));
+
         HashMap<String, RMNode> nodes = new HashMap<String, RMNode>(5);
-        nodes.put(RMDeployingNode.PROTOCOL_ID + "://removableNode", mockedRemovableNodeInDeploy);
-        nodes.put(RMDeployingNode.PROTOCOL_ID + "://unRemovableNode", mockedUnremovableNodeInDeploy);
-        nodes.put("mockedRemovableNode", mockedRemovableNode);
-        nodes.put("mockedUnremovableNode", mockedUnremovableNode);
-        nodes.put("mockedBusyNode", mockedBusyNode);
-        rmCore.setAllNodes(nodes);
-        
+        nodes.put(mockedRemovableNodeInDeploy.getNodeName(), mockedRemovableNodeInDeploy);
+        nodes.put(mockedUnremovableNodeInDeploy.getNodeName(), mockedUnremovableNodeInDeploy);
+        nodes.put(mockedRemovableNode.getNodeName(), mockedRemovableNode);
+        nodes.put(mockedUnremovableNode.getNodeName(), mockedUnremovableNode);
+        nodes.put(mockedBusyNode.getNodeName(), mockedBusyNode);
+
         ArrayList<RMNode> freeNodes = new ArrayList<RMNode>(2);
         freeNodes.add(mockedRemovableNodeInDeploy);
         freeNodes.add(mockedRemovableNode);
-        rmCore.setFreeNodesList(freeNodes);
-        
+
+        rmCore = new RMCore(nodeSources, new ArrayList<String>(), nodes, mockedCaller,
+                mockedMonitoring, mockedSelectionManager, freeNodes, dataBaseManager);
     }
     
-    private RMNode newMockedRMNode(String urlNode) {
-        RMNode mockedRMNode = Mockito.mock(RMNode.class);
+    private void configureRMNode(MockedRMNodeParameters param) {
+        RMNode rmNode = param.getRmNode();
         Node mockedNode = Mockito.mock(Node.class);
         NodeInformation mockedNodeInformation = Mockito.mock(NodeInformation.class);
-        when(mockedNodeInformation.getName()).thenReturn(urlNode);
-        when(mockedNodeInformation.getURL()).thenReturn(urlNode);
         when(mockedNode.getNodeInformation()).thenReturn(mockedNodeInformation);
-        when(mockedRMNode.getNode()).thenReturn(mockedNode);
-        when(mockedRMNode.getNodeName()).thenReturn(urlNode);
-        return mockedRMNode;
+        when(rmNode.getNode()).thenReturn(mockedNode);
+        when(rmNode.getNodeName()).thenReturn(param.getUrl());
+        when(rmNode.isDown()).thenReturn(param.isDown());
+        when(rmNode.isFree()).thenReturn(param.isFree());
+        when(rmNode.isLocked()).thenReturn(param.isLocked());
+        when(mockedNodeInformation.getURL()).thenReturn(param.getUrl());
+        when(mockedNodeInformation.getName()).thenReturn(param.getUrl());
+        when(rmNode.getNodeSource()).thenReturn(param.getNodeSource());
+        when(rmNode.getNodeSourceName()).thenReturn(param.getNodeSourceName());
+        when(rmNode.getAdminPermission()).thenReturn(null);
+    }
+
+    private void configureNodeSource(NodeSource nodeSource, String nodeSourceName) {
+        when(nodeSource.getName()).thenReturn(nodeSourceName);
+        when(nodeSource.acquireNode(Matchers.any(String.class), Matchers.any(Client.class)))
+                .thenReturn(new BooleanWrapper(true));
+    }
+
+    private class MockedRMNodeParameters {
+        private String url;
+        private boolean isFree;
+        private boolean isDown;
+        private boolean isLocked;
+        private NodeSource nodeSource;
+        private String nodeSourceName;
+        private RMNode rmNode;
+
+        MockedRMNodeParameters(String url, boolean isFree, boolean isDown, boolean isLocked,
+                               NodeSource nodeSource, String nodeSourceName, RMNode rmNode) {
+            this.url = url;
+            this.isFree = isFree;
+            this.isDown = isDown;
+            this.isLocked = isLocked;
+            this.nodeSource = nodeSource;
+            this.nodeSourceName = nodeSourceName;
+            this.rmNode = rmNode;
+        }
+
+        protected String getUrl() {
+            return url;
+        }
+
+        protected boolean isFree() {
+            return isFree;
+        }
+
+        protected boolean isDown() {
+            return isDown;
+        }
+
+        public NodeSource getNodeSource() {
+            return nodeSource;
+        }
+
+        public String getNodeSourceName() {
+            return nodeSourceName;
+        }
+
+        public RMNode getRmNode() {
+            return rmNode;
+        }
+
+        public boolean isLocked() {
+            return isLocked;
+        }
     }
 }

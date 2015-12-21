@@ -88,8 +88,7 @@ public abstract class SelectionManager {
 
     private RMCore rmcore;
 
-    private static final int SELECTION_THEADS_NUMBER = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER
-            .getValueAsInt();
+    private static final int SELECTION_THEADS_NUMBER = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt();
 
     private ExecutorService scriptExecutorThreadPool;
 
@@ -105,7 +104,7 @@ public abstract class SelectionManager {
 
     public SelectionManager(RMCore rmcore) {
         this.rmcore = rmcore;
-        this.scriptExecutorThreadPool = Executors.newFixedThreadPool(SELECTION_THEADS_NUMBER,
+        this.scriptExecutorThreadPool = Executors.newFixedThreadPool(PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt(),
                 new NamedThreadFactory("Selection manager threadpool"));
         this.inProgress = Collections.synchronizedSet(new HashSet<String>());
 
@@ -267,14 +266,14 @@ public abstract class SelectionManager {
                 while (matchedNodes.size() < criteria.getSize()) {
                     int numberOfNodesForScriptExecution = criteria.getSize() - matchedNodes.size();
 
-                    if (numberOfNodesForScriptExecution < SELECTION_THEADS_NUMBER) {
-                        // we can run "SELECTION_THEADS_NUMBER" scripts in parallel
+                    if (numberOfNodesForScriptExecution < PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()) {
+                        // we can run "PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()" scripts in parallel
                         // in case when we need less nodes it still useful to
                         // the full capacity of the thread pool to find nodes quicker
 
                         // it is not important if we find more nodes than needed
                         // subset will be selected later (topology handlers)
-                        numberOfNodesForScriptExecution = SELECTION_THEADS_NUMBER;
+                        numberOfNodesForScriptExecution = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt();
                     }
 
                     List<RMNode> subset = arrangedNodes.subList(0,

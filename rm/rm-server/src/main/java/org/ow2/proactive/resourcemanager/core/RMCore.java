@@ -264,6 +264,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.jmxHelper = new RMJMXHelper(this.accountsManager);
     }
 
+    public RMCore(HashMap<String, NodeSource> nodeSources, ArrayList<String> brokenNodeSources,
+                  HashMap<String, RMNode> allNodes, Client caller, RMMonitoringImpl monitoring,
+                  SelectionManager manager, ArrayList<RMNode> freeNodesList, RMDBManager newDataBaseManager) {
+        this.nodeSources = nodeSources;
+        this.brokenNodeSources = brokenNodeSources;
+        this.allNodes = allNodes;
+        this.caller = caller;
+        this.monitoring = monitoring;
+        this.selectionManager = manager;
+        this.freeNodes = freeNodesList;
+        this.dataBaseManager = newDataBaseManager;
+    }
+
     /**
      * Initialization part of the RMCore active object.
      * Create RM's active objects and the default static Node Source named
@@ -1805,37 +1818,4 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.internalUnlockNode(rmnode);
         }
     }
-
-    protected void setNodeSources(HashMap<String, NodeSource> hashMap) {
-        this.nodeSources = hashMap;
-    }
-    
-    protected void setBrokenNodeSources(ArrayList<String> brokenNodeSources) {
-        this.brokenNodeSources = brokenNodeSources;
-    }
-    
-    protected void setAllNodes(HashMap<String, RMNode> allNodes) {
-        this.allNodes = allNodes;
-    }
-    
-    protected void setCaller(Client caller) {
-        this.caller = caller;
-    }
-    
-    protected void setMonitoring(RMMonitoringImpl monitoring) {
-        this.monitoring = monitoring;
-    }
-    
-    protected void setSelectionManager(SelectionManager manager) {
-        this.selectionManager = manager;
-    }
-
-    protected void setFreeNodesList(ArrayList<RMNode> freeNodesList) {
-        this.freeNodes = freeNodesList;
-    }
-    
-    protected void setDataBaseManager(RMDBManager newDataBaseManager) {
-        this.dataBaseManager = newDataBaseManager;
-    }
-    
 }
