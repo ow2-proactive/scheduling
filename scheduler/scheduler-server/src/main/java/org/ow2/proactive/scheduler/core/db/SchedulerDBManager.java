@@ -199,10 +199,8 @@ public class SchedulerDBManager {
             final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
-            return new Page<JobInfo>(new ArrayList<JobInfo>(), 0);
+            return new Page<JobInfo>(new ArrayList<JobInfo>(0), 0);
         }
-        
-        JobFilterCriteria jfc = new JobFilterCriteria(false, true, true, true);
 
         DBJobDataParameters params = new DBJobDataParameters(offset, limit, user, pending, running, finished, sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
