@@ -1202,7 +1202,7 @@ public class SchedulerDBManager {
             public Void executeWork(Session session) {
 
                 Query query = session.createQuery(
-                        "update TaskData task set task." + fieldName + " = :newTime " + 
+                        "update TaskData task set task." + fieldName + " = :newTime " + //NOSONAR
                                 "where task.id.jobId = :jobId and task.id.taskId= :taskId")
                         .setParameter("newTime", time)
                         .setParameter("jobId", jobId)
