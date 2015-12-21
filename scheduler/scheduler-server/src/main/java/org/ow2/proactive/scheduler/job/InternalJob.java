@@ -1022,10 +1022,10 @@ public abstract class InternalJob extends JobState {
         setNumberOfRunningTasks(0);
         setStatus(JobStatus.RUNNING);
 
-        List<InternalTask> tasks = getITasks();
-        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>(tasks.size());
+        List<InternalTask> internalTasks = getITasks();
+        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>(internalTasks.size());
 
-        for (InternalTask internalTask : tasks) {
+        for (InternalTask internalTask : internalTasks) {
             internalTask.setStatus(TaskStatus.PENDING);
             taskStatus.put(internalTask.getId(), TaskStatus.PENDING);
         }
