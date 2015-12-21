@@ -1392,11 +1392,6 @@ public abstract class InternalJob extends JobState {
         return applyReplacementsOnGenericInformation(replacements);
     }
 
-    @Override
-    public void setGenericInformations(Map<String, String> genericInformations) {
-        super.setGenericInformations(genericInformations);
-    }
-
     /**
      *
      * Gets the task generic information.
