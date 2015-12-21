@@ -35,10 +35,8 @@ import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryp
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.TaskSortParameter;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -1202,8 +1200,9 @@ public class SchedulerDBManager {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             public Void executeWork(Session session) {
+
                 Query query = session.createQuery(
-                        "update TaskData task set task." + fieldName + " = :newTime " +
+                        "update TaskData task set task." + fieldName + " = :newTime " + 
                                 "where task.id.jobId = :jobId and task.id.taskId= :taskId")
                         .setParameter("newTime", time)
                         .setParameter("jobId", jobId)
