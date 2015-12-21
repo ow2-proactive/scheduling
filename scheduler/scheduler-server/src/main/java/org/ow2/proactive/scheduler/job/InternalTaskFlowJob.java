@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
