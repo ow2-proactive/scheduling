@@ -38,7 +38,9 @@ import functionaltests.utils.Jobs;
 import org.hibernate.cfg.Configuration;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -65,6 +67,9 @@ import static com.google.common.truth.Truth.assertThat;
  * @author ActiveEon Team
  */
 public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
+
+    @Rule
+    public TemporaryFolder dbFolder= new TemporaryFolder();
 
     private SchedulerDBManager dbManager;
 
@@ -203,6 +208,10 @@ public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
         Configuration config =
                 new Configuration().configure(
                         new File(this.getClass().getResource("/functionaltests/config/" + configureFilename).toURI()));
+
+        String jdbcUrl = "jdbc:hsqldb:file:" + dbFolder.getRoot().getAbsolutePath() + ";create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false";
+
+        config.setProperty("hibernate.connection.url", jdbcUrl);
 
         return new SchedulerDBManager(config, wipeOnStartup);
     }
