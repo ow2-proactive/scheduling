@@ -735,49 +735,43 @@ public abstract class InternalJob extends JobState {
      * @param action the duplication action.
      */
     private void assignReplicationTag(InternalTask replicatedTask, InternalTask initiator, boolean loopAction, FlowAction action){
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
-        if(loopAction){
+        if (loopAction) {
             buf.append("LOOP-");
             buf.append(InternalTask.getInitialName(initiator.getName()));
-            if(initiator.getReplicationIndex() > 0){
+            if(initiator.getReplicationIndex() > 0) {
                 buf.append("*");
                 buf.append(initiator.getReplicationIndex());
             }
-        }
-        else {
+        } else {
             buf.append("REPLICATE-");
             buf.append(initiator.getName());
         }
 
-
         buf.append("-");
 
-        if(loopAction){
-            FlowScript flow = initiator.getFlowScript();
+        if (loopAction) {
             String cronExpr = action.getCronExpr();
-            if(cronExpr.equals("")){
+            if (cronExpr.isEmpty()) {
                 buf.append(replicatedTask.getIterationIndex());
-            }
-            else{
+            } else{
                 //cron task: the replication index is the next date that matches the cron expression
-                Date resolvedCron = (new Predictor(cronExpr)).nextMatchingDate();
+                Date resolvedCron = new Predictor(cronExpr).nextMatchingDate();
                 SimpleDateFormat dt = new SimpleDateFormat("dd_MM_YY_HH_mm");
                 buf.append(dt.format(resolvedCron));
             }
-        }
-        else{
+        } else{
             buf.append(replicatedTask.getReplicationIndex());
         }
 
         replicatedTask.setTag(buf.toString());
     }
 
-
     private boolean replicateForNextLoopIteration(InternalTask initiator, InternalTask target,
             ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, FlowAction action) {
 
-        logger.info("LOOP (init:" + initiator.getId() + ";target:" + target.getId() + ")");
+        logger.info("LOOP (init:" + initiator.getId() + "; target:" + target.getId() + ")");
 
         // accumulates the tasks between the initiator and the target
         Map<TaskId, InternalTask> dup = new HashMap<>();
