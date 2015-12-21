@@ -483,9 +483,8 @@ public abstract class InternalJob extends JobState {
                 }
             }
         }
-        
-        InternalTask[] result = {targetIf, targetElse, targetJoin};
-        return result;
+
+        return new InternalTask[]{targetIf, targetElse, targetJoin};
     }
     
     
