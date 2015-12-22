@@ -63,7 +63,7 @@ public class TerminateLoopHandlerTest {
 		when(action.getTarget()).thenReturn(initiatorName);
 		when(internalJob.replicateForNextLoopIteration(initiator, initiator, changesInfo, frontend, action))
 				.thenReturn(true);
-		boolean result = terminateLoopHandler.terminateLoopTask(false, action, initiator, changesInfo, frontend);
+		boolean result = terminateLoopHandler.terminateLoopTask(action, initiator, changesInfo, frontend);
 		assertThat(result, is(true));
 		verify(changesInfo, times(0)).getNewTasks();
 	}
@@ -79,7 +79,7 @@ public class TerminateLoopHandlerTest {
 		when(internalJob.getIHMTasks()).thenReturn(newTasks);
 		when(internalJob.replicateForNextLoopIteration(initiator, initiator, changesInfo, frontend, action))
 				.thenReturn(true);
-		boolean result = terminateLoopHandler.terminateLoopTask(false, action, initiator, changesInfo, frontend);
+		boolean result = terminateLoopHandler.terminateLoopTask(action, initiator, changesInfo, frontend);
 		assertThat(result, is(true));
 		Map<String, String> genericInformation = newTasks.values().iterator().next().getGenericInformation();
 		assertThat(genericInformation.containsKey(InternalJob.GENERIC_INFO_START_AT_KEY), is(true));

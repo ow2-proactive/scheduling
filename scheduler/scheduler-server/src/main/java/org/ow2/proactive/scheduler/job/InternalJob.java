@@ -121,10 +121,13 @@ public abstract class InternalJob extends JobState {
 	@XmlTransient
 	private Credentials credentials = null;
 
+	@XmlTransient
 	private final TerminateLoopHandler terminateLoopHandler;
 
+	@XmlTransient
 	private final TerminateIfTaskHandler terminateIfTaskHandler;
 
+	@XmlTransient
 	private final TerminateReplicateTaskHandler terminateReplicateTaskHandler;
 
 	/** Hibernate default constructor */
@@ -348,7 +351,7 @@ public abstract class InternalJob extends JobState {
 			 * LOOP action
 			 */
 			case LOOP: {
-				didAction = terminateLoopHandler.terminateLoopTask(didAction, action, initiator, changesInfo, frontend);
+				didAction = terminateLoopHandler.terminateLoopTask(action, initiator, changesInfo, frontend);
 				break;
 			}
 

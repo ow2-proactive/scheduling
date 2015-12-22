@@ -192,7 +192,7 @@ public class TerminateReplicateTaskHandler {
 	 */
 	private void assignReplicationTag(InternalTask replicatedTask, InternalTask initiator, boolean loopAction,
 			FlowAction action) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 
 		if (loopAction) {
 			buf.append("LOOP-");
@@ -210,7 +210,7 @@ public class TerminateReplicateTaskHandler {
 
 		if (loopAction) {
 			String cronExpr = action.getCronExpr();
-			if (cronExpr.equals("")) {
+			if ("".equals(cronExpr)) {
 				buf.append(replicatedTask.getIterationIndex());
 			} else {
 				// cron task: the replication index is the next date that

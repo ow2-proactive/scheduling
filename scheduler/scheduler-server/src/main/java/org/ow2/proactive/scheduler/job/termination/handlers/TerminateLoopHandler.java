@@ -16,7 +16,7 @@ import it.sauronsoftware.cron4j.Predictor;
 
 public class TerminateLoopHandler {
 
-	public static final Logger logger = Logger.getLogger(TerminateLoopHandler.class);
+	private static final Logger LOGGER = Logger.getLogger(TerminateLoopHandler.class);
 
 	private final InternalJob internalJob;
 
@@ -24,8 +24,8 @@ public class TerminateLoopHandler {
 		this.internalJob = internalJob;
 	}
 
-	public boolean terminateLoopTask(boolean didAction, FlowAction action, InternalTask initiator,
-			ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend) {
+	public boolean terminateLoopTask(FlowAction action, InternalTask initiator, ChangedTasksInfo changesInfo,
+			SchedulerStateUpdate frontend) {
 		// find the target of the loop
 		InternalTask target = null;
 		if (action.getTarget().equals(initiator.getName())) {
@@ -33,8 +33,9 @@ public class TerminateLoopHandler {
 		} else {
 			target = internalJob.findTaskUp(action.getTarget(), initiator);
 		}
-		didAction = internalJob.replicateForNextLoopIteration(initiator, target, changesInfo, frontend, action);
-		if (didAction && action.getCronExpr() != null) {
+		boolean replicateForNextLoopIteration = internalJob.replicateForNextLoopIteration(initiator, target,
+				changesInfo, frontend, action);
+		if (replicateForNextLoopIteration && action.getCronExpr() != null) {
 			for (TaskId tid : changesInfo.getNewTasks()) {
 				InternalTask newTask = internalJob.getIHMTasks().get(tid);
 				try {
@@ -45,10 +46,11 @@ public class TerminateLoopHandler {
 				} catch (InvalidPatternException e) {
 					// this will not happen as the cron expression is
 					// already being validated in FlowScript class.
+					LOGGER.debug(e.getMessage());
 				}
 			}
 		}
-		return didAction;
+		return replicateForNextLoopIteration;
 	}
 
 }

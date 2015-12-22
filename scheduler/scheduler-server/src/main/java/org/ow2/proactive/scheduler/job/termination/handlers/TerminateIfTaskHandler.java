@@ -17,7 +17,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 public class TerminateIfTaskHandler {
 
-	public static final Logger logger = Logger.getLogger(TerminateIfTaskHandler.class);
+	private static final Logger LOGGER = Logger.getLogger(TerminateIfTaskHandler.class);
 
 	private final InternalJob internalJob;
 
@@ -30,16 +30,16 @@ public class TerminateIfTaskHandler {
 
 		InternalTask[] targets = searchIfElseJoinTasks(action, initiator);
 
-		// the targetIf from action.getTarget() is the selected branch;
+		// the targetIf from action getTarget is the selected branch
 		// the IF condition has already been evaluated prior to being put in a
 		// FlowAction
-		// the targetElse from action.getTargetElse() is the branch that was NOT
+		// the targetElse from action getTargetElse is the branch that was NOT
 		// selected
 		InternalTask targetIf = targets[0];
 		InternalTask targetElse = targets[1];
 		InternalTask targetJoin = targets[2];
 
-		logger.info("Control Flow Action IF: " + targetIf.getId() + " join: "
+		LOGGER.info("Control Flow Action IF: " + targetIf.getId() + " join: "
 				+ ((targetJoin == null) ? "null" : targetJoin.getId()));
 
 		// these 2 tasks delimit the Task Block formed by the IF branch
@@ -92,7 +92,7 @@ public class TerminateIfTaskHandler {
 			changesInfo.taskSkipped(it);
 			internalJob.setNumberOfPendingTasks(internalJob.getNumberOfPendingTasks() - 1);
 			internalJob.setNumberOfFinishedTasks(internalJob.getNumberOfFinishedTasks() + 1);
-			logger.info("Task " + it.getId() + " will not be executed");
+			LOGGER.info("Task " + it.getId() + " will not be executed");
 		}
 
 		// plug the branch in the descriptor
