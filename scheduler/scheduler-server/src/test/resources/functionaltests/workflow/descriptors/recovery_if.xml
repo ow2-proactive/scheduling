@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job name="RecoveryIf" priority="normal" projectName="Not Assigned" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev" xmlns="urn:proactive:jobdescriptor:dev">
+    <description>No description</description>
+    <taskFlow>
+        <task name="A">
+            <javaExecutable class="functionaltests.job.recover.TestIfTaskRestore$TaskA"/>
+            <controlFlow>
+                <if else="C" target="B">
+                    <script>
+                        <code language="javascript"><![CDATA[branch = "if";]]></code>
+                    </script>
+                </if>
+            </controlFlow>
+        </task>
+        <task name="B">
+            <javaExecutable class="functionaltests.job.recover.TestIfTaskRestore$TaskB"/>
+        </task>
+        <task name="C">
+            <javaExecutable class="functionaltests.job.recover.TestIfTaskRestore$TaskC"/>
+        </task>
+    </taskFlow>
+</job>

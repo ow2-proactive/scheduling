@@ -35,10 +35,8 @@ import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryp
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.TaskSortParameter;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -199,10 +197,8 @@ public class SchedulerDBManager {
             final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
-            return new Page<JobInfo>(new ArrayList<JobInfo>(), 0);
+            return new Page<JobInfo>(new ArrayList<JobInfo>(0), 0);
         }
-        
-        JobFilterCriteria jfc = new JobFilterCriteria(false, true, true, true);
 
         DBJobDataParameters params = new DBJobDataParameters(offset, limit, user, pending, running, finished, sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
@@ -786,11 +782,10 @@ public class SchedulerDBManager {
             public List<InternalJob> executeWork(Session session) {
                 Query query;
                 if (period > 0) {
-                    long minSubmittedTime = System.currentTimeMillis() - period;
                     query = session
                             .createQuery(
                                     "select id from JobData where status in (:status) and removedTime = -1 and submittedTime >= :minSubmittedTime")
-                            .setParameter("minSubmittedTime", minSubmittedTime).setParameterList("status",
+                            .setParameter("minSubmittedTime", System.currentTimeMillis() - period).setParameterList("status",
                                     status);
                 } else {
                     query = session.createQuery(
@@ -1205,8 +1200,9 @@ public class SchedulerDBManager {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             public Void executeWork(Session session) {
+
                 Query query = session.createQuery(
-                        "update TaskData task set task." + fieldName + " = :newTime " +
+                        "update TaskData task set task." + fieldName + " = :newTime " + //NOSONAR
                                 "where task.id.jobId = :jobId and task.id.taskId= :taskId")
                         .setParameter("newTime", time)
                         .setParameter("jobId", jobId)

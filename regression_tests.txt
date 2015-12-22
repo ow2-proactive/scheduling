@@ -3,7 +3,6 @@ TestNSNodesPermissions
 SelectionScriptTimeOutTest
 TestJobInstantGetTaskResult
 TestMultipleUsersMakingMassivGetResultRequest
-TestWorkflowRecoveryInterrupted
 TestJobKilled
 TestProcessTreeKiller
 SchedulerDbManagerConcurrencyTest

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.3"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+        name="Replicate"
+        priority="normal"
+        cancelJobOnError="false">
+    <taskFlow>
+        <task name="SplitTask">
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[ result = true ]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow>
+                <replicate>
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[ runs=5 ]]>
+                        </code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="ProcessTask">
+            <depends>
+                <task ref="SplitTask"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[ result = variables.get('PA_TASK_REPLICATION') ]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="MergeTask">
+            <depends>
+                <task ref="ProcessTask"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[ result = true ]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+    </taskFlow>
+</job>

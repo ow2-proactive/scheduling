@@ -20,7 +20,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
+import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
@@ -71,8 +71,8 @@ public class SchedulingService {
     private URI lastRmUrl;
 
     public SchedulingService(SchedulingInfrastructure infrastructure, SchedulerStateUpdate listener,
-            SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState, String policyClassName,
-            SchedulingMethod schedulingMethod) throws Exception {
+                             RecoveredSchedulerState recoveredState, String policyClassName,
+                             SchedulingMethod schedulingMethod) throws Exception {
         this.infrastructure = infrastructure;
         this.listener = listener;
         this.jobs = new LiveJobs(infrastructure.getDBManager(), listener);
@@ -732,7 +732,7 @@ public class SchedulingService {
         }
     }
 
-    private void recover(SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState) {
+    private void recover(RecoveredSchedulerState recoveredState) {
         jobsRecovered(recoveredState.getPendingJobs());
         jobsRecovered(recoveredState.getRunningJobs());
 

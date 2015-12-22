@@ -37,12 +37,15 @@ public final class ClientJobState extends JobState {
     private JobInfoImpl jobInfo;
     private String owner;
     private JobType type;
-    private Map<TaskId, TaskState> tasks = new HashMap<>();
+    private Map<TaskId, TaskState> tasks;
     private boolean cancelJobOnError;
     private int maxNumberOfExecution;
-    private HashMap<String, String> genericInformations;
+    private HashMap<String, String> genericInformation;
 
     public ClientJobState(JobState jobState) {
+        List<TaskState> taskStates = jobState.getTasks();
+        this.tasks = new HashMap<>(taskStates.size());
+
         // converting internal job into a light job descriptor
         jobInfo = (JobInfoImpl) jobState.getJobInfo();
         owner = jobState.getOwner();
@@ -58,17 +61,15 @@ public final class ClientJobState extends JobState {
         this.cancelJobOnError = jobState.isCancelJobOnError();
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
-        this.genericInformations = new HashMap<>(jobState.getGenericInformation());
+        this.genericInformation = new HashMap<>(jobState.getGenericInformation());
 
         this.clientJobSerializationHelper = new ClientJobSerializationHelper();
 
-        List<TaskState> taskStates = jobState.getTasks();
         List<ClientTaskState> clientTaskStates = new ArrayList<>(taskStates.size());
         for (TaskState ts : taskStates) {
             clientTaskStates.add(new ClientTaskState(ts));
         }
         addTasks(clientTaskStates);
-
     }
 
     @Override
@@ -84,7 +85,7 @@ public final class ClientJobState extends JobState {
 
     @Override
     public Map<String, String> getGenericInformation() {
-        return this.genericInformations;
+        return this.genericInformation;
     }
 
     @Override

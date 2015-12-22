@@ -12,9 +12,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
@@ -27,14 +29,13 @@ public class SchedulingServiceTest {
 	@Mock
 	private SchedulerStateUpdate listener;
 	@Mock
-	private SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState;
+	private RecoveredSchedulerState recoveredState;
 	@Mock
 	private SchedulingMethod schedulingMethod;
 	@Mock
-	private RMProxiesManager rmProxiesManager; 
+	private RMProxiesManager rmProxiesManager;
 	
-	
-	private String policyClassName = "org.ow2.proactive.scheduler.policy.DefaultPolicy";
+	private final String policyClassName = DefaultPolicy.class.getName();
 
 	@Before
 	public void init() throws Exception {
@@ -46,7 +47,6 @@ public class SchedulingServiceTest {
 		Mockito.when(rmProxiesManager.getRmUrl()).thenReturn(null);
 		
 		schedulingService = new SchedulingService(infrastructure, listener, recoveredState, policyClassName, schedulingMethod);
-
 	}
 	
 	@Test
@@ -76,7 +76,6 @@ public class SchedulingServiceTest {
 		assertThat(schedulingService.isSubmitPossible(), is(false));
 	}
 
-	
 	@Test
 	public void testStop(){
 		assertThat(schedulingService.stop(), is(true));
@@ -195,7 +194,6 @@ public class SchedulingServiceTest {
 		assertThat(schedulingService.status, is(schedulingService.status.DB_DOWN));
 	}
 	
-	
 	@Test
 	public void testShutdown(){
 		schedulingService.status = schedulingService.status.STARTED;
@@ -222,8 +220,7 @@ public class SchedulingServiceTest {
 		assertThat(schedulingService.shutdown(), is(false));
 		assertThat(schedulingService.status, is(schedulingService.status.DB_DOWN));
 	}
-	
-	
+
 	@Test
 	public void testKill(){
 		schedulingService.status = schedulingService.status.STARTED;
@@ -231,7 +228,6 @@ public class SchedulingServiceTest {
 		assertThat(schedulingService.status, is(schedulingService.status.KILLED));
 		Mockito.verify(infrastructure, Mockito.times(1)).shutdown();
 		Mockito.verify(listener, Mockito.times(1)).schedulerStateUpdated(SchedulerEvent.KILLED);
-		
 	}
 	
 	@Test
@@ -243,7 +239,6 @@ public class SchedulingServiceTest {
 		schedulingService.status = schedulingService.status.DB_DOWN;
 		assertThat(schedulingService.kill(), is(false));
 		assertThat(schedulingService.status, is(schedulingService.status.DB_DOWN));
-		
 	}
 	
 	@Test
@@ -252,17 +247,15 @@ public class SchedulingServiceTest {
 		InternalTask task = new InternalScriptTask();
 		schedulingService.restartTaskOnNodeFailure(task);
 		Mockito.verify(infrastructure, Mockito.times(0)).getInternalOperationsThreadPool();
-		
 	}
 	
 	@Test
 	public void testRestartTaskOnNodeFailure(){
-		
 		InternalTask task = new InternalScriptTask();
 		ExecutorService executorService = Mockito.mock(ExecutorService.class);
 		Mockito.when(infrastructure.getInternalOperationsThreadPool()).thenReturn(executorService);
 		schedulingService.restartTaskOnNodeFailure(task);
 		Mockito.verify(executorService, Mockito.times(1)).submit(org.mockito.Matchers.any(Runnable.class));
-		
 	}
+
 }

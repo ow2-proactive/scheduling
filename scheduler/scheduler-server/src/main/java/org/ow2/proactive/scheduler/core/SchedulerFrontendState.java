@@ -128,19 +128,26 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * and job/user association.
      */
     private void recover(SchedulerStateImpl sState) {
+        Vector<JobState> pendingJobs = sState.getPendingJobs();
+        Vector<JobState> runningJobs = sState.getRunningJobs();
+        Vector<JobState> finishedJobs = sState.getFinishedJobs();
+
         //default state = started
-        Set<JobState> jobStates = new HashSet<>();
+        Set<JobState> jobStates =
+                new HashSet<>(pendingJobs.size() + runningJobs.size() + finishedJobs.size());
+
         if (logger.isInfoEnabled()) {
-            logger.info("#Pending jobs: " + sState.getPendingJobs().size() + " #Running jobs: " +
-                sState.getRunningJobs().size() + " #Finished jobs: " + sState.getFinishedJobs().size());
+            logger.info("#Pending jobs: " + pendingJobs.size() + " #Running jobs: " +
+                runningJobs.size() + " #Finished jobs: " + finishedJobs.size());
         }
-        for (JobState js : sState.getPendingJobs()) {
+
+        for (JobState js : pendingJobs) {
             prepare(jobStates, js, false);
         }
-        for (JobState js : sState.getRunningJobs()) {
+        for (JobState js : runningJobs) {
             prepare(jobStates, js, false);
         }
-        for (JobState js : sState.getFinishedJobs()) {
+        for (JobState js : finishedJobs) {
             prepare(jobStates, js, true);
         }
     }

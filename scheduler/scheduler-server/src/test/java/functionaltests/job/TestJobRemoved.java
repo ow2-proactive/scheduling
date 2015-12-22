@@ -51,7 +51,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
 
 /**
  * Checking that job removal works for pending/running/finished jobs
- * 
+ *
  */
 public class TestJobRemoved extends SchedulerFunctionalTest {
 

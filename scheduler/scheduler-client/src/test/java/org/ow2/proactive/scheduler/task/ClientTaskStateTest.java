@@ -13,26 +13,24 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static com.google.common.truth.Truth.assertThat;
 
 public class ClientTaskStateTest {
 
     @Test
-    public void restoreDependenciesSerializationCallsDefaultReadObjectTest() throws NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+    public void testRestoreDependenciesSerializationCallsDefaultReadObject() throws NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         ClientTaskState clientTaskState = new ClientTaskState(new TestTaskState());
 
         Method method = clientTaskState.getClass().getDeclaredMethod("readObject", ObjectInputStream.class);
         method.setAccessible(true);
         ObjectInputStream mockedObjectInputStream = Mockito.mock(ObjectInputStream.class);
-        Object r = method.invoke(clientTaskState, mockedObjectInputStream);
+        method.invoke(clientTaskState, mockedObjectInputStream);
 
         Mockito.verify(mockedObjectInputStream).defaultReadObject();
-
     }
 
     @Test
-    public void restoreDependenciesSerializationCreatesEmptyArrayListTest() throws NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+    public void testRestoreDependenciesSerializationCreatesEmptyArrayList() throws NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         TestTaskState testTaskState = new TestTaskState();
         ClientTaskState clientTaskState = new ClientTaskState(testTaskState);
 
@@ -40,22 +38,21 @@ public class ClientTaskStateTest {
         clientTaskState.getDependences().add(testTaskState);
 
         // Check that there is one task in the dependencies list
-        assertThat(clientTaskState.getDependences().size(), is(1));
+        assertThat(clientTaskState.getDependences()).hasSize(1);
 
-        // Call then eadObject method
+        // Call then readObject method
         Method method = clientTaskState.getClass().getDeclaredMethod("readObject", ObjectInputStream.class);
         method.setAccessible(true);
         ObjectInputStream mockedObjectInputStream = Mockito.mock(ObjectInputStream.class);
         Object r = method.invoke(clientTaskState, mockedObjectInputStream);
 
         // Check that the ArrayList is now an empty list
-        assertThat(clientTaskState.getDependences().size(), is(0));
-
+        assertThat(clientTaskState.getDependences()).hasSize(0);
     }
 
     public class TestTaskState extends TaskState {
 
-        List<TaskState> dependencies = new ArrayList<>();
+        List<TaskState> dependencies = new ArrayList<>(0);
 
         @Override
         public void update(TaskInfo taskInfo) {
@@ -91,5 +88,7 @@ public class ClientTaskStateTest {
         public int getReplicationIndex() {
             return 0;
         }
+
     }
+
 }

@@ -20,6 +20,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -49,7 +50,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         dbManager.updateAfterTaskFinished(job, task1, result);
 
         SchedulerStateRecoverHelper stateRecoverHelper = new SchedulerStateRecoverHelper(dbManager);
-        SchedulerStateRecoverHelper.RecoveredSchedulerState recovered;
+        RecoveredSchedulerState recovered;
 
         recovered = stateRecoverHelper.recover(-1);
 

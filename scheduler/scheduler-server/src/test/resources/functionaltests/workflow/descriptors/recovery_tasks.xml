@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job name="TestTaskRestore" priority="normal" projectName="Not Assigned"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev"
+     xmlns="urn:proactive:jobdescriptor:dev">
+    <description>No description</description>
+    <taskFlow>
+        <task name="task1">
+            <pre>
+                <script>
+                    <code language="js"><![CDATA[print('prescript1')]]></code>
+                </script>
+            </pre>
+            <javaExecutable class="functionaltests.job.recover.TestTaskRestore$TestJavaTask1">
+                <parameters>
+                    <parameter name="param1" value="javaTask1"/>
+                </parameters>
+            </javaExecutable>
+            <post>
+                <script>
+                    <code language="js"><![CDATA[print('postscript1')]]></code>
+                </script>
+            </post>
+        </task>
+        <task name="task2">
+            <depends>
+                <task ref="task1"/>
+            </depends>
+            <selection>
+                <script>
+                    <code language="groovy"><![CDATA[var args=["/tmp/junit3925527021484427651/TestTaskRestore_sel2.tmp"];
+if (!new java.io.File(args[0]).exists()) { print('Going to create file ' + args[0]); if (!new java.io.File(args[0]).createNewFile()) { throw new java.lang.Exception(); } } ; selected=true;]]></code>
+                </script>
+            </selection>
+            <forkEnvironment>
+                <envScript>
+                    <script>
+                        <code language="groovy"><![CDATA[var args=["/tmp/junit3925527021484427651/TestTaskRestore_env2.tmp"];
+if (!new java.io.File(args[0]).exists()) { print('Going to create file ' + args[0]); if (!new java.io.File(args[0]).createNewFile()) { throw new java.lang.Exception(); } } ; selected=true;]]></code>
+                    </script>
+                </envScript>
+            </forkEnvironment>
+            <pre>
+                <script>
+                    <code language="js"><![CDATA[print('prescript2')]]></code>
+                </script>
+            </pre>
+            <javaExecutable class="functionaltests.job.recover.TestTaskRestore$TestJavaTask2">
+                <parameters>
+                    <parameter name="param1" value="javaTask2"/>
+                </parameters>
+            </javaExecutable>
+            <post>
+                <script>
+                    <code language="js"><![CDATA[print('postscript2')]]></code>
+                </script>
+            </post>
+            <cleaning>
+                <script>
+                    <code language="groovy"><![CDATA[var args=["/tmp/junit3925527021484427651/TestTaskRestore_clean2.tmp"];
+if (!new java.io.File(args[0]).exists()) { print('Going to create file ' + args[0]); if (!new java.io.File(args[0]).createNewFile()) { throw new java.lang.Exception(); } } ; selected=true;]]></code>
+                </script>
+            </cleaning>
+        </task>
+        <task name="task3">
+            <depends>
+                <task ref="task1"/>
+            </depends>
+            <selection>
+                <script>
+                    <code language="groovy"><![CDATA[var args=["/tmp/junit3925527021484427651/TestTaskRestore_sel3.tmp"];
+if (!new java.io.File(args[0]).exists()) { print('Going to create file ' + args[0]); if (!new java.io.File(args[0]).createNewFile()) { throw new java.lang.Exception(); } } ; selected=true;]]></code>
+                </script>
+            </selection>
+            <pre>
+                <script>
+                    <code language="js"><![CDATA[print('prescript3')]]></code>
+                </script>
+            </pre>
+            <nativeExecutable>
+                <staticCommand
+                        value="/home/lpellegr/Projects/ow2-proactive/scheduling/scheduler/scheduler-server/build/resources/test/functionaltests/executables/test_echo_task.sh"/>
+            </nativeExecutable>
+            <post>
+                <script>
+                    <code language="js"><![CDATA[print('postscript3')]]></code>
+                </script>
+            </post>
+            <cleaning>
+                <script>
+                    <code language="groovy"><![CDATA[var args=["/tmp/junit3925527021484427651/TestTaskRestore_clean3.tmp"];
+if (!new java.io.File(args[0]).exists()) { print('Going to create file ' + args[0]); if (!new java.io.File(args[0]).createNewFile()) { throw new java.lang.Exception(); } } ; selected=true;]]></code>
+                </script>
+            </cleaning>
+        </task>
+    </taskFlow>
+</job>
