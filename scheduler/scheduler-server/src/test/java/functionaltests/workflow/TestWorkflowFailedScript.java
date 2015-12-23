@@ -39,14 +39,14 @@ package functionaltests.workflow;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.junit.Assert;
-import org.junit.Test;
 
 
 /**
@@ -63,7 +63,7 @@ public class TestWorkflowFailedScript extends TRepJobs {
     private static final String ifScriptContent = "throw new java.lang.Exception(\"test exception\");";
 
     @Test
-    public void run() throws Throwable {
+    public void testWorkflowFailedScript() throws Throwable {
         testIf();
     }
 

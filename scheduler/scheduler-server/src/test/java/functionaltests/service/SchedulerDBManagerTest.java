@@ -1,5 +1,6 @@
 package functionaltests.service;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -7,16 +8,14 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.truth.Truth;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.TaskFilterCriteria;
+import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
@@ -320,7 +319,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         assertEquals("Incorrect tasks list size due to coupled dates from/to", totalNbTasks,
                 actualPageState.getList().size());
     }
-    
+
     private void initExpectedResults(String jobName, String tag) throws Throwable {
         actualInternalJobs = createTestJobs(jobName, tag, nbJobs, nbTasksPerJob);
         lAllTasks = new ArrayList<Task>(totalNbTasks);
@@ -383,13 +382,13 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
     private Page<TaskInfo> getTasks(TaskFilterCriteria criterias) {
         return dbManager.getTasks(criterias.getFrom(), criterias.getTo(), criterias.getTag(),
                 criterias.getOffset(), criterias.getLimit(), criterias.getUser(), criterias.isPending(),
-                criterias.isRunning(), criterias.isFinished(), criterias.getSortParameters());
+                criterias.isRunning(), criterias.isFinished());
     }
     
     private Page<TaskState> getTaskStates(TaskFilterCriteria criterias) {
         return dbManager.getTaskStates(criterias.getFrom(), criterias.getTo(), criterias.getTag(),
                 criterias.getOffset(), criterias.getLimit(), criterias.getUser(), criterias.isPending(),
-                criterias.isRunning(), criterias.isFinished(), criterias.getSortParameters());
+                criterias.isRunning(), criterias.isFinished());
     }
     
     private void assertTaskPageSizes(Page<?> page, int nbTasksInPage, int totalNbTasks) {

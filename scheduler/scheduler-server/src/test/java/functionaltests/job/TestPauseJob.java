@@ -36,22 +36,25 @@
  */
 package functionaltests.job;
 
-import java.nio.file.Path;
-
+import functionaltests.utils.SchedulerFunctionalTest;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.FileLock;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static functionaltests.job.recover.TestPauseJobRecover.createJob;
-import static functionaltests.job.recover.TestPauseJobRecover.getTaskState;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -94,6 +97,54 @@ public class TestPauseJob extends SchedulerFunctionalTest {
         Thread.sleep(5000);
         js = schedulerHelper.getSchedulerInterface().getJobState(jobId);
         assertEquals(TaskStatus.PAUSED, getTaskState("task2", js).getStatus());
+    }
+
+    public static TaskState getTaskState(String taskName, JobState jobState) {
+        for (TaskState ts : jobState.getTasks()) {
+            if (ts.getName().equals(taskName)) {
+                return ts;
+            }
+        }
+        return null;
+    }
+
+    public static TaskFlowJob createJob(String fileLockPath) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+
+        JavaTask task1 = new JavaTask();
+        task1.setName("task1");
+        task1.setExecutableClassName(TestJavaTask.class.getName());
+        task1.addArgument("fileLockPath", fileLockPath);
+
+        JavaTask task2 = new JavaTask();
+        task2.setName("task2");
+        task2.setExecutableClassName(SleepTask.class.getName());
+
+        task2.addDependence(task1);
+        job.addTask(task1);
+        job.addTask(task2);
+        return job;
+    }
+
+    public static class SleepTask extends JavaExecutable {
+
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            TimeUnit.MILLISECONDS.sleep(1);
+            return "OK";
+        }
+    }
+
+    public static class TestJavaTask extends JavaExecutable {
+
+        private String fileLockPath;
+
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            System.out.println("OK");
+            FileLock.waitUntilUnlocked(fileLockPath);
+            return "OK";
+        }
     }
 
 }

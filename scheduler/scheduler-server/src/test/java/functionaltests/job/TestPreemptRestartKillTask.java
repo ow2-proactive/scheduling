@@ -36,9 +36,15 @@
  */
 package functionaltests.job;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
 import org.ow2.proactive.scheduler.common.exception.TaskRestartedException;
@@ -50,12 +56,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -84,7 +86,7 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_preempt_restart_kill.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testPreemptRestartKillTask() throws Throwable {
 
         log("Submitting job");
 

@@ -14,7 +14,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
@@ -36,7 +35,7 @@ public class ClientJobStateTest {
     }
 
     @Test
-    public void restoreDependenciesSerializationCallsDefaultReadObjectAndSerializationHelperTest() throws NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+    public void testRestoreDependenciesSerializationCallsDefaultReadObjectAndSerializationHelper() throws NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         // Create a ClientJobState
         ClientJobState jobState = new ClientJobState(new TestJobState());
 
@@ -53,9 +52,7 @@ public class ClientJobStateTest {
 
         Mockito.verify(mockedObjectInputStream).defaultReadObject();
         Mockito.verify(helperMock).serializeTasks(Mockito.any(Map.class));
-
     }
-
 
     /**
      * Sets a private field.
@@ -71,7 +68,7 @@ public class ClientJobStateTest {
     }
 
     @Test
-    public void taskUpdate_ShouldUpdate_NumberOfTasksInJobInfo() throws Exception {
+    public void testNumberOfTasksInJobInfoUpdatedWhenUpdateTask() throws Exception {
         JobInfoImpl jobInfo = createJobInfo();
         ClientJobState jobState = new ClientJobState(createJobState(jobInfo));
 
@@ -120,8 +117,8 @@ public class ClientJobStateTest {
             }
 
             @Override
-            public ArrayList<TaskState> getTasks() {
-                ArrayList<TaskState> tasks = new ArrayList<>();
+            public List<TaskState> getTasks() {
+                List<TaskState> tasks = new ArrayList<>(0);
                 tasks.add(new TaskState() {
                     @Override
                     public void update(TaskInfo taskInfo) {
@@ -181,9 +178,9 @@ public class ClientJobStateTest {
         };
     }
 
-    class TestJobState extends JobState {
+    private class TestJobState extends JobState {
 
-        final ArrayList<TaskState> listOfTasks = new ArrayList<>();
+        private final List<TaskState> listOfTasks = new ArrayList<>(0);
 
         @Override
         public void update(TaskInfo info) {
@@ -201,13 +198,13 @@ public class ClientJobStateTest {
         }
 
         @Override
-        public ArrayList<TaskState> getTasks() {
+        public List<TaskState> getTasks() {
             return this.listOfTasks;
         }
 
         @Override
         public Map<TaskId, TaskState> getHMTasks() {
-            return new HashMap<>();
+            return new HashMap<>(0);
         }
 
         @Override
@@ -220,4 +217,5 @@ public class ClientJobStateTest {
             return JobType.TASKSFLOW;
         }
     }
+
 }

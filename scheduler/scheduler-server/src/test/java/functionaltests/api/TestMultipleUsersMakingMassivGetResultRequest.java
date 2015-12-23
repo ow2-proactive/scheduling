@@ -36,6 +36,9 @@
  */
 package functionaltests.api;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+
+import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -45,12 +48,9 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.examples.EmptyTask;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.TestUsers;
-
-import static functionaltests.utils.SchedulerTHelper.log;
 
 
 /**
@@ -72,7 +72,7 @@ public class TestMultipleUsersMakingMassivGetResultRequest extends SchedulerFunc
     private static int nbFinished = 0;//will be increase to count terminated threads
 
     @Test
-    public void run() throws Throwable {
+    public void testMultipleUsersMakingMassivGetResultRequest() throws Throwable {
 
         final SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
 

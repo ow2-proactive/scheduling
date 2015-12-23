@@ -30,9 +30,27 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *  * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler;
+package functionaltests.utils;
 
-public class Test {
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.tests.ProActiveTest;
+
+public final class Credentials extends ProActiveTest {
+
+    private static final String DEFAULT_USER_NAME = "admin";
+
+    private static org.ow2.proactive.authentication.crypto.Credentials defaultCredentials;
+
+    public static org.ow2.proactive.authentication.crypto.Credentials getDefaultCredentials() throws Exception {
+        if (defaultCredentials == null) {
+            defaultCredentials = org.ow2.proactive.authentication.crypto.Credentials.createCredentials(DEFAULT_USER_NAME, "admin",
+                    PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH
+                            .getValueAsString()));
+        }
+
+        return defaultCredentials;
+    }
+
 }

@@ -38,21 +38,21 @@ package functionaltests.workflow.variables;
 
 import java.util.HashMap;
 
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.executables.PropagateVariablesExec;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 
 public class TestPropagatedVariables extends SchedulerFunctionalTest {
 
     @Test
-    public void run() throws Throwable {
+    public void testPropagatedVariables() throws Throwable {
         schedulerHelper.testJobSubmissionAndVerifyAllResults(createTaskFlowJob(),
                 "TestPropagatedVariables.TestFlowJob");
     }

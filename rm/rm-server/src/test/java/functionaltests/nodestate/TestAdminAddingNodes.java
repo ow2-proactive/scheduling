@@ -36,8 +36,14 @@
  */
 package functionaltests.nodestate;
 
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
 import java.net.URI;
 
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -49,14 +55,10 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestNode;
-
-import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -81,7 +83,7 @@ import static org.junit.Assert.*;
 public class TestAdminAddingNodes extends RMFunctionalTest {
 
     @Test
-    public void action() throws Exception {
+    public void testAddNodes() throws Exception {
 
         final String NS_NAME = "TestAdminAddingNodes";
 

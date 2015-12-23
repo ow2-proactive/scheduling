@@ -36,21 +36,22 @@
  */
 package functionaltests.job.taskkill;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
+import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
-import org.junit.Test;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -70,7 +71,7 @@ public class TestJobKilled extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_Killed.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testJobKilled() throws Throwable {
         schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
           "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 

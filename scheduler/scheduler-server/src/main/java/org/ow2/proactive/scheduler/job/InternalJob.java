@@ -404,6 +404,7 @@ public abstract class InternalJob extends JobState {
                     Date startAt = (new Predictor(action.getCronExpr())).nextMatchingDate();
                     newTask.addGenericInformation(GENERIC_INFO_START_AT_KEY, ISO8601DateUtil
                             .parse(startAt));
+                    newTask.setScheduledTime(startAt.getTime());
                 } catch (InvalidPatternException e) {
                     // this will not happen as the cron expression is
                     // already being validated in FlowScript class.
@@ -482,9 +483,8 @@ public abstract class InternalJob extends JobState {
                 }
             }
         }
-        
-        InternalTask[] result = {targetIf, targetElse, targetJoin};
-        return result;
+
+        return new InternalTask[]{targetIf, targetElse, targetJoin};
     }
     
     
@@ -734,49 +734,43 @@ public abstract class InternalJob extends JobState {
      * @param action the duplication action.
      */
     private void assignReplicationTag(InternalTask replicatedTask, InternalTask initiator, boolean loopAction, FlowAction action){
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
-        if(loopAction){
+        if (loopAction) {
             buf.append("LOOP-");
             buf.append(InternalTask.getInitialName(initiator.getName()));
-            if(initiator.getReplicationIndex() > 0){
+            if(initiator.getReplicationIndex() > 0) {
                 buf.append("*");
                 buf.append(initiator.getReplicationIndex());
             }
-        }
-        else {
+        } else {
             buf.append("REPLICATE-");
             buf.append(initiator.getName());
         }
 
-
         buf.append("-");
 
-        if(loopAction){
-            FlowScript flow = initiator.getFlowScript();
+        if (loopAction) {
             String cronExpr = action.getCronExpr();
-            if(cronExpr.equals("")){
+            if (cronExpr.isEmpty()) {
                 buf.append(replicatedTask.getIterationIndex());
-            }
-            else{
+            } else{
                 //cron task: the replication index is the next date that matches the cron expression
-                Date resolvedCron = (new Predictor(cronExpr)).nextMatchingDate();
+                Date resolvedCron = new Predictor(cronExpr).nextMatchingDate();
                 SimpleDateFormat dt = new SimpleDateFormat("dd_MM_YY_HH_mm");
                 buf.append(dt.format(resolvedCron));
             }
-        }
-        else{
+        } else{
             buf.append(replicatedTask.getReplicationIndex());
         }
 
         replicatedTask.setTag(buf.toString());
     }
 
-
     private boolean replicateForNextLoopIteration(InternalTask initiator, InternalTask target,
             ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, FlowAction action) {
 
-        logger.info("LOOP (init:" + initiator.getId() + ";target:" + target.getId() + ")");
+        logger.info("LOOP (init:" + initiator.getId() + "; target:" + target.getId() + ")");
 
         // accumulates the tasks between the initiator and the target
         Map<TaskId, InternalTask> dup = new HashMap<>();
@@ -1021,11 +1015,12 @@ public abstract class InternalJob extends JobState {
         setNumberOfRunningTasks(0);
         setStatus(JobStatus.RUNNING);
 
-        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>();
+        List<InternalTask> internalTasks = getITasks();
+        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>(internalTasks.size());
 
-        for (InternalTask td : getITasks()) {
-            td.setStatus(TaskStatus.PENDING);
-            taskStatus.put(td.getId(), TaskStatus.PENDING);
+        for (InternalTask internalTask : internalTasks) {
+            internalTask.setStatus(TaskStatus.PENDING);
+            taskStatus.put(internalTask.getId(), TaskStatus.PENDING);
         }
     }
 
@@ -1050,15 +1045,16 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been paused, false if not.
      */
     public Set<TaskId> setPaused() {
-        Set<TaskId> updatedTasks = new HashSet<>();
-
         if (jobInfo.getStatus() == JobStatus.PAUSED) {
-            return updatedTasks;
+            return new HashSet<>(0);
         }
 
         jobInfo.setStatus(JobStatus.PAUSED);
 
-        for (InternalTask td : tasks.values()) {
+        Collection<InternalTask> values = tasks.values();
+        Set<TaskId> updatedTasks = new HashSet<>(values.size());
+
+        for (InternalTask td : values) {
             if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
                 (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY)) {
                 td.setStatus(TaskStatus.PAUSED);
@@ -1077,10 +1073,8 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been unpaused, false if not.
      */
     public Set<TaskId> setUnPause() {
-        Set<TaskId> updatedTasks = new HashSet<>();
-
         if (jobInfo.getStatus() != JobStatus.PAUSED) {
-            return updatedTasks;
+            return new HashSet<>(0);
         }
 
         if ((getNumberOfPendingTasks() + getNumberOfRunningTasks() + getNumberOfFinishedTasks()) == 0) {
@@ -1091,6 +1085,7 @@ public abstract class InternalJob extends JobState {
             jobInfo.setStatus(JobStatus.RUNNING);
         }
 
+        Set<TaskId> updatedTasks = new HashSet<>();
         for (InternalTask td : tasks.values()) {
             if (jobInfo.getStatus() == JobStatus.PENDING) {
                 td.setStatus(TaskStatus.SUBMITTED);
@@ -1138,8 +1133,9 @@ public abstract class InternalJob extends JobState {
      */
     @Override
     public Map<TaskId, TaskState> getHMTasks() {
-        Map<TaskId, TaskState> tmp = new HashMap<>();
-        for (Entry<TaskId, InternalTask> e : tasks.entrySet()) {
+        Set<Entry<TaskId, InternalTask>> entries = tasks.entrySet();
+        Map<TaskId, TaskState> tmp = new HashMap<>(entries.size());
+        for (Entry<TaskId, InternalTask> e : entries) {
             tmp.put(e.getKey(), e.getValue());
         }
         return tmp;
@@ -1314,7 +1310,7 @@ public abstract class InternalJob extends JobState {
             return restartWaitingTimer;
         } else if (executionNumber > 10) {
             //execution timer exceed 10, restart after 60 seconds
-            return 60 * 1000;
+            return 60000;
         } else {
             //else restart according to this function
             return (getNextWaitingTime(executionNumber - 1) + executionNumber * 1000);
@@ -1383,7 +1379,7 @@ public abstract class InternalJob extends JobState {
     public Map<String, String> getGenericInformation() {
         if (genericInformations == null) {
             // task is not yet properly initialized
-            return new HashMap<>();
+            return new HashMap<>(0);
         }
 
         Map<String, String> replacements = new HashMap<>();

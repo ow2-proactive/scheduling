@@ -36,16 +36,18 @@
  */
 package functionaltests.job.recover;
 
-import java.io.File;
-import java.net.URL;
-
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.junit.Assert;
-import org.junit.Test;
-
 import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.utils.SchedulerTHelper;
+import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.Map;
+
+import static com.google.common.truth.Truth.assertThat;
 
 
 /**
@@ -53,7 +55,7 @@ import functionaltests.utils.SchedulerTHelper;
  * Even if it is in pending, running, or finished list, the scheduled jobs must be restarted
  * as expected after the scheduler restart.
  * This test case is about the behavior of the scheduler after a failure.
- *
+ * <p>
  * This test will first commit 3 jobs.
  * When the each one will be in each list (pending, running, finished), the scheduler will
  * be interrupt abnormally.
@@ -64,56 +66,58 @@ import functionaltests.utils.SchedulerTHelper;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobRecover extends SchedulerFunctionalTest {
-
-    private static URL jobDescriptor = TestJobRecover.class
-            .getResource("/functionaltests/descriptors/Job_PI_recover.xml");
+public class JobRecoverTest extends SchedulerFunctionalTest {
 
     @Test
     public void run() throws Throwable {
+        JobId firstJobId = schedulerHelper.submitJob(getWorkflowFile());
+        JobId secondJobId = schedulerHelper.submitJob(getWorkflowFile());
+        JobId thirdJobId = schedulerHelper.submitJob(getWorkflowFile());
 
-        JobId idJ1 = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-        JobId idJ2 = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-        JobId idJ3 = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-
-        schedulerHelper.waitForEventJobRunning(idJ1);
+        schedulerHelper.waitForEventJobRunning(firstJobId);
 
         SchedulerTHelper.log("Waiting for job 1 to finish");
-        schedulerHelper.waitForFinishedJob(idJ1);
+        schedulerHelper.waitForFinishedJob(firstJobId);
 
         SchedulerTHelper.log("Kill Scheduler");
-        schedulerHelper.killSchedulerAndNodesAndRestart(new File(SchedulerTHelper.class.getResource(
-                "/functionaltests/config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
+        schedulerHelper.killSchedulerAndNodesAndRestart(
+                new File(SchedulerTHelper.class.getResource(
+                    "/functionaltests/config/functionalTSchedulerProperties-updateDB.ini").toURI()).getAbsolutePath());
 
         SchedulerTHelper.log("Waiting for job 2 to finish");
-        schedulerHelper.waitForEventJobFinished(idJ2);
+        schedulerHelper.waitForEventJobFinished(secondJobId);
 
         SchedulerTHelper.log("Waiting for job 3 to finish");
-        schedulerHelper.waitForFinishedJob(idJ3);
+        schedulerHelper.waitForFinishedJob(thirdJobId);
 
-        SchedulerTHelper.log("check result job 1");
-        JobResult result = schedulerHelper.getJobResult(idJ1);
-        Assert.assertEquals(6, result.getAllResults().size());
-        for (int i = 1; i <= 6; i++) {
-            Assert.assertNotNull(result.getResult("Computation" + i).value());
-            Assert.assertNull(result.getResult("Computation" + i).getException());
-        }
+        SchedulerTHelper.log("Check result job 1");
+        JobResult result = schedulerHelper.getJobResult(firstJobId);
+        checkJobResults(result);
 
-        SchedulerTHelper.log("check result job 2");
-        result = schedulerHelper.getJobResult(idJ2);
-        Assert.assertEquals(6, result.getAllResults().size());
-        for (int i = 1; i <= 6; i++) {
-            Assert.assertNotNull(result.getResult("Computation" + i).value());
-            Assert.assertNull(result.getResult("Computation" + i).getException());
-        }
+        SchedulerTHelper.log("Check result job 2");
+        result = schedulerHelper.getJobResult(secondJobId);
+        checkJobResults(result);
 
-        SchedulerTHelper.log("check result job 3");
-        result = schedulerHelper.getJobResult(idJ3);
-        Assert.assertEquals(6, result.getAllResults().size());
-        for (int i = 1; i <= 6; i++) {
-            Assert.assertNotNull(result.getResult("Computation" + i).value());
-            Assert.assertNull(result.getResult("Computation" + i).getException());
-        }
-
+        SchedulerTHelper.log("Check result job 3");
+        result = schedulerHelper.getJobResult(thirdJobId);
+        checkJobResults(result);
     }
+
+    private String getWorkflowFile() throws URISyntaxException {
+        return new File(this.getClass().getResource(
+                "/functionaltests/descriptors/Job_PI_recover.xml").toURI()).getAbsolutePath();
+    }
+
+    private void checkJobResults(JobResult result) throws Throwable {
+        Map<String, TaskResult> allResults = result.getAllResults();
+
+        assertThat(allResults).hasSize(6);
+
+        for (int i = 1; i <= allResults.size(); i++) {
+            TaskResult taskResult = result.getResult("Computation" + i);
+            assertThat(taskResult.value()).isNotNull();
+            assertThat(taskResult.getException()).isNull();
+        }
+    }
+
 }

@@ -36,12 +36,16 @@
  */
 package functionaltests.workflow;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
 import java.util.Map.Entry;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -51,12 +55,8 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.junit.Assert;
-import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -92,7 +92,7 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTest {
      * @throws Throwable
      */
     @Test
-    public void run() throws Throwable {
+    public void testWorkflowIterationAwareness() throws Throwable {
         testJavaJob();
         testNativeJob();
     }

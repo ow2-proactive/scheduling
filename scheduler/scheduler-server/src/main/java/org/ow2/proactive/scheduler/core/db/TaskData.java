@@ -31,6 +31,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
+import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
@@ -54,6 +55,7 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -68,8 +70,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
 
 @Entity
-@Table(name = "TASK_DATA"/*, uniqueConstraints = { @UniqueConstraint(columnNames = {
-		"TASK_ID_JOB", "TASK_NAME" }) }*/)
+@Table(name = "TASK_DATA")
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
@@ -111,6 +112,8 @@ public class TaskData {
     private long startTime;
 
     private long finishedTime;
+
+    private long scheduledTime; // START_AT time
 
     private long executionDuration;
 
@@ -174,7 +177,7 @@ public class TaskData {
     }
 
     @Column(name = "JVM_ARGUMENTS")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public List<String> getJvmArguments() {
         return jvmArguments;
     }
@@ -184,7 +187,7 @@ public class TaskData {
     }
 
     @Column(name = "CLASSPATH")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public List<String> getAdditionalClasspath() {
         return additionalClasspath;
     }
@@ -302,12 +305,15 @@ public class TaskData {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
 
             DBTaskId dbTaskId = (DBTaskId) o;
 
-            if (jobId != dbTaskId.jobId) return false;
+            if (jobId != dbTaskId.jobId)
+                return false;
             return taskId == dbTaskId.taskId;
         }
 
@@ -376,6 +382,7 @@ public class TaskData {
         setTaskName(task.getName());
         setStartTime(task.getStartTime());
         setFinishedTime(task.getFinishedTime());
+        setScheduledTime(task.getScheduledTime());
         setIteration(task.getIterationIndex());
         setReplication(task.getReplicationIndex());
         setMatchingBlock(task.getMatchingBlock());
@@ -403,10 +410,19 @@ public class TaskData {
         taskData.setCancelJobOnError(task.isCancelJobOnError());
         taskData.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         taskData.setJobData(jobRuntimeData);
-        taskData.setNumberOfExecutionOnFailureLeft(PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
-                .getValueAsInt());
+        taskData.setNumberOfExecutionOnFailureLeft(
+                PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
         taskData.setGenericInformation(task.getGenericInformations(false));
+
+        // set the scheduledTime if the START_AT property exists
+        Map<String, String> genericInfos = taskData.getGenericInformation();
+        if (genericInfos != null && genericInfos.containsKey(CommonAttribute.GENERIC_INFO_START_AT_KEY)) {
+            long scheduledTime = ISO8601DateUtil
+                    .toDate(genericInfos.get(CommonAttribute.GENERIC_INFO_START_AT_KEY)).getTime();
+            taskData.setScheduledTime(scheduledTime);
+            task.setScheduledTime(scheduledTime);
+        }
         taskData.updateMutableAttributes(task);
 
         if (task.getSelectionScripts() != null) {
@@ -460,13 +476,11 @@ public class TaskData {
             Map<String, String> systemEnvironment = forkEnvironment.getSystemEnvironment();
 
             if (systemEnvironment != null) {
-                List<EnvironmentModifierData> envModifiers =
-                        new ArrayList<>(systemEnvironment.size());
+                List<EnvironmentModifierData> envModifiers = new ArrayList<>(systemEnvironment.size());
 
                 for (Map.Entry<String, String> entry : systemEnvironment.entrySet()) {
-                    envModifiers.add(
-                            EnvironmentModifierData.create(
-                                    new PropertyModifier(entry.getKey(), entry.getValue()), taskData));
+                    envModifiers.add(EnvironmentModifierData
+                            .create(new PropertyModifier(entry.getKey(), entry.getValue()), taskData));
                 }
 
                 taskData.setEnvModifiers(envModifiers);
@@ -504,6 +518,7 @@ public class TaskData {
         internalTask.setExecutionDuration(getExecutionDuration());
         internalTask.setFinishedTime(getFinishedTime());
         internalTask.setStartTime(getStartTime());
+        internalTask.setScheduledTime(getScheduledTime());
         internalTask.setExecutionHostName(getExecutionHostName());
         internalTask.setCancelJobOnError(isCancelJobOnError());
         internalTask.setPreciousLogs(isPreciousLogs());
@@ -561,7 +576,7 @@ public class TaskData {
     }
 
     @Column(name = "GENERIC_INFO", updatable = false)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public Map<String, String> getGenericInformation() {
         return genericInformation;
     }
@@ -712,7 +727,7 @@ public class TaskData {
     }
 
     void initTaskType(InternalTask task) {
-       if (task.getClass().equals(InternalForkedScriptTask.class)) {
+        if (task.getClass().equals(InternalForkedScriptTask.class)) {
             taskType = FORKED_SCRIPT_TASK;
         } else if (task.getClass().equals(InternalScriptTask.class)) {
             taskType = SCRIPT_TASK;
@@ -731,10 +746,14 @@ public class TaskData {
     }
 
     @Column(name = "TAG", updatable = false)
-    public String getTag(){ return this.tag; }
+    @Index(name = "TASK_TAG")
+    public String getTag() {
+        return this.tag;
+    }
 
-    public void setTag(String tag) { this.tag = tag; }
-
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     @Column(name = "MAX_NUMBER_OF_EXEC", updatable = false)
     public int getMaxNumberOfExecution() {
@@ -800,6 +819,7 @@ public class TaskData {
     }
 
     @Column(name = "START_TIME")
+    @Index(name = "TASK_START_TIME")
     public long getStartTime() {
         return startTime;
     }
@@ -809,12 +829,22 @@ public class TaskData {
     }
 
     @Column(name = "FINISH_TIME")
+    @Index(name = "TASK_FINISHED_TIME")
     public long getFinishedTime() {
         return finishedTime;
     }
 
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
+    }
+
+    @Column(name = "SCHEDULED_TIME")
+    public long getScheduledTime() {
+        return scheduledTime;
+    }
+
+    public void setScheduledTime(long scheduledTime) {
+        this.scheduledTime = scheduledTime;
     }
 
     @Column(name = "EXEC_DURATION")
@@ -978,10 +1008,9 @@ public class TaskData {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
 
         return new TaskUsage(taskId.value(), getTaskName(), getStartTime(), getFinishedTime(),
-            getExecutionDuration(), getParallelEnvironment() == null ? 1 : getParallelEnvironment()
-                    .getNodesNumber());
+            getExecutionDuration(),
+            getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
     }
-    
 
     TaskInfoImpl createTaskInfo(JobIdImpl jobId) {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId(), getTag());
@@ -995,17 +1024,18 @@ public class TaskData {
         taskInfo.setJobInfo(getJobData().toJobInfo());
         taskInfo.setJobId(jobId);
         taskInfo.setFinishedTime(getFinishedTime());
+        taskInfo.setScheduledTime(getScheduledTime());
         taskInfo.setExecutionHostName(getExecutionHostName());
         taskInfo.setExecutionDuration(getExecutionDuration());
         return taskInfo;
     }
-    
+
     public TaskInfo toTaskInfo() {
         JobIdImpl jobId = new JobIdImpl(getJobData().getId(), getJobData().getJobName());
         TaskInfoImpl taskInfo = createTaskInfo(jobId);
         return taskInfo;
     }
-    
+
     public TaskState toTaskState() {
         TaskInfo taskInfo = toTaskInfo();
         TaskStateImpl taskState = new TaskStateImpl();
@@ -1017,8 +1047,8 @@ public class TaskData {
         taskState.setReplicationIndex(getReplication());
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
         taskState.setParallelEnvironment(getParallelEnvironment());
+        taskState.setGenericInformations(getGenericInformation());
         return taskState;
     }
-    
-    
+
 }

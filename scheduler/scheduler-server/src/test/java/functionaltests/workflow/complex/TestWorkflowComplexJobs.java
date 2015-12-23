@@ -50,7 +50,7 @@ import functionaltests.workflow.TRepJobs;
  */
 public class TestWorkflowComplexJobs extends TRepJobs {
     @org.junit.Test
-    public void run() throws Throwable {
+    public void testWorkflowComplexJobs() throws Throwable {
         String prefix = "/functionaltests/workflow/descriptors/flow_complex_";
 
         TRepCase t1 = new TRepCase(prefix + "1.xml", 20, "T,2,12 T4,4,32 T5,4,68 T1,4,28 T3,4,32 T2,2,70");

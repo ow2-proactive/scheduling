@@ -36,6 +36,9 @@
  */
 package functionaltests.job.taskkill;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +46,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.Timeout;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -55,16 +63,8 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
 
 import functionaltests.utils.SchedulerFunctionalTest;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
 
 
 /**
@@ -100,7 +100,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTest {
     public Timeout testTimeout = new Timeout(10, TimeUnit.MINUTES);
 
     @Test
-    public void run() throws Throwable {
+    public void testProcessTreeKiller() throws Throwable {
         schedulerHelper.addExtraNodes(2);
 
         Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);

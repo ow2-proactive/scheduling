@@ -40,8 +40,8 @@ package functionaltests.workflow.variables;
 import java.io.File;
 import java.net.URL;
 
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
 
 import functionaltests.utils.SchedulerFunctionalTest;
 
@@ -52,7 +52,7 @@ public class Test_SCHEDULING_2034 extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_SCHEDULING_2034_unix.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testSCHEDULING_2034() throws Throwable {
         if (OperatingSystem.unix == OperatingSystem.getOperatingSystem()) {
             schedulerHelper.testJobSubmissionAndVerifyAllResults(absolutePath(job_desc_unix));
         }

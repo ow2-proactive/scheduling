@@ -36,25 +36,26 @@
  */
 package functionaltests.workflow;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
-import org.ow2.proactive.scheduler.common.job.factories.JobComparator;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
-import functionaltests.job.multinodes.TestMultipleHostsRequest;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
+import org.ow2.proactive.scheduler.common.job.factories.JobComparator;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 
-import static functionaltests.utils.SchedulerTHelper.log;
+import functionaltests.job.multinodes.TestMultipleHostsRequest;
 
 
 /**
@@ -100,7 +101,7 @@ public class TestXMLTransformer {
     }
 
     @Test
-    public void run() throws Throwable {
+    public void testXMLTransformer() throws Throwable {
         File folder = new File(jobDescriptorsFolder.toURI());
         Collection<File> testJobDescrFiles = FileUtils.listFiles(folder, new String[] { "xml" }, true);
 

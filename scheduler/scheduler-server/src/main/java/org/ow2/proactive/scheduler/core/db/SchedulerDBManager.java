@@ -35,10 +35,8 @@ import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryp
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.TaskSortParameter;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -199,10 +197,8 @@ public class SchedulerDBManager {
             final List<SortParameter<JobSortParameter>> sortParameters) {
 
         if (!pending && !running && !finished) {
-            return new Page<JobInfo>(new ArrayList<JobInfo>(), 0);
+            return new Page<JobInfo>(new ArrayList<JobInfo>(0), 0);
         }
-        
-        JobFilterCriteria jfc = new JobFilterCriteria(false, true, true, true);
 
         DBJobDataParameters params = new DBJobDataParameters(offset, limit, user, pending, running, finished, sortParameters);
         int totalNbJobs = getTotalNumberOfJobs(params);
@@ -274,10 +270,10 @@ public class SchedulerDBManager {
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag,
             final int offset, final int limit,
             final String user, final boolean pending, final boolean running,
-            final boolean finished, final List<SortParameter<TaskSortParameter>> sortParameters) {
+            final boolean finished) {
 
         DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
-            pending, running, finished, sortParameters);
+            pending, running, finished);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskState> lTasks = runWithoutTransaction(TaskDBUtils.taskStateSessionWork(parameters));
         
@@ -287,69 +283,20 @@ public class SchedulerDBManager {
     public Page<TaskInfo> getTasks(final long from, final long to, final String tag,
             final int offset, final int limit,
             final String user, final boolean pending, final boolean running,
-            final boolean finished, final List<SortParameter<TaskSortParameter>> sortParameters) {
+            final boolean finished) {
 
         DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
-                pending, running, finished, sortParameters);
+                pending, running, finished);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskInfo> lTaskInfo =  runWithoutTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
         
         return new Page<TaskInfo>(lTaskInfo, totalNbTasks);
     }
-    
+
     private int getTotalNumberOfTasks(final DBTaskDataParameters params) {
 
-        return runWithoutTransaction(new SessionWork<Integer>() {
+        return runWithoutTransaction(TaskDBUtils.getTotalNumberOfTasks(params));
 
-            @Override
-            public Integer executeWork(Session session) {
-
-                Set<TaskStatus> lStatuses = params.getStatuses();
-
-                if (lStatuses.isEmpty()) {
-                    return 0;
-                } else {
-
-                    boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
-                    boolean hasTag = params.getTag() != null && "".compareTo(params.getTag()) != 0;
-                    boolean hasDateFrom = params.getFrom() != 0;
-                    boolean hasDateTo = params.getTo() != 0;
-
-                    StringBuilder queryString = new StringBuilder(
-                        "select count(*) from TaskData T where T.jobData.removedTime = -1 ");
-
-                    if (hasDateFrom)
-                        queryString.append("and startTime >= :dateFrom ");
-
-                    if (hasDateTo)
-                        queryString.append("and finishedTime <= :dateTo ");
-
-                    if (hasUser)
-                        queryString.append("and T.jobData.owner = :user ");
-
-                    if (hasTag)
-                        queryString.append("and tag = :taskTag ");
-
-                    queryString.append("and taskStatus in (:taskStatus) ");
-
-                    Query query = session.createQuery(queryString.toString());
-                    query.setParameterList("taskStatus", lStatuses);
-                    if (hasUser) {
-                        query.setParameter("user", params.getUser());
-                    }
-
-                    if (hasDateFrom)
-                        query.setParameter("dateFrom", params.getFrom());
-                    if (hasDateTo)
-                        query.setParameter("dateTo", params.getTo());
-                    if (hasTag)
-                        query.setParameter("taskTag", params.getTag());
-                    Long count = (Long) query.uniqueResult();
-                    
-                    return count.intValue();
-                }
-            }
-        });
     }
     
     private int getTotalNumberOfJobs(final DBJobDataParameters params) {
@@ -835,11 +782,10 @@ public class SchedulerDBManager {
             public List<InternalJob> executeWork(Session session) {
                 Query query;
                 if (period > 0) {
-                    long minSubmittedTime = System.currentTimeMillis() - period;
                     query = session
                             .createQuery(
                                     "select id from JobData where status in (:status) and removedTime = -1 and submittedTime >= :minSubmittedTime")
-                            .setParameter("minSubmittedTime", minSubmittedTime).setParameterList("status",
+                            .setParameter("minSubmittedTime", System.currentTimeMillis() - period).setParameterList("status",
                                     status);
                 } else {
                     query = session.createQuery(
@@ -1235,6 +1181,37 @@ public class SchedulerDBManager {
                 return null;
             }
 
+        });
+    }
+
+    public void updateStartTime(long jobId, long taskId, long newStartTime) {
+        updateStartOrEndOrScheduledtime(jobId, taskId, "startTime", newStartTime);
+    }
+
+    public void updateFinishedTime(long jobId, long taskId, long newFinishedTime) {
+        updateStartOrEndOrScheduledtime(jobId, taskId, "finishedTime", newFinishedTime);
+    }
+
+    public void updateScheduledTime(long jobId, long taskId, long newScheduledTime) {
+        updateStartOrEndOrScheduledtime(jobId, taskId, "scheduledTime", newScheduledTime);
+    }
+
+    private void updateStartOrEndOrScheduledtime(final long jobId, final long taskId, final String fieldName, final long time) {
+        runWithTransaction(new SessionWork<Void>() {
+            @Override
+            public Void executeWork(Session session) {
+
+                Query query = session.createQuery(
+                        "update TaskData task set task." + fieldName + " = :newTime " + //NOSONAR
+                                "where task.id.jobId = :jobId and task.id.taskId= :taskId")
+                        .setParameter("newTime", time)
+                        .setParameter("jobId", jobId)
+                        .setParameter("taskId", taskId);
+
+                query.executeUpdate();
+
+                return null;
+            }
         });
     }
 
@@ -1668,16 +1645,15 @@ public class SchedulerDBManager {
         });
     }
 
-    private <T> T runWithTransaction(SessionWork<T> sessionWork) {
+    public <T> T runWithTransaction(SessionWork<T> sessionWork) {
         return transactionHelper.runWithTransaction(sessionWork);
     }
 
-    private <T> T runWithTransaction(SessionWork<T> sessionWork, boolean readonly) {
-
+    public <T> T runWithTransaction(SessionWork<T> sessionWork, boolean readonly) {
         return transactionHelper.runWithTransaction(sessionWork, readonly);
     }
 
-    private <T> T runWithoutTransaction(SessionWork<T> sessionWork) {
+    public <T> T runWithoutTransaction(SessionWork<T> sessionWork) {
         return transactionHelper.runWithoutTransaction(sessionWork);
     }
 

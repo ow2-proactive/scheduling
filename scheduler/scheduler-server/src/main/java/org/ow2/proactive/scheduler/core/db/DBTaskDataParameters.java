@@ -1,19 +1,19 @@
 package org.ow2.proactive.scheduler.core.db;
 
+import com.google.common.base.Strings;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
+
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.TaskSortParameter;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 /**
  * Utility container to pass multiple parameters for tasks requests.
  *
+ * @author ActiveEon Team
  */
 public class DBTaskDataParameters {
+
     private final String tag;
     private final long from;
     private final long to;
@@ -23,12 +23,10 @@ public class DBTaskDataParameters {
     private final boolean pending;
     private final boolean running;
     private final boolean finished;
-    private final List<SortParameter<TaskSortParameter>> sortParameters;
     private final Set<TaskStatus> status;
 
     DBTaskDataParameters(String tag, long from, long to, int offset, int limit, String user,
-            boolean pending, boolean running, boolean finished,
-            List<SortParameter<TaskSortParameter>> sortParameters) {
+            boolean pending, boolean running, boolean finished) {
         this.tag = tag;
         this.from = from;
         this.to = to;
@@ -38,19 +36,22 @@ public class DBTaskDataParameters {
         this.pending = pending;
         this.running = running;
         this.finished = finished;
-        this.sortParameters = sortParameters;
-        
-        Set<TaskStatus> newStatus = new HashSet<TaskStatus>();
 
-        if (pending)
+        Set<TaskStatus> newStatus = new HashSet<>();
+
+        if (pending) {
             newStatus.addAll(SchedulerDBManager.PENDING_TASKS);
-        if (running)
+        }
+
+        if (running) {
             newStatus.addAll(SchedulerDBManager.RUNNING_TASKS);
-        if (finished)
+        }
+
+        if (finished) {
             newStatus.addAll(SchedulerDBManager.FINISHED_TASKS);
-        
+        }
+
         this.status = Collections.unmodifiableSet(newStatus);
-        
     }
 
     public String getTag() {
@@ -76,7 +77,23 @@ public class DBTaskDataParameters {
     public String getUser() {
         return user;
     }
-    
+
+    public boolean hasDateFrom() {
+        return from > 0;
+    }
+
+    public boolean hasDateTo() {
+        return to > 0;
+    }
+
+    public boolean hasTag() {
+        return !Strings.isNullOrEmpty(tag);
+    }
+
+    public boolean hasUser() {
+        return !Strings.isNullOrEmpty(user);
+    }
+
     public boolean isRunning() {
         return running;
     }
@@ -89,11 +106,83 @@ public class DBTaskDataParameters {
         return finished;
     }
 
-    public List<SortParameter<TaskSortParameter>> getSortParameters() {
-        return sortParameters;
-    }
-
     public Set<TaskStatus> getStatuses() {
         return status;
     }
+
+
+    public static class Builder {
+
+        private String tag;
+        private String user;
+        private long from;
+        private long to;
+        private int offset;
+        private int limit;
+        private boolean pending = true;
+        private boolean running = true;
+        private boolean finished = true;
+
+        private Builder() {
+        }
+
+        public static Builder create() {
+            return new Builder();
+        }
+
+        public Builder setTag(String tag) {
+            this.tag = tag;
+            return this;
+        }
+
+        public Builder setFrom(long from) {
+            this.from = from;
+            return this;
+        }
+
+        public Builder setTo(long to) {
+            this.to = to;
+            return this;
+        }
+
+        public Builder setUser(String user) {
+            this.user = user;
+            return this;
+        }
+
+        public Builder setOffset(int offset) {
+            this.offset = offset;
+            return this;
+        }
+
+        public Builder setLimit(int limit) {
+            this.limit = limit;
+            return this;
+        }
+
+        public Builder setPending(boolean pending) {
+            this.pending = pending;
+            return this;
+        }
+
+        public Builder setRunning(boolean running) {
+            this.running = running;
+            return this;
+        }
+
+        public Builder setFinished(boolean finished) {
+            this.finished = finished;
+            return this;
+        }
+
+        public Builder but() {
+            return create().setTag(tag).setFrom(from).setTo(to).setOffset(offset).setLimit(limit).setPending(pending).setRunning(running).setFinished(finished);
+        }
+
+        public DBTaskDataParameters build() {
+            return new DBTaskDataParameters(tag, from, to, offset, limit, user, pending, running, finished);
+        }
+    }
+
 }
+

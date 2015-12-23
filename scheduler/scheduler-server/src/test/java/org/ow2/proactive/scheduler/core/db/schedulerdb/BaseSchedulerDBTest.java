@@ -35,8 +35,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
-import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -54,6 +54,16 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 	private static Credentials defaultCredentials;
 
 	protected static final String DEFAULT_USER_NAME = "admin";
+
+	protected boolean inMemory = false;
+
+	public BaseSchedulerDBTest() {
+		this(false);
+	}
+
+	public BaseSchedulerDBTest(boolean inMemory) {
+		this.inMemory = inMemory;
+	}
 
 	public static class TestResult implements Serializable {
 
@@ -148,8 +158,8 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 		return defaultCredentials;
 	}
 
-	protected SchedulerStateRecoverHelper.RecoveredSchedulerState checkRecoveredState(
-			SchedulerStateRecoverHelper.RecoveredSchedulerState state, StateMatcher stateMatcher) {
+	protected RecoveredSchedulerState checkRecoveredState(
+			RecoveredSchedulerState state, StateMatcher stateMatcher) {
 		assertThat(state.getSchedulerState(), stateMatcher);
 
 		assertThat(state.getPendingJobs(), containsInAnyOrder(stateMatcher.pending.toArray(new JobStateMatcher[] {})));
@@ -250,7 +260,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 			Assert.assertEquals("Running tasks for " + id, running.size(), item.getNumberOfRunningTasks());
 			Assert.assertEquals("Finished tasks for " + id, finishedNumber, item.getNumberOfFinishedTasks());
 
-			Collection<TaskStateMatcher> all = new ArrayList<>();
+			Collection<TaskStateMatcher> all = new ArrayList<>(pending.size() + running.size() + finished.size());
 			all.addAll(pending);
 			all.addAll(running);
 			all.addAll(finished);
@@ -348,9 +358,14 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 		PASchedulerProperties.SCHEDULER_HOME.updateProperty(ClasspathUtils.findSchedulerHome());
 		PASchedulerProperties.TASK_FORK.updateProperty("true");
 		CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
-		Configuration config = new Configuration()
-				.configure(new File(this.getClass().getResource("/functionaltests/config/hibernate.cfg.xml").toURI()));
-		dbManager = new SchedulerDBManager(config, true);
+
+		if (inMemory) {
+			dbManager = SchedulerDBManager.createInMemorySchedulerDBManager();
+		} else {
+			Configuration config = new Configuration()
+					.configure(new File(this.getClass().getResource("/functionaltests/config/hibernate.cfg.xml").toURI()));
+			dbManager = new SchedulerDBManager(config, true);
+		}
 	}
 
 	@After

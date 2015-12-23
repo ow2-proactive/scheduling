@@ -36,9 +36,17 @@
  */
 package functionaltests.workflow;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -49,15 +57,9 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
 import functionaltests.job.error.TestJobAborted;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import functionaltests.utils.SchedulerFunctionalTest;
 
 
 /**
@@ -98,7 +100,7 @@ public class TestJobCoverage extends SchedulerFunctionalTest {
             .getResource("/functionaltests/descriptors/Job_Coverage.xml");
 
     @Test
-    public void run() throws Throwable {
+    public void testJobCoverage() throws Throwable {
         JobState jstate;
         TaskInfo tinfo;
         JobInfo jinfo;
