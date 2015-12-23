@@ -36,16 +36,16 @@
  */
 package functionaltests.nodestate;
 
+import static functionaltests.utils.RMTHelper.log;
+
+import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
-
-import static functionaltests.utils.RMTHelper.log;
 
 
 /**
@@ -59,7 +59,7 @@ public class TestAddRemoveAll extends RMFunctionalTest {
     private String nsName = "TestAddRemoveAll";
 
     @Test
-    public void action() throws Exception {
+    public void testCreateNodeSource() throws Exception {
 
         ResourceManager resourceManager = rmHelper.getResourceManager();
         log("Add/RemoveAll");

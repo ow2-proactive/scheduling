@@ -36,6 +36,13 @@
  */
 package functionaltests.nodestate;
 
+import static functionaltests.utils.RMTHelper.log;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
@@ -44,13 +51,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Test;
 
 import functionaltests.utils.RMFunctionalTest;
-
-import static functionaltests.utils.RMTHelper.log;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.*;
 
 
 /**
@@ -71,7 +73,7 @@ import static org.junit.Assert.*;
 public class TestNodesStates extends RMFunctionalTest {
 
     @Test
-    public void action() throws Exception {
+    public void testManyStatesChanges() throws Exception {
 
         ResourceManager resourceManager = rmHelper.getResourceManager();
         int totalNodeNumber = 5;
