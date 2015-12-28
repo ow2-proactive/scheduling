@@ -122,13 +122,13 @@ public abstract class InternalJob extends JobState {
 	private Credentials credentials = null;
 
 	@XmlTransient
-	private final TerminateLoopHandler terminateLoopHandler;
+	private final transient TerminateLoopHandler terminateLoopHandler;
 
 	@XmlTransient
-	private final TerminateIfTaskHandler terminateIfTaskHandler;
+	private final transient TerminateIfTaskHandler terminateIfTaskHandler;
 
 	@XmlTransient
-	private final TerminateReplicateTaskHandler terminateReplicateTaskHandler;
+	private final transient TerminateReplicateTaskHandler terminateReplicateTaskHandler;
 
 	/** Hibernate default constructor */
 	public InternalJob() {
