@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.3"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+        name="RecoveryTest"
+        priority="normal"
+        cancelJobOnError="false">
+    <description>
+        <![CDATA[ Workflow used for testing recovery ]]>
+    </description>
+    <genericInformation>
+        <info name="var1" value="val1"/>
+        <info name="var2" value="val2"/>
+    </genericInformation>
+    <taskFlow>
+        <task name="Ta">
+            <description>
+                <![CDATA[ The simplest task, ran by a bash engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="bash">
+                        <![CDATA[
+ls -la
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="T1"
+              maxNumberOfExecution="4">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+                <parameters>
+                    <parameter name="sleepTime" value="20"/>
+                    <parameter name="number" value="2"/>
+                </parameters>
+            </javaExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="T2">
+            <description>
+                <![CDATA[ The simplest task, ran by a javascript engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print("Hello World!")
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="T3">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println "uname -a".execute().text
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="T4">
+            <description>
+                <![CDATA[ The simplest task, ran by a ruby engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="ruby">
+                        <![CDATA[
+puts 'Hello world'
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="T5">
+            <description>
+                <![CDATA[ The simplest task, ran by a python engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="python">
+                        <![CDATA[
+for x in range(1, 11):
+    print x
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="Tb">
+            <depends>
+                <task ref="Ta"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print(java.lang.System.getProperty('pas.task.name'))
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="Tc">
+            <depends>
+                <task ref="Tb"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        <![CDATA[
+print(java.lang.System.getProperty('pas.task.name'))
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+    </taskFlow>
+</job>

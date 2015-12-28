@@ -6,6 +6,7 @@ import java.util.Set;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -40,7 +41,7 @@ public class TestTaskIdGeneration extends BaseSchedulerDBTest {
         checkIds(job);
 
         SchedulerStateRecoverHelper recoverHelper = new SchedulerStateRecoverHelper(dbManager);
-        SchedulerStateRecoverHelper.RecoveredSchedulerState state = recoverHelper.recover(-1);
+        RecoveredSchedulerState state = recoverHelper.recover(-1);
         Collection<InternalJob> jobs = state.getPendingJobs();
         Assert.assertEquals(1, jobs.size());
         job = jobs.iterator().next();

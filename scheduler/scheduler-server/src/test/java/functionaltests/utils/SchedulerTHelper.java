@@ -92,7 +92,7 @@ import static org.junit.Assert.assertFalse;
  * after its occurrence. On the contrary, an event is kept till a waitForEvent**() for this event
  * has been called.
  *
- * waitForTerminatedJob() method dosen't act as other waitForEvent**() Methods.
+ * waitForTerminatedJob() method doesn't act as other waitForEvent**() Methods.
  * This method deduce a job finished from current Scheduler's job states and received event.
  * This method can also be used for testing for job submission with killing and restarting
  * Scheduler.
@@ -103,6 +103,7 @@ import static org.junit.Assert.assertFalse;
 public class SchedulerTHelper {
 
     private static TestScheduler scheduler = new TestScheduler();
+
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -117,11 +118,11 @@ public class SchedulerTHelper {
     }
 
     private static SchedulerTestUser connectedSchedulerUser = new SchedulerTestUser(TestUsers.DEMO);
+
     private static RMTestUser connectedRMUser = new RMTestUser(TestUsers.DEMO);
 
     // can be changed by starting the Scheduler manually
-    private SchedulerTestConfiguration currentTestConfiguration = SchedulerTestConfiguration
-            .defaultConfiguration();
+    private SchedulerTestConfiguration currentTestConfiguration = SchedulerTestConfiguration.defaultConfiguration();
 
     /**
      * Start the scheduler using a forked JVM and
@@ -857,19 +858,6 @@ public class SchedulerTHelper {
         return RMTHelper.createNode(nodeName, nodeUrl, nodeProcess);
     }
 
-    /**
-     * Returns the alive Nodes accessible by the RM
-     * @return list of ProActive Nodes
-     */
-    public List<Node> listAliveNodes() throws Exception {
-        ArrayList<Node> nodes = new ArrayList<>();
-        Set<String> urls = getResourceManager().listAliveNodeUrls();
-        for (String url : urls) {
-            nodes.add(NodeFactory.getNode(url));
-        }
-        return nodes;
-    }
-
     public RMNodeEvent waitForAnyNodeEvent(RMEventType nodeStateChanged) throws Exception {
         return RMTHelper.waitForAnyNodeEvent(nodeStateChanged, getRMMonitorsHandler());
     }
@@ -893,7 +881,7 @@ public class SchedulerTHelper {
     }
 
     public void checkNodesAreClean() throws Exception {
-        List<Node> nodes = listAliveNodes();
+        Set<String> nodeUrls = getResourceManager().listAliveNodeUrls();
         // We wait until no active object remain on the nodes.
         // If AO remains the test will fail with a timeout.
         boolean remainingAO = true;
@@ -903,12 +891,14 @@ public class SchedulerTHelper {
             Thread.sleep(50);
             wait += 50;
             remainingAO = false;
-            for (Node node : nodes) {
-                remainingAO = remainingAO || (node.getNumberOfActiveObjects() > 0);
+            for (String nodeUrl : nodeUrls) {
+                remainingAO = remainingAO || (NodeFactory.getNode(nodeUrl).getNumberOfActiveObjects() > 0);
             }
         }
         if (remainingAO) {
-            for (Node node : nodes) {
+            for (String nodeUrl : nodeUrls) {
+                Node node = NodeFactory.getNode(nodeUrl);
+
                 log("Found remaining AOs on node " + node.getNodeInformation().getURL() + " " +
                     Arrays.toString(node.getActiveObjects()));
             }

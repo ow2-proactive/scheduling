@@ -101,6 +101,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
+import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
@@ -182,6 +183,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     /**
+     * Mainly there for testing purposes.
+     *
+     * It allows to create a SchedulerFrontend instance without breaking encapsulation.
+     *
+     * @param schedulerSpacesSupport
+     */
+    SchedulerFrontend(SchedulerFrontendState schedulerFrontendState, SchedulerSpacesSupport schedulerSpacesSupport) {
+        this.frontendState = schedulerFrontendState;
+        this.spacesSupport = schedulerSpacesSupport;
+    }
+
+    /**
      * Scheduler Front-end constructor.
      *
      * @param rmURL               a started Resource Manager URL which
@@ -249,7 +262,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             logger.debug("Booting jmx...");
             this.jmxHelper.boot(authentication);
 
-            SchedulerStateRecoverHelper.RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(
+            RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(
                 dbManager).recover(loadJobPeriod);
 
             this.frontendState = new SchedulerFrontendState(recoveredState.getSchedulerState(), jmxHelper);

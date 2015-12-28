@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job cancelJobOnError="false" name="TestTaskRestore_pending" priority="normal" projectName="Not Assigned"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev"
+     xmlns="urn:proactive:jobdescriptor:dev">
+    <description>No description</description>
+    <taskFlow>
+        <task name="Task">
+            <selection>
+                <script>
+                    <code language="JavaScript"><![CDATA[selected = false;]]></code>
+                </script>
+            </selection>
+            <javaExecutable class="functionaltests.job.recover.TestTaskRestore$TestJavaTask1"/>
+        </task>
+    </taskFlow>
+</job>

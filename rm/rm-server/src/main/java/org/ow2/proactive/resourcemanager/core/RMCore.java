@@ -52,6 +52,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -123,7 +124,6 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -262,6 +262,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.accountsManager = new RMAccountsManager();
         this.jmxHelper = new RMJMXHelper(this.accountsManager);
+    }
+
+    public RMCore(HashMap<String, NodeSource> nodeSources, ArrayList<String> brokenNodeSources,
+                  HashMap<String, RMNode> allNodes, Client caller, RMMonitoringImpl monitoring,
+                  SelectionManager manager, ArrayList<RMNode> freeNodesList, RMDBManager newDataBaseManager) {
+        this.nodeSources = nodeSources;
+        this.brokenNodeSources = brokenNodeSources;
+        this.allNodes = allNodes;
+        this.caller = caller;
+        this.monitoring = monitoring;
+        this.selectionManager = manager;
+        this.freeNodes = freeNodesList;
+        this.dataBaseManager = newDataBaseManager;
     }
 
     /**
@@ -1805,5 +1818,4 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.internalUnlockNode(rmnode);
         }
     }
-
 }

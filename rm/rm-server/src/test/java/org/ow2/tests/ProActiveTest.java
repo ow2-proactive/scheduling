@@ -34,14 +34,13 @@
  */
 package org.ow2.tests;
 
-import java.nio.file.Paths;
-import java.security.Policy;
-
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+
+import java.security.Policy;
 
 
 /**
@@ -49,6 +48,7 @@ import org.apache.log4j.Logger;
  * line.
  */
 public class ProActiveTest {
+
 	static {
 		configureSecurityManager();
 		configurePAHome();
