@@ -84,7 +84,6 @@ public class InternalTaskFlowJob extends InternalJob {
 		super(name, priority, cancelOnError, description);
 	}
 
-<<<<<<< HEAD
 	/**
 	 * Append a list of tasks to this job.
 	 *
@@ -93,27 +92,12 @@ public class InternalTaskFlowJob extends InternalJob {
 	 * @return true if the list of tasks have been correctly added to the job,
 	 *         false if not.
 	 */
-	public boolean addTasks(ArrayList<InternalTask> tasks) {
+	public boolean addTasks(List<InternalTask> tasks) {
 		for (InternalTask td : tasks) {
 			if (!addTask(td)) {
 				return false;
 			}
 		}
-=======
-    /**
-     * Append a list of tasks to this job.
-     *
-     * @param tasks the list of tasks to add.
-     * @return true if the list of tasks have been correctly added to the job,
-     *         false if not.
-     */
-    public boolean addTasks(List<InternalTask> tasks) {
-        for (InternalTask td : tasks) {
-            if (!addTask(td)) {
-                return false;
-            }
-        }
->>>>>>> upstream/master
 
 		return true;
 	}
