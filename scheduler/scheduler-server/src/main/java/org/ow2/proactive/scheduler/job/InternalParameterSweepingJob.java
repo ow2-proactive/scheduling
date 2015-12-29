@@ -43,10 +43,9 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
-
 /**
- * Class ParameterSweepingJob.
- * This is the definition of a Parameter Sweeping Job.
+ * Class ParameterSweepingJob. This is the definition of a Parameter Sweeping
+ * Job.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -54,48 +53,56 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InternalParameterSweepingJob extends InternalJob {
 
-    /**
-     * ProActive empty constructor.
-     */
-    public InternalParameterSweepingJob() {
-    }
+	/**
+	 * ProActive empty constructor.
+	 */
+	public InternalParameterSweepingJob() {
+		super();
+	}
 
-    /**
-     * Create a new Parameter Sweeping Job with the given parameters. It provides methods to add or
-     * remove tasks.
-     *
-     * @param name the current job name.
-     * @param priority the priority of this job between 1 and 5.
-     * @param cancelOnError true if the job has to run until its end or an user intervention.
-     * @param description a short description of the job and what it will do.
-     */
+	/**
+	 * Create a new Parameter Sweeping Job with the given parameters. It
+	 * provides methods to add or remove tasks.
+	 *
+	 * @param name
+	 *            the current job name.
+	 * @param priority
+	 *            the priority of this job between 1 and 5.
+	 * @param cancelOnError
+	 *            true if the job has to run until its end or an user
+	 *            intervention.
+	 * @param description
+	 *            a short description of the job and what it will do.
+	 */
 
-    //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
-    public InternalParameterSweepingJob(String name, JobPriority priority, boolean cancelOnError,
-            String description) {
-        super(name, priority, cancelOnError, description);
-    }
+	// * @param runtimeLimit the maximum execution time for this job given in
+	// millisecond.
+	public InternalParameterSweepingJob(String name, JobPriority priority, boolean cancelOnError, String description) {
+		super(name, priority, cancelOnError, description);
+	}
 
-    /**
-     * Append a task to this job, only if no task has been added before.
-     *
-     * @param task the task to add.
-     * @return true if the task has been correctly added to the job, false if not.
-     */
-    @Override
-    public boolean addTask(InternalTask task) {
-        if (getTasks().size() > 0) {
-            return false;
-        }
+	/**
+	 * Append a task to this job, only if no task has been added before.
+	 *
+	 * @param task
+	 *            the task to add.
+	 * @return true if the task has been correctly added to the job, false if
+	 *         not.
+	 */
+	@Override
+	public boolean addTask(InternalTask task) {
+		if (getTasks().size() > 0) {
+			return false;
+		}
 
-        return super.addTask(task);
-    }
+		return super.addTask(task);
+	}
 
-    /**
-     * @see org.ow2.proactive.scheduler.job.InternalJob#getType()
-     */
-    @Override
-    public JobType getType() {
-        return JobType.PARAMETER_SWEEPING;
-    }
+	/**
+	 * @see org.ow2.proactive.scheduler.job.InternalJob#getType()
+	 */
+	@Override
+	public JobType getType() {
+		return JobType.PARAMETER_SWEEPING;
+	}
 }
