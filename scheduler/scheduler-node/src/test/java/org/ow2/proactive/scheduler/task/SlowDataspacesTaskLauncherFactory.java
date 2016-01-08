@@ -30,7 +30,7 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
         }
 
         @Override
-        public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter) {
+        public TaskExecutor createTaskExecutor(File workingDir) {
             return new InProcessTaskExecutor();
         }
 

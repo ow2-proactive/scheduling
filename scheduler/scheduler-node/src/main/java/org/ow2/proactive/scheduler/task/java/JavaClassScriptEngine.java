@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
-import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
+import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 import org.apache.commons.io.IOUtils;
@@ -77,10 +77,10 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             execInitializer.setErrorSink(error);
 
             Map<String, byte[]> propagatedVariables = null;
-            if (context.getAttribute(InProcessTaskExecutor.VARIABLES_BINDING_NAME) != null) {
+            if (context.getAttribute(ForkedTaskVariablesManager.VARIABLES_BINDING_NAME) != null) {
                 propagatedVariables = SerializationUtil
                         .serializeVariableMap((Map<String, Serializable>) context.getAttribute(
-                          InProcessTaskExecutor.VARIABLES_BINDING_NAME));
+                          ForkedTaskVariablesManager.VARIABLES_BINDING_NAME));
                 execInitializer.setPropagatedVariables(propagatedVariables);
             } else {
                 execInitializer.setPropagatedVariables(Collections.<String, byte[]> emptyMap());
@@ -100,9 +100,9 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
                 execInitializer.setThirdPartyCredentials(Collections.<String, String> emptyMap());
             }
 
-            if (context.getAttribute(InProcessTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
+            if (context.getAttribute(ForkedTaskVariablesManager.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
                 List<String> nodesURLs = (List<String>) context
-                        .getAttribute(InProcessTaskExecutor.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
+                        .getAttribute(ForkedTaskVariablesManager.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
                 execInitializer.setNodesURL(nodesURLs);
             } else {
                 execInitializer.setNodesURL(Collections.<String>emptyList());
@@ -115,7 +115,7 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
 
             if (propagatedVariables != null) {
                 ((Map<String, Serializable>) context.getAttribute(
-                  InProcessTaskExecutor.VARIABLES_BINDING_NAME)).putAll(javaExecutable.getVariables());
+                  ForkedTaskVariablesManager.VARIABLES_BINDING_NAME)).putAll(javaExecutable.getVariables());
             }
 
             output.close();

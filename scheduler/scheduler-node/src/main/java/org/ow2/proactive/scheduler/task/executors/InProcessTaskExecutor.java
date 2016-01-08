@@ -34,40 +34,38 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
-import org.ow2.proactive.scheduler.task.SchedulerVars;
-import org.ow2.proactive.scheduler.task.TaskContext;
-import org.ow2.proactive.scheduler.task.exceptions.TaskException;
-import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.context.TaskContext;
+import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
+import org.ow2.proactive.scheduler.task.exceptions.TaskException;
+import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.TaskScript;
 import com.google.common.base.Stopwatch;
 import org.apache.commons.io.FileUtils;
 
 
 /**
  * Run a task through a script handler.
- * <p>
+ * <p/>
  * Responsible for:
  * - running the different scripts
  * - variable propagation
@@ -76,24 +74,34 @@ import org.apache.commons.io.FileUtils;
  */
 public class InProcessTaskExecutor implements TaskExecutor {
 
-    private static final String DS_SCRATCH_BINDING_NAME = "localspace";
-    private static final String DS_INPUT_BINDING_NAME = "inputspace";
-    private static final String DS_OUTPUT_BINDING_NAME = "outputspace";
-    private static final String DS_GLOBAL_BINDING_NAME = "globalspace";
-    private static final String DS_USER_BINDING_NAME = "userspace";
-
-    public static final String MULTI_NODE_TASK_NODESURL_BINDING_NAME = "nodesurl";
-
     private static final String NODES_FILE_DIRECTORY_NAME = ".pa_nodes";
+    private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
+    private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
-    public static final String VARIABLES_BINDING_NAME = "variables";
+    private static String writeNodesFile(TaskContext context) throws IOException {
+        List<String> nodesHosts = context.getNodesHosts();
 
-    /**
-     * Will be replaced by the matching third-party credential
-     * Example: if one of the third-party credentials' key-value pairs is 'foo:bar',
-     * then '$credentials_foo' will be replaced by 'bar' in the arguments of the tasks.
-     */
-    private static final String CREDENTIALS_KEY_PREFIX = "credentials_";
+        if (nodesHosts.isEmpty()) {
+            return "";
+        } else {
+            File directory;
+            if (context.getScratchURI() == null || context.getScratchURI().isEmpty()) {
+                directory = new File(".");
+            } else {
+                directory = new File(context.getScratchURI());
+            }
+            File nodesFile = File.createTempFile(NODES_FILE_DIRECTORY_NAME, null, directory);
+
+            Writer outputWriter = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(nodesFile), "UTF-8"));
+            for (String nodeHost : nodesHosts) {
+                outputWriter.append(nodeHost).append(System.lineSeparator());
+            }
+            outputWriter.close();
+
+            return nodesFile.getAbsolutePath();
+        }
+    }
 
     @Override
     public TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error) {
@@ -101,9 +109,12 @@ public class InProcessTaskExecutor implements TaskExecutor {
         String nodesFile = null;
         try {
             nodesFile = writeNodesFile(container);
-            Map<String, Serializable> variables = taskVariables(container, nodesFile);
-            Map<String, String> thirdPartyCredentials = thirdPartyCredentials(container);
-            createBindings(container, scriptHandler, variables, thirdPartyCredentials);
+            Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(container,
+                    nodesFile);
+            Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
+                    container);
+            forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, container, variables,
+                    thirdPartyCredentials);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
@@ -136,217 +147,37 @@ public class InProcessTaskExecutor implements TaskExecutor {
         }
     }
 
-    static void createBindings(TaskContext container, ScriptHandler scriptHandler, Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials) {
-        scriptHandler.addBinding(VARIABLES_BINDING_NAME, variables);
-
-        TaskResult[] results = tasksResults(container);
-        scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, results);
-
-        scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
-
-        scriptHandler.addBinding(DS_SCRATCH_BINDING_NAME, container.getScratchURI());
-        scriptHandler.addBinding(DS_INPUT_BINDING_NAME, container.getInputURI());
-        scriptHandler.addBinding(DS_OUTPUT_BINDING_NAME, container.getOutputURI());
-        scriptHandler.addBinding(DS_GLOBAL_BINDING_NAME, container.getGlobalURI());
-        scriptHandler.addBinding(DS_USER_BINDING_NAME, container.getUserURI());
-
-        List<String> nodesUrls = container.getOtherNodesURLs();
-        scriptHandler.addBinding(MULTI_NODE_TASK_NODESURL_BINDING_NAME, nodesUrls);
-    }
-
-    private static String writeNodesFile(TaskContext context) throws IOException, URISyntaxException {
-        List<String> nodesHosts = context.getNodesHosts();
-
-        if (nodesHosts.isEmpty()) {
-            return "";
-        } else {
-            File directory;
-            if (context.getScratchURI() == null || context.getScratchURI().isEmpty()) {
-                directory = new File(".");
-            } else {
-                directory = new File(context.getScratchURI());
-            }
-            File nodesFile = File.createTempFile(NODES_FILE_DIRECTORY_NAME, null, directory);
-
-            FileWriter outputWriter = new FileWriter(nodesFile);
-            for (String nodeHost : nodesHosts) {
-                outputWriter.append(nodeHost).append(System.lineSeparator());
-            }
-            outputWriter.close();
-
-            return nodesFile.getAbsolutePath();
-        }
-    }
-
-    private static Map<String, Serializable> taskVariables(TaskContext container, TaskResult taskResult, String nodesFile)
-            throws Exception {
-        Map<String, Serializable> variables = taskVariables(container, taskResult);
-
-        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getOtherNodesURLs().size() + 1);
-        variables.put(SchedulerVars.PA_NODESFILE.toString(), nodesFile);
-
-        variables.put(SchedulerVars.PA_TASK_PROGRESS_FILE.toString(), container.getProgressFilePath());
-
-        return variables;
-    }
-
-    public static Map<String, Serializable> taskVariables(TaskContext container,
-      TaskResult taskResult) throws Exception {
-        Map<String, Serializable> variables = new HashMap<>();
-
-        // variables from workflow definition
-        if (container.getInitializer().getVariables() != null) {
-            variables.putAll(container.getInitializer().getVariables());
-        }
-
-        try {
-            // variables from previous tasks
-            if (container.getPreviousTasksResults() != null) {
-                for (TaskResult previousTaskResult : container.getPreviousTasksResults()) {
-                    if (previousTaskResult.getPropagatedVariables() != null) {
-                        variables.putAll(SerializationUtil.deserializeVariableMap(
-                          previousTaskResult.getPropagatedVariables()));
-                    }
-                }
-            }
-            // and from this task execution
-            if (taskResult != null) {
-                if (taskResult.getPropagatedVariables() != null) {
-                    variables.putAll(SerializationUtil.deserializeVariableMap(taskResult
-                            .getPropagatedVariables()));
-                }
-            }
-        } catch (Exception e) {
-            throw new Exception("Could not deserialize variables", e);
-        }
-
-        // variables from current job/task context
-        variables.putAll(contextVariables(container.getInitializer()));
-
-        variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), container.getSchedulerHome());
-        return variables;
-    }
-
-    public static Map<String, Serializable> taskVariables(TaskContext container) throws Exception {
-        return taskVariables(container, (TaskResult) null);
-    }
-
-    public static Map<String, Serializable> taskVariables(TaskContext container, String nodesFile) throws Exception {
-        return taskVariables(container, null, nodesFile);
-    }
-
-    static TaskResult[] tasksResults(TaskContext container) {
-        TaskResult[] previousTasksResults = container.getPreviousTasksResults();
-        if (previousTasksResults != null) {
-            return previousTasksResults;
-        } else {
-            return new TaskResult[0];
-        }
-    }
-
-    public static Map<String, Serializable> contextVariables(TaskLauncherInitializer initializer) {
-        Map<String, Serializable> variables = new HashMap<>();
-        variables.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
-        variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
-                .getReadableName());
-        variables.put(SchedulerVars.PA_TASK_ID.toString(), initializer.getTaskId().value());
-        variables.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
-        variables.put(SchedulerVars.PA_TASK_ITERATION.toString(), initializer.getIterationIndex());
-        variables.put(SchedulerVars.PA_TASK_REPLICATION.toString(), initializer.getReplicationIndex());
-        variables.put(SchedulerVars.PA_USER.toString(), initializer.getJobOwner());
-        return variables;
-    }
-
-    static Map<String, String> thirdPartyCredentials(TaskContext container) throws Exception {
-        try {
-            Map<String, String> thirdPartyCredentials = new HashMap<>();
-            if (container.getDecrypter() != null) {
-                thirdPartyCredentials.putAll(container.getDecrypter().decrypt().getThirdPartyCredentials());
-            }
-            return thirdPartyCredentials;
-        } catch (Exception e) {
-            throw new Exception("Could read encrypted third party credentials", e);
-        }
-    }
-
-    static void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,
-                                        Map<String, Serializable> variables, PrintStream errorStream) {
-
-        Map<String, Serializable> variablesAndCredentials = new HashMap<>(variables);
-
-        for (Map.Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
-            variablesAndCredentials.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry.getValue());
-        }
-
-        replace(script, variablesAndCredentials, errorStream);
-    }
-
-    public static void replace(Script script, Map<String, Serializable> substitutes, PrintStream errorStream) {
-        if (script != null) {
-            if ("java".equals(script.getEngineName())) {
-                try {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Serializable> deserializedArgs =
-                            SerializationUtil.deserializeVariableMap(
-                                    (Map<String, byte[]>) script.getParameters()[0]);
-                    for (Map.Entry<String, Serializable> deserializedArg : deserializedArgs.entrySet()) {
-                        if (deserializedArg.getValue() instanceof String) {
-                            deserializedArg.setValue(
-                              VariableSubstitutor.filterAndUpdate((String) deserializedArg.getValue(),
-                                      substitutes));
-                        }
-                    }
-                    script.getParameters()[0] = new HashMap<>(
-                            SerializationUtil.serializeVariableMap(deserializedArgs));
-                } catch (Exception e) {
-                    errorStream.println("Cannot read Java parameters");
-                    e.printStackTrace(errorStream);
-                }
-            } else if ("native".equals(script.getEngineName())) { // to replace script arguments
-                script.setScript(VariableSubstitutor.filterAndUpdate(script.getScript(), substitutes));
-            } else {
-                Serializable[] args = script.getParameters();
-
-                if (args != null) {
-                    for (int i = 0; i < args.length; i++) {
-                        if (args[i] instanceof String) {
-                            args[i] = VariableSubstitutor.filterAndUpdate((String) args[i], substitutes);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private Serializable execute(TaskContext taskContext, PrintStream output, PrintStream error,
             ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
             Map<String, Serializable> variables) throws Throwable {
         if (taskContext.getPreScript() != null) {
             Script<?> script = taskContext.getPreScript();
-            replaceScriptParameters(script, thirdPartyCredentials, variables, error);
+            forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables,
+                    error);
             ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
             if (preScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute pre script: " +
-                    preScriptResult.getException().getMessage(), preScriptResult.getException());
+                        preScriptResult.getException().getMessage(), preScriptResult.getException());
             }
         }
 
         Script<Serializable> script = ((ScriptExecutableContainer) taskContext.getExecutableContainer())
                 .getScript();
-        replaceScriptParameters(script, thirdPartyCredentials, variables, error);
+        forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, error);
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
 
         if (scriptResult.errorOccured()) {
             throw new TaskException("Failed to execute task: " + scriptResult.getException().getMessage(),
-                scriptResult.getException());
+                    scriptResult.getException());
         }
 
         if (taskContext.getPostScript() != null) {
-            replaceScriptParameters(taskContext.getPostScript(), thirdPartyCredentials, variables, error);
+            forkedTaskVariablesManager.replaceScriptParameters(taskContext.getPostScript(),
+                    thirdPartyCredentials, variables, error);
             ScriptResult postScriptResult = scriptHandler.handle(taskContext.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute post script: " +
-                    postScriptResult.getException().getMessage(), postScriptResult.getException());
+                        postScriptResult.getException().getMessage(), postScriptResult.getException());
             }
         }
         return scriptResult.getResult();

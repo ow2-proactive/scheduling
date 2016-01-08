@@ -36,67 +36,41 @@ package org.ow2.proactive.scheduler.task.executors;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
-import org.ow2.proactive.resourcemanager.utils.OneJar;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.task.TaskContext;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.context.TaskContext;
+import org.ow2.proactive.scheduler.task.context.TaskContextSerializer;
 import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
-import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+import org.ow2.proactive.scheduler.task.executors.forked.env.ExecuteForkedTaskInsideNewJvm;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.ScriptLoader;
-import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
-import com.google.common.base.Strings;
 import org.apache.commons.io.FileUtils;
 
 
 /**
  * Executor in charge to fork a new process for running a non forked task in a dedicated JVM.
  *
- * @see ForkedTaskExecutor#fromForkedJVM(String)
+ * @see ExecuteForkedTaskInsideNewJvm#fromForkedJVM(String)
  * @see InProcessTaskExecutor
  */
 public class ForkedTaskExecutor implements TaskExecutor {
 
-    private static final String FORK_ENVIRONMENT_BINDING_NAME = "forkEnvironment";
-    private static final Set<PosixFilePermission> SHARED_FOLDER_PERMISSIONS = PosixFilePermissions.fromString(
-      "rwxrwxrwx");
+    private final ForkedProcessBuilderCreator forkedJvmProcessBuilderCreator = new ForkedProcessBuilderCreator();
+    private final TaskContextSerializer taskContextSerializer = new TaskContextSerializer();
 
     private final File workingDir;
-    private final Decrypter decrypter;
 
     public ForkedTaskExecutor(File workingDir) {
-        this(workingDir, null);
-    }
-
-    public ForkedTaskExecutor(File workingDir, Decrypter decrypter) {
         this.workingDir = workingDir;
-        this.decrypter = decrypter;
     }
 
+    @Override
     public TaskResultImpl execute(TaskContext context, PrintStream outputSink, PrintStream errorSink) {
         CookieBasedProcessTreeKiller taskProcessTreeKiller = null;
         Process process = null;
@@ -104,10 +78,11 @@ public class ForkedTaskExecutor implements TaskExecutor {
         File serializedContext = null;
 
         try {
-            serializedContext = serializeContext(context, workingDir);
+            serializedContext = taskContextSerializer.serializeContext(context, workingDir);
 
-            OSProcessBuilder processBuilder = createForkedProcess(context, serializedContext, outputSink,
-                    errorSink);
+            OSProcessBuilder processBuilder = forkedJvmProcessBuilderCreator.createForkedProcessBuilder(
+                    context, serializedContext, outputSink,
+                    errorSink, workingDir);
 
             try {
                 TaskId taskId = context.getTaskId();
@@ -131,8 +106,8 @@ public class ForkedTaskExecutor implements TaskExecutor {
                     Object error = deserializeTaskResult(serializedContext);
                     if (error instanceof TaskContext) {
                         return createTaskResult(context, new IOException(
-                            "Forked task failed to remove serialized task context, " +
-                                "probably a permission issue on folder " + workingDir));
+                                "Forked task failed to remove serialized task context, " +
+                                        "probably a permission issue on folder " + workingDir));
                     } else {
                         Throwable exception = (Throwable) error;
                         return createTaskResult(context, exception);
@@ -162,181 +137,19 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
     private TaskResultImpl createTaskResult(TaskContext context, Throwable throwable) {
         return new TaskResultImpl(context.getTaskId(), new ForkedJvmProcessException(
-            "Failed to execute task in a forked JVM", throwable));
-    }
-
-    private OSProcessBuilder createForkedProcess(TaskContext context, File serializedContext,
-            PrintStream outputSink, PrintStream errorSink) throws Exception {
-        OSProcessBuilder processBuilder;
-        String nativeScriptPath = context.getSchedulerHome();
-
-        if (context.isRunAsUser()) {
-            shareWorkingDirWithRunAsMeUser(workingDir);
-            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
-                    ForkerUtils.checkConfigAndGetUser(decrypter));
-        } else {
-            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
-        }
-
-        String javaHome = System.getProperty("java.home");
-        ArrayList<String> jvmArguments = new ArrayList<>(1);
-        // set the task fork property so that script engines have a mean to know
-        // if they are running in a forked task or not
-        jvmArguments.add(PASchedulerProperties.TASK_FORK.getCmdLine() + "true");
-
-        StringBuilder classpath = new StringBuilder("." + File.pathSeparatorChar);
-        classpath.append(System.getProperty("java.class.path", ""));
-
-        for (String classpathEntry : OneJar.getClasspath()) {
-            classpath.append(File.pathSeparatorChar).append(classpathEntry);
-        }
-
-        ForkEnvironment forkEnvironment = context.getInitializer().getForkEnvironment();
-
-        if (forkEnvironment != null) {
-            Map<String, Serializable> variables = InProcessTaskExecutor.taskVariables(context);
-            Map<String, String> thirdPartyCredentials = InProcessTaskExecutor.thirdPartyCredentials(context);
-            if (forkEnvironment.getEnvScript() != null) {
-                ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
-                InProcessTaskExecutor
-                        .createBindings(context, scriptHandler, variables, thirdPartyCredentials);
-
-                scriptHandler.addBinding(FORK_ENVIRONMENT_BINDING_NAME, forkEnvironment);
-                Script<?> script = forkEnvironment.getEnvScript();
-
-                InProcessTaskExecutor.replaceScriptParameters(script, thirdPartyCredentials, variables,
-                        errorSink);
-                ScriptResult scriptResult = scriptHandler.handle(script, outputSink, errorSink);
-                if (scriptResult.errorOccured()) {
-                    throw new Exception("Failed to execute fork environment script",
-                        scriptResult.getException());
-                }
-            }
-
-            for (String jvmArgument : forkEnvironment.getJVMArguments()) {
-                jvmArguments.add(VariableSubstitutor.filterAndUpdate(jvmArgument, variables));
-            }
-
-            if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
-                javaHome = VariableSubstitutor.filterAndUpdate(forkEnvironment.getJavaHome(), variables);
-            }
-
-            for (String classpathEntry : forkEnvironment.getAdditionalClasspath()) {
-                classpath.append(File.pathSeparatorChar).append(
-                        VariableSubstitutor.filterAndUpdate(classpathEntry, variables));
-            }
-
-            try {
-                HashMap<String, Serializable> systemEnvironmentVariables = new HashMap<String, Serializable>(
-                    System.getenv());
-                systemEnvironmentVariables.putAll(variables);
-                systemEnvironmentVariables.putAll(thirdPartyCredentials);
-                processBuilder.environment().putAll(
-                // replace variables in defined system environment values
-                // by existing environment variables, variables and credentials
-                        VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(),
-                                systemEnvironmentVariables));
-            } catch (IllegalArgumentException processEnvironmentReadOnly) {
-                throw new IllegalStateException(
-                    "Cannot use runAsMe mode and set system environment properties",
-                    processEnvironmentReadOnly);
-            }
-        }
-
-        List<String> javaCommand = processBuilder.command();
-        javaCommand.add(javaHome + File.separatorChar + "bin" + File.separatorChar + "java");
-        javaCommand.add("-cp");
-        javaCommand.add(classpath.toString());
-        javaCommand.addAll(jvmArguments);
-        javaCommand.add(ForkedTaskExecutor.class.getName());
-        javaCommand.add(serializedContext.getAbsolutePath());
-
-        processBuilder.directory(workingDir);
-        return processBuilder;
-    }
-
-    private void shareWorkingDirWithRunAsMeUser(File workingDir) throws IOException {
-        try {
-            Files.setPosixFilePermissions(workingDir.toPath(), SHARED_FOLDER_PERMISSIONS);
-        } catch (IOException e) {
-            throw new IOException("Working directory will not be writable by runAsMe user", e);
-        } catch (UnsupportedOperationException ignored) {
-            // ignored, could be running on Windows
-        }
-    }
-
-    // 1 called by forker
-    private static File serializeContext(TaskContext context, File directory) throws IOException {
-        // prefix must be at least 3 characters long
-        String tmpFilePrefix = Strings.padStart(context.getTaskId().value(), 3, '0');
-
-        File file = File.createTempFile(tmpFilePrefix, null, directory);
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
-            objectOutputStream.writeObject(context);
-        }
-        return file;
-    }
-
-    // 2 called by forked
-    private static TaskContext deserializeContext(String pathToFile) throws IOException,
-            ClassNotFoundException {
-        File f = new File(pathToFile);
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(f))) {
-            return (TaskContext) inputStream.readObject();
-        } finally {
-            FileUtils.forceDelete(f);
-        }
-    }
-
-    // 3 called by forked
-    private static void serializeTaskResult(Object result, String contextPath) throws IOException {
-        File file = new File(contextPath);
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
-            objectOutputStream.writeObject(result);
-        }
+                "Failed to execute task in a forked JVM", throwable));
     }
 
     // 4 called by forker
-    private static Object deserializeTaskResult(File pathToFile) throws IOException, ClassNotFoundException {
+    private Object deserializeTaskResult(File pathToFile) throws IOException, ClassNotFoundException {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(pathToFile))) {
             return inputStream.readObject();
         } catch (IOException e) {
             throw new ForkedJvmProcessException(
-                "Could not read serialized task result (forked JVM may have been killed by the task or could not write to local space)",
-                e);
+                    "Could not read serialized task result (forked JVM may have been killed by the task or could not write to local space)",
+                    e);
         } finally {
             FileUtils.forceDelete(pathToFile);
-        }
-    }
-
-    /**
-     * Everything here and called from here should only use System.out and System.err
-     */
-    public static void main(String[] args) throws Throwable {
-        if (args.length != 1) {
-            System.err.println("Path to serialized task context is expected");
-            System.exit(-1);
-        }
-
-        fromForkedJVM(args[0]);
-    }
-
-    private static void fromForkedJVM(String contextPath) {
-        try {
-            TaskContext container = deserializeContext(contextPath);
-
-            TaskResultImpl result = new InProcessTaskExecutor().execute(container, System.out, System.err);
-
-            serializeTaskResult(result, contextPath);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace(System.err);
-            try {
-                serializeTaskResult(throwable, contextPath);
-            } catch (Throwable couldNotSerializeException) {
-                System.err.println("Could not serialize exception as task result");
-                couldNotSerializeException.printStackTrace(System.err);
-            }
-            System.exit(1);
         }
     }
 

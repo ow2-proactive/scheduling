@@ -32,7 +32,7 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.context;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.Script;
@@ -54,12 +55,14 @@ public class TaskContext implements Serializable {
     private final List<String> otherNodesURLs;
     private final List<String> nodesHosts;
 
-    private ExecutableContainer executableContainer;
-    private TaskLauncherInitializer initializer;
-    private Decrypter decrypter;
-    private TaskResult[] previousTasksResults;
+    private final ExecutableContainer executableContainer;
+    private final TaskLauncherInitializer initializer;
+    private final Decrypter decrypter;
+    private final TaskResult[] previousTasksResults;
 
-    private String scratchURI;
+    private final String scratchURI;
+
+
     private final String inputURI;
     private final String outputURI;
     private final String userURI;
@@ -68,23 +71,21 @@ public class TaskContext implements Serializable {
 
     private final String progressFilePath;
 
-    // for testing purpose only
-    public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer) throws
-      NodeException {
-        this(executableContainer, initializer, null, "", "", "", "", "", "",
-          "");
-    }
-
-    // for testing purpose only
-    public TaskContext(ExecutableContainer executableContainer,
-            TaskLauncherInitializer initializer, TaskResult[] previousTasksResults) throws NodeException {
-        this(executableContainer, initializer, previousTasksResults, "", "", "", "", "", "",
-          "");
-    }
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
-      TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI, String userURI,
-      String globalURI, String progressFilePath, String currentNodeHostname) throws NodeException {
+            TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI,
+            String userURI,
+            String globalURI, String progressFilePath, String currentNodeHostname) throws NodeException {
+        this(executableContainer, initializer, previousTasksResults, scratchURI, inputURI, outputURI, userURI,
+                globalURI, progressFilePath, currentNodeHostname, null);
+    }
+
+
+    public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
+            TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI,
+            String userURI,
+            String globalURI, String progressFilePath, String currentNodeHostname,
+            Decrypter decrypter) throws NodeException {
         this.initializer = initializer;
         initializer.setNamingService(null);
         this.previousTasksResults = previousTasksResults;
@@ -96,8 +97,15 @@ public class TaskContext implements Serializable {
         this.progressFilePath = progressFilePath;
         this.schedulerHome = ClasspathUtils.findSchedulerHome();
         this.executableContainer = executableContainer;
+        this.decrypter = decrypter;
 
-        if (executableContainer.getNodes() != null) {
+        // Added executableContainer != null for now. It is too much work to refactor all of this.
+        // This class should not be so overloaded with parameters in the constructor.
+        // And it should not be mutable and it should not change other instance's data inside this
+        // constructor.
+        // Rule is: max 3 parameters in the constructor
+        // Target: Immutable
+        if (executableContainer != null && executableContainer.getNodes() != null) {
             int nbNodes = executableContainer.getNodes().size();
             otherNodesURLs = new ArrayList<>(nbNodes);
             nodesHosts = new ArrayList<>(nbNodes + 1);
@@ -113,6 +121,7 @@ public class TaskContext implements Serializable {
             nodesHosts = new ArrayList<>(0);
         }
     }
+
 
     public ExecutableContainer getExecutableContainer() {
         return executableContainer;
@@ -136,10 +145,6 @@ public class TaskContext implements Serializable {
 
     public TaskLauncherInitializer getInitializer() {
         return initializer;
-    }
-
-    public void setDecrypter(Decrypter decrypter) {
-        this.decrypter = decrypter;
     }
 
     public Decrypter getDecrypter() {

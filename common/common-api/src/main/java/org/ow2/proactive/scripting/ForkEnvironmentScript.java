@@ -32,22 +32,43 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scripting;
 
-import java.io.File;
-import java.io.Serializable;
+import javax.script.Bindings;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scripting.helper.forkenvironment.ForkEnvironmentScriptResultExtractor;
 
+@PublicAPI
+@XmlAccessorType(XmlAccessType.FIELD)
+public class ForkEnvironmentScript extends Script<ForkEnvironmentScriptResult> {
 
-public interface TaskLauncherFactory extends Serializable {
+    ForkEnvironmentScriptResultExtractor forkEnvironmentScriptResultExtractor =
+            new ForkEnvironmentScriptResultExtractor();
 
-    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception;
+    @Override
+    protected String getDefaultScriptName() {
+        return "ForkEnvironmentScript";
+    }
 
-    TaskExecutor createTaskExecutor(File workingDir);
+    public ForkEnvironmentScript(Script<?> original) throws InvalidScriptException {
+        super(original);
+    }
+
+    @Override
+    protected void prepareSpecialBindings(Bindings bindings) {
+
+    }
+
+    @Override
+    protected ScriptResult<ForkEnvironmentScriptResult> getResult(Object evalResult, Bindings bindings) {
+        // Extract the prefix command
+        return new ScriptResult<>(
+                new ForkEnvironmentScriptResult()
+                .setJavaPrefixCommand(forkEnvironmentScriptResultExtractor.getJavaPrefixCommand(bindings))
+        );
+    }
 
 }

@@ -4,7 +4,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2015 INRIA/University of
+ * Copyright (C) 1997-2016 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -32,22 +32,22 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scripting;
 
-import java.io.File;
 import java.io.Serializable;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
+public class ForkEnvironmentScriptResult implements Serializable {
 
+    private String[] javaPrefixCommand;
 
-public interface TaskLauncherFactory extends Serializable {
+    public List<String> getJavaPrefixCommand() {
+        return ImmutableList.copyOf(javaPrefixCommand);
+    }
 
-    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception;
-
-    TaskExecutor createTaskExecutor(File workingDir);
-
+    public ForkEnvironmentScriptResult setJavaPrefixCommand(String[] javaPrefixCommand) {
+        this.javaPrefixCommand = javaPrefixCommand.clone();
+        return this;
+    }
 }

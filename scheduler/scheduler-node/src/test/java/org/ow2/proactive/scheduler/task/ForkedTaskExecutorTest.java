@@ -15,6 +15,7 @@ import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -29,7 +30,6 @@ import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 
 public class ForkedTaskExecutorTest {
 
@@ -50,11 +50,12 @@ public class ForkedTaskExecutorTest {
                 forkedTaskExecutor.execute(
                         new TaskContext(
                                 new ScriptExecutableContainer(
-                                new TaskScript(
-                                        new SimpleScript(
-                                                "result=System.getProperty('"
-                                                        + PASchedulerProperties.TASK_FORK.getKey() + "')"
-                                                , "groovy"))), initializer),
+                                        new TaskScript(
+                                                new SimpleScript(
+                                                        "result=System.getProperty('"
+                                                                + PASchedulerProperties.TASK_FORK.getKey() + "')"
+                                                        , "groovy"))), initializer, null, "", "", "", "", "",
+                                "", ""),
                         taskOutput.outputStream, taskOutput.error);
 
         Assert.assertEquals("true", result.value());
@@ -70,8 +71,9 @@ public class ForkedTaskExecutorTest {
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
-                "javascript"))), initializer), taskOutput.outputStream, taskOutput.error);
+                        new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
+                                "javascript"))), initializer, null, "", "", "", "", "", "", ""),
+                taskOutput.outputStream, taskOutput.error);
 
         assertEquals(String.format("hello%n"), taskOutput.output());
         assertEquals("hello", result.value());
@@ -89,7 +91,8 @@ public class ForkedTaskExecutorTest {
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
+                        new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))),
+                        initializer, null, "", "", "", "", "", "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -106,7 +109,8 @@ public class ForkedTaskExecutorTest {
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))), initializer),
+                        new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))),
+                        initializer, null, "", "", "", "", "", "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -118,18 +122,19 @@ public class ForkedTaskExecutorTest {
 
         Decrypter decrypter = createCredentials("somebody_that_does_not_exists");
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), decrypter);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder());
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         ScriptExecutableContainer container = new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-            "print('hello'); result='hello'", "javascript")));
+                "print('hello'); result='hello'", "javascript")));
 
         container.setRunAsUser(true);
 
-        TaskContext taskContext = new TaskContext(container, initializer);
-        taskContext.setDecrypter(decrypter);
+        TaskContext taskContext = new TaskContext(container, initializer, null, "", "", "", "", "", "", "",
+                decrypter);
+
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -152,12 +157,13 @@ public class ForkedTaskExecutorTest {
         initializer.setForkEnvironment(forkEnvironment);
 
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-            "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); " +
-              "println new File('.').getCanonicalPath()", "groovy"))), initializer), taskOutput.outputStream,
-          taskOutput.error);
+                        "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); " +
+                                "println new File('.').getCanonicalPath()", "groovy"))), initializer, null, "", "",
+                        "", "", "", "", ""), taskOutput.outputStream,
+                taskOutput.error);
 
         assertEquals(String.format("envValue%njvmValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
-          taskOutput.output());
+                taskOutput.output());
     }
 
     @Test
@@ -170,7 +176,7 @@ public class ForkedTaskExecutorTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
-        initializer.setVariables(Collections.singletonMap("aVar","aValue"));
+        initializer.setVariables(Collections.singletonMap("aVar", "aValue"));
 
         ForkEnvironment forkEnvironment = new ForkEnvironment();
         forkEnvironment.addSystemEnvironmentVariable("envVar", "$aVar");
@@ -178,12 +184,13 @@ public class ForkedTaskExecutorTest {
         initializer.setForkEnvironment(forkEnvironment);
 
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-            "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
-              + "println new File('.').getCanonicalPath()", "groovy"))), initializer),
-          taskOutput.outputStream, taskOutput.error);
+                        "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
+                                + "println new File('.').getCanonicalPath()", "groovy"))), initializer, null, "", "",
+                        "", "", "", "", ""),
+                taskOutput.outputStream, taskOutput.error);
 
         assertEquals(String.format("aValue%naValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
-          taskOutput.output());
+                taskOutput.output());
     }
 
     @Test
@@ -202,7 +209,8 @@ public class ForkedTaskExecutorTest {
         initializer.setForkEnvironment(forkEnvironment);
 
         TaskResultImpl taskResult = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("", "groovy"))), initializer), taskOutput.outputStream,
+                        new TaskScript(new SimpleScript("", "groovy"))), initializer, null, "", "", "", "", "", "",
+                        ""), taskOutput.outputStream,
                 taskOutput.error);
 
         assertTrue(taskResult.hadException());

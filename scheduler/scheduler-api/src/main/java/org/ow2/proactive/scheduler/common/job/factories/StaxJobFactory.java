@@ -73,6 +73,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -1402,7 +1403,7 @@ public class StaxJobFactory extends JobFactory {
                         } else if (XMLTags.JOB_PATH_ELEMENT.matches(current)) {
                             forkEnv.addAdditionalClasspath(replace(cursorExec.getAttributeValue(0)));
                         } else if (XMLTags.SCRIPT_ENV.matches(current)) {
-                            forkEnv.setEnvScript(createScript(cursorExec));
+                            forkEnv.setEnvScript(new ForkEnvironmentScript(createScript(cursorExec)));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
