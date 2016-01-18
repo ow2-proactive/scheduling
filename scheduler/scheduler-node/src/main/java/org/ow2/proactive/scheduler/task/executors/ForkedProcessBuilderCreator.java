@@ -41,6 +41,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.security.KeyException;
 import java.util.Set;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
@@ -51,30 +52,51 @@ import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedJvmTaskExecut
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scripting.ScriptResult;
 
-public class ForkedProcessBuilderCreator extends ForkEnvironmentScriptExecutor implements Serializable {
+public class ForkedProcessBuilderCreator implements Serializable {
     private static final Set<PosixFilePermission> SHARED_FOLDER_PERMISSIONS = PosixFilePermissions.fromString(
             "rwxrwxrwx");
     private final ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
     private final ForkEnvironmentScriptExecutor forkEnvironmentScriptExecutor = new ForkEnvironmentScriptExecutor();
 
+    /**
+     * Creates a process builder for a given task context.
+     *
+     * @param context           The task context to execute.
+     * @param serializedContext The task context saved to disk.
+     * @param outputSink        Standard output sink.
+     * @param errorSink         Error sink.
+     * @param workingDir        The working directory to execute the process in.
+     * @return Returns a process builder, ready to excute.
+     * @throws Exception
+     */
     public OSProcessBuilder createForkedProcessBuilder(TaskContext context, File serializedContext,
             PrintStream outputSink, PrintStream errorSink, File workingDir) throws Exception {
-        OSProcessBuilder processBuilder;
 
         String nativeScriptPath = context.getSchedulerHome();
         ScriptResult forkEnvironmentScriptResult = null;
 
-        if (context.isRunAsUser()) {
-            shareWorkingDirWithRunAsMeUser(workingDir);
-            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
-                    ForkerUtils.checkConfigAndGetUser(context.getDecrypter()));
-        } else {
-            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
-        }
+        OSProcessBuilder processBuilder = getOsProcessBuilder(context, workingDir, nativeScriptPath);
 
+        forkEnvironmentScriptResult = executeForkEnvironmentScriptAndExtractVariables(context, outputSink,
+                errorSink, forkEnvironmentScriptResult,
+                processBuilder);
+
+        processBuilder
+                .command()
+                .addAll(forkedJvmTaskExecutionCommandCreator
+                        .createForkedJvmTaskExecutionCommand(context,
+                                forkEnvironmentScriptResult, serializedContext.getAbsolutePath()
+                        ));
+
+        processBuilder = processBuilder.directory(workingDir);
+        return processBuilder;
+    }
+
+    private ScriptResult executeForkEnvironmentScriptAndExtractVariables(TaskContext context,
+            PrintStream outputSink, PrintStream errorSink, ScriptResult forkEnvironmentScriptResult,
+            OSProcessBuilder processBuilder) throws Exception {
         ForkEnvironment forkEnvironment = context.getInitializer().getForkEnvironment();
-
         if (forkEnvironment != null) {
 
             if (forkEnvironment.getEnvScript() != null) {
@@ -94,15 +116,19 @@ public class ForkedProcessBuilderCreator extends ForkEnvironmentScriptExecutor i
                         processEnvironmentReadOnly);
             }
         }
+        return forkEnvironmentScriptResult;
+    }
 
-        processBuilder
-                .command()
-                .addAll(forkedJvmTaskExecutionCommandCreator
-                        .createForkedJvmTaskExecutionCommand(context,
-                                forkEnvironmentScriptResult, serializedContext.getAbsolutePath()
-                        ));
-
-        processBuilder = processBuilder.directory(workingDir);
+    private OSProcessBuilder getOsProcessBuilder(TaskContext context, File workingDir,
+            String nativeScriptPath) throws IOException, IllegalAccessException, KeyException {
+        OSProcessBuilder processBuilder;
+        if (context.isRunAsUser()) {
+            shareWorkingDirWithRunAsMeUser(workingDir);
+            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
+                    ForkerUtils.checkConfigAndGetUser(context.getDecrypter()));
+        } else {
+            processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
+        }
         return processBuilder;
     }
 

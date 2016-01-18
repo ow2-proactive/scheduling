@@ -38,7 +38,6 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
@@ -46,22 +45,29 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
-import org.jetbrains.annotations.NotNull;
 
 public class ForkEnvironmentScriptExecutor implements Serializable {
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
 
-    public ScriptResult executeForkEnvironmentScript(TaskContext context,PrintStream outputSink,
+    /**
+     * Executes a fork environment script.
+     *
+     * @param context    The task context to execute the script in.
+     * @param outputSink Standard output sink.
+     * @param errorSink  Error output sink.
+     * @return Returns a ScriptResult.
+     * @throws Exception
+     */
+    public ScriptResult executeForkEnvironmentScript(TaskContext context, PrintStream outputSink,
             PrintStream errorSink) throws Exception {
 
-        ForkEnvironment forkEnvironment = context.getInitializer().getForkEnvironment();
         Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(context);
-        Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(context);
-        ScriptResult scriptResult;
+        Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
+                context);
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
-        Script<?> script = forkEnvironment.getEnvScript();
+        Script<?> script = context.getInitializer().getForkEnvironment().getEnvScript();
 
         forkedTaskVariablesManager
                 .addBindingsToScriptHandler(scriptHandler,
@@ -74,7 +80,7 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
                 variables,
                 errorSink);
 
-        scriptResult = scriptHandler.handle(script,
+        ScriptResult scriptResult = scriptHandler.handle(script,
                 outputSink,
                 errorSink);
 

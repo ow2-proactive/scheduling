@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -78,22 +79,30 @@ public class InProcessTaskExecutor implements TaskExecutor {
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
-    private static String writeNodesFile(TaskContext context) throws IOException {
-        List<String> nodesHosts = context.getNodesHosts();
+    /**
+     * Writes a nodes file to disk.
+     *
+     * @param taskContext The task taskContext from which to extract the nodes file from.
+     * @return The absolute path of the nodes file.
+     * @throws IOException
+     */
+    private static String writeNodesFile(TaskContext taskContext) throws IOException {
+        List<String> nodesHosts = taskContext.getNodesHosts();
 
         if (nodesHosts.isEmpty()) {
             return "";
         } else {
             File directory;
-            if (context.getScratchURI() == null || context.getScratchURI().isEmpty()) {
+            if (taskContext.getScratchURI() == null || taskContext.getScratchURI().isEmpty()) {
                 directory = new File(".");
             } else {
-                directory = new File(context.getScratchURI());
+                directory = new File(taskContext.getScratchURI());
             }
             File nodesFile = File.createTempFile(NODES_FILE_DIRECTORY_NAME, null, directory);
 
             Writer outputWriter = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(nodesFile), "UTF-8"));
+                    new FileOutputStream(nodesFile),
+                    PASchedulerProperties.valueOf("FILE_ENCODING").toString()));
             for (String nodeHost : nodesHosts) {
                 outputWriter.append(nodeHost).append(System.lineSeparator());
             }
@@ -103,43 +112,53 @@ public class InProcessTaskExecutor implements TaskExecutor {
         }
     }
 
+    /**
+     * Executes a task inside a task context.
+     *
+     * @param taskContext Task context to execute.
+     * @param output      Standard output sink.
+     * @param error       Error sink.
+     * @return Returns the task result.
+     */
     @Override
-    public TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error) {
+    public TaskResultImpl execute(TaskContext taskContext, PrintStream output, PrintStream error) {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         String nodesFile = null;
         try {
-            nodesFile = writeNodesFile(container);
-            Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(container,
+            nodesFile = writeNodesFile(taskContext);
+            Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(
+                    taskContext,
                     nodesFile);
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
-                    container);
-            forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, container, variables,
+                    taskContext);
+            forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext, variables,
                     thirdPartyCredentials);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
             try {
                 stopwatch.start();
-                Serializable result = execute(container, output, error, scriptHandler, thirdPartyCredentials,
+                Serializable result = execute(taskContext, output, error, scriptHandler,
+                        thirdPartyCredentials,
                         variables);
                 stopwatch.stop();
                 taskResult = new TaskResultImpl(
-                        container.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                        taskContext.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 stopwatch.stop();
                 e.printStackTrace(error);
                 taskResult = new TaskResultImpl(
-                        container.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                        taskContext.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
 
-            executeFlowScript(container.getControlFlowScript(), scriptHandler, output, error, taskResult);
+            executeFlowScript(taskContext.getControlFlowScript(), scriptHandler, output, error, taskResult);
 
             taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
 
             return taskResult;
         } catch (Throwable e) {
             e.printStackTrace(error);
-            return new TaskResultImpl(container.getTaskId(), e);
+            return new TaskResultImpl(taskContext.getTaskId(), e);
         } finally {
             if (nodesFile != null && !nodesFile.isEmpty()) {
                 FileUtils.deleteQuietly(new File(nodesFile));
@@ -147,6 +166,18 @@ public class InProcessTaskExecutor implements TaskExecutor {
         }
     }
 
+    /**
+     * Executes a task.
+     *
+     * @param taskContext           Task context to execute
+     * @param output                Standard output sink.
+     * @param error                 Error sink.
+     * @param scriptHandler
+     * @param thirdPartyCredentials
+     * @param variables             Environment variables.
+     * @return The result of the executed script.
+     * @throws Throwable
+     */
     private Serializable execute(TaskContext taskContext, PrintStream output, PrintStream error,
             ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
             Map<String, Serializable> variables) throws Throwable {
