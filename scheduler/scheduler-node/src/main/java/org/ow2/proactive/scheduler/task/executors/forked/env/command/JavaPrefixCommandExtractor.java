@@ -32,22 +32,32 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.executors.forked.env.command;
 
-import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
+import org.ow2.proactive.scripting.ForkEnvironmentScriptResult;
+import org.ow2.proactive.scripting.ScriptResult;
 
+public class JavaPrefixCommandExtractor implements Serializable {
+    /**
+     * Extracts a java fork prefix command from a script result.
+     *
+     * @param scriptResult ScriptResult object from which the fork environment command is extracted.
+     * @return Java prefix command, extracted out of the fork environment script variables.
+     */
+    public List<String> extractJavaPrefixCommandToCommandListFromScriptResult(ScriptResult scriptResult) {
+        List<String> javaPrefixCommand = new ArrayList<>();
 
-public interface TaskLauncherFactory extends Serializable {
+        if (scriptResult != null && scriptResult.getResult() instanceof ForkEnvironmentScriptResult) {
 
-    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception;
+            ForkEnvironmentScriptResult forkEnvResult =
+                    (ForkEnvironmentScriptResult) scriptResult.getResult();
 
-    TaskExecutor createTaskExecutor(File workingDir);
-
+            javaPrefixCommand.addAll(forkEnvResult.getJavaPrefixCommand());
+        }
+        return javaPrefixCommand;
+    }
 }

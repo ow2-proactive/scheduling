@@ -32,22 +32,29 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scripting.helper.forkenvironment;
 
-import java.io.File;
 import java.io.Serializable;
-
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
+import java.util.Map;
 
 
-public interface TaskLauncherFactory extends Serializable {
+public class ForkEnvironmentScriptResultExtractor implements Serializable {
+    public static final String PRE_JAVA_CMD_KEY = "preJavaHomeCmd";
 
-    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception;
+    public String[] getJavaPrefixCommand(Map<String, Object> bindingsMap) {
+        // Null checks
+        if (bindingsMap == null || bindingsMap.get(PRE_JAVA_CMD_KEY) == null) {
+            return new String[0];
+        }
 
-    TaskExecutor createTaskExecutor(File workingDir);
-
+        // The java prefix command is split by spaces. That can introduce issues, e.g. with paths
+        // which contain spaces. That behavior is address in the user interface (studio), so when
+        // this split behavior is changed communicate it in the user interface.
+        if (bindingsMap.get(PRE_JAVA_CMD_KEY) instanceof CharSequence) {
+            return bindingsMap.get(PRE_JAVA_CMD_KEY)
+                    .toString()
+                    .split(" ");
+        }
+        return new String[0];
+    }
 }

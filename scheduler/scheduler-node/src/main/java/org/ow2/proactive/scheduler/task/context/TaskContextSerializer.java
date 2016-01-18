@@ -32,22 +32,33 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.context;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
-import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
+import com.google.common.base.Strings;
 
+public class TaskContextSerializer implements Serializable {
 
-public interface TaskLauncherFactory extends Serializable {
+    /**
+     * Serializes a task context to disk.
+     * @param context The context object to serialize.
+     * @param directory The directory where to save the context object.
+     * @return A file pointing/holding the serialized context object.
+     * @throws IOException
+     */
+    public File serializeContext(TaskContext context, File directory) throws IOException {
+        // prefix must be at least 3 characters long
+        String tmpFilePrefix = Strings.padStart(context.getTaskId().value(), 3, '0');
 
-    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception;
-
-    TaskExecutor createTaskExecutor(File workingDir);
-
+        File file = File.createTempFile(tmpFilePrefix, null, directory);
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
+            objectOutputStream.writeObject(context);
+        }
+        return file;
+    }
 }

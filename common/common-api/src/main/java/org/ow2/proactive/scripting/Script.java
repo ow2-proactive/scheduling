@@ -45,6 +45,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
@@ -342,10 +343,14 @@ public abstract class Script<E> implements Serializable {
     /** String identifying the script.
      * @return a String identifying the script.
      */
-    public abstract String getId();
+    public String getId() {
+        return this.id;
+    }
 
     /** The reader used to read the script. */
-    protected abstract Reader getReader();
+    protected Reader getReader() {
+        return new StringReader(this.script);
+    }
 
     /** The Script Engine used to evaluate the script. */
     protected ScriptEngine createScriptEngine() {

@@ -54,8 +54,8 @@ public class ProActiveForkedTaskLauncherFactory implements TaskLauncherFactory {
     }
 
     @Override
-    public TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter){
-        return new ForkedTaskExecutor(workingDir, decrypter);
+    public TaskExecutor createTaskExecutor(File workingDir){
+        return new ForkedTaskExecutor(workingDir);
     }
 
 }

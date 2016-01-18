@@ -34,6 +34,8 @@
  */
 package org.ow2.proactive.scripting;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -46,6 +48,15 @@ import org.junit.Test;
 
 
 public class ScriptTest {
+
+    @Test
+    public void testScriptReturnsId() throws InvalidScriptException {
+        String scriptString = "script";
+        ScriptForTests script = new ScriptForTests(scriptString, "something");
+
+        assertThat(script.getId(), is(scriptString));
+    }
+
 
     @Test
     public void testScriptCanBeCreatedWithoutScriptEngines_Script_Inlined() throws Exception {
@@ -104,11 +115,6 @@ public class ScriptTest {
 
         public ScriptForTests(File file) throws InvalidScriptException {
             super(file);
-        }
-
-        @Override
-        public String getId() {
-            return null;
         }
 
         @Override

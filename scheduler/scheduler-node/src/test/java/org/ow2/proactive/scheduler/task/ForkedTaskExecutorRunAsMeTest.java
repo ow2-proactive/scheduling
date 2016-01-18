@@ -10,6 +10,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -19,7 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
 
 
@@ -38,18 +39,18 @@ public class ForkedTaskExecutorRunAsMeTest {
 
         Decrypter decrypter = createCredentials(USERNAME, PASSWORD);
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder(), decrypter);
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder());
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
         ScriptExecutableContainer container = new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-            "whoami", "native")));
+                "whoami", "native")));
 
         container.setRunAsUser(true);
 
-        TaskContext taskContext = new TaskContext(container, initializer);
-        taskContext.setDecrypter(decrypter);
+        TaskContext taskContext = new TaskContext(container, initializer, null, "", "", "", "", "", "", "",
+                decrypter);
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
         assertTaskResultOk(result);
