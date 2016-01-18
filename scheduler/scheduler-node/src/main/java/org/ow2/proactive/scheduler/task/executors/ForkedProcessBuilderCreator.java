@@ -74,12 +74,11 @@ public class ForkedProcessBuilderCreator implements Serializable {
             PrintStream outputSink, PrintStream errorSink, File workingDir) throws Exception {
 
         String nativeScriptPath = context.getSchedulerHome();
-        ScriptResult forkEnvironmentScriptResult = null;
 
         OSProcessBuilder processBuilder = getOsProcessBuilder(context, workingDir, nativeScriptPath);
 
-        forkEnvironmentScriptResult = executeForkEnvironmentScriptAndExtractVariables(context, outputSink,
-                errorSink, forkEnvironmentScriptResult,
+        ScriptResult forkEnvironmentScriptResult = executeForkEnvironmentScriptAndExtractVariables(context, outputSink,
+                errorSink,
                 processBuilder);
 
         processBuilder
@@ -94,8 +93,10 @@ public class ForkedProcessBuilderCreator implements Serializable {
     }
 
     private ScriptResult executeForkEnvironmentScriptAndExtractVariables(TaskContext context,
-            PrintStream outputSink, PrintStream errorSink, ScriptResult forkEnvironmentScriptResult,
+            PrintStream outputSink, PrintStream errorSink,
             OSProcessBuilder processBuilder) throws Exception {
+        ScriptResult forkEnvironmentScriptResult = null;
+
         ForkEnvironment forkEnvironment = context.getInitializer().getForkEnvironment();
         if (forkEnvironment != null) {
 
