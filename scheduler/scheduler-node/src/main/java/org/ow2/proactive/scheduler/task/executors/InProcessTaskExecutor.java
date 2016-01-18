@@ -49,7 +49,6 @@ import java.util.concurrent.TimeUnit;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -60,6 +59,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.PAProperties;
 import com.google.common.base.Stopwatch;
 import org.apache.commons.io.FileUtils;
 
@@ -102,7 +102,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
             Writer outputWriter = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(nodesFile),
-                    PASchedulerProperties.valueOf("FILE_ENCODING").toString()));
+                    PAProperties.getFileEncoding()));
             for (String nodeHost : nodesHosts) {
                 outputWriter.append(nodeHost).append(System.lineSeparator());
             }
