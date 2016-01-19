@@ -12,6 +12,8 @@ build/
 /dist/
 !/dist/war/getstarted
 !/dist/scripts
+dist/war/rm.war
+dist/war/scheduler.war
 /data
 /logs
 /lib
