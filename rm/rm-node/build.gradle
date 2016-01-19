@@ -24,5 +24,5 @@ dependencies {
 
     runtime 'org.codehaus.groovy:groovy-all:2.4.5'
     runtime 'jsr223:jsr223-nativeshell:0.3'
-    runtime 'jsr223:jsr223-docker-compose:0.0.1'
+    runtime 'jsr223:jsr223-docker-compose:0.0.2'
 }
