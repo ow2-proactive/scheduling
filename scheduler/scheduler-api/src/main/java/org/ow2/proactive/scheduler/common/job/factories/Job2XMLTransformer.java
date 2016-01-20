@@ -36,22 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -65,16 +51,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.GenerationScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
-import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
-import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.MultipleHostsExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
-import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
-import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
-import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.ow2.proactive.topology.descriptor.*;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -918,12 +895,15 @@ public class Job2XMLTransformer {
     }
 
     private static String formatDate(long millis) {
-        String formatted = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-                TimeUnit.MILLISECONDS.toMinutes(millis) -
-                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)), TimeUnit.MILLISECONDS
-                        .toSeconds(millis) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-        return formatted.replace("00:", "");
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        millis -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        millis -= TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
+        String formatted = String.format("%02d:%02d:%02d", hours,
+                minutes, seconds);
+        // replace heading 00: as it's not accepted by the schema validation
+        return (formatted.replaceFirst("^(00:)+", ""));
     }
 }
 
