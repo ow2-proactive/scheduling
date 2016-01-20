@@ -1,79 +1,30 @@
 package org.ow2.proactive.scheduler.smartproxy.common;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.base.Throwables.propagate;
-import static com.google.common.base.Throwables.propagateIfInstanceOf;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PAUSED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_FINISHED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_RUNNING;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RESUMED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RUNNING_TO_FINISHED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.KILLED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.RESUMED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTDOWN;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTTING_DOWN;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.STOPPED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PENDING_TO_RUNNING;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PROGRESS;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_RUNNING_TO_FINISHED;
-
-import java.io.File;
-import java.security.KeyException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import javax.security.auth.login.LoginException;
-
+import com.google.common.net.UrlEscapers;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
-import com.google.common.net.UrlEscapers;
+import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.security.KeyException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.base.Throwables.propagateIfInstanceOf;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.*;
 
 /**
  * Asbtract implementation of smart proxy that factorizes code used by all smart proxy implementations.
@@ -85,37 +36,26 @@ import com.google.common.net.UrlEscapers;
  */
 public abstract class AbstractSmartProxy<T extends JobTracker> implements Scheduler, SchedulerEventListener {
 
-    private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
-
     public static final String GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME = "client_input_data_folder";
     public static final String GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME = "client_output_data_folder";
-
     public static final String GENERIC_INFO_PUSH_URL_PROPERTY_NAME = "push_url";
     public static final String GENERIC_INFO_PULL_URL_PROPERTY_NAME = "pull_url";
-
     public static final int MAX_NB_OF_DATA_TRANSFER_THREADS = 3 * Runtime.getRuntime().availableProcessors();
-
-    private ThreadFactory threadFactory =
-            new NamedThreadFactory("SmartProxyDataTransferThread");
-
-    protected final ExecutorService threadPool =
-            Executors.newFixedThreadPool(MAX_NB_OF_DATA_TRANSFER_THREADS, threadFactory);
-
     protected static final SchedulerEvent[] PROXY_SCHED_EVENTS = new SchedulerEvent[]{
             JOB_RUNNING_TO_FINISHED, JOB_PENDING_TO_RUNNING, JOB_PENDING_TO_FINISHED, JOB_PAUSED,
             JOB_RESUMED, TASK_PENDING_TO_RUNNING, KILLED, SHUTDOWN, SHUTTING_DOWN, STOPPED, RESUMED,
             TASK_RUNNING_TO_FINISHED, TASK_PROGRESS};
-
+    private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
     protected T jobTracker;
-
     protected String schedulerUrl;
-
     protected String schedulerLogin;
-
     protected String schedulerPassword;
-
     protected Set<SchedulerEventListenerExtended> eventListeners =
             Collections.synchronizedSet(new HashSet<SchedulerEventListenerExtended>());
+    private ThreadFactory threadFactory =
+            new NamedThreadFactory("SmartProxyDataTransferThread");
+    protected final ExecutorService threadPool =
+            Executors.newFixedThreadPool(MAX_NB_OF_DATA_TRANSFER_THREADS, threadFactory);
 
     public AbstractSmartProxy() {
     }
@@ -124,16 +64,230 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         this.jobTracker = jobTracker;
     }
 
+    /**
+     * Cleans the DataBase handled by the smart proxy, it will delete all informations tracked.
+     * Warning : This method cannot be called after a call to terminate
+     */
     public void cleanDatabase() {
         jobTracker.cleanDataBase();
     }
 
+    /**
+     * Terminate the SmartProxy, and release all resources used.
+     */
     public void terminate() {
         jobTracker.close();
+        threadPool.shutdownNow();
+        try {
+            removeEventListener();
+        } catch (Exception e) {
+            log.trace(e);
+        }
     }
 
+    /**
+     * Sets the name of this recording session. The name must be an unique word composed of alphanumerical charecter
+     * The file used to persist awaited jobs will be named accordingly. If no session name is provided, a generic default name will be used.
+     *
+     * @param name name of the session to create or reuse
+     */
     public void setSessionName(String name) {
         jobTracker.setSessionName(name);
+    }
+
+    /**
+     * Connects to the scheduler
+     *
+     * @param url  url of the scheduler
+     * @param user user name
+     * @param pwd  password
+     * @throws SchedulerException
+     * @throws LoginException
+     */
+    public abstract void init(String url, String user, String pwd) throws SchedulerException, LoginException;
+
+    /**
+     * Disconnect from the scheduler
+     *
+     * @throws PermissionException
+     * @throws NotConnectedException
+     */
+    public abstract void disconnect() throws PermissionException, NotConnectedException;
+
+    @Override
+    public boolean isConnected() {
+        return getScheduler().isConnected();
+    }
+
+    @Override
+    public void renewSession() throws NotConnectedException {
+        getScheduler().renewSession();
+    }
+
+    @Override
+    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException, PermissionException {
+        return getScheduler().getJobServerLogs(id);
+    }
+
+    @Override
+    public String getTaskServerLogs(String id, String taskName) throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
+        return getScheduler().getTaskServerLogs(id, taskName);
+    }
+
+
+    @Override
+    public String getTaskServerLogsByTag(String id, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
+        return getScheduler().getTaskServerLogsByTag(id, taskTag);
+    }
+
+    @Override
+    public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
+        return getScheduler().getJobs(offset, limit, filterCriteria, sortParameters);
+    }
+
+    @Override
+    public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
+        return getScheduler().getUsers();
+    }
+
+    @Override
+    public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
+        return getScheduler().getUsersWithJobs();
+    }
+
+    /**
+     * Reconnects this smart proxy to the scheduler
+     * @throws SchedulerException
+     * @throws LoginException
+     */
+    public void reconnect() throws SchedulerException, LoginException {
+        if (this.schedulerUrl == null) {
+            throw new IllegalStateException("No connection to the scheduler has been established yet.");
+        }
+
+        disconnect();
+        init(schedulerUrl, schedulerLogin, schedulerPassword);
+    }
+
+    /**
+     * Submits a job to the scheduler and handle data transfer via the SmartProxy, the dataspace server will be the default user space
+     *
+     * @param job                   job to submit
+     * @param localInputFolderPath  path to the local directory containing input files
+     * @param localOutputFolderPath path to the local directory which will contain output files
+     * @param isolateTaskOutputs    if set to true, output files from each tasks will be isolated from each other in the dataspace server (to prevent overlapping)
+     * @param automaticTransfer     if set to true, output files will be automatically transferred from the dataspace server to the local machine as soon as the task is finished.
+     *                              If set to false, the files will not be automatically transferred and a call to pullData must be done to transfer files
+     * @return the new job id
+     * @throws NotConnectedException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     * @throws JobCreationException
+     * @throws Exception
+     */
+    public JobId submit(TaskFlowJob job, String localInputFolderPath, String localOutputFolderPath,
+                        boolean isolateTaskOutputs, boolean automaticTransfer) throws NotConnectedException,
+            PermissionException, SubmissionClosedException, JobCreationException, Exception {
+        return submit(job, localInputFolderPath, null, localOutputFolderPath, null, isolateTaskOutputs,
+                automaticTransfer);
+    }
+
+    /**
+     * Submits a job to the scheduler and handle data transfer via the SmartProxy
+     *
+     * @param job                   job to submit
+     * @param localInputFolderPath  path to the local directory containing input files
+     * @param pushUrl               url of the dataspace server used to push input files to
+     * @param localOutputFolderPath path to the local directory which will contain output files
+     * @param pullUrl               url of the dataspace server used to pull output files from
+     * @param isolateTaskOutputs    if set to true, output files from each tasks will be isolated from each other in the dataspace server (to prevent overlapping)
+     * @param automaticTransfer     if set to true, output files will be automatically transferred from the dataspace server to the local machine as soon as the task is finished.
+     *                              If set to false, the files will not be automatically transferred and a call to pullData must be done to transfer files
+     * @return the new job id
+     * @throws Exception
+     * @throws SubmissionClosedException
+     * @throws JobCreationException
+     */
+    public JobId submit(TaskFlowJob job, String localInputFolderPath, String pushUrl,
+                        String localOutputFolderPath, String pullUrl, boolean isolateTaskOutputs,
+                        boolean automaticTransfer) throws Exception,
+            SubmissionClosedException, JobCreationException {
+        if (isNullOrEmpty(pushUrl)) {
+            pushUrl = getLocalUserSpace();
+        }
+        if (isNullOrEmpty(pullUrl)) {
+            pullUrl = getLocalUserSpace();
+        }
+        String newFolderName = createNewFolderName();
+        String pushUrlUpdate = prepareJobInput(job, localInputFolderPath, pushUrl, newFolderName);
+        String pullUrlUpdate = prepareJobOutput(job, localOutputFolderPath, pullUrl, newFolderName,
+                isolateTaskOutputs);
+        uploadInputfiles(job, localInputFolderPath);
+        JobId id = null;
+        try {
+            id = submit(job);
+        } catch (Exception e) {
+            log.error("Error while submitting job", e);
+
+            try {
+                removeJobIO(job, pushUrl, pullUrl, newFolderName);
+            } catch (Exception e2) {
+                log.error("Error while removing job IO", e2);
+            }
+
+            propagateIfInstanceOf(e, NotConnectedException.class);
+            propagateIfInstanceOf(e, PermissionException.class);
+            propagateIfInstanceOf(e, SubmissionClosedException.class);
+            propagateIfInstanceOf(e, JobCreationException.class);
+            propagateIfInstanceOf(e, RuntimeException.class);
+            propagate(e);
+        }
+
+        HashMap<String, AwaitedTask> awaitedTaskMap = new HashMap<>();
+        for (Task t : job.getTasks()) {
+            awaitedTaskMap.put(t.getName(), new AwaitedTask(t.getName(), t.getOutputFilesList()));
+        }
+
+        AwaitedJob awaitedJob = new AwaitedJob(id.toString(), localInputFolderPath, job.getInputSpace(),
+                pushUrlUpdate, localOutputFolderPath, job.getOutputSpace(), pullUrlUpdate, isolateTaskOutputs,
+                automaticTransfer, awaitedTaskMap);
+        jobTracker.putAwaitedJob(id.toString(), awaitedJob);
+
+        return id;
+    }
+
+    /**
+     * Transfer the output files associated with the given task to the specified local folder.
+     * This method must be called manually if automaticTransfer was set to false at job submission
+     *
+     * @param jobId       id of the job
+     * @param t_name      name of the task
+     * @param localFolder path to the local directory which will contain output files
+     * @throws Exception
+     */
+    public void pullData(String jobId, String t_name, String localFolder) throws Exception {
+
+        AwaitedJob awaitedjob = jobTracker.getAwaitedJob(jobId);
+        if (awaitedjob == null) {
+            throw new IllegalArgumentException("The job " + jobId + " is unknown or has been removed");
+        }
+        if (awaitedjob.isAutomaticTransfer()) {
+            throw new UnsupportedOperationException("Transfer of input files with job " + jobId +
+                    " is handled automatically.");
+        }
+
+        String localOutFolderPath = null;
+        if (localFolder == null) {
+            localOutFolderPath = awaitedjob.getLocalOutputFolder();
+        } else {
+            localOutFolderPath = localFolder;
+        }
+        if (localOutFolderPath == null) {
+            throw new IllegalArgumentException("The job " + awaitedjob.getJobId() +
+                    " does not define an output folder on local machine, please provide an outputFolder.");
+        }
+
+        downloadTaskOutputFiles(awaitedjob, jobId, t_name, localOutFolderPath);
     }
 
     protected void reinitializeState(String schedulerUrl)
@@ -142,15 +296,6 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         jobTracker.loadJobs();
         registerAsListener();
         syncAwaitedJobs();
-    }
-
-    public void reconnect() throws SchedulerException, LoginException {
-        if (this.schedulerUrl == null) {
-            throw new IllegalStateException("No connection to the scheduler has been established yet.");
-        }
-
-        disconnect();
-        init(schedulerUrl, schedulerLogin, schedulerPassword);
     }
 
     /**
@@ -235,60 +380,6 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         }
     }
 
-    public JobId submit(TaskFlowJob job, String localInputFolderPath, String localOutputFolderPath,
-                        boolean isolateTaskOutputs, boolean automaticTransfer) throws NotConnectedException,
-            PermissionException, SubmissionClosedException, JobCreationException, Exception {
-        return submit(job, localInputFolderPath, null, localOutputFolderPath, null, isolateTaskOutputs,
-                automaticTransfer);
-    }
-
-    public JobId submit(TaskFlowJob job, String localInputFolderPath, String pushUrl,
-                        String localOutputFolderPath, String pullUrl, boolean isolateTaskOutputs,
-                        boolean automaticTransfer) throws Exception,
-            SubmissionClosedException, JobCreationException {
-        if (isNullOrEmpty(pushUrl)) {
-            pushUrl = getLocalUserSpace();
-        }
-        if (isNullOrEmpty(pullUrl)) {
-            pullUrl = getLocalUserSpace();
-        }
-        String newFolderName = createNewFolderName();
-        String pushUrlUpdate = prepareJobInput(job, localInputFolderPath, pushUrl, newFolderName);
-        String pullUrlUpdate = prepareJobOutput(job, localOutputFolderPath, pullUrl, newFolderName,
-                isolateTaskOutputs);
-        uploadInputfiles(job, localInputFolderPath);
-        JobId id = null;
-        try {
-            id = submit(job);
-        } catch (Exception e) {
-            log.error("Error while submitting job", e);
-
-            try {
-                removeJobIO(job, pushUrl, pullUrl, newFolderName);
-            } catch (Exception e2) {
-                log.error("Error while removing job IO", e2);
-            }
-
-            propagateIfInstanceOf(e, NotConnectedException.class);
-            propagateIfInstanceOf(e, PermissionException.class);
-            propagateIfInstanceOf(e, SubmissionClosedException.class);
-            propagateIfInstanceOf(e, JobCreationException.class);
-            propagateIfInstanceOf(e, RuntimeException.class);
-            propagate(e);
-        }
-
-        HashMap<String, AwaitedTask> awaitedTaskMap = new HashMap<>();
-        for (Task t : job.getTasks()) {
-            awaitedTaskMap.put(t.getName(), new AwaitedTask(t.getName(), t.getOutputFilesList()));
-        }
-
-        AwaitedJob awaitedJob = new AwaitedJob(id.toString(), localInputFolderPath, job.getInputSpace(),
-                pushUrlUpdate, localOutputFolderPath, job.getOutputSpace(), pullUrlUpdate, isolateTaskOutputs,
-                automaticTransfer, awaitedTaskMap);
-        jobTracker.putAwaitedJob(id.toString(), awaitedJob);
-
-        return id;
-    }
 
     protected String getLocalUserSpace() throws NotConnectedException, PermissionException {
         List<String> userSpaceURIS = getUserSpaceURIs();
@@ -462,33 +553,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         return UrlEscapers.urlPathSegmentEscaper().escape(newFolderName);
     }
 
-    /**
-     * ************** Pushing and Pulling Data **********************
-     */
-    public void pullData(String jobId, String t_name, String localFolder) throws Exception {
 
-        AwaitedJob awaitedjob = jobTracker.getAwaitedJob(jobId);
-        if (awaitedjob == null) {
-            throw new IllegalArgumentException("The job " + jobId + " is unknown or has been removed");
-        }
-        if (awaitedjob.isAutomaticTransfer()) {
-            throw new UnsupportedOperationException("Transfer of input files with job " + jobId +
-                    " is handled automatically.");
-        }
-
-        String localOutFolderPath = null;
-        if (localFolder == null) {
-            localOutFolderPath = awaitedjob.getLocalOutputFolder();
-        } else {
-            localOutFolderPath = localFolder;
-        }
-        if (localOutFolderPath == null) {
-            throw new IllegalArgumentException("The job " + awaitedjob.getJobId() +
-                    " does not define an output folder on local machine, please provide an outputFolder.");
-        }
-
-        downloadTaskOutputFiles(awaitedjob, jobId, t_name, localOutFolderPath);
-    }
 
     // ******** Scheduler Event Listener *********************** //
 
@@ -698,51 +763,6 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      */
     protected void removeAwaitedTask(String jobId, String taskName) {
         jobTracker.removeAwaitedTask(jobId, taskName);
-    }
-
-    public abstract void init(String url, String user, String pwd) throws SchedulerException, LoginException;
-
-    public abstract void disconnect() throws PermissionException, NotConnectedException;
-
-    @Override
-    public boolean isConnected() {
-        return getScheduler().isConnected();
-    }
-
-    @Override
-    public void renewSession() throws NotConnectedException {
-        getScheduler().renewSession();
-    }
-
-    @Override
-    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException, PermissionException {
-        return getScheduler().getJobServerLogs(id);
-    }
-
-    @Override
-    public String getTaskServerLogs(String id, String taskName) throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
-        return getScheduler().getTaskServerLogs(id, taskName);
-    }
-
-
-    @Override
-    public String getTaskServerLogsByTag(String id, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
-        return getScheduler().getTaskServerLogsByTag(id, taskTag);
-    }
-
-    @Override
-    public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
-        return getScheduler().getJobs(offset, limit, filterCriteria, sortParameters);
-    }
-
-    @Override
-    public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
-        return getScheduler().getUsers();
-    }
-
-    @Override
-    public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
-        return getScheduler().getUsersWithJobs();
     }
 
     /**
