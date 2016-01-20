@@ -48,6 +48,6 @@ public interface TaskLauncherFactory extends Serializable {
 
     TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception;
 
-    TaskExecutor createTaskExecutor(File workingDir, Decrypter decrypter);
+    TaskExecutor createTaskExecutor(File workingDir);
 
 }

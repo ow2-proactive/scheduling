@@ -1,26 +1,10 @@
 package org.ow2.proactive.scheduler.task;
 
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mockito.Matchers;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -36,14 +20,29 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Matchers;
+
+import static java.util.Collections.singletonMap;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 public class TaskLauncherTest {
-	
-	private final static String HEADLESS_JAVA_LOG = "Picked up _JAVA_OPTIONS: -Djava.awt.headless=true";
+
+    private final static String HEADLESS_JAVA_LOG = "Picked up _JAVA_OPTIONS: -Djava.awt.headless=true";
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -67,8 +66,9 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        assertThat((String)taskResult.value(), is("hello"));
-        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("prehellopost%n")), is(true));
+        assertThat((String) taskResult.value(), is("hello"));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("prehellopost%n")),
+                is(true));
     }
 
     @Test
@@ -76,9 +76,9 @@ public class TaskLauncherTest {
         HashMap<String, byte[]> args = new HashMap<>();
         args.put("number", Object2ByteConverter.convertObject2Byte(123));
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript(WaitAndPrint.class.getName(), "java", new Serializable[]{
-            args
-          })));
+                new TaskScript(new SimpleScript(WaitAndPrint.class.getName(), "java", new Serializable[] {
+                        args
+                })));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -86,15 +86,15 @@ public class TaskLauncherTest {
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
-        
-        assertThat((String)taskResult.value(), is(not("")));
+
+        assertThat((String) taskResult.value(), is(not("")));
         assertThat(taskResult.getOutput().getAllLogs(false).contains("123"), is(true));
     }
 
     @Test
     public void failedTask() throws Throwable {
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("failing task'", "groovy")));
+                new TaskScript(new SimpleScript("failing task'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -104,13 +104,13 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertNotNull(taskResult.getException());
-        assertNotEquals("", taskResult.getOutput().getStderrLogs(false).replace(HEADLESS_JAVA_LOG,""));
+        assertNotEquals("", taskResult.getOutput().getStderrLogs(false).replace(HEADLESS_JAVA_LOG, ""));
     }
 
     @Test
     public void thirdPartyCredentials() throws Throwable {
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print(credentials.get('password'))", "groovy")));
+                new TaskScript(new SimpleScript("print(credentials.get('password'))", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
@@ -125,7 +125,7 @@ public class TaskLauncherTest {
 
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-        
+
         assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("r00t%n")), is(true));
     }
 
@@ -143,8 +143,9 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-    
-        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)), is(true));
+
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)),
+                is(true));
     }
 
     @Test
@@ -162,8 +163,9 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-  
-        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)), is(true));
+
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)),
+                is(true));
     }
 
     private String pwdCommand() {
@@ -202,7 +204,7 @@ public class TaskLauncherTest {
     @Test
     public void taskLogsAreNotCopiedToUserSpace_PreciousLogsDisabled() throws Exception {
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-          new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
+                new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -212,7 +214,7 @@ public class TaskLauncherTest {
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
         when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(){
+        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
 
             @Override
             public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
@@ -256,7 +258,7 @@ public class TaskLauncherTest {
 
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
                 new TaskScript(new SimpleScript(taskScript, "python",
-                        new String [] {Integer.toString(nbIterations)})));
+                        new String[] { Integer.toString(nbIterations) })));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "job", 1000L));
@@ -266,12 +268,13 @@ public class TaskLauncherTest {
 
         List result = (List) taskResult.value();
 
-        for (int i=1; i<=result.size(); i++) {
-            assertEquals(i * (100 / nbIterations), result.get(i-1));
+        for (int i = 1; i <= result.size(); i++) {
+            assertEquals(i * (100 / nbIterations), result.get(i - 1));
         }
     }
 
-    private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer) {
+    private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
+            ScriptExecutableContainer executableContainer) {
         TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
 
         taskLauncher.doTask(executableContainer, null, taskResult);

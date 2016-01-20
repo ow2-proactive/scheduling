@@ -12,6 +12,7 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
@@ -46,14 +47,14 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
     }
 
     @Override
-    public TaskExecutor createTaskExecutor(final File workingDir, final Decrypter decrypter) {
+    public TaskExecutor createTaskExecutor(final File workingDir) {
         return new TaskExecutor() {
             @Override
             public TaskResultImpl execute(TaskContext container, PrintStream output, PrintStream error) {
                 if (taskRunning != null) {
                     taskRunning.release();
                 }
-                return new ForkedTaskExecutor(workingDir, decrypter).execute(container, output, error);
+                return new ForkedTaskExecutor(workingDir).execute(container, output, error);
             }
         };
     }

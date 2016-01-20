@@ -1,0 +1,184 @@
+#!/bin/bash
+# chkconfig: 2345 80 80
+# ProActive Scheduler
+# Description: The ProActive Scheduler service.
+
+# Loading path for CMDS
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+#Loading profile to have, for example, JAVA_HOME set
+. /etc/profile
+
+# The following values must be changed on each environment :
+
+USER=proactive
+PROTOCOL=http
+PORT=8080
+NB_NODES=1
+ALIAS=$(hostname)
+PA_ROOT=/opt/proactive
+
+
+# e,d of variables to modify
+
+export PROACTIVE_HOME=$PA_ROOT/default
+
+#The service name
+NAME=proactive-scheduler
+#THE COMMAND TO LAUNCH
+
+DAEMON="$PROACTIVE_HOME/bin/proactive-server -ln $NB_NODES"
+
+#File where log will be placed (/dev/null if empty)
+LOGFILE=/var/log/proactive/scheduler
+#File where pid will be store, leave as is if you don't know what you do
+PIDFILE=/var/run/$NAME.pid
+
+REST_URL=$PROTOCOL://localhost:$PORT/rest
+REST_PUBLIC_URL=$PROTOCOL://${ALIAS}:$PORT/rest
+
+processRunning() {
+		kill -0 $1 &> /dev/null
+		if [ "$?" == "0" ]
+		then
+			echo 0
+		else
+			if [ -f $PIDFILE ]
+			then
+				rm $PIDFILE
+			fi
+			echo 1
+		fi
+}
+
+daemonRunning() {
+	if [ -f $PIDFILE ]
+	then
+		echo $(processRunning $(cat $PIDFILE))
+	else
+		echo 1
+	fi
+}
+
+waitForCompletion() {
+
+	echo "Service $NAME is being stopped"
+	while [ $(daemonRunning) == 0 ]
+	do
+		sleep 1
+	done
+}
+
+
+
+start() {
+	CMD="nohup "
+	if [ $(daemonRunning) == 1 ]
+	then
+			CMD="$CMD $DAEMON"
+			if [ "$LOGFILE" != ""  ]
+			then
+				if [ ! -f $LOGFILE ]
+				then
+				    mkdir -p $(dirname $LOGFILE)
+					touch $LOGFILE
+					if [ "$USER" != "" ]
+					then
+						chown $USER:$(id -gn $USER) $LOGFILE
+					fi
+				fi
+				CMD="$CMD 1>> $LOGFILE 2>>$LOGFILE"
+			else
+				CMD="$CMD &> /dev/null"
+			fi
+			CMD="$CMD  &"
+			#echo $CMD
+			# CMD="$CMD echo \$!"
+			if [ "$USER" != "" ]
+			then
+				$(su $USER -c "$CMD")
+			else
+				$(su -c "cd $PROACTIVE_HOME/bin && $CMD")
+			fi
+			echo Scheduler command executed, waiting for start
+			export https_proxy=
+			sleep 1
+			CURRPID=$(ps aux|grep SchedulerStarter|grep -v "grep"|awk '{ print $2 }')
+			echo $CURRPID > $PIDFILE
+			until curl --noproxy '*' --insecure $REST_PUBLIC_URL 2>/dev/null;
+        		do
+                		sleep 0.5
+        		done
+			echo Web interfaces started at $PROTOCOL://${ALIAS}:$PORT
+
+			echo -e "Service $NAME \e[0;32mSTARTED\e[0m"
+
+	else
+		echo -e "Service $NAME already running, pid: \e[1;34m$(cat $PIDFILE)\e[0m"
+	fi
+
+}
+
+
+
+# Restart the service proactive-scheduler
+stop() {
+	if [ -f $PIDFILE ] 
+	then
+		CURRPID=$(cat $PIDFILE)
+	fi
+
+	if [ $(daemonRunning) == 0 ]
+	then
+		# kill scheduler process
+		kill $CURRPID
+		waitForCompletion
+		echo -e "Service $NAME : \e[0;31mSTOPPED\e[0m"
+	else
+		echo "Service $NAME is not currently running."
+	fi
+}
+
+forcestop() {
+	CURRPID=$(cat $PIDFILE)
+	if [ $(daemonRunning) == 0 ]
+	then
+			kill -9 $CURRPID
+			waitForCompletion
+			echo -e "Service $NAME : \e[0;31mSTOPPED\e[0m"
+	else
+		echo "Service $NAME is not currently running."
+	fi
+}
+
+### main logic ###
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        if [ $(daemonRunning) == "0" ]
+		then
+			echo "Service $NAME running under pid $(cat $PIDFILE)"
+		else
+			echo "Service is stopped"
+		fi
+        ;;
+  restart)
+        stop
+        start
+        ;;
+  force-restart)
+        forcestop
+        start
+        ;;
+  force-stop)
+        forcestop
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|force-restart|force-stop|status}"
+        exit 1
+esac
+exit 0
