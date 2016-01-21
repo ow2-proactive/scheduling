@@ -3,6 +3,19 @@
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run the installation script as root" ; exit 1 ; fi
 
 SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
+CURRENT_PADIR="$(dirname "$SCRIPT_DIR")"
+PA_FOLDER_NAME="$(basename "$CURRENT_PADIR")"
+
+# checking java installation
+
+if [[ "$JAVA_HOME" == "" ]]; then
+	if which java 2&> /dev/null ; then
+                if [ ! -f "$CURRENT_PADIR/jre/bin/java" ]; then
+                        echo "JAVA_HOME is not set, no 'java' command could be found in your PATH, and this ProActive distribution does not contain an embedded jre, please install a JRE or JDK." ; exit 1 ;
+                fi
+        fi
+fi
+
 
 # installation of the ProActive distribution
  
@@ -13,8 +26,6 @@ PA_ROOT=$(echo $PA_ROOT | xargs)
 mkdir -p $PA_ROOT
 rm -f $PA_ROOT/default
 
-CURRENT_PADIR="$(dirname "$SCRIPT_DIR")"
-PA_FOLDER_NAME="$(basename "$CURRENT_PADIR")"
 
 confirm() {
     # call with a prompt string or use a default
@@ -31,10 +42,10 @@ confirm() {
 if [ -d "$PA_ROOT/$PA_FOLDER_NAME" ]; then
     if confirm "A folder $PA_ROOT/$PA_FOLDER_NAME already exists, delete its content and replace by a fresh install? [Y/n] " ; then
         rm -rf $PA_ROOT/$PA_FOLDER_NAME
-        cp -f -R $CURRENT_PADIR $PA_ROOT
+        rsync --progress -a $CURRENT_PADIR $PA_ROOT
     fi
 else
-    cp -f -R $CURRENT_PADIR $PA_ROOT
+    rsync --progress -a $CURRENT_PADIR $PA_ROOT
 fi
 
 
