@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 
@@ -17,10 +18,16 @@ class RestPageParameters {
     private int offset;
     private int limit;
     private String tag;
+    private String sortAttribute;
+    private boolean ascendingOrder;
+
+
+
+    private SortSpecifierContainer sortParams;
 
     public RestPageParameters(SchedulerFrontendState frontEnd, String calledMethod, long from, long to,
             boolean myTasksOnly, boolean running, boolean pending, boolean finished, int offset, int limit,
-            String tag) {
+            String tag, SortSpecifierContainer sortParams) {
         this.frontEnd = frontEnd;
         this.calledMethod = calledMethod;
         this.setFrom(from);
@@ -32,6 +39,9 @@ class RestPageParameters {
         this.setOffset(offset);
         this.setLimit(limit);
         this.setTag(tag);
+        this.setSortAttribute(sortAttribute);
+        this.setAscendingOrder(ascendingOrder);
+        this.setSortParams(sortParams);
     }
 
     public long getFrom() {
@@ -111,4 +121,27 @@ class RestPageParameters {
         else return null;
     }
 
+    public String getSortAttribute() {
+        return sortAttribute;
+    }
+
+    public boolean isAscendingOrder() {
+        return ascendingOrder;
+    }
+
+    public void setSortAttribute(String sortAttribute) {
+        this.sortAttribute = sortAttribute;
+    }
+
+    public void setAscendingOrder(boolean ascendingOrder) {
+        this.ascendingOrder = ascendingOrder;
+    }
+
+    public SortSpecifierContainer getSortParams() {
+        return sortParams;
+    }
+
+    public void setSortParams(SortSpecifierContainer sortParams) {
+        this.sortParams = sortParams;
+    }
 }

@@ -74,12 +74,7 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -112,6 +107,7 @@ import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
 import org.ow2.proactive.scheduler.rest.utils.HttpUtility;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.SortSpecifierRestContainer;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -950,7 +946,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                     throws NotConnectedException, PermissionException {
         RestPage<TaskStateData> page = null;
         try {
-            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset, limit);
+            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset, limit, null);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         } catch (PermissionRestException e) {
@@ -969,12 +965,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
-            boolean running, boolean pending, boolean finished, int offset, int limit)
+                                         boolean running, boolean pending, boolean finished,
+                                         int offset, int limit, SortSpecifierContainer sortParams)
                     throws NotConnectedException, PermissionException {
         RestPage<TaskStateData> page = null;
+        SortSpecifierRestContainer sortContainer = new SortSpecifierRestContainer(sortParams.toString());
         try {
             page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset,
-                    limit);
+                    limit, sortContainer);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         } catch (PermissionRestException e) {

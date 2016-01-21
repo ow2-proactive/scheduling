@@ -570,7 +570,8 @@ public interface SchedulerRestInterface {
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("-1") int limit)
+            @QueryParam("limit") @DefaultValue("-1") int limit,
+            @QueryParam("sortparameters") SortSpecifierRestContainer sortParams)
                     throws NotConnectedRestException, PermissionRestException;
     
     /**
@@ -605,7 +606,8 @@ public interface SchedulerRestInterface {
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("-1") int limit)
+            @QueryParam("limit") @DefaultValue("-1") int limit,
+            @QueryParam("sortparameters") SortSpecifierRestContainer sortParams)
                     throws NotConnectedRestException, PermissionRestException;
     
     

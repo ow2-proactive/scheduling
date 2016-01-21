@@ -37,6 +37,7 @@ import org.ow2.proactive.db.FilteredExceptionCallback;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -268,12 +269,12 @@ public class SchedulerDBManager {
     
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag,
-            final int offset, final int limit,
-            final String user, final boolean pending, final boolean running,
-            final boolean finished) {
+                                         final int offset, final int limit,
+                                         final String user, final boolean pending, final boolean running,
+                                         final boolean finished, SortSpecifierContainer sortParams) {
 
         DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
-            pending, running, finished);
+            pending, running, finished, sortParams);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskState> lTasks = runWithoutTransaction(TaskDBUtils.taskStateSessionWork(parameters));
         
@@ -286,7 +287,7 @@ public class SchedulerDBManager {
             final boolean finished) {
 
         DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
-                pending, running, finished);
+                pending, running, finished, new SortSpecifierContainer());
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskInfo> lTaskInfo =  runWithoutTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
         

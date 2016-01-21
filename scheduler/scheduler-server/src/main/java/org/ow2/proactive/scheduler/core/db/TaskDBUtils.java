@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.core.db;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -73,7 +74,8 @@ public class TaskDBUtils {
 
                 String queryPrefix = "select count(*) from TaskData T where ";
 
-                Query query = getQuery(session, params, taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo, queryPrefix);
+                Query query = getQuery(session, params, taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo,
+                        null, queryPrefix);
 
                 Long count = (Long) query.uniqueResult();
 
@@ -134,29 +136,35 @@ public class TaskDBUtils {
 
         String queryPrefix = "select T from TaskData T where ";
 
-        Query query = getQuery(session, params, taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo, queryPrefix);
+        Query query = getQuery(session, params, taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo,
+                params.getSortParams(), queryPrefix);
         query.setMaxResults(params.getLimit());
         query.setFirstResult(params.getOffset());
+
 
         return query.list();
     }
 
     @NotNull
-    private static Query getQuery(Session session, DBTaskDataParameters params, Set<TaskStatus> taskStatuses, boolean hasUser, boolean hasTag, boolean hasDateFrom, boolean hasDateTo, String queryPrefix) {
+    private static Query getQuery(Session session, DBTaskDataParameters params, Set<TaskStatus> taskStatuses,
+                                  boolean hasUser, boolean hasTag, boolean hasDateFrom, boolean hasDateTo,
+                                  SortSpecifierContainer sortParams, String queryPrefix) {
         StringBuilder queryString = new StringBuilder(queryPrefix);
-        queryString.append(getQueryFilteringExpression(hasUser, hasTag, hasDateFrom, hasDateTo));
+        queryString.append(getQueryFilteringExpression(hasUser, hasTag, hasDateFrom, hasDateTo, sortParams));
 
+        System.out.println(queryString.toString());
         Query query = session.createQuery(queryString.toString());
 
-        setQueryParameters(taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo, query, params);
+        setQueryParameters(taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo,
+                query, params);
 
         return query;
     }
 
-    private static StringBuilder getQueryFilteringExpression(boolean hasUser, boolean hasTag, boolean hasDateFrom, boolean hasDateTo) {
+    private static StringBuilder getQueryFilteringExpression(boolean hasUser, boolean hasTag,
+                                                             boolean hasDateFrom, boolean hasDateTo,
+                                                             SortSpecifierContainer sortParams) {
         StringBuilder result = new StringBuilder();
-
-        // sorting is not required since it is done at client side
 
         result.append("T.jobData.removedTime = -1 ");
 
@@ -184,10 +192,23 @@ public class TaskDBUtils {
 
         result.append("and taskStatus in (:taskStatus) ");
 
+        if (sortParams != null && !sortParams.getSortParameters().isEmpty()) {
+            result.append("order by ");
+            List<SortSpecifierContainer.SortSpecifierItem> items = sortParams.getSortParameters();
+            for (int i = 0; i < items.size(); i++) {
+                SortSpecifierContainer.SortSpecifierItem item = items.get(i);
+                String order = "ASCENDING".compareTo(item.getOrder().toString()) == 0 ? "ASC" : "DESC";
+                result.append("T.id." + item.getField() + " " + order);
+                if (i < items.size()) result.append(",");
+            }
+            result.append(" ");
+        }
         return result;
     }
 
-    private static void setQueryParameters(Set<TaskStatus> taskStatuses, boolean hasUser, boolean hasTag, boolean hasDateFrom, boolean hasDateTo, Query query, DBTaskDataParameters params) {
+    private static void setQueryParameters(Set<TaskStatus> taskStatuses, boolean hasUser, boolean hasTag,
+                                           boolean hasDateFrom, boolean hasDateTo, Query query,
+                                           DBTaskDataParameters params) {
         query.setParameterList("taskStatus", taskStatuses);
 
         if (hasUser) {
@@ -205,6 +226,7 @@ public class TaskDBUtils {
         if (hasTag) {
             query.setParameter("taskTag", params.getTag());
         }
+
     }
 
 }

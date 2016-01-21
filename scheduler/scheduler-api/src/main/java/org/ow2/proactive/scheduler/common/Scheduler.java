@@ -977,9 +977,10 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      * @throws PermissionException
      */
-    Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
-            boolean running, boolean pending, boolean finished, int offset, int limit)
-                    throws NotConnectedException, PermissionException;
+    Page<TaskState> getTaskStates(String taskTag, long from, long to,
+                                  boolean mytasks, boolean running, boolean pending, boolean finished,
+                                  int offset, int limit, SortSpecifierContainer sortParams)
+            throws NotConnectedException, PermissionException;
 
     /**
      * Retrieve a job info by it id.

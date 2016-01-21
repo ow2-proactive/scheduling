@@ -46,11 +46,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -86,6 +82,7 @@ import org.ow2.proactive_grid_cloud_portal.common.FileType;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
+import org.ow2.proactive_grid_cloud_portal.common.SortSpecifierRestContainer;
 
 /**
  * Smart proxy implementation that relies on the REST API for communicating with dataspaces
@@ -511,10 +508,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     @Override
-    public Page<TaskState>  getTaskStates(String taskTag, long from, long to, boolean mytasks,
-            boolean running, boolean pending, boolean finished, int offset, int limit)
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
+                                          boolean running, boolean pending, boolean finished,
+                                         int offset, int limit, SortSpecifierContainer sortParams)
                     throws NotConnectedException, PermissionException {
-        return restSchedulerClient.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+        return restSchedulerClient.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit, sortParams);
     }
 
     @Override

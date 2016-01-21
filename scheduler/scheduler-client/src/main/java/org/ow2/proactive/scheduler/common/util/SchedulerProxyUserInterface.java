@@ -54,16 +54,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -611,9 +602,10 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     public Page<TaskState>  getTaskStates(String taskTag, long from, long to, boolean mytasks,
-            boolean running, boolean pending, boolean finished, int offset, int limit)
+                                          boolean running, boolean pending, boolean finished,
+                                          int offset, int limit, SortSpecifierContainer sortParams)
                     throws NotConnectedException, PermissionException {
-        return uischeduler.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
+        return uischeduler.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit, sortParams);
     }
 
     @Override
