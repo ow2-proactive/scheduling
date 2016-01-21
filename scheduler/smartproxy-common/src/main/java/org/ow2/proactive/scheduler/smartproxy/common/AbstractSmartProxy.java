@@ -135,13 +135,9 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
 
-    @Override
-    public String getTaskServerLogsByTag(String id, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
-        return getScheduler().getTaskServerLogsByTag(id, taskTag);
-    }
 
     @Override
-    public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
+    public List<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         return getScheduler().getJobs(offset, limit, filterCriteria, sortParameters);
     }
 
