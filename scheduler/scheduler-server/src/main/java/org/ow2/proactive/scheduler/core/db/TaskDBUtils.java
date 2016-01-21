@@ -141,7 +141,6 @@ public class TaskDBUtils {
         query.setMaxResults(params.getLimit());
         query.setFirstResult(params.getOffset());
 
-
         return query.list();
     }
 
@@ -151,8 +150,6 @@ public class TaskDBUtils {
                                   SortSpecifierContainer sortParams, String queryPrefix) {
         StringBuilder queryString = new StringBuilder(queryPrefix);
         queryString.append(getQueryFilteringExpression(hasUser, hasTag, hasDateFrom, hasDateTo, sortParams));
-
-        System.out.println(queryString.toString());
         Query query = session.createQuery(queryString.toString());
 
         setQueryParameters(taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo,
