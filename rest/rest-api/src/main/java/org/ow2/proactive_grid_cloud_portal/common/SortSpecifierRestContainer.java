@@ -95,4 +95,12 @@ public class SortSpecifierRestContainer implements Serializable {
         return sortParameters;
     }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0 ; i < sortParameters.size(); i++) {
+            sb.append(sortParameters.get(i).toString());
+            if (i < sortParameters.size() - 1) sb.append(";");
+        }
+        return sb.toString();
+    }
 }

@@ -197,9 +197,9 @@ public class TaskDBUtils {
             List<SortSpecifierContainer.SortSpecifierItem> items = sortParams.getSortParameters();
             for (int i = 0; i < items.size(); i++) {
                 SortSpecifierContainer.SortSpecifierItem item = items.get(i);
-                String order = "ASCENDING".compareTo(item.getOrder().toString()) == 0 ? "ASC" : "DESC";
-                result.append("T.id." + item.getField() + " " + order);
-                if (i < items.size()) result.append(",");
+                String order = "ascending".compareTo(item.getOrder().toString()) == 0 ? "ASC" : "DESC";
+                result.append("T." + item.getField() + " " + order);
+                if (i < items.size() - 1) result.append(",");
             }
             result.append(" ");
         }

@@ -3253,7 +3253,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     protected static Map<String, String> createSortableTaskAttrMap() {
         HashMap<String, String> sortableTaskAttrMap = new HashMap<>(13);
-        sortableTaskAttrMap.put("id", "taskId");
+        sortableTaskAttrMap.put("id", "id.taskId");
         sortableTaskAttrMap.put("status", "taskStatus");
         sortableTaskAttrMap.put("name", "taskName");
         sortableTaskAttrMap.put("tag", "tag");
@@ -3308,9 +3308,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NotConnectedRestException, PermissionRestException {
         String dbSortAttribute = null;
         SortSpecifierRestContainer filteredSorts = new SortSpecifierRestContainer();
-        for (SortSpecifierRestContainer.SortSpecifierRestItem i : sortParams.getSortParameters()) {
-            if (sortableTaskAttrMap.containsKey(i.getField())) {
-                filteredSorts.add(sortableTaskAttrMap.get(i.getField()), i.getOrder());
+        if (sortParams != null) {
+            for (SortSpecifierRestContainer.SortSpecifierRestItem i : sortParams.getSortParameters()) {
+                if (sortableTaskAttrMap.containsKey(i.getField())) {
+                    filteredSorts.add(sortableTaskAttrMap.get(i.getField()), i.getOrder());
+                }
             }
         }
         return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit,

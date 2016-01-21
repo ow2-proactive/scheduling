@@ -81,10 +81,13 @@ public class SortSpecifierContainer implements Serializable {
 
     public SortSpecifierContainer(String values) {
         sortParameters = new ArrayList<>();
-        for (String s : values.split(";")) {
-            String[] sortParam = s.split(",");
-            add(sortParam[0], sortParam[1]);
+        if (values != null && "".compareTo(values) != 0) {
+            for (String s : values.split(";")) {
+                String[] sortParam = s.split(",");
+                add(sortParam[0], sortParam[1]);
+            }
         }
+
     }
 
     public void add(String field, String order) {
@@ -93,6 +96,15 @@ public class SortSpecifierContainer implements Serializable {
 
     public List<SortSpecifierItem> getSortParameters() {
         return sortParameters;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0 ; i < sortParameters.size(); i++) {
+            sb.append(sortParameters.get(i).toString());
+            if (i < sortParameters.size() - 1) sb.append(";");
+        }
+        return sb.toString();
     }
 
 }
