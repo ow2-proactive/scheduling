@@ -1,4 +1,0 @@
-dependencies {
-    compile "org.objectweb.proactive:programming-extension-gcmdeployment:${programmingVersion}"
-    compile project(':rm:rm-server')
-}

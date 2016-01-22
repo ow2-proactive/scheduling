@@ -1,4 +1,0 @@
-dependencies {
-    compile 'com.google.code.typica:typica:1.7.2'
-    compile project(':rm:rm-server')
-}

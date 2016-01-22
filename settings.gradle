@@ -14,9 +14,6 @@ include 'rm:rm-node'
 include 'rm:rm-node-updater'
 include 'rm:rm-server'
 
-include 'rm:rm-infrastructure:rm-infrastructure-ec2'
-include 'rm:rm-infrastructure:rm-infrastructure-gcm'
-include 'rm:rm-infrastructure:rm-infrastructure-winhpc'
 include 'rm:rm-policy:rm-policy-scheduler'
 
 include 'rest'

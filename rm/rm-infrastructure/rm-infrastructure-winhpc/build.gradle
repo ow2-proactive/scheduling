@@ -1,6 +1,0 @@
-dependencies {
-    compile 'org.apache.axis2:axis2:1.4'
-    compile 'org.apache.ws.commons.axiom:axiom-api:1.2.7'
-    compile 'winhpc:WinHPCWebserviceStubs:1.0-proactive'
-    compile project(':rm:rm-server')
-}

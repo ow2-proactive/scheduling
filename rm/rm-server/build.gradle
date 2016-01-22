@@ -16,7 +16,6 @@ dependencies {
             project(':rm:rm-node'),
     )
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-    testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
 
     testCompile 'org.jruby:jruby-complete:9.0.1.0'
     testCompile 'org.python:jython-standalone:2.7.0'
