@@ -51,6 +51,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
@@ -58,15 +59,15 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.Formatter;
+
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -123,12 +124,15 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * <p>
      * Starts a PA runtime on remote host using SSH, register it manually in the
      * nodesource.
-     * @param host hostname of the node on which a node should be started
-     * @throws RMException acquisition failed
+     * 
+     * @param host
+     *            hostname of the node on which a node should be started
+     * @throws RMException
+     *             acquisition failed
      */
     protected void startNodeImpl(final InetAddress host) throws RMException {
         String fs = this.targetOSObj.fs;
-        //we set the java security policy file
+        // we set the java security policy file
         ArrayList<String> sb = new ArrayList<>();
         final boolean containsSpace = schedulingPath.contains(" ");
         if (containsSpace) {
@@ -148,7 +152,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             }
             sb.add(securitycmd);
         }
-        //we set the log4j configuration file
+        // we set the log4j configuration file
         String log4jcmd = CentralPAPropertyRepository.LOG4J.getCmdLine();
         if (!this.javaOptions.contains(log4jcmd)) {
             // log4j only understands urls
@@ -166,7 +170,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             }
             sb.add(log4jcmd);
         }
-        //we add extra java/PA configuration
+        // we add extra java/PA configuration
         if (this.javaOptions != null && !this.javaOptions.trim().isEmpty()) {
             sb.add(this.javaOptions.trim());
         }
@@ -177,7 +181,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         // current rmcore shortID should be added to ensure uniqueness
         final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         clb.setNodeName(nodeName);
-        //finally, the credential's value
+        // finally, the credential's value
 
         String credString;
         try {
@@ -188,18 +192,18 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         }
         clb.setCredentialsValueAndNullOthers(credString);
 
-        //add an expected node. every unexpected node will be discarded
+        // add an expected node. every unexpected node will be discarded
         String cmdLine;
         String obfuscatedCmdLine;
         try {
             cmdLine = clb.buildCommandLine(true);
             obfuscatedCmdLine = clb.buildCommandLine(false);
         } catch (IOException e) {
-            throw new RMException("Cannot build the " + RMNodeStarter.class.getSimpleName() +
-                "'s command line.", e);
+            throw new RMException(
+                "Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e);
         }
 
-        //one escape the command to make it runnable through ssh
+        // one escape the command to make it runnable through ssh
         if (cmdLine.contains("\"")) {
             cmdLine = cmdLine.replaceAll("\"", "\\\\\"");
         }
@@ -229,9 +233,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             session.setConfig(this.sshOptions);
             session.connect(shorterTimeout);
         } catch (JSchException e) {
-            super
-                    .declareDeployingNodeLost(pnURL, "unable to " + msg + "\n" +
-                        Formatter.stackTraceToString(e));
+            super.declareDeployingNodeLost(pnURL,
+                    "unable to " + msg + "\n" + Formatter.stackTraceToString(e));
             throw new RMException("unable to " + msg, e);
         }
 
@@ -247,8 +250,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                 channel.setErrStream(baos);
                 channel.connect();
             } catch (JSchException e) {
-                super.declareDeployingNodeLost(pnURL, "unable to " + msg + "\n" +
-                    Formatter.stackTraceToString(e));
+                super.declareDeployingNodeLost(pnURL,
+                        "unable to " + msg + "\n" + Formatter.stackTraceToString(e));
                 throw new RMException("unable to " + msg, e);
             }
             final ChannelExec chan = channel;
@@ -259,14 +262,16 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                         if (SSHInfrastructureV2.super.pnTimeout.get(pnURL)) {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }
-                        if (chan.getExitStatus() != -1) { // -1 means process is still running
+                        if (chan.getExitStatus() != -1) { // -1 means process is
+                                                          // still running
                             throw new IllegalStateException(
                                 "The jvm process of the node has exited prematurely");
                         }
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
-                            return null; // we know the cause of this interruption just exit
+                            return null; // we know the cause of this
+                                         // interruption just exit
                         }
                     }
                     return null; // Victory
@@ -305,16 +310,15 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     /**
      * Configures the Infrastructure
      *
-     * @param parameters parameters[3] : ssh server port
-     * parameters[4] : ssh username
-     * parameters[5] : ssh password
-     * parameters[6] : ssh private key
-     * parameters[7] : optional ssh options file
-     * parameters[8] : java path on the remote machines
-     * parameters[9] : Scheduling path on remote machines
-     * parameters[10] : target OS' type (Linux, Windows or Cygwin)
-     * parameters[11] : extra java options
-     * @throws IllegalArgumentException configuration failed
+     * @param parameters
+     *            parameters[3] : ssh server port parameters[4] : ssh username
+     *            parameters[5] : ssh password parameters[6] : ssh private key
+     *            parameters[7] : optional ssh options file parameters[8] : java
+     *            path on the remote machines parameters[9] : Scheduling path on
+     *            remote machines parameters[10] : target OS' type (Linux,
+     *            Windows or Cygwin) parameters[11] : extra java options
+     * @throws IllegalArgumentException
+     *             configuration failed
      */
     @Override
     public void configure(Object... parameters) {
@@ -395,6 +399,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     /**
      * @return short description of the IM
      */
+    @Override
     public String getDescription() {
         return "Deploy nodes via SSH with login/password or login/pkey";
     }

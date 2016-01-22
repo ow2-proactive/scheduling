@@ -1,5 +1,13 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.IOException;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
@@ -11,14 +19,6 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.utils.Tools;
-
-import java.io.IOException;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class LocalInfrastructure extends InfrastructureManager {
@@ -39,14 +39,21 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     /** To link a nodeName with its process */
     private Hashtable<String, ProcessExecutor> nodeNameToProcess;
-    /** To link a deploying node url with a boolean, used to notify deploying node removal */
+    /**
+     * To link a deploying node url with a boolean, used to notify deploying
+     * node removal
+     */
     private Hashtable<String, Boolean> isDeployingNodeLost;
-    /** Notifies the acquisition loop that the node has been acquired and that it can exit the loop */
+    /**
+     * Notifies the acquisition loop that the node has been acquired and that it
+     * can exit the loop
+     */
     private Hashtable<String, Boolean> isNodeAcquired;
 
     public LocalInfrastructure() {
     }
 
+    @Override
     public String getDescription() {
         return "Deploys nodes on Resource Manager's machine";
     }
@@ -60,7 +67,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                 }
             });
         }
-        //one decremented once too many
+        // one decremented once too many
         this.atomicMaxNodes.getAndIncrement();
         logger.debug("Cannot acquire more nodes");
     }
@@ -74,7 +81,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                 }
             });
         } else {
-            //one decremented once too many
+            // one decremented once too many
             this.atomicMaxNodes.getAndIncrement();
             logger.warn("Cannot acquire a new node");
         }
@@ -83,7 +90,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private void acquireNodeImpl() {
         String nodeName = "local-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         OperatingSystem os = OperatingSystem.UNIX;
-        //assuming no cygwin, windows or the "others"...
+        // assuming no cygwin, windows or the "others"...
         if (System.getProperty("os.name").contains("Windows")) {
             os = OperatingSystem.WINDOWS;
         }
@@ -92,7 +99,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             rmHome += os.fs;
         }
         CommandLineBuilder clb = this.getDefaultCommandLineBuilder(os);
-        //RM_Home set in bin/unix/env script
+        // RM_Home set in bin/unix/env script
         clb.setRmHome(rmHome);
         ArrayList<String> paPropList = new ArrayList<>();
         if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
@@ -153,11 +160,11 @@ public class LocalInfrastructure extends InfrastructureManager {
             return;
         }
 
-        //watching process
+        // watching process
         int threshold = 10;
         Boolean isLost, isAcquired;
         while (((isLost = this.isDeployingNodeLost.get(depNodeURL)) != null) && !isLost &&
-                ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
+            ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
             if (processExecutor.isProcessFinished()) {
                 int exit = processExecutor.getExitCode();
                 if (exit != 0) {
@@ -169,7 +176,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                     message += "stdout: " + out + lf + "stderr: " + err;
                     this.declareDeployingNodeLost(depNodeURL, message);
                 }
-                //nodeNameToProcess will be clean up when exiting the loop
+                // nodeNameToProcess will be clean up when exiting the loop
             } else {
                 logger.debug("Waiting for node " + nodeName + " acquisition");
             }
@@ -189,7 +196,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         logNodeOutput(nodeName + " stderr: ", processExecutor.getErrorOutput());
 
         if (isLost) {
-            //clean up the process
+            // clean up the process
             processExecutor.killProcess();
             this.nodeNameToProcess.remove(nodeName);
         }
@@ -206,9 +213,13 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     /**
-     * Creates a lost node. The deployment has failed while building the command line
-     * @param message a message
-     * @param e the cause
+     * Creates a lost node. The deployment has failed while building the command
+     * line
+     * 
+     * @param message
+     *            a message
+     * @param e
+     *            the cause
      */
     private void createLostNode(String name, String message, Throwable e) {
         this.isNodeAcquired.remove(name);
@@ -220,10 +231,8 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     /**
-     * args[0] = credentials
-     * args[1] = max nodes
-     * args[2] = timeout
-     * args[3] = pa props
+     * args[0] = credentials args[1] = max nodes args[2] = timeout args[3] = pa
+     * props
      */
     @Override
     protected void configure(Object... args) {
@@ -258,8 +267,8 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
-        //notifies the watching loop to exit... it will clean
-        //isDeployingNodeLost & isNodeAcquired collections up.
+        // notifies the watching loop to exit... it will clean
+        // isDeployingNodeLost & isNodeAcquired collections up.
         this.isDeployingNodeLost.put(pnURL, true);
     }
 

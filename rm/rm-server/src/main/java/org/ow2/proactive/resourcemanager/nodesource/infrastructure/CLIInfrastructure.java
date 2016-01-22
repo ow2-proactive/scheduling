@@ -15,18 +15,20 @@ import org.ow2.proactive.utils.Formatter;
 
 /**
  *
- * An infrastructure manager that operates custom scripts in order to deploy/remove nodes.
+ * An infrastructure manager that operates custom scripts in order to
+ * deploy/remove nodes.
  * <p>
  * Deployment phase:
  * <ul>
- *     <li>launch the script by providing host name, node name, node source name, rm url</li>
- *     <li>if no node within timeout =&gt; terminates the script.</li>
+ * <li>launch the script by providing host name, node name, node source name, rm
+ * url</li>
+ * <li>if no node within timeout =&gt; terminates the script.</li>
  * </ul>
  * <p>
  * Removal phase:
  * <ul>
- *     <li>remove node from the resource manager</li>
- *     <li>launch removal script giving host name and node url.</li>
+ * <li>remove node from the resource manager</li>
+ * <li>launch removal script giving host name and node url.</li>
  * </ul>
  */
 public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
@@ -46,10 +48,11 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
      * Configures the Infrastructure
      *
      * @param parameters
-     *			  parameters[3]   : An interpreter that launch the script
-     *			  parameters[4]   : A script that deploys nodes on a single host
-     *			  parameters[5]   : A script that removes a node
-     * @throws IllegalArgumentException configuration failed
+     *            parameters[3] : An interpreter that launch the script
+     *            parameters[4] : A script that deploys nodes on a single host
+     *            parameters[5] : A script that removes a node
+     * @throws IllegalArgumentException
+     *             configuration failed
      */
     @Override
     protected void configure(Object... parameters) {
@@ -64,7 +67,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                 // putting .cmd as an extension so that it works on Windows
                 deploymentScript = File.createTempFile("deployment", ".cmd");
                 FileToBytesConverter.convertByteArrayToFile(bytes, deploymentScript);
-                //deploymentScript.setExecutable(true);
+                // deploymentScript.setExecutable(true);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Could not read deployment script", e);
             }
@@ -74,7 +77,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                 // putting .cmd as an extension so that it works on Windows
                 removalScript = File.createTempFile("removal", ".cmd");
                 FileToBytesConverter.convertByteArrayToFile(bytes, removalScript);
-                //removalScript.setExecutable(true);
+                // removalScript.setExecutable(true);
             } catch (Exception e) {
                 throw new IllegalArgumentException("Could not read removal script file", e);
             }
@@ -84,11 +87,13 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * Internal node acquisition method
      * <p>
-     * Starts a PA runtime on remote host using a custom script, register it manually in the
-     * nodesource.
+     * Starts a PA runtime on remote host using a custom script, register it
+     * manually in the nodesource.
      *
-     * @param host hostname of the node on which a node should be started
-     * @throws RMException acquisition failed
+     * @param host
+     *            hostname of the node on which a node should be started
+     * @throws RMException
+     *             acquisition failed
      */
     protected void startNodeImpl(InetAddress host) throws RMException {
 
@@ -135,16 +140,16 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                 })) {
                     return;
                 } else {
-                    //there isn't any race regarding node registration
-                    throw new RMException("A node " + nodeName +
-                        " is not expected anymore because of an error.");
+                    // there isn't any race regarding node registration
+                    throw new RMException(
+                        "A node " + nodeName + " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");
             }
 
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
-                //registration is ok, we destroy the process
+                // registration is ok, we destroy the process
                 logger.debug("Destroying the process: " + p);
                 p.destroy();
                 return;
@@ -158,11 +163,11 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             }
         }
 
-        //if we exit because of a timeout
+        // if we exit because of a timeout
         if (this.pnTimeout.get(pnURL)) {
-            //we remove it
+            // we remove it
             this.pnTimeout.remove(pnURL);
-            //we destroy the process
+            // we destroy the process
             p.destroy();
             throw new RMException("Deploying Node " + nodeName + " not expected any more");
         }
@@ -220,6 +225,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * @return short description of the IM
      */
+    @Override
     public String getDescription() {
         return "Creates remote runtimes using custom scripts";
     }

@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
@@ -53,22 +54,20 @@ import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.Formatter;
-import org.apache.log4j.Logger;
 
 
 /**
  * Acquires nodes over SSH given a list of hosts
  * <p>
- * Assumes all necessary ProActive configuration has already been performed:
- * ssh username, key directory, etc. This class won't handle it,
- * see {@link org.objectweb.proactive.core.ssh.SSHClient}.
+ * Assumes all necessary ProActive configuration has already been performed: ssh
+ * username, key directory, etc. This class won't handle it, see
+ * {@link org.objectweb.proactive.core.ssh.SSHClient}.
  * <p>
- * Also assumes JRE and Scheduling installation paths are the same
- * on all hosts.
+ * Also assumes JRE and Scheduling installation paths are the same on all hosts.
  * <p>
- * If you need more control over you deployment, you may consider
- * using {@code GCMInfrastructure} instead, which contains the
- * functionalities of this Infrastructure, but requires more configuration.
+ * If you need more control over you deployment, you may consider using
+ * {@code GCMInfrastructure} instead, which contains the functionalities of this
+ * Infrastructure, but requires more configuration.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 2.0
@@ -100,6 +99,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             }
         }
     }
+
     /**
      * Path to the Scheduling installation on the remote hosts
      */
@@ -112,7 +112,8 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     protected String targetOs = "Linux";
     protected OperatingSystem targetOSObj = null;
     /**
-     * Additional java options to append to the command executed on the remote host
+     * Additional java options to append to the command executed on the remote
+     * host
      */
     @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
     protected String javaOptions;
@@ -133,17 +134,19 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using SSH, register it manually in the
      * nodesource.
      *
-     * @param host hostname of the node on which a node should be started
-     * @throws RMException acquisition failed
+     * @param host
+     *            hostname of the node on which a node should be started
+     * @throws RMException
+     *             acquisition failed
      */
     protected void startNodeImpl(InetAddress host) throws RMException {
         String fs = this.targetOSObj.fs;
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
-        //we take care of spaces in java path
+        // we take care of spaces in java path
         clb.setJavaPath(this.javaPath);
-        //we set the rm.home prop
+        // we set the rm.home prop
         clb.setRmHome(schedulingPath);
-        //we set the java security policy file
+        // we set the java security policy file
         StringBuilder sb = new StringBuilder();
         final boolean containsSpace = schedulingPath.contains(" ");
         String securitycmd = CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine();
@@ -162,7 +165,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             }
             sb.append(" ");
         }
-        //we set the log4j configuration file
+        // we set the log4j configuration file
         String log4jcmd = CentralPAPropertyRepository.LOG4J.getCmdLine();
         if (!this.javaOptions.contains(log4jcmd)) {
             sb.append(log4jcmd);
@@ -187,7 +190,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             }
             sb.append(" ");
         }
-        //we add extra java/PA configuration
+        // we add extra java/PA configuration
         sb.append(this.javaOptions);
         clb.setPaProperties(sb.toString());
         // afterwards, node's name
@@ -195,7 +198,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         // current rmcore shortID should be added to ensure uniqueness
         final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         clb.setNodeName(nodeName);
-        //finally, the credential's value
+        // finally, the credential's value
         String credString = null;
         try {
             credString = new String(this.credentials.getBase64());
@@ -204,25 +207,25 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         }
         clb.setCredentialsValueAndNullOthers(credString);
 
-        //add an expected node. every unexpected node will be discarded
+        // add an expected node. every unexpected node will be discarded
         String cmdLine;
         String obfuscatedCmdLine;
         try {
             cmdLine = clb.buildCommandLine(true);
             obfuscatedCmdLine = clb.buildCommandLine(false);
         } catch (IOException e2) {
-            throw new RMException("Cannot build the " + RMNodeStarter.class.getSimpleName() +
-                "'s command line.", e2);
+            throw new RMException(
+                "Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e2);
         }
 
-        //one escape the command to make it runnable through ssh
+        // one escape the command to make it runnable through ssh
         if (cmdLine.contains("\"")) {
             cmdLine = cmdLine.replaceAll("\"", "\\\\\"");
         }
 
-        //we create a new deploying node before ssh command ran
-        final String pnURL = super.addDeployingNode(nodeName, obfuscatedCmdLine, "Deploying node on host " +
-            host, this.nodeTimeOut);
+        // we create a new deploying node before ssh command ran
+        final String pnURL = super.addDeployingNode(nodeName, obfuscatedCmdLine,
+                "Deploying node on host " + host, this.nodeTimeOut);
         this.pnTimeout.put(pnURL, new Boolean(false));
 
         Process p = null;
@@ -259,16 +262,16 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                 })) {
                     return;
                 } else {
-                    //there isn't any race regarding node registration
-                    throw new RMException("SSH Node " + nodeName +
-                        " is not expected anymore because of an error.");
+                    // there isn't any race regarding node registration
+                    throw new RMException(
+                        "SSH Node " + nodeName + " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");
             }
 
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
-                //registration is ok, we destroy the process
+                // registration is ok, we destroy the process
                 p.destroy();
                 return;
             }
@@ -281,11 +284,11 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             }
         }
 
-        //if we exit because of a timeout
+        // if we exit because of a timeout
         if (this.pnTimeout.get(pnURL)) {
-            //we remove it
+            // we remove it
             this.pnTimeout.remove(pnURL);
-            //we destroy the process
+            // we destroy the process
             p.destroy();
             throw new RMException("Deploying Node " + nodeName + " not expected any more");
         }
@@ -299,13 +302,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * Configures the Infrastructure
      *
      * @param parameters
-     *			  parameters[3]   : ssh Options, see {@link SSHClient}
-     *			  parameters[4]   : java path on the remote machines
-     *			  parameters[5]   : Scheduling path on remote machines
-     *			  parameters[6]   : target OS' type (Linux, Windows or Cygwin)
-     *            parameters[7]   : extra java options
-     *            parameters[8]   : rm cred
-     * @throws IllegalArgumentException configuration failed
+     *            parameters[3] : ssh Options, see {@link SSHClient}
+     *            parameters[4] : java path on the remote machines parameters[5]
+     *            : Scheduling path on remote machines parameters[6] : target
+     *            OS' type (Linux, Windows or Cygwin) parameters[7] : extra java
+     *            options parameters[8] : rm cred
+     * @throws IllegalArgumentException
+     *             configuration failed
      */
     @Override
     public void configure(Object... parameters) {
@@ -318,7 +321,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                 throw new IllegalArgumentException("A valid Java path must be supplied.");
             }
             this.schedulingPath = parameters[index++].toString();
-            //target OS
+            // target OS
             if (parameters[index] != null) {
                 this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[index++].toString());
                 if (this.targetOSObj == null) {
@@ -331,7 +334,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
             this.javaOptions = parameters[index++].toString();
 
-            //credentials
+            // credentials
             if (parameters[index] == null) {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
@@ -362,6 +365,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * @return short description of the IM
      */
+    @Override
     public String getDescription() {
         return "Creates remote runtimes using SSH";
     }

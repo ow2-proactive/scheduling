@@ -39,22 +39,21 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 import java.rmi.dgc.VMID;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
-import org.apache.log4j.Logger;
 
 
 /**
  *
- * A default infrastructure manager.
- * Cannot perform the deployment but is able to register incoming nodes
- * (existing nodes added by url) and remove them.
+ * A default infrastructure manager. Cannot perform the deployment but is able
+ * to register incoming nodes (existing nodes added by url) and remove them.
  *
  */
 public class DefaultInfrastructureManager extends InfrastructureManager {
 
-    /** logger*/
+    /** logger */
     protected static Logger logger = Logger.getLogger(DefaultInfrastructureManager.class);
     /** registered nodes number */
     protected int nodesCount = 0;
@@ -89,9 +88,13 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     }
 
     /**
-     * Remove the node from underlying infrastructure. Terminates proactive runtime if there is no more nodes.
-     * @param node node to release
-     * @throws RMException if any problems occurred
+     * Remove the node from underlying infrastructure. Terminates proactive
+     * runtime if there is no more nodes.
+     * 
+     * @param node
+     *            node to release
+     * @throws RMException
+     *             if any problems occurred
      */
     @Override
     public void removeNode(Node node) throws RMException {
@@ -105,7 +108,8 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
                             logger.info("Terminating the runtime " + n.getProActiveRuntime().getURL());
                             n.getProActiveRuntime().killRT(false);
                         } catch (Exception e) {
-                            //do nothing, no exception treatment for node just killed before
+                            // do nothing, no exception treatment for node just
+                            // killed before
                         }
                     }
                 });
@@ -127,15 +131,20 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     /**
      * Node source description
      */
+    @Override
     public String getDescription() {
         return "Default infrastructure";
     }
 
     /**
-     * Check if there are any other nodes handled by the NodeSource in the same JVM of the node
-     * passed in parameter.
-     * @param node Node to check if there any other node of the NodeSource in the same JVM
-     * @return true there is another node in the node's JVM handled by the nodeSource, false otherwise.
+     * Check if there are any other nodes handled by the NodeSource in the same
+     * JVM of the node passed in parameter.
+     * 
+     * @param node
+     *            Node to check if there any other node of the NodeSource in the
+     *            same JVM
+     * @return true there is another node in the node's JVM handled by the
+     *         nodeSource, false otherwise.
      */
     public boolean isThereNodesInSameJVM(Node node) {
         VMID nodeID = node.getVMInformation().getVMID();
