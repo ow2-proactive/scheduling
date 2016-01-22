@@ -36,17 +36,17 @@
  */
 package functionaltests;
 
-import org.objectweb.proactive.api.PAActiveObject;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.util.FileLock;
 import org.ow2.tests.FunctionalTest;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.ProActiveLock;
+import java.nio.file.Path;
 
 import static functionaltests.TestPauseJobRecover.createJob;
 import static functionaltests.TestPauseJobRecover.getTaskState;
@@ -63,9 +63,10 @@ public class TestPauseJob extends FunctionalTest {
     @Test
     public void test() throws Throwable {
 
-        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
+        FileLock fileLock = new FileLock();
+        Path fileLockPath = fileLock.lock();
 
-        TaskFlowJob job = createJob(PAActiveObject.getUrl(communicationObject));
+        TaskFlowJob job = createJob(fileLockPath.toString());
 
         System.out.println("Submit job");
         JobId jobId = SchedulerTHelper.submitJob(job);
@@ -88,7 +89,7 @@ public class TestPauseJob extends FunctionalTest {
         Assert.assertEquals(TaskStatus.PAUSED, getTaskState("task2", js).getStatus());
 
         //let the task1 finish
-        communicationObject.unlock();
+        fileLock.unlock();
 
         System.out.println("Checking is the status of task2 remains unchanged");
         Thread.sleep(10000);

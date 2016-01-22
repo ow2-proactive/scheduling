@@ -36,11 +36,8 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-
-import org.objectweb.proactive.api.PAActiveObject;
+import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -53,13 +50,15 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.util.FileLock;
 import org.ow2.tests.FunctionalTest;
-import org.apache.commons.io.FileUtils;
-import org.junit.Test;
 
-import functionaltests.utils.ProActiveLock;
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.nio.file.Path;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.ow2.proactive.utils.FileUtils.createTempDirectory;
 
 
@@ -120,19 +119,20 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
      * space was correctly setup by transferring a file created in working dir from the task
      */
     private void javaTaskTaskRestartedAnotherNode() throws Exception {
-        ProActiveLock blockTaskFromTest = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
-        ProActiveLock blockTestBeforeKillingNode = PAActiveObject.newActive(ProActiveLock.class,
-                new Object[] {});
+        FileLock blockTaskFromTest = new FileLock();
+        Path blockTaskFromTestPath = blockTaskFromTest.lock();
 
-        TaskFlowJob job = createFileInLocalSpaceJob(PAActiveObject.getUrl(blockTaskFromTest), PAActiveObject
-                .getUrl(blockTestBeforeKillingNode));
+        FileLock blockTestBeforeKillingNode = new FileLock();
+        Path blockTestBeforeKillingNodePath = blockTestBeforeKillingNode.lock();
+
+        TaskFlowJob job = createFileInLocalSpaceJob(blockTaskFromTestPath.toString(), blockTestBeforeKillingNodePath.toString());
 
         JobId idJ1 = SchedulerTHelper.submitJob(job);
 
         SchedulerTHelper.log("Wait until task is in the middle of the run");
         final String taskNodeUrl = findNodeRunningTask();
         SchedulerTHelper.waitForEventTaskRunning(idJ1, "task1");
-        ProActiveLock.waitUntilUnlocked(blockTestBeforeKillingNode);
+        FileLock.waitUntilUnlocked(blockTestBeforeKillingNodePath);
 
         SchedulerTHelper.log("Kill the node running the task");
         RMTHelper.getDefaultInstance().killNode(taskNodeUrl);
@@ -180,15 +180,10 @@ public class TestForkedTaskWorkingDir extends FunctionalTest {
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
-            ProActiveLock blockTaskFromTest = PAActiveObject.lookupActive(ProActiveLock.class,
-                    blockTaskFromTestUrl);
 
-            ProActiveLock blockTestBeforeKillingNode = PAActiveObject.lookupActive(ProActiveLock.class,
-                    blockTestBeforeKillingNodeUrl);
-
-            blockTestBeforeKillingNode.unlock();
+            FileLock.unlock(blockTestBeforeKillingNodeUrl);
             // for the first execution, the node will be killed here
-            ProActiveLock.waitUntilUnlocked(blockTaskFromTest);
+            FileLock.waitUntilUnlocked(blockTaskFromTestUrl);
 
             return new File("output_file.txt").createNewFile();
         }

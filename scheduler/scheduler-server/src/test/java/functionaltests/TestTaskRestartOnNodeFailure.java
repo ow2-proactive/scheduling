@@ -36,9 +36,8 @@
  */
 package functionaltests;
 
-import java.io.Serializable;
-
-import org.objectweb.proactive.api.PAActiveObject;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -49,11 +48,11 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.util.FileLock;
 import org.ow2.tests.FunctionalTest;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.ProActiveLock;
+import java.io.Serializable;
+import java.nio.file.Path;
 
 
 /**
@@ -69,15 +68,13 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
 
     public static class TestJavaTask extends JavaExecutable {
 
-        private String communicationObjectUrl;
+        private String fileLockPath;
 
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
             getOut().println("OK");
-            ProActiveLock communicationObject = PAActiveObject.lookupActive(ProActiveLock.class,
-                    communicationObjectUrl);
+            FileLock.waitUntilUnlocked(fileLockPath);
 
-            ProActiveLock.waitUntilUnlocked(communicationObject);
             return "OK";
         }
 
@@ -96,21 +93,21 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         String rmUrl = rmHelper.getLocalUrl();
         SchedulerTHelper.startScheduler(false, null, null, rmUrl);
 
-        ProActiveLock communicationObject = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
+        FileLock fileLock = new FileLock();
 
-        node1 = testTaskKillNode(communicationObject, node1, false);
-        node1 = testTaskKillNode(communicationObject, node1, true);
-        node1 = testTaskKillNode(communicationObject, node1, false);
-        node1 = testTaskKillNode(communicationObject, node1, true);
+        node1 = testTaskKillNode(fileLock, node1, false);
+        node1 = testTaskKillNode(fileLock, node1, true);
+        node1 = testTaskKillNode(fileLock, node1, false);
+        node1 = testTaskKillNode(fileLock, node1, true);
     }
 
-    private TNode testTaskKillNode(ProActiveLock communicationObject, TNode node1, boolean waitBeforeKill)
+    private TNode testTaskKillNode(FileLock fileLock, TNode node1, boolean waitBeforeKill)
             throws Exception {
-        communicationObject.lock();
+        Path fileLockPath = fileLock.lock();
         TNode node2 = startNode(rmHelper);
 
         System.out.println("Submit job");
-        final JobId jobId = SchedulerTHelper.submitJob(createJob(PAActiveObject.getUrl(communicationObject)));
+        final JobId jobId = SchedulerTHelper.submitJob(createJob(fileLockPath.toString()));
 
         System.out.println("Wait when node becomes busy");
         RMNodeEvent event;
@@ -151,7 +148,7 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         nodeToKill.getNodeProcess().stopProcess();
 
         System.out.println("Let task finish");
-        communicationObject.unlock();
+        fileLock.unlock();
 
         System.out.println("Wait when job finish");
         SchedulerTHelper.waitForEventJobFinished(jobId, TIMEOUT);
@@ -195,7 +192,7 @@ public class TestTaskRestartOnNodeFailure extends FunctionalTest {
         javaTask.setMaxNumberOfExecution(1);
         javaTask.setCancelJobOnError(true);
         javaTask.setName("Test task");
-        javaTask.addArgument("communicationObjectUrl", communicationObjectUrl);
+        javaTask.addArgument("fileLockPath", communicationObjectUrl);
         job.addTask(javaTask);
 
         return job;

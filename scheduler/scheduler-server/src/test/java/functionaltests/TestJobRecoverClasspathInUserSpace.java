@@ -36,17 +36,15 @@
  */
 package functionaltests;
 
-import java.io.File;
-
-import org.objectweb.proactive.api.PAActiveObject;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobEnvironment;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.util.FileLock;
 import org.ow2.tests.FunctionalTest;
 
-import org.junit.Test;
-
-import functionaltests.utils.ProActiveLock;
+import java.io.File;
+import java.nio.file.Path;
 
 import static functionaltests.TestPauseJobRecover.createJob;
 
@@ -56,9 +54,10 @@ public class TestJobRecoverClasspathInUserSpace extends FunctionalTest {
     @Test
     // SCHEDULING-2077
     public void action() throws Throwable {
-        ProActiveLock controlJobExecution = PAActiveObject.newActive(ProActiveLock.class, new Object[] {});
+        FileLock controlJobExecution = new FileLock();
+        Path controlJobExecutionPath = controlJobExecution.lock();
 
-        TaskFlowJob job = createJob(PAActiveObject.getUrl(controlJobExecution));
+        TaskFlowJob job = createJob(controlJobExecutionPath.toString());
         JobEnvironment env = new JobEnvironment();
         env.setJobClasspath(new String[] { "$USERSPACE/test.jar" });
         job.setEnvironment(env);
