@@ -1,17 +1,5 @@
 package org.ow2.proactive.scheduler.smartproxy;
 
-import java.io.Serializable;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import javax.security.auth.login.LoginException;
-
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
@@ -51,6 +39,17 @@ import org.ow2.proactive.scheduler.smartproxy.common.AbstractSmartProxy;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
+
+import javax.security.auth.login.LoginException;
+import java.io.Serializable;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Smart proxy implementation that relies on active objects for communicating with dataspaces
@@ -239,14 +238,18 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
         jobTracker.loadJobs();
 
+        setInitialized(true);
+
         registerAsListener();
         syncAwaitedJobs();
     }
 
     @Override
     public void disconnect() throws NotConnectedException, PermissionException {
+        checkInitialized();
         try {
             schedulerProxy.disconnect();
+
         } catch (NotConnectedException e) {
             // we ignore this exception
         } catch (PermissionException e) {
@@ -254,6 +257,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         } catch (Exception e) {
             // we ignore any runtime exception
         }
+        setInitialized(false);
     }
 
     @Override
@@ -263,10 +267,6 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
     @Override
     public void reconnect() throws SchedulerException, LoginException {
-        if (super.schedulerUrl == null) {
-            throw new IllegalStateException("No connection to the scheduler has been established yet.");
-        }
-
         disconnect();
 
         if (this.credentials == null) {

@@ -36,30 +36,26 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.net.URI;
-import java.util.Stack;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.rest.ISchedulerClient;
-import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import com.google.common.io.Files;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.rest.ISchedulerClient;
+import org.ow2.proactive.scheduler.rest.SchedulerClient;
+
+import java.io.File;
+import java.net.URI;
+import java.util.Stack;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
@@ -91,6 +87,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // client should automatically renew the session identifier
         status = client.getStatus();
         assertNotNull(status);
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testDisconnect() throws Exception {
+        ISchedulerClient client = clientInstance();
+        client.disconnect();
+        Assert.assertFalse(client.isConnected());
+        client = clientInstance();
+        Assert.assertTrue(client.isConnected());
+
     }
 
     @Test(timeout = MAX_WAIT_TIME)
