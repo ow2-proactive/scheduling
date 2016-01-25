@@ -1,16 +1,16 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.ProActiveCounter;
-
-import org.ow2.proactive.process_tree_killer.ProcessTree;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.utils.Formatter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 import java.util.Properties;
+
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.ProActiveCounter;
+import org.ow2.proactive.process_tree_killer.ProcessTree;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.utils.Formatter;
 
 
 /**
@@ -28,10 +28,10 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     public static final String NODESOURCE_CREDENTIALS = "nodesource.credentials";
 
     @Configurable(description = "Command that will be launched for every host")
-    protected String command = "scp -o StrictHostKeyChecking=no ${pa.rm.home}/dist/war/rest/node.jar ${host.name}:/tmp/${node.name}.jar && "
-        + "ssh -o StrictHostKeyChecking=no ${host.name} "
-        + "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} "
-        + "1>>/tmp/${node.name}.log 2>&1\"";
+    protected String command = "scp -o StrictHostKeyChecking=no ${pa.rm.home}/dist/war/rest/node.jar ${host.name}:/tmp/${node.name}.jar && " +
+        "ssh -o StrictHostKeyChecking=no ${host.name} " +
+        "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +
+        "1>>/tmp/${node.name}.log 2>&1\"";
 
     @Override
     public void configure(Object... parameters) {
@@ -44,11 +44,13 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     /**
      * Internal node acquisition method
      * <p>
-     * Starts a PA runtime on remote host using a custom script, register it manually in the
-     * nodesource.
+     * Starts a PA runtime on remote host using a custom script, register it
+     * manually in the nodesource.
      *
-     * @param host hostname of the node on which a node should be started
-     * @throws org.ow2.proactive.resourcemanager.exception.RMException acquisition failed
+     * @param host
+     *            hostname of the node on which a node should be started
+     * @throws org.ow2.proactive.resourcemanager.exception.RMException
+     *             acquisition failed
      */
     protected void startNodeImpl(InetAddress host) throws RMException {
 
@@ -71,8 +73,8 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         String filledCommand = replaceProperties(command, localProperties);
         filledCommand = replaceProperties(filledCommand, System.getProperties());
 
-        final String pnURL = super.addDeployingNode(nodeName, filledCommand,
-                "Deploying node on host " + host, this.nodeTimeOut);
+        final String pnURL = super.addDeployingNode(nodeName, filledCommand, "Deploying node on host " + host,
+                this.nodeTimeOut);
         this.pnTimeout.put(pnURL, new Boolean(false));
 
         Process p;
@@ -111,16 +113,16 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
                 })) {
                     return;
                 } else {
-                    //there isn't any race regarding node registration
-                    throw new RMException("A node " + nodeName +
-                        " is not expected anymore because of an error.");
+                    // there isn't any race regarding node registration
+                    throw new RMException(
+                        "A node " + nodeName + " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");
             }
 
             if (super.checkNodeIsAcquiredAndDo(nodeName, null, null)) {
-                //registration is ok, we destroy the process
+                // registration is ok, we destroy the process
                 logger.debug("Destroying the process: " + p);
                 try {
                     ProcessTree.get().get(p).kill();
@@ -138,11 +140,11 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             }
         }
 
-        //if we exit because of a timeout
+        // if we exit because of a timeout
         if (this.pnTimeout.get(pnURL)) {
-            //we remove it
+            // we remove it
             this.pnTimeout.remove(pnURL);
-            //we destroy the process
+            // we destroy the process
             p.destroy();
             throw new RMException("Deploying Node " + nodeName + " not expected any more");
         }
@@ -171,6 +173,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     /**
      * @return short description of the IM
      */
+    @Override
     public String getDescription() {
         return "In order to deploy a node this infrastructure ssh to a computer and uses wget to download proactive node distribution. It keep nodes always up-to-dated and does not require pre-installed proactive on a node machine.";
     }

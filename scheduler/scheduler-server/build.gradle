@@ -28,7 +28,6 @@ dependencies {
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
     testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
-    testCompile project(':rm:rm-infrastructure:rm-infrastructure-gcm')
     testCompile project(':rm:rm-policy:rm-policy-scheduler')
     testCompile project(':scheduler:scheduler-examples')
 
