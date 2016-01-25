@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class SortSpecifierContainer implements Serializable {
 
-    public List<SortSpecifierItem> sortParameters = null;
+    public ArrayList<SortSpecifierItem> sortParameters = null;
 
     public SortSpecifierContainer() {
         sortParameters = new ArrayList<>();

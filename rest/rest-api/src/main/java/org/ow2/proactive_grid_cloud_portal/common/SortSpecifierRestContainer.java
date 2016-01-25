@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class SortSpecifierRestContainer implements Serializable {
 
-    public List<SortSpecifierRestItem> sortParameters = null;
+    private final ArrayList<SortSpecifierRestItem> sortParameters;
 
     public SortSpecifierRestContainer() {
         sortParameters = new ArrayList<>();
@@ -49,8 +49,8 @@ public class SortSpecifierRestContainer implements Serializable {
 
     public class SortSpecifierRestItem implements Serializable {
 
-        protected String field;
-        protected String order;
+        private final String field;
+        private final String order;
 
         SortSpecifierRestItem(String field, String order) {
             this.field = field;
@@ -81,8 +81,8 @@ public class SortSpecifierRestContainer implements Serializable {
 
     public SortSpecifierRestContainer(String values) {
         sortParameters = new ArrayList<>();
-        for (String s : values.split(";")) {
-            String[] sortParam = s.split(",");
+        for (String criteriaTerm : values.split(";")) {
+            String[] sortParam = criteriaTerm.split(",");
             add(sortParam[0], sortParam[1]);
         }
     }

@@ -13,6 +13,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -93,6 +94,7 @@ public class RestTestUtils {
         TaskId mockedTaskId = mock(TaskId.class);
         TaskState mockedState = mock(TaskState.class);
         when(mockedTaskId.getReadableName()).thenReturn(generateReadableName(jobIdStr, cnt, nbTasks));
+        when(mockedTaskId.longValue()).thenReturn(Integer.toUnsignedLong(cnt));
         when(mockedState.getTag()).thenReturn(tag);
         when(mockedState.getId()).thenReturn(mockedTaskId);
         when(mockedState.getName()).thenReturn(generateReadableName(jobIdStr, cnt, nbTasks));
@@ -104,6 +106,7 @@ public class RestTestUtils {
         TaskInfoData mockedTaskInfoData = mock(TaskInfoData.class);
         TaskIdData mockedTaskIdData = mock(TaskIdData.class);
         when(mockedTaskIdData.getReadableName()).thenReturn(generateReadableName(jobIdStr, cnt, nbTasks));
+        when(mockedTaskIdData.getId()).thenReturn(Integer.toUnsignedLong(cnt));
         when(mockedTaskInfoData.getTaskId()).thenReturn(mockedTaskIdData);
         when(mockedTaskStateData.getTaskInfo()).thenReturn(mockedTaskInfoData);
         when(mockedTaskStateData.getTag()).thenReturn(tag);

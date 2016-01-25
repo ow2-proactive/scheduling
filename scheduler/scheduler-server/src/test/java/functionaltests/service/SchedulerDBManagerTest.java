@@ -11,6 +11,7 @@ import java.util.List;
 import com.google.common.truth.Truth;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskFilterCriteria;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -38,6 +39,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
     private List<InternalJob> actualInternalJobs = null;
     private Page<JobInfo> actualJobPage = null;
     private List<Task> lAllTasks = null;
+    private List<SortSpecifierContainer> sortParameters = null;
     
     @Test
     public void testGetTasks() throws Throwable {
@@ -177,6 +179,13 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         // default parameters, with tag "NON-EXISTENT-TAG"
         crit = TaskFilterCriteria.TFCBuilder.newInstance().tag("NON-EXISTENT-TAG").criterias();
         actualPageState = getTaskStates(crit);
+        assertTaskStatePage(actualPageState, crit);
+
+        // all statuses, no pagination, everything should come up sorted by taskId
+        sortParameters = new ArrayList<>();
+        sortParameters.add(new SortSpecifierContainer("id.taskId,descending"));
+        crit = TaskFilterCriteria.TFCBuilder.newInstance().sortParameters(sortParameters).criterias();
+        actualPageState =getTaskStates(crit);
         assertTaskStatePage(actualPageState, crit);
     }
     
@@ -471,7 +480,7 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
             if (tag != null)
                 assertEquals("Tag is incorrect", tag, taskState.getTag());
             
-         // from
+            // from
             long from = criterias.getFrom();
             if (from != 0)
                 assertEquals("startTime is incorrect", from, taskState.getStartTime());

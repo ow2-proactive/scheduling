@@ -3306,17 +3306,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                  boolean running, boolean pending, boolean finished,
                                                  int offset, int limit, SortSpecifierRestContainer sortParams)
             throws NotConnectedRestException, PermissionRestException {
-        String dbSortAttribute = null;
-        SortSpecifierRestContainer filteredSorts = new SortSpecifierRestContainer();
-        if (sortParams != null) {
-            for (SortSpecifierRestContainer.SortSpecifierRestItem i : sortParams.getSortParameters()) {
-                if (sortableTaskAttrMap.containsKey(i.getField())) {
-                    filteredSorts.add(sortableTaskAttrMap.get(i.getField()), i.getOrder());
-                }
-            }
-        }
-        return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit,
-                filteredSorts);
+        return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished,
+                offset, limit, mapToDBNamespace(sortParams));
     }
 
     @Override
@@ -3341,6 +3332,25 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         }
+    }
+
+    /**
+     * Translates the tasks attributes names that are used to sort the result
+     * For example the task status is called `status` client-side, it is represented by
+     * `taskStatus` in the DB
+     * @param sortParams  The sort parameters using the client-side namespace
+     * @return the sort parameters using the DB namespace
+     */
+    private SortSpecifierRestContainer mapToDBNamespace(SortSpecifierRestContainer sortParams) {
+        SortSpecifierRestContainer filteredSorts = new SortSpecifierRestContainer();
+        if (sortParams != null) {
+            for (SortSpecifierRestContainer.SortSpecifierRestItem i : sortParams.getSortParameters()) {
+                if (sortableTaskAttrMap.containsKey(i.getField())) {
+                    filteredSorts.add(sortableTaskAttrMap.get(i.getField()), i.getOrder());
+                }
+            }
+        }
+        return filteredSorts;
     }
 
 }
