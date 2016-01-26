@@ -88,7 +88,6 @@ read -e -p "Port used by the proactive server: " -i "8080" PORT
 PORT=$(echo $PORT | xargs)
 
 read -e -p "Number of ProActive nodes to start on the server machine: " -i "4" NB_NODES
-
 NB_NODES=$(echo $NB_NODES | xargs)
 
 if confirm "Setup cron task for cleaning old logs? [Y/n] " ; then
@@ -114,6 +113,10 @@ sed "s/PORT=.*/PORT=$PORT/g"  -i "/etc/init.d/proactive-scheduler"
 sed "s/NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"
 sed "s/PA_ROOT=.*/PA_ROOT=$(escape_rhs_sed "$PA_ROOT")/g"  -i "/etc/init.d/proactive-scheduler"
 
+if confirm "Start ProActive Nodes in a single JVM process (y) or multiple JVM Processes (n) ? [Y/n] " ; then
+    sed "s/SINGLE_JVM=.*/SINGLE_JVM=true/g"  -i "/etc/init.d/proactive-scheduler"
+fi
+
 chmod 700 /etc/init.d/proactive-scheduler
 
 mkdir -p /var/log/proactive
@@ -122,7 +125,11 @@ touch /var/log/proactive/scheduler
 chown -R $USER:$USER /var/log/proactive
 
 if confirm "Start the proactive-scheduler service at startup? [Y/n] " ; then
-    chkconfig proactive-scheduler on
+    if chkconfig proactive-scheduler on 2> /dev/null ; then
+        echo "proactive-scheduler service added as a startup daemon"
+    else
+        update-rc.d proactive-scheduler defaults
+    fi
 fi
 
 
