@@ -133,6 +133,20 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     }
 
     @Test
+    public void testTerminate() throws Exception {
+        restSmartProxy.terminate();
+        Assert.assertFalse(restSmartProxy.isConnected());
+        try {
+            restSmartProxy.getStatus();
+            fail("Using the restsmartproxy after termination should throw an exception");
+        } catch (Throwable t) {
+
+        } finally {
+            restSmartProxy = null;
+        }
+    }
+
+    @Test
     public void testReconnection() throws Exception {
 
         restSmartProxy.reconnect();

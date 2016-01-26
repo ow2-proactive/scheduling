@@ -203,8 +203,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public void disconnect() throws NotConnectedException, PermissionException {
         try {
             restApi().disconnect(sid);
-        } catch (Exception e2) {
-            throwNCEOrPE(e2);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
         }
         initialized = false;
     }
@@ -407,7 +407,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         if (initialized) {
             try {
                 isConnected = restApi().isConnected(sid);
-            } catch (NotConnectedRestException e) {
+            } catch (Throwable e) {
                 // ignore
             }
         }
@@ -683,7 +683,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public List<JobResult> waitForAllJobs(List<String> jobIds, long timeout)
             throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
         long timestamp = 0;
-        List<JobResult> results = new ArrayList<>();
+        List<JobResult> results = new ArrayList<>(jobIds.size());
         for (String jobId : jobIds) {
             timestamp = currentTimeMillis();
             results.add(waitForJob(jobId, timeout));
