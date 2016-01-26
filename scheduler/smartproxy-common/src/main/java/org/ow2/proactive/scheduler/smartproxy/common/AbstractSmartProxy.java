@@ -124,7 +124,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             return false;
         }
         if (terminated) {
-            return true;
+            return false;
         }
         return getScheduler().isConnected();
     }
@@ -296,7 +296,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         downloadTaskOutputFiles(awaitedjob, jobId, t_name, localOutFolderPath);
     }
 
-    protected void checkInitialized() throws IllegalStateException {
+    protected void checkInitialized() {
         if (terminated) {
             throw new IllegalStateException("This SmartProxy instance has been terminated and cannot be used any more.");
         }
@@ -305,7 +305,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         }
     }
 
-    protected void setInitialized(boolean initialized) throws IllegalStateException {
+    protected void setInitialized(boolean initialized) {
         this.initialized = initialized;
     }
 
