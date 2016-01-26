@@ -16,6 +16,7 @@ PORT=8080
 NB_NODES=1
 ALIAS=$(hostname)
 PA_ROOT=/opt/proactive
+SINGLE_JVM=false
 
 
 # e,d of variables to modify
@@ -26,15 +27,21 @@ export PROACTIVE_HOME=$PA_ROOT/default
 NAME=proactive-scheduler
 #THE COMMAND TO LAUNCH
 
-DAEMON="$PROACTIVE_HOME/bin/proactive-server -ln $NB_NODES"
+if $SINGLE_JVM ; then
+	DAEMON="$PROACTIVE_HOME/bin/proactive-server -ln 0"
+else
+	DAEMON="$PROACTIVE_HOME/bin/proactive-server -ln $NB_NODES"
+fi
 
 #File where log will be placed (/dev/null if empty)
 LOGFILE=/var/log/proactive/scheduler
 #File where pid will be store, leave as is if you don't know what you do
 PIDFILE=/var/run/$NAME.pid
+NODE_PIDFILE=/var/run/$NAME_node.pid
 
 REST_URL=$PROTOCOL://localhost:$PORT/rest
 REST_PUBLIC_URL=$PROTOCOL://${ALIAS}:$PORT/rest
+PA_URL=pnp://${ALIAS}:64738
 
 processRunning() {
 		kill -0 $1 &> /dev/null
@@ -67,6 +74,29 @@ waitForCompletion() {
 		sleep 1
 	done
 }
+
+createnodes() {
+    echo Creating local nodes ...
+    PA_PROTOCOL=$(grep 'proactive.communication.protocol' "$PROACTIVE_HOME/config/network/server.ini" | sed "s/proactive\.communication\.protocol=\(.*\)/\1/g")
+    if [[ "$PA_PROTOCOL" == "pnp" ]]; then
+        PA_URL=pnp://${ALIAS}:64738
+    elif [[ "$PA_PROTOCOL" == "pamr" ]]; then
+    	PA_URL=pamr://0
+    else
+    	PA_URL=pnp://${ALIAS}:64738
+    fi
+
+	CMD="nohup $PROACTIVE_HOME/bin/proactive-node -w $NB_NODES -f $PROACTIVE_HOME/config/authentication/rm.cred -s Default -r $PA_URL &> /dev/null & "
+	if [ "$USER" != "" ]
+        then
+        	$(su $USER -c "$CMD")
+        else
+        	$(su -c "cd $PROACTIVE_HOME/bin && $CMD")
+        fi
+        CURRPID=$(ps aux|grep RMNodeStarter|grep -v "grep"|awk '{ print $2 }')
+        echo $CURRPID > $NODE_PIDFILE
+}
+
 
 
 
@@ -110,6 +140,10 @@ start() {
         		done
 			echo Web interfaces started at $PROTOCOL://${ALIAS}:$PORT
 
+			if $SINGLE_JVM ; then
+				createnodes
+            fi
+
 			echo -e "Service $NAME \e[0;32mSTARTED\e[0m"
 
 	else
@@ -131,6 +165,10 @@ stop() {
 	then
 		# kill scheduler process
 		kill $CURRPID
+		if $SINGLE_JVM ; then
+			NODEPID=$(cat $NODE_PIDFILE)
+			kill $NODEPID
+		fi
 		waitForCompletion
 		echo -e "Service $NAME : \e[0;31mSTOPPED\e[0m"
 	else
