@@ -75,7 +75,7 @@ public class TaskDBUtils {
                 String queryPrefix = "select count(*) from TaskData T where ";
 
                 Query query = getQuery(session, params, taskStatuses, hasUser, hasTag, hasDateFrom, hasDateTo,
-                        null, queryPrefix);
+                        SortSpecifierContainer.EMPTY_CONTAINER, queryPrefix);
 
                 Long count = (Long) query.uniqueResult();
 
@@ -189,7 +189,7 @@ public class TaskDBUtils {
 
         result.append("and taskStatus in (:taskStatus) ");
 
-        if (sortParams != null && !sortParams.getSortParameters().isEmpty()) {
+        if (!sortParams.getSortParameters().isEmpty()) {
             result.append("order by ");
             List<SortSpecifierContainer.SortSpecifierItem> items = sortParams.getSortParameters();
             for (int i = 0; i < items.size(); i++) {

@@ -41,6 +41,8 @@ import java.util.List;
  */
 public final class SortSpecifierContainer implements Serializable {
 
+    public static final SortSpecifierContainer EMPTY_CONTAINER = new SortSpecifierContainer();
+
     private final ArrayList<SortSpecifierItem> sortParameters;
 
     public SortSpecifierContainer() {
@@ -98,11 +100,15 @@ public final class SortSpecifierContainer implements Serializable {
         return sortParameters;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        int paddedSize = sortParameters.size() - 1;
         for (int i = 0 ; i < sortParameters.size(); i++) {
             sb.append(sortParameters.get(i).toString());
-            if (i < sortParameters.size() - 1) sb.append(";");
+            if (i < paddedSize) {
+                sb.append(";");
+            }
         }
         return sb.toString();
     }

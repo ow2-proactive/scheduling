@@ -132,6 +132,7 @@ public class DBTaskDataParameters {
         private SortSpecifierContainer sortParams;
 
         private Builder() {
+            sortParams = new SortSpecifierContainer();
         }
 
         public static Builder create() {

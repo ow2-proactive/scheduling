@@ -1134,7 +1134,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         RestPageParameters params = new RestPageParameters(frontendState, "getTaskIds", from, to, mytasks,
-                running, pending, finished, offset, limit, taskTag, null);
+                running, pending, finished, offset, limit, taskTag, SortSpecifierContainer.EMPTY_CONTAINER);
         Page<TaskInfo> pTaskInfo;
         pTaskInfo = dbManager.getTasks(params.getFrom(), params.getTo(), params.getTag(),
                 params.getOffset(), params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),

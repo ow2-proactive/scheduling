@@ -287,7 +287,7 @@ public class SchedulerDBManager {
             final boolean finished) {
 
         DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
-                pending, running, finished, new SortSpecifierContainer());
+                pending, running, finished, SortSpecifierContainer.EMPTY_CONTAINER);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskInfo> lTaskInfo =  runWithoutTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
         
