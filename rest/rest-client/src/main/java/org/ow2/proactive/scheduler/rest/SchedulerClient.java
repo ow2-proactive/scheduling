@@ -107,7 +107,6 @@ import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
 import org.ow2.proactive.scheduler.rest.utils.HttpUtility;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.SortSpecifierRestContainer;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -969,7 +968,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                          int offset, int limit, SortSpecifierContainer sortParams)
                     throws NotConnectedException, PermissionException {
         RestPage<TaskStateData> page = null;
-        SortSpecifierRestContainer sortContainer = new SortSpecifierRestContainer(sortParams.toString());
+        SortSpecifierContainer sortContainer = new SortSpecifierContainer(sortParams.toString());
         try {
             page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset,
                     limit, sortContainer);

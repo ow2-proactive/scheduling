@@ -82,7 +82,6 @@ import org.ow2.proactive_grid_cloud_portal.common.FileType;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import org.ow2.proactive_grid_cloud_portal.common.SortSpecifierRestContainer;
 
 /**
  * Smart proxy implementation that relies on the REST API for communicating with dataspaces

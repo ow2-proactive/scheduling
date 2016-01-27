@@ -3304,7 +3304,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public RestPage<TaskStateData> getTaskStates(String sessionId, long from, long to, boolean mytasks,
                                                  boolean running, boolean pending, boolean finished,
-                                                 int offset, int limit, SortSpecifierRestContainer sortParams)
+                                                 int offset, int limit, SortSpecifierContainer sortParams)
             throws NotConnectedRestException, PermissionRestException {
         return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished,
                 offset, limit, mapToDBNamespace(sortParams));
@@ -3313,7 +3313,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public RestPage<TaskStateData> getTaskStatesByTag(String sessionId, String taskTag, long from, long to,
                                                       boolean mytasks, boolean running, boolean pending, boolean finished,
-                                                      int offset, int limit, SortSpecifierRestContainer sortParams)
+                                                      int offset, int limit, SortSpecifierContainer sortParams)
             throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks/tag/" + taskTag);
 
@@ -3341,10 +3341,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @param sortParams  The sort parameters using the client-side namespace
      * @return the sort parameters using the DB namespace
      */
-    private SortSpecifierRestContainer mapToDBNamespace(SortSpecifierRestContainer sortParams) {
-        SortSpecifierRestContainer filteredSorts = new SortSpecifierRestContainer();
+    private SortSpecifierContainer mapToDBNamespace(SortSpecifierContainer sortParams) {
+        SortSpecifierContainer filteredSorts = new SortSpecifierContainer();
         if (sortParams != null) {
-            for (SortSpecifierRestContainer.SortSpecifierRestItem i : sortParams.getSortParameters()) {
+            for (SortSpecifierContainer.SortSpecifierItem i : sortParams.getSortParameters()) {
                 if (sortableTaskAttrMap.containsKey(i.getField())) {
                     filteredSorts.add(sortableTaskAttrMap.get(i.getField()), i.getOrder());
                 }

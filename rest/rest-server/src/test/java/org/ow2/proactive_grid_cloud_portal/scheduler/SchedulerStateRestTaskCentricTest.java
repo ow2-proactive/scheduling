@@ -50,16 +50,12 @@ import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
-import org.ow2.proactive_grid_cloud_portal.common.SortSpecifierRestContainer;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 
 
@@ -146,7 +142,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                 .thenReturn(expectedPage);
 
         RestPage<TaskStateData> page = restInterface.getTaskStatesByTag(sessionId, tag, 0, 0, false, true,
-                true, true, 0, nbTasksInPage, new SortSpecifierRestContainer());
+                true, true, 0, nbTasksInPage, new SortSpecifierContainer());
 
         RestTestUtils.assertTaskStates(expectedPage, page);
     }
@@ -166,7 +162,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
                 .thenReturn(expectedPage);
 
         RestPage<TaskStateData> page = restInterface.getTaskStatesByTag(sessionId, tag, 0, 0, false, true,
-                true, true, 0, nbTasksInPage, new SortSpecifierRestContainer(".id.taskId,descending"));
+                true, true, 0, nbTasksInPage, new SortSpecifierContainer(".id.taskId,descending"));
 
         RestTestUtils.assertTaskStates(expectedPage, page);
 
