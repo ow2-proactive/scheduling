@@ -77,7 +77,9 @@ waitForCompletion() {
 
 createnodes() {
     echo Creating local nodes ...
-    PA_PROTOCOL=$(grep 'proactive.communication.protocol' "$PROACTIVE_HOME/config/network/server.ini" | sed "s/proactive\.communication\.protocol=\(.*\)/\1/g")
+    PA_PROTOCOL=$( grep -e '^proactive.communication.protocol=' "$PROACTIVE_HOME/config/network/server.ini" | sed -e "s/^proactive\.communication\.protocol=\(.*\)/\1/g"  )
+    PA_PROTOCOL=$(echo $PA_PROTOCOL| xargs)
+
     if [[ "$PA_PROTOCOL" == "pnp" ]]; then
         PA_URL=pnp://${ALIAS}:64738
     elif [[ "$PA_PROTOCOL" == "pamr" ]]; then
