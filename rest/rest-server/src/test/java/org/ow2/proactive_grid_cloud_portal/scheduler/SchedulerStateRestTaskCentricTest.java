@@ -37,6 +37,8 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +47,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -113,17 +116,19 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
         Page<TaskState> expectedPage = RestTestUtils.newMockedTaskStatePage(jobIdStr, tag, nbTasksInPage,
                 nbTotalTasks);
 
-        when(mockOfScheduler.getTaskStates(null, 0, 0, false, true, true, true, 0, nbTasksInPage))
+        when(mockOfScheduler.getTaskStates(anyString(), anyLong(), anyLong(),
+                anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyInt(),
+                anyInt(), any(SortSpecifierContainer.class)))
                 .thenReturn(expectedPage);
 
         RestPage<TaskStateData> page = restInterface.getTaskStates(sessionId, 0, 0, false, true, true, true,
-                0, nbTasksInPage);
+                0, nbTasksInPage, null);
 
         RestTestUtils.assertTaskStates(expectedPage, page);
     }
 
     @Test
-    public void testGetTaskStatesByTag() throws Throwable {
+    public void testGetTaskStatesByTagNoSorting() throws Throwable {
         int nbTasksInPage = 50;
         int nbTotalTasks = 100;
         String jobIdStr = "1";
@@ -131,13 +136,42 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
         Page<TaskState> expectedPage = RestTestUtils.newMockedTaskStatePage(jobIdStr, tag, nbTasksInPage,
                 nbTotalTasks);
 
-        when(mockOfScheduler.getTaskStates(tag, 0, 0, false, true, true, true, 0, nbTasksInPage))
+        when(mockOfScheduler.getTaskStates(anyString(), anyLong(), anyLong(),
+                anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyInt(),
+                anyInt(), any(SortSpecifierContainer.class)))
                 .thenReturn(expectedPage);
 
         RestPage<TaskStateData> page = restInterface.getTaskStatesByTag(sessionId, tag, 0, 0, false, true,
-                true, true, 0, nbTasksInPage);
+                true, true, 0, nbTasksInPage, new SortSpecifierContainer());
 
         RestTestUtils.assertTaskStates(expectedPage, page);
+    }
+
+    @Test
+    public void testGetTaskStatesByTagSortByIdDesc() throws Throwable {
+        int nbTasksInPage = 50;
+        int nbTotalTasks = 100;
+        String jobIdStr = "1";
+        String tag = "TAG-TEST";
+        Page<TaskState> expectedPage = RestTestUtils.newMockedTaskStatePage(jobIdStr, tag, nbTasksInPage,
+                nbTotalTasks);
+
+        when(mockOfScheduler.getTaskStates(anyString(), anyLong(), anyLong(),
+                anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyInt(),
+                anyInt(), any(SortSpecifierContainer.class)))
+                .thenReturn(expectedPage);
+
+        RestPage<TaskStateData> page = restInterface.getTaskStatesByTag(sessionId, tag, 0, 0, false, true,
+                true, true, 0, nbTasksInPage, new SortSpecifierContainer(".id.taskId,descending"));
+
+        RestTestUtils.assertTaskStates(expectedPage, page);
+
+        // let's check only the first two as the string comparison is not valid
+        // after that case : "JOB-1-TASK-1/50".compareTo("JOB-1-TASK-10/50")
+        List<TaskStateData> tasks = page.getList();
+        TaskStateData previousTask = tasks.get(0);
+        TaskStateData currentTask = tasks.get(1);
+        assertTrue(previousTask.getName().compareTo(currentTask.getName()) < 0);
     }
 
     @Test

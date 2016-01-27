@@ -116,13 +116,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
@@ -150,10 +144,7 @@ import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
-import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.*;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -209,11 +200,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private static FileSystemManager fsManager = null;
 
+    private static Map<String, String> sortableTaskAttrMap = null;
+
     private static final int TASKS_PAGE_SIZE = PASchedulerProperties.TASKS_PAGE_SIZE.getValueAsInt();
 
     static {
         try {
             fsManager = VFSFactory.createDefaultFileSystemManager();
+            sortableTaskAttrMap = createSortableTaskAttrMap();
         } catch (FileSystemException e) {
             logger.error("Could not create Default FileSystem Manager", e);
         }
@@ -3257,6 +3251,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 .contains(MediaType.APPLICATION_XML.toLowerCase());
     }
 
+    protected static Map<String, String> createSortableTaskAttrMap() {
+        HashMap<String, String> sortableTaskAttrMap = new HashMap<>(13);
+        sortableTaskAttrMap.put("id", "id.taskId");
+        sortableTaskAttrMap.put("status", "taskStatus");
+        sortableTaskAttrMap.put("name", "taskName");
+        sortableTaskAttrMap.put("tag", "tag");
+        sortableTaskAttrMap.put("execDuration", "executionDuration");
+        sortableTaskAttrMap.put("nodeCount", "parallelEnvNodesNumber");
+        sortableTaskAttrMap.put("executions", "numberOfExecutionLeft");
+        sortableTaskAttrMap.put("nodeFailure", "numberOfExecutionOnFailureLeft");
+        sortableTaskAttrMap.put("host", "executionHostName");
+        sortableTaskAttrMap.put("startTime", "startTime");
+        sortableTaskAttrMap.put("finishedTime", "finishedTime");
+        sortableTaskAttrMap.put("description", "description");
+        sortableTaskAttrMap.put("scheduledAt", "scheduledTime");
+        return sortableTaskAttrMap;
+    }
+
     @Override
     public RestPage<String> getTaskIds(String sessionId, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
@@ -3291,23 +3303,28 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Override
     public RestPage<TaskStateData> getTaskStates(String sessionId, long from, long to, boolean mytasks,
-            boolean running, boolean pending, boolean finished, int offset, int limit)
-                    throws NotConnectedRestException, PermissionRestException {
-        return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit);
+                                                 boolean running, boolean pending, boolean finished,
+                                                 int offset, int limit, SortSpecifierContainer sortParams)
+            throws NotConnectedRestException, PermissionRestException {
+        return getTaskStatesByTag(sessionId, null, from, to, mytasks, running, pending, finished,
+                offset, limit, mapToDBNamespace(sortParams));
     }
 
     @Override
     public RestPage<TaskStateData> getTaskStatesByTag(String sessionId, String taskTag, long from, long to,
-            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
-                    throws NotConnectedRestException, PermissionRestException {
+                                                      boolean mytasks, boolean running, boolean pending, boolean finished,
+                                                      int offset, int limit, SortSpecifierContainer sortParams)
+            throws NotConnectedRestException, PermissionRestException {
         Scheduler s = checkAccess(sessionId, "tasks/tag/" + taskTag);
 
         PageBoundaries boundaries = Pagination.getTasksPageBoundaries(offset, limit, TASKS_PAGE_SIZE);
 
+        SortSpecifierContainer sortContainer = new SortSpecifierContainer(sortParams.toString());
+
         Page<TaskState> page = null;
         try {
             page = s.getTaskStates(taskTag, from, to, mytasks, running, pending, finished,
-                    boundaries.getOffset(), boundaries.getLimit());
+                    boundaries.getOffset(), boundaries.getLimit(), sortContainer);
             List<TaskStateData> tasks = map(page.getList(), TaskStateData.class);
             return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (NotConnectedException e) {
@@ -3315,6 +3332,25 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         }
+    }
+
+    /**
+     * Translates the tasks attributes names that are used to sort the result
+     * For example the task status is called `status` client-side, it is represented by
+     * `taskStatus` in the DB
+     * @param sortParams  The sort parameters using the client-side namespace
+     * @return the sort parameters using the DB namespace
+     */
+    private SortSpecifierContainer mapToDBNamespace(SortSpecifierContainer sortParams) {
+        SortSpecifierContainer filteredSorts = new SortSpecifierContainer();
+        if (sortParams != null) {
+            for (SortSpecifierContainer.SortSpecifierItem i : sortParams.getSortParameters()) {
+                if (sortableTaskAttrMap.containsKey(i.getField())) {
+                    filteredSorts.add(sortableTaskAttrMap.get(i.getField()), i.getOrder());
+                }
+            }
+        }
+        return filteredSorts;
     }
 
 }

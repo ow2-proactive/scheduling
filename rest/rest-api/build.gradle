@@ -3,4 +3,5 @@ dependencies {
     compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.13.Final'
     compile "org.objectweb.proactive:programming-util:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
+    compile project(':scheduler:scheduler-api')
 }

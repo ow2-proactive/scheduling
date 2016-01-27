@@ -66,16 +66,7 @@ import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -1143,7 +1134,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             boolean running, boolean pending, boolean finished, int offset, int limit)
                     throws NotConnectedException, PermissionException {
         RestPageParameters params = new RestPageParameters(frontendState, "getTaskIds", from, to, mytasks,
-                running, pending, finished, offset, limit, taskTag);
+                running, pending, finished, offset, limit, taskTag, SortSpecifierContainer.EMPTY_CONTAINER);
         Page<TaskInfo> pTaskInfo;
         pTaskInfo = dbManager.getTasks(params.getFrom(), params.getTo(), params.getTag(),
                 params.getOffset(), params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
@@ -1157,14 +1148,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     @Override
     public Page<TaskState> getTaskStates(String taskTag, long from, long to,
-            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
+                                         boolean mytasks, boolean running, boolean pending, boolean finished,
+                                         int offset, int limit, SortSpecifierContainer sortParams)
                     throws NotConnectedException, PermissionException {
         RestPageParameters params = new RestPageParameters(frontendState, "getTaskStates", from, to, mytasks,
-            running, pending, finished, offset, limit, taskTag);
+            running, pending, finished, offset, limit, taskTag, sortParams);
         Page<TaskState> pTasks;
         pTasks = dbManager.getTaskStates(params.getFrom(), params.getTo(), params.getTag(), params.getOffset(),
                 params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
-                params.isFinished());
+                params.isFinished(), params.getSortParams());
         return pTasks;
         
     }

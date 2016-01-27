@@ -12,6 +12,7 @@ build/
 /dist/
 !/dist/war/getstarted
 !/dist/scripts
+dist/war/*.war
 /data
 /logs
 /lib

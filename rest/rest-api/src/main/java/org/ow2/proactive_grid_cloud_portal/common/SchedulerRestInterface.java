@@ -65,6 +65,7 @@ import javax.ws.rs.core.PathSegment;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -570,7 +571,8 @@ public interface SchedulerRestInterface {
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("-1") int limit)
+            @QueryParam("limit") @DefaultValue("-1") int limit,
+            @QueryParam("sortparameters") SortSpecifierContainer sortParams)
                     throws NotConnectedRestException, PermissionRestException;
     
     /**
@@ -605,7 +607,8 @@ public interface SchedulerRestInterface {
             @QueryParam("pending") @DefaultValue("true") boolean pending,
             @QueryParam("finished") @DefaultValue("true") boolean finished,
             @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("-1") int limit)
+            @QueryParam("limit") @DefaultValue("-1") int limit,
+            @QueryParam("sortparameters") SortSpecifierContainer sortParams)
                     throws NotConnectedRestException, PermissionRestException;
     
     

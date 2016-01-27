@@ -1,6 +1,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import com.google.common.base.Strings;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 import java.util.Collections;
@@ -23,10 +24,12 @@ public class DBTaskDataParameters {
     private final boolean pending;
     private final boolean running;
     private final boolean finished;
+    private final SortSpecifierContainer sortParams;
+
     private final Set<TaskStatus> status;
 
     DBTaskDataParameters(String tag, long from, long to, int offset, int limit, String user,
-            boolean pending, boolean running, boolean finished) {
+            boolean pending, boolean running, boolean finished, SortSpecifierContainer sortParams) {
         this.tag = tag;
         this.from = from;
         this.to = to;
@@ -36,6 +39,7 @@ public class DBTaskDataParameters {
         this.pending = pending;
         this.running = running;
         this.finished = finished;
+        this.sortParams = sortParams;
 
         Set<TaskStatus> newStatus = new HashSet<>();
 
@@ -110,6 +114,9 @@ public class DBTaskDataParameters {
         return status;
     }
 
+    public SortSpecifierContainer getSortParams() {
+        return sortParams;
+    }
 
     public static class Builder {
 
@@ -122,8 +129,10 @@ public class DBTaskDataParameters {
         private boolean pending = true;
         private boolean running = true;
         private boolean finished = true;
+        private SortSpecifierContainer sortParams;
 
         private Builder() {
+            sortParams = new SortSpecifierContainer();
         }
 
         public static Builder create() {
@@ -175,12 +184,19 @@ public class DBTaskDataParameters {
             return this;
         }
 
+        public Builder setSortParams(SortSpecifierContainer sortParams) {
+            this.sortParams = sortParams;
+            return this;
+        }
+
         public Builder but() {
-            return create().setTag(tag).setFrom(from).setTo(to).setOffset(offset).setLimit(limit).setPending(pending).setRunning(running).setFinished(finished);
+            return create().setTag(tag).setFrom(from).setTo(to).setOffset(offset).setLimit(limit)
+                    .setPending(pending).setRunning(running).setFinished(finished)
+                    .setSortParams(sortParams);
         }
 
         public DBTaskDataParameters build() {
-            return new DBTaskDataParameters(tag, from, to, offset, limit, user, pending, running, finished);
+            return new DBTaskDataParameters(tag, from, to, offset, limit, user, pending, running, finished, sortParams);
         }
     }
 

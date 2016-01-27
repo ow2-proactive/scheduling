@@ -28,7 +28,7 @@ public class TaskFilterCriteria implements Serializable {
     private boolean running = true;
     private boolean pending = true;
     private boolean finished = true;
-    private ArrayList<SortParameter<TaskSortParameter>> sortParameters = null;
+    private ArrayList<SortSpecifierContainer> sortParameters = null;
     
     public String getTag() {
         return tag;
@@ -102,16 +102,16 @@ public class TaskFilterCriteria implements Serializable {
         this.user = user;
     }
 
-    public List<SortParameter<TaskSortParameter>> getSortParameters() {
+    public List<SortSpecifierContainer> getSortParameters() {
         if (sortParameters != null)
             return Collections.unmodifiableList(sortParameters);
         else
             return null;
     }
 
-    public void setSortParameters(List<SortParameter<TaskSortParameter>> sortParameters) {
+    public void setSortParameters(List<SortSpecifierContainer> sortParameters) {
         if (sortParameters != null)
-            this.sortParameters = new ArrayList<SortParameter<TaskSortParameter>>(sortParameters);
+            this.sortParameters = new ArrayList<SortSpecifierContainer>(sortParameters);
     }
 
     public static class TFCBuilder {
@@ -201,7 +201,7 @@ public class TaskFilterCriteria implements Serializable {
         /**
          * Default value is <code>null</code> (no sort parameters)
          */
-        public TFCBuilder sortParameters(List<SortParameter<TaskSortParameter>> sortParameters) {
+        public TFCBuilder sortParameters(List<SortSpecifierContainer> sortParameters) {
             criterias.setSortParameters(sortParameters);
             return this;
         }
