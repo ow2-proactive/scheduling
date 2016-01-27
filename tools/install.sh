@@ -107,14 +107,14 @@ escape_rhs_sed ()
 
 }
 
-sed "s/USER=.*/USER=$USER/g"  -i "/etc/init.d/proactive-scheduler"
-sed "s/PROTOCOL=.*/PROTOCOL=$PROTOCOL/g"  -i "/etc/init.d/proactive-scheduler"
-sed "s/PORT=.*/PORT=$PORT/g"  -i "/etc/init.d/proactive-scheduler"
-sed "s/NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"
-sed "s/PA_ROOT=.*/PA_ROOT=$(escape_rhs_sed "$PA_ROOT")/g"  -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^USER=.*/USER=$USER/g"  -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^PROTOCOL=.*/PROTOCOL=$PROTOCOL/g"  -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^PORT=.*/PORT=$PORT/g"  -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^PA_ROOT=.*/PA_ROOT=$(escape_rhs_sed "$PA_ROOT")/g"  -i "/etc/init.d/proactive-scheduler"
 
 if confirm "Start ProActive Nodes in a single JVM process (y) or multiple JVM Processes (n) ? [Y/n] " ; then
-    sed "s/SINGLE_JVM=.*/SINGLE_JVM=true/g"  -i "/etc/init.d/proactive-scheduler"
+    sed -e "s/^SINGLE_JVM=.*/SINGLE_JVM=true/g"  -i "/etc/init.d/proactive-scheduler"
 fi
 
 chmod 700 /etc/init.d/proactive-scheduler
