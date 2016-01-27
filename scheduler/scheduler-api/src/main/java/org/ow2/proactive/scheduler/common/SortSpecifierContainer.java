@@ -39,18 +39,18 @@ import java.util.List;
  *
  * @author ActiveEon Team
  */
-public class SortSpecifierContainer implements Serializable {
+public final class SortSpecifierContainer implements Serializable {
 
-    public ArrayList<SortSpecifierItem> sortParameters = null;
+    private final ArrayList<SortSpecifierItem> sortParameters;
 
     public SortSpecifierContainer() {
         sortParameters = new ArrayList<>();
     }
 
-    public class SortSpecifierItem implements Serializable {
+    public final class SortSpecifierItem implements Serializable {
 
-        protected String field;
-        protected String order;
+        private final String field;
+        private final String order;
 
         SortSpecifierItem(String field, String order) {
             this.field = field;
