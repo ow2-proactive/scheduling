@@ -288,7 +288,7 @@ public final class CommandLineBuilder implements Cloneable {
         // add the content of addons dir on the classpath
         classpath.append(os.ps).append(rmHome).append(ADDONS_DIR);
         // add jars inside the addons directory
-        classpath.append(os.ps).append(rmHome).append(ADDONS_DIR).append(os.ps).append("*");
+        classpath.append(os.ps).append(rmHome).append(ADDONS_DIR).append(os.fs).append("*");
         classpath.append(os.ps).append(libRoot).append("*");
 
         command.add(classpath.toString());
