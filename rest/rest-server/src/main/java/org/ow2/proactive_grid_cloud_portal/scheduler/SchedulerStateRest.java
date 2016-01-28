@@ -3319,12 +3319,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         PageBoundaries boundaries = Pagination.getTasksPageBoundaries(offset, limit, TASKS_PAGE_SIZE);
 
-        SortSpecifierContainer sortContainer = new SortSpecifierContainer(sortParams.toString());
-
         Page<TaskState> page = null;
+
+        // if that method is called directly from REST without any sorting parameters
+        // sortParams will be null
+        if (sortParams == null) {
+            sortParams = new SortSpecifierContainer();
+        }
         try {
             page = s.getTaskStates(taskTag, from, to, mytasks, running, pending, finished,
-                    boundaries.getOffset(), boundaries.getLimit(), sortContainer);
+                    boundaries.getOffset(), boundaries.getLimit(), sortParams);
             List<TaskStateData> tasks = map(page.getList(), TaskStateData.class);
             return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (NotConnectedException e) {
