@@ -174,6 +174,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         clb.setJavaPath(this.javaPath);
         clb.setRmHome(this.schedulingPath);
         clb.setPaProperties(sb);
+        // Target Operating System is necessary linux (while host os can be windows)
+        clb.setTargetOS(OperatingSystem.UNIX);
         // current rmcore shortID should be added to ensure uniqueness
         final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         clb.setNodeName(nodeName);
