@@ -90,23 +90,23 @@ public class RestTestUtils {
         return new Page<TaskState>(lTasks, totalNumberOfTasks);
     }
 
-    protected static TaskState newTaskState(String jobIdStr, String tag, int cnt, int nbTasks) {
+    protected static TaskState newTaskState(String jobIdStr, String tag, long cnt, int nbTasks) {
         TaskId mockedTaskId = mock(TaskId.class);
         TaskState mockedState = mock(TaskState.class);
         when(mockedTaskId.getReadableName()).thenReturn(generateReadableName(jobIdStr, cnt, nbTasks));
-        when(mockedTaskId.longValue()).thenReturn(Integer.toUnsignedLong(cnt));
+        when(mockedTaskId.longValue()).thenReturn(cnt);
         when(mockedState.getTag()).thenReturn(tag);
         when(mockedState.getId()).thenReturn(mockedTaskId);
         when(mockedState.getName()).thenReturn(generateReadableName(jobIdStr, cnt, nbTasks));
         return mockedState;
     }
 
-    protected static TaskStateData newMockedTaskStateData(String jobIdStr, String tag, int cnt, int nbTasks) {
+    protected static TaskStateData newMockedTaskStateData(String jobIdStr, String tag, long cnt, int nbTasks) {
         TaskStateData mockedTaskStateData = mock(TaskStateData.class);
         TaskInfoData mockedTaskInfoData = mock(TaskInfoData.class);
         TaskIdData mockedTaskIdData = mock(TaskIdData.class);
         when(mockedTaskIdData.getReadableName()).thenReturn(generateReadableName(jobIdStr, cnt, nbTasks));
-        when(mockedTaskIdData.getId()).thenReturn(Integer.toUnsignedLong(cnt));
+        when(mockedTaskIdData.getId()).thenReturn(cnt);
         when(mockedTaskInfoData.getTaskId()).thenReturn(mockedTaskIdData);
         when(mockedTaskStateData.getTaskInfo()).thenReturn(mockedTaskInfoData);
         when(mockedTaskStateData.getTag()).thenReturn(tag);
@@ -185,7 +185,7 @@ public class RestTestUtils {
      * ################################################################################
      */
 
-    protected static String generateReadableName(final String jobIdStr, final int i, final int nbTasks) {
+    protected static String generateReadableName(final String jobIdStr, final long i, final int nbTasks) {
         return "JOB-" + jobIdStr + "-TASK-" + (i + 1) + "/" + nbTasks;
     }
 
