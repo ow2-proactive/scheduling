@@ -34,20 +34,14 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.utils.PAProperties;
 import org.ow2.proactive.utils.Tools;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 
 /**
@@ -293,21 +287,10 @@ public final class CommandLineBuilder implements Cloneable {
 
         // add the content of addons dir on the classpath
         classpath.append(os.ps).append(rmHome).append(ADDONS_DIR);
+        // add jars inside the addons directory
+        classpath.append(os.ps).append(rmHome).append(ADDONS_DIR).append(os.fs).append("*");
         classpath.append(os.ps).append(libRoot).append("*");
 
-        // add jars inside the addons directory
-        File addonsAbsolute = new File(rmHome + ADDONS_DIR);
-        File[] files = addonsAbsolute.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().matches(".*[.]jar");
-            }
-        });
-        if (files != null) {
-            for (File file : files) {
-                classpath.append(os.ps).append(file.getAbsolutePath());
-            }
-        }
         command.add(classpath.toString());
         command.add(RMNodeStarter.class.getName());
 
