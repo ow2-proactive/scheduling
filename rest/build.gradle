@@ -1,8 +1,3 @@
-ext.encoding = {
-    Properties props = new Properties()
-    props.load(new FileInputStream("$rootDir/config/scheduler/settings.ini"))
-    props.getProperty('pa.scheduler.job.file.encoding')
-}
 
 def functionalTestConfiguration = {
     forkEvery 1
@@ -16,7 +11,7 @@ def functionalTestConfiguration = {
     systemProperties << ['test_slice': System.getProperty("test_slice")]
     systemProperties << ['max_test_slice': System.getProperty("max_test_slice")]
     systemProperties << ['proactive.runtime.ping': false]
-    systemProperties << ['file.encoding': encoding.toString()]
+    systemProperties << ['file.encoding': 'UTF-8']
     testLogging {
         exceptionFormat = 'full'
     }

@@ -113,11 +113,6 @@ configure(javaSubprojects) {
     }
 }
 
-ext.encoding = {
-    Properties props = new Properties()
-    props.load(new FileInputStream("$rootDir/config/scheduler/settings.ini"))
-    props.getProperty('pa.scheduler.job.file.encoding')
-}
 
 def functionalTestConfiguration = {
 
@@ -134,7 +129,7 @@ def functionalTestConfiguration = {
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
     systemProperties << ['java.library.path': project.nativeLibsDir]
-    systemProperties << ['file.encoding': encoding.toString()]
+    systemProperties << ['file.encoding': 'UTF-8']
 
     testLogging {
         exceptionFormat = 'full'
@@ -614,17 +609,12 @@ class CustomCreateStartScripts extends CreateStartScripts {
                 println "Should not be here"
             }
         }
-		
-		
-	    Properties props = new Properties()
-        props.load(new FileInputStream(new File(project.rootDir, "config/scheduler/settings.ini")))
 
-        String encoding = props.getProperty('pa.scheduler.job.file.encoding')
 
         def generator = new org.gradle.api.internal.plugins.StartScriptGenerator()
         generator.applicationName = getApplicationName()
         generator.mainClassName = getMainClassName()
-        generator.defaultJvmOpts = ["-server", "-Dfile.encoding=" + encoding]
+        generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8"]
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
         generator.exitEnvironmentVar = getExitEnvironmentVar()
         generator.classpath = ["dist/lib/*", "addons", "addons/*"]
