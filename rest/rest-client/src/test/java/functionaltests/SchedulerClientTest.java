@@ -115,6 +115,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
+    public void testDisconnect() throws Exception {
+        ISchedulerClient client = clientInstance();
+        client.disconnect();
+        Assert.assertFalse(client.isConnected());
+        client = clientInstance();
+        Assert.assertTrue(client.isConnected());
+
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
     public void testWaitForTerminatingJob() throws Exception {
         ISchedulerClient client = clientInstance();
         Job job = defaultJob();

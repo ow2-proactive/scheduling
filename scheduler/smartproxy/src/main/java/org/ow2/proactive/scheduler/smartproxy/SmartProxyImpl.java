@@ -249,14 +249,18 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
         jobTracker.loadJobs();
 
+        setInitialized(true);
+
         registerAsListener();
         syncAwaitedJobs();
     }
 
     @Override
     public void disconnect() throws NotConnectedException, PermissionException {
+        checkInitialized();
         try {
             schedulerProxy.disconnect();
+
         } catch (NotConnectedException e) {
             // we ignore this exception
         } catch (PermissionException e) {
@@ -264,6 +268,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         } catch (Exception e) {
             // we ignore any runtime exception
         }
+        setInitialized(false);
     }
 
     @Override
@@ -273,10 +278,6 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
     @Override
     public void reconnect() throws SchedulerException, LoginException {
-        if (super.schedulerUrl == null) {
-            throw new IllegalStateException("No connection to the scheduler has been established yet.");
-        }
-
         disconnect();
 
         if (this.credentials == null) {

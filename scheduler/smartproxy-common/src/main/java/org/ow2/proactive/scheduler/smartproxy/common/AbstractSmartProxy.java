@@ -57,6 +57,9 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     protected final ExecutorService threadPool =
             Executors.newFixedThreadPool(MAX_NB_OF_DATA_TRANSFER_THREADS, threadFactory);
 
+    private boolean initialized = false;
+    private boolean terminated = false;
+
     public AbstractSmartProxy() {
     }
 
@@ -83,6 +86,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         } catch (Exception e) {
             log.trace(e);
         }
+        terminated = true;
     }
 
     /**
@@ -116,6 +120,12 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public boolean isConnected() {
+        if (!initialized) {
+            return false;
+        }
+        if (terminated) {
+            return true;
+        }
         return getScheduler().isConnected();
     }
 
@@ -157,10 +167,6 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * @throws LoginException
      */
     public void reconnect() throws SchedulerException, LoginException {
-        if (this.schedulerUrl == null) {
-            throw new IllegalStateException("No connection to the scheduler has been established yet.");
-        }
-
         disconnect();
         init(schedulerUrl, schedulerLogin, schedulerPassword);
     }
@@ -208,6 +214,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                         String localOutputFolderPath, String pullUrl, boolean isolateTaskOutputs,
                         boolean automaticTransfer) throws Exception,
             SubmissionClosedException, JobCreationException {
+        checkInitialized();
+
         if (isNullOrEmpty(pushUrl)) {
             pushUrl = getLocalUserSpace();
         }
@@ -263,6 +271,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      */
     public void pullData(String jobId, String t_name, String localFolder) throws Exception {
 
+        checkInitialized();
+
         AwaitedJob awaitedjob = jobTracker.getAwaitedJob(jobId);
         if (awaitedjob == null) {
             throw new IllegalArgumentException("The job " + jobId + " is unknown or has been removed");
@@ -284,6 +294,19 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         }
 
         downloadTaskOutputFiles(awaitedjob, jobId, t_name, localOutFolderPath);
+    }
+
+    protected void checkInitialized() throws IllegalStateException {
+        if (terminated) {
+            throw new IllegalStateException("This SmartProxy instance has been terminated and cannot be used any more.");
+        }
+        if (!initialized) {
+            throw new IllegalStateException("This SmartProxy instance has not been initialized.");
+        }
+    }
+
+    protected void setInitialized(boolean initialized) throws IllegalStateException {
+        this.initialized = initialized;
     }
 
     protected void reinitializeState(String schedulerUrl)

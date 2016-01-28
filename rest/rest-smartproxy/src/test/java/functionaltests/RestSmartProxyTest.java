@@ -139,6 +139,20 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         testJobSubmission(false, true);
     }
 
+    @Test
+    public void testReconnection() throws Exception {
+
+        restSmartProxy.reconnect();
+        Assert.assertTrue(restSmartProxy.isConnected());
+
+        // try a random method and verify that no exception is thrown
+        restSmartProxy.getStatus();
+
+        restSmartProxy.disconnect();
+        Assert.assertFalse(restSmartProxy.isConnected());
+
+    }
+
     private void testJobSubmission(boolean isolateTaskOutput, boolean automaticTransfer) throws Exception {
         TaskFlowJob job = createTestJob(isolateTaskOutput);
 
