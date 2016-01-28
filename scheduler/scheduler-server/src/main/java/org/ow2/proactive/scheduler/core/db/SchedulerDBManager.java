@@ -120,6 +120,10 @@ public class SchedulerDBManager {
 
     private final SessionFactory sessionFactory;
 
+    /**
+     * Object dealing with the database transactions (opening/closing sessions, retries, etc)
+     * Multi-threaded synchronization (to prevent deadlock issues) is performed by the transactionHelper
+     */
     private final TransactionHelper transactionHelper;
 
     public static SchedulerDBManager createUsingProperties() {
@@ -681,7 +685,7 @@ public class SchedulerDBManager {
                 "jobId", jobId).executeUpdate();
     }
 
-    public synchronized void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
+    public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
             public Void executeWork(Session session) {
@@ -1433,7 +1437,7 @@ public class SchedulerDBManager {
         }
     }
 
-    public synchronized void newJobSubmitted(final InternalJob job) {
+    public void newJobSubmitted(final InternalJob job) {
         runWithTransaction(new SessionWork<JobData>() {
 
             @Override
@@ -1639,15 +1643,25 @@ public class SchedulerDBManager {
         });
     }
 
+    /**
+     * Run the query and create a transaction, multi-threading synchro is handled by the TransactionHelper
+     */
     private <T> T runWithTransaction(SessionWork<T> sessionWork) {
         return transactionHelper.runWithTransaction(sessionWork);
     }
 
+    /**
+     * Run the query and create a transaction, multi-threading synchro is handled by the TransactionHelper
+     */
     private <T> T runWithTransaction(SessionWork<T> sessionWork, boolean readonly) {
 
         return transactionHelper.runWithTransaction(sessionWork, readonly);
     }
 
+    /**
+     * Run the query without creating a database transaction, the query must be read-only.
+     * multi-threading synchro is handled by the TransactionHelper
+     */
     private <T> T runWithoutTransaction(SessionWork<T> sessionWork) {
         return transactionHelper.runWithoutTransaction(sessionWork);
     }

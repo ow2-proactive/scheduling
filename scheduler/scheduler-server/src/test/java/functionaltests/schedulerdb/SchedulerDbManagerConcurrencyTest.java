@@ -1,29 +1,33 @@
 package functionaltests.schedulerdb;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.job.InternalJob;
+
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 
 @RunWith(Parameterized.class)
 public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
 
     private Scenario scenario;
+
+    List<SortParameter<JobSortParameter>> sortParameters = Collections.singletonList(new SortParameter<JobSortParameter>(JobSortParameter.ID, SortOrder.ASC));
+
 
     @Parameterized.Parameters(name = "{1}")
     public static Collection<Object[]> data() {
@@ -53,7 +57,7 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
         private final boolean deleteData;
 
         public ConcurrentJobDeletionScenario(boolean deleteData) {
-            super(10);
+            super(40);
             this.deleteData = deleteData;
         }
 
@@ -107,7 +111,7 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
         private AtomicInteger expectedNumberOfJobs;
 
         public ConcurrentJobInsertionAndDeletionScenario() {
-            super(30);
+            super(100);
 
             expectedNumberOfJobs = new AtomicInteger(nbJobs);
         }
@@ -120,7 +124,7 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
                 threadPool.submit(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        int value = iCopy % 3;
+                        int value = iCopy % 5;
 
                         switch (value) {
                             case 0:
@@ -134,6 +138,10 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
                             case 2:
                                 test.deleteJob(jobIds.get(iCopy), true);
                                 expectedNumberOfJobs.getAndDecrement();
+                                break;
+                            case 3:
+                            case 4:
+                                test.getJobs();
                                 break;
                         }
 
@@ -220,6 +228,10 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
         jobDef.addTask(javaTask);
 
         return defaultSubmitJob(jobDef);
+    }
+
+    public List<JobInfo> getJobs() throws Exception {
+        return dbManager.getJobs(0, 100, DEFAULT_USER_NAME, true, true, true, sortParameters);
     }
 
     public void deleteJob(JobId jobId, boolean deleteData) {
