@@ -22,7 +22,7 @@ task extractNativeBundle(type: Copy) {
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
-        mavenCentral()
+        jcenter()
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
     }
 
