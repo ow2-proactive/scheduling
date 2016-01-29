@@ -1,6 +1,8 @@
 package functionaltests.taskkill;
 
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.tests.FunctionalTest;
 
@@ -15,6 +17,10 @@ public class TestChildProcessOfNodeKilled extends FunctionalTest {
 
     @Test
     public void childProcessesForkedByTaskAreCleanedUpWhenRMNodeStarterIsKilled() throws Throwable {
+        if (OperatingSystem.getOperatingSystem() == OperatingSystem.windows) {
+            System.out.println("Test disabled on windows because of \"The filename or extension is too long\" issue");
+            return;
+        }
         TNode tNode = startSchedulerAndRMWithOneNode();
         startJobForkingProcesses();
 

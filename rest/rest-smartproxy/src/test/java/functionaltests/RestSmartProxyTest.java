@@ -42,16 +42,8 @@ import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobEnvironment;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
@@ -87,9 +79,9 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     protected static final String TASK_NAME = "TestJavaTask";
 
     // we add special characters to ensure they are supported
-    public final static String INPUT_FILE_BASE_NAME = "input é";
+    public final static String INPUT_FILE_BASE_NAME = "input Ã©";
     public final static String INPUT_FILE_EXT = ".txt";
-    public final static String OUTPUT_FILE_BASE_NAME = "output é";
+    public final static String OUTPUT_FILE_BASE_NAME = "output Ã©";
     public final static String OUTPUT_FILE_EXT = ".out";
 
     protected RestSmartProxyImpl restSmartProxy;
@@ -125,8 +117,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         pullUrl = userspace;
 
         // we add special characters and space to the folders to make sure transfer occurs normally
-        inputLocalFolder = tempDir.newFolder("input é");
-        outputLocalFolder = tempDir.newFolder("output é");
+        inputLocalFolder = tempDir.newFolder("input Ã©");
+        outputLocalFolder = tempDir.newFolder("output Ã©");
     }
 
     @Test(timeout = TEN_MINUTES)
@@ -226,7 +218,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     private TaskFlowJob createTestJob(boolean isolateOutputs) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         // add a special character to the job name to ensure the job is parsed correctly by the server
-        job.setName(this.getClass().getSimpleName() + " é");
+        job.setName(this.getClass().getSimpleName() + " Ã©");
 
         for (int i = 0; i < NB_TASKS; i++) {
             JavaTask testTask = new JavaTask();

@@ -36,16 +36,17 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.net.URL;
-
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory_stax;
 import org.ow2.tests.FunctionalTest;
-import org.junit.Test;
+
+import java.io.File;
+import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 
@@ -56,6 +57,7 @@ public class TestNonForkedScriptTask extends FunctionalTest {
             .getResource("/functionaltests/descriptors/Job_non_forked_script_task.xml");
 
     @Test
+    @Ignore("Unstable")
     public void nonForkedTasks_SystemExitScript_KillsANode() throws Throwable {
         SchedulerTHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
                 "config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());

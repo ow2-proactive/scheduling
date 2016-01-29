@@ -4,6 +4,7 @@ import functionaltests.monitor.EventMonitor;
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -207,7 +208,8 @@ public class TestSmartProxy extends SchedulerConsecutive {
     }
 
     @Test
-    public void run() throws Throwable {
+    @Ignore("Unstable")
+    public void test() throws Throwable {
         SchedulerTHelper
                 .log("***************************************************************************************************");
         SchedulerTHelper
