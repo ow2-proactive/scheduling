@@ -8,6 +8,7 @@ PA_FOLDER_NAME="$(basename "$CURRENT_PADIR")"
 OLD_PADIR=
 OS=
 PKG_TOOL=
+
 if which dnf > /dev/null 2>&1; then
    OS="RedHat"
    PKG_TOOL="dnf"
@@ -21,6 +22,7 @@ else
     echo "This Operating system is not supported by the Proactive installer."; exit 1 ;
 fi
 
+
 confirm() {
     # call with a prompt string or use a default
     read -r -p "${1:-Are you sure? [Y/n]} " yn
@@ -32,6 +34,16 @@ confirm() {
             false
     fi
 }
+
+echo "This will install the ProActive scheduler as a service."
+echo "Once the installer is started, it must process until the end otherwise the installation may be corrupted"
+
+
+if confirm "Do you want to continue? [Y/n] " ; then
+    :
+else
+    exit 1
+fi
 
 # checking java installation
 
@@ -67,22 +79,28 @@ read -e -p "Directory where to install the scheduler: " -i "/opt/proactive" PA_R
 PA_ROOT=$(echo $PA_ROOT | xargs)
 
 mkdir -p $PA_ROOT
-if [ -h "$PA_ROOT/default" ]; then
-    OLD_PADIR=$(readlink "$PA_ROOT/default")
-fi
-rm -f $PA_ROOT/default
 
-
-
-
+# handle overwriting an existing installation and finding the previous installation
 if [ -d "$PA_ROOT/$PA_FOLDER_NAME" ]; then
-    if confirm "A folder $PA_ROOT/$PA_FOLDER_NAME already exists, delete its content and replace by a fresh install? [Y/n] " ; then
+    if confirm "A folder $PA_ROOT/$PA_FOLDER_NAME already exists. This installer must delete its content and replace it by a fresh install, do you want to continue? [Y/n] " ; then
+        if [ -h "$PA_ROOT/previous" ]; then
+            OLD_PADIR=$(readlink "$PA_ROOT/previous")
+        fi
+
         rm -rf $PA_ROOT/$PA_FOLDER_NAME
+        rm -f $PA_ROOT/default
+    else
+        exit 1
+    fi
+else
+    # checking the previous installation
+    if [ -h "$PA_ROOT/default" ]; then
+        OLD_PADIR=$(readlink "$PA_ROOT/default")
+        rm -f $PA_ROOT/default
     fi
 fi
+
 rsync --info=progress2 -a $CURRENT_PADIR $PA_ROOT
-
-
 
 ln -s -f $PA_ROOT/$PA_FOLDER_NAME "$PA_ROOT/default"
 
@@ -201,7 +219,7 @@ if which git > /dev/null 2>&1; then
         echo "Detected an existing ProActive Scheduler installation at $OLD_PADIR, porting configuration into new installation."
         echo ""
 
-        rsync --info=progress2 -a $OLD_PADIR/{addons,data} $PA_ROOT/default/
+        rsync --info=progress2 -a $OLD_PADIR/addons $PA_ROOT/default/
 
         OLD_PADIR_NAME="$(basename "$OLD_PADIR")"
 
@@ -233,11 +251,26 @@ if which git > /dev/null 2>&1; then
         # copy merged changes on the service (if ever a conflict occurs, the user will have to manually copy the merge)
         cp proactive-scheduler /etc/init.d/
 
+
+        if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
+            # display the list of addons in the new installation
+            echo ""
+            echo "Here is the list of jar files in the new installation 'addons' folder."
+            echo "If there are duplicates, you need to manually remove outdated versions."
+            echo ""
+
+            ls -l $PA_ROOT/default/addons/*.jar
+        fi
+
     fi
     cd $OLD_PWD
 else
     # in case we don't use git
     rsync --info=progress2 -a $OLD_PADIR/{addons,data,config} $PA_ROOT/default/
+fi
+
+if [[ "$OLD_PADIR" != "" ]]; then
+    ln -s -f $OLD_PADIR "$PA_ROOT/previous"
 fi
 
 chown -R $USER:$GROUP $PA_ROOT/$CURRENT_PA_DIR
