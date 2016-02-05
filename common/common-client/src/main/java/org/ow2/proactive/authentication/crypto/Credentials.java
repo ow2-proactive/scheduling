@@ -36,32 +36,19 @@
  */
 package org.ow2.proactive.authentication.crypto;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.security.KeyException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import org.apache.commons.codec.binary.Base64;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+
+import javax.crypto.interfaces.DHPublicKey;
+import java.io.*;
+import java.security.*;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
-import javax.crypto.interfaces.DHPublicKey;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
-import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
-import org.apache.commons.codec.binary.Base64;
 
 
 /**
@@ -85,6 +72,9 @@ import org.apache.commons.codec.binary.Base64;
  */
 @PublicAPI
 public class Credentials implements Serializable {
+
+    // fix for #2456 : Credential Data and TaskLogs contain serialVersionUID based on scheduler server version
+    private static final long serialVersionUID = 1L;
 
     /** Default credentials location */
     private static final String DEFAULT_CREDS = System.getProperty("user.home") + File.separator +

@@ -36,21 +36,20 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.io.IOException;
-import java.util.LinkedList;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.utils.Formatter;
-import org.ow2.proactive.utils.ObjectByteConverter;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.utils.Formatter;
+import org.ow2.proactive.utils.ObjectByteConverter;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import java.io.IOException;
+import java.util.LinkedList;
 
 
 /**
@@ -61,6 +60,9 @@ import org.apache.log4j.spi.LoggingEvent;
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Log4JTaskLogs implements TaskLogs {
+
+    // fix for #2456 : Credential Data and TaskLogs contain serialVersionUID based on scheduler server version
+    private static final long serialVersionUID = 1L;
 
     /** Prefix for job logger */
     public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";
