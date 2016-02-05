@@ -238,7 +238,7 @@ clean.dependsOn cleanScripts
 
 class CustomCreateStartScripts extends CreateStartScripts {
 
-	//We override the generate() method because Gradle adds "bin/" in the classpath by default.
+	//We override the generate() method because Gradle adds "lib/" in the classpath by default.
     @Override
     void generate() {
         
