@@ -36,7 +36,7 @@ buildscript {
             exclude group: 'xml-apis', module: 'xml-apis'
         }
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
-        classpath 'org.ow2.proactive:gradle-serialver:2.1'
+        classpath 'org.ow2.proactive:gradle-serialver:2.2'
         classpath 'org.postgresql:postgresql:9.3-1102-jdbc41'  
         classpath 'org.ajoberstar:gradle-jacoco:0.3.0'
         classpath('org.gradle.api.plugins:gradle-format-plugin:1.1') {
@@ -125,7 +125,7 @@ configure(javaSubprojects) {
     task serialver(type: serialver.InsertSerialVersionUIDTask) {
         serialver = rootProject.serialver
         overwrite = false
-        forceUIDOnThrowable = true
+        forceUIDOnException = true
     }
 
     format {
