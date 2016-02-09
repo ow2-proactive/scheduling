@@ -36,23 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.Policy;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.security.auth.login.LoginException;
-
+import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.*;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarLoader;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -61,8 +49,10 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.PermissionChecker;
@@ -79,23 +69,15 @@ import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfi
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.Tools;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarLoader;
+
+import javax.security.auth.login.LoginException;
+import java.io.*;
+import java.net.*;
+import java.security.KeyException;
+import java.security.Policy;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
@@ -453,13 +435,66 @@ public class RMNodeStarter {
         if (rmURL != null) {
             try {
                 logger.debug("Detecting a network interface to bind the node");
-                String networkInterface = RMConnection.getNetworkInterfaceFor(rmURL);
-                logger.info("Node will be bounded to the following network interface " + networkInterface);
-                CentralPAPropertyRepository.PA_NET_INTERFACE.setValue(networkInterface);
-            } catch (Exception e) {
-                logger.debug("Unable to detect the network interface", e);
+                InetAddress ipAddress = getNetworkInterfaceFor(rmURL);
+                if (ipAddress != null) {
+                    logger.info("Node will be bounded to the following ip address " + ipAddress);
+                } else {
+                    throw new IllegalStateException("No valid IP address found, exiting.");
+                }
+
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException("Unable to detect the network interface", e);
             }
         }
+    }
+
+    /**
+     * Selects a network interface for proactive runtime based on provided url.
+     *
+     * @return the IP address associated with the selected network interface or null if no interface would be found
+     * @throws URISyntaxException    if the given string violates RFC&nbsp;2396,
+     * @throws IllegalStateException if no suitable address was found
+     */
+    public static InetAddress getNetworkInterfaceFor(String url) throws URISyntaxException, IllegalStateException {
+
+        if (url != null && CentralPAPropertyRepository.PA_NET_INTERFACE.getValue() == null &&
+                CentralPAPropertyRepository.PA_NET_NETMASK.getValue() == null && CentralPAPropertyRepository.PA_HOSTNAME != null) {
+            int port;  // use default port for rmi
+            String host;
+            URI parsedUrl = new URI(url);
+            if (parsedUrl.getScheme().equals("pamr")) {
+                // in case of pamr protocol, the url does not connect server:port information
+                if (!PAMRConfig.PA_NET_ROUTER_ADDRESS.isSet()) {
+                    logger.info(PAMRConfig.PA_NET_ROUTER_ADDRESS.getName() + " is not set, trying to connect to a local router.");
+                    host = "localhost";
+                } else {
+                    host = PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue();
+                }
+                if (PAMRConfig.PA_PAMR_SOCKET_FACTORY.getValue().equals("ssh")) {
+                    if (PAMRConfig.PA_PAMRSSH_REMOTE_PORT.isSet()) {
+                        port = PAMRConfig.PA_PAMRSSH_REMOTE_PORT.getValue();
+                    } else {
+                        port = 22;
+                    }
+                } else {
+                    port = PAMRConfig.PA_NET_ROUTER_PORT.getValue();
+                }
+            } else {
+                port = parsedUrl.getPort();
+                if (port == -1) {
+                    // use default port for rmi
+                    port = 1099;
+                }
+                host = parsedUrl.getHost();
+            }
+
+            // Use the fastest connection mechanism to detect the appropriate network interface
+            CentralPAPropertyRepository.PA_NET_FASTEST_CONNECTION.setValue(true);
+            CentralPAPropertyRepository.PA_NET_FASTEST_CONNECTION_SERVER.setValue(host);
+            CentralPAPropertyRepository.PA_NET_FASTEST_CONNECTION_PORT.setValue(port);
+        }
+
+        return ProActiveInet.getInstance().getInetAddress();
     }
 
     private ResourceManager reconnectToResourceManager() {

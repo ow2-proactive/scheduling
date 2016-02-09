@@ -11,12 +11,12 @@ dependencies {
 
     compile project(':common:common-client')
     compile project(':rm:rm-client')
+    compile "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
     runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
 
     // protocols
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
-    runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
     // script engines
     runtime 'org.jruby:jruby-complete:9.0.1.0'
