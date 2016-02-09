@@ -36,10 +36,10 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -50,6 +50,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SimpleTaskLogs implements TaskLogs {
+
+    // fix for #2456 : Credential Data and TaskLogs contain serialVersionUID based on scheduler server version
+    private static final long serialVersionUID = 1L;
 
     // logs on standard output
     private String standardLogs;

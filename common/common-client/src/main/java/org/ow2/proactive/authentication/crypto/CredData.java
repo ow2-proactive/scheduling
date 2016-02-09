@@ -36,11 +36,11 @@
  */
 package org.ow2.proactive.authentication.crypto;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -52,6 +52,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public class CredData implements Serializable {
+
+    // fix for #2456 : Credential Data and TaskLogs contain serialVersionUID based on scheduler server version
+    private static final long serialVersionUID = 1L;
 
     /**
      * thirdPartyCredentials can contain the SSH key used for runAsMe tasks under this specific key

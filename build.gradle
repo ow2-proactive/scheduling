@@ -36,7 +36,7 @@ buildscript {
             exclude group: 'xml-apis', module: 'xml-apis'
         }
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
-        classpath 'org.ow2.proactive:gradle-serialver:2.0'
+        classpath 'org.ow2.proactive:gradle-serialver:2.2'
         classpath 'org.postgresql:postgresql:9.3-1102-jdbc41'  
         classpath 'org.ajoberstar:gradle-jacoco:0.3.0'
         classpath('org.gradle.api.plugins:gradle-format-plugin:1.1') {
@@ -124,6 +124,8 @@ configure(javaSubprojects) {
 
     task serialver(type: serialver.InsertSerialVersionUIDTask) {
         serialver = rootProject.serialver
+        overwrite = false
+        forceUIDOnException = true
     }
 
     format {
@@ -237,18 +239,11 @@ task cleanScripts
 clean.dependsOn cleanScripts
 
 class CustomCreateStartScripts extends CreateStartScripts {
+
+	//We override the generate() method because Gradle adds "lib/" in the classpath by default.
     @Override
     void generate() {
-        org.gradle.api.internal.plugins.StartScriptGenerator.metaClass.'static'.getResource = {name ->
-            if ("windowsStartScript.txt" == name) {
-                new File(project.rootDir, "src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt").newInputStream()
-            } else if ("unixStartScript.txt" == name) {
-                new File(project.rootDir, "src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt").newInputStream()
-            } else {
-                println "Should not be here"
-            }
-        }
-
+        
         def generator = new org.gradle.api.internal.plugins.StartScriptGenerator()
         generator.applicationName = getApplicationName()
         generator.mainClassName = getMainClassName()
@@ -257,6 +252,10 @@ class CustomCreateStartScripts extends CreateStartScripts {
         generator.exitEnvironmentVar = getExitEnvironmentVar()
         generator.classpath = ["dist/lib/*", "addons", "addons/*"]
         generator.scriptRelPath = "bin/${getUnixScript().name}"
+        
+        generator.windowsStartScriptGenerator.template = project.resources.text.fromFile("src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt")
+        generator.unixStartScriptGenerator.template = project.resources.text.fromFile("src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt")
+        
         generator.generateUnixScript(getUnixScript())
         generator.generateWindowsScript(getWindowsScript())
 

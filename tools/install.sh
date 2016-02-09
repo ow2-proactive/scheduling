@@ -22,6 +22,13 @@ else
     echo "This Operating system is not supported by the Proactive installer."; exit 1 ;
 fi
 
+RSYNC_VER=$( rsync --version|grep "protocol version"|awk '{print $6}' )
+
+if [[ $RSYNC_VER -ge 31 ]]; then
+	RSYNC_PROGRESS="--info=progress2"
+else
+	RSYNC_PROGRESS="--progress"
+fi
 
 confirm() {
     # call with a prompt string or use a default
@@ -100,7 +107,7 @@ else
     fi
 fi
 
-rsync --info=progress2 -a $CURRENT_PADIR $PA_ROOT
+rsync $RSYNC_PROGRESS -a $CURRENT_PADIR $PA_ROOT
 
 ln -s -f $PA_ROOT/$PA_FOLDER_NAME "$PA_ROOT/default"
 
@@ -219,7 +226,7 @@ if which git > /dev/null 2>&1; then
         echo "Detected an existing ProActive Scheduler installation at $OLD_PADIR, porting configuration into new installation."
         echo ""
 
-        rsync --info=progress2 -a $OLD_PADIR/addons $PA_ROOT/default/
+        rsync $RSYNC_PROGRESS -a $OLD_PADIR/addons $PA_ROOT/default/
 
         OLD_PADIR_NAME="$(basename "$OLD_PADIR")"
 
@@ -266,7 +273,7 @@ if which git > /dev/null 2>&1; then
     cd $OLD_PWD
 else
     # in case we don't use git
-    rsync --info=progress2 -a $OLD_PADIR/{addons,data,config} $PA_ROOT/default/
+    rsync $RSYNC_PROGRESS -a $OLD_PADIR/{addons,data,config} $PA_ROOT/default/
 fi
 
 if [[ "$OLD_PADIR" != "" ]]; then

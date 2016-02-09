@@ -34,18 +34,16 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
 
 
 @Entity
 @Table(name = "THIRD_PARTY_CREDENTIAL_DATA")
 public class ThirdPartyCredentialData implements Serializable {
+
+    // fix for #2456 : Credential Data and TaskLogs contain serialVersionUID based on scheduler server version
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "USERNAME")
