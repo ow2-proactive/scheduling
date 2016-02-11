@@ -3,8 +3,8 @@
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run the installation script as root" ; exit 1 ; fi
 
 SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
-CURRENT_PADIR="$(dirname "$SCRIPT_DIR")"
-PA_FOLDER_NAME="$(basename "$CURRENT_PADIR")"
+INSTALL_PADIR="$(dirname "$SCRIPT_DIR")"
+PA_FOLDER_NAME="$(basename "$INSTALL_PADIR")"
 OLD_PADIR=
 OS=
 PKG_TOOL=
@@ -32,7 +32,7 @@ fi
 
 confirm() {
     # call with a prompt string or use a default
-    read -r -p "${1:-Are you sure? [Y/n]} " yn
+    read -r -e -p "${1:-Are you sure? [Y/n]} " -i "${2:-y}" yn
     yn=${yn,,}    # tolower
     yn=$(echo $yn | xargs)   # trim
     if [[ $yn =~ ^(yes|y|)$ ]]; then
@@ -54,12 +54,18 @@ fi
 
 # checking java installation
 
-if [[ "$JAVA_HOME" == "" ]]; then
-	if ! which java > /dev/null 2>&1; then
-                if [ ! -f "$CURRENT_PADIR/jre/bin/java" ]; then
-                        echo "JAVA_HOME is not set, no 'java' command could be found in your PATH, and this ProActive distribution does not contain an embedded jre, please install a JRE or JDK." ; exit 1 ;
-                fi
+JAVA_CMD=
+
+if [ ! -f "$INSTALL_PADIR/jre/bin/java" ]; then
+    if [[ "$JAVA_HOME" == "" ]]; then
+	    if ! which java > /dev/null 2>&1; then
+            echo "JAVA_HOME is not set, no 'java' command could be found in your PATH, and this ProActive distribution does not contain an embedded jre, please install a JRE or JDK." ; exit 1 ;
+        else
+            JAVA_CMD=java
         fi
+    else
+        JAVA_CMD="$JAVA_HOME/bin/java"
+    fi
 fi
 
 if ! which git > /dev/null 2>&1; then
@@ -107,7 +113,7 @@ else
     fi
 fi
 
-rsync $RSYNC_PROGRESS -a $CURRENT_PADIR $PA_ROOT
+rsync $RSYNC_PROGRESS -a $INSTALL_PADIR $PA_ROOT
 
 ln -s -f $PA_ROOT/$PA_FOLDER_NAME "$PA_ROOT/default"
 
@@ -122,16 +128,26 @@ read -e -p "Group of the user starting the ProActive service: " -i "proactive" G
 
 GROUP=$(echo $GROUP | xargs)
 
-if confirm "Do you want to create this user? [Y/n] "; then
-    if [ "$GROUP" == "$USER" ]; then
-        useradd $USER -d $PA_ROOT
+id -u "$USER" > /dev/null
+
+if (( $? != 0 )); then
+    echo "The user $USER does not exist. The installation script must create this user."
+    if confirm "Proceed ? [Y/n] "; then
+        if [ "$GROUP" == "$USER" ]; then
+            useradd $USER -d $PA_ROOT
+        else
+            useradd $USER -d $PA_ROOT -g $GROUP
+        fi
+        passwd $USER;
     else
-        useradd $USER -d $PA_ROOT -g $GROUP
+        exit 1
     fi
-    passwd $USER;
+
 fi
 
-chown -R $USER:$GROUP $PA_ROOT/$CURRENT_PA_DIR
+chown $USER:$GROUP $PA_ROOT
+chown $USER:$GROUP $PA_ROOT/default
+chown -R $USER:$GROUP $PA_ROOT/$PA_FOLDER_NAME
 
 
 # Configuration of the service script
@@ -186,6 +202,38 @@ if confirm "Start ProActive Nodes in a single JVM process (y) or multiple JVM Pr
     sed -e "s/^SINGLE_JVM=.*/SINGLE_JVM=true/g"  -i "/etc/init.d/proactive-scheduler"
 fi
 
+echo "Here are the network interfaces available on your machine and the interface which will be automatically selected by ProActive: "
+
+if [[ "$JAVA_CMD" == "" ]]; then
+   JAVA_CMD=$PA_ROOT/default/jre/bin/java
+fi
+
+# Select network interface
+
+NETWORK_OUTPUT=$( $JAVA_CMD -cp "$PA_ROOT/default/dist/lib:$PA_ROOT/default/dist/lib/*" org.objectweb.proactive.core.util.ProActiveInet )
+echo "$NETWORK_OUTPUT"
+
+
+if confirm "Do you want to change the network interface used? [y/N] " "n" ; then
+     ITF_ARRAY=( $( echo "$NETWORK_OUTPUT" | grep -e 'MAC:' | awk '{ print $1 }' ) )
+     echo "Available interfaces : " "${ITF_ARRAY[@]}"
+     ITF_SELECTED=false
+     while  ! $ITF_SELECTED ; do
+        read -e -p "Enter the interface name you want to use: " ITF_NAME
+        ITF_NAME=$(echo $ITF_NAME | xargs)
+
+        if [[ " ${ITF_ARRAY[@]} " =~ " ${ITF_NAME} " ]]; then
+            ITF_SELECTED=true
+        else
+            echo "Interface $ITF_NAME not in the list"
+        fi
+     done
+
+     echo "proactive.net.interface=$ITF_NAME" >> "$PA_ROOT/default/config/network/server.ini"
+     echo "proactive.net.interface=$ITF_NAME" >> "$PA_ROOT/default/config/network/node.ini"
+fi
+
+
 # installation of the proactive-scheduler service
 
 chmod 700 /etc/init.d/proactive-scheduler
@@ -193,7 +241,7 @@ chmod 700 /etc/init.d/proactive-scheduler
 mkdir -p /var/log/proactive
 touch /var/log/proactive/scheduler
 
-chown -R $USER:$USER /var/log/proactive
+chown -R $USER:$GROUP /var/log/proactive
 
 if confirm "Start the proactive-scheduler service at startup? [Y/n] " ; then
     if [[ "$OS" == "RedHat" ]]; then
@@ -202,6 +250,8 @@ if confirm "Start the proactive-scheduler service at startup? [Y/n] " ; then
        update-rc.d proactive-scheduler defaults
     fi
 fi
+
+CONFLICT=false
 
 if which git > /dev/null 2>&1; then
     # Porting of older version configuration and data files
@@ -248,11 +298,18 @@ if which git > /dev/null 2>&1; then
             ROOT_ID=$( git rev-parse old-version/master~$NB_COMMITS)
             MASTER_ID=$( git rev-parse old-version/master )
             echo ""
-            echo "Cherry-picking all changes to new installation, if a conflict occurs, cd to $PA_ROOT/default/config as root and follow the instructions to resolve them."
-            echo "Additionnaly, if a conflict occurs on the file $PA_ROOT/default/config/proactive-scheduler, you will need to manually copy the modified file after conflicts are resolved by using the command:"
-            echo "cp $PA_ROOT/default/config/proactive-scheduler /etc/init.d/"
+            echo "Cherry-picking all changes to new installation"
             echo ""
             git cherry-pick -x ${ROOT_ID}..$MASTER_ID
+
+            if (( $? != 0 )); then
+                echo ""
+                echo "A conflict occurred, cd to $PA_ROOT/default/config and follow the instructions displayed by git to resolve them."
+                echo "Additionnaly, if a conflict occurs on the file $PA_ROOT/default/config/proactive-scheduler,"
+                echo "you will need to manually copy the modified file after conflicts are resolved by using the command:"
+                echo "cp $PA_ROOT/default/config/proactive-scheduler /etc/init.d/"
+                CONFLICT=true
+            fi
         fi
 
         # copy merged changes on the service (if ever a conflict occurs, the user will have to manually copy the merge)
@@ -280,7 +337,18 @@ if [[ "$OLD_PADIR" != "" ]]; then
     ln -s -f $OLD_PADIR "$PA_ROOT/previous"
 fi
 
-chown -R $USER:$GROUP $PA_ROOT/$CURRENT_PA_DIR
+chown -R $USER:$GROUP $PA_ROOT/$PA_FOLDER_NAME
+
+if confirm "Restrict the access to the ProActive installation folder to user $USER ? [Y/n] " ; then
+    # preserve credentials access
+    chmod -R go-rwx $PA_ROOT/$PA_FOLDER_NAME
+fi
+
+if  ! $CONFLICT ; then
+    if confirm "Do you want to start the scheduler service now? [Y/n] " ; then
+        service proactive-scheduler start
+    fi
+fi
 
 
 
