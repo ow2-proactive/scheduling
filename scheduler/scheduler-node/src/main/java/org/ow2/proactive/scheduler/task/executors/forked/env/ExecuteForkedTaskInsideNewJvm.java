@@ -34,17 +34,12 @@
  */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
+import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
-import org.apache.commons.io.FileUtils;
+
+import java.io.*;
 
 public class ExecuteForkedTaskInsideNewJvm {
 
@@ -77,6 +72,9 @@ public class ExecuteForkedTaskInsideNewJvm {
         }
 
         fromForkedJVM(args[0]);
+
+        // Call to System.exit is necessary at this point (when the task is finished normally) as the forked JVM can keep alive non-daemon threads
+        System.exit(0);
     }
 
     private static void fromForkedJVM(String contextPath) {

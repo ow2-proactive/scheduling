@@ -1,36 +1,37 @@
-package org.ow2.proactive.scheduler.task;
+package functionaltests;
 
-import java.io.File;
-import java.security.KeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Collections;
-
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.TestTaskOutput;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.security.*;
+import java.util.Collections;
 
+import static org.junit.Assert.*;
+
+/**
+ * The ForkedTaskExecutorTest executes several scenarios on the ForkedTaskExecutor
+ * As the ForkedTaskExecutor starts a separate JVM, this test is a functionalTest (to avoid leaving alive subprocesses when cancelled)
+ */
 public class ForkedTaskExecutorTest {
 
     @Rule
@@ -138,6 +139,36 @@ public class ForkedTaskExecutorTest {
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
+    }
+
+    /**
+     * This test ensures that the forked JVM exited properly when non-daemon threads are created inside the task
+     *
+     * @throws Exception
+     */
+    @Test(timeout = 30000)
+    public void nonDaemonThreadsForkedJVMExit() throws Exception {
+
+        String taskScript = CharStreams.toString(new InputStreamReader(
+                getClass().getResourceAsStream("/task-nondaemon-thread.groovy"), Charsets.UTF_8));
+
+
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        File workingDir = tmpFolder.newFolder();
+
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(workingDir);
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
+
+        TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
+                        new TaskScript(new SimpleScript(taskScript, "groovy"))),
+                        initializer, null, "", "", "", "", "", "", ""),
+                taskOutput.outputStream,
+                taskOutput.error);
+
+        Assert.assertFalse(result.hadException());
     }
 
     @Test
