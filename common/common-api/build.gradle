@@ -5,7 +5,7 @@ dependencies {
     testRuntime 'org.jruby:jruby-complete:9.0.1.0'
     testRuntime 'org.python:jython-standalone:2.7.0'
     testRuntime 'org.codehaus.groovy:groovy-all:2.4.5'
-    testRuntime 'jsr223:jsr223-nativeshell:0.3'
+    testRuntime 'jsr223:jsr223-nativeshell:0.4'
     testCompile 'junit:junit:4.12'
 }
 
