@@ -23,6 +23,6 @@ dependencies {
     runtime 'org.python:jython-standalone:2.7.0'
 
     runtime 'org.codehaus.groovy:groovy-all:2.4.5'
-    runtime 'jsr223:jsr223-nativeshell:0.4'
+    runtime 'jsr223:jsr223-nativeshell:0.4.1'
     runtime 'jsr223:jsr223-docker-compose:0.0.2'
 }
