@@ -36,18 +36,8 @@
  */
 package functionaltests.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.monitor.RMMonitorsHandler;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -56,6 +46,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.StartNode;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -69,8 +60,13 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.rmi.AlreadyBoundException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -212,12 +208,26 @@ public class RMTHelper {
         return createNode(nodeName, new HashMap<String, String>(), new ArrayList<String>(), pnpPort);
     }
 
+    /**
+     * Create several nodes on the same JVMProcess
+     */
     public List<TestNode> createNodes(final String nodeName, int number) throws IOException, NodeException,
-            ExecutionException, InterruptedException {
-        ArrayList<TestNode> nodes = new ArrayList<>(number);
-        for (int i = 0; i < number; i++) {
-            nodes.add(createNode(nodeName + i, findFreePort()));
+            ExecutionException, InterruptedException, AlreadyBoundException {
+        if (number == 0) {
+            throw new IllegalArgumentException("" + number);
         }
+
+        ArrayList<TestNode> nodes = new ArrayList<>(number);
+        // Start the JVMProcess and create the first node
+        TestNode node0 = createNode(nodeName + 0, findFreePort());
+        nodes.add(0, node0);
+
+        // create all subsequent nodes remotely
+        for (int i = 1; i < number; i++) {
+            Node nodei = node0.getNode().getProActiveRuntime().createLocalNode(nodeName + i, false, null);
+            nodes.add(new TestNode(node0.getNodeProcess(), nodei));
+        }
+
         return nodes;
     }
 
@@ -464,6 +474,21 @@ public class RMTHelper {
      * @throws NodeException if node cannot be looked up
      */
     public static void killNode(String url) throws NodeException {
+        Node node = NodeFactory.getNode(url);
+        try {
+            ProActiveRuntime rt = node.getProActiveRuntime();
+            rt.killNode(node.getNodeInformation().getName());
+        } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * Kills the runtime associated with specified node url
+     *
+     * @param url of the node
+     * @throws NodeException if node cannot be looked up
+     */
+    public static void killRuntime(String url) throws NodeException {
         Node node = NodeFactory.getNode(url);
         try {
             node.getProActiveRuntime().killRT(false);

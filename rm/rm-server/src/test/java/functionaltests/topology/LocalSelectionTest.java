@@ -48,6 +48,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import java.io.File;
 import java.util.Collection;
 
 /**
@@ -76,7 +77,13 @@ public class LocalSelectionTest extends RMFunctionalTest {
 
     @Before
     public void getRM() throws Exception {
-        //rmHelper.startRM(null, TestRM.PA_PNP_PORT, "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5007");
+        String rmconf = new File(
+                PAResourceManagerProperties.getAbsolutePath(getClass()
+                        .getResource(
+                                "/functionaltests/config/functionalTRMPropertiesWithTopology.ini")
+                        .getFile())).getAbsolutePath();
+        rmHelper.startRM(rmconf);
+
         resourceManager = rmHelper.getResourceManager();
 
     }

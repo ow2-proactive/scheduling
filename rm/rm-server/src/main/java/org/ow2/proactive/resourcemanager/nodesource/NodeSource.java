@@ -36,16 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
-import java.security.Permission;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
@@ -78,7 +69,12 @@ import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.apache.log4j.Logger;
+
+import java.security.Permission;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -656,12 +652,12 @@ public class NodeSource implements InitActive, RunActive {
         logger.info("[" + name + "] Detected down node " + nodeUrl);
         Node downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
+            downNodes.put(nodeUrl, downNode);
             try {
                 RMCore.topologyManager.removeNode(downNode);
                 infrastructureManager.internalRemoveNode(downNode);
             } catch (RMException e) {
             }
-            downNodes.put(nodeUrl, downNode);
         }
         rmcore.setDownNode(nodeUrl);
     }

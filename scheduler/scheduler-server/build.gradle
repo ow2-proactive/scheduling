@@ -66,6 +66,9 @@ task dist(type: Copy) {
     from testJar
     into file("$rootDir/dist/lib")
 }
+
+dist.dependsOn project(':rm:rm-server').dist
+
 artifacts {
     archives testJar
 }

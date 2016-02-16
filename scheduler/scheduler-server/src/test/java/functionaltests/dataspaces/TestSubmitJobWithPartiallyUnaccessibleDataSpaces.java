@@ -34,12 +34,8 @@
  */
 package functionaltests.dataspaces;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-import java.nio.charset.Charset;
-
+import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +44,11 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
+import java.nio.charset.Charset;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -81,7 +81,9 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerF
         spaceRoot = tmpFolder.newFolder("space");
         spaceRootUser = new File(spaceRoot, "demo");
         spaceRootUser.mkdirs();
+
         deployer = new FileSystemServerDeployer(spaceRoot.getAbsolutePath(), false);
+        SchedulerTHelper.log("Dataspace started in : " + spaceRoot.getAbsolutePath());
         File inputFile = new File(spaceRootUser, "myfilein1");
         inputFile.createNewFile();
         File propertiesfile = new File(configFile.toURI());

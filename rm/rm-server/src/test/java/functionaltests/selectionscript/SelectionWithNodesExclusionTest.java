@@ -36,11 +36,10 @@
  */
 package functionaltests.selectionscript;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.TestNode;
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -50,13 +49,14 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -83,7 +83,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
+public class SelectionWithNodesExclusionTest extends RMFunctionalTestWithTestNode {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
@@ -221,10 +221,15 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
         String vmPropValue = "myValue";
         vmProperties.put(vmPropKey, vmPropValue);
 
-        String node1URL = rmHelper.createNode(node1Name, vmProperties).getNode().getNodeInformation().getURL();
+        TestNode node1 = rmHelper.createNode(node1Name, vmProperties);
+        testNodes.add(node1);
+
+        String node1URL = node1.getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL);
 
-        String node2URL = rmHelper.createNode(node2Name, vmProperties).getNode().getNodeInformation().getURL();
+        TestNode node2 = rmHelper.createNode(node2Name, vmProperties);
+        testNodes.add(node2);
+        String node2URL = node2.getNode().getNodeInformation().getURL();
         resourceManager.addNode(node2URL);
 
         Thread.sleep(5000);

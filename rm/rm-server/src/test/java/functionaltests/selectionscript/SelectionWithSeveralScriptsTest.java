@@ -36,11 +36,9 @@
  */
 package functionaltests.selectionscript;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.TestNode;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -50,12 +48,14 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -81,7 +81,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class SelectionWithSeveralScriptsTest extends RMFunctionalTest {
+public class SelectionWithSeveralScriptsTest extends RMFunctionalTestWithTestNode {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
@@ -109,8 +109,9 @@ public class SelectionWithSeveralScriptsTest extends RMFunctionalTest {
 
         String vmPropValue2 = "myValue2";
         vmTwoProperties.put(vmPropKey2, vmPropValue2);
-
-        String node1URL = rmHelper.createNode(node1Name, vmTwoProperties).getNode().getNodeInformation()
+        TestNode node1 = rmHelper.createNode(node1Name, vmTwoProperties);
+        testNodes.add(node1);
+        String node1URL = node1.getNode().getNodeInformation()
                 .getURL();
         resourceManager.addNode(node1URL, nodeSourceName);
 
@@ -126,7 +127,9 @@ public class SelectionWithSeveralScriptsTest extends RMFunctionalTest {
         HashMap<String, String> vmProp1 = new HashMap<>();
         vmProp1.put(vmPropKey1, vmPropValue1);
 
-        String node2URL = rmHelper.createNode(node2Name, vmProp1).getNode().getNodeInformation().getURL();
+        TestNode node2 = rmHelper.createNode(node2Name, vmProp1);
+        testNodes.add(node2);
+        String node2URL = node2.getNode().getNodeInformation().getURL();
         resourceManager.addNode(node2URL, nodeSourceName);
 
         //wait node adding event
@@ -141,7 +144,9 @@ public class SelectionWithSeveralScriptsTest extends RMFunctionalTest {
         HashMap<String, String> vmProp2 = new HashMap<>();
         vmProp1.put(vmPropKey2, vmPropValue2);
 
-        String node3URL = rmHelper.createNode(node3Name, vmProp2).getNode().getNodeInformation().getURL();
+        TestNode node3 = rmHelper.createNode(node3Name, vmProp2);
+        testNodes.add(node3);
+        String node3URL = node3.getNode().getNodeInformation().getURL();
         resourceManager.addNode(node3URL, nodeSourceName);
 
         //wait node adding event

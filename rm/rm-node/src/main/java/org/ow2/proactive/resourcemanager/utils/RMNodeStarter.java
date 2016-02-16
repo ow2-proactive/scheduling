@@ -36,23 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.Policy;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.security.auth.login.LoginException;
-
+import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.*;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarLoader;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -79,23 +67,17 @@ import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfi
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Formatter;
 import org.ow2.proactive.utils.Tools;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarLoader;
+
+import javax.security.auth.login.LoginException;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.Policy;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
@@ -126,7 +108,7 @@ public class RMNodeStarter {
     private static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
 
     /** Name of the java property to set the rank */
-    private final static String RANK_PROP_NAME = "proactive.agent.rank";
+    public final static String RANK_PROP_NAME = "proactive.agent.rank";
 
     /** Name of the java property to set the data spaces configuration status */
     public final static String DATASPACES_STATUS_PROP_NAME = "proactive.dataspaces.status";
@@ -150,7 +132,7 @@ public class RMNodeStarter {
     /** to inform that the user supplied a value from the command line for the join rm timeout */
     private static boolean WAIT_ON_JOIN_TIMEOUT_IN_MS_USER_SUPPLIED = false;
     /** Name of the java property to set the timeout value used to join the resource manager */
-    private final static String WAIT_ON_JOIN_PROP_NAME = "proactive.node.joinrm.timeout";
+    public final static String WAIT_ON_JOIN_PROP_NAME = "proactive.node.joinrm.timeout";
 
     /**
      * The ping delay used in RMPinger that pings the RM and exists if the
@@ -160,14 +142,14 @@ public class RMNodeStarter {
     /** to inform that the user supplied a value from the command line for the ping */
     private static boolean PING_DELAY_IN_MS_USER_SUPPLIED = false;
     /** Name of the java property to set the node -> rm ping frequency value */
-    private final static String PING_DELAY_PROP_NAME = "proactive.node.ping.delay";
+    public final static String PING_DELAY_PROP_NAME = "proactive.node.ping.delay";
 
     /** The number of attempts to add the local node to the RM before quitting */
     private static int NB_OF_ADD_NODE_ATTEMPTS = 10;
     /** to inform that the user supplied a value from the command line for the number of "add" attempts */
     private static boolean NB_OF_ADD_NODE_ATTEMPTS_USER_SUPPLIED = false;
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
-    private final static String NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME = "proactive.node.add.attempts";
+    public final static String NB_OF_ADD_NODE_ATTEMPTS_PROP_NAME = "proactive.node.add.attempts";
 
     /** The number of attempts to reconnect the node to the RM before quitting (interval between each attempt is
      * given by {@link #PING_DELAY_IN_MS})
@@ -175,24 +157,24 @@ public class RMNodeStarter {
     protected static int NB_OF_RECONNECTION_ATTEMPTS = 2 * 5; // so 5 minutes by default
 
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
-    private final static String NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME = "proactive.node.reconnection.attempts";
+    public final static String NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME = "proactive.node.reconnection.attempts";
 
     /** The delay, in millis, between two attempts to add a node */
     private static int ADD_NODE_ATTEMPTS_DELAY_IN_MS = 5000;
     /** to inform that the user supplied a value from the command line for the delay between two add attempts*/
     private static boolean ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED = false;
     /** Name of the java property to set the delay between two attempts performed to add a node to the resource manager */
-    private final static String ADD_NODE_ATTEMPTS_DELAY_PROP_NAME = "proactive.node.add.delay";
+    public final static String ADD_NODE_ATTEMPTS_DELAY_PROP_NAME = "proactive.node.add.delay";
     /** Name of the java property to set the node source name */
-    private final static String NODESOURCE_PROP_NAME = "proactive.node.nodesource";
+    public final static String NODESOURCE_PROP_NAME = "proactive.node.nodesource";
 
     private int discoveryTimeoutInMs = 3 * 1000;
-    private final static String DISCOVERY_TIMEOUT_IN_MS_NAME = "proactive.node.discovery.timeout";
+    public final static String DISCOVERY_TIMEOUT_IN_MS_NAME = "proactive.node.discovery.timeout";
     private int discoveryPort = 64739;
-    private final static String DISCOVERY_PORT_NAME = "proactive.node.discovery.port";
+    public final static String DISCOVERY_PORT_NAME = "proactive.node.discovery.port";
 
     private int workers = 1;
-    private final static String NUMBER_OF_WORKERS_PROPERTY_NAME = "proactive.node.workers";
+    public final static String NUMBER_OF_WORKERS_PROPERTY_NAME = "proactive.node.workers";
 
     // the rank of this node
     private int rank;
@@ -354,6 +336,8 @@ public class RMNodeStarter {
 
         configureLogging(nodeName);
 
+        logger.info("Using ProActive configuration file : " + System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()));
+
         selectNetworkInterface();
 
         readAndSetTheRank();
@@ -374,14 +358,23 @@ public class RMNodeStarter {
         connectToResourceManager(nodeName, nodes);
     }
 
-    private List<Node> createNodes(String nodeName) {
-        List<Node> nodes = new ArrayList<>();
-        for (int nodeIndex = 0; nodeIndex < workers; nodeIndex++) {
-            String indexedNodeName = nodeName;
-            if (workers > 1) {
+    public static List<String> getWorkersNodeNames(String baseNodeName, int nbWorkers) {
+        List<String> createdNodeNames = new ArrayList<>(nbWorkers);
+        for (int nodeIndex = 0; nodeIndex < nbWorkers; nodeIndex++) {
+            String indexedNodeName = baseNodeName;
+            if (nbWorkers > 1) {
                 indexedNodeName += "_" + nodeIndex;
             }
-            Node node = createLocalNode(indexedNodeName);
+            createdNodeNames.add(indexedNodeName);
+        }
+        return createdNodeNames;
+    }
+
+    private List<Node> createNodes(String nodeName) {
+        List<Node> nodes = new ArrayList<>();
+        List<String> createdNodeNames = getWorkersNodeNames(nodeName, workers);
+        for (int nodeIndex = 0; nodeIndex < workers; nodeIndex++) {
+            Node node = createLocalNode(createdNodeNames.get(nodeIndex));
             configureForDataSpace(node);
             nodes.add(node);
             logger.debug("URL of node " + nodeIndex + " " + node.getNodeInformation().getURL());
@@ -502,7 +495,16 @@ public class RMNodeStarter {
             if (!rm.setNodeAvailable(url).getBooleanValue()) {
                 if (!rm.nodeIsAvailable(url).getBooleanValue()) {
                     logger.info("Node " + url + " removed");
-                    iterator.remove(); // node removed manually by user
+                    // node removed manually by user
+                    // kill the local worker node
+                    String nodeName = null;
+                    try {
+                        nodeName = node.getNodeInformation().getName();
+                        node.getProActiveRuntime().killNode(nodeName);
+                    } catch (Exception e) {
+                        logger.warn("An exception occurred when killing the local node : " + nodeName);
+                    }
+                    iterator.remove();
                 } else {
                     return false;
                 }
@@ -982,6 +984,7 @@ public class RMNodeStarter {
 
     private RMAuthentication joinResourceManager(String rmURL) {
         // Create the full url to contact the Resource Manager
+        logger.info("Joining Resource Manager at " + rmURL);
         final String fullUrl = rmURL.endsWith("/") ? rmURL + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION
                 : rmURL + "/" + RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
         // Try to join the Resource Manager with a specified timeout
@@ -991,6 +994,7 @@ public class RMNodeStarter {
                 logger.error(ExitStatus.RMAUTHENTICATION_NULL.description);
                 System.exit(ExitStatus.RMAUTHENTICATION_NULL.exitCode);
             }
+            logger.info("Resource Manager joined.");
             return auth;
         } catch (Throwable t) {
             logger.error("Unable to join the Resource Manager at " + rmURL, t);
@@ -1076,6 +1080,7 @@ public class RMNodeStarter {
         String nodeUrl = node.getNodeInformation().getURL();
         String nodeName = node.getNodeInformation().getName();
 
+        logger.info("Adding node " + nodeName + " to Resource Manager.");
         while ((!isNodeAdded) && (attempts < NB_OF_ADD_NODE_ATTEMPTS)) {
             attempts++;
             try {

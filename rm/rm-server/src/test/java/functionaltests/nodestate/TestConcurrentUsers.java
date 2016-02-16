@@ -36,13 +36,8 @@
  */
 package functionaltests.nodestate;
 
-import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Collections;
-
+import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.TestUsers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
@@ -60,8 +55,10 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestUsers;
+import java.util.Collections;
+
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -69,7 +66,7 @@ import functionaltests.utils.TestUsers;
  * @author ProActive team
  *
  */
-public class TestConcurrentUsers extends RMFunctionalTest {
+public class TestConcurrentUsers extends RMFunctionalTestWithTestNode {
 
     @Test
     public void testConcurrency() throws Exception {
@@ -77,7 +74,8 @@ public class TestConcurrentUsers extends RMFunctionalTest {
         ResourceManager resourceManager = rmHelper.getResourceManager();
         String nsName = "TestConcurrentUsers";
         String node1Name = "node1";
-        String node1URL = rmHelper.createNode(node1Name).getNode().getNodeInformation().getURL();
+        testNode = rmHelper.createNode(node1Name);
+        String node1URL = testNode.getNode().getNodeInformation().getURL();
         resourceManager.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), null);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);

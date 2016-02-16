@@ -36,23 +36,13 @@
  */
 package functionaltests.jmx;
 
-import java.io.IOException;
-import java.security.PublicKey;
-import java.util.HashMap;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
+import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestNode;
+import functionaltests.utils.TestUsers;
+import org.junit.After;
+import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -63,11 +53,14 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestUsers;
+import javax.management.*;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import java.io.IOException;
+import java.security.PublicKey;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -79,7 +72,7 @@ import static org.junit.Assert.*;
  * 
  * @author ProActive team
  */
-public final class ResourceManagerJMXTest extends RMFunctionalTest {
+public final class ResourceManagerJMXTest extends RMFunctionalTestWithTestNode {
 
     @Test
     public void action() throws Exception {
@@ -252,7 +245,8 @@ public final class ResourceManagerJMXTest extends RMFunctionalTest {
 
         RMTHelper.log("Test as user 4 - Check RuntimeDataMBean attributes are correct");
         // Start a new node and add it to the rmHelper
-        final Node node = rmHelper.createNode("test").getNode();
+        testNode = rmHelper.createNode("test");
+        final Node node = testNode.getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         rmHelper.getResourceManager().addNode(nodeURL).getBooleanValue(); // force sync, now the node is in configuring state
 

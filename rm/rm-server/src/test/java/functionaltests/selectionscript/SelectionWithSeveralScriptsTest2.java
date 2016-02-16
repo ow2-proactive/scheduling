@@ -36,11 +36,9 @@
  */
 package functionaltests.selectionscript;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.TestNode;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -50,12 +48,14 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -74,7 +74,7 @@ import static org.junit.Assert.*;
  * As a result second node should be selected.
  *
  */
-public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
+public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTestWithTestNode {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 
@@ -99,7 +99,9 @@ public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
         String vmPropValue1 = "myValue1";
         vmProp1.put(vmPropKey1, vmPropValue1);
 
-        String node1URL = rmHelper.createNode(node1Name, vmProp1).getNode().getNodeInformation().getURL();
+        TestNode node1 = rmHelper.createNode(node1Name, vmProp1);
+        testNodes.add(node1);
+        String node1URL = node1.getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL, nodeSourceName);
 
         //wait node adding event
@@ -117,7 +119,9 @@ public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
         String vmPropValue2 = "myValue2";
         vmTwoProperties.put(vmPropKey2, vmPropValue2);
 
-        String node2URL = rmHelper.createNode(node2Name, vmTwoProperties).getNode().getNodeInformation()
+        TestNode node2 = rmHelper.createNode(node2Name, vmTwoProperties);
+        testNodes.add(node2);
+        String node2URL = node2.getNode().getNodeInformation()
                 .getURL();
         resourceManager.addNode(node2URL, nodeSourceName);
 

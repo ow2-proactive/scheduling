@@ -36,11 +36,14 @@
  */
 package functionaltests.rm;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.Properties;
-
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerFunctionalTestWithTestNode;
+import functionaltests.utils.SchedulerTestConfiguration;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -53,18 +56,15 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.examples.EmptyTask;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTestConfiguration;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -74,7 +74,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class TestOperationsWhenUnlinked extends SchedulerFunctionalTest {
+public class TestOperationsWhenUnlinked extends SchedulerFunctionalTestWithTestNode {
 
     static final String TASK_NAME = "Test task";
 
@@ -112,7 +112,8 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTest {
 
         schedulerHelper.startScheduler(false, config.getAbsolutePath(), null, rmUrl);
 
-        String nodeUrl = RMTHelper.createNode("test-node").getNode().getNodeInformation().getURL();
+        testNode = RMTHelper.createNode("test-node");
+        String nodeUrl = testNode.getNode().getNodeInformation().getURL();
         schedulerHelper.getResourceManager().addNode(nodeUrl);
         schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 
@@ -183,7 +184,8 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTest {
 
         rmHelper.startRM(null, 1299);
         ResourceManager rm = rmHelper.getResourceManager();
-        String nodeUrl = RMTHelper.createNode("test-node").getNode().getNodeInformation().getURL();
+        testNode = RMTHelper.createNode("test-node");
+        String nodeUrl = testNode.getNode().getNodeInformation().getURL();
         rm.addNode(nodeUrl);
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
 

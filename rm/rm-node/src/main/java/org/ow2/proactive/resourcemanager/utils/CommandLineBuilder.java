@@ -65,6 +65,7 @@ public final class CommandLineBuilder implements Cloneable {
     private String credentialsValue;
     private String credentialsEnv;
     private String rmHome;
+    private int nbNodes = 1;
     private Properties paPropProperties;
     private List<String> paPropList;
     private OperatingSystem targetOS = OperatingSystem.UNIX;
@@ -126,6 +127,10 @@ public final class CommandLineBuilder implements Cloneable {
 
     public void setRmURL(String rmURL) {
         this.rmURL = rmURL;
+    }
+
+    public void setNumberOfNodes(int nbNodes) {
+        this.nbNodes = nbNodes;
     }
 
     @Deprecated
@@ -325,7 +330,8 @@ public final class CommandLineBuilder implements Cloneable {
             command.add("-" + RMNodeStarter.OPTION_RM_URL);
             command.add(rmurl);
         }
-        command.add("-" + RMNodeStarter.OPTION_WORKERS + "1");
+        command.add("-" + RMNodeStarter.OPTION_WORKERS);
+        command.add("" + nbNodes);
         return command;
     }
 

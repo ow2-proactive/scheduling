@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -27,53 +26,36 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- * ################################################################
- * $ACTIVEEON_INITIAL_DEV$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.utils;
 
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.process.JVMProcess;
+import org.junit.After;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class TestNode {
+public class SchedulerFunctionalTestWithTestNode extends SchedulerFunctionalTest {
 
-    private final JVMProcess nodeProcess;
+    protected TestNode testNode;
 
-    private final Node node;
+    protected List<TestNode> testNodes = new ArrayList<>();
 
-    public TestNode(JVMProcess nodeProcess, Node node) {
-        this.nodeProcess = nodeProcess;
-        this.node = node;
-    }
-
-    public JVMProcess getNodeProcess() {
-        return nodeProcess;
-    }
-
-    public Node getNode() {
-        return node;
-    }
-
-    public String getNodeURL() {
-        return node.getNodeInformation().getURL();
-    }
-
-    public void kill() throws InterruptedException {
-        nodeProcess.stopProcess();
-        nodeProcess.waitFor();
-    }
-
-    public void killNode() throws InterruptedException {
+    @After
+    public void cleanup() {
         try {
-            node.getProActiveRuntime().killNode(node.getNodeInformation().getName());
-        } catch (ProActiveException e) {
-
+            testNode.kill();
+        } catch (InterruptedException e) {
+        }
+        for (TestNode tn : testNodes) {
+            try {
+                tn.kill();
+            } catch (InterruptedException e) {
+            }
         }
     }
 }

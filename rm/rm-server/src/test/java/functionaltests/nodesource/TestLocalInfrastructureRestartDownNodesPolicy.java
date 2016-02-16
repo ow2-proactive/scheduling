@@ -36,8 +36,10 @@
  */
 package functionaltests.nodesource;
 
-import java.io.File;
-
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -50,12 +52,10 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolic
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -66,6 +66,10 @@ import static org.junit.Assert.*;
 public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalTest {
 
     protected int defaultDescriptorNodesNb = 3;
+
+    ResourceManager resourceManager;
+
+    String nodeSourceName;
 
     protected void createNodeSourceWithNodes(String sourceName, Object[] policyParameters) throws Exception {
 
@@ -82,22 +86,36 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }
 
-    @Test
-    public void action() throws Exception {
-        String source1 = "Node_source_1";
+    @Before
+    public void setup() throws Exception {
+        resourceManager = rmHelper.getResourceManager();
+    }
 
-        ResourceManager resourceManager = rmHelper.getResourceManager();
+    public void cleanup() {
+        try {
+            resourceManager.removeNodeSource(nodeSourceName, true);
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    public void testRestartDownNodesPolicyWithNullParams() throws Exception {
         RMTHelper.log("Test 0 - create down nodes policy with null parameters (null is a valid input)");
-        createNodeSourceWithNodes("Node_source_0", null);
+        nodeSourceName = "Node_source_0";
+        createNodeSourceWithNodes(nodeSourceName, null);
 
         RMState stateTest0 = resourceManager.getState();
         assertEquals(defaultDescriptorNodesNb, stateTest0.getTotalNodesNumber());
         assertEquals(defaultDescriptorNodesNb, stateTest0.getFreeNodesNumber());
+    }
 
-        resourceManager.removeNodeSource("Node_source_0", true);
+    @Test
+    public void testRestartDownNodesPolicy() throws Exception {
+        nodeSourceName = "Node_source_1";
 
         RMTHelper.log("Test 1 - restart down nodes policy");
-        createNodeSourceWithNodes(source1, new Object[] { "ALL", "ALL", "10000" });
+        createNodeSourceWithNodes(nodeSourceName, new Object[]{"ALL", "ALL", "10000"});
 
         RMState stateTest1 = resourceManager.getState();
         assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
@@ -110,7 +128,8 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         }
 
         String nodeUrl = ns.get(0).getNodeInformation().getURL();
-        rmHelper.killNode(nodeUrl);
+        // Nodes will be redeployed only if we kill the whole runtime
+        rmHelper.killRuntime(nodeUrl);
 
         RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeUrl);
 
@@ -122,5 +141,64 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
 
         assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
         assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalAliveNodesNumber());
+    }
+
+
+    /**
+     * This test ensures that when a node has been manually removed it is not redeployed by the policy
+     */
+    @Test
+    public void testRestartDownNodesPolicyWithRemoveNode() throws Exception {
+        nodeSourceName = "Node_source_2";
+
+        RMTHelper.log("Test 2 - restart down nodes policy with a node removed");
+        createNodeSourceWithNodes(nodeSourceName, new Object[]{"ALL", "ALL", "10000"});
+
+        RMState stateTest1 = resourceManager.getState();
+        assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
+        assertEquals(defaultDescriptorNodesNb, stateTest1.getFreeNodesNumber());
+
+        NodeSet ns = resourceManager.getNodes(new Criteria(defaultDescriptorNodesNb));
+
+        for (Node n : ns) {
+            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+        }
+
+        // remove the first node
+        Node nodeToRemove = ns.remove(0);
+        resourceManager.removeNode(nodeToRemove.getNodeInformation().getURL(), true);
+
+        rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, nodeToRemove.getNodeInformation().getURL());
+
+        RMTHelper.log("Node removed.");
+
+        stateTest1 = resourceManager.getState();
+        assertEquals(defaultDescriptorNodesNb - 1, stateTest1.getTotalNodesNumber());
+
+        String nodeUrl = ns.get(0).getNodeInformation().getURL();
+        // Nodes will be redeployed only if we kill the whole runtime
+        rmHelper.killRuntime(nodeUrl);
+
+        // one node is down - the policy should detect it and redeploy
+        for (int i = 0; i < defaultDescriptorNodesNb - 1; i++) {
+            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, ns.get(i).getNodeInformation().getURL());
+        }
+
+        RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeUrl);
+
+        assertEquals(NodeState.DOWN, ev.getNodeState());
+
+
+        // one node is down - the policy should detect it and redeploy
+        for (int i = 0; i < defaultDescriptorNodesNb - 1; i++) {
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
+
+        // now one node less should be deployed
+        assertEquals(defaultDescriptorNodesNb - 1, stateTest1.getTotalNodesNumber());
+        assertEquals(defaultDescriptorNodesNb - 1, stateTest1.getTotalAliveNodesNumber());
     }
 }

@@ -1,16 +1,7 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.IOException;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.process.ProcessExecutor;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -18,7 +9,16 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.Tools;
+
+import java.io.IOException;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class LocalInfrastructure extends InfrastructureManager {
@@ -31,24 +31,16 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")
     private int maxNodes = DEFAULT_NODE_NUMBER;
     // number of nodes which can still be acquired
-    private AtomicInteger atomicMaxNodes;
+    private AtomicInteger acquiredNodes;
+    private AtomicInteger lostNodes;
+    private AtomicInteger handledNodes;
+    private AtomicBoolean commandLineStarted;
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     private int nodeTimeout = DEFAULT_TIMEOUT;
     @Configurable(description = "Additional ProActive properties")
     private String paProperties = "";
 
-    /** To link a nodeName with its process */
-    private Hashtable<String, ProcessExecutor> nodeNameToProcess;
-    /**
-     * To link a deploying node url with a boolean, used to notify deploying
-     * node removal
-     */
-    private Hashtable<String, Boolean> isDeployingNodeLost;
-    /**
-     * Notifies the acquisition loop that the node has been acquired and that it
-     * can exit the loop
-     */
-    private Hashtable<String, Boolean> isNodeAcquired;
+    private transient ProcessExecutor processExecutor;
 
     public LocalInfrastructure() {
     }
@@ -60,35 +52,27 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireAllNodes() {
-        while (this.atomicMaxNodes.getAndDecrement() >= 1) {
-            this.nodeSource.executeInParallel(new Runnable() {
-                public void run() {
-                    LocalInfrastructure.this.acquireNodeImpl();
-                }
-            });
-        }
-        // one decremented once too many
-        this.atomicMaxNodes.getAndIncrement();
-        logger.debug("Cannot acquire more nodes");
+        this.acquireNode();
     }
 
     @Override
     public void acquireNode() {
-        if (this.atomicMaxNodes.getAndDecrement() >= 1) {
+        if (this.commandLineStarted.compareAndSet(false, true)) {
             this.nodeSource.executeInParallel(new Runnable() {
                 public void run() {
-                    LocalInfrastructure.this.acquireNodeImpl();
+                    LocalInfrastructure.this.startNodeProcess();
                 }
             });
         } else {
-            // one decremented once too many
-            this.atomicMaxNodes.getAndIncrement();
-            logger.warn("Cannot acquire a new node");
+            logger.debug("Cannot acquire more nodes");
         }
     }
 
-    private void acquireNodeImpl() {
-        String nodeName = "local-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
+    private void startNodeProcess() {
+        acquiredNodes.set(0);
+        lostNodes.set(0);
+
+        String baseNodeName = "local-" + this.nodeSource.getName();
         OperatingSystem os = OperatingSystem.UNIX;
         // assuming no cygwin, windows or the "others"...
         if (System.getProperty("os.name").contains("Windows")) {
@@ -120,51 +104,66 @@ public class LocalInfrastructure extends InfrastructureManager {
             Collections.addAll(paPropList, this.paProperties.split(" "));
         }
         clb.setPaProperties(paPropList);
-        clb.setNodeName(nodeName);
+        clb.setNodeName(baseNodeName);
+        clb.setNumberOfNodes(handledNodes.get());
         try {
             clb.setCredentialsValueAndNullOthers(new String(this.credentials.getBase64()));
         } catch (KeyException e) {
-            createLostNode(nodeName, "Cannot decrypt credentials value", e);
+            createLostNodes(baseNodeName, "Cannot decrypt credentials value", e);
             return;
         }
         List<String> cmd;
         try {
             cmd = clb.buildCommandLineAsList(false);
         } catch (IOException e) {
-            createLostNode(nodeName, "Cannot build command line", e);
+            createLostNodes(baseNodeName, "Cannot build command line", e);
             return;
         }
 
         // The printed cmd with obfuscated credentials
         final String obfuscatedCmd = Tools.join(cmd, " ");
 
-        String depNodeURL = null;
-        ProcessExecutor processExecutor;
+        List<String> depNodeURLs = new ArrayList<>(handledNodes.get());
         try {
-            this.isNodeAcquired.put(nodeName, false);
-            depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, "Node launched locally",
-                    this.nodeTimeout);
+            List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseNodeName, handledNodes.get());
+            for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
+                String depNodeURL = this.addDeployingNode(createdNodeNames.get(nodeIndex), obfuscatedCmd, "Node launched locally",
+                        this.nodeTimeout);
+                depNodeURLs.add(depNodeURL);
+            }
 
             // Deobfuscate the cred value
             Collections.replaceAll(cmd, CommandLineBuilder.OBFUSC, clb.getCredentialsValue());
 
-            this.isDeployingNodeLost.put(depNodeURL, false);
-            processExecutor = new ProcessExecutor(nodeName, cmd, false, true);
+            processExecutor = new ProcessExecutor(baseNodeName, cmd, false, true);
             processExecutor.start();
 
-            this.nodeNameToProcess.put(nodeName, processExecutor);
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (processExecutor != null && !processExecutor.isProcessFinished()) {
+                        processExecutor.killProcess();
+                    }
+                }
+            }));
+
+            logger.info("Local Nodes command started : " + obfuscatedCmd);
+
         } catch (IOException e) {
             String lf = System.lineSeparator();
-            String mess = "Cannot launch rm node " + nodeName + lf + Utils.getStacktrace(e);
-            this.declareDeployingNodeLost(depNodeURL, mess);
+            String mess = "Cannot launch rm node " + baseNodeName + lf + Utils.getStacktrace(e);
+            for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
+                this.declareDeployingNodeLost(depNodeURLs.get(nodeIndex), mess);
+            }
+            if (processExecutor != null) {
+                cleanProcess();
+            }
             return;
         }
 
         // watching process
         int threshold = 10;
-        Boolean isLost, isAcquired;
-        while (((isLost = this.isDeployingNodeLost.get(depNodeURL)) != null) && !isLost &&
-            ((isAcquired = this.isNodeAcquired.get(nodeName)) != null) && !isAcquired) {
+        while (!allNodesAcquiredOrLost()) {
             if (processExecutor.isProcessFinished()) {
                 int exit = processExecutor.getExitCode();
                 if (exit != 0) {
@@ -174,11 +173,12 @@ public class LocalInfrastructure extends InfrastructureManager {
                     String out = Tools.join(processExecutor.getOutput(), "\n");
                     String err = Tools.join(processExecutor.getErrorOutput(), "\n");
                     message += "stdout: " + out + lf + "stderr: " + err;
-                    this.declareDeployingNodeLost(depNodeURL, message);
+                    for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
+                        this.declareDeployingNodeLost(depNodeURLs.get(nodeIndex), message);
+                    }
                 }
-                // nodeNameToProcess will be clean up when exiting the loop
             } else {
-                logger.debug("Waiting for node " + nodeName + " acquisition");
+                logger.debug("Waiting for nodes " + baseNodeName + " acquisition");
             }
             try {
                 Thread.sleep(500);
@@ -191,17 +191,14 @@ public class LocalInfrastructure extends InfrastructureManager {
             }
         }
 
-        logger.debug("Local Infrastructure manager exits watching loop for node " + nodeName);
-        logNodeOutput(nodeName + " stdout: ", processExecutor.getOutput());
-        logNodeOutput(nodeName + " stderr: ", processExecutor.getErrorOutput());
+        logger.debug("Local Infrastructure manager exits watching loop for nodes " + baseNodeName);
+        logNodeOutput(baseNodeName + " stdout: ", processExecutor.getOutput());
+        logNodeOutput(baseNodeName + " stderr: ", processExecutor.getErrorOutput());
 
-        if (isLost) {
+        if (allNodesLost()) {
             // clean up the process
-            processExecutor.killProcess();
-            this.nodeNameToProcess.remove(nodeName);
+            cleanProcess();
         }
-        this.isDeployingNodeLost.remove(depNodeURL);
-        this.isNodeAcquired.remove(nodeName);
     }
 
     private void logNodeOutput(final String prefix, List<String> nodeOutputLines) {
@@ -221,14 +218,34 @@ public class LocalInfrastructure extends InfrastructureManager {
      * @param e
      *            the cause
      */
-    private void createLostNode(String name, String message, Throwable e) {
-        this.isNodeAcquired.remove(name);
-        String lf = System.lineSeparator();
-        String url = super.addDeployingNode(name, "deployed as daemon",
-                "Deploying a new windows azure insance", this.nodeTimeout);
-        String st = Utils.getStacktrace(e);
-        super.declareDeployingNodeLost(url, message + lf + st);
+    private void createLostNodes(String baseName, String message, Throwable e) {
+        List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseName, handledNodes.get());
+        for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
+            String name = createdNodeNames.get(nodeIndex);
+            String lf = System.lineSeparator();
+            String url = super.addDeployingNode(name, "deployed as daemon",
+                    "Deploying a local infrastructure node", this.nodeTimeout);
+            String st = Utils.getStacktrace(e);
+            super.declareDeployingNodeLost(url, message + lf + st);
+        }
     }
+
+    private boolean allNodesAcquiredOrLost() {
+        return (acquiredNodes.get() + lostNodes.get()) == handledNodes.get();
+    }
+
+    private boolean allNodesLost() {
+        return lostNodes.get() == handledNodes.get();
+    }
+
+    private void cleanProcess() {
+        if (processExecutor != null) {
+            processExecutor.killProcess();
+            commandLineStarted.set(false);
+            processExecutor = null;
+        }
+    }
+
 
     /**
      * args[0] = credentials args[1] = max nodes args[2] = timeout args[3] = pa
@@ -236,9 +253,6 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     @Override
     protected void configure(Object... args) {
-        this.isDeployingNodeLost = new Hashtable<>();
-        this.nodeNameToProcess = new Hashtable<>();
-        this.isNodeAcquired = new Hashtable<>();
         int index = 0;
         try {
             this.credentials = Credentials.getCredentialsBase64((byte[]) args[index++]);
@@ -248,10 +262,14 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         try {
             this.maxNodes = Integer.parseInt(args[index++].toString());
-            this.atomicMaxNodes = new AtomicInteger(this.maxNodes);
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot determine max node");
         }
+
+        this.acquiredNodes = new AtomicInteger(0);
+        this.lostNodes = new AtomicInteger(0);
+        this.commandLineStarted = new AtomicBoolean(false);
+        this.handledNodes = new AtomicInteger(maxNodes);
 
         try {
             this.nodeTimeout = Integer.parseInt(args[index++].toString());
@@ -267,27 +285,33 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
-        // notifies the watching loop to exit... it will clean
-        // isDeployingNodeLost & isNodeAcquired collections up.
-        this.isDeployingNodeLost.put(pnURL, true);
+        this.lostNodes.incrementAndGet();
     }
 
     @Override
     protected void notifyAcquiredNode(Node arg0) throws RMException {
-        this.isNodeAcquired.put(arg0.getNodeInformation().getName(), true);
+        this.acquiredNodes.incrementAndGet();
     }
 
     @Override
     public void removeNode(Node node) throws RMException {
-        String nodeName = node.getNodeInformation().getName();
-        logger.debug("Removing node " + node.getNodeInformation().getURL() + " from infrastructure");
-        this.atomicMaxNodes.incrementAndGet();
-        ProcessExecutor proc = this.nodeNameToProcess.remove(nodeName);
-        if (proc != null) {
-            proc.killProcess();
-            logger.info("Process associated to node " + nodeName + " destroyed");
-        } else {
-            logger.warn("No process associated to node " + nodeName);
+        logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " + this.getClass().getSimpleName());
+
+        if (!this.nodeSource.getDownNodes().contains(node)) {
+            // the node was manually removed
+            handledNodes.decrementAndGet();
+        }
+
+        int remainingNodesCount = this.acquiredNodes.decrementAndGet();
+        // If there is no remaining node, kill the JVM process
+        if (remainingNodesCount == 0 && commandLineStarted.get()) {
+            if (processExecutor != null) {
+                processExecutor.killProcess();
+            }
+            commandLineStarted.set(false);
+            // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
+            logger.info("Process associated with node source " + nodeSource.getName() + " destroyed");
+
         }
     }
 

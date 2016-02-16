@@ -36,15 +36,11 @@
  */
 package functionaltests.jmx.account;
 
-import java.security.PublicKey;
-import java.util.HashMap;
-
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
+import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -58,12 +54,14 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.utils.Criteria;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestUsers;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import java.security.PublicKey;
+import java.util.HashMap;
 
 
 /**
@@ -78,7 +76,7 @@ import functionaltests.utils.TestUsers;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetDownRemoveTest extends RMFunctionalTest {
+public final class AddGetDownRemoveTest extends RMFunctionalTestWithTestNode {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -110,7 +108,8 @@ public final class AddGetDownRemoveTest extends RMFunctionalTest {
         // ADD, GET, DOWN, REMOVE
         // 1) ADD
         final String name = "AddGetDownRemoveTest";
-        Node node = rmHelper.createNode(name).getNode();
+        testNode = rmHelper.createNode(name);
+        Node node = testNode.getNode();
         final String nodeURL = node.getNodeInformation().getURL();
         r.addNode(nodeURL).getBooleanValue();
 
@@ -130,7 +129,7 @@ public final class AddGetDownRemoveTest extends RMFunctionalTest {
 
         // 3) Kill the node to ensure that the RM considers it as being DOWN
         try {
-            node.getProActiveRuntime().killRT(false);
+            node.getProActiveRuntime().killNode(node.getNodeInformation().getName());
         } catch (Exception e) {
         }
         while (r.nodeIsAvailable(nodeURL).getBooleanValue()) {

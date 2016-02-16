@@ -367,7 +367,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             results.addAll(globResults);
             results.addAll(userResults);
 
-            ArrayList<Future> transferFutures = new ArrayList<>();
+            ArrayList<Future<Boolean>> transferFutures = new ArrayList<>();
             for (DataSpacesFileObject dsfo : results) {
                 String relativePath;
                 if (inResults.contains(dsfo)) {
@@ -392,11 +392,19 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                         public Boolean call() throws FileSystemException {
                             logger.info("Copying " + finaldsfo.getRealURI() + " to " + SCRATCH.getRealURI() +
                                     "/" + finalRelativePath);
-                            SCRATCH
-                                    .resolveFile(finalRelativePath)
+                            DataSpacesFileObject finalOut = SCRATCH.resolveFile(finalRelativePath);
+                            finalOut
                                     .copyFrom(
                                             finaldsfo,
                                             FileSelector.SELECT_SELF);
+
+                            if (!finalOut.exists()) {
+                                logger.error("There was a problem during the copy of " + finaldsfo.getRealURI() + " to " + finalOut.getRealURI() +
+                                        "/" + finalRelativePath + ". File not present after copy.");
+                                logDataspacesStatus("There was a problem during the copy of " + finaldsfo.getRealURI() + " to " + finalOut.getRealURI() +
+                                                "/" + finalRelativePath + ". File not present after copy.",
+                                        DataspacesStatusLevel.ERROR);
+                            }
                             return true;
                         }
                     }));
@@ -407,7 +415,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
             StringBuilder exceptionMsg = new StringBuilder();
             String nl = System.lineSeparator();
-            for (Future f : transferFutures) {
+            for (Future<Boolean> f : transferFutures) {
                 try {
                     f.get();
                 } catch (InterruptedException | ExecutionException e) {
