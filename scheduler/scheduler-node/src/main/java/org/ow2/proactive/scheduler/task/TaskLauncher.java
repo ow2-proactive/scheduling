@@ -36,17 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.io.Serializable;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Stopwatch;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
@@ -72,8 +63,13 @@ import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
-import com.google.common.base.Stopwatch;
-import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.Serializable;
+import java.security.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -132,7 +128,7 @@ public class TaskLauncher implements InitActive {
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
-        logger.info("Task started");
+        logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
 
         WallTimer wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
 
@@ -218,12 +214,11 @@ public class TaskLauncher implements InitActive {
         } finally {
             progressFileReader.stop();
             taskLogger.close();
-            removeShutdownHook();
-            terminate();
-
             if (dataspaces != null) {
                 dataspaces.cleanScratchSpace();
             }
+            removeShutdownHook();
+            terminate();
         }
     }
 

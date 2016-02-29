@@ -36,12 +36,10 @@
  */
 package functionaltests.job.workingdir;
 
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-import java.nio.file.Path;
-
-import org.objectweb.proactive.api.PAActiveObject;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -57,17 +55,17 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.FileLock;
-import org.apache.commons.io.FileUtils;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.nio.file.Path;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.ow2.proactive.utils.FileUtils.createTempDirectory;
 
 
-public class TestForkedTaskWorkingDir extends SchedulerFunctionalTest {
+public class TestForkedTaskWorkingDir extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void input_files_are_in_working_dir_for_forked_tasks() throws Throwable {

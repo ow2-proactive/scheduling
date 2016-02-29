@@ -36,7 +36,7 @@
  */
 package functionaltests.nodestate;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestNode;
 import org.junit.Test;
@@ -77,14 +77,14 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class TestAdminAddingNodes extends RMFunctionalTestWithTestNode {
+public class TestAdminAddingNodes extends RMFunctionalTest {
 
     @Test
     public void testAddNodes() throws Exception {
 
         final String NS_NAME = "TestAdminAddingNodes";
 
-        int pingFrequency = 8000;
+        int pingFrequency = 6000;
         ResourceManager resourceManager = rmHelper.getResourceManager();
         resourceManager.createNodeSource(NS_NAME, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), null);
@@ -120,6 +120,7 @@ public class TestAdminAddingNodes extends RMFunctionalTestWithTestNode {
         assertEquals(0, resourceManager.getState().getFreeNodesNumber());
 
         log("Test 3 : add a node, kill this node, node is detected down, and add a node that has the same URL");
+        // Test seems to have a race condition at this step
         String node2Name = "node2";
         TestNode testNode2 = RMTHelper.createNode(node2Name);
         testNodes.add(testNode2);
@@ -167,7 +168,7 @@ public class TestAdminAddingNodes extends RMFunctionalTestWithTestNode {
         resourceManager.setNodeSourcePingFrequency(Integer.MAX_VALUE, NS_NAME);
 
         //wait the end of last ping sequence
-        Thread.sleep(12000);
+        Thread.sleep(pingFrequency * 2);
 
         //node2 is free, kill the node
         testNode2.kill();

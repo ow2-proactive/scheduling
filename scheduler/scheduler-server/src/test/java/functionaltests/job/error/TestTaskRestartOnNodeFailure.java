@@ -36,9 +36,10 @@
  */
 package functionaltests.job.error;
 
-import functionaltests.utils.SchedulerFunctionalTestWithTestNode;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestNode;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -67,7 +68,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithTestNode {
+public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     private static final long TIMEOUT = 60000;
 
@@ -84,12 +85,22 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithTes
 
     }
 
-    @Test
-    public void testRestart() throws Exception {
-        schedulerHelper.startScheduler(false, new File(SchedulerTHelper.class.getResource(
+    /**
+     * Starts an scheduler in non-fork mode with an empty rm
+     *
+     * @throws Exception
+     */
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper = new SchedulerTHelper(false, new File(SchedulerTHelper.class.getResource(
                         "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath(),
                 null,
                 null);
+    }
+
+    @Test
+    public void testRestart() throws Exception {
+
 
         FileLock fileLock = new FileLock();
         testTaskKillNode(fileLock, false);

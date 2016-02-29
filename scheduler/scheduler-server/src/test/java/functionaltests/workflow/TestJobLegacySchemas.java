@@ -36,20 +36,19 @@
  */
 package functionaltests.workflow;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.URL;
+
+import static functionaltests.utils.SchedulerTHelper.log;
 
 
 /**
@@ -65,7 +64,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.4.0
  */
-public class TestJobLegacySchemas extends SchedulerFunctionalTest {
+public class TestJobLegacySchemas extends SchedulerFunctionalTestWithRestart {
 
     private static String[] jobDescriptorsLoc = { "3_0/Job_Schemas.xml", "3_1/Job_Schemas.xml",
             "3_2/Job_Schemas.xml" };
@@ -88,7 +87,7 @@ public class TestJobLegacySchemas extends SchedulerFunctionalTest {
             Job testJob = JobFactory.getFactory().createJob(jobDescPath);
             // This line prints the debug information of the job, checking that no toString method produces a NPE
             log(testJob.display());
-            schedulerHelper.testJobSubmissionAndVerifyAllResults(jobDescPath);
+            schedulerHelper.testJobSubmission(jobDescPath);
         }
     }
 

@@ -36,21 +36,16 @@
  */
 package functionaltests.workflow.nativetask;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -72,7 +67,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestJobNativeSubmission extends SchedulerFunctionalTest {
+public class TestJobNativeSubmission extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testJobNativeSubmission() throws Throwable {

@@ -36,12 +36,7 @@
  */
 package functionaltests.workflow.nativetask;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -56,7 +51,7 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.*;
 
 
 /**
@@ -67,7 +62,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @since ProActive Scheduling 3.4
  */
 @Ignore // localspace is current folder
-public class TestNativeTaskPaths extends SchedulerFunctionalTest {
+public class TestNativeTaskPaths extends SchedulerFunctionalTestNoRestart {
 
     private static final String OutVarsFileC = "outvarsc";
     private static final String OutVarsFileD = "outvarsd";

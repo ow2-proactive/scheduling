@@ -36,11 +36,15 @@
  */
 package functionaltests.rm.nodesource;
 
-import java.io.File;
-import java.util.ArrayList;
-
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestUsers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -54,21 +58,25 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.junit.Test;
 
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestUsers;
+import java.io.File;
+import java.util.ArrayList;
 
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
-public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTest {
+public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     protected int defaultDescriptorNodesNb = 1;
     private RMTHelper rmHelper;
+
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        RMFactory.setOsJavaProperty();
+        schedulerHelper = new SchedulerTHelper(true, true);
+    }
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
@@ -112,9 +120,6 @@ public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTest {
 
     @Test
     public void action() throws Exception {
-        RMFactory.setOsJavaProperty();
-
-        schedulerHelper.startSchedulerWithEmptyResourceManager();
 
         // creating node source with the scheduler aware policy
         log("Phase 2 - creating the node source");
@@ -126,12 +131,12 @@ public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTest {
         schedulerHelper.killScheduler();
 
         // starting the RM
-        ResourceManager resourceManager = startRMPreservingDB();
+        RMMonitorEventReceiver resourceManager = (RMMonitorEventReceiver) startRMPreservingDB();
 
         // the resource manager should try to recover the node source
         // but it will fail because the scheduler does not exist
         log("Phase 4 - checking the number of nodesources");
-        ArrayList<RMNodeSourceEvent> nodeSources = resourceManager.getMonitoring().getState().getNodeSource();
+        ArrayList<RMNodeSourceEvent> nodeSources = resourceManager.getInitialState().getNodeSource();
 
         assertEquals(0, nodeSources.size());
 

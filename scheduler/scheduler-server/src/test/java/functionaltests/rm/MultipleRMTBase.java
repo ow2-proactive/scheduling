@@ -1,5 +1,14 @@
 package functionaltests.rm;
 
+import functionaltests.utils.TestRM;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.tests.ProActiveTest;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,15 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
-
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.tests.ProActiveTest;
-import functionaltests.utils.TestRM;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
 
 
 public class MultipleRMTBase extends ProActiveTest {

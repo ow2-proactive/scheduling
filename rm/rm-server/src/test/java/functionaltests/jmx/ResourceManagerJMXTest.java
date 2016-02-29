@@ -36,12 +36,9 @@
  */
 package functionaltests.jmx;
 
-import functionaltests.RMFunctionalTestWithTestNode;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestNode;
 import functionaltests.utils.TestUsers;
-import org.junit.After;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -72,7 +69,7 @@ import static org.junit.Assert.*;
  * 
  * @author ProActive team
  */
-public final class ResourceManagerJMXTest extends RMFunctionalTestWithTestNode {
+public final class ResourceManagerJMXTest extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

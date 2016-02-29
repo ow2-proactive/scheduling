@@ -34,36 +34,39 @@
  */
 package functionaltests.jmx;
 
-import java.security.PublicKey;
-import java.util.Collections;
-
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
+import org.junit.After;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.util.RMListenerProxy;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestUsers;
+import java.security.PublicKey;
+import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 
 public class RMProxyUserInterfaceTest extends RMFunctionalTest {
 
     private static final String EXISTING_OBJECT_NAME = "java.lang:type=Runtime";
 
+    private RMListenerProxy proxyUserInterface;
+
     // SCHEDULING-1850
     @Test
     public void testGetNodeMBeanInfo_DisconnectionOfRemovedNodeSource() throws Exception {
-        RMListenerProxy proxyUserInterface = createRMCachingProxyUserInterface();
+        proxyUserInterface = createRMCachingProxyUserInterface();
 
         rmHelper.createNodeSource("NodeSource1", 1);
 
-        RMInitialState state = rmHelper.getResourceManager().getMonitoring().getState();
+        RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
         String nodeSource1_NodeJmxUrl = state.getNodesEvents().get(0).getDefaultJMXUrl();
 
         Object mBeanFromNodeSource1 = proxyUserInterface.getNodeMBeanInfo(nodeSource1_NodeJmxUrl,
@@ -76,7 +79,7 @@ public class RMProxyUserInterfaceTest extends RMFunctionalTest {
 
         rmHelper.createNodeSource("NodeSource2", 1);
 
-        state = rmHelper.getResourceManager().getMonitoring().getState();
+        state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
         String nodeSource2_NodeJmxUrl = state.getNodesEvents().get(0).getDefaultJMXUrl();
 
         Object mBeanFromNodeSource2 = proxyUserInterface.getNodeMBeanInfo(nodeSource2_NodeJmxUrl,
@@ -87,6 +90,19 @@ public class RMProxyUserInterfaceTest extends RMFunctionalTest {
         // cleanup
         rmHelper.getResourceManager().removeNodeSource("NodeSource2", true);
     }
+
+    @After
+    public void cleanUp() {
+        if (proxyUserInterface != null) {
+            try {
+                proxyUserInterface.disconnect();
+            } catch (Exception ignored) {
+
+            }
+            PAActiveObject.terminateActiveObject(proxyUserInterface, true);
+        }
+    }
+
 
     private RMListenerProxy createRMCachingProxyUserInterface() throws Exception {
         RMListenerProxy proxyUserInterface = PAActiveObject.newActive(RMListenerProxy.class, new Object[] {});

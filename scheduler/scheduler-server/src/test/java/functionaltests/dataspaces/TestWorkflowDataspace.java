@@ -36,12 +36,9 @@
  */
 package functionaltests.dataspaces;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.workflow.JobWorkflowDataspace;
+import functionaltests.workflow.TWorkflowJobs;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -53,9 +50,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.workflow.JobWorkflowDataspace;
-import functionaltests.workflow.TWorkflowJobs;
+import java.io.*;
 
 
 /**
@@ -64,7 +59,7 @@ import functionaltests.workflow.TWorkflowJobs;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowDataspace extends SchedulerFunctionalTest {
+public class TestWorkflowDataspace extends SchedulerFunctionalTestWithRestart {
 
     @Test
     public void testWorkflowDataspace() throws Throwable {

@@ -1,25 +1,20 @@
 package functionaltests.job.taskkill;
 
-import java.io.Serializable;
-import java.util.List;
-
+import functionaltests.utils.DebugHelper;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.junit.Ignore;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.DebugHelper;
+import java.io.Serializable;
+import java.util.List;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -31,7 +26,7 @@ import static org.junit.Assert.*;
  * 
  * To simulate node hanging it suspends node using java debug interface.
  */
-public class TestKillWhenNodeHangs extends SchedulerFunctionalTest {
+public class TestKillWhenNodeHangs extends SchedulerFunctionalTestWithRestart {
 
     public static class SleepForeverTask extends JavaExecutable {
         @Override

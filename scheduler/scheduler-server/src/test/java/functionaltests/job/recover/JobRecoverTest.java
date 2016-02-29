@@ -36,7 +36,7 @@
  */
 package functionaltests.job.recover;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.utils.SchedulerTHelper;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -66,7 +66,7 @@ import static com.google.common.truth.Truth.assertThat;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class JobRecoverTest extends SchedulerFunctionalTest {
+public class JobRecoverTest extends SchedulerFunctionalTestWithRestart {
 
     @Test
     public void run() throws Throwable {

@@ -34,12 +34,12 @@
  */
 package functionaltests.dataspaces;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
@@ -61,23 +61,23 @@ import static org.junit.Assert.assertTrue;
  *
  * @author The ProActive Team
  */
-public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerFunctionalTest {
+public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-    URL jobDescriptor = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
+    static URL jobDescriptor = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpacePartiallyUnacc.xml");
 
-    URL configFile = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
+    static URL configFile = TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/schedulerPropertiesPartiallyUnaccessibleSpaces.ini");
-    File spaceRoot;
-    File spaceRootUser;
+    static File spaceRoot;
+    static File spaceRootUser;
 
-    @Rule
-    public TemporaryFolder tmpFolder = new TemporaryFolder();
+    @ClassRule
+    static public TemporaryFolder tmpFolder = new TemporaryFolder();
 
-    FileSystemServerDeployer deployer;
+    static FileSystemServerDeployer deployer;
 
-    @Before
-    public void before() throws Throwable {
+    @BeforeClass
+    public static void before() throws Throwable {
         spaceRoot = tmpFolder.newFolder("space");
         spaceRootUser = new File(spaceRoot, "demo");
         spaceRootUser.mkdirs();
@@ -91,13 +91,13 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerF
         String newContent = propContent.replace("$$TOREPLACE$$", deployer.getVFSRootURL());
         FileUtils.writeStringToFile(propertiesfile, newContent);
 
-        schedulerHelper.startScheduler(propertiesfile.getAbsolutePath());
+        schedulerHelper = new SchedulerTHelper(true, propertiesfile.getAbsolutePath());
     }
 
     @Test
     public void testSubmitJobWithPartiallyUnaccessibleDataSpaces() throws Throwable {
 
-        schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+        schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
 
         File lastoutputFile = new File(spaceRootUser, "myfileout4");
@@ -106,7 +106,6 @@ public class TestSubmitJobWithPartiallyUnaccessibleDataSpaces extends SchedulerF
 
     @After
     public void after() throws Throwable {
-        schedulerHelper.killScheduler();
         if (deployer != null) {
             deployer.terminate();
         }

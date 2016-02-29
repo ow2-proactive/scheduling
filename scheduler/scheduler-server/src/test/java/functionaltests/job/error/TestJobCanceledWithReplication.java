@@ -36,34 +36,27 @@
  */
 package functionaltests.job.error;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.junit.Test;
+import org.objectweb.proactive.utils.StackTraceUtil;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.examples.FailTaskConditionally;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
-import org.junit.Test;
-import org.objectweb.proactive.utils.StackTraceUtil;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.examples.FailTaskConditionally;
-
-import functionaltests.utils.SchedulerFunctionalTest;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
  * This class tests the cancelJobOnError feature of a task together with task
- * replication. It will start task1, which is an ordinary task, and task2, which
+ * replication. It will start task2, which
  * has "cancelJobOnError" attribute set to true and is also replicated with
  * factor 3 (tesk2replicate and task2merge are necessary because for replication
- * to work). Tasks task1, task2 and task2*2 will sleep for 30 seconds, task2*1
+ * to work). Tasks task2 and task2*2 will sleep for 10 seconds, task2*1
  * will throw an exception after 3 seconds. We check that the job is canceled
  * and that it is possible to retrieve the result of the faulty task (the
  * exception which caused the failure).
@@ -71,7 +64,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.1
  */
-public class TestJobCanceledWithReplication extends SchedulerFunctionalTest {
+public class TestJobCanceledWithReplication extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestJobCanceledWithReplication.class
             .getResource("/functionaltests/descriptors/Job_Aborted_With_Replication.xml");
@@ -108,7 +101,7 @@ public class TestJobCanceledWithReplication extends SchedulerFunctionalTest {
 
         Map<String, TaskResult> results = res.getAllResults();
 
-        assertEquals("The number of results should be 2 (task2replicate and task2*1)", 2, results.size());
+        assertTrue("The number of results should be 2 [task2replicate, task2*1] but was " + results.size() + " : " + results, 2 == results.size());
         assertNotNull("Faulty task result should be an exception", results.get(faultyTaskName).getException
           ());
 

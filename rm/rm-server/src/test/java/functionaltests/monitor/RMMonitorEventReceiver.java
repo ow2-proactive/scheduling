@@ -37,16 +37,17 @@
 package functionaltests.monitor;
 
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
+import org.ow2.proactive.resourcemanager.common.event.*;
+import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
+import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
 import static functionaltests.utils.RMTHelper.log;
 
 
 @ActiveObject
-public class RMMonitorEventReceiver extends RMGroupEventListener {
+public class RMMonitorEventReceiver extends RMProxyUserInterface {
 
     private RMMonitorsHandler monitorsHandler;
 
@@ -56,26 +57,46 @@ public class RMMonitorEventReceiver extends RMGroupEventListener {
     public RMMonitorEventReceiver() {
     }
 
-    /**
-     * @param monitor SchedulerMonitorsHandler object which is notified
-     * of Schedulers events.
-     */
     public RMMonitorEventReceiver(RMMonitorsHandler monitor) {
         this.monitorsHandler = monitor;
     }
 
+
     public void nodeEvent(RMNodeEvent event) {
-        log("Event: " + event);
+        log("RM Event [last: " + counter + "]: " + event);
         monitorsHandler.handleNodeEvent(event);
+        super.nodeEvent(event);
     }
 
     public void nodeSourceEvent(RMNodeSourceEvent event) {
-        log("Event: " + event);
+        log("RM Event [last: " + counter + "]: " + event);
         monitorsHandler.handleNodesourceEvent(event);
+        super.nodeSourceEvent(event);
     }
 
     public void rmEvent(RMEvent event) {
-        log("Event: " + event);
+        log("RM Event: [last: " + counter + "]: " + event);
         monitorsHandler.handleSchedulerStateEvent(event.getEventType());
+        super.rmEvent(event);
+    }
+
+
+    @Override
+    public RMMonitoring getMonitoring() {
+        throw null;
+    }
+
+    public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events) {
+        return super.getMonitoring().addRMEventListener(listener, events);
+    }
+
+    public void removeRMEventListener() throws RMException {
+        monitorsHandler.clear();
+        counter = 0;
+        super.getMonitoring().removeRMEventListener();
+    }
+
+    public RMInitialState getInitialState() {
+        return super.getMonitoring().getState();
     }
 }

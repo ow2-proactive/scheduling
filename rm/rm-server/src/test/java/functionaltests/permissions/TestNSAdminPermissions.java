@@ -36,7 +36,7 @@
  */
 package functionaltests.permissions;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestNode;
 import functionaltests.utils.TestUsers;
@@ -68,7 +68,7 @@ import static org.junit.Assert.fail;
  *  admin and nsadmin are in the same group ("nsadmins")
  *
  */
-public class TestNSAdminPermissions extends RMFunctionalTestWithTestNode {
+public class TestNSAdminPermissions extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

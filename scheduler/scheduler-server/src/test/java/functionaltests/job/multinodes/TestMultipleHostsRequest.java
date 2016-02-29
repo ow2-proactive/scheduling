@@ -36,27 +36,21 @@
  */
 package functionaltests.job.multinodes;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerTHelper;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.File;
+import java.net.URL;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -66,7 +60,7 @@ import functionaltests.utils.SchedulerTHelper;
  *
  * @author The ProActive Team
  */
-public class TestMultipleHostsRequest extends SchedulerFunctionalTest {
+public class TestMultipleHostsRequest extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestMultipleHostsRequest.class
             .getResource("/functionaltests/descriptors/Job_native_4_hosts.xml");

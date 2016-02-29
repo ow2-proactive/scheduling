@@ -36,7 +36,7 @@
  */
 package functionaltests.selectionscript;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.TestNode;
 import org.junit.Assert;
 import org.junit.Test;
@@ -83,7 +83,7 @@ import static org.junit.Assert.assertEquals;
  * @author ProActive team
  *
  */
-public class SelectionWithNodesExclusionTest extends RMFunctionalTestWithTestNode {
+public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 

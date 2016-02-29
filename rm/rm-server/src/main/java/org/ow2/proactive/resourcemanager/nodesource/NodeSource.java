@@ -232,7 +232,7 @@ public class NodeSource implements InitActive, RunActive {
                 timeStamp = System.currentTimeMillis();
 
                 if (delta > pingFrequency) {
-                    logger.info("[" + name + "] Pinging alive nodes");
+                    logger.info("[" + name + "] Pinging alive nodes : " + getAliveNodes().size());
                     for (Node node : getAliveNodes()) {
                         pingNode(node);
                     }

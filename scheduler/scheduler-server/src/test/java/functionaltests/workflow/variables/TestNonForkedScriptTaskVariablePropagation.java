@@ -36,36 +36,26 @@
  */
 package functionaltests.workflow.variables;
 
+import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Before;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-
-
-public class TestNonForkedScriptTaskVariablePropagation extends SchedulerFunctionalTest {
+public class TestNonForkedScriptTaskVariablePropagation extends SchedulerFunctionalTestNonForkedModeNoRestart {
     private static final long five_minutes = 5 * 60 * 1000;
 
-    private String jobDescPath;
-
-    @Before
-    public void setup() throws Exception {
-        String configPath = absolutePath(
-          SchedulerTHelper.class.getResource("/functionaltests/config/scheduler-nonforkedscripttasks.ini"));
-        jobDescPath = absolutePath(TestNonForkedScriptTaskVariablePropagation.class
-                .getResource("/functionaltests/descriptors/Job_variable_propagation_with_non_forked_script_task.xml"));
-        schedulerHelper.startScheduler(configPath);
-    }
+    private static String jobDescPath;
 
     @Test(timeout = five_minutes)
     public void propagateVariables_byNonForkedScriptTask_shouldSucceed() throws Throwable {
-        schedulerHelper.testJobSubmissionAndVerifyAllResults(jobDescPath);
+        jobDescPath = absolutePath(TestNonForkedScriptTaskVariablePropagation.class
+                .getResource("/functionaltests/descriptors/Job_variable_propagation_with_non_forked_script_task.xml"));
+        schedulerHelper.testJobSubmission(jobDescPath);
     }
 
-    private String absolutePath(URL url) throws Exception {
+    private static String absolutePath(URL url) throws Exception {
         return (new File(url.toURI())).getAbsolutePath();
     }
 }

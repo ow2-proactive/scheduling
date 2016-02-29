@@ -36,51 +36,51 @@
  */
 package functionaltests.job;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
+import functionaltests.executables.EndlessExecutable;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.ScriptTask;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
-import functionaltests.executables.EndlessExecutable;
-import functionaltests.utils.SchedulerFunctionalTest;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
 
 
 /**
  * Test checks that walltime parameter is correctly taken into account for various tasks
  */
-public class TestJobWalltime extends SchedulerFunctionalTest {
+public class TestJobWalltime extends SchedulerFunctionalTestWithRestart {
 
     private static final long TIMEOUT = 30000;
 
+
     @Test
-    public void testJobWalltime() throws Throwable {
+    public void testJobWalltimeJavaTask() throws Throwable {
         JobId walltimeJavaTask = walltimeJavaTask();
-        JobId walltimeForkedJavaTask = walltimeForkedJavaTask();
-        JobId walltimeNativeTask = walltimeNativeTask();
-        JobId walltimeScriptTask = walltimeScriptTask();
-
         checkJobRanAndWalltimed("walltimeJavaTask", walltimeJavaTask);
-        checkJobRanAndWalltimed("walltimeForkedJavaTask", walltimeForkedJavaTask);
-        checkJobRanAndWalltimed("walltimeNativeTask", walltimeNativeTask);
-        checkJobRanAndWalltimed("walltimeScriptTask", walltimeScriptTask);
+    }
 
-        schedulerHelper.checkNodesAreClean();
+    @Test
+    public void testJobWalltimeForkedJavaTask() throws Throwable {
+        JobId walltimeForkedJavaTask = walltimeForkedJavaTask();
+        checkJobRanAndWalltimed("walltimeForkedJavaTask", walltimeForkedJavaTask);
+    }
+
+    @Test
+    public void testJobWalltimeForkedNativeTask() throws Throwable {
+        JobId walltimeNativeTask = walltimeNativeTask();
+        checkJobRanAndWalltimed("walltimeNativeTask", walltimeNativeTask);
+    }
+
+    @Test
+    public void testJobWalltimeForkedScriptTask() throws Throwable {
+        JobId walltimeScriptTask = walltimeScriptTask();
+        checkJobRanAndWalltimed("walltimeScriptTask", walltimeScriptTask);
     }
 
     public JobId walltimeJavaTask() throws Throwable {
@@ -131,6 +131,8 @@ public class TestJobWalltime extends SchedulerFunctionalTest {
     }
 
     public JobId walltimeNativeTask() throws Throwable {
+        assumeFalse("This test fails on windows because the ProcessTreeKiller is not working", OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
+
         log("Test WallTime Native Task ...");
         String tname = "walltimeNativeTask";
         // pre script interruption

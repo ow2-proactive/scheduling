@@ -36,7 +36,7 @@
  */
 package functionaltests.selectionscript;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.TestNode;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
@@ -74,7 +74,7 @@ import static org.junit.Assert.assertEquals;
  * As a result second node should be selected.
  *
  */
-public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTestWithTestNode {
+public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
 
     private URL vmPropSelectionScriptpath = this.getClass().getResource("vmPropertySelectionScript.groovy");
 

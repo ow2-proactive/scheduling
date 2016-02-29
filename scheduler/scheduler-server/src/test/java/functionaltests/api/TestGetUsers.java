@@ -36,32 +36,31 @@
  */
 package functionaltests.api;
 
-import java.util.List;
-
+import functionaltests.executables.EmptyExecutable;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.executables.EmptyExecutable;
-import functionaltests.utils.TestUsers;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
  * Sanity test against method 'Scheduler.getUsers' and 'Scheduler.getUsersWithJobs'.
  *
  */
-public class TestGetUsers extends SchedulerFunctionalTest {
+public class TestGetUsers extends SchedulerFunctionalTestNoRestart {
 
     long testStartTime = System.currentTimeMillis();
 
     @Test
     public void test() throws Exception {
-        schedulerHelper.killScheduler(); // make sure we get a clean state
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
         List<SchedulerUserInfo> users;

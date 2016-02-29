@@ -1,7 +1,7 @@
 package functionaltests.job;
 
-import java.io.Serializable;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -10,11 +10,10 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.Serializable;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -24,7 +23,7 @@ import static org.junit.Assert.*;
  * - before task was restarted job is killed
  *
  */
-public class TestTaskNotRestarted extends SchedulerFunctionalTest {
+public class TestTaskNotRestarted extends SchedulerFunctionalTestWithRestart {
 
     public static class TestJavaTask extends JavaExecutable {
         @Override

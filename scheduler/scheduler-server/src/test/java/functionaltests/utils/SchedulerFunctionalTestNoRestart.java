@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -29,30 +28,29 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
+ *  Contributor(s):
  *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionaltests.scripts.selection;
+package functionaltests.utils;
 
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
-import org.junit.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
-import java.io.File;
-import java.net.URL;
+/**
+ * Test which either reuses an existing scheduler or start a new one with the default configuration
+ */
+public class SchedulerFunctionalTestNoRestart extends SchedulerFunctionalTest {
 
 
-public class TestJobSelScriptSubmission extends SchedulerFunctionalTestNoRestart {
-
-    private static URL jobDescriptor = TestJobSelScriptSubmission.class
-            .getResource("/functionaltests/descriptors/Job_with_select_script.xml");
-
-    @Test
-    public void testJobSelScriptSubmission() throws Throwable {
-        schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI())
-                .getAbsolutePath());
-        schedulerHelper.checkNodesAreClean();
+    @BeforeClass
+    public static void doNotStartSchedulerIfNotNeeded() throws Exception {
+        SchedulerTHelper.log("Start the scheduler only if needed");
+        schedulerHelper = new SchedulerTHelper(false);
     }
 
+    @AfterClass
+    public static void noRestartCleanup() throws Exception {
+        cleanupScheduler();
+    }
 }

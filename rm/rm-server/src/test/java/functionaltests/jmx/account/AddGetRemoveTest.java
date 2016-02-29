@@ -36,7 +36,7 @@
  */
 package functionaltests.jmx.account;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.TestUsers;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
@@ -74,7 +74,7 @@ import static org.junit.Assert.assertTrue;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetRemoveTest extends RMFunctionalTestWithTestNode {
+public final class AddGetRemoveTest extends RMFunctionalTest {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -82,7 +82,7 @@ public final class AddGetRemoveTest extends RMFunctionalTestWithTestNode {
     @Test
     public void action() throws Exception {
 
-        final ResourceManager r = rmHelper.getResourceManager();
+        final ResourceManager rm = rmHelper.getResourceManager();
         // The username and thr password must be the same a used to connect to the RM
         final String adminLogin = TestUsers.TEST.username;
         final String adminPassword = TestUsers.TEST.password;
@@ -111,20 +111,20 @@ public final class AddGetRemoveTest extends RMFunctionalTestWithTestNode {
         testNode = rmHelper.createNode("test");
         Node node = testNode.getNode();
         final String nodeURL = node.getNodeInformation().getURL();
-        r.addNode(nodeURL).getBooleanValue();
+        rm.addNode(nodeURL).getBooleanValue();
         //we eat the configuring to free
         rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeURL);
         rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeURL);
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();
-        r.getAtMostNodes(1, null).get(0);
+        rm.getAtMostNodes(1, null).get(0);
 
         // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);
 
         // 3) REMOVE  
-        r.removeNode(nodeURL, true).getBooleanValue();
+        rm.removeNode(nodeURL, true).getBooleanValue();
         final long getRemoveMaxDuration = System.currentTimeMillis() - beforeGetTime;
 
         // Refresh the account manager

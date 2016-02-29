@@ -36,19 +36,20 @@
  */
 package functionaltests.utils;
 
-import java.util.concurrent.TimeUnit;
-
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.tests.ProActiveTest;
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.tests.ProActiveTest;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.fail;
 
 
 /**
@@ -60,29 +61,58 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     protected static final Logger logger = Logger.getLogger("SchedulerTests");
 
-    protected SchedulerTHelper schedulerHelper;
+    protected static SchedulerTHelper schedulerHelper;
+
+    protected TestNode testNode;
+
+    protected List<TestNode> testNodes = new ArrayList<>();
+
 
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
         TimeUnit.MILLISECONDS);
 
-    @Before
-    public void startSchedulerIfNeeded() throws Exception {
-        schedulerHelper = new SchedulerTHelper();
-    }
-
-    @After
-    public void killAllProcessesIfNeeded() throws Exception {
-        schedulerHelper.removeExtraNodes();
-
-        try {
-            schedulerHelper.disconnect(); // in case user has changed during test
-        } catch (NotConnectedException alreadyDisconnected) {
-        }
-    }
 
     protected Job parseXml(String workflowFile) throws JobCreationException {
         return Jobs.parseXml(getClass().getResource(workflowFile).getPath());
+    }
+
+    /**
+     * Kill all standalone nodes created by the test
+     */
+    @After
+    public void killTestNodes() {
+        try {
+            if (testNode != null) {
+                testNode.kill();
+            }
+        } catch (InterruptedException e) {
+        }
+        for (TestNode tn : testNodes) {
+            try {
+                tn.kill();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    /**
+     * Remove the "extra" node source and checks that the number of alive nodes after the test is the default
+     *
+     * @throws Exception
+     */
+    public static void cleanupScheduler() throws Exception {
+        if (schedulerHelper.isStarted()) {
+            SchedulerTHelper.log("Do not kill the scheduler after test, but clean extra nodes.");
+            schedulerHelper.removeExtraNodeSource();
+
+            int numberOfNodesAfterTest = schedulerHelper.getResourceManager().listAliveNodeUrls().size();
+            if (schedulerHelper.getResourceManager().listAliveNodeUrls().size() != RMTHelper.DEFAULT_NODES_NUMBER) {
+                SchedulerTHelper.log("Unexpected number of nodes after test : " + numberOfNodesAfterTest + ", scheduler will be restarted and test declared failing.");
+                schedulerHelper.killScheduler();
+                fail("Unexpected number of nodes after test : " + numberOfNodesAfterTest);
+            }
+        }
     }
 
 }

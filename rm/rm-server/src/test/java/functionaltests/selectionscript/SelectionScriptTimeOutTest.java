@@ -36,7 +36,7 @@
  */
 package functionaltests.selectionscript;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -65,7 +65,7 @@ import static org.junit.Assert.assertEquals;
  * @author ProActice team
  *
  */
-public class SelectionScriptTimeOutTest extends RMFunctionalTestWithTestNode {
+public class SelectionScriptTimeOutTest extends RMFunctionalTest {
 
     private URL selectionScriptWithtimeOutPath = this.getClass().getResource(
             "selectionScriptWithtimeOut.groovy");

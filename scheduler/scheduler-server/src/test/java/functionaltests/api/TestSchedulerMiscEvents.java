@@ -36,17 +36,16 @@
  */
 package functionaltests.api;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.UserType;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.UserType;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -57,7 +56,7 @@ import functionaltests.utils.UserType;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestSchedulerMiscEvents extends SchedulerFunctionalTest {
+public class TestSchedulerMiscEvents extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testSchedulerMiscEvents() throws Throwable {

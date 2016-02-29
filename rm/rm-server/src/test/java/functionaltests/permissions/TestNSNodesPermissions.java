@@ -36,7 +36,7 @@
  */
 package functionaltests.permissions;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestNode;
 import functionaltests.utils.TestUsers;
@@ -62,7 +62,7 @@ import static org.junit.Assert.assertEquals;
  *  private AccessType userAccessType = AccessType.ALL;
  *
  */
-public class TestNSNodesPermissions extends RMFunctionalTestWithTestNode {
+public class TestNSNodesPermissions extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {

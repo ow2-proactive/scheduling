@@ -36,7 +36,7 @@
  */
 package functionaltests.topology;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -77,9 +77,8 @@ import java.util.List;
  * RM distrib path as well as jdk path must be the same on all machines.
  *
  */
-//build -DdistantHost="bound.inria.fr" -DneighborHost="eon1.inria.fr" -Dtest="**/*SelectionTest*" junit.rmHelper
 @Ignore("requires several machines")
-public class SelectionTest extends RMFunctionalTestWithTestNode {
+public class SelectionTest extends RMFunctionalTest {
 
     private String vmPropSelectionScriptpath = this.getClass().getResource(
             "/functionaltests/selectionscript/vmPropertySelectionScript.groovy").getPath();

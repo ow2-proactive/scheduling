@@ -32,34 +32,28 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionaltests;
+package functionaltests.utils;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestNode;
-import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
-public class RMFunctionalTestWithTestNode extends RMFunctionalTest {
+/**
+ * Test which either reuses an existing scheduler with non-forked mode task configuration or starts a new one
+ */
+public class SchedulerFunctionalTestNonForkedModeNoRestart extends SchedulerFunctionalTest {
 
-    // For tests which use a single test node (separate JVM process)
-    protected TestNode testNode;
 
-    // For tests which use multiple test nodes (separate JVM processes)
-    protected List<TestNode> testNodes = new ArrayList<>();
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper.log("Start Scheduler in non-fork mode.");
+        schedulerHelper = new SchedulerTHelper(false, new File(SchedulerFunctionalTest.class.getResource(
+                "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+    }
 
-    @After
-    public void cleanup() {
-        try {
-            testNode.kill();
-        } catch (Exception e) {
-        }
-        for (TestNode tn : testNodes) {
-            try {
-                tn.kill();
-            } catch (Exception e) {
-            }
-        }
+    @AfterClass
+    public static void noRestartCleanup() throws Exception {
+        cleanupScheduler();
     }
 }

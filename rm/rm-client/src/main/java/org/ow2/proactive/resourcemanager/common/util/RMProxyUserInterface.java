@@ -36,19 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.common.util;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import javax.management.AttributeList;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MBeanInfo;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -65,6 +52,12 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+
+import javax.management.*;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -97,15 +90,6 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
      */
     public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4) {
         return target.createNodeSource(arg0, arg1, arg2, arg3, arg4);
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#disconnect()
-     */
-    public BooleanWrapper disconnect() {
-        BooleanWrapper r = target.disconnect();
-        PAActiveObject.terminateActiveObject(true);
-        return r;
     }
 
     /**

@@ -36,9 +36,14 @@
  */
 package functionaltests.rm;
 
-import java.net.URI;
-import java.util.ArrayList;
-
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestRM;
+import functionaltests.utils.TestUsers;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -54,18 +59,13 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.core.rmproxies.SingleConnectionRMProxiesManager;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestRM;
-import functionaltests.utils.TestUsers;
+import java.net.URI;
+import java.util.ArrayList;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class TestRMProxyRebind extends MultipleRMTBase {
@@ -75,6 +75,9 @@ public class TestRMProxyRebind extends MultipleRMTBase {
     private Credentials schedulerProxyCredentials;
     private TestRM helper1;
     private TestRM helper2;
+    private ResourceManager rm1;
+    private ResourceManager rm2;
+    private RMMonitorEventReceiver eventReceiver;
 
     @Before
     public void initCredentials() throws Exception {
@@ -86,8 +89,18 @@ public class TestRMProxyRebind extends MultipleRMTBase {
 
     @After
     public void stopRMs() throws Exception {
+        if (rm1 != null) {
+            PAFuture.waitFor(rm1.shutdown(true));
+        }
+        if (rm2 != null) {
+            PAFuture.waitFor(rm2.shutdown(true));
+        }
         helper1.kill();
         helper2.kill();
+
+        if (eventReceiver != null) {
+            PAActiveObject.terminateActiveObject(eventReceiver, true);
+        }
     }
 
     @Test
@@ -106,14 +119,14 @@ public class TestRMProxyRebind extends MultipleRMTBase {
                         .parseDomain(TestUsers.DEMO.username), TestUsers.DEMO.password), helper1.getAuth()
                         .getPublicKey());
 
-        ResourceManager rm1 = helper1.getAuth().login(connectedUserCreds);
+        rm1 = helper1.getAuth().login(connectedUserCreds);
         RMMonitorsHandler monitorsHandler1 = listenEvents(rm1);
         RMTHelper.createNodeSource(NODES_NUMBER, new ArrayList<String>(), rm1, monitorsHandler1);
 
         helper2.start(config2.getAbsolutePath(), rmiPort2,
                 PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort2);
 
-        ResourceManager rm2 = helper2.getAuth().login(connectedUserCreds);
+        rm2 = helper2.getAuth().login(connectedUserCreds);
 
         RMMonitorsHandler monitorsHandler2 = listenEvents(rm2);
 
@@ -156,7 +169,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
          * 	(shared instance between event receiver and static helpers).
          */
         RMMonitorEventReceiver passiveEventReceiver = new RMMonitorEventReceiver(monitorsHandler1);
-        RMMonitorEventReceiver eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
+        eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
         PAFuture.waitFor(rm.getMonitoring().addRMEventListener(eventReceiver));
         return monitorsHandler1;
     }
@@ -227,7 +240,9 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         assertEquals(NODES_NUMBER - 2, proxiesManager.getRmProxy().getState().getFreeNodesNumber());
 
         log("Kill RM1");
+        PAFuture.waitFor(rm1.shutdown(true));
         helper1.kill();
+        rm1 = null;
 
         assertEquals(NODES_NUMBER - 2, proxiesManager.getRmProxy().getState().getFreeNodesNumber());
         assertTrue(proxiesManager.getRmProxy().isActive().getBooleanValue());

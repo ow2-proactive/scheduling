@@ -36,19 +36,11 @@
  */
 package functionaltests.jmx;
 
-import java.security.PublicKey;
-import java.util.HashMap;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
@@ -61,12 +53,13 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.TestUsers;
+import javax.management.*;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import java.security.PublicKey;
+import java.util.HashMap;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.*;
@@ -77,11 +70,10 @@ import static org.junit.Assert.*;
  * 
  * @author ProActive team
  */
-public final class SchedulerJMXTest extends SchedulerFunctionalTest {
+public final class SchedulerJMXTest extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void action() throws Exception {
-        schedulerHelper.killScheduler();
 
         final String userLogin = TestUsers.DEMO.username;
         final String userPassword = TestUsers.DEMO.password;

@@ -36,12 +36,12 @@
  */
 package functionaltests.job.log;
 
-import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.spi.LoggingEvent;
+import org.junit.*;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -54,15 +54,12 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -77,13 +74,20 @@ import org.junit.Test;
  *
  * @author ProActive team
  */
-public class TestListenJobLogs extends SchedulerFunctionalTest {
+public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     static final long LOG_EVENT_TIMEOUT = 30000;
 
     static final String TASK_NAME1 = "TestTask1";
 
     static final String TASK_NAME2 = "TestTask2";
+
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper = new SchedulerTHelper(true, new File(SchedulerTHelper.class.getResource(
+                "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+
+    }
 
     public static class CommunicationObject {
 
@@ -171,8 +175,6 @@ public class TestListenJobLogs extends SchedulerFunctionalTest {
 
     @Test
     public void test() throws Exception {
-        schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
-                "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
         testLogs();
     }

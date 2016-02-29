@@ -34,6 +34,8 @@
  */
 package functionaltests.credentials;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -41,13 +43,11 @@ import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import functionaltests.utils.SchedulerFunctionalTest;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 
-public class TestThirdPartyCredentialsDefined extends SchedulerFunctionalTest {
+public class TestThirdPartyCredentialsDefined extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testThatCredentialsAreCreatedIfThirdPartyCredentialHaveBeenDefined() throws Exception {

@@ -36,19 +36,18 @@
  */
 package functionaltests.workflow.variables;
 
-import static functionaltests.utils.SchedulerTHelper.setExecutable;
-import static org.objectweb.proactive.utils.OperatingSystem.unix;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
 
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Test;
-import org.objectweb.proactive.utils.OperatingSystem;
-
-import functionaltests.utils.SchedulerFunctionalTest;
+import static functionaltests.utils.SchedulerTHelper.setExecutable;
+import static org.objectweb.proactive.utils.OperatingSystem.unix;
 
 
-public class TestModifyPropagatedVariables extends SchedulerFunctionalTest {
+public class TestModifyPropagatedVariables extends SchedulerFunctionalTestNoRestart {
 
     private static URL job_desc = TestModifyPropagatedVariables.class
             .getResource("/functionaltests/descriptors/Job_modify_propagated_vars.xml");
@@ -59,11 +58,11 @@ public class TestModifyPropagatedVariables extends SchedulerFunctionalTest {
 
     @Test
     public void testModifyPropagatedVariables() throws Throwable {
-        schedulerHelper.testJobSubmissionAndVerifyAllResults(absolutePath(job_desc));
+        schedulerHelper.testJobSubmission(absolutePath(job_desc));
         OperatingSystem os = OperatingSystem.getOperatingSystem();
         if (unix == os) {
             setExecutable(absolutePath(unix_sh));
-            schedulerHelper.testJobSubmissionAndVerifyAllResults(absolutePath(job_desc_unix));
+            schedulerHelper.testJobSubmission(absolutePath(job_desc_unix));
         }
     }
 

@@ -36,28 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.Permission;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.Service;
+import org.objectweb.proactive.*;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -81,11 +61,7 @@ import org.ow2.proactive.resourcemanager.cleaning.NodesCleaner;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.common.event.*;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
@@ -115,15 +91,18 @@ import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelect
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.ScriptException;
-import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.*;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.Permission;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -1260,7 +1239,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         if (!clients.containsKey(owner.getId())) {
             logger.warn(nodeUrl + " cannot set busy as the client disconnected " + owner);
-            throw new NotConnectedException("Client " + owner.getId() +
+            throw new NotConnectedException("Client " + owner +
                 " is not connected to the resource manager");
         }
 
@@ -1499,7 +1478,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 return RMCore.localClient;
             }
 
-            throw new NotConnectedException("Client " + clientId +
+            throw new NotConnectedException("Client " + clientId.shortString() +
                 " is not connected to the resource manager");
         }
 

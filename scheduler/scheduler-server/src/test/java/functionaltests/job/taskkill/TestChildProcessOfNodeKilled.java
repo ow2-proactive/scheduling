@@ -1,14 +1,20 @@
 package functionaltests.job.taskkill;
 
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestNode;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.TestNode;
-import org.junit.Test;
 
+public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTest {
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper = new SchedulerTHelper(true, true);
+    }
 
     @Test
     public void childProcessesForkedByTaskAreCleanedUpWhenRMNodeStarterIsKilled() throws Throwable {
@@ -27,11 +33,10 @@ public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTest {
     }
 
     private TestNode startSchedulerAndRMWithOneNode() throws Exception {
-        schedulerHelper.startSchedulerWithEmptyResourceManager();
         ResourceManager resourceManager = schedulerHelper.getResourceManager();
-        TestNode tNode = schedulerHelper.createRMNodeStarterNode("test1");
-        resourceManager.addNode(tNode.getNode().getNodeInformation().getURL());
-        return tNode;
+        testNode = schedulerHelper.createRMNodeStarterNode("test1");
+        resourceManager.addNode(testNode.getNode().getNodeInformation().getURL());
+        return testNode;
     }
 
 }

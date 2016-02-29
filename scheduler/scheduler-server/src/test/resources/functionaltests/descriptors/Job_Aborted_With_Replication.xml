@@ -4,15 +4,6 @@
 	name="job_aborted_with_replication" priority="normal" cancelJobOnError="false">
 	<description>The second task of this job will throw an exception and so the job will be canceled</description>
 	<taskFlow>
-		<task name="task1">
-			<description>task WaitAndPrint - will sleep for 30s</description>
-			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
-				<parameters>
-					<parameter name="sleepTime" value="10"/>
-					<parameter name="number" value="1"/>
-				</parameters>
-			</javaExecutable>
-		</task>
         <task name="task2replicate" preciousResult="true" cancelJobOnError="true">
             <description>replicate task2</description>
             <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">

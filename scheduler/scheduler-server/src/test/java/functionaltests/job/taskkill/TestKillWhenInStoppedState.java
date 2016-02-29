@@ -72,8 +72,9 @@
  */
 package functionaltests.job.taskkill;
 
-import java.io.Serializable;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -83,10 +84,8 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.Serializable;
 
 
 /**
@@ -96,7 +95,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author ProActive team
  *
  */
-public class TestKillWhenInStoppedState extends SchedulerFunctionalTest {
+public class TestKillWhenInStoppedState extends SchedulerFunctionalTestWithRestart {
 
     static final long FINISH_JOB_TIMEOUT = 30000;
 

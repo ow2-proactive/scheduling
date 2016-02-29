@@ -34,13 +34,7 @@
  */
 package functionaltests.credentials;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Set;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -51,10 +45,15 @@ import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
+import java.util.Set;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
-public class TaskUsingCredentialsTest extends SchedulerFunctionalTest {
+public class TaskUsingCredentialsTest extends SchedulerFunctionalTestNoRestart {
     private static URL jobDescriptor = TaskUsingCredentialsTest.class
             .getResource("/functionaltests/descriptors/Job_UsingCredentials.xml");
 

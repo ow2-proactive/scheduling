@@ -36,7 +36,7 @@
  */
 package functionaltests.dataspaces;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -49,7 +49,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertFalse;
 
-public class TestCleanTaskWorkingDir extends SchedulerFunctionalTest {
+public class TestCleanTaskWorkingDir extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void input_files_are_in_working_dir_for_forked_tasks() throws Throwable {

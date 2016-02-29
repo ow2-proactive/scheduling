@@ -37,6 +37,7 @@ package org.ow2.proactive.scheduler.task.data;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
@@ -137,8 +138,9 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
         //prepare scratch, input, output
         try {
-            DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
-                    .getStubOnThis()), id, namingService);
+            Node node = PAActiveObject.getNode();
+            logger.info("Configuring dataspaces for app " + id + " on " + node.getNodeInformation().getName());
+            DataSpacesNodes.configureApplication(node, id, namingService);
 
             SCRATCH = PADataSpaces.resolveScratchForAO();
             logger.info("SCRATCH space is " + SCRATCH.getRealURI());
@@ -446,6 +448,11 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         }
 
         try {
+            // A desynchronization has been noticed when multiple dataspaces are mounted on the same folder
+            // The call to refresh ensures that the content of the dataspace cache is resynchronized with the disk
+            // before the transfer
+            space.refresh();
+
             int oldSize = results.size();
 
             Utils.findFiles(space, selector, results);

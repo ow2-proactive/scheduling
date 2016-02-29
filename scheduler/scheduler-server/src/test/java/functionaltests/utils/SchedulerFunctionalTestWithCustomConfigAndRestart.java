@@ -34,28 +34,24 @@
  */
 package functionaltests.utils;
 
-import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Test which starts a new scheduler with a custom configuration, and kill it after the test.
+ * The scheduler start is delegated to the subclass.
+ */
+public class SchedulerFunctionalTestWithCustomConfigAndRestart extends SchedulerFunctionalTest {
 
-public class SchedulerFunctionalTestWithTestNode extends SchedulerFunctionalTest {
 
-    protected TestNode testNode;
+    @BeforeClass
+    public static void letTheSubclassStartTheScheduler() throws Exception {
+        schedulerHelper.log("Scheduler has been started with a custom configuration.");
+    }
 
-    protected List<TestNode> testNodes = new ArrayList<>();
-
-    @After
-    public void cleanup() {
-        try {
-            testNode.kill();
-        } catch (InterruptedException e) {
-        }
-        for (TestNode tn : testNodes) {
-            try {
-                tn.kill();
-            } catch (InterruptedException e) {
-            }
-        }
+    @AfterClass
+    public static void cleanupScheduler() throws Exception {
+        schedulerHelper.log("Kill Scheduler after test.");
+        schedulerHelper.killScheduler();
     }
 }

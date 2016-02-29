@@ -36,14 +36,13 @@
  */
 package functionaltests.api;
 
+import functionaltests.executables.ResultAsArray;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
-
-import functionaltests.executables.ResultAsArray;
-import functionaltests.utils.SchedulerFunctionalTest;
 
 
 /**
@@ -55,7 +54,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestJobInstantGetTaskResult extends SchedulerFunctionalTest {
+public class TestJobInstantGetTaskResult extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testJobInstantGetTaskResult() throws Throwable {

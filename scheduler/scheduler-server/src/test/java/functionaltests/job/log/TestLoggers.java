@@ -36,24 +36,23 @@
  */
 package functionaltests.job.log;
 
+import functionaltests.executables.Logging;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.spi.LoggingEvent;
+import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
+
 import java.io.File;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
-import org.junit.Test;
-
-import functionaltests.executables.Logging;
-import functionaltests.utils.SchedulerFunctionalTest;
-
 import static com.jayway.awaitility.Awaitility.await;
 
 
-public class TestLoggers extends SchedulerFunctionalTest {
+public class TestLoggers extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestLoggers.class
             .getResource("/functionaltests/descriptors/Job_Test_Loggers.xml");

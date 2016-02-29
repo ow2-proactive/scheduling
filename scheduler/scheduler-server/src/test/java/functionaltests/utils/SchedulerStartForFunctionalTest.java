@@ -36,9 +36,6 @@
  */
 package functionaltests.utils;
 
-import java.io.Serializable;
-import java.net.URI;
-
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -53,6 +50,9 @@ import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+
+import java.io.Serializable;
+import java.net.URI;
 
 
 /**
@@ -130,6 +130,7 @@ public class SchedulerStartForFunctionalTest implements Serializable {
                                         getJavaPropertiesLine() },
                                 StaticPolicy.class.getName(),
                                 new Object[] { "ALL", "ALL" });
+                        rmAdmin.disconnect();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

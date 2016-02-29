@@ -36,7 +36,7 @@
  */
 package functionaltests.jmx.account;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestUsers;
 import org.junit.Assert;
@@ -76,7 +76,7 @@ import java.util.HashMap;
  *  
  * @author The ProActive Team 
  */
-public final class AddGetDownRemoveTest extends RMFunctionalTestWithTestNode {
+public final class AddGetDownRemoveTest extends RMFunctionalTest {
 
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
@@ -85,12 +85,12 @@ public final class AddGetDownRemoveTest extends RMFunctionalTestWithTestNode {
     public void action() throws Exception {
 
         // The username and thr password must be the same a used to connect to the RM
-        final ResourceManager r = rmHelper.getResourceManager();
+        final ResourceManager rm = rmHelper.getResourceManager();
         // All accounting values are checked through JMX
         final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
         final Credentials adminCreds = Credentials.createCredentials(new CredData(
-          TestUsers.TEST.username, TestUsers.TEST.password), pubKey);
+                TestUsers.TEST.username, TestUsers.TEST.password), pubKey);
 
         final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(
             auth.getJMXConnectorURL(JMXTransportProtocol.RMI));
@@ -111,10 +111,10 @@ public final class AddGetDownRemoveTest extends RMFunctionalTestWithTestNode {
         testNode = rmHelper.createNode(name);
         Node node = testNode.getNode();
         final String nodeURL = node.getNodeInformation().getURL();
-        r.addNode(nodeURL).getBooleanValue();
+        rm.addNode(nodeURL).getBooleanValue();
 
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-        r.setNodeSourcePingFrequency(5000, NodeSource.DEFAULT);
+        rm.setNodeSourcePingFrequency(5000, NodeSource.DEFAULT);
 
         // wait for node from configuring to free
         rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeURL);
@@ -122,7 +122,7 @@ public final class AddGetDownRemoveTest extends RMFunctionalTestWithTestNode {
 
         // 2) GET the same node
         final long beforeGetTime = System.currentTimeMillis();
-        node = r.getNodes(new Criteria(1)).get(0);
+        node = rm.getNodes(new Criteria(1)).get(0);
 
         // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);
@@ -132,7 +132,7 @@ public final class AddGetDownRemoveTest extends RMFunctionalTestWithTestNode {
             node.getProActiveRuntime().killNode(node.getNodeInformation().getName());
         } catch (Exception e) {
         }
-        while (r.nodeIsAvailable(nodeURL).getBooleanValue()) {
+        while (rm.nodeIsAvailable(nodeURL).getBooleanValue()) {
             RMTHelper.log("Node is available " + nodeURL);
             Thread.sleep(100);
         }
@@ -140,7 +140,7 @@ public final class AddGetDownRemoveTest extends RMFunctionalTestWithTestNode {
         final long getDownMaxDuration = System.currentTimeMillis() - beforeGetTime;
 
         // 4) REMOVE  
-        r.removeNode(nodeURL, true).getBooleanValue();
+        rm.removeNode(nodeURL, true).getBooleanValue();
 
         // Refresh the account manager
         conn.invoke(managementMBeanName, "clearAccoutingCache", null, null);

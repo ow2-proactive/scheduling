@@ -37,10 +37,10 @@
 package functionaltests.rm;
 
 import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTestWithTestNode;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.SchedulerTestConfiguration;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -74,18 +74,20 @@ import static org.junit.Assert.fail;
  * @author ProActive team
  *
  */
-public class TestOperationsWhenUnlinked extends SchedulerFunctionalTestWithTestNode {
+public class TestOperationsWhenUnlinked extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     static final String TASK_NAME = "Test task";
 
     static final long EVENT_TIMEOUT = 5*60000;
     @Rule
-    public TemporaryFolder tmpFolder = new TemporaryFolder();
-    private File config;
-    private RMTHelper rmHelper;
+    public static TemporaryFolder tmpFolder = new TemporaryFolder();
+    private static File config;
+    private static RMTHelper rmHelper;
 
-    @Before
-    public void createConfig() throws Exception {
+    private static String rmUrl;
+
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
         // set property SCHEDULER_RMCONNECTION_AUTO_CONNECT to false so that RM failure is detected more fast
         File configurationFile = new File(SchedulerTestConfiguration.SCHEDULER_DEFAULT_CONFIGURATION.toURI());
 
@@ -95,22 +97,16 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTestWithTestN
         config = tmpFolder.newFile("scheduler_config.ini");
         properties.put(PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.getKey(), "false");
         properties.store(new FileOutputStream(config), null);
-    }
 
-    @After
-    public void killRMAndScheduler() throws Exception {
-        rmHelper.killRM();
-        schedulerHelper.killScheduler();
+
+        rmHelper = new RMTHelper();
+        rmUrl = rmHelper.startRM(null, 1299);
+
+        schedulerHelper = new SchedulerTHelper(false, config.getAbsolutePath(), null, rmUrl);
     }
 
     @Test
     public void testKillJob() throws Throwable {
-        schedulerHelper.killScheduler();
-
-        rmHelper = new RMTHelper();
-        String rmUrl = rmHelper.startRM(null, 1299);
-
-        schedulerHelper.startScheduler(false, config.getAbsolutePath(), null, rmUrl);
 
         testNode = RMTHelper.createNode("test-node");
         String nodeUrl = testNode.getNode().getNodeInformation().getURL();
@@ -152,12 +148,6 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTestWithTestN
 
     @Test
     public void testSubmitAndPause() throws Throwable {
-        schedulerHelper.killScheduler();
-
-        rmHelper = new RMTHelper();
-        String rmUrl = rmHelper.startRM(null, 1299);
-
-        schedulerHelper.startScheduler(false, config.getAbsolutePath(), null, rmUrl);
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 

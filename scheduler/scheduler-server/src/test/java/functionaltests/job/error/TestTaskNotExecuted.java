@@ -36,13 +36,7 @@
  */
 package functionaltests.job.error;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.TaskCouldNotRestartException;
@@ -54,10 +48,15 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
-public class TestTaskNotExecuted extends SchedulerFunctionalTest {
+public class TestTaskNotExecuted extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor1 = TestTaskNotExecuted.class
             .getResource("/functionaltests/descriptors/Job_TaskCouldNotStart.xml");

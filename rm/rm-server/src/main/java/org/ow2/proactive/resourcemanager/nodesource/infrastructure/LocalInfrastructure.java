@@ -305,14 +305,18 @@ public class LocalInfrastructure extends InfrastructureManager {
         int remainingNodesCount = this.acquiredNodes.decrementAndGet();
         // If there is no remaining node, kill the JVM process
         if (remainingNodesCount == 0 && commandLineStarted.get()) {
-            if (processExecutor != null) {
-                processExecutor.killProcess();
-            }
-            commandLineStarted.set(false);
-            // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
-            logger.info("Process associated with node source " + nodeSource.getName() + " destroyed");
-
+            shutDown();
         }
+    }
+
+    @Override
+    public void shutDown() {
+        if (processExecutor != null) {
+            processExecutor.killProcess();
+        }
+        commandLineStarted.set(false);
+        // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
+        logger.info("Process associated with node source " + nodeSource.getName() + " destroyed");
     }
 
     @Override

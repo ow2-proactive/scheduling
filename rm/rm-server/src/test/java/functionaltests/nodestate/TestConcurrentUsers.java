@@ -36,7 +36,7 @@
  */
 package functionaltests.nodestate;
 
-import functionaltests.RMFunctionalTestWithTestNode;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.TestUsers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,7 +66,7 @@ import static org.junit.Assert.*;
  * @author ProActive team
  *
  */
-public class TestConcurrentUsers extends RMFunctionalTestWithTestNode {
+public class TestConcurrentUsers extends RMFunctionalTest {
 
     @Test
     public void testConcurrency() throws Exception {

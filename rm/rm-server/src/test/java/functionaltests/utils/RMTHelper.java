@@ -104,8 +104,6 @@ public class RMTHelper {
         }));
     }
 
-    private static RMTestUser connectedUser = new RMTestUser(TestUsers.TEST);
-
     private String currentTestConfiguration;
 
     public static void log(String s) {
@@ -138,19 +136,19 @@ public class RMTHelper {
      * Creates a Local node source with specified name
      */
     public static void createNodeSource(String name, int nodeNumber, ResourceManager rm,
-            RMMonitorsHandler monitor) throws Exception {
+                                        RMMonitorsHandler monitor) throws Exception {
         RMFactory.setOsJavaProperty();
         System.out.println("Creating a node source " + name);
         //first emtpy im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rm.createNodeSource(name, LocalInfrastructure.class.getName(),
-                new Object[] {
+                new Object[]{
                         creds,
                         nodeNumber,
                         RMTHelper.DEFAULT_NODES_TIMEOUT,
                         setup.getJvmParameters() + " " +
-                            CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp" },
+                                CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp"},
                 StaticPolicy.class.getName(), null);
         rm.setNodeSourcePingFrequency(5000, name);
 
@@ -362,11 +360,24 @@ public class RMTHelper {
         return getResourceManager().listAliveNodeUrls();
     }
 
+    /**
+     * Kills the rm process
+     *
+     * @throws Exception
+     */
     public void killRM() throws Exception {
-        if (connectedUser != null) {
-            connectedUser.disconnect();
-        }
+        RMTestUser.getInstance().disconnectFromRM();
         rm.kill();
+    }
+
+    /**
+     * Shutdowns the RM (takes longer than killing the process)
+     *
+     * @throws Exception
+     */
+    public void shutdownRM() throws Exception {
+        getResourceManager().shutdown(true);
+        killRM();
     }
 
     /**
@@ -376,7 +387,7 @@ public class RMTHelper {
      * @param nodeSourceEvent awaited event.
      * @param nodeSourceName corresponding node source name for which an event is awaited.
      */
-    public void waitForNodeSourceEvent(RMEventType nodeSourceEvent, String nodeSourceName) {
+    public void waitForNodeSourceEvent(RMEventType nodeSourceEvent, String nodeSourceName) throws ProActiveTimeoutException {
         waitForNodeSourceEvent(nodeSourceEvent, nodeSourceName, getMonitorsHandler());
     }
 
@@ -489,8 +500,8 @@ public class RMTHelper {
      * @throws NodeException if node cannot be looked up
      */
     public static void killRuntime(String url) throws NodeException {
-        Node node = NodeFactory.getNode(url);
         try {
+            Node node = NodeFactory.getNode(url);
             node.getProActiveRuntime().killRT(false);
         } catch (Exception ignored) {
         }
@@ -528,8 +539,8 @@ public class RMTHelper {
      */
     public String startRM(String configurationFile, int pnpPort, String... jvmArgs) throws Exception {
         if (!rm.isStartedWithSameConfiguration(configurationFile)) {
+            killRM();
             log("Starting RM");
-            connectedUser = new RMTestUser(TestUsers.TEST);
             rm.start(configurationFile, pnpPort, jvmArgs);
             currentTestConfiguration = configurationFile;
         }
@@ -548,31 +559,27 @@ public class RMTHelper {
     public ResourceManager getResourceManager(TestUsers user, String... jvmArgs) throws Exception {
         startRM(currentTestConfiguration, TestRM.PA_PNP_PORT, jvmArgs);
 
-        if (!connectedUser.is(user)) { // changing user on the fly
-            if (connectedUser != null) {
-                connectedUser.disconnect();
-            }
-            connectedUser = new RMTestUser(user);
-            connectedUser.connect(rm.getAuth());
+        if (!RMTestUser.getInstance().is(user)) { // changing user on the fly
+            RMTestUser.getInstance().connect(user, rm.getUrl());
         }
 
-        if (!connectedUser.isConnected()) {
-            connectedUser.connect(rm.getAuth());
+        if (!RMTestUser.getInstance().isConnected()) {
+            RMTestUser.getInstance().connect(user, rm.getUrl());
         }
 
-        return connectedUser.getResourceManager();
+        return RMTestUser.getInstance().getResourceManager();
     }
 
     public static String getLocalUrl() {
         return rm.getUrl();
     }
 
-    public RMMonitorsHandler getMonitorsHandler() {
-        return connectedUser.getMonitorsHandler();
+    public RMMonitorsHandler getMonitorsHandler() throws ProActiveTimeoutException {
+        return RMTestUser.getInstance().getMonitorsHandler();
     }
 
     public RMMonitorEventReceiver getEventReceiver() {
-        return connectedUser.getEventReceiver();
+        return RMTestUser.getInstance().getEventReceiver();
     }
 
     public RMAuthentication getRMAuth() throws Exception {
@@ -581,7 +588,7 @@ public class RMTHelper {
     }
 
     public void disconnect() throws Exception {
-        connectedUser.disconnect();
+        RMTestUser.getInstance().disconnectFromRM();
     }
 
     public boolean isRMStarted() {

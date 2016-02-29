@@ -36,16 +36,7 @@
  */
 package functionaltests.dataspaces;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -58,7 +49,10 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.*;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -67,7 +61,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestDataspaceScripts extends SchedulerFunctionalTest {
+public class TestDataspaceScripts extends SchedulerFunctionalTestWithRestart {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();

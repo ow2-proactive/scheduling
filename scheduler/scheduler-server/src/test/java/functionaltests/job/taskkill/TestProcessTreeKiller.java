@@ -36,16 +36,7 @@
  */
 package functionaltests.job.taskkill;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
@@ -64,7 +55,15 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -82,7 +81,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * name and counting the number of processes
  *
  */
-public class TestProcessTreeKiller extends SchedulerFunctionalTest {
+public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
 
     public static URL launchersDir = TestProcessTreeKiller.class
             .getResource("/functionaltests/executables/TestSleep.exe");

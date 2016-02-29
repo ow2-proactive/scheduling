@@ -36,6 +36,19 @@
  */
 package functionaltests.job.log;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.junit.Assert;
+import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.utils.FileToBytesConverter;
+
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
@@ -43,24 +56,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.proactive.utils.FileToBytesConverter;
-import org.junit.Assert;
-import org.junit.Test;
-
-import functionaltests.utils.SchedulerFunctionalTest;
 
 
 /**
@@ -73,7 +68,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  *
  * @author ProActive team
  */
-public class TestPreciousLogs extends SchedulerFunctionalTest {
+public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
 
     public static class TestJavaTask extends JavaExecutable {
 

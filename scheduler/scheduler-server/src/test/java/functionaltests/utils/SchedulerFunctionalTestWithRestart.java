@@ -1,6 +1,5 @@
 /*
- * ################################################################
- *
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -29,30 +28,30 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
+ *  Contributor(s):
  *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionaltests.scripts.selection;
+package functionaltests.utils;
 
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
-import org.junit.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
-import java.io.File;
-import java.net.URL;
+/**
+ * Test which starts a new scheduler with the default configuration, and kill it after the test
+ */
+public class SchedulerFunctionalTestWithRestart extends SchedulerFunctionalTest {
 
 
-public class TestJobSelScriptSubmission extends SchedulerFunctionalTestNoRestart {
-
-    private static URL jobDescriptor = TestJobSelScriptSubmission.class
-            .getResource("/functionaltests/descriptors/Job_with_select_script.xml");
-
-    @Test
-    public void testJobSelScriptSubmission() throws Throwable {
-        schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI())
-                .getAbsolutePath());
-        schedulerHelper.checkNodesAreClean();
+    @BeforeClass
+    public static void startSchedulerInAnyCase() throws Exception {
+        schedulerHelper.log("Starting a clean scheduler.");
+        schedulerHelper = new SchedulerTHelper(true);
     }
 
+    @AfterClass
+    public static void cleanupScheduler() throws Exception {
+        schedulerHelper.log("Kill Scheduler after test.");
+        schedulerHelper.killScheduler();
+    }
 }

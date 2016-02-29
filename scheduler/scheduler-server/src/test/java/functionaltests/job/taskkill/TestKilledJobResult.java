@@ -1,22 +1,16 @@
 package functionaltests.job.taskkill;
 
-import java.io.Serializable;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.Serializable;
 
 import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
@@ -26,7 +20,7 @@ import static org.junit.Assert.*;
  * Sanity test against result for killed job.
  *
  */
-public class TestKilledJobResult extends SchedulerFunctionalTest {
+public class TestKilledJobResult extends SchedulerFunctionalTestWithRestart {
 
     public static class TestJavaTask1 extends JavaExecutable {
         @Override

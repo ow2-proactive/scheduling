@@ -36,29 +36,22 @@
  */
 package functionaltests.monitor;
 
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
+import org.junit.Test;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+
+import javax.management.*;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
-import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.junit.Test;
-
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestUsers;
-
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 
 /**
@@ -109,7 +102,7 @@ public class TestRMNodeMonitoring extends RMFunctionalTest {
 
         String jmxurl = null;
 
-        RMInitialState state = rmHelper.getResourceManager().getMonitoring().getState();
+        RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
         jmxurl = state.getNodesEvents().get(0).getDefaultJMXUrl();
 
         assertNotNull("The JMX URL of a node could not be obtained.", jmxurl);

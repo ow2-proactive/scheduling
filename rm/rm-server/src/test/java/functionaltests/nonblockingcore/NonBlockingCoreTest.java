@@ -36,8 +36,8 @@
  */
 package functionaltests.nonblockingcore;
 
-import functionaltests.RMFunctionalTestWithTestNode;
 import functionaltests.selectionscript.SelectionScriptTimeOutTest;
+import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestUsers;
 import org.junit.Test;
@@ -68,7 +68,7 @@ import static org.junit.Assert.fail;
  * @author ProActive team
  *
  */
-public class NonBlockingCoreTest extends RMFunctionalTestWithTestNode {
+public class NonBlockingCoreTest extends RMFunctionalTest {
 
 	private URL selectionScriptWithtimeOutPath = SelectionScriptTimeOutTest.class
 			.getResource("selectionScriptWithtimeOut.groovy");

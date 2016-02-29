@@ -34,24 +34,21 @@
  */
 package functionaltests.utils;
 
-import java.security.KeyException;
-
-import javax.security.auth.login.LoginException;
-
+import functionaltests.monitor.MonitorEventReceiver;
+import functionaltests.monitor.SchedulerMonitorsHandler;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
-import functionaltests.monitor.MonitorEventReceiver;
-import functionaltests.monitor.SchedulerMonitorsHandler;
+import javax.security.auth.login.LoginException;
+import java.security.KeyException;
 
 
 public class SchedulerTestUser {
@@ -59,71 +56,128 @@ public class SchedulerTestUser {
     private String connectedUserName = null;
     private String connectedUserPassword = null;
 
-    private Scheduler scheduler;
+    private static SchedulerTestUser instance = null;
 
     private SchedulerMonitorsHandler monitorsHandler;
     private MonitorEventReceiver eventReceiver;
 
-    public SchedulerTestUser(TestUsers user) {
-        this.connectedUserName = user.username;
-        this.connectedUserPassword = user.password;
+    private SchedulerProxyUserInterface schedulerProxy;
+
+    public SchedulerTestUser() {
+
+    }
+
+    public static SchedulerTestUser getInstance() {
+        if (instance == null) {
+            instance = new SchedulerTestUser();
+        }
+        return instance;
     }
 
     public boolean is(TestUsers user) {
         return user.username.equals(connectedUserName);
     }
 
-    public Scheduler connect(SchedulerAuthenticationInterface schedulerAuthentication) throws LoginException,
-            KeyException, ActiveObjectCreationException, NodeException, AlreadyConnectedException,
-            NotConnectedException, PermissionException {
-        disconnect();
-        Credentials connectedUserCreds = Credentials.createCredentials(
+    /**
+     * Connects the singleton using the given user
+     */
+    public boolean connect(TestUsers user, String schedulerUrl) throws LoginException,
+            KeyException, ActiveObjectCreationException, NodeException, SchedulerException {
+        this.connectedUserName = user.username;
+        this.connectedUserPassword = user.password;
+
+        disconnectFromScheduler();
+
+        if (schedulerProxy == null) {
+            schedulerProxy = PAActiveObject.newActive(SchedulerProxyUserInterface.class, new Object[0]);
+        }
+
+        SchedulerTHelper.log("Connecting user " + connectedUserName + " to the Scheduler at url " + schedulerUrl);
+        CredData connectedUserCreds =
                 new CredData(CredData.parseLogin(connectedUserName), CredData.parseDomain(connectedUserName),
-                    connectedUserPassword), schedulerAuthentication.getPublicKey());
-        scheduler = schedulerAuthentication.login(connectedUserCreds);
+                        connectedUserPassword);
+
+        schedulerProxy.init(schedulerUrl, connectedUserCreds);
 
         monitorsHandler = new SchedulerMonitorsHandler();
-        if (eventReceiver == null) {
-            /** create event receiver then turnActive to avoid deepCopy of MonitorsHandler object
-             * 	(shared instance between event receiver and static helpers).
-             */
-            MonitorEventReceiver passiveEventReceiver = new MonitorEventReceiver(monitorsHandler);
-            eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
 
+        if (eventReceiver != null) {
+            PAActiveObject.terminateActiveObject(eventReceiver, true);
         }
-        SchedulerState state = scheduler.addEventListener(eventReceiver, true, true);
+
+        /** create event receiver then turnActive to avoid deepCopy of MonitorsHandler object
+         * 	(shared instance between event receiver and static helpers).
+         */
+        MonitorEventReceiver passiveEventReceiver = new MonitorEventReceiver(monitorsHandler);
+        eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
+
+        SchedulerState state = schedulerProxy.addEventListener(eventReceiver, true, true);
         monitorsHandler.init(state);
-
-        return scheduler;
+        return true;
     }
 
-    public boolean isConnected() {
-        return scheduler != null;
-    }
-
-    public void disconnect() throws NotConnectedException, PermissionException {
-        try {
-            if (scheduler != null && scheduler.isConnected()) {
-                scheduler.removeEventListener();
-                scheduler.disconnect();
-            }
-        } catch (Throwable schedulerKilled) {
+    public void schedulerIsRestarted() {
+        RMTHelper.log("Scheduler has been restarted.");
+        if (schedulerProxy != null) {
+            PAActiveObject.terminateActiveObject(schedulerProxy, true);
+            schedulerProxy = null;
         }
-
-        scheduler = null;
-        eventReceiver = null;
-        monitorsHandler = null;
+        if (eventReceiver != null) {
+            PAActiveObject.terminateActiveObject(eventReceiver, true);
+            eventReceiver = null;
+        }
     }
 
     public Scheduler getScheduler() {
-        return scheduler;
+        return schedulerProxy;
     }
 
+
+    public boolean isConnected() {
+        try {
+            return schedulerProxy != null && schedulerProxy.isConnected();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    public void disconnectFromScheduler() throws NotConnectedException, PermissionException {
+        if (isConnected()) {
+            SchedulerTHelper.log("Disconnecting user " + connectedUserName + " from the Scheduler");
+            try {
+                schedulerProxy.removeEventListener();
+            } catch (Exception ignored) {
+
+            }
+            if (eventReceiver != null) {
+                PAActiveObject.terminateActiveObject(eventReceiver, true);
+                eventReceiver = null;
+            }
+            try {
+                schedulerProxy.disconnect();
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
+
+    /**
+     * Returns a direct reference to the monitors handler object, the monitor can be used to wait for specific events
+     *
+     * @return
+     */
     public SchedulerMonitorsHandler getMonitorsHandler() {
         return monitorsHandler;
     }
 
+    /**
+     * Returns a stub to the event receiver (active object)
+     *
+     * @return
+     */
     public MonitorEventReceiver getEventReceiver() {
         return eventReceiver;
     }
+
 }

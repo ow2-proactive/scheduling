@@ -36,27 +36,21 @@
  */
 package functionaltests.job.workingdir;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerTHelper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -65,7 +59,7 @@ import functionaltests.utils.SchedulerTHelper;
  *
  * @author The ProActive Team
  */
-public class TestWorkingDirStaticCommand extends SchedulerFunctionalTest {
+public class TestWorkingDirStaticCommand extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestWorkingDirStaticCommand.class
             .getResource("/functionaltests/descriptors/Job_test_workingDir_static_command.xml");

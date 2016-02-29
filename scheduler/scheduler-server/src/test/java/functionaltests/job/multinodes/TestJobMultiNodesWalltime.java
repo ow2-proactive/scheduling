@@ -36,20 +36,19 @@
  */
 package functionaltests.job.multinodes;
 
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
 
 
 /**
  * Test checks that walltime parameter of multinode job is correctly
  * taken into account.
  */
-public class TestJobMultiNodesWalltime extends SchedulerFunctionalTest {
+public class TestJobMultiNodesWalltime extends SchedulerFunctionalTestWithRestart {
 
     private static URL jobDescriptor = TestJobMultiNodesWalltime.class
             .getResource("/functionaltests/descriptors/Job_MultiNodes_walltime.xml");

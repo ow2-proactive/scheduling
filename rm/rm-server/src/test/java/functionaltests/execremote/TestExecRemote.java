@@ -36,11 +36,13 @@
  */
 package functionaltests.execremote;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import org.apache.commons.io.FileUtils;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
@@ -54,13 +56,11 @@ import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.apache.commons.io.FileUtils;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -83,7 +83,7 @@ public final class TestExecRemote extends RMFunctionalTest {
 
         rmHelper.createNodeSource(nsName);
 
-        RMInitialState state = rmHelper.getResourceManager().getMonitoring().getState();
+        RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
         String hostname = state.getNodesEvents().get(0).getHostName();
         HashSet<String> nodesUrls = new HashSet<>();
         for (RMNodeEvent ne : state.getNodesEvents()) {

@@ -36,7 +36,7 @@
  */
 package functionaltests.job;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -61,7 +61,7 @@ import static org.junit.Assert.assertEquals;
  * Test checks that once a job is paused the execution of all tasks except running
  * is postponed.
  */
-public class TestPauseJob extends SchedulerFunctionalTest {
+public class TestPauseJob extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void test() throws Throwable {

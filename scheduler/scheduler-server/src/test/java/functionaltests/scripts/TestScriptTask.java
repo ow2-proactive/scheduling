@@ -36,15 +36,8 @@
  */
 package functionaltests.scripts;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerStartForFunctionalTest;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -56,11 +49,14 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerStartForFunctionalTest;
+import java.io.File;
+import java.net.URL;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 
 
-public class TestScriptTask extends SchedulerFunctionalTest {
+public class TestScriptTask extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestScriptTask.class
             .getResource("/functionaltests/descriptors/Job_script_task.xml");

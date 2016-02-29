@@ -34,12 +34,13 @@
  */
 package functionaltests.dataspaces;
 
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
 
 
 /**
@@ -51,7 +52,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  *
  * @author The ProActive Team
  */
-public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerFunctionalTest {
+public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     static URL jobDescriptor = TestSubmitJobWithUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpaceUnacc.xml");
@@ -59,10 +60,15 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerFunctional
     static URL configFile = TestSubmitJobWithUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/schedulerPropertiesWrongSpaces.ini");
 
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper = new SchedulerTHelper(true, new File(configFile.toURI()).getAbsolutePath());
+    }
+
     @Test
     public void testSubmitJobWithUnaccessibleDataSpaces() throws Throwable {
-        schedulerHelper.startScheduler((new File(configFile.toURI())).getAbsolutePath());
-        schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+
+        schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
     }
 
