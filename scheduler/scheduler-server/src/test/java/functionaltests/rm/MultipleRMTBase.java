@@ -2,8 +2,7 @@ package functionaltests.rm;
 
 import functionaltests.utils.TestRM;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -22,15 +21,14 @@ import java.util.Properties;
 
 public class MultipleRMTBase extends ProActiveTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @ClassRule
+    public static TemporaryFolder folder = new TemporaryFolder();
 
-    protected File config1;
+    protected static File config1;
 
-    protected File config2;
+    protected static File config2;
 
-    @Before
-    public void initConfigs() throws Exception {
+    protected static void initConfigs() throws Exception {
         /*
          * Create two copies of default RM test configurations, and
          * then change the path to the directory used by the database.

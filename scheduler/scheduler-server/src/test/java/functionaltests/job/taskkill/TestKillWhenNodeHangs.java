@@ -51,7 +51,7 @@ public class TestKillWhenNodeHangs extends SchedulerFunctionalTestWithRestart {
 
         // create RM and node source with one node, node JVM listens for debugger connections
         List<String> vmOptions = debugHelper.getDebuggedVMOptions();
-        schedulerHelper.createNodeSource(1, vmOptions);
+        testNodes.addAll(schedulerHelper.addNodesToDefaultNodeSource(1, vmOptions));
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 

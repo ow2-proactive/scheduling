@@ -36,11 +36,6 @@
  */
 package org.ow2.tests;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
@@ -49,6 +44,11 @@ import org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFact
 import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.OperatingSystem;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -99,6 +99,15 @@ public class ProActiveSetup {
 
     final public List<String> getJvmParametersAsList() {
         return this.jvmParameters;
+    }
+
+    public static String listToString(List<String> list) {
+        StringBuilder sb = new StringBuilder();
+        for (String item : list) {
+            sb.append(item);
+            sb.append(" ");
+        }
+        return sb.toString();
     }
 
     /**

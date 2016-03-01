@@ -36,10 +36,8 @@
  */
 package functionaltests.rm;
 
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.SchedulerTestConfiguration;
+import functionaltests.utils.*;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,6 +54,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.examples.EmptyTask;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.tests.ProActiveTest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,7 +73,7 @@ import static org.junit.Assert.fail;
  * @author ProActive team
  *
  */
-public class TestOperationsWhenUnlinked extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class TestOperationsWhenUnlinked extends ProActiveTest {
 
     static final String TASK_NAME = "Test task";
 
@@ -83,11 +82,18 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTestWithCusto
     public static TemporaryFolder tmpFolder = new TemporaryFolder();
     private static File config;
     private static RMTHelper rmHelper;
+    private static SchedulerTHelper schedulerHelper;
+    private static TestNode testNode;
 
     private static String rmUrl;
 
     @BeforeClass
     public static void startDedicatedScheduler() throws Exception {
+        if (TestScheduler.isStarted()) {
+            SchedulerTHelper.log("Killing previous scheduler.");
+            TestScheduler.kill();
+        }
+
         // set property SCHEDULER_RMCONNECTION_AUTO_CONNECT to false so that RM failure is detected more fast
         File configurationFile = new File(SchedulerTestConfiguration.SCHEDULER_DEFAULT_CONFIGURATION.toURI());
 
@@ -103,6 +109,24 @@ public class TestOperationsWhenUnlinked extends SchedulerFunctionalTestWithCusto
         rmUrl = rmHelper.startRM(null, 1299);
 
         schedulerHelper = new SchedulerTHelper(false, config.getAbsolutePath(), null, rmUrl);
+    }
+
+    @AfterClass
+    public static void cleanUp() {
+        if (testNode != null) {
+            try {
+                testNode.kill();
+            } catch (Exception ignored) {
+            }
+        }
+        try {
+            rmHelper.killRM();
+        } catch (Exception ignored) {
+        }
+        try {
+            schedulerHelper.killScheduler();
+        } catch (Exception ignored) {
+        }
     }
 
     @Test

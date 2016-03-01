@@ -38,11 +38,10 @@ package functionaltests.rm;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestRM;
-import functionaltests.utils.TestUsers;
+import functionaltests.utils.*;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -61,7 +60,10 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 import java.net.URI;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
@@ -75,16 +77,66 @@ public class TestRMProxyRebind extends MultipleRMTBase {
     private Credentials schedulerProxyCredentials;
     private TestRM helper1;
     private TestRM helper2;
+    private int pnpPort1;
+    private int jmxPort1;
+    private int pnpPort2;
+    private int jmxPort2;
     private ResourceManager rm1;
     private ResourceManager rm2;
-    private RMMonitorEventReceiver eventReceiver;
+    private List<RMMonitorEventReceiver> eventReceivers = new ArrayList<>();
+    private RMMonitorsHandler monitorsHandler1;
+    private RMMonitorsHandler monitorsHandler2;
+    private List<TestNode> testNodes = new ArrayList<>();
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        if (TestScheduler.isStarted()) {
+            SchedulerTHelper.log("Killing previous scheduler.");
+            TestScheduler.kill();
+        }
+        initConfigs();
+    }
 
     @Before
-    public void initCredentials() throws Exception {
+    public void createRMs() throws Exception {
         schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
                 .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
         helper1 = new TestRM();
         helper2 = new TestRM();
+
+        pnpPort1 = CentralPAPropertyRepository.PA_RMI_PORT.getValue() + 1;
+        jmxPort1 = PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + 1;
+
+        pnpPort2 = CentralPAPropertyRepository.PA_RMI_PORT.getValue() + 2;
+        jmxPort2 = PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + 2;
+
+        helper1.start(config1.getAbsolutePath(), pnpPort1,
+                PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort1);
+
+        Credentials connectedUserCreds = Credentials.createCredentials(
+                new CredData(CredData.parseLogin(TestUsers.DEMO.username), CredData
+                        .parseDomain(TestUsers.DEMO.username), TestUsers.DEMO.password), helper1.getAuth()
+                        .getPublicKey());
+
+        Map.Entry<RMMonitorsHandler, RMMonitorEventReceiver> entry1 = connectToRM(helper1.getUrl(), connectedUserCreds);
+
+        monitorsHandler1 = entry1.getKey();
+        rm1 = entry1.getValue();
+
+        testNodes.addAll(RMTHelper.addNodesToDefaultNodeSource(NODES_NUMBER, new ArrayList<String>(), rm1, monitorsHandler1));
+
+        helper2.start(config2.getAbsolutePath(), pnpPort2,
+                PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort2);
+
+        Map.Entry<RMMonitorsHandler, RMMonitorEventReceiver> entry2 = connectToRM(helper2.getUrl(), connectedUserCreds);
+
+        monitorsHandler2 = entry2.getKey();
+        rm2 = entry2.getValue();
+
+        testNodes.addAll(RMTHelper.addNodesToDefaultNodeSource(NODES_NUMBER, new ArrayList<String>(), rm2, monitorsHandler2));
+
+        checkFreeNodes(rm1, NODES_NUMBER);
+        checkFreeNodes(rm2, NODES_NUMBER);
     }
 
     @After
@@ -98,80 +150,49 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         helper1.kill();
         helper2.kill();
 
-        if (eventReceiver != null) {
-            PAActiveObject.terminateActiveObject(eventReceiver, true);
+        for (TestNode node : testNodes) {
+            try {
+                node.kill();
+            } catch (Exception ignored) {
+
+            }
+        }
+
+        for (RMMonitorEventReceiver receiver : eventReceivers) {
+            try {
+                PAActiveObject.terminateActiveObject(receiver, true);
+            } catch (Exception ignored) {
+
+            }
         }
     }
 
     @Test
-    public void testRMProxyRebind() throws Exception {
-        int rmiPort1 = CentralPAPropertyRepository.PA_RMI_PORT.getValue() + 1;
-        int jmxPort1 = PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + 1;
-
-        int rmiPort2 = CentralPAPropertyRepository.PA_RMI_PORT.getValue() + 2;
-        int jmxPort2 = PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + 2;
-
-        helper1.start(config1.getAbsolutePath(), rmiPort1,
-                PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort1);
-
-        Credentials connectedUserCreds = Credentials.createCredentials(
-                new CredData(CredData.parseLogin(TestUsers.DEMO.username), CredData
-                        .parseDomain(TestUsers.DEMO.username), TestUsers.DEMO.password), helper1.getAuth()
-                        .getPublicKey());
-
-        rm1 = helper1.getAuth().login(connectedUserCreds);
-        RMMonitorsHandler monitorsHandler1 = listenEvents(rm1);
-        RMTHelper.createNodeSource(NODES_NUMBER, new ArrayList<String>(), rm1, monitorsHandler1);
-
-        helper2.start(config2.getAbsolutePath(), rmiPort2,
-                PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort2);
-
-        rm2 = helper2.getAuth().login(connectedUserCreds);
-
-        RMMonitorsHandler monitorsHandler2 = listenEvents(rm2);
-
-        RMTHelper.createNodeSource(NODES_NUMBER, new ArrayList<String>(), rm2, monitorsHandler2);
-
-        checkFreeNodes(rm1, NODES_NUMBER);
-        checkFreeNodes(rm2, NODES_NUMBER);
-
-        log("\n Test with per-user connection \n");
-        testRebind(new URI(helper1.getUrl()), new URI(helper2.getUrl()), rm1, rm2, monitorsHandler1,
-                monitorsHandler2, false);
-
+    public void testRMProxyRebindSingle() throws Exception {
         log("\n Test with single connection \n");
-
-        // RM1 was killed, restart it
-        rmiPort1 = CentralPAPropertyRepository.PA_RMI_PORT.getValue() + 3;
-        jmxPort1 = PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + 3;
-
-        helper1.start(config1.getAbsolutePath(), rmiPort1,
-                PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort1);
-
-        rm1 = helper1.getAuth().login(connectedUserCreds);
-
-        monitorsHandler1 = listenEvents(rm1);
-
-        RMTHelper.createNodeSource(NODES_NUMBER, new ArrayList<String>(), rm1, monitorsHandler1);
-
-        checkFreeNodes(rm1, NODES_NUMBER);
-        checkFreeNodes(rm2, NODES_NUMBER);
-
         testRebind(new URI(helper1.getUrl()), new URI(helper2.getUrl()), rm1, rm2, monitorsHandler1,
                 monitorsHandler2, true);
     }
 
-    private RMMonitorsHandler listenEvents(ResourceManager rm)
-            throws org.objectweb.proactive.ActiveObjectCreationException,
-            org.objectweb.proactive.core.node.NodeException {
+    @Test
+    public void testRMProxyRebindPerUser() throws Exception {
+        log("\n Test with per-user connection \n");
+        testRebind(new URI(helper1.getUrl()), new URI(helper2.getUrl()), rm1, rm2, monitorsHandler1,
+                monitorsHandler2, false);
+    }
+
+
+    private Map.Entry<RMMonitorsHandler, RMMonitorEventReceiver> connectToRM(String rmUrl, Credentials creds)
+            throws Exception {
         RMMonitorsHandler monitorsHandler1 = new RMMonitorsHandler();
         /** create event receiver then turnActive to avoid deepCopy of MonitorsHandler object
          * 	(shared instance between event receiver and static helpers).
          */
         RMMonitorEventReceiver passiveEventReceiver = new RMMonitorEventReceiver(monitorsHandler1);
-        eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
-        PAFuture.waitFor(rm.getMonitoring().addRMEventListener(eventReceiver));
-        return monitorsHandler1;
+        RMMonitorEventReceiver receiver = PAActiveObject.turnActive(passiveEventReceiver);
+        eventReceivers.add(receiver);
+        receiver.init(rmUrl, creds);
+        return new AbstractMap.SimpleImmutableEntry<RMMonitorsHandler, RMMonitorEventReceiver>(monitorsHandler1, receiver);
     }
 
     private void testRebind(URI rmUri1, URI rmUri2, ResourceManager rm1, ResourceManager rm2,

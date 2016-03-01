@@ -92,6 +92,8 @@ public class SchedulerTHelper {
 
     private static TestScheduler scheduler = new TestScheduler();
 
+    public static final String extraNS = "extra";
+
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -835,8 +837,20 @@ public class SchedulerTHelper {
         return RMTestUser.getInstance().getMonitorsHandler();
     }
 
-    public void createNodeSource(int nbNodes, List<String> vmOptions) throws Exception {
-        RMTHelper.createNodeSource(nbNodes, vmOptions, getResourceManager(), getRMMonitorsHandler());
+    public void createNodeSource(String name, int nbNodes) throws Exception {
+        RMTHelper.createNodeSource(name, nbNodes, null, getResourceManager(), getRMMonitorsHandler());
+    }
+
+    public void createNodeSource(String name, int nbNodes, List<String> vmOptions) throws Exception {
+        RMTHelper.createNodeSource(name, nbNodes, vmOptions, getResourceManager(), getRMMonitorsHandler());
+    }
+
+    public List<TestNode> addNodesToDefaultNodeSource(int nbNodes) throws Exception {
+        return RMTHelper.addNodesToDefaultNodeSource(nbNodes, null, getResourceManager(), getRMMonitorsHandler());
+    }
+
+    public List<TestNode> addNodesToDefaultNodeSource(int nbNodes, List<String> vmOptions) throws Exception {
+        return RMTHelper.addNodesToDefaultNodeSource(nbNodes, vmOptions, getResourceManager(), getRMMonitorsHandler());
     }
 
     public TestNode createNode(String nodeName) throws Exception {
@@ -877,13 +891,17 @@ public class SchedulerTHelper {
     }
 
     public void addExtraNodes(int nbNodes) throws Exception {
-        RMTHelper.createNodeSource("extra", nbNodes, getResourceManager(), getRMMonitorsHandler());
-        RMTHelper.log("Node source \"Extra\" created");
+        RMTHelper.createNodeSource(extraNS, nbNodes, getResourceManager(), getRMMonitorsHandler());
+        RMTHelper.log("Node source \"" + extraNS + "\" created");
     }
 
     public void removeExtraNodeSource() throws Exception {
+        removeNodeSource(extraNS);
+    }
+
+    public void removeNodeSource(String nsName) throws Exception {
         try {
-            getResourceManager().removeNodeSource("extra", true).getBooleanValue();
+            getResourceManager().removeNodeSource(nsName, true).getBooleanValue();
         } catch (Throwable ignored) {
         }
     }

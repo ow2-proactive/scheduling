@@ -119,7 +119,7 @@ public class RMTHelper {
     }
 
     /**
-     * Creates a Local node source with specified name
+     * Creates a Local node source with specified name and default number of nodes
      * @throws Exception
      * @return expected number of nodes
      */
@@ -128,17 +128,29 @@ public class RMTHelper {
         return RMTHelper.DEFAULT_NODES_NUMBER;
     }
 
+
+    public void removeNodeSource(String name) throws Exception {
+        try {
+            getResourceManager().removeNodeSource(name, true).getBooleanValue();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * Creates a Local node source with specified name and number of nodes
+     *
+     * @param name
+     * @param nodeNumber
+     * @throws Exception
+     */
     public void createNodeSource(String name, int nodeNumber) throws Exception {
         createNodeSource(name, nodeNumber, getResourceManager(), getMonitorsHandler());
     }
 
-    /**
-     * Creates a Local node source with specified name
-     */
-    public static void createNodeSource(String name, int nodeNumber, ResourceManager rm,
+    public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
                                         RMMonitorsHandler monitor) throws Exception {
         RMFactory.setOsJavaProperty();
-        System.out.println("Creating a node source " + name);
+        log("Creating a node source " + name);
         //first emtpy im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
@@ -147,12 +159,46 @@ public class RMTHelper {
                         creds,
                         nodeNumber,
                         RMTHelper.DEFAULT_NODES_TIMEOUT,
-                        setup.getJvmParameters() + " " +
-                                CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp"},
+                        vmOptions != null ? setup.listToString(vmOptions) : setup.getJvmParameters()},
                 StaticPolicy.class.getName(), null);
         rm.setNodeSourcePingFrequency(5000, name);
 
         waitForNodeSourceCreation(name, nodeNumber, monitor);
+    }
+
+    /**
+     * Creates a Local node source with specified name
+     */
+    public static void createNodeSource(String name, int nodeNumber, ResourceManager rm,
+                                        RMMonitorsHandler monitor) throws Exception {
+        createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor);
+    }
+
+    public List<TestNode> addNodesToDefaultNodeSource(int nodesNumber) throws Exception {
+        return addNodesToDefaultNodeSource(nodesNumber, new ArrayList<String>());
+    }
+
+    public List<TestNode> addNodesToDefaultNodeSource(int nodesNumber, List<String> vmOptions) throws Exception {
+        return addNodesToDefaultNodeSource(nodesNumber, vmOptions != null ? vmOptions : setup.getJvmParametersAsList(), getResourceManager(), getMonitorsHandler());
+    }
+
+    public static List<TestNode> addNodesToDefaultNodeSource(int nodesNumber, List<String> vmOptions,
+                                                             ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
+
+        Map<String, String> map = new HashMap<>();
+        List<TestNode> nodes = new ArrayList<>();
+        map.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
+        for (int i = 0; i < nodesNumber; i++) {
+            String nodeName = "node-" + i;
+            TestNode node = createNode(nodeName, map, vmOptions != null ? vmOptions : setup.getJvmParametersAsList());
+            nodes.add(node);
+            resourceManager.addNode(node.getNode().getNodeInformation().getURL());
+        }
+        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT, monitor);
+        for (int i = 0; i < nodesNumber; i++) {
+            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
+        }
+        return nodes;
     }
 
     /** Wait for the node source to be created when the node source is empty */
@@ -229,29 +275,8 @@ public class RMTHelper {
         return nodes;
     }
 
-    public void createNodeSource(int nodesNumber) throws Exception {
-        createNodeSource(nodesNumber, new ArrayList<String>());
-    }
 
-    public void createNodeSource(int nodesNumber, List<String> vmOptions) throws Exception {
-        createNodeSource(nodesNumber, vmOptions, getResourceManager(), getMonitorsHandler());
-    }
 
-    public static void createNodeSource(int nodesNumber, List<String> vmOptions,
-            ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
-        Map<String, String> map = new HashMap<>();
-        map.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
-        for (int i = 0; i < nodesNumber; i++) {
-            String nodeName = "node-" + i;
-
-            TestNode node = createNode(nodeName, map, vmOptions);
-            resourceManager.addNode(node.getNode().getNodeInformation().getURL());
-        }
-        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT, monitor);
-        for (int i = 0; i < nodesNumber; i++) {
-            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
-        }
-    }
 
     static int findFreePort() throws IOException {
         ServerSocket server = new ServerSocket(0);

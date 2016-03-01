@@ -32,36 +32,30 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task.utils;
+package org.ow2.proactive.utils;
 
-public class TaskKiller {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    public enum Status {
-        KILLED_MANUALLY, WALLTIME_REACHED, NOT_YET_KILLED;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({
+        java.lang.annotation.ElementType.METHOD
+})
 
-    private Thread threadToKill;
+/**
+ * This annotation allows to execute a junit test multiple times, either sequentially or in parallel.
+ *
+ * Examples :
+ * @Repeat(value = 10) // will execute the test 10 times sequentially
+ * @Repeat(value = 10, parallel = true) // will execute the test 10 times in parallel
+ * @Repeat(value = 10, parallel = true, timeout = 10000) // will execute the test 10 times sequentially and fail after 10 seconds
+ */
+public @interface Repeat {
+    int value() default 1;
 
-    private boolean wasKilled = false;
+    boolean parallel() default false;
 
-    private Status status = Status.NOT_YET_KILLED;
-
-    public TaskKiller(Thread threadToKill) { // executor service?
-        this.threadToKill = threadToKill;
-    }
-
-    public synchronized boolean wasKilled() {
-        return wasKilled;
-    }
-
-    public synchronized void kill(Status status) {
-        wasKilled = true;
-        this.status = status;
-        threadToKill.interrupt();
-    }
-
-    public synchronized Status getStatus() {
-        return status;
-    }
-
+    long timeout() default -1;
 }
+

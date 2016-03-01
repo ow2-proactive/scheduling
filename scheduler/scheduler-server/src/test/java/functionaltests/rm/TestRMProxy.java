@@ -67,18 +67,18 @@ public class TestRMProxy extends ProActiveTest {
 
     static final int NODES_NUMBER = 3;
 
-    private Credentials user1Credentials;
+    private static Credentials user1Credentials;
 
-    private Credentials user2Credentials;
+    private static Credentials user2Credentials;
+
+    private RMProxiesManager proxiesManager;
 
     static String nsName = "test";
 
     private static RMTHelper rmHelper;
 
-
-    @Before
-    public void init() throws Exception {
-
+    @BeforeClass
+    public static void setUp() throws Exception {
         if (TestScheduler.isStarted()) {
             SchedulerTHelper.log("Killing previous scheduler.");
             TestScheduler.kill();
@@ -91,27 +91,46 @@ public class TestRMProxy extends ProActiveTest {
 
         user2Credentials = Credentials.createCredentials(new CredData("demo", "demo"), rmHelper.getRMAuth()
                 .getPublicKey());
+
+        rmHelper.createNodeSource(nsName, NODES_NUMBER);
+    }
+
+
+    @Test
+    public void testProxiesManagerPerUser() throws Exception {
+        log("\n Test with per-user connection \n");
+        testRMProxies(false);
     }
 
     @Test
-    public void testProxiesManager() throws Exception {
-
-        rmHelper.createNodeSource(nsName, NODES_NUMBER);
-
-        log("\n Test with per-user connection \n");
-        testRMProxies(false);
-
+    public void testProxiesManagerSingle() throws Exception {
         log("\n Test with single connection \n");
-
         testRMProxies(true);
     }
 
     @After
-    public void cleanup() throws Exception {
-        log("\n Shutdown RM \n");
-        rmHelper.getResourceManager().shutdown(true);
-        rmHelper.killRM();
+    public void terminateProxies() {
+        log("Terminate all proxies");
+        if (proxiesManager != null) {
+            try {
+                proxiesManager.terminateAllProxies();
+            } catch (Exception ignored) {
+
+            }
+        }
     }
+
+    @AfterClass
+    public static void deleteNS() throws Exception {
+        try {
+            rmHelper.removeNodeSource(nsName);
+            rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        } catch (Exception ignored) {
+
+        }
+        rmHelper.shutdownRM();
+    }
+
 
     private void testRMProxies(boolean singleUserConnection) throws Exception {
         ResourceManager rm = rmHelper.getResourceManager();
@@ -121,8 +140,6 @@ public class TestRMProxy extends ProActiveTest {
         URI rmUri = new URI(RMTHelper.getLocalUrl());
         Credentials schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
                 .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
-
-        RMProxiesManager proxiesManager;
 
         if (singleUserConnection) {
             proxiesManager = new SingleConnectionRMProxiesManager(rmUri, schedulerProxyCredentials);
@@ -170,8 +187,6 @@ public class TestRMProxy extends ProActiveTest {
         user2RMProxy = proxiesManager.getUserRMProxy("demo", user2Credentials);
         requestReleaseAllNodes(user2RMProxy, rm);
 
-        log("Terminate all proxies");
-        proxiesManager.terminateAllProxies();
     }
 
     private void requestWithTwoUsers(RMProxy proxy1, RMProxy proxy2, ResourceManager rm) throws Exception {
