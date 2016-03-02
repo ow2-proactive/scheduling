@@ -1,12 +1,9 @@
 package functionaltests;
 
-import static org.junit.Assume.assumeTrue;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
+import functionaltests.monitor.EventMonitor;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestUsers;
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,16 +23,18 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl;
 
-import functionaltests.monitor.EventMonitor;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestUsers;
+import java.io.File;
+import java.io.FileWriter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
+import static org.junit.Assume.assumeTrue;
 
 
 /**
  * @author esalagea
  */
-public class TestSmartProxy extends SchedulerFunctionalTest {
+public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
 
     /**
      * Local folder on client side where the input data is located and where the
