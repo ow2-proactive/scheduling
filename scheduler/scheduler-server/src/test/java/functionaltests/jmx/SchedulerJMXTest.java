@@ -37,7 +37,7 @@
 package functionaltests.jmx;
 
 import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.utils.TestUsers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -70,7 +70,7 @@ import static org.junit.Assert.*;
  * 
  * @author ProActive team
  */
-public final class SchedulerJMXTest extends SchedulerFunctionalTestNoRestart {
+public final class SchedulerJMXTest extends SchedulerFunctionalTestWithRestart {
 
     @Test
     public void action() throws Exception {
