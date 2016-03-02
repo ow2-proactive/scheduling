@@ -200,6 +200,10 @@ public class RMNodeStarter {
     private static final String OPTION_DISCOVERY_TIMEOUT = "dt";
     private static final char OPTION_HELP = 'h';
 
+    public RMNodeStarter() {
+
+    }
+
     /**
      * Fills the command line options.
      * @param options the options to fill
@@ -311,8 +315,13 @@ public class RMNodeStarter {
         try {
             args = JVMPropertiesPreloader.overrideJVMProperties(args);
             CookieBasedProcessTreeKiller.registerKillChildProcessesOnShutdown("node");
-            RMNodeStarter starter = new RMNodeStarter();
-            starter.doMain(args);
+            RMNodeStarter passiveStarter = new RMNodeStarter();
+            String baseNodeName = passiveStarter.configure(args);
+            // The RMNodeStarter object is turned to an active object for cleaner identification to the resource manager
+            RMNodeStarter starter = PAActiveObject.turnActive(passiveStarter);
+
+            starter.createNodesAndConnect(baseNodeName);
+
         } catch (Throwable t) {
             System.err
                     .println("A major problem occurred when trying to start a node and register it into the Resource Manager, see the stacktrace below");
@@ -326,7 +335,7 @@ public class RMNodeStarter {
         }
     }
 
-    protected void doMain(final String args[]) {
+    protected String configure(final String args[]) {
         configureSecurityManager();
         configureRMAndProActiveHomes();
         configureProActiveDefaultConfigurationFile();
@@ -342,6 +351,11 @@ public class RMNodeStarter {
 
         readAndSetTheRank();
 
+        return nodeName;
+    }
+
+    public boolean createNodesAndConnect(final String nodeName) {
+
         List<Node> nodes = createNodes(nodeName);
 
         Tools.logAvailableScriptEngines(logger);
@@ -356,6 +370,8 @@ public class RMNodeStarter {
         }
 
         connectToResourceManager(nodeName, nodes);
+
+        return true;
     }
 
     public static List<String> getWorkersNodeNames(String baseNodeName, int nbWorkers) {

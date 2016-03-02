@@ -1,7 +1,9 @@
 package functionaltests.job.taskkill;
 
 import functionaltests.utils.DebugHelper;
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -26,7 +28,13 @@ import static org.junit.Assert.assertEquals;
  * 
  * To simulate node hanging it suspends node using java debug interface.
  */
-public class TestKillWhenNodeHangs extends SchedulerFunctionalTestWithRestart {
+public class TestKillWhenNodeHangs extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        // we start a scheduler with an empty RM
+        schedulerHelper = new SchedulerTHelper(true, true);
+    }
 
     public static class SleepForeverTask extends JavaExecutable {
         @Override
