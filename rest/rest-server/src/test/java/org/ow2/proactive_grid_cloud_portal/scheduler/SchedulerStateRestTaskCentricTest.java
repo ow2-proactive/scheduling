@@ -42,6 +42,8 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -148,7 +150,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
     }
 
     @Test
-    public void testGetTaskStatesByTagSortByIdDesc() throws Throwable {
+    public void testGetTaskStatesByTagSortByTaskIdDesc() throws Throwable {
         int nbTasksInPage = 50;
         int nbTotalTasks = 100;
         String jobIdStr = "1";
@@ -172,6 +174,26 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
         TaskStateData previousTask = tasks.get(0);
         TaskStateData currentTask = tasks.get(1);
         assertTrue(previousTask.getName().compareTo(currentTask.getName()) < 0);
+    }
+
+    @Test
+    public void testGetTaskStatesByTagSortByJobIdAsc() throws Throwable {
+        int nbTasksInPage = 6;
+        int nbTotalTasks = 6;
+        ArrayList<String> jobIds = new ArrayList<String>(Arrays.asList("1","8","4","4","6","2"));
+        String tag = "TAG-TEST";
+        Page<TaskState> expectedPage = RestTestUtils.newMockedTaskStatePage(jobIds, tag, nbTasksInPage,
+                nbTotalTasks);
+
+        when(mockOfScheduler.getTaskStates(anyString(), anyLong(), anyLong(),
+                anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyInt(),
+                anyInt(), any(SortSpecifierContainer.class)))
+                .thenReturn(expectedPage);
+
+        RestPage<TaskStateData> page = restInterface.getTaskStatesByTag(sessionId, tag, 0, 0, false, true,
+                true, true, 0, nbTasksInPage, new SortSpecifierContainer(".jobData.id,ascending"));
+
+        RestTestUtils.assertTaskStates(expectedPage, page);
     }
 
     @Test
