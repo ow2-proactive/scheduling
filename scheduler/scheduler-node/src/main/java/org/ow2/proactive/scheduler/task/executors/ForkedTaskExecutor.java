@@ -34,12 +34,7 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.PrintStream;
-
+import org.apache.commons.io.FileUtils;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -50,7 +45,8 @@ import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ExecuteForkedTaskInsideNewJvm;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
-import org.apache.commons.io.FileUtils;
+
+import java.io.*;
 
 
 /**

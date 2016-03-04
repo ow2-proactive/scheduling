@@ -50,7 +50,11 @@ public class ExecuteForkedTaskInsideNewJvm {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(f))) {
             return (TaskContext) inputStream.readObject();
         } finally {
-            FileUtils.forceDelete(f);
+            try {
+                FileUtils.forceDelete(f);
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+            }
         }
     }
 
@@ -89,7 +93,7 @@ public class ExecuteForkedTaskInsideNewJvm {
             try {
                 serializeTaskResult(throwable, contextPath);
             } catch (Throwable couldNotSerializeException) {
-                System.err.println("Could not serialize exception as task result");
+                System.err.println("Could not serialize exception as task result:");
                 couldNotSerializeException.printStackTrace(System.err);
             }
             System.exit(1);

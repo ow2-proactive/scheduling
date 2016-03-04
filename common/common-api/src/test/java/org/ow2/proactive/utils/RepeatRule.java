@@ -88,6 +88,7 @@ public class RepeatRule implements TestRule {
 
             } else {
                 for (int i = 0; i < times; i++) {
+                    System.out.println("Repeat test iteration " + i);
                     statement.evaluate();
                 }
             }

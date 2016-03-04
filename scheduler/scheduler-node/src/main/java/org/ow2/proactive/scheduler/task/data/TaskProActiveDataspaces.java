@@ -137,22 +137,16 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         long id = taskId.getJobId().hashCode();
 
         //prepare scratch, input, output
-        try {
-            Node node = PAActiveObject.getNode();
-            logger.info("Configuring dataspaces for app " + id + " on " + node.getNodeInformation().getName());
-            DataSpacesNodes.configureApplication(node, id, namingService);
 
-            SCRATCH = PADataSpaces.resolveScratchForAO();
-            logger.info("SCRATCH space is " + SCRATCH.getRealURI());
+        Node node = PAActiveObject.getNode();
+        logger.info("Configuring dataspaces for app " + id + " on " + node.getNodeInformation().getName());
+        DataSpacesNodes.configureApplication(node, id, namingService);
 
-        } catch (FileSystemException fse) {
-            logger.error("There was a problem while initializing dataSpaces, they are not activated", fse);
-            this.logDataspacesStatus(
-                    "There was a problem while initializing dataSpaces, they are not activated",
-                    DataspacesStatusLevel.ERROR);
-            this.logDataspacesStatus(Formatter.stackTraceToString(fse), DataspacesStatusLevel.ERROR);
-        }
+        SCRATCH = PADataSpaces.resolveScratchForAO();
+        logger.info("SCRATCH space is " + SCRATCH.getRealURI());
 
+        // Set the scratch folder writable for everyone
+        getScratchFolder().setWritable(true, false);
 
         INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
@@ -222,7 +216,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     @Override
     public File getScratchFolder() {
         if (SCRATCH == null) {
-            return new File(".");
+            throw new IllegalStateException("SCRATCH space not mounted");
         }
 
         return new File(convertDataSpaceURIToFileIfPossible(SCRATCH.getRealURI(), true));
@@ -231,7 +225,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     @Override
     public String getScratchURI() {
         if (SCRATCH == null) {
-            return new File(".").getAbsolutePath();
+            throw new IllegalStateException("SCRATCH space not mounted");
         }
         return convertDataSpaceURIToFileIfPossible(SCRATCH.getRealURI(), true);
     }
@@ -571,7 +565,11 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     @Override
     public void cleanScratchSpace() {
-        FileUtils.deleteQuietly(getScratchFolder());
+        try {
+            File folder = getScratchFolder();
+            FileUtils.deleteQuietly(folder);
+        } catch (Exception ignored) {
+        }
     }
 
     private FileSystemException copyScratchDataToOutput(DataSpacesFileObject space, String spaceName, OutputSelector outputSelector,

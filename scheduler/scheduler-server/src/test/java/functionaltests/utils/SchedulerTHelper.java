@@ -159,6 +159,22 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Creates a test scheduler with a given configuration and empty RM
+     *
+     * @param configuration the Scheduler configuration file to use (default is
+     *                      functionalTSchedulerProperties.ini)
+     *                      null to use the default one.
+     * @throws Exception if an error occurs.
+     */
+    public SchedulerTHelper(boolean restart, boolean emptyRM, String configuration) throws Exception {
+        if (emptyRM) {
+            startScheduler(restart, SchedulerTestConfiguration.emptyRMandCustomSchedulerConfig(configuration));
+        } else {
+            startScheduler(restart, SchedulerTestConfiguration.customSchedulerConfig(configuration));
+        }
+    }
+
+    /**
      * Creates a test scheduler with a given number of nodes,
      * and given scheduler and resource manager configurations
      * @param localnodes number of nodes to create
@@ -324,6 +340,17 @@ public class SchedulerTHelper {
     public boolean killJob(String jobId) throws Exception {
         Scheduler userInt = getSchedulerInterface();
         return userInt.killJob(jobId);
+    }
+
+    /**
+     * Kills a tzsk
+     *
+     * @return success or failure at killing the task
+     * @throws Exception
+     */
+    public boolean killTask(String jobId, String taskName) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.killTask(jobId, taskName);
     }
 
     /**

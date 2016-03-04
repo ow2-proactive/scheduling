@@ -134,6 +134,10 @@ public class SchedulerTestConfiguration {
         return new SchedulerTestConfiguration(null, null, false, TestScheduler.PNP_PORT, null);
     }
 
+    public static SchedulerTestConfiguration emptyRMandCustomSchedulerConfig(String configuration) {
+        return new SchedulerTestConfiguration(configuration, null, false, TestScheduler.PNP_PORT, null);
+    }
+
     public static SchedulerTestConfiguration customSchedulerConfig(String configuration) {
         return new SchedulerTestConfiguration(configuration, null, true, TestScheduler.PNP_PORT, null);
     }

@@ -141,8 +141,6 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTestWithResta
 
         log("Kill t4");
         schedulerHelper.getSchedulerInterface().killTask(id, "t4");
-        //SchedulerTHelper.log("Wait for event t4 finished");
-        //schedulerHelper.waitForEventTaskFinished(id, "t4");
         log("Wait for event job finished");
         //finished jobs list must have only one job
         JobInfo ji4 = schedulerHelper.waitForEventJobFinished(id);
