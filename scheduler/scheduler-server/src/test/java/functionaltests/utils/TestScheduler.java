@@ -65,6 +65,7 @@ public class TestScheduler {
 
     public static String schedulerUrl = "pnp://" + ProActiveInet.getInstance().getHostname() + ":" +
             PNP_PORT + "/";
+    public static String rmUrl;
     private static Process schedulerProcess;
 
     private static SchedulerAuthenticationInterface schedulerAuth;
@@ -142,6 +143,7 @@ public class TestScheduler {
         } else {
             rmToConnectTo = schedulerUrl;
         }
+        rmUrl = rmToConnectTo;
 
         System.out.println("Starting Scheduler process: " + commandLine);
 
@@ -231,6 +233,10 @@ public class TestScheduler {
 
     public static String getUrl() {
         return schedulerUrl;
+    }
+
+    public static String getRMUrl() {
+        return rmUrl;
     }
 
 }

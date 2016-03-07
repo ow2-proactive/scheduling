@@ -36,7 +36,7 @@
  */
 package functionaltests.job.taskkill;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -65,7 +65,7 @@ import static org.junit.Assert.fail;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestJobKilled extends SchedulerFunctionalTestWithRestart {
+public class TestJobKilled extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     private static URL jobDescriptor = TestJobKilled.class
             .getResource("/functionaltests/descriptors/Job_Killed.xml");

@@ -207,7 +207,7 @@ public class SchedulerTHelper {
             killScheduler();
             log("Starting Scheduler");
             scheduler.start(configuration);
-            RMTestUser.getInstance().connect(TestUsers.DEMO, scheduler.getUrl());
+            RMTestUser.getInstance().connect(TestUsers.DEMO, scheduler.getRMUrl());
         }
         currentTestConfiguration = configuration;
     }
@@ -846,11 +846,11 @@ public class SchedulerTHelper {
 
     public ResourceManager getResourceManager(TestUsers user) throws Exception {
         if (!RMTestUser.getInstance().is(user)) { // changing user on the fly
-            RMTestUser.getInstance().connect(user, scheduler.getUrl());
+            RMTestUser.getInstance().connect(user, scheduler.getRMUrl());
         }
 
         if (!RMTestUser.getInstance().isConnected()) {
-            RMTestUser.getInstance().connect(user, scheduler.getUrl());
+            RMTestUser.getInstance().connect(user, scheduler.getRMUrl());
         }
 
         return RMTestUser.getInstance().getResourceManager();
