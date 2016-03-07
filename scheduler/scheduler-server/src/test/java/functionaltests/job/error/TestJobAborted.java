@@ -36,23 +36,18 @@
  */
 package functionaltests.job.error;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
-import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-
-import functionaltests.utils.SchedulerFunctionalTest;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 /**
@@ -67,7 +62,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestJobAborted extends SchedulerFunctionalTest {
+public class TestJobAborted extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestJobAborted.class
             .getResource("/functionaltests/descriptors/Job_Aborted.xml");

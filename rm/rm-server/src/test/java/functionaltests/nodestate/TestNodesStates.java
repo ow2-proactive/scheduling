@@ -36,12 +36,7 @@
  */
 package functionaltests.nodestate;
 
-import static functionaltests.utils.RMTHelper.log;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
+import functionaltests.utils.RMFunctionalTest;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -52,7 +47,9 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
 
-import functionaltests.utils.RMFunctionalTest;
+import static functionaltests.utils.RMTHelper.log;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 
 
 /**
@@ -172,7 +169,7 @@ public class TestNodesStates extends RMFunctionalTest {
         Node n2 = nodes.get(1); //for next test
 
         try {
-            n.getProActiveRuntime().killRT(false);
+            n.getProActiveRuntime().killNode(n.getNodeInformation().getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -201,7 +198,7 @@ public class TestNodesStates extends RMFunctionalTest {
         // node must detected down by RM
         log("Test 5");
         try {
-            n2.getProActiveRuntime().killRT(false);
+            n2.getProActiveRuntime().killNode(n2.getNodeInformation().getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -239,7 +236,7 @@ public class TestNodesStates extends RMFunctionalTest {
 
         //kill the node
         try {
-            n.getProActiveRuntime().killRT(false);
+            n.getProActiveRuntime().killNode(n.getNodeInformation().getName());
         } catch (Exception e) {
             e.printStackTrace();
         }

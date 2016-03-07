@@ -36,12 +36,10 @@
  */
 package functionaltests.rm.nodesource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.After;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -54,22 +52,30 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.File;
+import java.net.URL;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
  * Checking that job with token is deployed on nodes with the corresponding token.
  * 
  */
-public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
-	
-	private static URL simpleJob = TestJobNodeAccessToken.class
+public class TestJobNodeAccessToken extends SchedulerFunctionalTestNoRestart {
+
+    private static URL simpleJob = TestJobNodeAccessToken.class
             .getResource("/functionaltests/descriptors/Job_simple.xml");
     private static URL simpleJobWithToken = TestJobNodeAccessToken.class
             .getResource("/functionaltests/descriptors/Job_simple_with_token.xml");
-    
+
+    private boolean nsCreated = false;
+
+    String nsName = "NodeSourceWithToken";
+
+    ResourceManager rm;
+
     @Test
     public void testJobNodeAccessToken() throws Throwable {
     	
@@ -87,14 +93,15 @@ public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
         assertEquals(JobStatus.PENDING, js.getStatus());
 
         // adding node with the token "test_token"
-        ResourceManager rm = schedulerHelper.getResourceManager();
+        rm = schedulerHelper.getResourceManager();
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        String nsName = "NodeSourceWithToken";
 
         String nsProps = "-D" + RMNodeStarter.NODE_ACCESS_TOKEN + "=test_token";
         assertTrue(rm.createNodeSource(nsName, LocalInfrastructure.class.getName(), new Object[] { creds, 1,
                 RMTHelper.DEFAULT_NODES_TIMEOUT, nsProps }, StaticPolicy.class.getName(), null).getBooleanValue());
+
+        nsCreated = true;
 
         // ns created
         schedulerHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
@@ -109,8 +116,13 @@ public class TestJobNodeAccessToken extends SchedulerFunctionalTest {
 
         schedulerHelper.waitForEventJobFinished(id2);
 
-        rm.removeNodeSource(nsName, false);
-        
-        
+
+    }
+
+    @After
+    public void cleanUp() {
+        if (nsCreated) {
+            rm.removeNodeSource(nsName, false);
+        }
     }
 }

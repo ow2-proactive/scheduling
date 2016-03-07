@@ -1,8 +1,8 @@
 package org.ow2.proactive.scheduler.task;
 
-import java.io.Serializable;
-import java.util.concurrent.Semaphore;
-
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -12,20 +12,31 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.Before;
-import org.junit.Test;
+import org.ow2.proactive.utils.Repeat;
+import org.ow2.proactive.utils.RepeatRule;
+
+import java.io.Serializable;
+import java.util.concurrent.Semaphore;
 
 import static org.junit.Assert.assertEquals;
 
 
 public class KillTaskLauncherTest {
 
+    static final int repetitions = 10;
+    static final boolean parallel = true;
+    static final long timeout = 10000;
+
+    @Rule
+    public RepeatRule repeatRule = new RepeatRule();
+
     @Before
     public void setUp() throws Exception {
         CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
     }
 
-    @Test(timeout = 5000)
+    @Test
+    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_while_sleeping_in_task() throws Exception {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
@@ -48,7 +59,8 @@ public class KillTaskLauncherTest {
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }
 
-    @Test(timeout = 5000)
+    @Test
+    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_while_looping_in_task() throws Exception {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
@@ -70,7 +82,8 @@ public class KillTaskLauncherTest {
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }
 
-    @Test(timeout = 5000)
+    @Test
+    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void finished_but_terminate_not_called_back() throws Throwable {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
@@ -93,7 +106,8 @@ public class KillTaskLauncherTest {
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }
 
-    @Test(timeout = 5000)
+    @Test
+    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_when_finished() throws Throwable {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
@@ -113,12 +127,18 @@ public class KillTaskLauncherTest {
 
         assertEquals("done", taskResultWaiter.getTaskResult().value());
 
-        taskLauncherPA.kill();
+        try {
+            taskLauncherPA.kill();
+        } catch (Exception ignored) {
+            // task launcher can be terminated before the kill message is received
+        }
+
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
     }
 
-    @Test(timeout = 5000)
+    @Test
+    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_when_copying() throws Throwable {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(

@@ -36,10 +36,11 @@
  */
 package functionaltests.job.error;
 
-import java.io.File;
-import java.io.Serializable;
-import java.nio.file.Path;
-
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestNode;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -51,15 +52,13 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.FileLock;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestNode;
-import org.junit.Test;
+
+import java.io.File;
+import java.io.Serializable;
+import java.nio.file.Path;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -69,7 +68,7 @@ import static org.junit.Assert.assertTrue;
  * @author ProActive team
  *
  */
-public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
+public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     private static final long TIMEOUT = 60000;
 
@@ -86,12 +85,22 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
 
     }
 
-    @Test
-    public void testRestart() throws Exception {
-        schedulerHelper.startScheduler(false, new File(SchedulerTHelper.class.getResource(
+    /**
+     * Starts an scheduler in non-fork mode with an empty rm
+     *
+     * @throws Exception
+     */
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper = new SchedulerTHelper(false, new File(SchedulerTHelper.class.getResource(
                         "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath(),
                 null,
                 null);
+    }
+
+    @Test
+    public void testRestart() throws Exception {
+
 
         FileLock fileLock = new FileLock();
         testTaskKillNode(fileLock, false);
@@ -155,13 +164,13 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTest {
         int nodeNumber = startedNodesCounter++;
 
         log("Start new node: node-" + nodeNumber);
-        TestNode node = schedulerHelper.createNode("node" + nodeNumber);
-        String nodeUrl = node.getNode().getNodeInformation().getURL();
+        testNode = schedulerHelper.createNode("node" + nodeNumber);
+        String nodeUrl = testNode.getNode().getNodeInformation().getURL();
         schedulerHelper.getResourceManager().addNode(nodeUrl);
         schedulerHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeUrl, TIMEOUT);
         RMNodeEvent event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeUrl, TIMEOUT);
         assertEquals(NodeState.FREE, event.getNodeState());
-        return node;
+        return testNode;
     }
 
     private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {

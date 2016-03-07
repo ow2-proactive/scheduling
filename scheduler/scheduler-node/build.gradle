@@ -17,6 +17,7 @@ dependencies {
     runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
 
     testCompile project(':scheduler:scheduler-examples')
+    testCompile project(':common:common-api').sourceSets.test.output
 }
 
 task stub(type: StubTask) {

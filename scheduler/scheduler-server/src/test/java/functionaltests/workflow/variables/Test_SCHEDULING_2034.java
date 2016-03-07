@@ -37,16 +37,15 @@
 
 package functionaltests.workflow.variables;
 
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
 
 
-public class Test_SCHEDULING_2034 extends SchedulerFunctionalTest {
+public class Test_SCHEDULING_2034 extends SchedulerFunctionalTestNoRestart {
 
     private static URL job_desc_unix = TestModifyPropagatedVariables.class
             .getResource("/functionaltests/descriptors/Job_SCHEDULING_2034_unix.xml");
@@ -54,7 +53,7 @@ public class Test_SCHEDULING_2034 extends SchedulerFunctionalTest {
     @Test
     public void testSCHEDULING_2034() throws Throwable {
         if (OperatingSystem.unix == OperatingSystem.getOperatingSystem()) {
-            schedulerHelper.testJobSubmissionAndVerifyAllResults(absolutePath(job_desc_unix));
+            schedulerHelper.testJobSubmission(absolutePath(job_desc_unix));
         }
     }
 

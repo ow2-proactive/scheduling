@@ -1,25 +1,22 @@
 package functionaltests.job.taskkill;
 
-import java.io.Serializable;
-import java.util.List;
-
+import functionaltests.utils.DebugHelper;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.junit.Ignore;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.DebugHelper;
+import java.io.Serializable;
+import java.util.List;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -31,7 +28,13 @@ import static org.junit.Assert.*;
  * 
  * To simulate node hanging it suspends node using java debug interface.
  */
-public class TestKillWhenNodeHangs extends SchedulerFunctionalTest {
+public class TestKillWhenNodeHangs extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        // we start a scheduler with an empty RM
+        schedulerHelper = new SchedulerTHelper(true, true);
+    }
 
     public static class SleepForeverTask extends JavaExecutable {
         @Override
@@ -56,7 +59,7 @@ public class TestKillWhenNodeHangs extends SchedulerFunctionalTest {
 
         // create RM and node source with one node, node JVM listens for debugger connections
         List<String> vmOptions = debugHelper.getDebuggedVMOptions();
-        schedulerHelper.createNodeSource(1, vmOptions);
+        testNodes.addAll(schedulerHelper.addNodesToDefaultNodeSource(1, vmOptions));
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 

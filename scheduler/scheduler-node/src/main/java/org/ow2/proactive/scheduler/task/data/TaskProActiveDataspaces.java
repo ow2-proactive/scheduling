@@ -37,6 +37,7 @@ package org.ow2.proactive.scheduler.task.data;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
@@ -136,21 +137,16 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         long id = taskId.getJobId().hashCode();
 
         //prepare scratch, input, output
-        try {
-            DataSpacesNodes.configureApplication(PAActiveObject.getActiveObjectNode(PAActiveObject
-                    .getStubOnThis()), id, namingService);
 
-            SCRATCH = PADataSpaces.resolveScratchForAO();
-            logger.info("SCRATCH space is " + SCRATCH.getRealURI());
+        Node node = PAActiveObject.getNode();
+        logger.info("Configuring dataspaces for app " + id + " on " + node.getNodeInformation().getName());
+        DataSpacesNodes.configureApplication(node, id, namingService);
 
-        } catch (FileSystemException fse) {
-            logger.error("There was a problem while initializing dataSpaces, they are not activated", fse);
-            this.logDataspacesStatus(
-                    "There was a problem while initializing dataSpaces, they are not activated",
-                    DataspacesStatusLevel.ERROR);
-            this.logDataspacesStatus(Formatter.stackTraceToString(fse), DataspacesStatusLevel.ERROR);
-        }
+        SCRATCH = PADataSpaces.resolveScratchForAO();
+        logger.info("SCRATCH space is " + SCRATCH.getRealURI());
 
+        // Set the scratch folder writable for everyone
+        getScratchFolder().setWritable(true, false);
 
         INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
@@ -220,7 +216,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     @Override
     public File getScratchFolder() {
         if (SCRATCH == null) {
-            return new File(".");
+            throw new IllegalStateException("SCRATCH space not mounted");
         }
 
         return new File(convertDataSpaceURIToFileIfPossible(SCRATCH.getRealURI(), true));
@@ -229,7 +225,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     @Override
     public String getScratchURI() {
         if (SCRATCH == null) {
-            return new File(".").getAbsolutePath();
+            throw new IllegalStateException("SCRATCH space not mounted");
         }
         return convertDataSpaceURIToFileIfPossible(SCRATCH.getRealURI(), true);
     }
@@ -367,7 +363,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             results.addAll(globResults);
             results.addAll(userResults);
 
-            ArrayList<Future> transferFutures = new ArrayList<>();
+            ArrayList<Future<Boolean>> transferFutures = new ArrayList<>();
             for (DataSpacesFileObject dsfo : results) {
                 String relativePath;
                 if (inResults.contains(dsfo)) {
@@ -392,11 +388,19 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                         public Boolean call() throws FileSystemException {
                             logger.info("Copying " + finaldsfo.getRealURI() + " to " + SCRATCH.getRealURI() +
                                     "/" + finalRelativePath);
-                            SCRATCH
-                                    .resolveFile(finalRelativePath)
+                            DataSpacesFileObject finalOut = SCRATCH.resolveFile(finalRelativePath);
+                            finalOut
                                     .copyFrom(
                                             finaldsfo,
                                             FileSelector.SELECT_SELF);
+
+                            if (!finalOut.exists()) {
+                                logger.error("There was a problem during the copy of " + finaldsfo.getRealURI() + " to " + finalOut.getRealURI() +
+                                        "/" + finalRelativePath + ". File not present after copy.");
+                                logDataspacesStatus("There was a problem during the copy of " + finaldsfo.getRealURI() + " to " + finalOut.getRealURI() +
+                                                "/" + finalRelativePath + ". File not present after copy.",
+                                        DataspacesStatusLevel.ERROR);
+                            }
                             return true;
                         }
                     }));
@@ -407,7 +411,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
             StringBuilder exceptionMsg = new StringBuilder();
             String nl = System.lineSeparator();
-            for (Future f : transferFutures) {
+            for (Future<Boolean> f : transferFutures) {
                 try {
                     f.get();
                 } catch (InterruptedException | ExecutionException e) {
@@ -438,6 +442,11 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         }
 
         try {
+            // A desynchronization has been noticed when multiple dataspaces are mounted on the same folder
+            // The call to refresh ensures that the content of the dataspace cache is resynchronized with the disk
+            // before the transfer
+            space.refresh();
+
             int oldSize = results.size();
 
             Utils.findFiles(space, selector, results);
@@ -556,7 +565,11 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     @Override
     public void cleanScratchSpace() {
-        FileUtils.deleteQuietly(getScratchFolder());
+        try {
+            File folder = getScratchFolder();
+            FileUtils.deleteQuietly(folder);
+        } catch (Exception ignored) {
+        }
     }
 
     private FileSystemException copyScratchDataToOutput(DataSpacesFileObject space, String spaceName, OutputSelector outputSelector,

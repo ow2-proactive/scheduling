@@ -36,46 +36,35 @@
  */
 package org.ow2.proactive.resourcemanager.common.util;
 
-import java.io.IOException;
-import java.security.KeyException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MBeanException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-import javax.management.openmbean.CompositeData;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-import javax.security.auth.login.LoginException;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.common.event.*;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
-import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+
+import javax.management.*;
+import javax.management.openmbean.CompositeData;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.security.KeyException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -87,7 +76,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 @ActiveObject
 public class RMListenerProxy extends RMGroupEventListener {
 
-    private Logger logger = ProActiveLogger.getLogger(RMListenerProxy.class);
+    protected Logger logger = ProActiveLogger.getLogger(RMListenerProxy.class);
 
     protected RMAuthentication rmAuth;
     protected RMInitialState rmInitialState;
@@ -114,14 +103,30 @@ public class RMListenerProxy extends RMGroupEventListener {
         this.rmAuth = RMConnection.join(url);
         this.target = rmAuth.login(credentials);
 
-        rmInitialState = this.target.getMonitoring().addRMEventListener(
-                (RMEventListener) PAActiveObject.getStubOnThis());
+        rebindListener();
 
         // here we log on using an empty login field to ensure that
         // credentials are used.
         this.jmxClient = new JMXClientHelper(rmAuth, new Object[] { "", credentials });
         this.jmxClient.connect();
         return true;
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#disconnect()
+     */
+    public BooleanWrapper disconnect() {
+        try {
+            target.getMonitoring().removeRMEventListener();
+        } catch (RMException ignored) {
+        }
+        BooleanWrapper r = target.disconnect();
+        return r;
+    }
+
+    private void rebindListener() {
+        rmInitialState = this.target.getMonitoring().addRMEventListener(
+                (RMEventListener) PAActiveObject.getStubOnThis());
     }
 
     private void checkCounter(RMEvent event) {
@@ -134,8 +139,7 @@ public class RMListenerProxy extends RMGroupEventListener {
             } catch (RMException e) {
                 logger.error(e.getMessage(), e);
             }
-            rmInitialState = this.target.getMonitoring().addRMEventListener(
-                    (RMEventListener) PAActiveObject.getStubOnThis());
+            rebindListener();
             counter = 0;
         } else {
             counter = event.getCounter();

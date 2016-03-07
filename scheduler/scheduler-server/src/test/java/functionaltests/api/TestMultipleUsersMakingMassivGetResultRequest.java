@@ -36,8 +36,8 @@
  */
 package functionaltests.api;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
 import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -49,8 +49,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.examples.EmptyTask;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.TestUsers;
+import static functionaltests.utils.SchedulerTHelper.log;
 
 
 /**
@@ -63,7 +62,7 @@ import functionaltests.utils.TestUsers;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestMultipleUsersMakingMassivGetResultRequest extends SchedulerFunctionalTest {
+public class TestMultipleUsersMakingMassivGetResultRequest extends SchedulerFunctionalTestNoRestart {
 
     private static int ThreadNumber = 8; //8 clients
     private static long jobSubmissionDuration = 60 * 1000; // 60 sec

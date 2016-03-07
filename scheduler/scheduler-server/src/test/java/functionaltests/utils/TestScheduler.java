@@ -34,15 +34,6 @@
  */
 package functionaltests.utils;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.net.URISyntaxException;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.security.auth.login.LoginException;
-
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
@@ -59,22 +50,32 @@ import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.FileUtils;
 
+import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.net.URISyntaxException;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class TestScheduler {
 
     public static final int PNP_PORT = TestRM.PA_PNP_PORT;
 
-    private static String schedulerUrl = "pnp://" + ProActiveInet.getInstance().getHostname() + ":" +
+    public static String schedulerUrl = "pnp://" + ProActiveInet.getInstance().getHostname() + ":" +
             PNP_PORT + "/";
     private static Process schedulerProcess;
 
-    private SchedulerAuthenticationInterface schedulerAuth;
-    private RMAuthentication rmAuth;
+    private static SchedulerAuthenticationInterface schedulerAuth;
+    private static RMAuthentication rmAuth;
 
-    private CookieBasedProcessTreeKiller processTreeKiller;
-    private SchedulerTestConfiguration startedConfiguration = SchedulerTestConfiguration.defaultConfiguration();
+    private static CookieBasedProcessTreeKiller processTreeKiller;
+    private static SchedulerTestConfiguration startedConfiguration = SchedulerTestConfiguration.defaultConfiguration();
 
-    public synchronized void start(SchedulerTestConfiguration configuration) throws Exception {
+    private static boolean isStarted = false;
+
+    public static synchronized void start(SchedulerTestConfiguration configuration) throws Exception {
         kill();
         cleanTMP();
 
@@ -161,9 +162,14 @@ public class TestScheduler {
 
         schedulerAuth = SchedulerConnection.waitAndJoin(schedulerUrl, 120000);
         System.out.println("The Scheduler is up and running");
+        isStarted = true;
     }
 
-    private void startLocalNodes(
+    public static boolean isStarted() {
+        return isStarted;
+    }
+
+    private static void startLocalNodes(
             SchedulerTestConfiguration configuration) throws KeyException, LoginException, InterruptedException {
         if (configuration.hasLocalNodes()) {
             // Waiting while all the nodes will be registered in the RM.
@@ -183,12 +189,13 @@ public class TestScheduler {
         }
     }
 
-    public void kill() throws Exception {
+    public static void kill() throws Exception {
         if (schedulerProcess != null) {
             schedulerProcess.destroy();
             schedulerProcess.waitFor();
             processTreeKiller.kill();
             schedulerProcess = null;
+            isStarted = false;
         }
     }
 
@@ -209,20 +216,20 @@ public class TestScheduler {
         }
     }
 
-    public synchronized SchedulerAuthenticationInterface getAuth() {
+    public static synchronized SchedulerAuthenticationInterface getAuth() {
         return schedulerAuth;
     }
 
-    public boolean isStartedWithSameConfiguration(SchedulerTestConfiguration configuration)
+    public static boolean isStartedWithSameConfiguration(SchedulerTestConfiguration configuration)
             throws URISyntaxException {
         return schedulerProcess != null && startedConfiguration.equals(configuration);
     }
 
-    public synchronized RMAuthentication getRMAuth() {
+    public static synchronized RMAuthentication getRMAuth() {
         return rmAuth;
     }
 
-    public String getUrl() {
+    public static String getUrl() {
         return schedulerUrl;
     }
 

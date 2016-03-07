@@ -36,12 +36,11 @@
  */
 package functionaltests.scripts;
 
-import java.io.File;
-
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
 
 
 /**
@@ -49,7 +48,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * in {@code task} element for Jobs Schema in version 3.3 but not longer
  * in {@code javaExecutable} element.
  */
-public class TestScriptForkEnvironment extends SchedulerFunctionalTest {
+public class TestScriptForkEnvironment extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testValidForkEnvironmentPositionWithSchemaVersion3_3() throws Throwable {

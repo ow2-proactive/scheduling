@@ -36,17 +36,7 @@
  */
 package functionaltests.dataspaces;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.URI;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -65,7 +55,11 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.*;
+import java.net.URI;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -86,7 +80,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestUserSpace extends SchedulerFunctionalTest {
+public class TestUserSpace extends SchedulerFunctionalTestWithRestart {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
             { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },

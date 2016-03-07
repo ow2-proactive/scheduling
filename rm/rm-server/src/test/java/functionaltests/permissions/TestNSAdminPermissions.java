@@ -36,18 +36,18 @@
  */
 package functionaltests.permissions;
 
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestNode;
+import functionaltests.utils.TestUsers;
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Assert;
-import org.junit.Test;
-
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestUsers;
 
 import static org.junit.Assert.fail;
 
@@ -106,11 +106,13 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
         RMTHelper.log("Test2 - ns admin can remove foreign nodes");
         userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
         userRMAccess.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "PROVIDER", "ALL" });
+                StaticPolicy.class.getName(), new Object[]{"PROVIDER", "ALL"});
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        Node node = rmHelper.createNode("node1").getNode();
+        TestNode testNode1 = rmHelper.createNode("node1");
+        testNodes.add(testNode1);
+        Node node = testNode1.getNode();
 
         // adding the node as provider
         providerRMAccess.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -125,7 +127,9 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
 
         RMTHelper.log("Test3 - ns admin cannot get the foreign node");
         providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        Node node2 = rmHelper.createNode("node2").getNode();
+        TestNode testNode2 = rmHelper.createNode("node2");
+        testNodes.add(testNode2);
+        Node node2 = testNode2.getNode();
         // adding the node as provider
         providerRMAccess.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);

@@ -34,6 +34,14 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
+import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.task.context.TaskContext;
+import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
+import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedJvmTaskExecutionCommandCreator;
+import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+import org.ow2.proactive.scripting.ScriptResult;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -44,16 +52,8 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.security.KeyException;
 import java.util.Set;
 
-import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.task.context.TaskContext;
-import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
-import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedJvmTaskExecutionCommandCreator;
-import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
-import org.ow2.proactive.scripting.ScriptResult;
-
 public class ForkedProcessBuilderCreator implements Serializable {
-    private static final Set<PosixFilePermission> SHARED_FOLDER_PERMISSIONS = PosixFilePermissions.fromString(
+    public static final Set<PosixFilePermission> SHARED_FOLDER_PERMISSIONS = PosixFilePermissions.fromString(
             "rwxrwxrwx");
     private final ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();

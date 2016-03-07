@@ -36,8 +36,12 @@
  */
 package functionaltests.permissions;
 
-import java.util.List;
-
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestNode;
+import functionaltests.utils.TestUsers;
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -45,15 +49,10 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestNode;
-import functionaltests.utils.TestUsers;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -76,6 +75,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" }).getBooleanValue();
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 17);
+
+        testNode = nodePool.get(0);
 
         Node node = nodePool.remove(0).getNode();
         Node node2 = nodePool.remove(0).getNode();
@@ -300,7 +301,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         RMTHelper.log("Test6.1 - specific users");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "users=nsadmin", "ALL" }).getBooleanValue();
+                StaticPolicy.class.getName(), new Object[]{"users=nsadmin", "ALL"}).getBooleanValue();
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
@@ -341,7 +342,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         RMTHelper.log("Test6.2 - specific groups");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "groups=nsadmins", "ALL" }).getBooleanValue();
+                StaticPolicy.class.getName(), new Object[]{"groups=nsadmins", "ALL"}).getBooleanValue();
 
         node = nodePool.remove(0).getNode();
         node2 = nodePool.remove(0).getNode();
@@ -441,7 +442,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         RMTHelper.log("Test6.4 - specific users and groups");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "users=radmin;groups=nsadmins", "ALL" })
+                StaticPolicy.class.getName(), new Object[]{"users=radmin;groups=nsadmins", "ALL"})
                 .getBooleanValue();
 
         node = nodePool.remove(0).getNode();

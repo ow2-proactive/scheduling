@@ -34,20 +34,19 @@
  */
 package functionaltests.workflow.variables;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
-public class TestPropagatedVariablesWalltime extends SchedulerFunctionalTest {
+public class TestPropagatedVariablesWalltime extends SchedulerFunctionalTestWithRestart {
 
     @Test
     public void testPropagatedVariablesWalltime() throws Throwable {

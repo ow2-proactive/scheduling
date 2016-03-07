@@ -1,25 +1,16 @@
 package org.ow2.proactive.scheduler.task;
 
+import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.ClosedWatchServiceException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.utils.FileUtils;
-import org.apache.log4j.Logger;
 
 /**
  * ProgressFileReader is in charge of:
@@ -138,12 +129,7 @@ public class ProgressFileReader {
                 || !Files.exists(progressFileDir)) {
             return;
         }
-
-        try {
-            FileUtils.deleteRecursively(progressFileDir);
-        } catch (IOException e) {
-            logger.warn("Cannot delete progress file dir: " + progressFileDir, e);
-        }
+        org.apache.commons.io.FileUtils.deleteQuietly(progressFileDir.toFile());
     }
 
     public interface Listener {

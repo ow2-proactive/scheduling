@@ -36,16 +36,7 @@
  */
 package functionaltests.dataspaces;
 
-import static org.junit.Assume.assumeTrue;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -53,7 +44,11 @@ import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -64,7 +59,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @since ProActive Scheduling 1.0
  */
 @Ignore // lpellegr: test is marked as ignored while I am investigating the issue
-public class TestSpecialCharacterFileName extends SchedulerFunctionalTest {
+public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRestart {
 
     private static String fileNameWithAccent = "myfile-é";
     private static String inputSpace = "data\\defaultinput\\user";

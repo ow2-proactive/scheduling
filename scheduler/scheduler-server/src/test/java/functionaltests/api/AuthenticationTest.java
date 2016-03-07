@@ -36,11 +36,9 @@
  */
 package functionaltests.api;
 
-import java.security.KeyException;
-import java.security.PublicKey;
-
-import javax.security.auth.login.LoginException;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
+import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -48,13 +46,13 @@ import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.TestUsers;
+import javax.security.auth.login.LoginException;
+import java.security.KeyException;
+import java.security.PublicKey;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -73,7 +71,7 @@ import static org.junit.Assert.*;
  * @since ProActive Scheduling 1.0
  *
  */
-public class AuthenticationTest extends SchedulerFunctionalTest {
+public class AuthenticationTest extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void action() throws Exception {

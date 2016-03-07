@@ -36,17 +36,11 @@
  */
 package functionaltests.utils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.monitor.SchedulerMonitorsHandler;
+import org.junit.Assert;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
@@ -58,24 +52,18 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.junit.Assert;
 
-import functionaltests.monitor.RMMonitorsHandler;
-import functionaltests.monitor.SchedulerMonitorsHandler;
+import java.io.IOException;
+import java.util.*;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -104,6 +92,8 @@ public class SchedulerTHelper {
 
     private static TestScheduler scheduler = new TestScheduler();
 
+    public static final String extraNS = "extra";
+
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -117,57 +107,123 @@ public class SchedulerTHelper {
         }));
     }
 
-    private static SchedulerTestUser connectedSchedulerUser = new SchedulerTestUser(TestUsers.DEMO);
-
-    private static RMTestUser connectedRMUser = new RMTestUser(TestUsers.DEMO);
 
     // can be changed by starting the Scheduler manually
     private SchedulerTestConfiguration currentTestConfiguration = SchedulerTestConfiguration.defaultConfiguration();
 
     /**
-     * Start the scheduler using a forked JVM and
-     * deploys, with its associated Resource manager, 5 local ProActive nodes.
+     * Creates a test scheduler
+     * @param restart if true then a new scheduler will be recreated
+     * @throws Exception
+     */
+    public SchedulerTHelper(boolean restart) throws Exception {
+        this(restart, false);
+    }
+
+    /**
+     * Creates a test scheduler
+     *
+     * @param restart if true then a new scheduler will be recreated
+     * @param emptyRM if true then a the scheduler must have zero node
+     * @throws Exception
+     */
+    public SchedulerTHelper(boolean restart, boolean emptyRM) throws Exception {
+        if (emptyRM) {
+            startScheduler(restart, SchedulerTestConfiguration.emptyResourceManager());
+        } else {
+            startScheduler(restart, SchedulerTestConfiguration.defaultConfiguration());
+        }
+    }
+
+    /**
+     * Creates a test scheduler with a given configuration
+     *
+     * @param restart       if true then a new scheduler will be recreated
+     * @param configuration configuration to use
+     * @throws Exception
+     */
+    public SchedulerTHelper(boolean restart, SchedulerTestConfiguration configuration) throws Exception {
+        startScheduler(restart, configuration);
+    }
+
+    /**
+     * Creates a test scheduler with a given configuration
      *
      * @param configuration the Scheduler configuration file to use (default is
      *                      functionalTSchedulerProperties.ini)
      * 			null to use the default one.
      * @throws Exception if an error occurs.
      */
-    public void startScheduler(String configuration) throws Exception {
-        startScheduler(SchedulerTestConfiguration.customSchedulerConfig(configuration));
+    public SchedulerTHelper(boolean restart, String configuration) throws Exception {
+        startScheduler(restart, SchedulerTestConfiguration.customSchedulerConfig(configuration));
     }
 
     /**
-     * Start the scheduler using a forked JVM and
-     * deploys, with its associated empty Resource manager.
+     * Creates a test scheduler with a given configuration and empty RM
      *
+     * @param configuration the Scheduler configuration file to use (default is
+     *                      functionalTSchedulerProperties.ini)
+     *                      null to use the default one.
      * @throws Exception if an error occurs.
      */
-    public void startSchedulerWithEmptyResourceManager() throws Exception {
-        startScheduler(SchedulerTestConfiguration.emptyResourceManager());
+    public SchedulerTHelper(boolean restart, boolean emptyRM, String configuration) throws Exception {
+        if (emptyRM) {
+            startScheduler(restart, SchedulerTestConfiguration.emptyRMandCustomSchedulerConfig(configuration));
+        } else {
+            startScheduler(restart, SchedulerTestConfiguration.customSchedulerConfig(configuration));
+        }
     }
 
-    public void startScheduler(boolean localnodes, String schedPropertiesFilePath,
+    /**
+     * Creates a test scheduler with a given number of nodes,
+     * and given scheduler and resource manager configurations
+     * @param localnodes number of nodes to create
+     * @param schedPropertiesFilePath configuration file for the scheduler
+     * @param rmPropertiesFilePath configuration file for the rm
+     * @param rmUrl url of the resource manager
+     * @throws Exception
+     */
+    public SchedulerTHelper(boolean localnodes, String schedPropertiesFilePath,
+                            String rmPropertiesFilePath, String rmUrl) throws Exception {
+        startScheduler(localnodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
+    }
+
+
+    private void startScheduler(String configuration) throws Exception {
+        startScheduler(true, SchedulerTestConfiguration.customSchedulerConfig(configuration));
+    }
+
+
+    private void startScheduler(boolean localnodes, String schedPropertiesFilePath,
             String rmPropertiesFilePath, String rmUrl) throws Exception {
         SchedulerTestConfiguration configuration = new SchedulerTestConfiguration(schedPropertiesFilePath,
             rmPropertiesFilePath, localnodes, TestScheduler.PNP_PORT, rmUrl);
-        startScheduler(configuration);
+        startScheduler(true, configuration);
     }
 
-    private void startScheduler(SchedulerTestConfiguration configuration) throws Exception {
-        if (!scheduler.isStartedWithSameConfiguration(configuration)) {
+    private void startScheduler(boolean restart, SchedulerTestConfiguration configuration) throws Exception {
+        if (restart || !scheduler.isStartedWithSameConfiguration(configuration)) {
+            log("Kill previous Scheduler and alive connexions");
+            killScheduler();
             log("Starting Scheduler");
             scheduler.start(configuration);
+            RMTestUser.getInstance().connect(TestUsers.DEMO, scheduler.getUrl());
         }
         currentTestConfiguration = configuration;
+    }
+
+    public boolean isStarted() {
+        return scheduler.isStarted();
     }
 
     /**
      * Kill the forked Scheduler if exists.
      */
     public void killScheduler() throws Exception {
-        connectedRMUser.disconnect();
-        connectedSchedulerUser.disconnect();
+
+        SchedulerTestUser.getInstance().schedulerIsRestarted();
+        RMTestUser.getInstance().disconnectFromRM();
+        log("Killing scheduler process");
         scheduler.kill();
     }
 
@@ -202,7 +258,6 @@ public class SchedulerTHelper {
      * @throws Exception
      */
     public SchedulerAuthenticationInterface getSchedulerAuth() throws Exception {
-        startScheduler(currentTestConfiguration);
         return scheduler.getAuth();
     }
 
@@ -245,21 +300,18 @@ public class SchedulerTHelper {
      * @throws Exception if an error occurs.
      */
     public Scheduler getSchedulerInterface(TestUsers user) throws Exception {
-        startScheduler(currentTestConfiguration);
 
-        if (!connectedSchedulerUser.is(user)) { // changing user on the fly
-            if (connectedSchedulerUser != null) {
-                connectedSchedulerUser.disconnect();
-            }
-            connectedSchedulerUser = new SchedulerTestUser(user);
-            connectedSchedulerUser.connect(scheduler.getAuth());
+
+        if (!SchedulerTestUser.getInstance().is(user)) { // changing user on the fly
+            SchedulerTestUser.getInstance().disconnectFromScheduler();
+            SchedulerTestUser.getInstance().connect(user, scheduler.getUrl());
         }
 
-        if (!connectedSchedulerUser.isConnected()) {
-            connectedSchedulerUser.connect(scheduler.getAuth());
+        if (!SchedulerTestUser.getInstance().isConnected()) {
+            SchedulerTestUser.getInstance().connect(user, scheduler.getUrl());
         }
 
-        return connectedSchedulerUser.getScheduler();
+        return SchedulerTestUser.getInstance().getScheduler();
     }
 
     /**
@@ -291,6 +343,17 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Kills a tzsk
+     *
+     * @return success or failure at killing the task
+     * @throws Exception
+     */
+    public boolean killTask(String jobId, String taskName) throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.killTask(jobId, taskName);
+    }
+
+    /**
      * Remove a job from Scheduler database.
      * connect as user if needed (if not yet connected as user).
      * @param id of the job to remove from database.
@@ -301,42 +364,19 @@ public class SchedulerTHelper {
         userInt.removeJob(id);
     }
 
-    public void testJobSubmissionAndVerifyAllResults(String jobDescPath) throws Throwable {
-        Job testJob = JobFactory.getFactory().createJob(jobDescPath);
-        testJobSubmissionAndVerifyAllResults(testJob, jobDescPath);
-    }
-
-    public void testJobSubmissionAndVerifyAllResults(Job testJob, String jobDesc) throws Throwable {
-        JobId id = testJobSubmission(testJob);
-        // check result are not null
-        JobResult res = getJobResult(id);
-        assertFalse("Had Exception : " + jobDesc, getJobResult(id).hadException());
-
-        for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
-
-            assertFalse("Had Exception (" + jobDesc + ") : " + entry.getKey(),
-              entry.getValue().hadException());
-
-            Assert.assertNotNull("Result not null (" + jobDesc + ") : " + entry.getKey(), entry.getValue()
-                    .value());
-        }
-
-        removeJob(id);
-        waitForEventJobRemoved(id);
-    }
 
     /**
-     * Creates and submit a job from an XML job descriptor, and check
+     * Creates and submit a job from an XML job descriptor, and check, with assertions,
      * event related to this job submission :
      * 1/ job submitted event
      * 2/ job passing from pending to running (with state set to running).
-     * 3/ every task passing from pending to running (with state set to running).
-     * 4/ every task passing from running to finished (with state set to finished).
-     * 5/ and finally job passing from running to finished (with state set to finished).
+     * 3/ job passing from running to finished (with state set to finished).
+     * 4/ every task finished without error
+     *
      * Then returns.
      *
      * This is the simplest events sequence of a job submission. If you need to test
-     * specific event or task states (failure, rescheduling etc, you must not use this
+     * specific events or task states (failures, rescheduling etc, you must not use this
      * helper and check events sequence with waitForEvent**() functions.
      *
      * @param jobDescPath path to an XML job descriptor to submit
@@ -354,9 +394,9 @@ public class SchedulerTHelper {
      * event related to this job submission :
      * 1/ job submitted event
      * 2/ job passing from pending to running (with state set to running).
-     * 3/ every task passing from pending to running (with state set to running).
-     * 4/ every task finish without error ; passing from running to finished (with state set to finished).
-     * 5/ and finally job passing from running to finished (with state set to finished).
+     * 3/ job passing from running to finished (with state set to finished).
+     * 4/ every task finished without error
+     *
      * Then returns.
      *
      * This is the simplest events sequence of a job submission. If you need to test
@@ -385,22 +425,27 @@ public class SchedulerTHelper {
         Assert.assertEquals(jInfo.getJobId(), id);
         Assert.assertEquals("Job " + jInfo.getJobId(), JobStatus.RUNNING, jInfo.getStatus());
 
+        log("Waiting for job finished");
+        jInfo = waitForEventJobFinished(id);
+        Assert.assertEquals("Job " + jInfo.getJobId(), JobStatus.FINISHED, jInfo.getStatus());
+        log("Job finished");
+
+        boolean taskError = false;
+        String message = "";
+
         if (jobToSubmit instanceof TaskFlowJob) {
 
-            for (Task t : ((TaskFlowJob) jobToSubmit).getTasks()) {
-                log("Waiting for task running : " + t.getName());
-                TaskInfo ti = waitForEventTaskRunning(id, t.getName());
-                Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
-                Assert.assertEquals("Task " + t.getName(), TaskStatus.RUNNING, ti.getStatus());
-            }
+            JobState jobState = userInt.getJobState(id);
 
-            for (Task t : ((TaskFlowJob) jobToSubmit).getTasks()) {
-                log("Waiting for task finished : " + t.getName());
-                TaskInfo ti = waitForEventTaskFinished(id, t.getName());
-                Assert.assertEquals(t.getName(), ti.getTaskId().getReadableName());
-                if (ti.getStatus() == TaskStatus.FAULTY) {
+            for (TaskState t : jobState.getTasks()) {
+                log("Looking at the result of task : " + t.getName());
+                if (t.getStatus() == TaskStatus.FAULTY) {
                     TaskResult tres = userInt.getTaskResult(jInfo.getJobId(), t.getName());
-                    Assert.assertNotNull("Task result of " + t.getName(), tres);
+                    if (tres == null) {
+                        message = "Task result of " + t.getName() + " should not be null.";
+                        taskError = true;
+                        break;
+                    }
                     if (tres.getOutput() != null) {
                         System.err.println("Output of failing task (" + t.getName() + ") :");
                         System.err.println(tres.getOutput().getAllLogs(true));
@@ -408,19 +453,22 @@ public class SchedulerTHelper {
                     if (tres.hadException()) {
                         System.err.println("Exception occurred in task (" + t.getName() + ") :");
                         tres.getException().printStackTrace(System.err);
+                        message = "Exception occurred in task (" + t.getName() + ")";
+                        taskError = true;
+                        break;
                     }
-
+                } else if (t.getStatus() != TaskStatus.FINISHED) {
+                    message = "Invalid task status for task " + t.getName() + " : " + t.getStatus();
+                    taskError = true;
+                    break;
                 }
-                Assert.assertEquals("Task " + t.getName(), TaskStatus.FINISHED, ti.getStatus());
             }
-
         }
 
-        log("Waiting for job finished");
-        jInfo = waitForEventJobFinished(id);
-        Assert.assertEquals("Job " + jInfo.getJobId(), JobStatus.FINISHED, jInfo.getStatus());
+        if (taskError) {
+            fail(message);
+        }
 
-        log("Job finished");
         return id;
     }
 
@@ -470,7 +518,7 @@ public class SchedulerTHelper {
      * @return Jobstate object corresponding to job submitted event.
      * @throws ProActiveTimeoutException if timeout is reached.
      */
-    public JobState waitForEventJobSubmitted(JobId id, long timeout) throws ProActiveTimeoutException {
+    public JobState waitForEventJobSubmitted(JobId id, long timeout) {
         return getSchedulerMonitorsHandler().waitForEventJobSubmitted(id, timeout);
     }
 
@@ -503,7 +551,7 @@ public class SchedulerTHelper {
      * @return JobInfo event's associated object.
      * @throws ProActiveTimeoutException if timeout is reached.
      */
-    public JobInfo waitForEventJobRunning(JobId id, long timeout) throws ProActiveTimeoutException {
+    public JobInfo waitForEventJobRunning(JobId id, long timeout) {
         return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_RUNNING, id,
                 timeout);
     }
@@ -598,7 +646,7 @@ public class SchedulerTHelper {
      * @return JobInfo event's associated object.
      * @throws ProActiveTimeoutException if timeout is reached.
      */
-    public JobInfo waitForEventJobRemoved(JobId id, long timeout) throws ProActiveTimeoutException {
+    public JobInfo waitForEventJobRemoved(JobId id, long timeout) {
         return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_REMOVE_FINISHED, id, timeout);
     }
 
@@ -634,8 +682,7 @@ public class SchedulerTHelper {
      * @return TaskInfo event's associated object.
      * @throws ProActiveTimeoutException if timeout is reached.
      */
-    public TaskInfo waitForEventTaskRunning(JobId jobId, String taskName, long timeout)
-            throws ProActiveTimeoutException {
+    public TaskInfo waitForEventTaskRunning(JobId jobId, String taskName, long timeout) {
         return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING, jobId,
                 taskName, timeout);
     }
@@ -672,8 +719,7 @@ public class SchedulerTHelper {
      * @return TaskInfo event's associated object.
      * @throws ProActiveTimeoutException if timeout is reached.
      */
-    public TaskInfo waitForEventTaskWaitingForRestart(JobId jobId, String taskName, long timeout)
-            throws ProActiveTimeoutException {
+    public TaskInfo waitForEventTaskWaitingForRestart(JobId jobId, String taskName, long timeout) {
         return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_WAITING_FOR_RESTART, jobId,
                 taskName, timeout);
     }
@@ -710,8 +756,7 @@ public class SchedulerTHelper {
      * @return TaskInfo, associated event's object.
      * @throws ProActiveTimeoutException if timeout is reached.
      */
-    public TaskInfo waitForEventTaskFinished(JobId jobId, String taskName, long timeout)
-            throws ProActiveTimeoutException {
+    public TaskInfo waitForEventTaskFinished(JobId jobId, String taskName, long timeout) {
         return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_RUNNING_TO_FINISHED, jobId,
                 taskName, timeout);
     }
@@ -739,8 +784,7 @@ public class SchedulerTHelper {
      * @param timeout in milliseconds
      * @throws ProActiveTimeoutException if timeout is reached
      */
-    public void waitForEventSchedulerState(SchedulerEvent event, long timeout)
-            throws ProActiveTimeoutException {
+    public void waitForEventSchedulerState(SchedulerEvent event, long timeout) {
         getSchedulerMonitorsHandler().waitForEventSchedulerState(event, timeout);
     }
 
@@ -775,12 +819,12 @@ public class SchedulerTHelper {
      * @param timeout in milliseconds
      * @throws ProActiveTimeoutException if timeout is reached
      */
-    public void waitForFinishedJob(JobId id, long timeout) throws ProActiveTimeoutException {
-        connectedSchedulerUser.getMonitorsHandler().waitForFinishedJob(id, timeout);
+    public void waitForFinishedJob(JobId id, long timeout) {
+        SchedulerTestUser.getInstance().getMonitorsHandler().waitForFinishedJob(id, timeout);
     }
 
     private SchedulerMonitorsHandler getSchedulerMonitorsHandler() {
-        return connectedSchedulerUser.getMonitorsHandler();
+        return SchedulerTestUser.getInstance().getMonitorsHandler();
     }
 
     public static void setExecutable(String filesList) throws IOException {
@@ -788,8 +832,12 @@ public class SchedulerTHelper {
     }
 
     public void disconnect() throws Exception {
-        connectedSchedulerUser.disconnect();
-        connectedRMUser.disconnect();
+        if (RMTestUser.getInstance().isConnected()) {
+            RMTestUser.getInstance().disconnectFromRM();
+        }
+        if (SchedulerTestUser.getInstance().isConnected()) {
+            SchedulerTestUser.getInstance().disconnectFromScheduler();
+        }
     }
 
     public ResourceManager getResourceManager() throws Exception {
@@ -797,21 +845,15 @@ public class SchedulerTHelper {
     }
 
     public ResourceManager getResourceManager(TestUsers user) throws Exception {
-        startScheduler(currentTestConfiguration);
-
-        if (!connectedRMUser.is(user)) { // changing user on the fly
-            if (connectedRMUser != null) {
-                connectedRMUser.disconnect();
-            }
-            connectedRMUser = new RMTestUser(user);
-            connectedRMUser.connect(scheduler.getRMAuth());
+        if (!RMTestUser.getInstance().is(user)) { // changing user on the fly
+            RMTestUser.getInstance().connect(user, scheduler.getUrl());
         }
 
-        if (!connectedRMUser.isConnected()) {
-            connectedRMUser.connect(scheduler.getRMAuth());
+        if (!RMTestUser.getInstance().isConnected()) {
+            RMTestUser.getInstance().connect(user, scheduler.getUrl());
         }
 
-        return connectedRMUser.getResourceManager();
+        return RMTestUser.getInstance().getResourceManager();
     }
 
     public static String getLocalUrl() {
@@ -819,17 +861,27 @@ public class SchedulerTHelper {
     }
 
     private RMMonitorsHandler getRMMonitorsHandler() throws Exception {
-        if (connectedRMUser.getMonitorsHandler() == null) {
-            getResourceManager();
-        }
-        return connectedRMUser.getMonitorsHandler();
+        return RMTestUser.getInstance().getMonitorsHandler();
     }
 
-    public void createNodeSource(int nbNodes, List<String> vmOptions) throws Exception {
-        RMTHelper.createNodeSource(nbNodes, vmOptions, getResourceManager(), getRMMonitorsHandler());
+    public void createNodeSource(String name, int nbNodes) throws Exception {
+        RMTHelper.createNodeSource(name, nbNodes, null, getResourceManager(), getRMMonitorsHandler());
     }
 
-    public TestNode createNode(String nodeName) throws InterruptedException, NodeException, IOException {
+    public void createNodeSource(String name, int nbNodes, List<String> vmOptions) throws Exception {
+        RMTHelper.createNodeSource(name, nbNodes, vmOptions, getResourceManager(), getRMMonitorsHandler());
+    }
+
+    public List<TestNode> addNodesToDefaultNodeSource(int nbNodes) throws Exception {
+        return RMTHelper.addNodesToDefaultNodeSource(nbNodes, null, getResourceManager(), getRMMonitorsHandler());
+    }
+
+    public List<TestNode> addNodesToDefaultNodeSource(int nbNodes, List<String> vmOptions) throws Exception {
+        return RMTHelper.addNodesToDefaultNodeSource(nbNodes, vmOptions, getResourceManager(), getRMMonitorsHandler());
+    }
+
+    public TestNode createNode(String nodeName) throws Exception {
+        getResourceManager(); // reconnect with the default user
         return RMTHelper.createNode(nodeName);
     }
 
@@ -841,13 +893,12 @@ public class SchedulerTHelper {
         return RMTHelper.waitForAnyNodeEvent(nodeStateChanged, timeout, getRMMonitorsHandler());
     }
 
-    public void killNode(String url) throws NodeException {
+    public void killNode(String url) throws Exception {
+        getResourceManager(); // reconnect with the default user
         RMTHelper.killNode(url);
     }
 
-    public TestNode createRMNodeStarterNode(String nodeName) throws IOException, NodeException,
-            InterruptedException {
-
+    public TestNode createRMNodeStarterNode(String nodeName) throws Exception {
         int pnpPort = RMTHelper.findFreePort();
         String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
         Map<String, String> vmParameters = new HashMap<>();
@@ -867,16 +918,18 @@ public class SchedulerTHelper {
     }
 
     public void addExtraNodes(int nbNodes) throws Exception {
-        RMTHelper.createNodeSource("extra", nbNodes, getResourceManager(), getRMMonitorsHandler());
+        RMTHelper.createNodeSource(extraNS, nbNodes, getResourceManager(), getRMMonitorsHandler());
+        RMTHelper.log("Node source \"" + extraNS + "\" created");
     }
 
-    public void removeExtraNodes() {
-        // do not start Scheduler if not yet started
-        if (connectedRMUser.isConnected()) {
-            try {
-                connectedRMUser.getResourceManager().removeNodeSource("extra", true).getBooleanValue();
-            } catch (Throwable ignored) {
-            }
+    public void removeExtraNodeSource() throws Exception {
+        removeNodeSource(extraNS);
+    }
+
+    public void removeNodeSource(String nsName) throws Exception {
+        try {
+            getResourceManager().removeNodeSource(nsName, true).getBooleanValue();
+        } catch (Throwable ignored) {
         }
     }
 

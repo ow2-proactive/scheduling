@@ -36,25 +36,19 @@
  */
 package functionaltests.job.error;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Map;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestScheduler;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.examples.NativeTestWithRandomDefault;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.TestScheduler;
+import java.util.Map;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -72,7 +66,7 @@ import functionaltests.utils.TestScheduler;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestErrorAndFailure extends SchedulerFunctionalTest {
+public class TestErrorAndFailure extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testErrorAndFailure() throws Throwable {

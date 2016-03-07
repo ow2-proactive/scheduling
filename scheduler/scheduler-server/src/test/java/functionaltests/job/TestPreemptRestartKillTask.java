@@ -36,14 +36,7 @@
  */
 package functionaltests.job;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
@@ -57,7 +50,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -80,7 +77,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.0
  */
-public class TestPreemptRestartKillTask extends SchedulerFunctionalTest {
+public class TestPreemptRestartKillTask extends SchedulerFunctionalTestWithRestart {
 
     private static URL jobDescriptor = TestPreemptRestartKillTask.class
             .getResource("/functionaltests/descriptors/Job_preempt_restart_kill.xml");
@@ -144,8 +141,6 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTest {
 
         log("Kill t4");
         schedulerHelper.getSchedulerInterface().killTask(id, "t4");
-        //SchedulerTHelper.log("Wait for event t4 finished");
-        //schedulerHelper.waitForEventTaskFinished(id, "t4");
         log("Wait for event job finished");
         //finished jobs list must have only one job
         JobInfo ji4 = schedulerHelper.waitForEventJobFinished(id);

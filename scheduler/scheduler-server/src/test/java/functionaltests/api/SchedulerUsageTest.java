@@ -34,13 +34,8 @@
  */
 package functionaltests.api;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.security.PublicKey;
-import java.util.Date;
-import java.util.List;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
 import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -50,11 +45,15 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.TestUsers;
+import java.security.PublicKey;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 
-public class SchedulerUsageTest extends SchedulerFunctionalTest {
+public class SchedulerUsageTest extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testSchedulerUsage() throws Exception {

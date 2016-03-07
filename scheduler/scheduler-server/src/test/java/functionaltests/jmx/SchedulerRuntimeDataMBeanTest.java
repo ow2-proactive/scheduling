@@ -1,18 +1,7 @@
 package functionaltests.jmx;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.management.JMX;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -31,8 +20,17 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBean;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.TestUsers;
+import javax.management.JMX;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -44,7 +42,7 @@ import functionaltests.utils.TestUsers;
  * @author ProActive team
  *
  */
-public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTest {
+public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRestart {
 
     public static class FailingTestJavaTask extends JavaExecutable {
         @Override
@@ -55,7 +53,6 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTest {
 
     @Test
     public void test() throws Exception {
-        schedulerHelper.killScheduler();
         testAsAdmin();
         testAsUser();
     }

@@ -36,10 +36,8 @@
  */
 package functionaltests.nodestate;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -53,8 +51,9 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import java.io.File;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -128,7 +127,7 @@ public class TestNodeSourcesActions extends RMFunctionalTest {
         Node n2 = nodes.remove(0);
 
         try {
-            n2.getProActiveRuntime().killRT(false);
+            n2.getProActiveRuntime().killNode(n2.getNodeInformation().getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -187,7 +186,7 @@ public class TestNodeSourcesActions extends RMFunctionalTest {
         Node n3 = nodes.remove(0);
 
         try {
-            n2.getProActiveRuntime().killRT(false);
+            n2.getProActiveRuntime().killNode(n2.getNodeInformation().getName());
         } catch (Exception e) {
             e.printStackTrace();
         }

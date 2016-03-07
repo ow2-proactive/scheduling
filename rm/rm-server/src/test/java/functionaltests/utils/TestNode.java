@@ -36,6 +36,7 @@
  */
 package functionaltests.utils;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcess;
 
@@ -66,5 +67,13 @@ public class TestNode {
     public void kill() throws InterruptedException {
         nodeProcess.stopProcess();
         nodeProcess.waitFor();
+    }
+
+    public void killNode() throws InterruptedException {
+        try {
+            node.getProActiveRuntime().killNode(node.getNodeInformation().getName());
+        } catch (ProActiveException e) {
+
+        }
     }
 }

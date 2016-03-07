@@ -36,7 +36,7 @@
  */
 package functionaltests.job.log;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -72,7 +72,7 @@ import static org.junit.Assert.fail;
  * - for finished job we have logs for all the tasks
  * - for pending jobs we have correct RM output & script output
  */
-public class TestJobServerLogs extends SchedulerFunctionalTest {
+public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
     public final int TASKS_IN_SIMPLE_JOB = 2;
     private static URL simpleJobDescriptor = TestJobServerLogs.class

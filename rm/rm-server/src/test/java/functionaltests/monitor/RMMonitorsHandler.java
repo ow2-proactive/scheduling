@@ -36,16 +36,15 @@
  */
 package functionaltests.monitor;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import functionaltests.utils.RMTHelper;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.utils.TimeoutAccounter;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 
-import functionaltests.utils.RMTHelper;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class RMMonitorsHandler {
@@ -80,6 +79,16 @@ public class RMMonitorsHandler {
         nodeSourcesEvent = new ArrayList<>();
         nodesEvent = new ArrayList<>();
         eventsMonitors = new ArrayList<>();
+    }
+
+    /**
+     * Clears this monitor state in case of reconnection
+     */
+    public void clear() {
+        stateEvents.clear();
+        nodesEvent.clear();
+        nodesEvent.clear();
+        eventsMonitors.clear();
     }
 
     public void waitForRMStateEvent(RMEventType eventType, long timeout) throws ProActiveTimeoutException {
@@ -141,7 +150,7 @@ public class RMMonitorsHandler {
 
     /**
     *
-    * @param event
+     * @param eventType
     */
     public void handleSchedulerStateEvent(RMEventType eventType) {
         synchronized (this) {

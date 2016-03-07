@@ -1,5 +1,7 @@
 package functionaltests.job;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -9,11 +11,9 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.examples.EmptyTask;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
  * (job is killed when task has 'pending' or 'submitted' status) . 
  *
  */
-public class TestTaskNotStarted extends SchedulerFunctionalTest {
+public class TestTaskNotStarted extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void test() throws Exception {

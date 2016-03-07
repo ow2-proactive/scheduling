@@ -36,8 +36,8 @@
  */
 package functionaltests.workflow.variables;
 
-import java.util.HashMap;
-
+import functionaltests.executables.PropagateVariablesExec;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.exception.UserException;
@@ -45,16 +45,14 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 
-import functionaltests.executables.PropagateVariablesExec;
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.util.HashMap;
 
 
-public class TestPropagatedVariables extends SchedulerFunctionalTest {
+public class TestPropagatedVariables extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testPropagatedVariables() throws Throwable {
-        schedulerHelper.testJobSubmissionAndVerifyAllResults(createTaskFlowJob(),
-                "TestPropagatedVariables.TestFlowJob");
+        schedulerHelper.testJobSubmission(createTaskFlowJob());
     }
 
     private TaskFlowJob createTaskFlowJob() throws UserException {

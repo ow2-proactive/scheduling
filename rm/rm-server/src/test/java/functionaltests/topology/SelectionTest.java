@@ -36,11 +36,11 @@
  */
 package functionaltests.topology;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -55,12 +55,11 @@ import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -78,7 +77,6 @@ import functionaltests.utils.RMTHelper;
  * RM distrib path as well as jdk path must be the same on all machines.
  *
  */
-//build -DdistantHost="bound.inria.fr" -DneighborHost="eon1.inria.fr" -Dtest="**/*SelectionTest*" junit.rmHelper
 @Ignore("requires several machines")
 public class SelectionTest extends RMFunctionalTest {
 
@@ -147,7 +145,8 @@ public class SelectionTest extends RMFunctionalTest {
         HashMap<String, String> vmProperties = new HashMap<>();
         vmProperties.put(this.vmPropKey1, this.vmPropValue1);
 
-        String node1URL = rmHelper.createNode(node1, vmProperties).getNode().getNodeInformation().getURL();
+        testNode = rmHelper.createNode(node1, vmProperties);
+        String node1URL = testNode.getNode().getNodeInformation().getURL();
         resourceManager.addNode(node1URL, NodeSource.DEFAULT);
 
         //wait node adding event

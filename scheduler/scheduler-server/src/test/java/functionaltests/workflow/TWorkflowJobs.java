@@ -36,35 +36,18 @@
  */
 package functionaltests.workflow;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
-import org.junit.Assert;
-import org.junit.Before;
-
-import functionaltests.utils.SchedulerFunctionalTest;
+import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
 import functionaltests.utils.SchedulerTHelper;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+
+import java.io.File;
+import java.util.*;
+import java.util.Map.Entry;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 
@@ -75,7 +58,7 @@ import static functionaltests.utils.SchedulerTHelper.log;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public abstract class TWorkflowJobs extends SchedulerFunctionalTest {
+public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedModeNoRestart {
 
     protected final String jobSuffix = ".xml";
 
@@ -99,12 +82,6 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTest {
      */
     public abstract String getJobPrefix();
 
-    @Before
-    public void startScheduleCustomConfigIfNeeded() throws Exception {
-        schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
-          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
-
-    }
     /**
      * For each job described in {@link #jobs}, submit the job,
      * wait for finished state, and compare expected result for each task with the actual result
@@ -231,9 +208,6 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTest {
      */
     public void testJob(String jobPath, Map<String, Long> expectedResults,
             Map<String, Set<String>> expectedDependences) throws Throwable {
-
-        schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
-          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
 
         List<String> skip = new ArrayList<>();
         for (Entry<String, Long> er : expectedResults.entrySet()) {

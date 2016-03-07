@@ -54,13 +54,28 @@ public class TaskKiller {
         return wasKilled;
     }
 
-    public synchronized void kill(Status status) {
-        wasKilled = true;
-        this.status = status;
-        threadToKill.interrupt();
+    /**
+     * Interrupts the target thread repeatedly as InterruptedException can be catched without action
+     */
+    private void interruptRepeatedly() {
+        while (threadToKill.isAlive()) {
+            threadToKill.interrupt();
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+            }
+        }
     }
 
-    public Status getStatus() {
+    public void kill(Status status) {
+        synchronized (this) {
+            wasKilled = true;
+            this.status = status;
+        }
+        interruptRepeatedly();
+    }
+
+    public synchronized Status getStatus() {
         return status;
     }
 

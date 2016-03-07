@@ -36,14 +36,7 @@
  */
 package functionaltests.workflow;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.net.URL;
-import java.util.Map.Entry;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -56,7 +49,13 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.net.URL;
+import java.util.Map.Entry;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -66,7 +65,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowIterationAwareness extends SchedulerFunctionalTest {
+public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRestart {
 
     private static final URL java_job = TestWorkflowIterationAwareness.class
             .getResource("/functionaltests/workflow/descriptors/flow_it_1.xml");

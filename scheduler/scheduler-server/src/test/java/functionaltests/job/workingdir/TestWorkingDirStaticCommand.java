@@ -36,27 +36,19 @@
  */
 package functionaltests.job.workingdir;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
-
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
 
 
 /**
@@ -65,7 +57,7 @@ import functionaltests.utils.SchedulerTHelper;
  *
  * @author The ProActive Team
  */
-public class TestWorkingDirStaticCommand extends SchedulerFunctionalTest {
+public class TestWorkingDirStaticCommand extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestWorkingDirStaticCommand.class
             .getResource("/functionaltests/descriptors/Job_test_workingDir_static_command.xml");
@@ -115,7 +107,7 @@ public class TestWorkingDirStaticCommand extends SchedulerFunctionalTest {
 
                 ((NativeTask) job.getTask("task1")).setCommandLine(command
                         .toArray(new String[command.size()]));
-                id = schedulerHelper.submitJob(job);
+                id = schedulerHelper.testJobSubmission(job);
                 break;
             case unix:
                 System.setProperty(executablePathPropertyName, new File(executablePath.toURI())
@@ -125,37 +117,11 @@ public class TestWorkingDirStaticCommand extends SchedulerFunctionalTest {
                                 .getAbsolutePath());
                 SchedulerTHelper.setExecutable(new File(executablePath.toURI()).getAbsolutePath());
                 //test submission and event reception
-                id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+                id = schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }
-
-        SchedulerTHelper.log("Job submitted, id " + id.toString());
-
-        SchedulerTHelper.log("Waiting for jobSubmitted Event");
-        JobState receivedState = schedulerHelper.waitForEventJobSubmitted(id);
-
-        Assert.assertEquals(receivedState.getId(), id);
-
-        SchedulerTHelper.log("Waiting for job running");
-        JobInfo jInfo = schedulerHelper.waitForEventJobRunning(id);
-        Assert.assertEquals(jInfo.getJobId(), id);
-        Assert.assertEquals(JobStatus.RUNNING, jInfo.getStatus());
-
-        schedulerHelper.waitForEventTaskRunning(id, task1Name);
-        TaskInfo tInfo = schedulerHelper.waitForEventTaskFinished(id, task1Name);
-
-        SchedulerTHelper.log(schedulerHelper.getSchedulerInterface().getTaskResult(id, "task1").getOutput()
-                .getAllLogs(false));
-
-        Assert.assertEquals(TaskStatus.FINISHED, tInfo.getStatus());
-
-        schedulerHelper.waitForEventJobFinished(id);
-        JobResult res = schedulerHelper.getJobResult(id);
-
-        //check that there is one exception in results
-        Assert.assertTrue(res.getExceptionResults().size() == 0);
 
         //remove job
         schedulerHelper.removeJob(id);

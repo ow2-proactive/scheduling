@@ -36,22 +36,21 @@
  */
 package functionaltests.scripts.selection;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Test;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-
-
-public class TestJobSelScriptSubmission extends SchedulerFunctionalTest {
+public class TestJobSelScriptSubmission extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestJobSelScriptSubmission.class
             .getResource("/functionaltests/descriptors/Job_with_select_script.xml");
 
     @Test
     public void testJobSelScriptSubmission() throws Throwable {
-        schedulerHelper.testJobSubmissionAndVerifyAllResults(new File(jobDescriptor.toURI())
+        schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI())
                 .getAbsolutePath());
         schedulerHelper.checkNodesAreClean();
     }

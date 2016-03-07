@@ -36,22 +36,22 @@
  */
 package functionaltests.job.taskkill;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Map;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.File;
+import java.net.URL;
+import java.util.Map;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -65,16 +65,19 @@ import functionaltests.utils.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestJobKilled extends SchedulerFunctionalTest {
+public class TestJobKilled extends SchedulerFunctionalTestWithRestart {
 
     private static URL jobDescriptor = TestJobKilled.class
             .getResource("/functionaltests/descriptors/Job_Killed.xml");
 
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper = new SchedulerTHelper(true, new File(SchedulerTHelper.class.getResource(
+                "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+    }
+
     @Test
     public void testJobKilled() throws Throwable {
-        schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
-          "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
-
         String task1Name = "task1";
         String task2Name = "task2";
         String task3Name = "task3";

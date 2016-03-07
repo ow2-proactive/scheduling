@@ -36,9 +36,8 @@
  */
 package functionaltests.workflow;
 
-import java.io.Serializable;
-import java.util.HashMap;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerTHelper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -52,8 +51,8 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.Serializable;
+import java.util.HashMap;
 
 
 /**
@@ -61,7 +60,7 @@ import functionaltests.utils.SchedulerTHelper;
  * $PA_TASK_REPLICATION are replaced by it's actual value in generic information.
  * 
  */
-public class TestGenericInformation extends SchedulerFunctionalTest {
+public class TestGenericInformation extends SchedulerFunctionalTestNoRestart {
 
     private final String JOB_NAME = this.getClass().getSimpleName();
 

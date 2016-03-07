@@ -36,12 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
-import java.io.IOException;
-import java.net.URI;
-
-import javax.management.JMException;
-import javax.security.auth.login.LoginException;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -58,7 +53,11 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.apache.log4j.Logger;
+
+import javax.management.JMException;
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URI;
 
 
 /**

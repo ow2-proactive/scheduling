@@ -36,20 +36,8 @@
  */
 package functionaltests.nodesource;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
-import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.util.OsUtils;
@@ -65,11 +53,22 @@ import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
+import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class TestSSHInfrastructureV2 extends RMFunctionalTest {

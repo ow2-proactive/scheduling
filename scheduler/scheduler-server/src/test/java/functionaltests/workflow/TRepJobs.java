@@ -36,27 +36,20 @@
  */
 package functionaltests.workflow;
 
+import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.Assert;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.junit.Assert;
-import org.junit.Before;
-
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
 
 
 /**
@@ -66,7 +59,7 @@ import functionaltests.utils.SchedulerTHelper;
  * @author mschnoor
  *
  */
-public class TRepJobs extends SchedulerFunctionalTest {
+public class TRepJobs extends SchedulerFunctionalTestNonForkedModeNoRestart {
 
     public static class TRepCase {
         String jobPath;
@@ -111,12 +104,6 @@ public class TRepJobs extends SchedulerFunctionalTest {
                 results.put(key, val2);
             }
         }
-    }
-
-    @Before
-    public void startScheduleCustomConfigIfNeeded() throws Exception {
-        schedulerHelper.startScheduler(new File(SchedulerTHelper.class.getResource(
-              "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
     }
 
     public void testJobs(TRepCase... testCases) throws Throwable {

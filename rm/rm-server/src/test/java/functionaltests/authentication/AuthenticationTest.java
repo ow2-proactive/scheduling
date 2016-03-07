@@ -36,21 +36,19 @@
  */
 package functionaltests.authentication;
 
-import java.security.KeyException;
-
-import javax.security.auth.login.LoginException;
-
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
+import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestUsers;
+import javax.security.auth.login.LoginException;
+import java.security.KeyException;
 
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 
 public class AuthenticationTest extends RMFunctionalTest {
@@ -58,7 +56,7 @@ public class AuthenticationTest extends RMFunctionalTest {
     @Test
     public void loginScenarios() throws Exception {
         RMAuthentication auth = rmHelper.getRMAuth();
-        rmHelper.getResourceManager().disconnect().getBooleanValue();
+        rmHelper.disconnect();
 
         loginAsAdmin(auth);
         loginAsUser(auth);

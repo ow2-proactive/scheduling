@@ -34,94 +34,102 @@
  */
 package functionaltests.utils;
 
-import java.security.KeyException;
-
-import javax.security.auth.login.LoginException;
-
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+
+import javax.security.auth.login.LoginException;
+import java.security.KeyException;
 
 
 public class RMTestUser {
 
+    private static RMTestUser instance = null;
+
     private String connectedUserName = null;
     private String connectedUserPassword = null;
 
-    private ResourceManager resourceManager;
-
     private RMMonitorsHandler monitorsHandler;
-    private RMMonitorEventReceiver eventReceiver;
 
-    public RMTestUser(TestUsers user) {
-        this.connectedUserName = user.username;
-        this.connectedUserPassword = user.password;
+    private String rmUrl;
+
+    private RMMonitorEventReceiver rmProxy;
+
+    public RMTestUser() {
+
+    }
+
+    public static RMTestUser getInstance() {
+        if (instance == null) {
+            instance = new RMTestUser();
+        }
+        return instance;
     }
 
     public boolean is(TestUsers user) {
         return user.username.equals(connectedUserName);
     }
 
-    public ResourceManager connect(RMAuthentication rmAuth) throws LoginException, KeyException,
-            ActiveObjectCreationException, NodeException {
-        disconnect();
-        Credentials connectedUserCreds = Credentials.createCredentials(
-                new CredData(CredData.parseLogin(connectedUserName), CredData.parseDomain(connectedUserName),
-                    connectedUserPassword), rmAuth.getPublicKey());
-        resourceManager = rmAuth.login(connectedUserCreds);
+    public void connect(TestUsers user, String rmUrl) throws RMException, KeyException, LoginException, ActiveObjectCreationException, NodeException {
+        this.connectedUserName = user.username;
+        this.connectedUserPassword = user.password;
+        this.rmUrl = rmUrl;
 
-        monitorsHandler = new RMMonitorsHandler();
-        /** create event receiver then turnActive to avoid deepCopy of MonitorsHandler object
-         * 	(shared instance between event receiver and static helpers).
-         */
-        RMMonitorEventReceiver passiveEventReceiver = new RMMonitorEventReceiver(monitorsHandler);
-        eventReceiver = PAActiveObject.turnActive(passiveEventReceiver);
-        PAFuture.waitFor(resourceManager.getMonitoring().addRMEventListener(eventReceiver));
+        disconnectFromRM();
 
-        return resourceManager;
-    }
-
-    public boolean isConnected() {
-        return resourceManager != null;
-    }
-
-    public void disconnect() {
-        try {
-            if (resourceManager != null) {
-                resourceManager.getMonitoring().removeRMEventListener();
-            }
-        } catch (Throwable rmHasBeenKilled) {
+        if (rmProxy == null) {
+            monitorsHandler = new RMMonitorsHandler();
+            RMMonitorEventReceiver passiveEventReceiver = new RMMonitorEventReceiver(monitorsHandler);
+            rmProxy = PAActiveObject.turnActive(passiveEventReceiver);
+            RMTHelper.log("RM Proxy initialized : " + PAActiveObject.getUrl(rmProxy));
         }
 
-        try {
-            if (resourceManager != null) {
-                resourceManager.disconnect().getBooleanValue();
-            }
-        } catch (Throwable rmHasBeenKilled) {
-        }
+        RMTHelper.log("Connecting user " + connectedUserName + " to the Resource Manager at " + rmUrl);
 
-        resourceManager = null;
-        eventReceiver = null;
-        monitorsHandler = null;
+        CredData credData = new CredData(CredData.parseLogin(connectedUserName), CredData.parseDomain(connectedUserName),
+                connectedUserPassword);
+
+        rmProxy.init(rmUrl, credData);
     }
 
     public ResourceManager getResourceManager() {
-        return resourceManager;
+        return rmProxy;
     }
+
+    public boolean isConnected() {
+        return rmProxy != null;
+    }
+
+    public void disconnectFromRM() {
+        if (isConnected()) {
+            RMTHelper.log("Disconnecting user " + connectedUserName + " from the Resource Manager");
+            killRMProxy();
+        }
+    }
+
+    private void killRMProxy() {
+        if (rmProxy != null) {
+            RMTHelper.log("Kill RM Proxy");
+            try {
+                rmProxy.disconnect().getBooleanValue();
+            } catch (Exception ignored) {
+            }
+            PAActiveObject.terminateActiveObject(rmProxy, true);
+            rmProxy = null;
+        }
+    }
+
 
     public RMMonitorsHandler getMonitorsHandler() {
         return monitorsHandler;
     }
 
     public RMMonitorEventReceiver getEventReceiver() {
-        return eventReceiver;
+        return rmProxy;
     }
 }

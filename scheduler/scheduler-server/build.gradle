@@ -28,6 +28,7 @@ dependencies {
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
     testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
+    testCompile project(':common:common-api').sourceSets.test.output
     testCompile project(':rm:rm-policy:rm-policy-scheduler')
     testCompile project(':scheduler:scheduler-examples')
 
@@ -66,6 +67,9 @@ task dist(type: Copy) {
     from testJar
     into file("$rootDir/dist/lib")
 }
+
+dist.dependsOn project(':rm:rm-server').dist
+
 artifacts {
     archives testJar
 }

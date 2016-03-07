@@ -36,17 +36,10 @@
  */
 package functionaltests.jmx.account;
 
-import java.security.PublicKey;
-import java.util.HashMap;
-
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
+import org.junit.Assert;
+import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -58,11 +51,16 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.junit.Assert;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestUsers;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import java.security.PublicKey;
+import java.util.HashMap;
 
 
 /**
@@ -82,10 +80,11 @@ public final class AddGetReleaseRemoveTest extends RMFunctionalTest {
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
 
+
     @Test
     public void action() throws Exception {
 
-        final ResourceManager r = rmHelper.getResourceManager();
+        final ResourceManager rm = rmHelper.getResourceManager();
         // The username and thr password must be the same a used to connect to the RM
         final String adminLogin = TestUsers.TEST.username;
         final String adminPassword = TestUsers.TEST.password;
@@ -118,26 +117,27 @@ public final class AddGetReleaseRemoveTest extends RMFunctionalTest {
         // ADD, GET, RELEASE, REMOVE
         // 1) ADD
         final long beforeAddTime = System.currentTimeMillis();
-        Node node = rmHelper.createNode("test").getNode();
+        testNode = rmHelper.createNode("test");
+        Node node = testNode.getNode();
         final String nodeURL = node.getNodeInformation().getURL();
-        r.addNode(nodeURL).getBooleanValue();
+        rm.addNode(nodeURL).getBooleanValue();
 
         // We eat the configuring to free event
         rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeURL);
         rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeURL);
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();
-        node = r.getAtMostNodes(1, null).get(0);
+        node = rm.getAtMostNodes(1, null).get(0);
 
         // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);
 
         // 3) RELEASE
-        r.releaseNode(node).getBooleanValue();
+        rm.releaseNode(node).getBooleanValue();
         final long getReleaseMaxDuration = System.currentTimeMillis() - beforeGetTime;
 
         // 4) REMOVE  
-        r.removeNode(nodeURL, true).getBooleanValue();
+        rm.removeNode(nodeURL, true).getBooleanValue();
         final long addRemoveMaxDuration = System.currentTimeMillis() - beforeAddTime;
 
         // Refresh the account manager

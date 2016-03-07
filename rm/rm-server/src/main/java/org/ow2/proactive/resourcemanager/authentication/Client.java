@@ -36,12 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
-import java.io.Serializable;
-import java.security.Permission;
-import java.security.PrivilegedAction;
-
-import javax.security.auth.Subject;
-
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -52,6 +46,11 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
+
+import javax.security.auth.Subject;
+import java.io.Serializable;
+import java.security.Permission;
+import java.security.PrivilegedAction;
 
 
 /**
@@ -81,6 +80,11 @@ public class Client implements Serializable {
     /** Unique id of the client */
     private UniqueID id;
 
+    /**
+     * URL of the client
+     */
+    private String url;
+
     /** Body of the sender of request */
     private transient UniversalBody body;
 
@@ -109,6 +113,7 @@ public class Client implements Serializable {
         if (pingable) {
             Request r = PAActiveObject.getContext().getCurrentRequest();
             this.id = r.getSourceBodyID();
+            this.url = r.getSender().getNodeURL() + "/" + this.id.shortString();
             this.body = r.getSender();
         }
     }
@@ -179,7 +184,7 @@ public class Client implements Serializable {
      * @return string representation of the client
      */
     public String toString() {
-        return "\"" + name + "\"";
+        return "\"" + name + "\"" + (id != null ? " (" + url + ")" : "");
     }
 
     /**

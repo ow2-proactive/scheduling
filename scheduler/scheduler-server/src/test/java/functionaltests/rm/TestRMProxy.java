@@ -36,10 +36,10 @@
  */
 package functionaltests.rm;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestScheduler;
+import org.junit.*;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -54,13 +54,10 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.tests.ProActiveTest;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerTHelper;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.*;
@@ -70,38 +67,70 @@ public class TestRMProxy extends ProActiveTest {
 
     static final int NODES_NUMBER = 3;
 
-    private Credentials user1Credentials;
+    private static Credentials user1Credentials;
 
-    private Credentials user2Credentials;
-    private RMTHelper rmHelper;
+    private static Credentials user2Credentials;
 
-    @Before
-    public void init() throws Exception {
-        new SchedulerTHelper().killScheduler();
+    private RMProxiesManager proxiesManager;
+
+    static String nsName = "test";
+
+    private static RMTHelper rmHelper;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        if (TestScheduler.isStarted()) {
+            SchedulerTHelper.log("Killing previous scheduler.");
+            TestScheduler.kill();
+        }
         rmHelper = new RMTHelper();
+        rmHelper.getResourceManager();
+
         user1Credentials = Credentials.createCredentials(new CredData("admin", "admin"), rmHelper.getRMAuth()
                 .getPublicKey());
 
         user2Credentials = Credentials.createCredentials(new CredData("demo", "demo"), rmHelper.getRMAuth()
                 .getPublicKey());
+
+        rmHelper.createNodeSource(nsName, NODES_NUMBER);
     }
 
-    @After
-    public void killRMForOtherTests() throws Exception {
-        rmHelper.killRM();
+
+    @Test
+    public void testProxiesManagerPerUser() throws Exception {
+        log("\n Test with per-user connection \n");
+        testRMProxies(false);
     }
 
     @Test
-    public void testProxiesManager() throws Exception {
-        rmHelper.createNodeSource("test", NODES_NUMBER);
-
-        log("\n Test with per-user connection \n");
-        testRMProxies(false);
-
+    public void testProxiesManagerSingle() throws Exception {
         log("\n Test with single connection \n");
-
         testRMProxies(true);
     }
+
+    @After
+    public void terminateProxies() {
+        log("Terminate all proxies");
+        if (proxiesManager != null) {
+            try {
+                proxiesManager.terminateAllProxies();
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
+
+    @AfterClass
+    public static void deleteNS() throws Exception {
+        try {
+            rmHelper.removeNodeSource(nsName);
+            rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+        } catch (Exception ignored) {
+
+        }
+        rmHelper.shutdownRM();
+    }
+
 
     private void testRMProxies(boolean singleUserConnection) throws Exception {
         ResourceManager rm = rmHelper.getResourceManager();
@@ -111,8 +140,6 @@ public class TestRMProxy extends ProActiveTest {
         URI rmUri = new URI(RMTHelper.getLocalUrl());
         Credentials schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
                 .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
-
-        RMProxiesManager proxiesManager;
 
         if (singleUserConnection) {
             proxiesManager = new SingleConnectionRMProxiesManager(rmUri, schedulerProxyCredentials);
@@ -160,8 +187,6 @@ public class TestRMProxy extends ProActiveTest {
         user2RMProxy = proxiesManager.getUserRMProxy("demo", user2Credentials);
         requestReleaseAllNodes(user2RMProxy, rm);
 
-        log("Terminate all proxies");
-        proxiesManager.terminateAllProxies();
     }
 
     private void requestWithTwoUsers(RMProxy proxy1, RMProxy proxy2, ResourceManager rm) throws Exception {
@@ -272,13 +297,13 @@ public class TestRMProxy extends ProActiveTest {
         assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
     }
 
-    private void waitWhenNodesAreReleased(int nodesNumber) {
+    private void waitWhenNodesAreReleased(int nodesNumber) throws Exception {
         for (int i = 0; i < nodesNumber; i++) {
             rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
     }
 
-    private void waitWhenNodeSetAcquired(NodeSet nodeSet, int expectedNodesNumber) {
+    private void waitWhenNodeSetAcquired(NodeSet nodeSet, int expectedNodesNumber) throws Exception {
         PAFuture.waitFor(nodeSet);
         assertEquals("Unexpected nodes number in NodeSet", expectedNodesNumber, nodeSet.size());
         for (int i = 0; i < expectedNodesNumber; i++) {

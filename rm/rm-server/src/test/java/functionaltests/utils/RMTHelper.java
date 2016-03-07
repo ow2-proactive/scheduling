@@ -36,18 +36,8 @@
  */
 package functionaltests.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.monitor.RMMonitorsHandler;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -56,6 +46,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.StartNode;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -69,8 +60,13 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.rmi.AlreadyBoundException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -108,8 +104,6 @@ public class RMTHelper {
         }));
     }
 
-    private static RMTestUser connectedUser = new RMTestUser(TestUsers.TEST);
-
     private String currentTestConfiguration;
 
     public static void log(String s) {
@@ -125,7 +119,7 @@ public class RMTHelper {
     }
 
     /**
-     * Creates a Local node source with specified name
+     * Creates a Local node source with specified name and default number of nodes
      * @throws Exception
      * @return expected number of nodes
      */
@@ -134,31 +128,77 @@ public class RMTHelper {
         return RMTHelper.DEFAULT_NODES_NUMBER;
     }
 
+
+    public void removeNodeSource(String name) throws Exception {
+        try {
+            getResourceManager().removeNodeSource(name, true).getBooleanValue();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * Creates a Local node source with specified name and number of nodes
+     *
+     * @param name
+     * @param nodeNumber
+     * @throws Exception
+     */
     public void createNodeSource(String name, int nodeNumber) throws Exception {
         createNodeSource(name, nodeNumber, getResourceManager(), getMonitorsHandler());
+    }
+
+    public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
+                                        RMMonitorsHandler monitor) throws Exception {
+        RMFactory.setOsJavaProperty();
+        log("Creating a node source " + name);
+        //first emtpy im parameter is default rm url
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        rm.createNodeSource(name, LocalInfrastructure.class.getName(),
+                new Object[]{
+                        creds,
+                        nodeNumber,
+                        RMTHelper.DEFAULT_NODES_TIMEOUT,
+                        vmOptions != null ? setup.listToString(vmOptions) : setup.getJvmParameters()},
+                StaticPolicy.class.getName(), null);
+        rm.setNodeSourcePingFrequency(5000, name);
+
+        waitForNodeSourceCreation(name, nodeNumber, monitor);
     }
 
     /**
      * Creates a Local node source with specified name
      */
     public static void createNodeSource(String name, int nodeNumber, ResourceManager rm,
-            RMMonitorsHandler monitor) throws Exception {
-        RMFactory.setOsJavaProperty();
-        System.out.println("Creating a node source " + name);
-        //first emtpy im parameter is default rm url
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
-                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rm.createNodeSource(name, LocalInfrastructure.class.getName(),
-                new Object[] {
-                        creds,
-                        nodeNumber,
-                        RMTHelper.DEFAULT_NODES_TIMEOUT,
-                        setup.getJvmParameters() + " " +
-                            CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp" },
-                StaticPolicy.class.getName(), null);
-        rm.setNodeSourcePingFrequency(5000, name);
+                                        RMMonitorsHandler monitor) throws Exception {
+        createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor);
+    }
 
-        waitForNodeSourceCreation(name, nodeNumber, monitor);
+    public List<TestNode> addNodesToDefaultNodeSource(int nodesNumber) throws Exception {
+        return addNodesToDefaultNodeSource(nodesNumber, new ArrayList<String>());
+    }
+
+    public List<TestNode> addNodesToDefaultNodeSource(int nodesNumber, List<String> vmOptions) throws Exception {
+        return addNodesToDefaultNodeSource(nodesNumber, vmOptions != null ? vmOptions : setup.getJvmParametersAsList(), getResourceManager(), getMonitorsHandler());
+    }
+
+    public static List<TestNode> addNodesToDefaultNodeSource(int nodesNumber, List<String> vmOptions,
+                                                             ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
+
+        Map<String, String> map = new HashMap<>();
+        List<TestNode> nodes = new ArrayList<>();
+        map.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
+        for (int i = 0; i < nodesNumber; i++) {
+            String nodeName = "node-" + i;
+            TestNode node = createNode(nodeName, map, vmOptions != null ? vmOptions : setup.getJvmParametersAsList());
+            nodes.add(node);
+            resourceManager.addNode(node.getNode().getNodeInformation().getURL());
+        }
+        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT, monitor);
+        for (int i = 0; i < nodesNumber; i++) {
+            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
+        }
+        return nodes;
     }
 
     /** Wait for the node source to be created when the node source is empty */
@@ -212,38 +252,31 @@ public class RMTHelper {
         return createNode(nodeName, new HashMap<String, String>(), new ArrayList<String>(), pnpPort);
     }
 
+    /**
+     * Create several nodes on the same JVMProcess
+     */
     public List<TestNode> createNodes(final String nodeName, int number) throws IOException, NodeException,
-            ExecutionException, InterruptedException {
-        ArrayList<TestNode> nodes = new ArrayList<>(number);
-        for (int i = 0; i < number; i++) {
-            nodes.add(createNode(nodeName + i, findFreePort()));
+            ExecutionException, InterruptedException, AlreadyBoundException {
+        if (number == 0) {
+            throw new IllegalArgumentException("" + number);
         }
+
+        ArrayList<TestNode> nodes = new ArrayList<>(number);
+        // Start the JVMProcess and create the first node
+        TestNode node0 = createNode(nodeName + 0, findFreePort());
+        nodes.add(0, node0);
+
+        // create all subsequent nodes remotely
+        for (int i = 1; i < number; i++) {
+            Node nodei = node0.getNode().getProActiveRuntime().createLocalNode(nodeName + i, false, null);
+            nodes.add(new TestNode(node0.getNodeProcess(), nodei));
+        }
+
         return nodes;
     }
 
-    public void createNodeSource(int nodesNumber) throws Exception {
-        createNodeSource(nodesNumber, new ArrayList<String>());
-    }
 
-    public void createNodeSource(int nodesNumber, List<String> vmOptions) throws Exception {
-        createNodeSource(nodesNumber, vmOptions, getResourceManager(), getMonitorsHandler());
-    }
 
-    public static void createNodeSource(int nodesNumber, List<String> vmOptions,
-            ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
-        Map<String, String> map = new HashMap<>();
-        map.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
-        for (int i = 0; i < nodesNumber; i++) {
-            String nodeName = "node-" + i;
-
-            TestNode node = createNode(nodeName, map, vmOptions);
-            resourceManager.addNode(node.getNode().getNodeInformation().getURL());
-        }
-        waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT, monitor);
-        for (int i = 0; i < nodesNumber; i++) {
-            waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
-        }
-    }
 
     static int findFreePort() throws IOException {
         ServerSocket server = new ServerSocket(0);
@@ -352,11 +385,24 @@ public class RMTHelper {
         return getResourceManager().listAliveNodeUrls();
     }
 
+    /**
+     * Kills the rm process
+     *
+     * @throws Exception
+     */
     public void killRM() throws Exception {
-        if (connectedUser != null) {
-            connectedUser.disconnect();
-        }
+        RMTestUser.getInstance().disconnectFromRM();
         rm.kill();
+    }
+
+    /**
+     * Shutdowns the RM (takes longer than killing the process)
+     *
+     * @throws Exception
+     */
+    public void shutdownRM() throws Exception {
+        getResourceManager().shutdown(true);
+        killRM();
     }
 
     /**
@@ -366,7 +412,7 @@ public class RMTHelper {
      * @param nodeSourceEvent awaited event.
      * @param nodeSourceName corresponding node source name for which an event is awaited.
      */
-    public void waitForNodeSourceEvent(RMEventType nodeSourceEvent, String nodeSourceName) {
+    public void waitForNodeSourceEvent(RMEventType nodeSourceEvent, String nodeSourceName) throws ProActiveTimeoutException {
         waitForNodeSourceEvent(nodeSourceEvent, nodeSourceName, getMonitorsHandler());
     }
 
@@ -466,6 +512,21 @@ public class RMTHelper {
     public static void killNode(String url) throws NodeException {
         Node node = NodeFactory.getNode(url);
         try {
+            ProActiveRuntime rt = node.getProActiveRuntime();
+            rt.killNode(node.getNodeInformation().getName());
+        } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * Kills the runtime associated with specified node url
+     *
+     * @param url of the node
+     * @throws NodeException if node cannot be looked up
+     */
+    public static void killRuntime(String url) throws NodeException {
+        try {
+            Node node = NodeFactory.getNode(url);
             node.getProActiveRuntime().killRT(false);
         } catch (Exception ignored) {
         }
@@ -503,8 +564,8 @@ public class RMTHelper {
      */
     public String startRM(String configurationFile, int pnpPort, String... jvmArgs) throws Exception {
         if (!rm.isStartedWithSameConfiguration(configurationFile)) {
+            killRM();
             log("Starting RM");
-            connectedUser = new RMTestUser(TestUsers.TEST);
             rm.start(configurationFile, pnpPort, jvmArgs);
             currentTestConfiguration = configurationFile;
         }
@@ -523,31 +584,27 @@ public class RMTHelper {
     public ResourceManager getResourceManager(TestUsers user, String... jvmArgs) throws Exception {
         startRM(currentTestConfiguration, TestRM.PA_PNP_PORT, jvmArgs);
 
-        if (!connectedUser.is(user)) { // changing user on the fly
-            if (connectedUser != null) {
-                connectedUser.disconnect();
-            }
-            connectedUser = new RMTestUser(user);
-            connectedUser.connect(rm.getAuth());
+        if (!RMTestUser.getInstance().is(user)) { // changing user on the fly
+            RMTestUser.getInstance().connect(user, rm.getUrl());
         }
 
-        if (!connectedUser.isConnected()) {
-            connectedUser.connect(rm.getAuth());
+        if (!RMTestUser.getInstance().isConnected()) {
+            RMTestUser.getInstance().connect(user, rm.getUrl());
         }
 
-        return connectedUser.getResourceManager();
+        return RMTestUser.getInstance().getResourceManager();
     }
 
     public static String getLocalUrl() {
         return rm.getUrl();
     }
 
-    public RMMonitorsHandler getMonitorsHandler() {
-        return connectedUser.getMonitorsHandler();
+    public RMMonitorsHandler getMonitorsHandler() throws ProActiveTimeoutException {
+        return RMTestUser.getInstance().getMonitorsHandler();
     }
 
     public RMMonitorEventReceiver getEventReceiver() {
-        return connectedUser.getEventReceiver();
+        return RMTestUser.getInstance().getEventReceiver();
     }
 
     public RMAuthentication getRMAuth() throws Exception {
@@ -556,7 +613,7 @@ public class RMTHelper {
     }
 
     public void disconnect() throws Exception {
-        connectedUser.disconnect();
+        RMTestUser.getInstance().disconnectFromRM();
     }
 
     public boolean isRMStarted() {

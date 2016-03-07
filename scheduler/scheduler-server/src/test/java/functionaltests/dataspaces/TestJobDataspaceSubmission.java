@@ -36,12 +36,7 @@
  */
 package functionaltests.dataspaces;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.Map;
-
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.junit.Assert;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
@@ -54,7 +49,11 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Map;
 
 
 /**
@@ -65,7 +64,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobDataspaceSubmission extends SchedulerFunctionalTest {
+public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithRestart {
 
     private static String IOSPACE =
             System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" + File.separator;

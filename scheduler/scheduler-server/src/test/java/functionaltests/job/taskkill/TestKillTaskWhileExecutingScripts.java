@@ -36,6 +36,12 @@
  */
 package functionaltests.job.taskkill;
 
+import functionaltests.executables.EmptyExecutable;
+import functionaltests.executables.EndlessExecutable;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -47,16 +53,10 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
-
-import functionaltests.executables.EmptyExecutable;
-import functionaltests.executables.EndlessExecutable;
-import functionaltests.utils.SchedulerFunctionalTest;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -74,7 +74,7 @@ import static org.junit.Assert.*;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestKillTaskWhileExecutingScripts extends SchedulerFunctionalTest {
+public class TestKillTaskWhileExecutingScripts extends SchedulerFunctionalTestWithRestart {
 
     static Script endlessScript;
 

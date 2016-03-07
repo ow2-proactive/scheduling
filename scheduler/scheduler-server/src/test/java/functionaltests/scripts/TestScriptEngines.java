@@ -34,22 +34,19 @@
  */
 package functionaltests.scripts;
 
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Map;
-
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
-import functionaltests.utils.SchedulerFunctionalTest;
+import java.io.File;
+import java.net.URL;
+import java.util.Map;
+
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
 
 
 /**
@@ -59,7 +56,7 @@ import functionaltests.utils.SchedulerFunctionalTest;
  *
  * @author The ProActive Team
  */
-public class TestScriptEngines extends SchedulerFunctionalTest {
+public class TestScriptEngines extends SchedulerFunctionalTestNoRestart {
 
     private static String jobDescriptorsLoc = "JobScriptEngines.xml";
 

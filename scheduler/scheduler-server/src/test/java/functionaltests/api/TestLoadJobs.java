@@ -1,7 +1,25 @@
 package functionaltests.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.google.common.collect.ImmutableList;
+import functionaltests.monitor.MonitorEventReceiver;
+import functionaltests.monitor.SchedulerMonitorsHandler;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
+import org.apache.log4j.Level;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.util.FileLock;
 
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -10,42 +28,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.junit.Before;
-import org.junit.Test;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.ow2.proactive.authentication.crypto.CredData;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.SortOrder;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.util.FileLock;
-
-import com.google.common.collect.ImmutableList;
-
-import functionaltests.monitor.MonitorEventReceiver;
-import functionaltests.monitor.SchedulerMonitorsHandler;
-import functionaltests.utils.SchedulerFunctionalTest;
-import functionaltests.utils.TestUsers;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
  * Test against method Scheduler.loadJobs
  */
-public class TestLoadJobs extends SchedulerFunctionalTest {
+public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
     private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_ASC =
             ImmutableList.of(
@@ -54,6 +44,8 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
     private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_DESC =
             ImmutableList.of(
                     new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
+
+    private MonitorEventReceiver eventReceiver;
 
     @Before
     public void setUp() throws Exception {
@@ -65,6 +57,13 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
 
         for (JobInfo job : jobs) {
             scheduler.removeJob(job.getJobId());
+        }
+    }
+
+    @After
+    public void cleanUp() throws Exception {
+        if (eventReceiver != null) {
+            PAActiveObject.terminateActiveObject(eventReceiver, true);
         }
     }
 
@@ -158,7 +157,7 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
                 TestUsers.USER.password), auth.getPublicKey());
         scheduler = auth.login(cred);
 
-        MonitorEventReceiver eventReceiver = new MonitorEventReceiver(monitorsHandler);
+        eventReceiver = new MonitorEventReceiver(monitorsHandler);
         eventReceiver = PAActiveObject.turnActive(eventReceiver);
         SchedulerState state = scheduler.addEventListener(eventReceiver, true, true);
         monitorsHandler.init(state);
@@ -208,6 +207,8 @@ public class TestLoadJobs extends SchedulerFunctionalTest {
         checkJobs(jobs, thirdJob, fourthJob);
 
         scheduler.disconnect();
+
+        PAActiveObject.terminateActiveObject(eventReceiver, true);
 
         // connect as a user who can see only its own jobs
         cred = Credentials.createCredentials(new CredData("guest", "pwd"), auth.getPublicKey());

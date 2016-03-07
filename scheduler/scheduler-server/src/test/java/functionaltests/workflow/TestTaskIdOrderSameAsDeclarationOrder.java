@@ -36,6 +36,15 @@
  */
 package functionaltests.workflow;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -43,20 +52,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.junit.Test;
-
-import functionaltests.utils.SchedulerFunctionalTest;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
-public class TestTaskIdOrderSameAsDeclarationOrder extends SchedulerFunctionalTest {
+public class TestTaskIdOrderSameAsDeclarationOrder extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestTaskIdOrderSameAsDeclarationOrder.class
             .getResource("/functionaltests/descriptors/Job_Id_Order.xml");

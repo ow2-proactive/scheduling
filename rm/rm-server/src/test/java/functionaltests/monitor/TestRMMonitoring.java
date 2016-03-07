@@ -36,19 +36,17 @@
  */
 package functionaltests.monitor;
 
-import java.util.Set;
-
+import functionaltests.utils.RMFunctionalTest;
+import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
+import java.util.Set;
 
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -63,15 +61,15 @@ public class TestRMMonitoring extends RMFunctionalTest {
     public void action() throws Exception {
         log("Deployment");
 
-        ResourceManager resourceManager = rmHelper.getResourceManager();
+        RMMonitorEventReceiver resourceManager = (RMMonitorEventReceiver) rmHelper.getResourceManager();
         rmHelper.createNodeSource("TestRMMonitoring");
 
         Set<String> nodesUrls = rmHelper.listAliveNodesUrls();
 
         // we received all event as we are here
         log("Test 1 - subscribing only to 'node remove' event");
-        resourceManager.getMonitoring().removeRMEventListener();
-        resourceManager.getMonitoring().addRMEventListener(rmHelper.getEventReceiver(), RMEventType.NODE_REMOVED);
+        resourceManager.removeRMEventListener();
+        resourceManager.addRMEventListener(rmHelper.getEventReceiver(), RMEventType.NODE_REMOVED);
 
         String url = nodesUrls.iterator().next();
         BooleanWrapper status = resourceManager.removeNode(url, true);

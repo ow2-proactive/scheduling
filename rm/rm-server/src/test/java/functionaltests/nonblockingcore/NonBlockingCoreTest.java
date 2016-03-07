@@ -36,11 +36,11 @@
  */
 package functionaltests.nonblockingcore;
 
-import java.io.File;
-import java.net.URL;
-
-import javax.security.auth.login.LoginException;
-
+import functionaltests.selectionscript.SelectionScriptTimeOutTest;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestUsers;
+import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -50,15 +50,14 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestUsers;
-import functionaltests.selectionscript.SelectionScriptTimeOutTest;
+import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.net.URL;
 
 import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -119,7 +118,8 @@ public class NonBlockingCoreTest extends RMFunctionalTest {
 		t.start();
 
 		String nodeName = "node_non_blocking_test";
-		String nodeUrl = RMTHelper.createNode(nodeName).getNode().getNodeInformation().getURL();
+		testNode = RMTHelper.createNode(nodeName);
+		String nodeUrl = testNode.getNode().getNodeInformation().getURL();
 
 		log("Adding node " + nodeUrl);
 		resourceManager.addNode(nodeUrl);
