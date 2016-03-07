@@ -34,13 +34,6 @@
  */
 package functionaltests.utils;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -48,6 +41,13 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class TestRM {
@@ -151,6 +151,7 @@ public class TestRM {
 
     public void kill() throws Exception {
         if (rmProcess != null) {
+            System.out.println("Destroying RM process.");
             rmProcess.destroy();
             rmProcess.waitFor();
             processTreeKiller.kill();

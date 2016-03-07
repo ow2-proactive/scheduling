@@ -40,7 +40,6 @@ import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.TestNode;
 import functionaltests.utils.TestUsers;
-import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -50,6 +49,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -64,6 +64,16 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestNSNodesPermissions extends RMFunctionalTest {
 
+    private List<Node> createNodes(String name, int number) throws Exception {
+        List<TestNode> nodePool = rmHelper.createNodes("node", 17);
+        testNodes.addAll(nodePool);
+        ArrayList<Node> answer = new ArrayList<>();
+        for (TestNode tn : nodePool) {
+            answer.add(tn.getNode());
+        }
+        return answer;
+    }
+
     @Test
     public void action() throws Exception {
 
@@ -74,12 +84,10 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ME", "ALL" }).getBooleanValue();
 
-        List<TestNode> nodePool = rmHelper.createNodes("node", 17);
+        List<Node> nodePool = createNodes("node", 2);
 
-        testNode = nodePool.get(0);
-
-        Node node = nodePool.remove(0).getNode();
-        Node node2 = nodePool.remove(0).getNode();
+        Node node = nodePool.remove(0);
+        Node node2 = nodePool.remove(0);
         nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -123,8 +131,10 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "MY_GROUPS", "ALL" }).getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
-        node2 = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+
+        node = nodePool.remove(0);
+        node2 = nodePool.remove(0);
         System.out.println(System.currentTimeMillis());
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -161,10 +171,11 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         RMTHelper.log("Test3 - node users = PROVIDER");
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "PROVIDER", "ALL" }).getBooleanValue();
+                StaticPolicy.class.getName(), new Object[]{"PROVIDER", "ALL"}).getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
-        node2 = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+        node = nodePool.remove(0);
+        node2 = nodePool.remove(0);
 
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -189,7 +200,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        nodes = admin.getNodes(new Criteria(2));
+        nodes = user.getNodes(new Criteria(2));
         assertEquals(1, nodes.size());
         //we eat free -> busy
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -212,10 +223,11 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         RMTHelper.log("Test4 - node users = PROVIDER_GROUPS");
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "PROVIDER_GROUPS", "ALL" }).getBooleanValue();
+                StaticPolicy.class.getName(), new Object[]{"PROVIDER_GROUPS", "ALL"}).getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
-        node2 = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+        node = nodePool.remove(0);
+        node2 = nodePool.remove(0);
 
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -240,10 +252,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user = rmHelper.getResourceManager(TestUsers.RADMIN);
-        nodes = admin.getNodes(new Criteria(2));
+        nodes = user.getNodes(new Criteria(2));
         assertEquals(1, nodes.size());
 
-        Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node6"));
         //we eat free -> busy
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         user.releaseNodes(nodes);
@@ -253,7 +264,6 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         nodes = nsadmin.getNodes(new Criteria(2));
         assertEquals("Have not get an admin node", 1, nodes.size());
-        Assert.assertTrue(nodes.get(0).getNodeInformation().getURL().contains("node7"));
         //we eat free -> busy
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.releaseNodes(nodes);
@@ -272,7 +282,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         user.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+        node = nodePool.remove(0);
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -303,8 +314,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[]{"users=nsadmin", "ALL"}).getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
-        node2 = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+        node = nodePool.remove(0);
+        node2 = nodePool.remove(0);
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -344,8 +356,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
                 StaticPolicy.class.getName(), new Object[]{"groups=nsadmins", "ALL"}).getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
-        node2 = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+        node = nodePool.remove(0);
+        node2 = nodePool.remove(0);
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -396,7 +409,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                 StaticPolicy.class.getName(), new Object[] { "tokens=token1,token2", "ALL" })
                 .getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+        node = nodePool.remove(0);
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -445,8 +459,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                 StaticPolicy.class.getName(), new Object[]{"users=radmin;groups=nsadmins", "ALL"})
                 .getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
-        node2 = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+        node = nodePool.remove(0);
+        node2 = nodePool.remove(0);
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -456,7 +471,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodes = user.getNodes(new Criteria(1));
         assertEquals("User did not get a node but had a right to get it", 1, nodes.size());
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
+        user.releaseNodes(nodes);
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         user.addNode(node2.getNodeInformation().getURL(), nsName).getBooleanValue();
@@ -467,7 +482,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         assertEquals("User did not get nodes but had a right to get them", 2, nodes.size());
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
+        user.releaseNodes(nodes);
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
@@ -495,7 +510,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                 StaticPolicy.class.getName(), new Object[] { "users=radmin;tokens=token1", "ALL" })
                 .getBooleanValue();
 
-        node = nodePool.remove(0).getNode();
+        nodePool = createNodes("node", 2);
+        node = nodePool.remove(0);
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -507,11 +523,11 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodes = user.getNodes(criteria);
         assertEquals("User did not get a node but had a right to get it", 1, nodes.size());
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        nsadmin.releaseNodes(nodes);
+        user.releaseNodes(nodes);
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         criteria.setNodeAccessToken("token2"); // will not get a node as don't have the token "token2"
-        nodes = nsadmin.getNodes(criteria);
+        nodes = user.getNodes(criteria);
         assertEquals(0, nodes.size());
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);

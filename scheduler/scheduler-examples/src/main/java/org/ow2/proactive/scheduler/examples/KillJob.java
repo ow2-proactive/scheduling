@@ -36,10 +36,11 @@
  */
 package org.ow2.proactive.scheduler.examples;
 
-import java.io.Serializable;
-
+import org.objectweb.proactive.api.PAActiveObject;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+
+import java.io.Serializable;
 
 
 /**
@@ -59,12 +60,12 @@ public class KillJob extends JavaExecutable {
     public Serializable execute(TaskResult... results) throws Throwable {
 
         try {
-            getOut().println("I will kill in 5 sec the node on which i was started with exit code = " +
-                exitcode);
+            getOut().println("I will kill in 5 sec the node on which i was started ");
 
             Thread.sleep(5000);
         } finally {
-            System.exit(exitcode);
+            String nodeName = PAActiveObject.getNode().getNodeInformation().getName();
+            PAActiveObject.getNode().getProActiveRuntime().killNode(nodeName);
             return null;
         }
     }
