@@ -36,7 +36,7 @@
  */
 package functionaltests.job.workingdir;
 
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.utils.SchedulerTHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -65,7 +65,7 @@ import static org.junit.Assert.assertTrue;
 import static org.ow2.proactive.utils.FileUtils.createTempDirectory;
 
 
-public class TestForkedTaskWorkingDir extends SchedulerFunctionalTestNoRestart {
+public class TestForkedTaskWorkingDir extends SchedulerFunctionalTestWithRestart {
 
     @Test
     public void input_files_are_in_working_dir_for_forked_tasks() throws Throwable {
