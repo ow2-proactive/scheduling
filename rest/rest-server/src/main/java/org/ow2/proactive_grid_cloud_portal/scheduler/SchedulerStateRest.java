@@ -3257,6 +3257,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         sortableTaskAttrMap.put("status", "taskStatus");
         sortableTaskAttrMap.put("name", "taskName");
         sortableTaskAttrMap.put("tag", "tag");
+        sortableTaskAttrMap.put("jobId", "jobData.id");
+        sortableTaskAttrMap.put("jobName", "jobData.jobName");
         sortableTaskAttrMap.put("execDuration", "executionDuration");
         sortableTaskAttrMap.put("nodeCount", "parallelEnvNodesNumber");
         sortableTaskAttrMap.put("executions", "numberOfExecutionLeft");

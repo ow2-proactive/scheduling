@@ -90,6 +90,15 @@ public class RestTestUtils {
         return new Page<TaskState>(lTasks, totalNumberOfTasks);
     }
 
+    protected static Page<TaskState> newMockedTaskStatePage(ArrayList<String> jobIds, String tag, int nbTasks,
+            int totalNumberOfTasks) {
+        List<TaskState> lTasks = new ArrayList<TaskState>(nbTasks);
+        for (int i = 0; i < nbTasks; i++) {
+            lTasks.add(newTaskState(jobIds.get(i), tag, i, nbTasks));
+        }
+        return new Page<TaskState>(lTasks, totalNumberOfTasks);
+    }
+
     protected static TaskState newTaskState(String jobIdStr, String tag, long cnt, int nbTasks) {
         TaskId mockedTaskId = mock(TaskId.class);
         TaskState mockedState = mock(TaskState.class);

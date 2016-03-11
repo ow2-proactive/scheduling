@@ -123,9 +123,10 @@ public class TaskResultData {
         this.flowAction = flowAction;
     }
 
+    // TRDTRD_INDEX = TASK_RUNTIME_DATA_TASK_RESULT_DATA_INDEX
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @Index(name = "TASK_RUNTIME_DATA_TASK_RESULT_DATA_INDEX", columnNames = {"JOB_ID", "TASK_ID"})
+    @Index(name = "TRDTRD_INDEX", columnNames = {"JOB_ID", "TASK_ID"})
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
             @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskRuntimeData() {
