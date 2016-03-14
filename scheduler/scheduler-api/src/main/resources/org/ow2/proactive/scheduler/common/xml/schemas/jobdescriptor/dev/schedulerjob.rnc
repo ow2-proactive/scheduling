@@ -35,7 +35,7 @@ variableValue = ## The patterns ${variable_name} will be replaced by this value
     attribute value { xsd:string }
 priority = ## Priority of the job
     attribute priority { jobPriority | variableRefType}
-onTaskError_j = ## Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)
+onTaskError_j = ## Defines the base task error behavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)
     attribute onTaskError {onErrorTaskType | variableRefType}
 restartTaskOnError_j = ## For each task, where does the task restart if an error occurred ? (default=anywhere)
     attribute restartTaskOnError {restartTaskType | variableRefType}
@@ -95,7 +95,7 @@ taskDescription = ## Textual description of this task
     element description { text }
 walltime = ## Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')
 	attribute walltime { walltimePattern | variableRefType}
-onTaskError_t = ## Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)
+onTaskError_t = ## Defines the base task error behavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)
    attribute onTaskError {onErrorTaskType | variableRefType}
 restartTaskOnError_t = ## Where does the task restart if an error occurred ?
     attribute restartTaskOnError {restartTaskType}
