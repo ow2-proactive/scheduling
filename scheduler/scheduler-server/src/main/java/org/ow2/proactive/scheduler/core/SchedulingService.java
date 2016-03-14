@@ -437,7 +437,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.killJob(jobId);
-                    boolean jobKilled = terminationData.jobTeminated(jobId);
+                    boolean jobKilled = terminationData.jobTerminated(jobId);
                     submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
                     return jobKilled;
@@ -468,7 +468,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.killTask(jobId, taskName);
-                    boolean taskKilled = terminationData.taskTeminated(jobId, taskName);
+                    boolean taskKilled = terminationData.taskTerminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
                     return taskKilled;
@@ -500,7 +500,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.restartTask(jobId, taskName, restartDelay);
-                    boolean taskRestarted = terminationData.taskTeminated(jobId, taskName);
+                    boolean taskRestarted = terminationData.taskTerminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
                     return taskRestarted;
@@ -528,7 +528,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.preemptTask(jobId, taskName, restartDelay);
-                    boolean taskRestarted = terminationData.taskTeminated(jobId, taskName);
+                    boolean taskRestarted = terminationData.taskTerminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
                     return taskRestarted;

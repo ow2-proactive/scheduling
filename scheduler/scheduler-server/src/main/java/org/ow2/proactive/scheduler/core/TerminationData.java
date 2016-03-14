@@ -6,11 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.utils.TaskIdWrapper;
+import org.apache.log4j.Logger;
 
 
 /*
@@ -69,7 +69,7 @@ final class TerminationData {
         this.tasksToRestart = tasksToRestart;
     }
 
-    void addJobToTermiante(JobId jobId) {
+    void addJobToTerminate(JobId jobId) {
         jobsToTerminate.add(jobId);
     }
 
@@ -86,11 +86,11 @@ final class TerminationData {
         return tasksToTerminate.isEmpty() && tasksToRestart.isEmpty() && jobsToTerminate.isEmpty();
     }
 
-    boolean jobTeminated(JobId jobId) {
+    boolean jobTerminated(JobId jobId) {
         return jobsToTerminate.contains(jobId);
     }
 
-    boolean taskTeminated(JobId jobId, String taskName) {
+    boolean taskTerminated(JobId jobId, String taskName) {
         for (TaskIdWrapper taskIdWrapper : tasksToTerminate.keySet()) {
             if (taskIdWrapper.getTaskId().getReadableName().equals(taskName)) {
                 return true;

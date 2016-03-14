@@ -320,7 +320,7 @@ class LiveJobs {
         TerminationData terminationData = TerminationData.newTerminationData();
         for (EligibleTaskDescriptor eltd : tasksToSchedule) {
             JobId jobId = eltd.getJobId();
-            if (!terminationData.jobTeminated(jobId)) {
+            if (!terminationData.jobTerminated(jobId)) {
                 JobData jobData = lockJob(jobId);
                 if (jobData != null) {
                     try {
@@ -580,7 +580,7 @@ class LiveJobs {
             job.terminate();
             jlogger.debug(job.getId(), "terminated");
             jobs.remove(job.getId());
-            terminationData.addJobToTermiante(job.getId());
+            terminationData.addJobToTerminate(job.getId());
         }
 
         //Update database
@@ -622,7 +622,7 @@ class LiveJobs {
         JobId jobId = jobData.job.getId();
 
         jobs.remove(jobId);
-        terminationData.addJobToTermiante(jobId);
+        terminationData.addJobToTerminate(jobId);
 
         InternalJob job = jobData.job;
 
