@@ -42,7 +42,6 @@ import functionaltests.utils.RestFuncTUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -90,7 +89,7 @@ public class RestFuncTHelper {
     final static URL schedHibernateConfig = RestFuncTHelper.class
             .getResource("config/schedHibernateConfig.xml");
 
-    final static int defaultNumberOfNodes = 1;
+    public final static int defaultNumberOfNodes = 1;
 
     private static String restServerUrl;
     private static String restfulSchedulerUrl;
@@ -102,7 +101,7 @@ public class RestFuncTHelper {
     private RestFuncTHelper() {
     }
 
-    public static void startRestfulSchedulerWebapp() throws Exception {
+    public static void startRestfulSchedulerWebapp(int nbNodes) throws Exception {
         // Kill all children processes on exit
         org.apache.log4j.BasicConfigurator.configure(new org.apache.log4j.varia.NullAppender());
         CookieBasedProcessTreeKiller.registerKillChildProcessesOnShutdown("rest_tests");
@@ -133,7 +132,7 @@ public class RestFuncTHelper {
         cmd.add(getClassPath());
         cmd.add(SchedulerStarter.class.getName());
         cmd.add("-ln");
-        cmd.add("1");
+        cmd.add("" + nbNodes);
 
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         processBuilder.redirectErrorStream(true);

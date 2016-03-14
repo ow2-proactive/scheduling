@@ -69,13 +69,26 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase{
     protected void cleanScheduler() throws NotConnectedException, PermissionException, UnknownJobException {
         scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<>();
-        jobStates.addAll(state.getPendingJobs());
-        jobStates.addAll(state.getRunningJobs());
-        jobStates.addAll(state.getFinishedJobs());
-        for (JobState jobState : jobStates) {
+        System.out.println("Cleaning scheduler.");
+        List<JobState> aliveJobsStates = new ArrayList<>();
+        aliveJobsStates.addAll(state.getPendingJobs());
+        aliveJobsStates.addAll(state.getRunningJobs());
+        List<JobState> finishedJobsStates = new ArrayList<>();
+        finishedJobsStates.addAll(state.getFinishedJobs());
+        for (JobState jobState : aliveJobsStates) {
             JobId jobId = jobState.getId();
-            scheduler.killJob(jobId);
+            try {
+                System.out.println("Killing job " + jobId);
+                scheduler.killJob(jobId);
+            } catch (Exception ignored) {
+
+            }
+            System.out.println("Removing job " + jobId);
+            scheduler.removeJob(jobId);
+        }
+        for (JobState jobState : finishedJobsStates) {
+            JobId jobId = jobState.getId();
+            System.out.println("Removing job " + jobId);
             scheduler.removeJob(jobId);
         }
     }

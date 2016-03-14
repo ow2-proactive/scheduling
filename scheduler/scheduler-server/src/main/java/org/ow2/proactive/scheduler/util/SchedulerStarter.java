@@ -36,19 +36,9 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
-import java.rmi.AlreadyBoundException;
-import java.security.KeyException;
-
-import javax.security.auth.login.LoginException;
-
+import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -76,15 +66,19 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.PAMRRouterStarter;
 import org.ow2.proactive.utils.Tools;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+
+import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
+import java.security.KeyException;
+import java.util.List;
 
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
@@ -161,7 +155,14 @@ public class SchedulerStarter {
         SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
 
         if (!commandLine.hasOption("no-rest")) {
-            new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL());
+            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL()));
+            if (applicationUrls != null) {
+                for (String applicationUrl : applicationUrls) {
+                    if (applicationUrl.endsWith("/rest")) {
+                        System.setProperty("rest.server.url", applicationUrl);
+                    }
+                }
+            }
         }
 
         addShutdownMessageHook();

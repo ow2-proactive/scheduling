@@ -132,6 +132,15 @@ public class TaskLauncher implements InitActive {
         });
     }
 
+    /**
+     * Method used to wait until the TaskLauncher is activated (i.e. the initActivity method has been run).
+     *
+     * @return dummy boolean value
+     */
+    public boolean isActivated() {
+        return true;
+    }
+
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
         logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
@@ -166,6 +175,7 @@ public class TaskLauncher implements InitActive {
             logger.info("Output space: " + context.getNodeDataSpaceURIs().getOutputURI());
             logger.info("User space: " + context.getNodeDataSpaceURIs().getUserURI());
             logger.info("Global space: " + context.getNodeDataSpaceURIs().getGlobalURI());
+            logger.info("Scheduler url: " + context.getRestUrl());
 
             wallTimer.start();
 

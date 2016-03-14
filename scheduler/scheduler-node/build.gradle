@@ -6,6 +6,7 @@ dependencies {
             "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}",
 
             project(':scheduler:scheduler-client'),
+            project(':rest:rest-client'),
             project(':rm:rm-node'),
     )
 

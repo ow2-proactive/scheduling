@@ -296,7 +296,7 @@ public class ForkedTaskVariablesManagerTest {
 
         // Execute method which adds bindings
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext,
-                variables, credentials);
+                variables, credentials, forkedTaskVariablesManager.createSchedulerNodeClient(taskContext));
 
         // Check if element exists
         assertThat((T) scriptHandlerBindings.get(key),
