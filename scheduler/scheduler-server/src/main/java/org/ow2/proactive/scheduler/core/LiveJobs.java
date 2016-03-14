@@ -148,8 +148,7 @@ class LiveJobs {
             dbManager.changeJobPriority(jobId, priority);
 
             listener.jobStateUpdated(jobData.job.getOwner(), new NotificationData<JobInfo>(
-                    SchedulerEvent.JOB_CHANGE_PRIORITY,
-                    new JobInfoImpl((JobInfoImpl) jobData.job.getJobInfo())));
+                SchedulerEvent.JOB_CHANGE_PRIORITY, new JobInfoImpl((JobInfoImpl) jobData.job.getJobInfo())));
         } finally {
             jobData.unlock();
         }
@@ -249,20 +248,20 @@ class LiveJobs {
         }
     }
 
-    private void restartTaskOnNodeFailure(InternalTask task, JobData jobData, TerminationData terminationData) {
+    private void restartTaskOnNodeFailure(InternalTask task, JobData jobData,
+            TerminationData terminationData) {
         final String errorMsg = "An error has occurred due to a node failure and the maximum amount of retries property has been reached.";
 
         task.setProgress(0);
         task.decreaseNumberOfExecutionOnFailureLeft();
-        tlogger.info(task.getId(), "number of retry on failure left " +
-            task.getNumberOfExecutionOnFailureLeft());
+        tlogger.info(task.getId(),
+                "number of retry on failure left " + task.getNumberOfExecutionOnFailureLeft());
         if (task.getNumberOfExecutionOnFailureLeft() > 0) {
             task.setStatus(TaskStatus.WAITING_ON_FAILURE);
             jobData.job.newWaitingTask();
-            listener
-                    .taskStateUpdated(jobData.job.getOwner(), new NotificationData<TaskInfo>(
-                            SchedulerEvent.TASK_WAITING_FOR_RESTART, new TaskInfoImpl((TaskInfoImpl) task
-                            .getTaskInfo())));
+            listener.taskStateUpdated(jobData.job.getOwner(),
+                    new NotificationData<TaskInfo>(SchedulerEvent.TASK_WAITING_FOR_RESTART,
+                        new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             jobData.job.reStartTask(task);
             dbManager.taskRestarted(jobData.job, task, null);
             tlogger.info(task.getId(), " is waiting for restart");
@@ -311,7 +310,7 @@ class LiveJobs {
         job.newWaitingTask();
         dbManager.updateAfterTaskFinished(job, task, result);
         listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                SchedulerEvent.TASK_WAITING_FOR_RESTART, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+            SchedulerEvent.TASK_WAITING_FOR_RESTART, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
 
         terminationData.addRestartData(task.getId(), waitTime);
     }
@@ -346,8 +345,8 @@ class LiveJobs {
             throw new IllegalStateException("Task is already started");
         }
 
-        runningTasksData.put(TaskIdWrapper.wrap(task.getId()), new RunningTaskData(task, job.getOwner(), job.getCredentials(),
-            launcher));
+        runningTasksData.put(TaskIdWrapper.wrap(task.getId()),
+                new RunningTaskData(task, job.getOwner(), job.getCredentials(), launcher));
 
         boolean firstTaskStarted;
 
@@ -366,7 +365,7 @@ class LiveJobs {
         dbManager.jobTaskStarted(job, task, firstTaskStarted);
 
         listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                SchedulerEvent.TASK_PENDING_TO_RUNNING, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+            SchedulerEvent.TASK_PENDING_TO_RUNNING, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
 
         //fill previous task progress with 0, means task has started
         task.setProgress(0);
@@ -390,6 +389,9 @@ class LiveJobs {
     }
 
     TerminationData taskTerminatedWithResult(TaskId taskId, TaskResultImpl result) {
+
+        logger.info("****************************** START taskTerminatedWithResult");
+
         JobData jobData = lockJob(taskId.getJobId());
         if (jobData == null) {
             return emptyResult(taskId);
@@ -423,18 +425,49 @@ class LiveJobs {
             tlogger.info(taskId, "finished with" + (errorOccurred ? "" : "out") + " errors");
 
             if (errorOccurred) {
+
+                logger.info("****************************** errorOccurred ");
+
                 task.decreaseNumberOfExecutionLeft();
                 if (task.getNumberOfExecutionLeft() <= 0 && task.isCancelJobOnError()) {
+
+                    logger.info(
+                            "****************************** task.getNumberOfExecutionLeft() <= 0 && task.isCancelJobOnError() ");
+
                     endJob(jobData, terminationData, task, result,
-                            "An error occurred in your task and the maximum number of executions has been reached. "
-                                + "You also ask to cancel the job in such a situation !", JobStatus.CANCELED);
+                            "An error occurred in your task and the maximum number of executions has been reached. " +
+                                "You also ask to cancel the job in such a situation !",
+                            JobStatus.CANCELED);
                     return terminationData;
                 } else if (task.getNumberOfExecutionLeft() > 0) {
-                    long waitTime = jobData.job.getNextWaitingTime(task.getMaxNumberOfExecution() -
-                        task.getNumberOfExecutionLeft());
-                    restartTaskOnError(jobData, task, TaskStatus.WAITING_ON_ERROR, result, waitTime,
-                            terminationData);
-                    return terminationData;
+
+                    logger.info("****************************** (task.getNumberOfExecutionLeft() > 0 ");
+
+                    if (requiresPauseTaskOnError(task)) {
+
+                        logger.info("****************************** requiresPauseTaskOnError");
+
+                        task.setStatus(TaskStatus.PAUSED_ON_ERROR);
+                        dbManager.updateTaskState(task);
+                        updateTaskPausedOnerrorState(jobData.job, task.getId());
+
+                    } else if (requiresPauseJobOnError(task)) {
+
+                        logger.info("****************************** requiresPauseJobOnError");
+
+                        pauseJob(task.getJobId());
+
+                    } else {
+
+                        logger.info("****************************** else");
+
+                        long waitTime = jobData.job.getNextWaitingTime(
+                                task.getMaxNumberOfExecution() - task.getNumberOfExecutionLeft());
+                        restartTaskOnError(jobData, task, TaskStatus.WAITING_ON_ERROR, result, waitTime,
+                                terminationData);
+                        return terminationData;
+                    }
+
                 }
             }
 
@@ -446,8 +479,8 @@ class LiveJobs {
         }
     }
 
-    TerminationData restartTask(JobId jobId, String taskName, int restartDelay) throws UnknownJobException,
-            UnknownTaskException {
+    TerminationData restartTask(JobId jobId, String taskName, int restartDelay)
+            throws UnknownJobException, UnknownTaskException {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
             throw new UnknownJobException(jobId);
@@ -466,15 +499,16 @@ class LiveJobs {
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(taskData, false);
 
-            TaskResultImpl taskResult = new TaskResultImpl(task.getId(), new TaskRestartedException(
-                "Aborted by user"), new SimpleTaskLogs("", "Aborted by user"), System.currentTimeMillis() -
-                task.getStartTime());
+            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+                new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
+                System.currentTimeMillis() - task.getStartTime());
 
             task.decreaseNumberOfExecutionLeft();
             if (task.getNumberOfExecutionLeft() <= 0 && task.isCancelJobOnError()) {
                 endJob(jobData, terminationData, task, taskResult,
-                        "An error occurred in your task and the maximum number of executions has been reached. "
-                            + "You also ask to cancel the job in such a situation !", JobStatus.CANCELED);
+                        "An error occurred in your task and the maximum number of executions has been reached. " +
+                            "You also ask to cancel the job in such a situation !",
+                        JobStatus.CANCELED);
                 return terminationData;
             } else if (task.getNumberOfExecutionLeft() > 0) {
                 long waitTime = restartDelay * 1000l;
@@ -491,8 +525,8 @@ class LiveJobs {
         }
     }
 
-    TerminationData preemptTask(JobId jobId, String taskName, int restartDelay) throws UnknownJobException,
-            UnknownTaskException {
+    TerminationData preemptTask(JobId jobId, String taskName, int restartDelay)
+            throws UnknownJobException, UnknownTaskException {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
             throw new UnknownJobException(jobId);
@@ -511,10 +545,10 @@ class LiveJobs {
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(taskData, false);
 
-            TaskResultImpl taskResult = new TaskResultImpl(task.getId(), new TaskPreemptedException(
-                "Preempted by admin"), new SimpleTaskLogs("", "Preempted by admin"), System
-                    .currentTimeMillis() -
-                task.getStartTime());
+            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+                new TaskPreemptedException("Preempted by admin"),
+                new SimpleTaskLogs("", "Preempted by admin"),
+                System.currentTimeMillis() - task.getStartTime());
 
             long waitTime = restartDelay * 1000l;
             restartTaskOnError(jobData, task, TaskStatus.PENDING, taskResult, waitTime, terminationData);
@@ -544,13 +578,13 @@ class LiveJobs {
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(taskData, false);
 
-            TaskResultImpl taskResult = new TaskResultImpl(task.getId(), new TaskAbortedException(
-                "Aborted by user"), new SimpleTaskLogs("", "Aborted by user"), System.currentTimeMillis() -
-                task.getStartTime());
+            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+                new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
+                System.currentTimeMillis() - task.getStartTime());
 
             if (task.isCancelJobOnError()) {
-                endJob(jobData, terminationData, task, taskResult, "The task has been manually killed. "
-                    + "You also ask to cancel the job in such a situation!", JobStatus.CANCELED);
+                endJob(jobData, terminationData, task, taskResult, "The task has been manually killed. " +
+                    "You also ask to cancel the job in such a situation!", JobStatus.CANCELED);
             } else {
                 terminateTask(jobData, task, true, taskResult, terminationData);
             }
@@ -592,14 +626,14 @@ class LiveJobs {
 
         //send event
         listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+            SchedulerEvent.TASK_RUNNING_TO_FINISHED, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
         //if this job is finished (every task have finished)
         jlogger.info(job.getId(), "finished tasks " + job.getNumberOfFinishedTasks() + ", total tasks " +
             job.getTotalNumberOfTasks() + ", finished " + jobFinished);
         if (jobFinished) {
             //send event to client
             listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
-                    SchedulerEvent.JOB_RUNNING_TO_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
         }
     }
 
@@ -662,8 +696,8 @@ class LiveJobs {
             //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
             boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
             if (jobStatus == JobStatus.FAILED || noResult) {
-                taskResult = new TaskResultImpl(task.getId(), new Exception(errorMsg), new SimpleTaskLogs("",
-                    errorMsg), -1);
+                taskResult = new TaskResultImpl(task.getId(), new Exception(errorMsg),
+                    new SimpleTaskLogs("", errorMsg), -1);
             }
 
             dbManager.updateAfterJobFailed(job, task, taskResult, tasksToUpdate);
@@ -681,8 +715,8 @@ class LiveJobs {
             try {
                 InternalTask t = job.getTask(tid);
                 TaskInfo ti = new TaskInfoImpl((TaskInfoImpl) t.getTaskInfo());
-                listener.taskStateUpdated(job.getOwner(), new NotificationData<>(
-                        SchedulerEvent.TASK_RUNNING_TO_FINISHED, ti));
+                listener.taskStateUpdated(job.getOwner(),
+                        new NotificationData<>(SchedulerEvent.TASK_RUNNING_TO_FINISHED, ti));
             } catch (UnknownTaskException e) {
                 logger.error(e);
             }
@@ -719,10 +753,34 @@ class LiveJobs {
     private void updateJobInSchedulerState(InternalJob currentJob, SchedulerEvent eventType) {
         try {
             listener.jobStateUpdated(currentJob.getOwner(), new NotificationData<JobInfo>(eventType,
-                    new JobInfoImpl((JobInfoImpl) currentJob.getJobInfo())));
+                new JobInfoImpl((JobInfoImpl) currentJob.getJobInfo())));
         } catch (Throwable t) {
             //Just to prevent update method error
         }
+    }
+
+    //TODO: Check if a task onTaskError attribute is pauseTask. 
+    private boolean requiresPauseTaskOnError(InternalTask task) {
+        return true;
+
+    }
+
+    //TODO: Check if a task onTaskError attribute is pauseTask. 
+    private boolean requiresPauseJobOnError(InternalTask task) {
+        return true;
+
+    }
+
+    private void updateTaskPausedOnerrorState(InternalJob job, TaskId taskToUpdate) {
+        try {
+            InternalTask t = job.getTask(taskToUpdate);
+            TaskInfo ti = new TaskInfoImpl((TaskInfoImpl) t.getTaskInfo());
+            listener.taskStateUpdated(job.getOwner(),
+                    new NotificationData<>(SchedulerEvent.TASK_PAUSED_ON_ERROR, ti));
+        } catch (UnknownTaskException e) {
+            logger.error(e);
+        }
+
     }
 
 }
