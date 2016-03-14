@@ -62,6 +62,10 @@ public enum TaskStatus implements java.io.Serializable {
      */
     PAUSED("Paused", true),
     /**
+     * The task is paused on error and waiting for a manual resume action.
+     */
+    PAUSED_ON_ERROR("Paused on Error", true),
+    /**
      * The task is executing.
      */
     RUNNING("Running", true),
