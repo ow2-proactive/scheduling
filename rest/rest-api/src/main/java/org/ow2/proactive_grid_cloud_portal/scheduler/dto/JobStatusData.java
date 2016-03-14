@@ -35,6 +35,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 public enum JobStatusData {
+
     /**
      * The job is waiting to be scheduled.
      */
@@ -56,14 +57,6 @@ public enum JobStatusData {
      */
     PAUSED,
     /**
-     * The job is paused due to one or more tasks in a paused on error state.
-     * When a job is in this state, it is assumed that all running tasks have finished.
-     * However, it is possible to have some tasks in the pending state due to
-     * the execution of the job that is suspended (because some tasks are
-     * in the paused on error state).
-     */
-    PAUSED_ON_ERROR,
-    /**
      * The job has been canceled due to user exception and order.
      * This status runs when a user exception occurs in a task
      * and when the user has asked to cancel On exception.
@@ -79,5 +72,14 @@ public enum JobStatusData {
      * Nothing can be done anymore on this job expect read execution informations
      * such as output, time, etc...
      */
-    KILLED
+    KILLED,
+    /**
+     * The job is paused due to one or more tasks in a paused on error state.
+     * When a job is in this state, it is assumed that all running tasks have finished.
+     * However, it is possible to have some tasks in the pending state due to
+     * the execution of the job that is suspended (because some tasks are
+     * in the paused on error state).
+     */
+    PAUSED_ON_ERROR;
+
 }

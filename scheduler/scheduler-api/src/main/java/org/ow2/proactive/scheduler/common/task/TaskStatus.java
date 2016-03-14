@@ -62,10 +62,6 @@ public enum TaskStatus implements java.io.Serializable {
      */
     PAUSED("Paused", true),
     /**
-     * The task is paused on error and waiting for a manual resume action.
-     */
-    PAUSED_ON_ERROR("Paused on Error", true),
-    /**
      * The task is executing.
      */
     RUNNING("Running", true),
@@ -110,7 +106,11 @@ public enum TaskStatus implements java.io.Serializable {
     /**
      * The task was not executed: it was the non-selected branch of an IF/ELSE control flow action
      */
-    SKIPPED("Skipped", false);
+    SKIPPED("Skipped", false),
+    /**
+     * The task is paused on error and waiting for a manual resume action.
+     */
+    PAUSED_ON_ERROR("Paused on Error", true);
 
     /** The name of the current status. */
     private String name;
@@ -138,4 +138,5 @@ public enum TaskStatus implements java.io.Serializable {
     public String toString() {
         return name;
     }
+    
 }
