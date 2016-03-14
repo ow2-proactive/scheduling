@@ -63,6 +63,7 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
@@ -330,6 +331,9 @@ public class StaxJobFactory extends JobFactory {
             } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
                 commonPropertiesHolder.setRestartTaskOnError(
                         RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
+            } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
+                commonPropertiesHolder.setOnTaskError(OnTaskError
+                        .getInstance(replace(cursorJob.getAttributeValue(i))));
             } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attrName)) {
                 commonPropertiesHolder.setMaxNumberOfExecution(
                         Integer.parseInt(replace(cursorJob.getAttributeValue(i))));
@@ -629,6 +633,9 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
                     tmpTask.setCancelJobOnError(Boolean
                             .parseBoolean(replace(cursorTask.getAttributeValue(i))));
+                } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
+                    tmpTask.setOnTaskError(OnTaskError
+                            .getInstance(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
                     tmpTask.setRestartTaskOnError(RestartMode
                             .getMode(replace(cursorTask.getAttributeValue(i))));
