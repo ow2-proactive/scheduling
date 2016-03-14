@@ -95,7 +95,7 @@
   </define>
   <define name="onTaskError_j">
     <attribute name="onTaskError">
-      <doc:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</doc:documentation>
+      <doc:documentation>Defines the base task error behavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</doc:documentation>
       <choice>
         <ref name="onErrorTaskType"/>
         <ref name="variableRefType"/>
@@ -278,7 +278,7 @@
   </define>
   <define name="onTaskError_t">
     <attribute name="onTaskError">
-      <doc:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</doc:documentation>
+      <doc:documentation>Defines the base task error behavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</doc:documentation>
       <choice>
         <ref name="onErrorTaskType"/>
         <ref name="variableRefType"/>

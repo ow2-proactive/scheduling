@@ -27,7 +27,7 @@
       </xs:attribute>
       <xs:attribute name="onTaskError">
         <xs:annotation>
-          <xs:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
+          <xs:documentation>Defines the base task error behavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:union memberTypes="jd:onErrorTaskType jd:variableRefType"/>
@@ -112,7 +112,7 @@
   <xs:attributeGroup name="onTaskError_j">
     <xs:attribute name="onTaskError" use="required">
       <xs:annotation>
-        <xs:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
+        <xs:documentation>Defines the base task error behavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="jd:onErrorTaskType jd:variableRefType"/>
@@ -238,7 +238,7 @@
           </xs:attribute>
           <xs:attribute name="onTaskError">
             <xs:annotation>
-              <xs:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
+              <xs:documentation>Defines the base task error behavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:union memberTypes="jd:onErrorTaskType jd:variableRefType"/>
@@ -340,7 +340,7 @@
   <xs:attributeGroup name="onTaskError_t">
     <xs:attribute name="onTaskError" use="required">
       <xs:annotation>
-        <xs:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
+        <xs:documentation>Defines the base task error behavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="jd:onErrorTaskType jd:variableRefType"/>
