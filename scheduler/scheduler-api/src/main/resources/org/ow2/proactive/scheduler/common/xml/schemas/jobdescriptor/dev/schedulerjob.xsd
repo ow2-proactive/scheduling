@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:dev" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.3" xmlns:jd="urn:proactive:jobdescriptor:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <xs:import namespace="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="xsi.xsd"/>
   <xs:element name="job">
     <xs:annotation>
@@ -25,12 +25,12 @@
           <xs:union memberTypes="jd:jobPriority jd:variableRefType"/>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="cancelJobOnError">
+      <xs:attribute name="onTaskError">
         <xs:annotation>
-          <xs:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</xs:documentation>
+          <xs:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
-          <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+          <xs:union memberTypes="jd:onErrorTaskType jd:variableRefType"/>
         </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="restartTaskOnError">
@@ -109,13 +109,13 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:attributeGroup name="cancelJobOnError_j">
-    <xs:attribute name="cancelJobOnError" use="required">
+  <xs:attributeGroup name="onTaskError_j">
+    <xs:attribute name="onTaskError" use="required">
       <xs:annotation>
-        <xs:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</xs:documentation>
+        <xs:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
-        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+        <xs:union memberTypes="jd:onErrorTaskType jd:variableRefType"/>
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
@@ -236,12 +236,12 @@
               <xs:union memberTypes="xs:positiveInteger jd:variableRefType"/>
             </xs:simpleType>
           </xs:attribute>
-          <xs:attribute name="cancelJobOnError">
+          <xs:attribute name="onTaskError">
             <xs:annotation>
-              <xs:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</xs:documentation>
+              <xs:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
-              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+              <xs:union memberTypes="jd:onErrorTaskType jd:variableRefType"/>
             </xs:simpleType>
           </xs:attribute>
           <xs:attribute name="restartTaskOnError" type="jd:restartTaskType">
@@ -337,13 +337,13 @@
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:attributeGroup name="cancelJobOnError_t">
-    <xs:attribute name="cancelJobOnError" use="required">
+  <xs:attributeGroup name="onTaskError_t">
+    <xs:attribute name="onTaskError" use="required">
       <xs:annotation>
-        <xs:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</xs:documentation>
+        <xs:documentation>Defines the base task error bahavior. Cancel job, pause task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
-        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+        <xs:union memberTypes="jd:onErrorTaskType jd:variableRefType"/>
       </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
@@ -1063,6 +1063,30 @@
       <xs:simpleType>
         <xs:restriction base="xs:token">
           <xs:enumeration value="elsewhere"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="onErrorTaskType">
+    <xs:union memberTypes="jd:variableRefType">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="cancelJob"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="pauseTask"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="pauseJob"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="continueJobExecution"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:union>
