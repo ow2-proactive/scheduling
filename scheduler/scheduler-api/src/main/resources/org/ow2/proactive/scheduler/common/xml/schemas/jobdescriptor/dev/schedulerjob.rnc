@@ -1,5 +1,5 @@
-default namespace = "urn:proactive:jobdescriptor:3.3"
-namespace jd = "urn:proactive:jobdescriptor:3.3"
+default namespace = "urn:proactive:jobdescriptor:3.4"
+namespace jd = "urn:proactive:jobdescriptor:3.4"
 namespace xsi = "http://www.w3.org/2001/XMLSchema-instance"
 namespace doc = "http://relaxng.org/ns/compatibility/annotations/1.0"
 start = job
