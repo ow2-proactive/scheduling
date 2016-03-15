@@ -93,6 +93,17 @@ public abstract class CommonAttribute implements Serializable {
     /** Common user informations */
     protected Map<String, BigString> genericInformations = new HashMap<String, BigString>();
 
+    protected UpdatableProperties<OnTaskError> onTaskError = new UpdatableProperties<>(
+           OnTaskError.NOT_SET);
+
+    public void setOnTaskError(OnTaskError onTaskError) {
+        this.onTaskError.setValue(onTaskError);
+    }
+
+    public UpdatableProperties<OnTaskError> getOnTaskErrorProperty() {
+        return this.onTaskError;
+    }
+
     /**
      * To get the cancelOnError property
      *
