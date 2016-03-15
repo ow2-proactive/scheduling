@@ -1172,13 +1172,14 @@ public class SchedulerDBManager {
         });
     }
 
-    private void updateTaskStatus(final TaskState task, Session session) {
+    private int updateTaskStatus(final TaskState task, Session session) {
         String taskUpdate = "update TaskData task set task.taskStatus = :taskStatus where task.id = :taskId";
 
         Query taskUpdateQuery = session.createQuery(taskUpdate);
 
         TaskInfo taskInfo = task.getTaskInfo();
-        taskUpdateQuery.setParameter("taskStatus", taskInfo.getStatus())
+
+        return taskUpdateQuery.setParameter("taskStatus", taskInfo.getStatus())
                 .setParameter("taskId", taskId(task.getId())).executeUpdate();
     }
 
