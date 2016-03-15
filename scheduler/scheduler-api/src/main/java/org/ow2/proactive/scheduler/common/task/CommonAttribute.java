@@ -100,7 +100,7 @@ public abstract class CommonAttribute implements Serializable {
         this.onTaskError.setValue(onTaskError);
     }
 
-    public UpdatableProperties<OnTaskError> getOnTaskError() {
+    public UpdatableProperties<OnTaskError> getOnTaskErrorProperty() {
         return this.onTaskError;
     }
 

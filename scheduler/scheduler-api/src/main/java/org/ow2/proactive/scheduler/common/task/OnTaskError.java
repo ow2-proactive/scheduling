@@ -34,29 +34,36 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 @PublicAPI
+@XmlRootElement(name = "onTaskError")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class OnTaskError {
+public class OnTaskError implements Serializable {
 
-    // Members
-    String descriptor;
+    // Member
+    @XmlAttribute
+    private final String descriptor;
 
-    private final static String CANCEL_JOB_STRING = "cancelJob";
-    private final static String PAUSE_TASK_STRING = "pauseTask";
-    private final static String PAUSE_JOB_STRING = "pauseJob";
-    private final static String CONTINUE_JOB_EXECUTION_STRING = "continueJobExecution";
-    private final static String NOT_SET_STRING = "";
+    // PUBLIC AND PRIVATE CONSTANTS
+    private static final String CANCEL_JOB_STRING = "cancelJob";
+    private static final String PAUSE_TASK_STRING = "pauseTask";
+    private static final String PAUSE_JOB_STRING = "pauseJob";
+    private static final String CONTINUE_JOB_EXECUTION_STRING = "continueJobExecution";
+    private static final String NOT_SET_STRING = "none";
 
-    public final static OnTaskError CANCEL_JOB = new OnTaskError(CANCEL_JOB_STRING);
-    public final static OnTaskError PAUSE_TASK = new OnTaskError(PAUSE_TASK_STRING);
-    public final static OnTaskError PAUSE_JOB = new OnTaskError(PAUSE_JOB_STRING);
-    public final static OnTaskError CONTINUE_JOB_EXECUTION = new OnTaskError(CONTINUE_JOB_EXECUTION_STRING);
-    public final static OnTaskError NOT_SET = new OnTaskError(NOT_SET_STRING);
+    public static final OnTaskError CANCEL_JOB = new OnTaskError(CANCEL_JOB_STRING);
+    public static final OnTaskError PAUSE_TASK = new OnTaskError(PAUSE_TASK_STRING);
+    public static final OnTaskError PAUSE_JOB = new OnTaskError(PAUSE_JOB_STRING);
+    public static final OnTaskError CONTINUE_JOB_EXECUTION = new OnTaskError(CONTINUE_JOB_EXECUTION_STRING);
+    public static final OnTaskError NOT_SET = new OnTaskError(NOT_SET_STRING);
 
 
     private OnTaskError(String descriptor) {
@@ -88,6 +95,7 @@ public class OnTaskError {
         return this.descriptor;
     }
 
+    @Override
     public String toString() {
         return this.descriptor;
     }

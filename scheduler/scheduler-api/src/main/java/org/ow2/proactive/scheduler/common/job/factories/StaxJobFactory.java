@@ -326,8 +326,9 @@ public class StaxJobFactory extends JobFactory {
                 commonPropertiesHolder.setPriority(
                         JobPriority.findPriority(replace(cursorJob.getAttributeValue(i))));
             } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
-                commonPropertiesHolder.setCancelJobOnError(
-                        Boolean.parseBoolean(replace(cursorJob.getAttributeValue(i))));
+                logger.warn(
+                        XMLAttributes.COMMON_CANCELJOB_ON_ERROR.getXMLName()
+                                + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior.");
             } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
                 commonPropertiesHolder.setRestartTaskOnError(
                         RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
@@ -631,8 +632,9 @@ public class StaxJobFactory extends JobFactory {
                     int numberOfNodesNeeded = Integer.parseInt(replace(cursorTask.getAttributeValue(i)));
                     tmpTask.setParallelEnvironment(new ParallelEnvironment(numberOfNodesNeeded));
                 } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
-                    tmpTask.setCancelJobOnError(Boolean
-                            .parseBoolean(replace(cursorTask.getAttributeValue(i))));
+                    logger.warn(
+                            XMLAttributes.COMMON_CANCELJOB_ON_ERROR.getXMLName()
+                                    + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior.");
                 } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
                     tmpTask.setOnTaskError(OnTaskError
                             .getInstance(replace(cursorTask.getAttributeValue(i))));
