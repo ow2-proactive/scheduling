@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -41,6 +40,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.TaskIdWrapper;
+import org.apache.log4j.Logger;
 
 
 class LiveJobs {
@@ -448,18 +448,13 @@ class LiveJobs {
                     logger.info("Number of execution left is " + numberOfExecutionLeft);
 
                     if (onErrorPolicyInterpreter.requiresPauseTaskOnError(jobData.job, task)) {
-                        task.setStatus(TaskStatus.PAUSED_ON_ERROR);
-                        dbManager.updateTaskState(task);
-                        updateTaskPausedOnerrorState(jobData.job, task.getId());
-
-                        runningTasksData.put(taskIdWrapper, taskData);
+                        pauseTaskOnError(jobData, task);
 
                         logger.info("Task is paused on error");
 
                         return terminationData;
                     } else if (onErrorPolicyInterpreter.requiresPauseJobOnError(jobData.job, task)) {
-                        task.setStatus(TaskStatus.PAUSED_ON_ERROR);
-
+                        pauseTaskOnError(jobData, task);
                         pauseJob(task.getJobId());
 
                         logger.info("Job is paused on error");
@@ -481,6 +476,23 @@ class LiveJobs {
             terminateTask(jobData, task, errorOccurred, result, terminationData);
 
             return terminationData;
+        } finally {
+            jobData.unlock();
+        }
+    }
+
+    private void pauseTaskOnError(JobData jobData, InternalTask task) {
+        jobData.job.setTaskPausedOnError(task);
+        dbManager.updateTaskState(task);
+        updateTaskPausedOnerrorState(jobData.job, task.getId());
+    }
+
+    void restartTaskOnError(JobId jobId, String taskName) throws UnknownTaskException {
+        JobData jobData = lockJob(jobId);
+        try {
+            jobData.job.setUnPauseTaskOnError(jobData.job.getTask(taskName));
+            dbManager.updateJobAndTasksState(jobData.job);
+            updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESUMED);
         } finally {
             jobData.unlock();
         }
@@ -514,22 +526,12 @@ class LiveJobs {
 
             task.decreaseNumberOfExecutionLeft();
             if (task.getNumberOfExecutionLeft() <= 0 && task.isCancelJobOnError()) {
-
-                logger.info(
-                        "*******************************************************  task.isCancelJobOnError()");
-
                 endJob(jobData, terminationData, task, taskResult,
                         "An error occurred in your task and the maximum number of executions has been reached. " +
                             "You also ask to cancel the job in such a situation !",
                         JobStatus.CANCELED);
                 return terminationData;
             } else if (task.getNumberOfExecutionLeft() > 0) {
-
-                logger.info(
-                        "*******************************************************  else if (task.getNumberOfExecutionLeft() > 0)");
-
-                runningTasksData.put(taskIdWrapper, taskData);
-
                 long waitTime = restartDelay * 1000l;
                 restartTaskOnError(jobData, task, TaskStatus.WAITING_ON_ERROR, taskResult, waitTime,
                         terminationData);
