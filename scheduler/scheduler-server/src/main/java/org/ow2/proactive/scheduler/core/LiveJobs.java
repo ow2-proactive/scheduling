@@ -448,11 +448,11 @@ class LiveJobs {
                     logger.info("Number of execution left is " + numberOfExecutionLeft);
 
                     if (onErrorPolicyInterpreter.requiresPauseTaskOnError(jobData.job, task)) {
+                        jobData.job.getJobDescriptor().eligibleTasks.put(taskId,((EligibleTaskDescriptor)jobData.job.getJobDescriptor().runningTasks.get(taskId)));
+                        jobData.job.setTaskPaused(task); // DON'T DO IT, DEBIUG TEST TODO
                         task.setStatus(TaskStatus.PAUSED_ON_ERROR);
                         dbManager.updateTaskState(task);
                         updateTaskPausedOnerrorState(jobData.job, task.getId());
-
-                        runningTasksData.put(taskIdWrapper, taskData);
 
                         logger.info("Task is paused on error");
 
@@ -488,7 +488,7 @@ class LiveJobs {
 
     TerminationData restartTask(JobId jobId, String taskName, int restartDelay)
             throws UnknownJobException, UnknownTaskException {
-        JobData jobData = lockJob(jobId);
+        /*JobData jobData = lockJob(jobId);
         if (jobData == null) {
             throw new UnknownJobException(jobId);
         }
@@ -500,6 +500,7 @@ class LiveJobs {
             }
 
             TaskIdWrapper taskIdWrapper = TaskIdWrapper.wrap(task.getId());
+
             RunningTaskData taskData = runningTasksData.remove(taskIdWrapper);
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
@@ -541,7 +542,13 @@ class LiveJobs {
             return terminationData;
         } finally {
             jobData.unlock();
-        }
+        } */
+        JobData jobData = lockJob(jobId);
+        jobData.job.setUnPause();
+        dbManager.updateJobAndTasksState(jobData.job);
+        updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESUMED);
+        jobData.unlock();
+        return TerminationData.EMPTY;
     }
 
     TerminationData preemptTask(JobId jobId, String taskName, int restartDelay)

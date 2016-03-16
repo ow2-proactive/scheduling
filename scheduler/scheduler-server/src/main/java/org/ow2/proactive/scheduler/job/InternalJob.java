@@ -754,12 +754,16 @@ public abstract class InternalJob extends JobState {
             if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
                 (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY) &&
                 (td.getStatus() != TaskStatus.PAUSED_ON_ERROR)) {
-                td.setStatus(TaskStatus.PAUSED);
-                getJobDescriptor().pause(td.getId());
+                setTaskPaused(td);
                 updatedTasks.add(td.getId());
             }
         }
         return updatedTasks;
+    }
+
+    public void setTaskPaused(InternalTask td) {
+        td.setStatus(TaskStatus.PAUSED);
+        getJobDescriptor().pause(td.getId());
     }
 
     /**
@@ -770,9 +774,9 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been unpaused, false if not.
      */
     public Set<TaskId> setUnPause() {
-        if (jobInfo.getStatus() != JobStatus.PAUSED) {
-            return new HashSet<>(0);
-        }
+//        if (jobInfo.getStatus() != JobStatus.PAUSED) {
+//            return new HashSet<>(0);
+//        }
 
         if ((getNumberOfPendingTasks() + getNumberOfRunningTasks() + getNumberOfFinishedTasks()) == 0) {
             jobInfo.setStatus(JobStatus.PENDING);

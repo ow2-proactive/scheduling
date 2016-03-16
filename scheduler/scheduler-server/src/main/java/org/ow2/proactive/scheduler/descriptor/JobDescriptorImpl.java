@@ -83,14 +83,14 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     /** Job tasks to be able to be schedule */
     @XmlTransient
-    private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<>();
+    public Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<>();
 
     /** Those are not directly eligible, and will be triggered by an IF control flow action */
     @XmlTransient
     private Map<TaskId, EligibleTaskDescriptor> branchTasks = new ConcurrentHashMap<>();
 
     /** Job running tasks */
-    private Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<>();
+    public Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<>();
 
     /** Job paused tasks */
     private Map<TaskId, EligibleTaskDescriptor> pausedTasks = new HashMap<>();
@@ -568,11 +568,11 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public void pause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            TaskDescriptor lt = eligibleTasks.get(taskId);
+            //TaskDescriptor lt = eligibleTasks.get(taskId);
 
-            if (lt != null) {
+            //if (lt != null) {
                 pausedTasks.put(taskId, eligibleTasks.remove(taskId));
-            }
+            //}
         }
     }
 
