@@ -144,7 +144,7 @@ public class JobData {
 
         JobData jobRuntimeData = new JobData();
         jobRuntimeData.setMaxNumberOfExecution(job.getMaxNumberOfExecution());
-        jobRuntimeData.setOnTaskError(job.getOnTaskErrorProperty().getValue());
+        jobRuntimeData.setOnTaskErrorString(job.getOnTaskErrorProperty().getValue());
         jobRuntimeData.setSubmittedTime(job.getSubmittedTime());
         jobRuntimeData.setStartTime(job.getStartTime());
         jobRuntimeData.setFinishedTime(job.getFinishedTime());
@@ -216,8 +216,12 @@ public class JobData {
         return onTaskErrorString;
     }
 
-    public void setOnTaskError(OnTaskError onTaskError) {
+    public void setOnTaskErrorString(OnTaskError onTaskError) {
         this.onTaskErrorString = onTaskError.toString();
+    }
+
+    public void setOnTaskErrorString(String onTaskError) {
+        this.onTaskErrorString = onTaskError;
     }
 
     @Column(name = "JOB_NAME", nullable = false, updatable = false)

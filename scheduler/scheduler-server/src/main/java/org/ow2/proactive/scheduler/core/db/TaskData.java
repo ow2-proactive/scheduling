@@ -408,7 +408,7 @@ public class TaskData {
         taskData.setPreciousResult(task.isPreciousResult());
         taskData.setRunAsMe(task.isRunAsMe());
         taskData.setWallTime(task.getWallTime());
-        taskData.setOnTaskError(task.getOnTaskErrorProperty().getValue());
+        taskData.setOnTaskErrorString(task.getOnTaskErrorProperty().getValue());
         taskData.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         taskData.setJobData(jobRuntimeData);
         taskData.setNumberOfExecutionOnFailureLeft(
@@ -770,8 +770,12 @@ public class TaskData {
         return this.onTaskErrorString;
     }
 
-    public void setOnTaskError(OnTaskError onTaskError) {
+    public void setOnTaskErrorString(OnTaskError onTaskError) {
         this.onTaskErrorString = onTaskError.toString();
+    }
+
+    public void setOnTaskErrorString(String onTaskError) {
+        this.onTaskErrorString = onTaskError;
     }
 
     @Column(name = "RES_PREVIEW", length = 1000, updatable = false)
