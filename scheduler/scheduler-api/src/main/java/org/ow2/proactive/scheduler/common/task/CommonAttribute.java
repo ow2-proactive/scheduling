@@ -47,7 +47,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.db.types.BigString;
-import org.ow2.proactive.scheduler.common.task.util.BooleanWrapper;
 import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 
 
@@ -86,7 +85,7 @@ public abstract class CommonAttribute implements Serializable {
     protected Map<String, BigString> genericInformations = new HashMap<String, BigString>();
 
     protected UpdatableProperties<OnTaskError> onTaskError = new UpdatableProperties<>(
-           OnTaskError.NOT_SET);
+           OnTaskError.NONE);
 
     /**
      * Set onTaskError property value.

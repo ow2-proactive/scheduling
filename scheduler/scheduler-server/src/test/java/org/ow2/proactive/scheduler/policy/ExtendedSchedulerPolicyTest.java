@@ -50,6 +50,7 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -199,7 +200,7 @@ public class ExtendedSchedulerPolicyTest {
     private JobDescriptor createJobDescWithTwoTasks(String jobStartAt, String oneTaskStartAt,
             String otherTaskStartAt) {
 
-        InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", JobPriority.NORMAL, true, "");
+        InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "");
         taskFlowJob.setId(JobIdImpl.makeJobId(Integer.toString(jobId++)));
 
         ArrayList<InternalTask> tasks = new ArrayList<>();

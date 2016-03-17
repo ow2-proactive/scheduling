@@ -21,6 +21,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -558,7 +559,8 @@ class LiveJobs {
                 System.currentTimeMillis() - task.getStartTime());
 
             task.decreaseNumberOfExecutionLeft();
-            if (task.getNumberOfExecutionLeft() <= 0 && task.isCancelJobOnError()) {
+            if (task.getNumberOfExecutionLeft() <= 0 && task.getOnTaskErrorProperty().getValue().equals(
+                    OnTaskError.CANCEL_JOB)) {
                 endJob(jobData, terminationData, task, taskResult,
                         "An error occurred in your task and the maximum number of executions has been reached. " +
                             "You also ask to cancel the job in such a situation !",
@@ -636,7 +638,7 @@ class LiveJobs {
                 new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
                 System.currentTimeMillis() - task.getStartTime());
 
-            if (task.isCancelJobOnError()) {
+            if (task.getOnTaskErrorProperty().getValue().equals(OnTaskError.CANCEL_JOB)) {
                 endJob(jobData, terminationData, task, taskResult, "The task has been manually killed. " +
                     "You also ask to cancel the job in such a situation!", JobStatus.CANCELED);
             } else {

@@ -140,8 +140,8 @@ public class JobComparator {
     }
 
     private boolean isEqualCommonAttribute(CommonAttribute attrib1, CommonAttribute attrib2) {
-        if (!isEqualUpdatableProperty(attrib1.getCancelJobOnErrorProperty(), attrib2
-                .getCancelJobOnErrorProperty())) {
+        if (!isEqualUpdatableProperty(attrib1.getOnTaskErrorProperty(), attrib2
+                .getOnTaskErrorProperty())) {
             stack.push(" CancelJobOnErrorProperty ");
             return false;
         }

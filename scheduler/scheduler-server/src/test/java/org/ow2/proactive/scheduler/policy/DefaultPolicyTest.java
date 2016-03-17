@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.policy;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -72,7 +73,7 @@ public class DefaultPolicyTest {
     }
 
     private JobDescriptorImpl createSingleTaskJob(JobPriority jobPriority) {
-        InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", jobPriority, true, "");
+        InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", jobPriority, OnTaskError.CANCEL_JOB, "");
         taskFlowJob.setId(JobIdImpl.makeJobId(Integer.toString(jobId++)));
         ArrayList<InternalTask> tasks = new ArrayList<>();
         tasks.add(new InternalScriptTask());

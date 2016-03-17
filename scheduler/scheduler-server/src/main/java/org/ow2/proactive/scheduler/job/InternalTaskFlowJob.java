@@ -44,6 +44,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 /**
@@ -71,17 +72,16 @@ public class InternalTaskFlowJob extends InternalJob {
 	 *            the current job name.
 	 * @param priority
 	 *            the priority of this job between 1 and 5.
-	 * @param cancelOnError
-	 *            true if the job has to run until its end or an user
-	 *            intervention.
+	 * @param onTaskError
+	 *            Defines the error behavior if a task error occurs.
 	 * @param description
 	 *            a short description of the job and what it will do.
 	 */
 
 	// * @param runtimeLimit the maximum execution time for this job given in
 	// millisecond.
-	public InternalTaskFlowJob(String name, JobPriority priority, boolean cancelOnError, String description) {
-		super(name, priority, cancelOnError, description);
+	public InternalTaskFlowJob(String name, JobPriority priority, OnTaskError onTaskError, String description) {
+		super(name, priority, onTaskError, description);
 	}
 
 	/**

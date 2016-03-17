@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.FileLock;
@@ -176,13 +177,13 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
     private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
-        job.setCancelJobOnError(true);
+        job.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.setMaxNumberOfExecution(1);
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());
         javaTask.setMaxNumberOfExecution(1);
-        javaTask.setCancelJobOnError(true);
+        javaTask.setOnTaskError(OnTaskError.CANCEL_JOB);
         javaTask.setName("Test task");
         javaTask.addArgument("fileLockPath", communicationObjectUrl);
         job.addTask(javaTask);

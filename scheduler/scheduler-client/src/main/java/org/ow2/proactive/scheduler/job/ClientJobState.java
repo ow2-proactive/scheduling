@@ -4,6 +4,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -38,7 +39,6 @@ public final class ClientJobState extends JobState {
     private String owner;
     private JobType type;
     private Map<TaskId, TaskState> tasks;
-    private boolean cancelJobOnError;
     private int maxNumberOfExecution;
     private HashMap<String, String> genericInformation;
 
@@ -58,7 +58,6 @@ public final class ClientJobState extends JobState {
         this.inputSpace = jobState.getInputSpace();
         this.outputSpace = jobState.getOutputSpace();
 
-        this.cancelJobOnError = jobState.isCancelJobOnError();
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
         this.genericInformation = new HashMap<>(jobState.getGenericInformation());
@@ -76,11 +75,6 @@ public final class ClientJobState extends JobState {
     public int getMaxNumberOfExecution() {
         return this.maxNumberOfExecution;
 
-    }
-
-    @Override
-    public boolean isCancelJobOnError() {
-        return cancelJobOnError;
     }
 
     @Override

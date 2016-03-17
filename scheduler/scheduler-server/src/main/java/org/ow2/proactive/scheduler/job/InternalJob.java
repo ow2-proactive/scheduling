@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -145,17 +146,16 @@ public abstract class InternalJob extends JobState {
      *            the current job name.
      * @param priority
      *            the priority of this job between 1 and 5.
-     * @param cancelJobOnError
-     *            true if the job has to run until its end or an user
-     *            intervention.
+     * @param onTaskError
+     *            Sets the error behavior if a task fails.
      * @param description
      *            a short description of the job and what it will do.
      */
 
-    public InternalJob(String name, JobPriority priority, boolean cancelJobOnError, String description) {
+    public InternalJob(String name, JobPriority priority, OnTaskError onTaskError, String description) {
         this.name = name;
         this.jobInfo.setPriority(priority);
-        this.setCancelJobOnError(cancelJobOnError);
+        this.setOnTaskError(onTaskError);
         this.description = description;
         this.terminateLoopHandler = new TerminateLoopHandler(this);
         this.terminateIfTaskHandler = new TerminateIfTaskHandler(this);
