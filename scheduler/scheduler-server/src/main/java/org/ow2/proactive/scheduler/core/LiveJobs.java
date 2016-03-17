@@ -25,6 +25,7 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -151,6 +152,34 @@ class LiveJobs {
 
             listener.jobStateUpdated(jobData.job.getOwner(), new NotificationData<JobInfo>(
                 SchedulerEvent.JOB_CHANGE_PRIORITY, new JobInfoImpl((JobInfoImpl) jobData.job.getJobInfo())));
+        } finally {
+            jobData.unlock();
+        }
+    }
+
+    public Boolean restartAllInErrorTasks(JobId jobId) {
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            return false;
+        }
+        try {
+            InternalJob job = jobData.job;
+            for (TaskState taskState : job.getTasks()) {
+                try {
+                    restartTaskOnError(jobId, taskState.getName());
+                } catch (UnknownTaskException e) {
+                    logger.error("", e);
+                    jlogger.error(jobId, "", e);
+                    tlogger.error(taskState.getId(), "", e);
+                }
+            }
+
+            job.setStatus(JobStatus.PAUSED_ON_ERROR);
+
+            dbManager.updateJobAndTasksState(job);
+            updateJobInSchedulerState(job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
+
+            return Boolean.TRUE;
         } finally {
             jobData.unlock();
         }
@@ -483,8 +512,12 @@ class LiveJobs {
 
     private void pauseTaskOnError(JobData jobData, InternalTask task) {
         jobData.job.setTaskPausedOnError(task);
-        dbManager.updateTaskState(task);
+        jobData.job.setStatus(JobStatus.PAUSED_ON_ERROR);
+
+        dbManager.updateJobAndTasksState(jobData.job);
+
         updateTaskPausedOnerrorState(jobData.job, task.getId());
+        updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_PAUSED_ON_ERROR);
     }
 
     void restartTaskOnError(JobId jobId, String taskName) throws UnknownTaskException {
@@ -492,7 +525,7 @@ class LiveJobs {
         try {
             jobData.job.setUnPauseTaskOnError(jobData.job.getTask(taskName));
             dbManager.updateJobAndTasksState(jobData.job);
-            updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESUMED);
+            updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
         } finally {
             jobData.unlock();
         }

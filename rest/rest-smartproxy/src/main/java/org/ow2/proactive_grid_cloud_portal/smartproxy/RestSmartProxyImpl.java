@@ -230,6 +230,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     @Override
+    public boolean restartAllInErrorTasks(
+            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return _getScheduler().restartAllInErrorTasks(jobId);
+    }
+
+    @Override
     public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
         return _getScheduler().getGlobalSpaceURIs();
     }

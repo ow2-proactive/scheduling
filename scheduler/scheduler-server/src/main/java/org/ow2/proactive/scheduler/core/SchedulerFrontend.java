@@ -889,6 +889,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return this.removeJob(JobIdImpl.makeJobId(jobId));
     }
 
+    @Override
+    public boolean restartAllInErrorTasks(
+            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkJobOwner("restartAllInErrorTasks", jobIdObject, "You do not have permission to restart in error tasks in this job!");
+        return schedulingService.restartAllInErrorTasks(jobIdObject);
+    }
+
     /**
      * {@inheritDoc}
      */

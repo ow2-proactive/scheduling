@@ -506,6 +506,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public boolean restartAllInErrorTasks(
+            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return schedulerProxy.restartAllInErrorTasks(jobId);
+    }
+
+    @Override
     public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
         return schedulerProxy.getGlobalSpaceURIs();
     }

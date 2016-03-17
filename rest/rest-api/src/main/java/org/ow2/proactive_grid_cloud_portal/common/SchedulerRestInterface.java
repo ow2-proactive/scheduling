@@ -957,6 +957,20 @@ public interface SchedulerRestInterface {
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
+     * Restart all tasks in error in the job represented by jobid
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @return true if success, false if not
+     */
+    @PUT
+    @Path("jobs/{jobid}/restartAllInErrorTasks")
+    @Produces("application/json")
+    boolean restartAllInErrorTasks(
+            @HeaderParam("sessionid") final String sessionId,
+            @PathParam("jobid") final String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    /**
      * Resumes the job represented by jobid
      * @param sessionId a valid session id
      * @param jobId the id of the job

@@ -679,6 +679,22 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             PermissionException;
 
     /**
+     * Restart all in error tasks in the job represented by jobId.<br>
+     * This method will restart every in error tasks of this job.<br><br>
+     * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>
+     * A user can only restart HIS job.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.
+     *
+     * @param jobId the job to resume.
+     * @return true if success, false if not.
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws UnknownJobException if the job does not exist.
+     * @throws PermissionException if you can't access to this particular job.
+     */
+    boolean restartAllInErrorTasks(String jobId) throws NotConnectedException, UnknownJobException,
+            PermissionException;
+
+    /**
      * Resume the job represented by jobId.<br>
      * This method will restart every non-finished tasks of this job.<br><br>
      * The jobId is given as a string. It's in fact the string returned by the {@link JobId#value()} method.<br>

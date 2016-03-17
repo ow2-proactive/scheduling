@@ -1,16 +1,16 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import org.apache.log4j.Logger;
 
 
 public class SchedulerStateRecoverHelper {
@@ -39,6 +39,7 @@ public class SchedulerStateRecoverHelper {
                     break;
                 case STALLED:
                 case RUNNING:
+                case PAUSED_ON_ERROR:
                     runningJobs.add(job);
                     runningTasksToPending(job.getITasks());
                     break;

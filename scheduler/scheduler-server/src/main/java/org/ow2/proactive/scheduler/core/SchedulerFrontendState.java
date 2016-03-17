@@ -48,7 +48,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
@@ -91,6 +90,7 @@ import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermissio
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.apache.log4j.Logger;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
@@ -903,7 +903,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 sState.getRunningJobs().add(js);
                 break;
             case JOB_PAUSED:
+            case JOB_PAUSED_ON_ERROR:
             case JOB_RESUMED:
+            case JOB_RESTARTED_FROM_ERROR:
             case JOB_CHANGE_PRIORITY:
             case TASK_REPLICATED:
             case TASK_SKIPPED:

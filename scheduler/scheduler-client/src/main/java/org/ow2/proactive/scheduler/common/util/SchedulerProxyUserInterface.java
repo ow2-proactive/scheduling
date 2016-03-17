@@ -432,6 +432,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public boolean restartAllInErrorTasks(
+            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return uischeduler.restartAllInErrorTasks(jobId);
+    }
+
+    @Override
     public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return uischeduler.removeJob(jobId);

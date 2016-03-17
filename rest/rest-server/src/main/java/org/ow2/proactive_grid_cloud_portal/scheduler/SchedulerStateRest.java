@@ -2030,6 +2030,36 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * Restart all tasks in error in the job represented by jobid
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the id of the job
+     * @return true if success, false if not
+     */
+    @Override
+    @PUT
+    @Path("jobs/{jobid}/restartAllTasksInError")
+    @Produces("application/json")
+    public boolean restartAllInErrorTasks(
+            @HeaderParam("sessionid") final String sessionId,
+            @PathParam("jobid") final String jobId)
+            throws NotConnectedRestException, UnknownJobRestException,
+            PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/restartAllTasksInError");
+            return s.restartAllInErrorTasks(jobId);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    /**
      * Resumes the job represented by jobid
      *
      * @param sessionId

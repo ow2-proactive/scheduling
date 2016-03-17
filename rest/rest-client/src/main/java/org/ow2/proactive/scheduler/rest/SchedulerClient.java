@@ -536,6 +536,18 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public boolean restartAllInErrorTasks(
+            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        boolean isAllInErrorTasksRestarted = false;
+        try {
+            isAllInErrorTasksRestarted = restApi().restartAllInErrorTasks(sid, jobId);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return isAllInErrorTasksRestarted;
+    }
+
+    @Override
     public boolean preemptTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return preemptTask(jobId.value(), taskName, restartDelay);

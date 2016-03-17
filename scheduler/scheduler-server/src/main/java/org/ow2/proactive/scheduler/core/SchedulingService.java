@@ -354,6 +354,21 @@ public class SchedulingService {
         }
     }
 
+    public boolean restartAllInErrorTasks(final JobId jobId) {
+        try {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    Boolean result = jobs.restartAllInErrorTasks(jobId);
+                    wakeUpSchedulingThread();
+                    return result;
+                }
+            }).get();
+        } catch (Exception e) {
+            throw handleFutureWaitException(e);
+        }
+    }
+
     public boolean resumeJob(final JobId jobId) {
         try {
             return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {

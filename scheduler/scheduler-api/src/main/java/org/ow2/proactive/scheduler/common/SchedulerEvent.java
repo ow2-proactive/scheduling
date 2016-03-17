@@ -73,9 +73,11 @@ public enum SchedulerEvent {
     JOB_PAUSED("Job paused"),
     /** A job has just been scheduled. At least one of its task is running. */
     JOB_PENDING_TO_RUNNING("Job pending to running"),
+    /** A job has just been restarted from erorr. */
+    JOB_RESTARTED_FROM_ERROR("Job restarted from error"),
     /** A job has just been resumed. */
-    JOB_RESUMED("Job resumed"),
-    /** A job has just been submitted. */
+    JOB_RESUMED("Job resumed")
+,    /** A job has just been submitted. */
     JOB_SUBMITTED("Job submitted"),
     /** A job has just finished. All tasks are finished. */
     JOB_RUNNING_TO_FINISHED("Job running to finished"),
