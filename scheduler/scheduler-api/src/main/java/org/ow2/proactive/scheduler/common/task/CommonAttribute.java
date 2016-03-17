@@ -65,14 +65,6 @@ public abstract class CommonAttribute implements Serializable {
     public static final String GENERIC_INFO_START_AT_KEY = "START_AT";
 
     /**
-     * Do the job has to cancel when an exception occurs in a task (default is false).
-     * <p>
-     * You can override this property inside each task.
-     */
-    protected UpdatableProperties<BooleanWrapper> cancelJobOnError = new UpdatableProperties<BooleanWrapper>(
-        new BooleanWrapper(false));
-
-    /**
      * Define where will a task be restarted if an error occurred (default is ANYWHERE).
      * <p>
      * It will be restarted according to the number of execution remaining.
@@ -96,40 +88,27 @@ public abstract class CommonAttribute implements Serializable {
     protected UpdatableProperties<OnTaskError> onTaskError = new UpdatableProperties<>(
            OnTaskError.NOT_SET);
 
+    /**
+     * Set onTaskError property value.
+     * @param onTaskError A OnTaskError instance.
+     * @throws IllegalArgumentException If set to null.
+     */
     public void setOnTaskError(OnTaskError onTaskError) {
+        if (onTaskError == null) {
+            throw new IllegalArgumentException(
+                    "OnTaskError cannot be set to null.");
+        }
         this.onTaskError.setValue(onTaskError);
     }
 
+    /**
+     * Get the OnTaskError UpdatableProperties.
+     * @return Reference to the UpdatableProperties instance hold by this class.
+     */
     public UpdatableProperties<OnTaskError> getOnTaskErrorProperty() {
         return this.onTaskError;
     }
 
-    /**
-     * To get the cancelOnError property
-     *
-     * @return the cancelOnError property
-     */
-    public boolean isCancelJobOnError() {
-        return cancelJobOnError.getValue().getBooleanValue();
-    }
-
-    /**
-     * Set to true if you want to cancel the job when an exception occurs in a task. (Default is false)
-     *
-     * @param cancelJobOnError the cancelJobOnError to set
-     */
-    public void setCancelJobOnError(boolean cancelJobOnError) {
-        this.cancelJobOnError.setValue(new BooleanWrapper(cancelJobOnError));
-    }
-
-    /**
-     * Get the cancelJobOnError updatable property.
-     *
-     * @return the cancelJobOnError updatable property.
-     */
-    public UpdatableProperties<BooleanWrapper> getCancelJobOnErrorProperty() {
-        return cancelJobOnError;
-    }
 
     /**
      * Returns the restartTaskOnError state.
