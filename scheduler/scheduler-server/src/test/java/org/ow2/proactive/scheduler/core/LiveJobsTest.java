@@ -16,6 +16,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -51,7 +52,7 @@ public class LiveJobsTest {
 	
 	@Test
 	public void testJobSubmitted(){
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		liveJobs.jobSubmitted(job);
@@ -60,7 +61,7 @@ public class LiveJobsTest {
 	
 	@Test
 	public void testPauseJob(){
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		List<InternalTask> tasksList =  new ArrayList<>();
@@ -73,7 +74,7 @@ public class LiveJobsTest {
 	
 	@Test
 	public void testResumeUnstartedJob(){
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		List<InternalTask> tasksList =  new ArrayList<>();
@@ -86,7 +87,7 @@ public class LiveJobsTest {
 
 	@Test
 	public void testResumeStartedJob() throws UnknownJobException, UnknownTaskException{
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		List<InternalTask> tasksList =  new ArrayList<>();
@@ -102,7 +103,7 @@ public class LiveJobsTest {
 	
 	@Test
 	public void testLockJobsToSchedule() throws UnknownJobException, UnknownTaskException{
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		List<InternalTask> tasksList =  new ArrayList<>();
@@ -118,7 +119,7 @@ public class LiveJobsTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void testRestartTaskOnNodeFailureRunningExceptionExpectedBecauseNotLockedTask() throws UnknownJobException, UnknownTaskException{
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		List<InternalTask> tasksList =  new ArrayList<>();
@@ -136,7 +137,7 @@ public class LiveJobsTest {
 	public void testRestartTaskOnNodeRunningDecreasingExecution() throws UnknownJobException, UnknownTaskException{
 		
 		PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.updateProperty("5");
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		List<InternalTask> tasksList =  new ArrayList<>();
@@ -168,7 +169,7 @@ public class LiveJobsTest {
 	public void testRestartTaskOnNodeRunning0ExecutionsLeft() throws UnknownJobException, UnknownTaskException{
 		
 		PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.updateProperty("0");
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		List<InternalTask> tasksList =  new ArrayList<>();
@@ -196,7 +197,7 @@ public class LiveJobsTest {
 	
 	@Test
 	public void testCanPingTask() throws UnknownJobException, UnknownTaskException{
-		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, true, "description");
+		InternalJob job =  new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "description");
 		JobId id = new JobIdImpl(666L, "test-name");
 		job.setId(id);
 		List<InternalTask> tasksList =  new ArrayList<>();

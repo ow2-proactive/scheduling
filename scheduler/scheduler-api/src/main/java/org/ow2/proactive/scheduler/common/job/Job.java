@@ -275,8 +275,8 @@ public abstract class Job extends CommonAttribute {
                 projectName +
                 '\'' +
                 nl +
-                (cancelJobOnError.isSet() ? "\tcancelJobOnError = '" +
-                        cancelJobOnError.getValue().getBooleanValue() + '\'' + nl : "") +
+                (onTaskError.isSet() ? "\tonTaskError = '" +
+                        onTaskError.getValue().toString() + '\'' + nl : "") +
                 (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' +
                         nl : "") +
                 (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +

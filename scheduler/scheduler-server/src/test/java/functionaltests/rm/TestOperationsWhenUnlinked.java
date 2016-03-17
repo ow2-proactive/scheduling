@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.examples.EmptyTask;
@@ -245,7 +246,7 @@ public class TestOperationsWhenUnlinked extends ProActiveTest {
     private TaskFlowJob createJobWithPendingTask(boolean addNormalTask) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName() + "_pending");
-        job.setCancelJobOnError(false);
+        job.setOnTaskError(OnTaskError.CONTINUE_JOB_EXECUTION);
 
         if (addNormalTask) {
             JavaTask javaTask = new JavaTask();

@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.job.InternalJob;
 
 
@@ -41,7 +42,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
     public void testJobAttribute() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setMaxNumberOfExecution(10);
-        job.setCancelJobOnError(true);
+        job.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.setDescription("desc");
         job.setProjectName("project");
         job.setName("name");
@@ -59,7 +60,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         Assert.assertNotNull(jobData.getId());
         Assert.assertEquals("name", jobData.getId().getReadableName());
         Assert.assertEquals(10, jobData.getMaxNumberOfExecution());
-        Assert.assertEquals(true, jobData.isCancelJobOnError());
+        Assert.assertEquals(OnTaskError.CANCEL_JOB, jobData.getOnTaskErrorProperty().getValue());
         Assert.assertEquals("name", jobData.getName());
         Assert.assertEquals("desc", jobData.getDescription());
         Assert.assertEquals("project", jobData.getProjectName());
