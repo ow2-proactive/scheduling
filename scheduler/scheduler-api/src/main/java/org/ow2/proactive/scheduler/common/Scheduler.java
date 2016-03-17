@@ -637,6 +637,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean restartTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException;
 
+    boolean restartTaskOnError(String jobId, String taskName) throws NotConnectedException,
+            UnknownJobException, UnknownTaskException, PermissionException;
+
     /**
      * Try to stop the task execution represented by the given task name in the given jobId.<br>
      * If the job does not exist, an UnknownJobException is sent with the proper message.<br>

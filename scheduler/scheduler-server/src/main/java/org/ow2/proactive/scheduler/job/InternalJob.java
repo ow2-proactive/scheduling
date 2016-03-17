@@ -50,7 +50,6 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -81,8 +80,8 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-
 import it.sauronsoftware.cron4j.Predictor;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -754,16 +753,17 @@ public abstract class InternalJob extends JobState {
             if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
                 (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY) &&
                 (td.getStatus() != TaskStatus.PAUSED_ON_ERROR)) {
-                setTaskPaused(td);
+                td.setStatus(TaskStatus.PAUSED);
+                getJobDescriptor().pause(td.getId());
                 updatedTasks.add(td.getId());
             }
         }
         return updatedTasks;
     }
 
-    public void setTaskPaused(InternalTask td) {
-        td.setStatus(TaskStatus.PAUSED);
-        getJobDescriptor().pause(td.getId());
+    public void setTaskPausedOnError(InternalTask internalTask) {
+        internalTask.setStatus(TaskStatus.PAUSED_ON_ERROR);
+        getJobDescriptor().pausedTaskOnError(internalTask.getId());
     }
 
     /**
@@ -774,9 +774,9 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been unpaused, false if not.
      */
     public Set<TaskId> setUnPause() {
-//        if (jobInfo.getStatus() != JobStatus.PAUSED) {
-//            return new HashSet<>(0);
-//        }
+        if (jobInfo.getStatus() != JobStatus.PAUSED) {
+            return new HashSet<>(0);
+        }
 
         if ((getNumberOfPendingTasks() + getNumberOfRunningTasks() + getNumberOfFinishedTasks()) == 0) {
             jobInfo.setStatus(JobStatus.PENDING);
@@ -794,16 +794,26 @@ public abstract class InternalJob extends JobState {
             } else if ((jobInfo.getStatus() == JobStatus.RUNNING) ||
                 (jobInfo.getStatus() == JobStatus.STALLED)) {
                 if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
-                    (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY)) {
+                    (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY)
+                        && (td.getStatus() != TaskStatus.PAUSED_ON_ERROR)) {
                     td.setStatus(TaskStatus.PENDING);
                     updatedTasks.add(td.getId());
                 }
             }
 
-            getJobDescriptor().unpause(td.getId());
+            if (td.getStatus() != TaskStatus.PAUSED_ON_ERROR) {
+                getJobDescriptor().unpause(td.getId());
+            }
         }
 
         return updatedTasks;
+    }
+
+    public void setUnPauseTaskOnError(InternalTask internalTask) {
+        if (internalTask.getStatus() == TaskStatus.PAUSED_ON_ERROR) {
+            internalTask.setStatus(TaskStatus.PENDING);
+            getJobDescriptor().unpause(internalTask.getId());
+        }
     }
 
     /**
