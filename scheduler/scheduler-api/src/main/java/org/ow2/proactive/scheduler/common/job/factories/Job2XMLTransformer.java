@@ -170,10 +170,6 @@ public class Job2XMLTransformer {
                 XSD_LOCATION);
         setAttribute(rootJob, XMLAttributes.JOB_PROJECT_NAME, job.getProjectName(), true);
         setAttribute(rootJob, XMLAttributes.JOB_PRIORITY, job.getPriority().toString());
-        if (job.getCancelJobOnErrorProperty().isSet()) {
-            setAttribute(rootJob, XMLAttributes.COMMON_CANCELJOB_ON_ERROR, Boolean.toString(job
-                    .getCancelJobOnErrorProperty().getValue().getBooleanValue()));
-        }
         if (job.getOnTaskErrorProperty().isSet()) {
             setAttribute(rootJob, XMLAttributes.COMMON_ON_TASK_ERROR,job
                     .getOnTaskErrorProperty().getValue().toString());
@@ -359,10 +355,6 @@ public class Job2XMLTransformer {
         // **** attributes *****
         // **** common attributes ***
 
-        if (task.getCancelJobOnErrorProperty().isSet()) {
-            setAttribute(taskE, XMLAttributes.COMMON_CANCELJOB_ON_ERROR, Boolean.toString(task
-                    .isCancelJobOnError()));
-        }
         if (task.getOnTaskErrorProperty().isSet()) {
         setAttribute(taskE, XMLAttributes.COMMON_ON_TASK_ERROR,
                 task.getOnTaskErrorProperty().getValue().toString());
