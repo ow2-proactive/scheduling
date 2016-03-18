@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -593,6 +594,21 @@ public class JobDescriptorImpl implements JobDescriptor {
             if (lt != null) {
                 eligibleTasks.put(taskId, lt);
                 pausedTasks.remove(taskId);
+            }
+        }
+    }
+
+    public void restoreInErrorTasks() {
+        final Iterator<Entry<TaskId, EligibleTaskDescriptor>> iterator = eligibleTasks.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Entry<TaskId, EligibleTaskDescriptor> entry = iterator.next();
+            TaskId taskId = entry.getKey();
+            EligibleTaskDescriptor task = entry.getValue();
+
+            if (task.getInternal().getStatus() == TaskStatus.PAUSED_ON_ERROR) {
+                pausedTasks.put(taskId, task);
+                iterator.remove();
             }
         }
     }

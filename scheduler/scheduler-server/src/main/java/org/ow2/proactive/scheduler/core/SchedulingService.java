@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -24,12 +25,12 @@ import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
-import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -177,10 +178,10 @@ public class SchedulingService {
         }
 
         status = SchedulerStatus.SHUTTING_DOWN;
-        logger.info("Scheduler is shutting down, this make take time to finish every jobs !");
+        logger.info("Scheduler is shutting down, this may take time to finish every jobs!");
         listener.schedulerStateUpdated(SchedulerEvent.SHUTTING_DOWN);
 
-        logger.info("Unpause all running and pending jobs !");
+        logger.info("Unpause all running and pending jobs!");
         jobs.unpauseAll();
 
         infrastructure.schedule(new Runnable() {
@@ -778,8 +779,14 @@ public class SchedulingService {
     }
 
     private void recover(RecoveredSchedulerState recoveredState) {
-        jobsRecovered(recoveredState.getPendingJobs());
-        jobsRecovered(recoveredState.getRunningJobs());
+        Vector<InternalJob> pendingJobs = recoveredState.getPendingJobs();
+        Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
+
+        jobsRecovered(pendingJobs);
+        jobsRecovered(runningJobs);
+
+        inErrorTasksRecovered(pendingJobs);
+        inErrorTasksRecovered(runningJobs);
 
         if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
             logger.debug("Removing non-managed jobs");
@@ -802,6 +809,14 @@ public class SchedulingService {
                         "sec");
                 }
             }
+        }
+    }
+
+    private void inErrorTasksRecovered(Vector<InternalJob> runningJobs) {
+        Iterator<InternalJob> iterJob = runningJobs.iterator();
+        while (iterJob.hasNext()) {
+            InternalJob job = iterJob.next();
+            job.getJobDescriptor().restoreInErrorTasks();
         }
     }
 

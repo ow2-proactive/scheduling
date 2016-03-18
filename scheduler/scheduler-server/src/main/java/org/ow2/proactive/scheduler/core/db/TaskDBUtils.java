@@ -36,18 +36,18 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.jetbrains.annotations.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.TransactionHelper.SessionWork;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility methods to fetch or update task related information from database.

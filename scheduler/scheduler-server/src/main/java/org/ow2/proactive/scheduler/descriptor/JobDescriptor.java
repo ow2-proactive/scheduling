@@ -98,4 +98,6 @@ public interface JobDescriptor extends Comparable<JobDescriptor> {
      */
     Map<TaskId, ? extends TaskDescriptor> getPausedTasks();
 
+    void restoreInErrorTasks();
+
 }
