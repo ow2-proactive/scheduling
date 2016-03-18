@@ -90,7 +90,9 @@ public class VariableSubstitutor {
 
         String output = input;
         for (Map.Entry<String, String> replacement : buildSubstitutes(variables).entrySet()) {
-            output = output.replace(replacement.getKey(), replacement.getValue());
+            if (replacement.getValue() != null) {
+                output = output.replace(replacement.getKey(), replacement.getValue());
+            }
         }
 
         return output;
@@ -110,7 +112,9 @@ public class VariableSubstitutor {
         Serializable[] params = script.getParameters();
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                params[i] = filterAndUpdate(params[i].toString(), variables);
+                if (params[i] != null) {
+                    params[i] = filterAndUpdate(params[i].toString(), variables);
+                }
             }
         }
     }
@@ -121,11 +125,13 @@ public class VariableSubstitutor {
 
         if (variables != null) {
             for (Map.Entry<? extends Serializable, ? extends Serializable> variable : variables.entrySet()) {
-                String key = variable.getKey().toString();
-                String value = variable.getValue().toString();
+                if (variable.getValue() != null) {
+                    String key = variable.getKey().toString();
+                    String value = variable.getValue().toString();
 
-                replacements.put("$" + key, value);
-                replacements.put("${" + key + "}", value);
+                    replacements.put("$" + key, value);
+                    replacements.put("${" + key + "}", value);
+                }
             }
         }
 
