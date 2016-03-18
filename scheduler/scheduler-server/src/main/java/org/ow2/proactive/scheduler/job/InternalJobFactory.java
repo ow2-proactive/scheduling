@@ -394,9 +394,9 @@ public class InternalJobFactory {
 
         //special behavior
         if ( onErrorPolicyInterpreter.notSetOrNone(task.getOnTaskErrorProperty())) {
-            taskToSet.setOnTaskError(task.getOnTaskErrorProperty().getValue());
-        } else {
             taskToSet.setOnTaskError(userJob.getOnTaskErrorProperty().getValue());
+        } else {
+            taskToSet.setOnTaskError(task.getOnTaskErrorProperty().getValue());
         }
         if (task.getRestartTaskOnErrorProperty().isSet()) {
             taskToSet.setRestartTaskOnError(task.getRestartTaskOnError());
