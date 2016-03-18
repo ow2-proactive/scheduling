@@ -636,7 +636,8 @@ public class StaxJobFactory extends JobFactory {
                     logger.warn(
                             XMLAttributes.COMMON_CANCELJOB_ON_ERROR.getXMLName()
                                     + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior. CancleJobOnError is translated into 'onTaskError=cancelJob'.");
-                    tmpTask.setOnTaskError(OnTaskError.CANCEL_JOB);} else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
+                    tmpTask.setOnTaskError(OnTaskError.CANCEL_JOB);
+                } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
                     tmpTask.setOnTaskError(OnTaskError
                             .getInstance(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
