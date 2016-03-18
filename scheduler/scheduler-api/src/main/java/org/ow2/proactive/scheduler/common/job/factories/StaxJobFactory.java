@@ -328,7 +328,8 @@ public class StaxJobFactory extends JobFactory {
             } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
                 logger.warn(
                         XMLAttributes.COMMON_CANCELJOB_ON_ERROR.getXMLName()
-                                + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior.");
+                                + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior. CancleJobOnError is translated into 'onTaskError=cancelJob'.");
+                commonPropertiesHolder.setOnTaskError(OnTaskError.CANCEL_JOB);
             } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
                 commonPropertiesHolder.setRestartTaskOnError(
                         RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
@@ -389,7 +390,7 @@ public class StaxJobFactory extends JobFactory {
             job.setName(commonPropertiesHolder.getName());
             job.setPriority(commonPropertiesHolder.getPriority());
             job.setProjectName(commonPropertiesHolder.getProjectName());
-            job.setCancelJobOnError(commonPropertiesHolder.isCancelJobOnError());
+            job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
             job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
             job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
             job.setGenericInformations(commonPropertiesHolder.getGenericInformation());
@@ -634,8 +635,8 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
                     logger.warn(
                             XMLAttributes.COMMON_CANCELJOB_ON_ERROR.getXMLName()
-                                    + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior.");
-                } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
+                                    + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior. CancleJobOnError is translated into 'onTaskError=cancelJob'.");
+                    tmpTask.setOnTaskError(OnTaskError.CANCEL_JOB);} else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
                     tmpTask.setOnTaskError(OnTaskError
                             .getInstance(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
@@ -710,10 +711,6 @@ public class StaxJobFactory extends JobFactory {
             autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
             autoCopyfields(Task.class, tmpTask, toReturn);
             if (toReturn != null) {
-                //set the following properties only if it is needed.
-                if (toReturn.getCancelJobOnErrorProperty().isSet()) {
-                    toReturn.setCancelJobOnError(toReturn.isCancelJobOnError());
-                }
                 if (toReturn.getRestartTaskOnErrorProperty().isSet()) {
                     toReturn.setRestartTaskOnError(toReturn.getRestartTaskOnError());
                 }
@@ -1508,7 +1505,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("description: " + job.getDescription());
             logger.debug("projectName: " + job.getProjectName());
             logger.debug("priority: " + job.getPriority());
-            logger.debug("cancelJobOnError: " + job.isCancelJobOnError());
+            logger.debug("onTaskError: " + job.getOnTaskErrorProperty().getValue().toString());
             logger.debug("restartTaskOnError: " + job.getRestartTaskOnError());
             logger.debug("maxNumberOfExecution: " + job.getMaxNumberOfExecution());
             logger.debug("inputSpace: " + job.getInputSpace());
@@ -1528,7 +1525,7 @@ public class StaxJobFactory extends JobFactory {
                 logger.debug("parallel: " + t.isParallel());
                 logger.debug(
                         "nbNodes: " + (t.getParallelEnvironment() == null ? "1" : t.getParallelEnvironment().getNodesNumber()));
-                logger.debug("cancelJobOnError: " + t.isCancelJobOnError());
+                logger.debug("onTaskError: " + t.getOnTaskErrorProperty().getValue().toString());
                 logger.debug("preciousResult: " + t.isPreciousResult());
                 logger.debug("preciousLogs: " + t.isPreciousLogs());
                 logger.debug("restartTaskOnError: " + t.getRestartTaskOnError());

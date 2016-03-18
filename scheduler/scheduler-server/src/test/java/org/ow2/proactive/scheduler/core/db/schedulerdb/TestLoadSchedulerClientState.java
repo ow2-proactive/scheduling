@@ -17,6 +17,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -145,10 +146,10 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         job1.setInputSpace("is1");
         job1.setOutputSpace("os1");
         job1.setMaxNumberOfExecution(22);
-        job1.setCancelJobOnError(false);
+        job1.setOnTaskError(OnTaskError.CONTINUE_JOB_EXECUTION);
         JavaTask task1 = createDefaultTask("task1");
         task1.setDescription("d1");
-        task1.setCancelJobOnError(true);
+        task1.setOnTaskError(OnTaskError.CANCEL_JOB);
         task1.setMaxNumberOfExecution(4);
         task1.setPreciousLogs(true);
         task1.setPreciousResult(true);
@@ -156,7 +157,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         task1.setWallTime(440000);
         JavaTask task2 = createDefaultTask("task2");
         task2.setDescription("d2");
-        task2.setCancelJobOnError(false);
+        task2.setOnTaskError(OnTaskError.NONE);
         task2.setMaxNumberOfExecution(3);
         task2.setPreciousLogs(false);
         task2.setPreciousResult(false);
@@ -208,7 +209,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         Assert.assertEquals(expected.getName(), taskState.getName());
         Assert.assertEquals(expected.getDescription(), taskState.getDescription());
         Assert.assertEquals(expected.getName(), taskState.getTaskInfo().getTaskId().getReadableName());
-        Assert.assertEquals(expected.isCancelJobOnError(), taskState.isCancelJobOnError());
+        Assert.assertEquals(expected.getOnTaskErrorProperty().getValue(), taskState.getOnTaskErrorProperty().getValue());
         Assert.assertEquals(expected.getMaxNumberOfExecution(), taskState.getMaxNumberOfExecution());
         Assert.assertEquals(expected.isPreciousLogs(), taskState.isPreciousLogs());
         Assert.assertEquals(expected.isPreciousResult(), taskState.isPreciousResult());
@@ -242,7 +243,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
                 Assert.assertEquals(job.getProjectName(), state.getProjectName());
                 Assert.assertEquals(job.getInputSpace(), state.getInputSpace());
                 Assert.assertEquals(job.getOutputSpace(), state.getOutputSpace());
-                Assert.assertEquals(job.isCancelJobOnError(), state.isCancelJobOnError());
+                Assert.assertEquals(job.getOnTaskErrorProperty().getValue(), state.getOnTaskErrorProperty().getValue());
                 Assert.assertEquals(job.getMaxNumberOfExecution(), state.getMaxNumberOfExecution());
 
                 Assert.assertEquals(0, state.getNumberOfFinishedTasks());

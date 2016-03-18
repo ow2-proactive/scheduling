@@ -36,10 +36,10 @@ public class OnErrorPolicyInterpreter {
         return false;
     }
 
-    private boolean notSetOrNone(UpdatableProperties<OnTaskError> onTaskErrorProperty) {
+    public boolean notSetOrNone(UpdatableProperties<OnTaskError> onTaskErrorProperty) {
         if (!onTaskErrorProperty.isSet()) {
             return true;
-        } else if (propertyIs(onTaskErrorProperty, OnTaskError.NOT_SET)) {
+        } else if (propertyIs(onTaskErrorProperty, OnTaskError.NONE)) {
             return true;
         }
 

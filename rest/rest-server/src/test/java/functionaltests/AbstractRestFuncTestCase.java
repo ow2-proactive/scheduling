@@ -63,6 +63,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 
 import functionaltests.jobs.NonTerminatingJob;
 import functionaltests.jobs.SimpleJob;
@@ -249,7 +250,7 @@ public abstract class AbstractRestFuncTestCase {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(clazz.getSimpleName());
         job.setPriority(JobPriority.NORMAL);
-        job.setCancelJobOnError(true);
+        job.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.setDescription("Test " + clazz.getSimpleName());
         job.setMaxNumberOfExecution(1);
 
@@ -257,7 +258,7 @@ public abstract class AbstractRestFuncTestCase {
         task.setName(clazz.getSimpleName() + "Task");
         task.setExecutableClassName(clazz.getName());
         task.setMaxNumberOfExecution(1);
-        task.setCancelJobOnError(true);
+        task.setOnTaskError(OnTaskError.CANCEL_JOB);
 
         String classpath = RestFuncTUtils.getClassPath(clazz);
         ForkEnvironment forkEnvironment = new ForkEnvironment();

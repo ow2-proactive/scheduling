@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.core.OnErrorPolicyInterpreter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
@@ -84,6 +85,8 @@ import org.apache.log4j.Logger;
 public class InternalJobFactory {
 
     public static final Logger logger = Logger.getLogger(InternalJobFactory.class);
+
+    private final static OnErrorPolicyInterpreter onErrorPolicyInterpreter = new OnErrorPolicyInterpreter();
 
     /**
      * Create a new internal job with the given job (user).
@@ -390,10 +393,10 @@ public class InternalJobFactory {
         autoCopyfields(Task.class, task, taskToSet);
 
         //special behavior
-        if (task.getCancelJobOnErrorProperty().isSet()) {
-            taskToSet.setCancelJobOnError(task.isCancelJobOnError());
+        if ( onErrorPolicyInterpreter.notSetOrNone(task.getOnTaskErrorProperty())) {
+            taskToSet.setOnTaskError(task.getOnTaskErrorProperty().getValue());
         } else {
-            taskToSet.setCancelJobOnError(userJob.isCancelJobOnError());
+            taskToSet.setOnTaskError(userJob.getOnTaskErrorProperty().getValue());
         }
         if (task.getRestartTaskOnErrorProperty().isSet()) {
             taskToSet.setRestartTaskOnError(task.getRestartTaskOnError());

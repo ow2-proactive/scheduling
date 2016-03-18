@@ -19,6 +19,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -69,7 +70,7 @@ public class JobData {
 
     private int maxNumberOfExecution;
 
-    private boolean cancelJobOnError;
+    private String onTaskErrorString;
 
     private JobPriority priority;
 
@@ -134,7 +135,7 @@ public class JobData {
         internalJob.setGlobalSpace(getGlobalSpace());
         internalJob.setUserSpace(getGlobalSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
-        internalJob.setCancelJobOnError(isCancelJobOnError());
+        internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
 
         return internalJob;
     }
@@ -143,7 +144,7 @@ public class JobData {
 
         JobData jobRuntimeData = new JobData();
         jobRuntimeData.setMaxNumberOfExecution(job.getMaxNumberOfExecution());
-        jobRuntimeData.setCancelJobOnError(job.isCancelJobOnError());
+        jobRuntimeData.setOnTaskErrorString(job.getOnTaskErrorProperty().getValue());
         jobRuntimeData.setSubmittedTime(job.getSubmittedTime());
         jobRuntimeData.setStartTime(job.getStartTime());
         jobRuntimeData.setFinishedTime(job.getFinishedTime());
@@ -210,13 +211,17 @@ public class JobData {
         this.maxNumberOfExecution = maxNumberOfExecution;
     }
 
-    @Column(name = "CANCEL_ON_ERROR", updatable = false, nullable = false)
-    public boolean isCancelJobOnError() {
-        return cancelJobOnError;
+    @Column(name = "ON_TASK_ERROR", updatable = false, nullable = false, length = 25)
+    public String getOnTaskErrorString() {
+        return onTaskErrorString;
     }
 
-    public void setCancelJobOnError(boolean cancelJobOnError) {
-        this.cancelJobOnError = cancelJobOnError;
+    public void setOnTaskErrorString(OnTaskError onTaskError) {
+        this.onTaskErrorString = onTaskError.toString();
+    }
+
+    public void setOnTaskErrorString(String onTaskError) {
+        this.onTaskErrorString = onTaskError;
     }
 
     @Column(name = "JOB_NAME", nullable = false, updatable = false)

@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
@@ -92,7 +93,7 @@ public class TestJobFactory {
         assertEquals(tfJob.getName(), "Job_TaskFlow");
         assertEquals(tfJob.getProjectName(), "My_project");
         assertEquals(tfJob.getPriority(), JobPriority.NORMAL);
-        assertEquals(tfJob.isCancelJobOnError(), true);
+        assertEquals(tfJob.getOnTaskErrorProperty(), OnTaskError.CANCEL_JOB.toString());
         assertEquals(tfJob.getMaxNumberOfExecution(), 2);
         assertEquals(tfJob.getRestartTaskOnError(), RestartMode.ELSEWHERE);
         assertEquals(tfJob.getType(), JobType.TASKSFLOW);
@@ -101,7 +102,7 @@ public class TestJobFactory {
         assertEquals("output/space", tfJob.getOutputSpace());
         //Check task 1 properties
         assertEquals(tfJob.getTask("task1").getName(), "task1");
-        assertEquals(tfJob.getTask("task1").isCancelJobOnError(), false);
+        assertEquals(tfJob.getTask("task1").getOnTaskErrorProperty(), OnTaskError.NONE);
         assertEquals(tfJob.getTask("task1").isPreciousResult(), false);
         assertEquals(tfJob.getTask("task1").getRestartTaskOnError(), RestartMode.ANYWHERE);
         assertEquals(tfJob.getTask("task1").getMaxNumberOfExecution(), 1);
@@ -255,7 +256,7 @@ public class TestJobFactory {
         assertEquals((tfJob.getTask("task3")).getNumberOfNodesNeeded(), 3);
         //Check task 4 properties
         assertEquals(tfJob.getTask("task4").getName(), "task4");
-        assertEquals(tfJob.getTask("task4").isCancelJobOnError(), true);
+        assertEquals(tfJob.getTask("task4").getOnTaskErrorProperty().getValue().toString(), OnTaskError.CANCEL_JOB.toString());
         assertEquals(tfJob.getTask("task4").isPreciousResult(), true);
         assertEquals(tfJob.getTask("task4").getRestartTaskOnError(), RestartMode.ANYWHERE);
         assertEquals(tfJob.getTask("task4").getMaxNumberOfExecution(), 3);
@@ -307,7 +308,7 @@ public class TestJobFactory {
         assertEquals(mnJob.getDescription(), "No description");
         assertEquals(mnJob.getName(), "job_multiNodes");
         assertEquals(mnJob.getPriority(), JobPriority.LOW);
-        assertEquals(mnJob.isCancelJobOnError(), false);
+        assertEquals(mnJob.getOnTaskErrorProperty().getValue(), OnTaskError.NONE);
         assertEquals(mnJob.getMaxNumberOfExecution(), 1);
         assertEquals(mnJob.getRestartTaskOnError(), RestartMode.ANYWHERE);
         assertEquals(mnJob.getType(), JobType.TASKSFLOW);
@@ -316,7 +317,7 @@ public class TestJobFactory {
         //Check task properties
         JavaTask jt = (JavaTask) mnJob.getTask("Controller");
         assertEquals(jt.getArgument("numberToFind"), "100");
-        assertEquals(jt.isCancelJobOnError(), false);
+        assertEquals(jt.getOnTaskErrorProperty().getValue(), OnTaskError.NONE);
         assertEquals(jt.getCleaningScript(), null);
         assertEquals(jt.getDependencesList(), null);
         assertEquals(jt.getDescription(), "Will control the workers in order to find the prime number");

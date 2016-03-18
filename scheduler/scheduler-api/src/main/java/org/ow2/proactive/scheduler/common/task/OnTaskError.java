@@ -48,22 +48,20 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class OnTaskError implements Serializable {
 
+    // PUBLIC AND PRIVATE CONSTANTS
+    private static final String CANCEL_JOB_STRING = "cancelJob";
+    public static final OnTaskError CANCEL_JOB = new OnTaskError(CANCEL_JOB_STRING);
+    private static final String PAUSE_TASK_STRING = "pauseTask";
+    public static final OnTaskError PAUSE_TASK = new OnTaskError(PAUSE_TASK_STRING);
+    private static final String PAUSE_JOB_STRING = "pauseJob";
+    public static final OnTaskError PAUSE_JOB = new OnTaskError(PAUSE_JOB_STRING);
+    private static final String CONTINUE_JOB_EXECUTION_STRING = "continueJobExecution";
+    public static final OnTaskError CONTINUE_JOB_EXECUTION = new OnTaskError(CONTINUE_JOB_EXECUTION_STRING);
+    private static final String NONE_STRING = "none";
+    public static final OnTaskError NONE = new OnTaskError(NONE_STRING);
     // Member
     @XmlAttribute
     private final String descriptor;
-
-    // PUBLIC AND PRIVATE CONSTANTS
-    private static final String CANCEL_JOB_STRING = "cancelJob";
-    private static final String PAUSE_TASK_STRING = "pauseTask";
-    private static final String PAUSE_JOB_STRING = "pauseJob";
-    private static final String CONTINUE_JOB_EXECUTION_STRING = "continueJobExecution";
-    private static final String NOT_SET_STRING = "none";
-
-    public static final OnTaskError CANCEL_JOB = new OnTaskError(CANCEL_JOB_STRING);
-    public static final OnTaskError PAUSE_TASK = new OnTaskError(PAUSE_TASK_STRING);
-    public static final OnTaskError PAUSE_JOB = new OnTaskError(PAUSE_JOB_STRING);
-    public static final OnTaskError CONTINUE_JOB_EXECUTION = new OnTaskError(CONTINUE_JOB_EXECUTION_STRING);
-    public static final OnTaskError NOT_SET = new OnTaskError(NOT_SET_STRING);
 
 
     private OnTaskError(String descriptor) {
@@ -87,7 +85,7 @@ public class OnTaskError implements Serializable {
             case CONTINUE_JOB_EXECUTION_STRING:
                 return CONTINUE_JOB_EXECUTION;
             default:
-                return NOT_SET;
+                return NONE;
         }
     }
 
@@ -99,4 +97,25 @@ public class OnTaskError implements Serializable {
     public String toString() {
         return this.descriptor;
     }
+
+    @Override
+    public boolean equals(Object onTaskError) {
+        if (onTaskError == null) {
+            return false;
+        }
+        if (onTaskError == this) {
+            return true;
+        }
+        if (onTaskError.getClass() != getClass()) {
+            return this.toString().equals(onTaskError.toString());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return this.descriptor.hashCode();
+    }
+
 }

@@ -14,6 +14,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
@@ -30,7 +31,7 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
         JavaTask task1 = new JavaTask();
         task1.setName("javaTask");
         task1.setExecutableClassName("class");
-        task1.setCancelJobOnError(cancelJobOnError);
+        task1.setOnTaskError(cancelJobOnError ? OnTaskError.CANCEL_JOB : OnTaskError.NONE);
         job.addTask(task1);
 
         NativeTask task2 = new NativeTask();

@@ -33,6 +33,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
@@ -123,7 +124,7 @@ public class TaskData {
 
     private int maxNumberOfExecution;
 
-    private boolean cancelJobOnError;
+    private String onTaskErrorString;
 
     private int numberOfExecutionLeft;
 
@@ -407,7 +408,7 @@ public class TaskData {
         taskData.setPreciousResult(task.isPreciousResult());
         taskData.setRunAsMe(task.isRunAsMe());
         taskData.setWallTime(task.getWallTime());
-        taskData.setCancelJobOnError(task.isCancelJobOnError());
+        taskData.setOnTaskErrorString(task.getOnTaskErrorProperty().getValue());
         taskData.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         taskData.setJobData(jobRuntimeData);
         taskData.setNumberOfExecutionOnFailureLeft(
@@ -520,7 +521,7 @@ public class TaskData {
         internalTask.setStartTime(getStartTime());
         internalTask.setScheduledTime(getScheduledTime());
         internalTask.setExecutionHostName(getExecutionHostName());
-        internalTask.setCancelJobOnError(isCancelJobOnError());
+        internalTask.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
         internalTask.setPreciousLogs(isPreciousLogs());
         internalTask.setPreciousResult(isPreciousResult());
         internalTask.setRunAsMe(isRunAsMe());
@@ -764,13 +765,17 @@ public class TaskData {
         this.maxNumberOfExecution = maxNumberOfExecution;
     }
 
-    @Column(name = "CANCEL_JOB_ON_ERROR", updatable = false)
-    public boolean isCancelJobOnError() {
-        return cancelJobOnError;
+    @Column(name = "ON_TASK_ERROR", updatable = false, nullable = false, length = 25)
+    public String getOnTaskErrorString() {
+        return this.onTaskErrorString;
     }
 
-    public void setCancelJobOnError(boolean cancelJobOnError) {
-        this.cancelJobOnError = cancelJobOnError;
+    public void setOnTaskErrorString(OnTaskError onTaskError) {
+        this.onTaskErrorString = onTaskError.toString();
+    }
+
+    public void setOnTaskErrorString(String onTaskError) {
+        this.onTaskErrorString = onTaskError;
     }
 
     @Column(name = "RES_PREVIEW", length = 1000, updatable = false)

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -58,7 +59,7 @@ public class RecoveredSchedulerStateTest {
 
     public InternalJob createJob(JobStatus jobStatus) {
         InternalTaskFlowJob job =
-                new InternalTaskFlowJob("MyJob", JobPriority.HIGH, true, "Description");
+                new InternalTaskFlowJob("MyJob", JobPriority.HIGH, OnTaskError.CANCEL_JOB, "Description");
 
         InternalScriptTask internalScriptTask = new InternalScriptTask();
 

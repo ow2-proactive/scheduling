@@ -37,7 +37,6 @@ public final class ClientTaskState extends TaskState {
     private List<TaskId> dependenceIds = new ArrayList<>();
     transient private List<TaskState> dependences = new ArrayList<>();
 
-    private boolean cancelJobOnError;
     private int maxNumberOfExecution;
 
     public ClientTaskState(TaskState taskState) {
@@ -55,7 +54,6 @@ public final class ClientTaskState extends TaskState {
         this.setPreciousLogs(taskState.isPreciousLogs());
         this.setRunAsMe(taskState.isRunAsMe());
 
-        this.cancelJobOnError = taskState.isCancelJobOnError();
         this.maxNumberOfExecution = taskState.getMaxNumberOfExecution();
 
         this.setParallelEnvironment(taskState.getParallelEnvironment());
@@ -117,11 +115,6 @@ public final class ClientTaskState extends TaskState {
     @Override
     public int getMaxNumberOfExecution() {
         return this.maxNumberOfExecution;
-    }
-
-    @Override
-    public boolean isCancelJobOnError() {
-        return cancelJobOnError;
     }
 
     /**
