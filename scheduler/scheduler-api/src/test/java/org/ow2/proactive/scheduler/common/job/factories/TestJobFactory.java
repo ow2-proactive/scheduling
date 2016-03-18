@@ -93,7 +93,7 @@ public class TestJobFactory {
         assertEquals(tfJob.getName(), "Job_TaskFlow");
         assertEquals(tfJob.getProjectName(), "My_project");
         assertEquals(tfJob.getPriority(), JobPriority.NORMAL);
-        assertEquals(tfJob.getOnTaskErrorProperty(), OnTaskError.CANCEL_JOB.toString());
+        assertEquals(tfJob.getOnTaskErrorProperty().getValue(), OnTaskError.CANCEL_JOB);
         assertEquals(tfJob.getMaxNumberOfExecution(), 2);
         assertEquals(tfJob.getRestartTaskOnError(), RestartMode.ELSEWHERE);
         assertEquals(tfJob.getType(), JobType.TASKSFLOW);
