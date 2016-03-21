@@ -73,8 +73,6 @@ public enum SchedulerEvent {
     JOB_PAUSED("Job paused"),
     /** A job has just been scheduled. At least one of its task is running. */
     JOB_PENDING_TO_RUNNING("Job pending to running"),
-    /** A job has just been restarted from erorr. */
-    JOB_RESTARTED_FROM_ERROR("Job restarted from error"),
     /** A job has just been resumed. */
     JOB_RESUMED("Job resumed")
 ,    /** A job has just been submitted. */
@@ -118,7 +116,9 @@ public enum SchedulerEvent {
      */
     JOB_PAUSED_ON_ERROR("Job paused on error"),
     /** A task has just been paused due to an error while executing */
-    TASK_PAUSED_ON_ERROR("Task paused on error");
+    TASK_PAUSED_ON_ERROR("Task paused on error"),
+    /** A job has just been restarted from error. */
+    JOB_RESTARTED_FROM_ERROR("Job restarted from error");
 
     /** Name of the method */
     private String methodName;
