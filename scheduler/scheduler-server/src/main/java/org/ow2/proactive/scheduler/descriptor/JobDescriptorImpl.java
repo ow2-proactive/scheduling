@@ -51,7 +51,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -63,6 +62,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -570,11 +570,11 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public void pause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            //TaskDescriptor lt = eligibleTasks.get(taskId);
+            TaskDescriptor lt = eligibleTasks.get(taskId);
 
-            //if (lt != null) {
-            pausedTasks.put(taskId, eligibleTasks.remove(taskId));
-            //}
+            if (lt != null) {
+                pausedTasks.put(taskId, eligibleTasks.remove(taskId));
+            }
         }
     }
 
