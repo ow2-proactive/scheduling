@@ -42,6 +42,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStatusData;
 
 
 public class RestartTaskCommand extends AbstractTaskCommand implements Command {
@@ -54,17 +56,34 @@ public class RestartTaskCommand extends AbstractTaskCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
-            boolean success = scheduler.restartTask(currentContext.getSessionId(), jobId, taskId);
-            resultStack(currentContext).push(success);
-            if (success) {
-                writeLine(currentContext, "%s successfully restarted.", task());
+            String sessionId = currentContext.getSessionId();
+
+            TaskStateData taskStateData = scheduler.jobTask(sessionId, jobId, taskId);
+
+            boolean result;
+
+            if (taskStateData.getTaskInfo().getTaskStatus() == TaskStatusData.PAUSED_ON_ERROR) {
+                result = scheduler.restartTaskOnError(sessionId, jobId, taskId);
             } else {
-                writeLine(currentContext, "Cannot restart %s.", task());
+                result = scheduler.restartTask(sessionId, jobId, taskId);
             }
+
+            handleResult(currentContext, result);
         } catch (Exception e) {
             handleError(String.format("An error occurred while attempting to restart %s:", task()), e,
                     currentContext);
+        }
+    }
+
+    private void handleResult(ApplicationContext currentContext, boolean result) {
+        resultStack(currentContext).push(result);
+
+        if (result) {
+            writeLine(currentContext, "%s successfully restarted.", task());
+        } else {
+            writeLine(currentContext, "Cannot restart %s.", task());
         }
     }
 
