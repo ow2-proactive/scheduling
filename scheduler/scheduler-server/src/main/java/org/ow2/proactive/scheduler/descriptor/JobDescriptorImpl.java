@@ -532,8 +532,10 @@ public class JobDescriptorImpl implements JobDescriptor {
                             .setCount(((EligibleTaskDescriptorImpl) task).getCount() - 1);
 
                     if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
-                        if (internalJob.getStatus() == JobStatus.PAUSED ||
-                            internalJob.getStatus() == JobStatus.PAUSED_ON_ERROR) {
+                        if (internalJob.getStatus() == JobStatus.PAUSED) {
+                            pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                        } else if (internalJob.getStatus() == JobStatus.PAUSED_ON_ERROR
+                                && task.getInternal().getStatus() == TaskStatus.PAUSED) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
                         } else {
                             eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
@@ -546,6 +548,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                 }
             }
         }
+
         runningTasks.remove(taskId);
     }
 
