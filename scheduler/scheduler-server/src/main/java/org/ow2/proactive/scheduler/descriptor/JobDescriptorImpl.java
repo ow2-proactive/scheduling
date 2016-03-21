@@ -570,31 +570,30 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public void pause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            TaskDescriptor lt = eligibleTasks.get(taskId);
+            EligibleTaskDescriptor eligibleTaskDescriptor = eligibleTasks.remove(taskId);
 
-            if (lt != null) {
-                pausedTasks.put(taskId, eligibleTasks.remove(taskId));
+            if (eligibleTaskDescriptor != null) {
+                pausedTasks.put(taskId, eligibleTaskDescriptor);
             }
         }
     }
 
     public void pausedTaskOnError(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            TaskDescriptor lt = runningTasks.remove(taskId);
+            TaskDescriptor taskDescriptor = runningTasks.remove(taskId);
 
-            if (lt != null) {
-                pausedTasks.put(taskId, (EligibleTaskDescriptor) lt);
+            if (taskDescriptor != null) {
+                pausedTasks.put(taskId, (EligibleTaskDescriptor) taskDescriptor);
             }
         }
     }
 
     public void unpause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            EligibleTaskDescriptor lt = pausedTasks.get(taskId);
+            EligibleTaskDescriptor eligibleTaskDescriptor = pausedTasks.remove(taskId);
 
-            if (lt != null) {
-                eligibleTasks.put(taskId, lt);
-                pausedTasks.remove(taskId);
+            if (eligibleTaskDescriptor != null) {
+                eligibleTasks.put(taskId, eligibleTaskDescriptor);
             }
         }
     }
