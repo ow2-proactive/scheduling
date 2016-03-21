@@ -51,6 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -62,7 +63,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -329,8 +329,8 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param elseTarget the START task of the ELSE branch that will not be executed
      * @param elseTasks list of tasks contained in the not executed ELSE branch
      */
-    public void doIf(TaskId initiator, TaskId branchStart, TaskId branchEnd, TaskId ifJoin,
-            TaskId elseTarget, List<InternalTask> elseTasks) {
+    public void doIf(TaskId initiator, TaskId branchStart, TaskId branchEnd, TaskId ifJoin, TaskId elseTarget,
+            List<InternalTask> elseTasks) {
         EligibleTaskDescriptorImpl init = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
         EligibleTaskDescriptorImpl start = (EligibleTaskDescriptorImpl) branchTasks.get(branchStart);
         EligibleTaskDescriptorImpl end = null;
@@ -528,11 +528,12 @@ public class JobDescriptorImpl implements JobDescriptor {
 
             if (lt != null) {
                 for (TaskDescriptor task : lt.getChildren()) {
-                    ((EligibleTaskDescriptorImpl) task).setCount(((EligibleTaskDescriptorImpl) task)
-                            .getCount() - 1);
+                    ((EligibleTaskDescriptorImpl) task)
+                            .setCount(((EligibleTaskDescriptorImpl) task).getCount() - 1);
 
                     if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
-                        if (internalJob.getStatus() == JobStatus.PAUSED) {
+                        if (internalJob.getStatus() == JobStatus.PAUSED ||
+                            internalJob.getStatus() == JobStatus.PAUSED_ON_ERROR) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
                         } else {
                             eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
@@ -572,7 +573,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             //TaskDescriptor lt = eligibleTasks.get(taskId);
 
             //if (lt != null) {
-                pausedTasks.put(taskId, eligibleTasks.remove(taskId));
+            pausedTasks.put(taskId, eligibleTasks.remove(taskId));
             //}
         }
     }
