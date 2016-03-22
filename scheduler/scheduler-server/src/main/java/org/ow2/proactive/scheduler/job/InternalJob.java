@@ -752,7 +752,7 @@ public abstract class InternalJob extends JobState {
         for (InternalTask td : values) {
             if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
                 (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY) &&
-                (td.getStatus() != TaskStatus.PAUSED_ON_ERROR)) {
+                (td.getStatus() != TaskStatus.IN_ERROR)) {
                 td.setStatus(TaskStatus.PAUSED);
                 getJobDescriptor().pause(td.getId());
                 updatedTasks.add(td.getId());
@@ -762,7 +762,7 @@ public abstract class InternalJob extends JobState {
     }
 
     public void setTaskPausedOnError(InternalTask internalTask) {
-        internalTask.setStatus(TaskStatus.PAUSED_ON_ERROR);
+        internalTask.setStatus(TaskStatus.IN_ERROR);
         getJobDescriptor().pausedTaskOnError(internalTask.getId());
     }
 
@@ -774,11 +774,11 @@ public abstract class InternalJob extends JobState {
      * @return true if the job has correctly been unpaused, false if not.
      */
     public Set<TaskId> setUnPause() {
-        if (jobInfo.getStatus() != JobStatus.PAUSED && jobInfo.getStatus() != JobStatus.PAUSED_ON_ERROR) {
+        if (jobInfo.getStatus() != JobStatus.PAUSED && jobInfo.getStatus() != JobStatus.IN_ERROR) {
             return new HashSet<>(0);
         }
 
-        boolean jobWasPausedOnError = jobInfo.getStatus() == JobStatus.PAUSED_ON_ERROR;
+        boolean jobWasPausedOnError = jobInfo.getStatus() == JobStatus.IN_ERROR;
 
         if ((getNumberOfPendingTasks() + getNumberOfRunningTasks() + getNumberOfFinishedTasks()) == 0) {
             jobInfo.setStatus(JobStatus.PENDING);
@@ -797,26 +797,26 @@ public abstract class InternalJob extends JobState {
                 (jobInfo.getStatus() == JobStatus.STALLED)) {
                 if ((task.getStatus() != TaskStatus.FINISHED) && (task.getStatus() != TaskStatus.RUNNING) &&
                     (task.getStatus() != TaskStatus.SKIPPED) && (task.getStatus() != TaskStatus.FAULTY)
-                        && (task.getStatus() != TaskStatus.PAUSED_ON_ERROR)) {
+                        && (task.getStatus() != TaskStatus.IN_ERROR)) {
                     task.setStatus(TaskStatus.PENDING);
                     updatedTasks.add(task.getId());
                 }
             }
 
-            if (task.getStatus() != TaskStatus.PAUSED_ON_ERROR) {
+            if (task.getStatus() != TaskStatus.IN_ERROR) {
                 getJobDescriptor().unpause(task.getId());
             }
         }
 
         if (jobWasPausedOnError) {
-            jobInfo.setStatus(JobStatus.PAUSED_ON_ERROR);
+            jobInfo.setStatus(JobStatus.IN_ERROR);
         }
 
         return updatedTasks;
     }
 
     public void setUnPauseTaskOnError(InternalTask internalTask) {
-        if (internalTask.getStatus() == TaskStatus.PAUSED_ON_ERROR) {
+        if (internalTask.getStatus() == TaskStatus.IN_ERROR) {
             internalTask.setStatus(TaskStatus.PENDING);
             getJobDescriptor().unpause(internalTask.getId());
         }

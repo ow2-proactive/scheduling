@@ -637,7 +637,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean restartTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException;
 
-    boolean restartTaskOnError(String jobId, String taskName) throws NotConnectedException,
+    boolean restartInErrorTask(String jobId, String taskName) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException;
 
     /**

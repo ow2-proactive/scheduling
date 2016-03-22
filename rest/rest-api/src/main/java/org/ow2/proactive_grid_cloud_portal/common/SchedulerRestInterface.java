@@ -1495,9 +1495,9 @@ public interface SchedulerRestInterface {
                     UnknownTaskRestException, PermissionRestException;
 
     @PUT
-    @Path("jobs/{jobid}/tasks/{taskname}/restartTaskOnError")
+    @Path("jobs/{jobid}/tasks/{taskname}/restartInErrorTask")
     @Produces("application/json")
-    boolean restartTaskOnError(
+    boolean restartInErrorTask(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobid,
             @PathParam("taskname") String taskname)

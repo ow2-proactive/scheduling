@@ -588,13 +588,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
-    public boolean restartTaskOnError(String jobId,
+    public boolean restartInErrorTask(String jobId,
             String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         //checking permissions
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
         frontendState
                 .checkJobOwner("restartTaskOnError", jobIdObject, "You do not have permission to restart this task!");
-        return schedulingService.restartTaskOnError(jobIdObject, taskName);
+        return schedulingService.restartInErrorTask(jobIdObject, taskName);
     }
 
     /**

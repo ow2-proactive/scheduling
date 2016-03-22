@@ -114,9 +114,9 @@ public enum SchedulerEvent {
      * A job has just been paused on error. It means that job execution can no longer progress
      * due to one or more tasks which are in paused on error state.
      */
-    JOB_PAUSED_ON_ERROR("Job paused on error"),
+    JOB_IN_ERROR("Job In-Error"),
     /** A task has just been paused due to an error while executing */
-    TASK_PAUSED_ON_ERROR("Task paused on error"),
+    TASK_IN_ERROR("Task In-Error"),
     /** A job has just been restarted from error. */
     JOB_RESTARTED_FROM_ERROR("Job restarted from error");
 

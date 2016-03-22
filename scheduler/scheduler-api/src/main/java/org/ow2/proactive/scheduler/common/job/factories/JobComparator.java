@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +62,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.apache.commons.collections4.CollectionUtils;
 
 
 public class JobComparator {

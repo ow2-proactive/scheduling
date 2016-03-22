@@ -534,7 +534,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                     if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
                         if (internalJob.getStatus() == JobStatus.PAUSED) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
-                        } else if (internalJob.getStatus() == JobStatus.PAUSED_ON_ERROR
+                        } else if (internalJob.getStatus() == JobStatus.IN_ERROR
                                 && task.getInternal().getStatus() == TaskStatus.PAUSED) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
                         } else {
@@ -609,7 +609,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             TaskId taskId = entry.getKey();
             EligibleTaskDescriptor task = entry.getValue();
 
-            if (task.getInternal().getStatus() == TaskStatus.PAUSED_ON_ERROR) {
+            if (task.getInternal().getStatus() == TaskStatus.IN_ERROR) {
                 pausedTasks.put(taskId, task);
                 iterator.remove();
             }

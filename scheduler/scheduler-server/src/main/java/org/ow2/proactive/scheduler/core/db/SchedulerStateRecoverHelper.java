@@ -39,7 +39,7 @@ public class SchedulerStateRecoverHelper {
                     break;
                 case STALLED:
                 case RUNNING:
-                case PAUSED_ON_ERROR:
+                case IN_ERROR:
                     runningJobs.add(job);
                     runningTasksToPending(job.getITasks());
                     break;

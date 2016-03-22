@@ -79,8 +79,8 @@ public class TestSchedulerEvent {
         Assert.assertEquals(SchedulerEvent.TASK_SKIPPED.ordinal(), 24);
         Assert.assertEquals(SchedulerEvent.TASK_PROGRESS.ordinal(), 25);
         Assert.assertEquals(SchedulerEvent.DB_DOWN.ordinal(), 26);
-        Assert.assertEquals(SchedulerEvent.JOB_PAUSED_ON_ERROR.ordinal(), 27);
-        Assert.assertEquals(SchedulerEvent.TASK_PAUSED_ON_ERROR.ordinal(), 28);
+        Assert.assertEquals(SchedulerEvent.JOB_IN_ERROR.ordinal(), 27);
+        Assert.assertEquals(SchedulerEvent.TASK_IN_ERROR.ordinal(), 28);
         Assert.assertEquals(SchedulerEvent.JOB_RESTARTED_FROM_ERROR.ordinal(), 29);
 
         Assert.assertEquals(30, SchedulerEvent.values().length);
