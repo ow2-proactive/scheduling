@@ -537,7 +537,7 @@ public class SchedulingService {
         }
     }
 
-    public boolean restartTaskOnError(final JobId jobId, final String taskName)
+    public boolean restartInErrorTask(final JobId jobId, final String taskName)
             throws UnknownJobException, UnknownTaskException {
         try {
             if (status.isUnusable()) {
@@ -547,7 +547,7 @@ public class SchedulingService {
             Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
-                    jobs.restartTaskOnError(jobId, taskName);
+                    jobs.restartInErrorTask(jobId, taskName);
                     wakeUpSchedulingThread();
                     return Boolean.TRUE;
                 }

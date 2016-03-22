@@ -500,9 +500,9 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public boolean restartTaskOnError(String jobId,
+    public boolean restartInErrorTask(String jobId,
             String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        return schedulerProxy.restartTaskOnError(jobId, taskName);
+        return schedulerProxy.restartInErrorTask(jobId, taskName);
     }
 
     @Override

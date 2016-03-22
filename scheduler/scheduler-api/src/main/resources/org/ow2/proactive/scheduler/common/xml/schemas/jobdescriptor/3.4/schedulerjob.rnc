@@ -252,7 +252,7 @@ actionReplicate = ## replicate control flow action
 # +++++++++++++ User define types
 jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest' | variableRefType
 restartTaskType = 'anywhere' | 'elsewhere' | variableRefType
-onErrorTaskType = 'cancelJob' | 'pauseTask' | 'pauseJob' |  'continueJobExecution' | 'none' |variableRefType
+onErrorTaskType = 'cancelJob' | 'pauseTask' | 'pauseJob' |  'continueJobExecution' | 'none' | variableRefType
 inaccessModeType = 'transferFromInputSpace' | 'transferFromOutputSpace' | 'transferFromGlobalSpace' | 'transferFromUserSpace' | 'none' | variableRefType
 outaccessModeType = 'transferToOutputSpace' | 'transferToGlobalSpace' | 'transferToUserSpace' | 'none' | variableRefType
 classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*" }

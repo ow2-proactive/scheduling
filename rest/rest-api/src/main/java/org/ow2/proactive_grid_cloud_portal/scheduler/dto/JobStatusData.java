@@ -80,6 +80,6 @@ public enum JobStatusData {
      * the execution of the job that is suspended (because some tasks are
      * in the paused on error state).
      */
-    PAUSED_ON_ERROR;
+    IN_ERROR;
 
 }

@@ -97,6 +97,6 @@ public enum TaskStatusData {
     /**
      * The task is paused on error and waiting for a manual resume action.
      */
-    PAUSED_ON_ERROR;
+    IN_ERROR;
 
 }

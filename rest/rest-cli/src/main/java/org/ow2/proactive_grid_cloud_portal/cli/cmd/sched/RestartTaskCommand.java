@@ -64,8 +64,8 @@ public class RestartTaskCommand extends AbstractTaskCommand implements Command {
 
             boolean result;
 
-            if (taskStateData.getTaskInfo().getTaskStatus() == TaskStatusData.PAUSED_ON_ERROR) {
-                result = scheduler.restartTaskOnError(sessionId, jobId, taskId);
+            if (taskStateData.getTaskInfo().getTaskStatus() == TaskStatusData.IN_ERROR) {
+                result = scheduler.restartInErrorTask(sessionId, jobId, taskId);
             } else {
                 result = scheduler.restartTask(sessionId, jobId, taskId);
             }

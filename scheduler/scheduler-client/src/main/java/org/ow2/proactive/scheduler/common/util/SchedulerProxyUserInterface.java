@@ -351,10 +351,10 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public boolean restartTaskOnError(String jobId,
+    public boolean restartInErrorTask(String jobId,
             String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
-        return uischeduler.restartTaskOnError(jobId, taskName);
+        return uischeduler.restartInErrorTask(jobId, taskName);
     }
 
     public boolean preemptTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,

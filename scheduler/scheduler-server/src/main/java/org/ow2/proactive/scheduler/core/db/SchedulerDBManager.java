@@ -88,7 +88,7 @@ public class SchedulerDBManager {
     protected static final Set<JobStatus> PENDING_JOB_STATUSES = ImmutableSet.of(JobStatus.PENDING);
 
     protected static final Set<JobStatus> RUNNING_JOB_STATUSES = ImmutableSet.of(JobStatus.PAUSED,
-            JobStatus.PAUSED_ON_ERROR,
+            JobStatus.IN_ERROR,
             JobStatus.STALLED, JobStatus.RUNNING);
 
     protected static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES = ImmutableSet
@@ -98,7 +98,7 @@ public class SchedulerDBManager {
             TaskStatus.PENDING, TaskStatus.NOT_STARTED);
 
     protected static final Set<TaskStatus> RUNNING_TASKS = ImmutableSet.of(TaskStatus.PAUSED,
-            TaskStatus.PAUSED_ON_ERROR,
+            TaskStatus.IN_ERROR,
             TaskStatus.RUNNING, TaskStatus.WAITING_ON_ERROR, TaskStatus.WAITING_ON_FAILURE);
 
     protected static final Set<TaskStatus> FINISHED_TASKS = ImmutableSet.of(TaskStatus.FAILED,

@@ -903,7 +903,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 sState.getRunningJobs().add(js);
                 break;
             case JOB_PAUSED:
-            case JOB_PAUSED_ON_ERROR:
+            case JOB_IN_ERROR:
             case JOB_RESUMED:
             case JOB_RESTARTED_FROM_ERROR:
             case JOB_CHANGE_PRIORITY:
@@ -944,7 +944,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
-            case TASK_PAUSED_ON_ERROR:
+            case TASK_IN_ERROR:
                 dispatchTaskStateUpdated(owner, notification);
                 break;
             case TASK_PROGRESS:

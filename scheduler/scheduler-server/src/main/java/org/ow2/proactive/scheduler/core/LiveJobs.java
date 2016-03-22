@@ -167,7 +167,7 @@ class LiveJobs {
             InternalJob job = jobData.job;
             for (TaskState taskState : job.getTasks()) {
                 try {
-                    restartTaskOnError(jobId, taskState.getName());
+                    restartInErrorTask(jobId, taskState.getName());
                 } catch (UnknownTaskException e) {
                     logger.error("", e);
                     jlogger.error(jobId, "", e);
@@ -175,7 +175,7 @@ class LiveJobs {
                 }
             }
 
-            job.setStatus(JobStatus.PAUSED_ON_ERROR);
+            job.setStatus(JobStatus.IN_ERROR);
 
             dbManager.updateJobAndTasksState(job);
             updateJobInSchedulerState(job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
@@ -512,15 +512,15 @@ class LiveJobs {
 
     private void pauseTaskOnError(JobData jobData, InternalTask task) {
         jobData.job.setTaskPausedOnError(task);
-        jobData.job.setStatus(JobStatus.PAUSED_ON_ERROR);
+        jobData.job.setStatus(JobStatus.IN_ERROR);
 
         dbManager.updateJobAndTasksState(jobData.job);
 
         updateTaskPausedOnerrorState(jobData.job, task.getId());
-        updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_PAUSED_ON_ERROR);
+        updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_IN_ERROR);
     }
 
-    void restartTaskOnError(JobId jobId, String taskName) throws UnknownTaskException {
+    void restartInErrorTask(JobId jobId, String taskName) throws UnknownTaskException {
         JobData jobData = lockJob(jobId);
         try {
             jobData.job.setUnPauseTaskOnError(jobData.job.getTask(taskName));
@@ -818,7 +818,7 @@ class LiveJobs {
             InternalTask t = job.getTask(taskToUpdate);
             TaskInfo ti = new TaskInfoImpl((TaskInfoImpl) t.getTaskInfo());
             listener.taskStateUpdated(job.getOwner(),
-                    new NotificationData<>(SchedulerEvent.TASK_PAUSED_ON_ERROR, ti));
+                    new NotificationData<>(SchedulerEvent.TASK_IN_ERROR, ti));
         } catch (UnknownTaskException e) {
             logger.error(e);
         }

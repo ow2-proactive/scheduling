@@ -835,17 +835,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @Override
     @PUT
-    @Path("jobs/{jobid}/tasks/{taskname}/restartTaskOnError")
+    @Path("jobs/{jobid}/tasks/{taskname}/restartInErrorTask")
     @Produces("application/json")
-    public boolean restartTaskOnError(
+    public boolean restartInErrorTask(
             @HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobid,
             @PathParam("taskname") String taskname)
             throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/restartTaskOnError");
-            return s.restartTaskOnError(jobid, taskname);
+            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/restartInErrorTask");
+            return s.restartInErrorTask(jobid, taskname);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -2040,7 +2040,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @Override
     @PUT
-    @Path("jobs/{jobid}/restartAllTasksInError")
+    @Path("jobs/{jobid}/restartAllInErrorTasks")
     @Produces("application/json")
     public boolean restartAllInErrorTasks(
             @HeaderParam("sessionid") final String sessionId,
@@ -2048,7 +2048,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NotConnectedRestException, UnknownJobRestException,
             PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/restartAllTasksInError");
+            Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/restartAllInErrorTasks");
             return s.restartAllInErrorTasks(jobId);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
