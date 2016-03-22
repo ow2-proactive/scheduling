@@ -8,6 +8,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -18,7 +19,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseTaskOnError() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.PAUSE_TASK);
 
@@ -31,7 +32,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseTaskOnErrorNull() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         boolean actual = new OnErrorPolicyInterpreter().requiresPauseTaskOnError(task);
 
@@ -42,7 +43,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseTaskOnErrorNotset() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.NONE);
 
@@ -55,7 +56,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseTaskOnErrorCancelJob() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.CANCEL_JOB);
 
@@ -68,7 +69,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseTaskOnErrorPauseJob() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.PAUSE_JOB);
 
@@ -81,7 +82,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseJobOnError() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.PAUSE_JOB);
 
@@ -94,7 +95,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseJobOnErrorNull() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         boolean actual = new OnErrorPolicyInterpreter().requiresPauseJobOnError(task);
 
@@ -105,7 +106,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseJobOnErrorNotset() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.NONE);
 
@@ -118,7 +119,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseJobOnErrorCancelJob() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.CANCEL_JOB);
 
@@ -131,7 +132,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresPauseJobOnErrorPauseTask() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.PAUSE_TASK);
 
@@ -144,7 +145,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresCancelJobOnError() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.CANCEL_JOB);
 
@@ -157,7 +158,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresCancelJobOnErrorNull() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         boolean actual = new OnErrorPolicyInterpreter().requiresCancelJobOnError(task);
 
@@ -168,7 +169,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresCancelJobOnErrorNotset() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.NONE);
 
@@ -181,7 +182,7 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresCancelJobOnErrorPauseJob() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.PAUSE_JOB);
 
@@ -194,13 +195,30 @@ public class OnErrorPolicyInterpreterTest {
     @Test
     public void testRequiresCancelJobOnErrorPauseTask() {
 
-        InternalTask task = createTask();
+        Task task = createTask();
 
         task.setOnTaskError(OnTaskError.PAUSE_TASK);
 
         boolean actual = new OnErrorPolicyInterpreter().requiresCancelJobOnError(task);
 
         assertThat(actual, is(false));
+
+    }
+
+    @Test
+    public void testnotSetOrNone() {
+
+        Task task = createTask();
+
+        boolean actual = new OnErrorPolicyInterpreter().notSetOrNone(task);
+
+        assertThat(actual, is(true));
+
+        task.setOnTaskError(OnTaskError.NONE);
+
+        actual = new OnErrorPolicyInterpreter().notSetOrNone(task);
+
+        assertThat(actual, is(true));
 
     }
 
