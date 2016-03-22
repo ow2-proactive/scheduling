@@ -51,8 +51,8 @@ public class OnTaskError implements Serializable {
     // PUBLIC AND PRIVATE CONSTANTS
     private static final String CANCEL_JOB_STRING = "cancelJob";
     public static final OnTaskError CANCEL_JOB = new OnTaskError(CANCEL_JOB_STRING);
-    private static final String PAUSE_TASK_STRING = "pauseTask";
-    public static final OnTaskError PAUSE_TASK = new OnTaskError(PAUSE_TASK_STRING);
+    private static final String SUSPEND_TASK_STRING = "suspendTask";
+    public static final OnTaskError PAUSE_TASK = new OnTaskError(SUSPEND_TASK_STRING);
     private static final String PAUSE_JOB_STRING = "pauseJob";
     public static final OnTaskError PAUSE_JOB = new OnTaskError(PAUSE_JOB_STRING);
     private static final String CONTINUE_JOB_EXECUTION_STRING = "continueJobExecution";
@@ -78,7 +78,7 @@ public class OnTaskError implements Serializable {
         switch (descriptor) {
             case CANCEL_JOB_STRING:
                 return CANCEL_JOB;
-            case PAUSE_TASK_STRING:
+            case SUSPEND_TASK_STRING:
                 return PAUSE_TASK;
             case PAUSE_JOB_STRING:
                 return PAUSE_JOB;

@@ -405,7 +405,7 @@ class LiveJobs {
         task.setProgress(0);
     }
 
-    TerminationData emptyResult(TaskId taskId) {
+    private TerminationData emptyResult(TaskId taskId) {
         RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(taskId));
         if (taskData != null) {
             throw new IllegalStateException("Task is marked as running: " + taskId);
@@ -413,7 +413,7 @@ class LiveJobs {
         return TerminationData.EMPTY;
     }
 
-    TerminationData emptyData(JobId jobId) {
+    private TerminationData emptyData(JobId jobId) {
         for (TaskIdWrapper taskId : runningTasksData.keySet()) {
             if (taskId.getTaskId().getJobId().equals(jobId)) {
                 throw new IllegalStateException("Unexpected task data: " + taskId);
@@ -422,7 +422,7 @@ class LiveJobs {
         return TerminationData.EMPTY;
     }
 
-    TerminationData taskTerminatedWithResult(TaskId taskId, TaskResultImpl result) {
+    public TerminationData taskTerminatedWithResult(TaskId taskId, TaskResultImpl result) {
         JobData jobData = lockJob(taskId.getJobId());
         if (jobData == null) {
             return emptyResult(taskId);
@@ -478,13 +478,13 @@ class LiveJobs {
                     logger.info("Number of execution left is " + numberOfExecutionLeft);
 
                     if (onErrorPolicyInterpreter.requiresPauseTaskOnError(jobData.job, task)) {
-                        pauseTaskOnError(jobData, task);
+                        suspendTaskOnError(jobData, task);
 
                         logger.info("Task is paused on error");
 
                         return terminationData;
                     } else if (onErrorPolicyInterpreter.requiresPauseJobOnError(jobData.job, task)) {
-                        pauseTaskOnError(jobData, task);
+                        suspendTaskOnError(jobData, task);
                         pauseJob(task.getJobId());
 
                         logger.info("Job is paused on error");
@@ -511,7 +511,7 @@ class LiveJobs {
         }
     }
 
-    private void pauseTaskOnError(JobData jobData, InternalTask task) {
+    private void suspendTaskOnError(JobData jobData, InternalTask task) {
         jobData.job.setTaskPausedOnError(task);
         jobData.job.setStatus(JobStatus.IN_ERROR);
 
@@ -605,7 +605,7 @@ class LiveJobs {
                 new SimpleTaskLogs("", "Preempted by admin"),
                 System.currentTimeMillis() - task.getStartTime());
 
-            long waitTime = restartDelay * 1000l;
+            long waitTime = restartDelay * 1000L;
             restartTaskOnError(jobData, task, TaskStatus.PENDING, taskResult, waitTime, terminationData);
 
             return terminationData;
