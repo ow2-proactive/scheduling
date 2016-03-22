@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -70,8 +71,8 @@ import org.ow2.proactive.scheduler.task.java.JavaClassScriptEngineFactory;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+
 import com.google.common.base.Joiner;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -98,7 +99,7 @@ public class InternalJobFactory {
     public static InternalJob createJob(Job job, Credentials cred) throws JobCreationException {
         InternalJob iJob;
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("Create job '" + job.getName() + "' - " + job.getClass().getName());
         }
 
@@ -285,8 +286,8 @@ public class InternalJobFactory {
                             new Serializable[] { args }))));
                     javaTask.setForkEnvironment(task.getForkEnvironment());
                 } else {
-                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
-                        new SimpleScript(task.getExecutableClassName(),
+                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(
+                        new TaskScript(new SimpleScript(task.getExecutableClassName(),
                             JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
                             new Serializable[] { args }))));
                 }
@@ -326,11 +327,11 @@ public class InternalJobFactory {
             String commandAndArguments = "\"" + Joiner.on("\" \"").join(task.getCommandLine()) + "\"";
             InternalTask scriptTask;
             if (isForkingTask()) {
-                scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(
-                    new SimpleScript(commandAndArguments, "native"))));
+                scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
+                    new TaskScript(new SimpleScript(commandAndArguments, "native"))));
             } else {
-                scriptTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(
-                    new SimpleScript(commandAndArguments, "native"))));
+                scriptTask = new InternalScriptTask(new ScriptExecutableContainer(
+                    new TaskScript(new SimpleScript(commandAndArguments, "native"))));
             }
             ForkEnvironment forkEnvironment = new ForkEnvironment();
             scriptTask.setForkEnvironment(forkEnvironment);
@@ -393,7 +394,7 @@ public class InternalJobFactory {
         autoCopyfields(Task.class, task, taskToSet);
 
         //special behavior
-        if ( onErrorPolicyInterpreter.notSetOrNone(task.getOnTaskErrorProperty())) {
+        if (onErrorPolicyInterpreter.notSetOrNone(task)) {
             taskToSet.setOnTaskError(userJob.getOnTaskErrorProperty().getValue());
         } else {
             taskToSet.setOnTaskError(task.getOnTaskErrorProperty().getValue());
@@ -420,8 +421,8 @@ public class InternalJobFactory {
      * @param from the T object in which to get the value
      * @param to the T object in which to set the value
      */
-    private static <T> void autoCopyfields(Class<T> klass, T from, T to) throws IllegalArgumentException,
-            IllegalAccessException {
+    private static <T> void autoCopyfields(Class<T> klass, T from, T to)
+            throws IllegalArgumentException, IllegalAccessException {
         for (Field f : klass.getDeclaredFields()) {
             if (!Modifier.isPrivate(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);

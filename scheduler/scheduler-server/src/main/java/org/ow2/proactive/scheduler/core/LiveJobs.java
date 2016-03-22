@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -21,7 +22,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -42,7 +42,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.TaskIdWrapper;
-import org.apache.log4j.Logger;
 
 
 class LiveJobs {
@@ -462,8 +461,7 @@ class LiveJobs {
 
                 int numberOfExecutionLeft = task.getNumberOfExecutionLeft();
 
-                if (numberOfExecutionLeft <= 0 &&
-                    onErrorPolicyInterpreter.requiresCancelJobOnError(jobData.job, task)) {
+                if (numberOfExecutionLeft <= 0 && onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                     logger.info("No retry left and task is tagged with cancel job on error");
 
                     endJob(jobData, terminationData, task, result,
@@ -477,14 +475,15 @@ class LiveJobs {
                 } else if (numberOfExecutionLeft > 0) {
                     logger.info("Number of execution left is " + numberOfExecutionLeft);
 
-                    if (onErrorPolicyInterpreter.requiresPauseTaskOnError(jobData.job, task)) {
+                    if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
                         suspendTaskOnError(jobData, task);
 
                         logger.info("Task is paused on error");
 
                         return terminationData;
-                    } else if (onErrorPolicyInterpreter.requiresPauseJobOnError(jobData.job, task)) {
+                    } else if (onErrorPolicyInterpreter.requiresPauseJobOnError(task)) {
                         suspendTaskOnError(jobData, task);
+
                         pauseJob(task.getJobId());
 
                         logger.info("Job is paused on error");
@@ -558,8 +557,8 @@ class LiveJobs {
                 new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
                 System.currentTimeMillis() - task.getStartTime());
 
-            if (task.getNumberOfExecutionLeft() <= 0 && task.getOnTaskErrorProperty().getValue().equals(
-                    OnTaskError.CANCEL_JOB)) {
+            if (task.getNumberOfExecutionLeft() <= 0 &&
+                onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                 endJob(jobData, terminationData, task, taskResult,
                         "An error occurred in your task and the maximum number of executions has been reached. " +
                             "You also ask to cancel the job in such a situation !",
@@ -637,7 +636,7 @@ class LiveJobs {
                 new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
                 System.currentTimeMillis() - task.getStartTime());
 
-            if (task.getOnTaskErrorProperty().getValue().equals(OnTaskError.CANCEL_JOB)) {
+            if (onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                 endJob(jobData, terminationData, task, taskResult, "The task has been manually killed. " +
                     "You also ask to cancel the job in such a situation!", JobStatus.CANCELED);
             } else {
