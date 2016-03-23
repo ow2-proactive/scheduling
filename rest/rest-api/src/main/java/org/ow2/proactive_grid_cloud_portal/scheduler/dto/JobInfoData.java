@@ -49,6 +49,11 @@ public class JobInfoData {
     private int numberOfPendingTasks;
     private int numberOfRunningTasks;
     private int numberOfFinishedTasks;
+
+    private int numberOfFailedTasks;
+    private int numberOfFaultyTasks;
+    private int numberOfInErrorTasks;
+
     private JobPriorityData priority;
     private String jobOwner;
     private boolean toBeRemoved = false;
@@ -99,6 +104,30 @@ public class JobInfoData {
 
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {
         this.numberOfFinishedTasks = numberOfFinishedTasks;
+    }
+
+    public int getNumberOfFailedTasks() {
+        return numberOfFailedTasks;
+    }
+
+    public void setNumberOfFailedTasks(int numberOfFailedTasks) {
+        this.numberOfFailedTasks = numberOfFailedTasks;
+    }
+
+    public int getNumberOfFaultyTasks() {
+        return numberOfFaultyTasks;
+    }
+
+    public void setNumberOfFaultyTasks(int numberOfFaultyTasks) {
+        this.numberOfFaultyTasks = numberOfFaultyTasks;
+    }
+
+    public int getNumberOfInErrorTasks() {
+        return numberOfInErrorTasks;
+    }
+
+    public void setNumberOfInErrorTasks(int numberOfInErrorTasks) {
+        this.numberOfInErrorTasks = numberOfInErrorTasks;
     }
 
     public String getJobOwner() {
@@ -159,10 +188,24 @@ public class JobInfoData {
 
     @Override
     public String toString() {
-        return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime +
-            ", submittedTime=" + submittedTime + ", status='" + status + '\'' + ", jobId=" + jobId +
-            ", totalNumberOfTasks=" + totalNumberOfTasks + ", numberOfPendingTasks=" + numberOfPendingTasks +
-            ", numberOfRunningTasks=" + numberOfRunningTasks + ", numberOfFinishedTasks=" +
-            numberOfFinishedTasks + ", priority='" + priority + '\'' + ", jobOwner='" + jobOwner + '\'' + '}';
+        return "JobInfoData{" +
+                "startTime=" + startTime +
+                ", finishedTime=" + finishedTime +
+                ", submittedTime=" + submittedTime +
+                ", removedTime=" + removedTime +
+                ", status=" + status +
+                ", jobId=" + jobId +
+                ", totalNumberOfTasks=" + totalNumberOfTasks +
+                ", numberOfPendingTasks=" + numberOfPendingTasks +
+                ", numberOfRunningTasks=" + numberOfRunningTasks +
+                ", numberOfFinishedTasks=" + numberOfFinishedTasks +
+                ", numberOfFailedTasks=" + numberOfFailedTasks +
+                ", numberOfFaultyTasks=" + numberOfFaultyTasks +
+                ", numberOfInErrorTasks=" + numberOfInErrorTasks +
+                ", priority=" + priority +
+                ", jobOwner='" + jobOwner + '\'' +
+                ", toBeRemoved=" + toBeRemoved +
+                '}';
     }
+
 }

@@ -1010,13 +1010,20 @@ public class SchedulerDBManager {
 
                 String jobUpdate = "update JobData set status = :status, " +
                         "numberOfPendingTasks = :numberOfPendingTasks, " +
-                        "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
+                        "numberOfRunningTasks = :numberOfRunningTasks, " +
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks " +
+                        "where id = :jobId";
 
                 JobInfo jobInfo = job.getJobInfo();
 
                 session.createQuery(jobUpdate).setParameter("status", jobInfo.getStatus())
                         .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
                         .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                        .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                        .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                        .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                         .setParameter("jobId", jobId).executeUpdate();
 
                 TaskData.DBTaskId taskId = taskId(task);
@@ -1054,7 +1061,11 @@ public class SchedulerDBManager {
                         "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                         "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                         "numberOfRunningTasks = :numberOfRunningTasks, " +
-                        "totalNumberOfTasks =:totalNumberOfTasks where id = :jobId";
+                        "totalNumberOfTasks =:totalNumberOfTasks, " +
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks " +
+                        "where id = :jobId";
 
                 long jobId = jobId(job);
 
@@ -1065,6 +1076,9 @@ public class SchedulerDBManager {
                         .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
                         .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
                         .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                        .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                        .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                        .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                         .setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
                         .setParameter("jobId", jobId).executeUpdate();
 
@@ -1149,11 +1163,19 @@ public class SchedulerDBManager {
                     updateTaskStatus(task, session);
                 }
 
-                String jobUpdate = "update JobData set status = :status where id = :jobId";
+                String jobUpdate = "update JobData set status = :status, " +
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks " +
+                        "where id = :jobId";
 
                 JobInfo jobInfo = job.getJobInfo();
 
-                session.createQuery(jobUpdate).setParameter("status", jobInfo.getStatus())
+                session.createQuery(jobUpdate)
+                        .setParameter("status", jobInfo.getStatus())
+                        .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                        .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                        .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                         .setParameter("jobId", jobId(job)).executeUpdate();
 
                 return null;
@@ -1231,7 +1253,11 @@ public class SchedulerDBManager {
                 String jobUpdate = "update JobData set status = :status, " +
                         "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                         "numberOfFinishedTasks = :numberOfFinishedTasks, " +
-                        "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId";
+                        "numberOfRunningTasks = :numberOfRunningTasks, " +
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks " +
+                        " where id = :jobId";
 
                 JobInfo jobInfo = job.getJobInfo();
 
@@ -1240,6 +1266,9 @@ public class SchedulerDBManager {
                         .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
                         .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
                         .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                        .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                        .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                        .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                         .setParameter("jobId", jobId).executeUpdate();
 
                 String taskUpdate = "update TaskData task set task.taskStatus = :taskStatus, " +

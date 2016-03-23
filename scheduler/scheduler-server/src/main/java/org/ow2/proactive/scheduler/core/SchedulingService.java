@@ -20,6 +20,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -785,8 +786,8 @@ public class SchedulingService {
         jobsRecovered(pendingJobs);
         jobsRecovered(runningJobs);
 
-        inErrorTasksRecovered(pendingJobs);
-        inErrorTasksRecovered(runningJobs);
+        recoverTasksState(pendingJobs);
+        recoverTasksState(runningJobs);
 
         if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
             logger.debug("Removing non-managed jobs");
@@ -812,10 +813,21 @@ public class SchedulingService {
         }
     }
 
-    private void inErrorTasksRecovered(Vector<InternalJob> runningJobs) {
+    private void recoverTasksState(Vector<InternalJob> runningJobs) {
         Iterator<InternalJob> iterJob = runningJobs.iterator();
         while (iterJob.hasNext()) {
             InternalJob job = iterJob.next();
+
+            int faultyTasksCount = 0;
+
+            for (InternalTask internalTask : job.getITasks()) {
+                if (internalTask.getStatus() == TaskStatus.FAULTY) {
+                    faultyTasksCount++;
+                }
+            }
+
+            job.setNumberOfFaultyTasks(faultyTasksCount);
+
             job.getJobDescriptor().restoreInErrorTasks();
         }
     }

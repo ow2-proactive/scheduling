@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -53,6 +51,8 @@ import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 
 
 /**
@@ -342,6 +342,33 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      */
     public int getNumberOfRunningTasks() {
         return getJobInfo().getNumberOfRunningTasks();
+    }
+
+    /**
+     * To get the numberOfFailedTask
+     *
+     * @return the numberOfFailedTask
+     */
+    public int getNumberOfFailedTasks() {
+        return getJobInfo().getNumberOfFailedTasks();
+    }
+
+    /**
+     * To get the numberOfFailedTask
+     *
+     * @return the numberOfFailedTask
+     */
+    public int getNumberOfFaultyTasks() {
+        return getJobInfo().getNumberOfFaultyTasks();
+    }
+
+    /**
+     * To get the numberOfInErrorTask
+     *
+     * @return the numberOfInErrorTask
+     */
+    public int getNumberOfInErrorTasks() {
+        return getJobInfo().getNumberOfInErrorTasks();
     }
 
     /**
