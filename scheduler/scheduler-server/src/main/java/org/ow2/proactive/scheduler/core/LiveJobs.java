@@ -524,6 +524,7 @@ class LiveJobs {
         JobData jobData = lockJob(jobId);
         try {
             jobData.job.setUnPauseTaskOnError(jobData.job.getTask(taskName));
+            jobData.job.newWaitingTask();
             dbManager.updateJobAndTasksState(jobData.job);
             updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
         } finally {
