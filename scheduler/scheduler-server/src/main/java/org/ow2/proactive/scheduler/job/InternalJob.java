@@ -50,6 +50,7 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -81,8 +82,8 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+
 import it.sauronsoftware.cron4j.Predictor;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -778,7 +779,7 @@ public abstract class InternalJob extends JobState {
             return new HashSet<>(0);
         }
 
-        boolean jobWasPausedOnError = jobInfo.getStatus() == JobStatus.IN_ERROR;
+        boolean jobContainsInErrorTasks = false;
 
         if ((getNumberOfPendingTasks() + getNumberOfRunningTasks() + getNumberOfFinishedTasks()) == 0) {
             jobInfo.setStatus(JobStatus.PENDING);
@@ -796,19 +797,21 @@ public abstract class InternalJob extends JobState {
             } else if ((jobInfo.getStatus() == JobStatus.RUNNING) ||
                 (jobInfo.getStatus() == JobStatus.STALLED)) {
                 if ((task.getStatus() != TaskStatus.FINISHED) && (task.getStatus() != TaskStatus.RUNNING) &&
-                    (task.getStatus() != TaskStatus.SKIPPED) && (task.getStatus() != TaskStatus.FAULTY)
-                        && (task.getStatus() != TaskStatus.IN_ERROR)) {
+                    (task.getStatus() != TaskStatus.SKIPPED) && (task.getStatus() != TaskStatus.FAULTY) &&
+                    (task.getStatus() != TaskStatus.IN_ERROR)) {
                     task.setStatus(TaskStatus.PENDING);
                     updatedTasks.add(task.getId());
                 }
             }
 
-            if (task.getStatus() != TaskStatus.IN_ERROR) {
+            if (task.getStatus() == TaskStatus.IN_ERROR) {
+                jobContainsInErrorTasks = true;
+            } else {
                 getJobDescriptor().unpause(task.getId());
             }
         }
 
-        if (jobWasPausedOnError) {
+        if (jobContainsInErrorTasks) {
             jobInfo.setStatus(JobStatus.IN_ERROR);
         }
 
