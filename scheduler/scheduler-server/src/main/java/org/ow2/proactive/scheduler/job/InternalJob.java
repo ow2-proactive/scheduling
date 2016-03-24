@@ -982,6 +982,10 @@ public abstract class InternalJob extends JobState {
         jobInfo.setNumberOfFailedTasks(numberOfFailedTasks);
     }
 
+    public boolean saveFaultyTaskId(TaskId taskId) {
+        return faultyTasks.add(taskId);
+    }
+
     public void increaseNumberOfFaultyTasks(TaskId taskId) {
         if (faultyTasks.add(taskId)) {
             incrementNumberOfFaultyTasksBy(1);
