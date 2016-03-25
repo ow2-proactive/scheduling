@@ -42,8 +42,6 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStatusData;
 
 
 public class RestartTaskCommand extends AbstractTaskCommand implements Command {
@@ -58,17 +56,7 @@ public class RestartTaskCommand extends AbstractTaskCommand implements Command {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
 
         try {
-            String sessionId = currentContext.getSessionId();
-
-            TaskStateData taskStateData = scheduler.jobTask(sessionId, jobId, taskId);
-
-            boolean result;
-
-            if (taskStateData.getTaskInfo().getTaskStatus() == TaskStatusData.IN_ERROR) {
-                result = scheduler.restartInErrorTask(sessionId, jobId, taskId);
-            } else {
-                result = scheduler.restartTask(sessionId, jobId, taskId);
-            }
+            boolean result = scheduler.restartTask(currentContext.getSessionId(), jobId, taskId);
 
             handleResult(currentContext, result);
         } catch (Exception e) {
