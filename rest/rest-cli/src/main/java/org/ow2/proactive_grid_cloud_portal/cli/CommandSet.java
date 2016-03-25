@@ -37,85 +37,17 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.commons.cli.Option;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.ExitCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.JsHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.OutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetDebugModeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetInsecureAccessCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetPasswordCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.VersionCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListInfrastructureCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListPolicyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.LockNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobTasksCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PutThirdPartyCredentialCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveThirdPartyCredentialCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ThirdPartyCredentialKeySetCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand;
-
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.*;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.*;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.*;
 import com.google.common.collect.Ordering;
+import org.apache.commons.cli.Option;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 
 /**
@@ -319,6 +251,13 @@ public class CommandSet {
                     .jsCommand("pausejob(job-id)")
                     .commandClass(PauseJobCommand.class).entry();
 
+    public static final CommandSet.Entry JOB_RESTART_ALL_IN_ERROR_TASKS =
+            CommandSetEntryBuilder.newInstance().opt("raiet").longOpt("restart-all-in-error-tasks")
+                    .description("Restart all In-Error tasks for the specified job")
+                    .hasArgs(true).numOfArgs(1).argNames("job-id")
+                    .jsCommand("restartAllInErrorTasks(job_id)")
+                    .commandClass(RestartAllInErrorTasksCommand.class).entry();
+
     public static final CommandSet.Entry JOB_RESUME =
             CommandSetEntryBuilder.newInstance().opt("rj").longOpt("resumejob")
                     .description("Resume the specified job (restart all 'paused' tasks)")
@@ -372,7 +311,7 @@ public class CommandSet {
 
     public static final CommandSet.Entry TASK_RESTART =
             CommandSetEntryBuilder.newInstance().opt("rt").longOpt("restarttask")
-                    .description("Restart the specified task after the specified delay")
+                    .description("Restart the specified running task (deprecated)")
                     .hasArgs(true).numOfArgs(2).argNames("job-id task-name")
                     .jsCommand("restarttask(job-id,task-name)")
                     .commandClass(RestartTaskCommand.class).entry();
@@ -593,7 +532,8 @@ public class CommandSet {
             new CommandSet.Entry[] {
                     SCHEDULER_START, SCHEDULER_STOP, SCHEDULER_PAUSE, SCHEDULER_RESUME, SCHEDULER_FREEZE,
                     SCHEDULER_KILL, LINK_RM, SCHEDULER_STATS, JOB_LIST, SUBMIT, JOB_STATE, JOB_OUTPUT,
-                    JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_KILL, JOB_TASK_LIST_BY_TAG,
+                    JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_RESTART_ALL_IN_ERROR_TASKS,
+                    JOB_KILL, JOB_TASK_LIST_BY_TAG,
                     JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, TASKS_STATES,
                     UPLOAD_FILE, DOWNLOAD_FILE, PUT_THIRD_PARTY_CREDENTIAL, REMOVE_THIRD_PARTY_CREDENTIAL,
                     THIRD_PARTY_CREDENTIAL_KEY_SET, SCHEDULER_HELP, LIVE_LOG };
