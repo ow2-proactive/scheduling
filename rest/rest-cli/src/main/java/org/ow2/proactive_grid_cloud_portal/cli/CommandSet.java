@@ -265,6 +265,13 @@ public class CommandSet {
                     .jsCommand("resumejob(job_id)")
                     .commandClass(ResumeJobCommand.class).entry();
 
+    public static final CommandSet.Entry JOB_RESUME_ALL_PAUSED_TASKS =
+            CommandSetEntryBuilder.newInstance().opt("rapt").longOpt("resume-all-paused-tasks")
+                    .description("Resume all paused tasks for the specified job")
+                    .hasArgs(true).numOfArgs(1).argNames("job-id")
+                    .jsCommand("resumeAllPausedTasks(job_id)")
+                    .commandClass(ResumeAllPausedTasksCommand.class).entry();
+
     public static final CommandSet.Entry JOB_KILL =
             CommandSetEntryBuilder.newInstance().opt("kj").longOpt("killjob")
                     .description("Kill the specfied job").hasArgs(true).numOfArgs(1)
@@ -532,8 +539,8 @@ public class CommandSet {
             new CommandSet.Entry[] {
                     SCHEDULER_START, SCHEDULER_STOP, SCHEDULER_PAUSE, SCHEDULER_RESUME, SCHEDULER_FREEZE,
                     SCHEDULER_KILL, LINK_RM, SCHEDULER_STATS, JOB_LIST, SUBMIT, JOB_STATE, JOB_OUTPUT,
-                    JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_RESTART_ALL_IN_ERROR_TASKS,
-                    JOB_KILL, JOB_TASK_LIST_BY_TAG,
+                    JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_RESUME_ALL_PAUSED_TASKS,
+                    JOB_RESTART_ALL_IN_ERROR_TASKS, JOB_KILL, JOB_TASK_LIST_BY_TAG,
                     JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, TASKS_STATES,
                     UPLOAD_FILE, DOWNLOAD_FILE, PUT_THIRD_PARTY_CREDENTIAL, REMOVE_THIRD_PARTY_CREDENTIAL,
                     THIRD_PARTY_CREDENTIAL_KEY_SET, SCHEDULER_HELP, LIVE_LOG };

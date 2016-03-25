@@ -59,6 +59,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeAllPausedTasksCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartAllInErrorTasksCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand);
@@ -228,6 +229,10 @@ function pausejob(jobId) {
 
 function resumejob(jobId) {
     execute(new ResumeJobCommand('' + jobId));
+}
+
+function resumeAllPausedTasks(jobId) {
+    execute(new ResumeAllPausedTasksCommand('' + jobId));
 }
 
 function restartAllInErrorTasks(jobId) {
