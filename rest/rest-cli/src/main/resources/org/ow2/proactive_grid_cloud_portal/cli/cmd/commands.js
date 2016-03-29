@@ -68,6 +68,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultComman
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartRunningTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand);
@@ -382,6 +383,10 @@ function preempttask(jobId, taskId) {
 
 function restarttask(jobId, taskId) {
     execute(new RestartTaskCommand('' + jobId, '' + taskId));
+}
+
+function restartRunningTask(jobId, taskId) {
+    execute(new RestartRunningTaskCommand('' + jobId, '' + taskId));
 }
 
 function uploadfile(spaceName, filePath, fileName, localFile) {

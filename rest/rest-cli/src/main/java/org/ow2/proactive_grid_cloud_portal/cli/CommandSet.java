@@ -330,6 +330,13 @@ public class CommandSet {
                     .jsCommand("restarttask(job-id,task-name)")
                     .commandClass(RestartTaskCommand.class).entry();
 
+    public static final CommandSet.Entry RESTART_RUNNING_TASK =
+            CommandSetEntryBuilder.newInstance().opt("rrt").longOpt("restart-running-task")
+                    .description("Restart the specified running task")
+                    .hasArgs(true).numOfArgs(2).argNames("job-id task-name")
+                    .jsCommand("restartRunningTask(job-id,task-name)")
+                    .commandClass(RestartRunningTaskCommand.class).entry();
+
     public static final CommandSet.Entry UPLOAD_FILE =
             CommandSetEntryBuilder.newInstance().opt("uf").longOpt("uploadfile")
                     .description("Upload a file to the specified location of the server")
@@ -548,9 +555,10 @@ public class CommandSet {
                     SCHEDULER_KILL, LINK_RM, SCHEDULER_STATS, JOB_LIST, SUBMIT, JOB_STATE, JOB_OUTPUT,
                     JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_RESUME_ALL_PAUSED_TASKS,
                     JOB_RESTART_ALL_IN_ERROR_TASKS, JOB_RESUME_ALL_PAUSED_TASKS_AND_RESTART_ALL_IN_ERROR_TASKS,
-                    JOB_KILL, JOB_TASK_LIST_BY_TAG, JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT,
-                    TASK_RESULT, TASKS_STATES, UPLOAD_FILE, DOWNLOAD_FILE, PUT_THIRD_PARTY_CREDENTIAL,
-                    REMOVE_THIRD_PARTY_CREDENTIAL, THIRD_PARTY_CREDENTIAL_KEY_SET, SCHEDULER_HELP, LIVE_LOG };
+                    JOB_KILL, JOB_TASK_LIST_BY_TAG, JOB_REMOVE, TASK_RESTART, RESTART_RUNNING_TASK,
+                    TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, TASKS_STATES, UPLOAD_FILE, DOWNLOAD_FILE,
+                    PUT_THIRD_PARTY_CREDENTIAL, REMOVE_THIRD_PARTY_CREDENTIAL, THIRD_PARTY_CREDENTIAL_KEY_SET,
+                    SCHEDULER_HELP, LIVE_LOG };
 
     /**
      * CommandSet.Entry objects which are specific to Resource Manager CLI
