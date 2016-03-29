@@ -60,20 +60,7 @@ import org.apache.log4j.Logger;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PAUSED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_FINISHED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_PENDING_TO_RUNNING;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RESTARTED_FROM_ERROR;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RESUMED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.JOB_RUNNING_TO_FINISHED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.KILLED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.RESUMED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTDOWN;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.SHUTTING_DOWN;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.STOPPED;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PENDING_TO_RUNNING;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_PROGRESS;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.TASK_RUNNING_TO_FINISHED;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.*;
 
 /**
  * Asbtract implementation of smart proxy that factorizes code used by all smart proxy implementations.
@@ -93,7 +80,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     protected static final SchedulerEvent[] PROXY_SCHED_EVENTS = new SchedulerEvent[]{
             JOB_RUNNING_TO_FINISHED, JOB_PENDING_TO_RUNNING, JOB_PENDING_TO_FINISHED, JOB_PAUSED,
             JOB_RESUMED, TASK_PENDING_TO_RUNNING, KILLED, SHUTDOWN, SHUTTING_DOWN, STOPPED, RESUMED,
-            TASK_RUNNING_TO_FINISHED, TASK_PROGRESS, JOB_RESTARTED_FROM_ERROR};
+            TASK_RUNNING_TO_FINISHED, TASK_PROGRESS, JOB_RESTARTED_FROM_ERROR, JOB_IN_ERROR, TASK_IN_ERROR
+    };
     private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
     protected T jobTracker;
     protected String schedulerUrl;
