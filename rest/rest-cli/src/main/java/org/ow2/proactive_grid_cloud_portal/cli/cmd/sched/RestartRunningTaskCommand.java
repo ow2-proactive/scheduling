@@ -35,28 +35,44 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
-import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
-public abstract class AbstractJobCommand extends AbstractCommand implements Command {
 
-    protected String jobId;
+public class RestartRunningTaskCommand extends AbstractTaskCommand implements Command {
 
-    public AbstractJobCommand(String jobId) {
-        this.jobId = jobId;
+    public RestartRunningTaskCommand(String jobId, String taskId) {
+        super(jobId, taskId);
     }
 
-    protected String job() {
-        return String.format("job('%s')", jobId);
+    @Override
+    public void execute(ApplicationContext currentContext) throws CLIException {
+
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
+        try {
+            boolean result = scheduler.restartTask(currentContext.getSessionId(), jobId, taskId);
+
+            handleResult(currentContext, result);
+        } catch (Exception e) {
+            handleError(String.format("An error occurred while attempting to restart %s:", task()), e,
+                    currentContext);
+        }
     }
 
-    protected void writeDeprecation(ApplicationContext currentContext,
-            CommandSet.Entry newCommandEntryToUse) {
-        writeLine(currentContext, "This option is deprecated, please use --"
-                + newCommandEntryToUse.longOpt() + " from non-interactive mode or "
-                + newCommandEntryToUse.jsCommand() + " from interactive mode.");
+    private void handleResult(ApplicationContext currentContext, boolean result) {
+        resultStack(currentContext).push(result);
+
+        if (result) {
+            writeLine(currentContext, "%s successfully restarted.", task());
+        } else {
+            writeLine(currentContext, "Cannot restart %s.", task());
+        }
     }
 
 }

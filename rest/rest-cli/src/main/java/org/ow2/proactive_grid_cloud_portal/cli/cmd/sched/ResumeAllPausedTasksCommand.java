@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2015 INRIA/University of
+ * Copyright (C) 1997-2016 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -39,35 +39,41 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 
-public class ResumeJobCommand extends AbstractJobCommand implements Command {
+public class ResumeAllPausedTasksCommand extends AbstractJobCommand implements Command {
 
-    public ResumeJobCommand(String jobId) {
+    public ResumeAllPausedTasksCommand(String jobId) {
         super(jobId);
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        writeDeprecation(currentContext, CommandSet.JOB_RESUME_ALL_PAUSED_TASKS);
-
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
-            boolean success = scheduler.resumeJob(currentContext.getSessionId(), jobId);
-            resultStack(currentContext).push(success);
-            if (success) {
-                writeLine(currentContext, "%s resumed successfully.", job());
-            } else {
-                writeLine(currentContext, "Cannot resume %s.", job());
-            }
+            boolean result = scheduler.resumeJob(currentContext.getSessionId(), jobId);
+
+            handleResult(currentContext, result);
         } catch (Exception e) {
-            handleError(String.format("An error occurred while attempting to resume: %s", job()), e,
-                    currentContext);
+            handleError(
+                    String.format(
+                            "An error occurred while attempting to resume all paused tasks for %s:",
+                            job()), e, currentContext);
+        }
+    }
+
+    private void handleResult(ApplicationContext currentContext, boolean result) {
+        resultStack(currentContext).push(result);
+
+        if (result) {
+            writeLine(currentContext, "All paused tasks for %s successfully resumed.", job());
+        } else {
+            writeLine(currentContext, "Cannot resume paused tasks for %s.", job());
         }
     }
 

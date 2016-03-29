@@ -35,28 +35,46 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 
-package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
-import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
+import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
-public abstract class AbstractJobCommand extends AbstractCommand implements Command {
 
-    protected String jobId;
+public class RestartAllInErrorTasksCommand extends AbstractJobCommand implements Command {
 
-    public AbstractJobCommand(String jobId) {
-        this.jobId = jobId;
+    public RestartAllInErrorTasksCommand(String jobId) {
+        super(jobId);
     }
 
-    protected String job() {
-        return String.format("job('%s')", jobId);
+    @Override
+    public void execute(ApplicationContext currentContext) throws CLIException {
+
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
+        try {
+            boolean result = scheduler.restartAllInErrorTasks(currentContext.getSessionId(), jobId);
+
+            handleResult(currentContext, result);
+        } catch (Exception e) {
+            handleError(
+                    String.format(
+                            "An error occurred while attempting to restart all In-Error tasks for %s:",
+                            job()), e, currentContext);
+        }
     }
 
-    protected void writeDeprecation(ApplicationContext currentContext,
-            CommandSet.Entry newCommandEntryToUse) {
-        writeLine(currentContext, "This option is deprecated, please use --"
-                + newCommandEntryToUse.longOpt() + " from non-interactive mode or "
-                + newCommandEntryToUse.jsCommand() + " from interactive mode.");
+    private void handleResult(ApplicationContext currentContext, boolean result) {
+        resultStack(currentContext).push(result);
+
+        if (result) {
+            writeLine(currentContext, "All In-Error tasks for %s successfully restarted.", job());
+        } else {
+            writeLine(currentContext, "Cannot restart In-Error tasks for %s.", job());
+        }
     }
 
 }
