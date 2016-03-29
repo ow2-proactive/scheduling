@@ -39,6 +39,7 @@ package functionaltests;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -50,6 +51,9 @@ import javax.xml.transform.TransformerException;
 
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -72,7 +76,6 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive_grid_cloud_portal.smartproxy.RestSmartProxyImpl;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
@@ -148,12 +151,12 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = TEN_MINUTES)
-    public void test_no_automatic_transfer() throws Exception {
+    public void testNoAutomaticTransfer() throws Exception {
         testJobSubmission(false, false);
     }
 
     @Test(timeout = TEN_MINUTES)
-    public void test_automatic_transfer() throws Exception {
+    public void testAutomaticTransfer() throws Exception {
         testJobSubmission(false, true);
     }
 
@@ -238,13 +241,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         System.out.println("Restarting all In-Error tasks");
         restSmartProxy.restartAllInErrorTasks(jobIdAsString);
 
-        JobState jobState = restSmartProxy.getJobState(jobIdAsString);
-
-        Thread.sleep(ONE_SECOND);
-        while (!jobState.isFinished()) {
-            jobState = restSmartProxy.getJobState(jobIdAsString);
-            Thread.sleep(ONE_SECOND);
-        }
+        JobState jobState = waitForJobFinishState(jobIdAsString);
 
         assertThat(JobStatus.FINISHED).isEqualTo(jobState.getStatus());
         assertThat(restartedFromErrorEventReceived.booleanValue()).isTrue();
@@ -252,6 +249,22 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         TaskStatus taskStatus = jobState.getTasks().get(0).getStatus();
         assertThat(taskStatus).isEqualTo(TaskStatus.FAULTY);
+    }
+
+    @NotNull
+    private JobState waitForJobFinishState(String jobIdAsString)
+            throws InterruptedException, NotConnectedException, UnknownJobException, PermissionException {
+
+        JobState jobState = restSmartProxy.getJobState(jobIdAsString);
+
+        Thread.sleep(ONE_SECOND);
+
+        while (!jobState.isFinished()) {
+            jobState = restSmartProxy.getJobState(jobIdAsString);
+            Thread.sleep(ONE_SECOND);
+        }
+
+        return jobState;
     }
 
     private void printJobXmlRepresentation(
@@ -294,7 +307,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testReconnection() throws Exception {
-
         restSmartProxy.reconnect();
         Assert.assertTrue(restSmartProxy.isConnected());
 
@@ -303,7 +315,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         restSmartProxy.disconnect();
         Assert.assertFalse(restSmartProxy.isConnected());
-
     }
 
     private void testJobSubmission(boolean isolateTaskOutput, boolean automaticTransfer) throws Exception {
@@ -323,13 +334,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
                         pushUrl, outputLocalFolder.getAbsolutePath(), pullUrl,
                         isolateTaskOutput, automaticTransfer);
 
-        JobState jobState = restSmartProxy.getJobState(id.toString());
-
-        Thread.sleep(ONE_SECOND);
-        while (!jobState.isFinished()) {
-            jobState = restSmartProxy.getJobState(id.toString());
-            Thread.sleep(ONE_SECOND);
-        }
+        JobState jobState = waitForJobFinishState(id.toString());
 
         assertEquals(JobStatus.FINISHED, jobState.getStatus());
 
@@ -404,7 +409,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     }
 
     private List<String> taskNameList() {
-        List<String> taskNames = Lists.newArrayList();
+        List<String> taskNames = new ArrayList<>(NB_TASKS);
         for (int i = 0; i < NB_TASKS; i++) {
             taskNames.add(TASK_NAME + i);
         }
