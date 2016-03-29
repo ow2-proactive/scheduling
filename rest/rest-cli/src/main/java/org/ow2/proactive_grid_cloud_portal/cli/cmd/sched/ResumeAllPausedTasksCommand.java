@@ -62,7 +62,7 @@ public class ResumeAllPausedTasksCommand extends AbstractJobCommand implements C
         } catch (Exception e) {
             handleError(
                     String.format(
-                            "An error occurred while attempting to resume all paused tasks for job %s:",
+                            "An error occurred while attempting to resume all paused tasks for %s:",
                             job()), e, currentContext);
         }
     }
@@ -71,9 +71,9 @@ public class ResumeAllPausedTasksCommand extends AbstractJobCommand implements C
         resultStack(currentContext).push(result);
 
         if (result) {
-            writeLine(currentContext, "All paused tasks for job %s successfully resumed.", job());
+            writeLine(currentContext, "All paused tasks for %s successfully resumed.", job());
         } else {
-            writeLine(currentContext, "Cannot resume paused tasks for job %s.", job());
+            writeLine(currentContext, "Cannot resume paused tasks for %s.", job());
         }
     }
 

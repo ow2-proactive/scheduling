@@ -62,7 +62,7 @@ public class RestartAllInErrorTasksCommand extends AbstractJobCommand implements
         } catch (Exception e) {
             handleError(
                     String.format(
-                            "An error occurred while attempting to restart all In-Error tasks for job %s:",
+                            "An error occurred while attempting to restart all In-Error tasks for %s:",
                             job()), e, currentContext);
         }
     }
@@ -71,9 +71,9 @@ public class RestartAllInErrorTasksCommand extends AbstractJobCommand implements
         resultStack(currentContext).push(result);
 
         if (result) {
-            writeLine(currentContext, "All In-Error tasks for job %s successfully restarted.", job());
+            writeLine(currentContext, "All In-Error tasks for %s successfully restarted.", job());
         } else {
-            writeLine(currentContext, "Cannot restart In-Error tasks for job %s.", job());
+            writeLine(currentContext, "Cannot restart In-Error tasks for %s.", job());
         }
     }
 

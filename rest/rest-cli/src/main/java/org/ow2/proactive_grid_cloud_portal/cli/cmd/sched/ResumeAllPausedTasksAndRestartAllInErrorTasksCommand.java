@@ -63,7 +63,7 @@ public class ResumeAllPausedTasksAndRestartAllInErrorTasksCommand extends Abstra
         } catch (Exception e) {
             handleError(
                     String.format(
-                            "An error occurred while attempting to resume/restart all paused/in-error tasks for job %s:",
+                            "An error occurred while attempting to resume/restart all paused/in-error tasks for %s:",
                             job()), e, currentContext);
         }
     }
@@ -72,9 +72,9 @@ public class ResumeAllPausedTasksAndRestartAllInErrorTasksCommand extends Abstra
         resultStack(currentContext).push(result);
 
         if (result) {
-            writeLine(currentContext, "All paused/in-error tasks for job %s successfully resumed/restarted.", job());
+            writeLine(currentContext, "All paused/in-error tasks for %s successfully resumed/restarted.", job());
         } else {
-            writeLine(currentContext, "Cannot resume/restart paused/in-error tasks for job %s.", job());
+            writeLine(currentContext, "Cannot resume/restart paused/in-error tasks for %s.", job());
         }
     }
 
