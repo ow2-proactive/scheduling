@@ -278,9 +278,15 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
             logger.debug("Pushing files for task " + t.getName());
             List<String> includes = Lists.newArrayList();
             List<String> excludes = Lists.newArrayList();
-            for (InputSelector is : t.getInputFilesList()) {
-                addfileSelection(is.getInputFiles(), includes, excludes);
+
+            List<InputSelector> inputFilesList = t.getInputFilesList();
+
+            if (inputFilesList != null) {
+                for (InputSelector is : inputFilesList) {
+                    addfileSelection(is.getInputFiles(), includes, excludes);
+                }
             }
+
             LocalDirSource source = new LocalDirSource(localInputFolderPath);
             source.setIncludes(includes);
             source.setExcludes(excludes);
