@@ -84,6 +84,9 @@ public abstract class CommonAttribute implements Serializable {
     /** Common user informations */
     protected Map<String, BigString> genericInformations = new HashMap<String, BigString>();
 
+    /**
+     * OnTaskError defines the behavior happening when a task fails.
+     */
     protected UpdatableProperties<OnTaskError> onTaskError = new UpdatableProperties<>(
            OnTaskError.NONE);
 

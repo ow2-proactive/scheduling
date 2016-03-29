@@ -779,14 +779,16 @@ public class SchedulingService {
     }
 
     private void recover(RecoveredSchedulerState recoveredState) {
+        Vector<InternalJob> finishedJobs = recoveredState.getFinishedJobs();
         Vector<InternalJob> pendingJobs = recoveredState.getPendingJobs();
         Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
 
         jobsRecovered(pendingJobs);
         jobsRecovered(runningJobs);
 
-        inErrorTasksRecovered(pendingJobs);
-        inErrorTasksRecovered(runningJobs);
+        recoverTasksState(finishedJobs, false);
+        recoverTasksState(runningJobs, true);
+        recoverTasksState(pendingJobs, true);
 
         if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
             logger.debug("Removing non-managed jobs");
@@ -812,11 +814,32 @@ public class SchedulingService {
         }
     }
 
-    private void inErrorTasksRecovered(Vector<InternalJob> runningJobs) {
-        Iterator<InternalJob> iterJob = runningJobs.iterator();
+    private void recoverTasksState(Vector<InternalJob> jobs, boolean restoreInErrorTasks) {
+        Iterator<InternalJob> iterJob = jobs.iterator();
         while (iterJob.hasNext()) {
             InternalJob job = iterJob.next();
-            job.getJobDescriptor().restoreInErrorTasks();
+
+            int faultyTasksCount = 0;
+
+            for (InternalTask internalTask : job.getITasks()) {
+                switch (internalTask.getStatus()) {
+                    case FAULTY:
+                        faultyTasksCount++;
+                        break;
+                    case WAITING_ON_ERROR:
+                        faultyTasksCount++;
+                        job.saveFaultyTaskId(internalTask.getId());
+                        break;
+                }
+            }
+
+            if (faultyTasksCount != job.getNumberOfFaultyTasks()) {
+                logger.warn("Number of faulty tasks saved in DB for Job " + job.getId() +  " does not match the one computed using task statuses");
+            }
+
+            if (restoreInErrorTasks) {
+                job.getJobDescriptor().restoreInErrorTasks();
+            }
         }
     }
 

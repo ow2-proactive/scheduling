@@ -68,6 +68,17 @@ public class JobData {
 
     private int numberOfFinishedTasks;
 
+    /*
+     * The next three fields are there to prevent
+     * expensive queries in order to display the number of "Issues".
+     */
+    private int numberOfFailedTasks;
+
+    private int numberOfFaultyTasks;
+
+    private int numberOfInErrorTasks;
+
+
     private int maxNumberOfExecution;
 
     private String onTaskErrorString;
@@ -99,6 +110,9 @@ public class JobData {
         jobInfo.setNumberOfPendingTasks(getNumberOfPendingTasks());
         jobInfo.setNumberOfRunningTasks(getNumberOfRunningTasks());
         jobInfo.setNumberOfFinishedTasks(getNumberOfFinishedTasks());
+        jobInfo.setNumberOfFailedTasks(getNumberOfFailedTasks());
+        jobInfo.setNumberOfFaultyTasks(getNumberOfFaultyTasks());
+        jobInfo.setNumberOfInErrorTasks(getNumberOfInErrorTasks());
         jobInfo.setPriority(getPriority());
         jobInfo.setRemovedTime(getRemovedTime());
         jobInfo.setStartTime(getStartTime());
@@ -165,6 +179,9 @@ public class JobData {
         jobRuntimeData.setNumberOfPendingTasks(job.getNumberOfPendingTasks());
         jobRuntimeData.setNumberOfRunningTasks(job.getNumberOfRunningTasks());
         jobRuntimeData.setNumberOfFinishedTasks(job.getNumberOfFinishedTasks());
+        jobRuntimeData.setNumberOfFailedTasks(job.getNumberOfFailedTasks());
+        jobRuntimeData.setNumberOfFaultyTasks(job.getNumberOfFaultyTasks());
+        jobRuntimeData.setNumberOfInErrorTasks(job.getNumberOfInErrorTasks());
         jobRuntimeData.setTotalNumberOfTasks(job.getTotalNumberOfTasks());
 
         return jobRuntimeData;
@@ -370,6 +387,33 @@ public class JobData {
 
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {
         this.numberOfFinishedTasks = numberOfFinishedTasks;
+    }
+
+    @Column(name = "FAILED_TASKS")
+    public int getNumberOfFailedTasks() {
+        return numberOfFailedTasks;
+    }
+
+    public void setNumberOfFailedTasks(int numberOfFailedTasks) {
+        this.numberOfFailedTasks = numberOfFailedTasks;
+    }
+
+    @Column(name = "FAULTY_TASKS")
+    public int getNumberOfFaultyTasks() {
+        return numberOfFaultyTasks;
+    }
+
+    public void setNumberOfFaultyTasks(int numberOfFaultyTasks) {
+        this.numberOfFaultyTasks = numberOfFaultyTasks;
+    }
+
+    @Column(name = "IN_ERROR_TASKS")
+    public int getNumberOfInErrorTasks() {
+        return numberOfInErrorTasks;
+    }
+
+    public void setNumberOfInErrorTasks(int numberOfInErrorTasks) {
+        this.numberOfInErrorTasks = numberOfInErrorTasks;
     }
 
     @Column(name = "PRIORITY", nullable = false)

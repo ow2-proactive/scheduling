@@ -157,7 +157,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         task1.setWallTime(440000);
         JavaTask task2 = createDefaultTask("task2");
         task2.setDescription("d2");
-        task2.setOnTaskError(OnTaskError.NONE);
+        task2.setOnTaskError(OnTaskError.NONE); // If it is set to none, the job level behavior will overwrite the task level none behavior.
         task2.setMaxNumberOfExecution(3);
         task2.setPreciousLogs(false);
         task2.setPreciousResult(false);

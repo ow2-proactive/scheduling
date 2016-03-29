@@ -172,7 +172,7 @@ public class Job2XMLTransformer {
         setAttribute(rootJob, XMLAttributes.JOB_PRIORITY, job.getPriority().toString());
         if (job.getOnTaskErrorProperty().isSet()) {
             setAttribute(rootJob, XMLAttributes.COMMON_ON_TASK_ERROR,job
-                    .getOnTaskErrorProperty().getValue().toString());
+                    .getOnTaskErrorProperty().getValue().toString(), true);
         }
         if (job.getMaxNumberOfExecutionProperty().isSet()) {
             setAttribute(rootJob, XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION, Integer.toString(job
@@ -357,7 +357,7 @@ public class Job2XMLTransformer {
 
         if (task.getOnTaskErrorProperty().isSet()) {
         setAttribute(taskE, XMLAttributes.COMMON_ON_TASK_ERROR,
-                task.getOnTaskErrorProperty().getValue().toString());
+                task.getOnTaskErrorProperty().getValue().toString(), true);
         }
         if (task.getMaxNumberOfExecutionProperty().isSet()) {
             setAttribute(taskE, XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION, Integer.toString(task

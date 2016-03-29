@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
-    name="update_variables_using_system_properties" cancelJobOnError="false" priority="normal">
+    name="update_variables_using_system_properties" onTaskError="continueJobExecution" priority="normal">
     <variables>
         <variable name="system_property" value="${system_property}" />
     </variables>

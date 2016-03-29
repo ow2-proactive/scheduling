@@ -122,6 +122,28 @@ public interface JobInfo extends Serializable {
     int getNumberOfRunningTasks();
 
     /**
+     * To get the numberOfFailedTasks
+     *
+     * @return the numberOfFailedTasks
+     */
+    int getNumberOfFailedTasks();
+
+    /**
+     * To get the numberOfFaultyTasks
+     *
+     * @return the numberOfFaultyTasks
+     */
+    int getNumberOfFaultyTasks();
+
+
+    /**
+     * To get the numberOfInErrorTasks
+     *
+     * @return the numberOfInErrorTasks
+     */
+    int getNumberOfInErrorTasks();
+
+    /**
      * To get the priority.
      *
      * @return the priority.

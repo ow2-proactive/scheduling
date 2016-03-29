@@ -2,7 +2,7 @@
 <job xmlns="urn:proactive:jobdescriptor:dev" 
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
-     name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
+     name="Job" priority="low" projectName="myProject" onTaskError="cancelJob">
   <taskFlow>
     <task name="T" maxNumberOfExecution="4">
       <description> // <![CDATA[

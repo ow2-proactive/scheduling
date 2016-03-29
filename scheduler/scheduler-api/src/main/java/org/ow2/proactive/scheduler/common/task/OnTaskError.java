@@ -70,7 +70,7 @@ public class OnTaskError implements Serializable {
 
     /**
      * Get a OnTaskError instance based on a descriptor string. If the descriptor string is not found,
-     * 'not set' is returned.
+     * 'none' is returned.
      * @param descriptor Descriptor string.
      * @return OnTaskError instance or 'not set' if descriptor string is not recognized.
      */
@@ -87,10 +87,6 @@ public class OnTaskError implements Serializable {
             default:
                 return NONE;
         }
-    }
-
-    String getDescriptor() {
-        return this.descriptor;
     }
 
     @Override
@@ -117,5 +113,4 @@ public class OnTaskError implements Serializable {
     public int hashCode() {
         return this.descriptor.hashCode();
     }
-
 }

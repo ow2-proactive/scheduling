@@ -102,7 +102,7 @@ public class TestJobFactory {
         assertEquals("output/space", tfJob.getOutputSpace());
         //Check task 1 properties
         assertEquals(tfJob.getTask("task1").getName(), "task1");
-        assertEquals(tfJob.getTask("task1").getOnTaskErrorProperty(), OnTaskError.NONE);
+        assertEquals(tfJob.getTask("task1").getOnTaskErrorProperty().getValue(), OnTaskError.CANCEL_JOB); // The job factory overwrites the task settings with the job settings if they are set to none.
         assertEquals(tfJob.getTask("task1").isPreciousResult(), false);
         assertEquals(tfJob.getTask("task1").getRestartTaskOnError(), RestartMode.ANYWHERE);
         assertEquals(tfJob.getTask("task1").getMaxNumberOfExecution(), 1);

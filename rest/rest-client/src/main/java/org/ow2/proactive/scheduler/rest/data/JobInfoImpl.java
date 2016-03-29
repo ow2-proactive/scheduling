@@ -55,6 +55,10 @@ public class JobInfoImpl implements JobInfo {
     private int numberOfRunningTasks = 0;
     private int numberOfFinishedTasks = 0;
 
+    private int numberOfFailedTasks = 0;
+    private int numberOfFaultyTasks = 0;
+    private int numberOfInErrorTasks = 0;
+
     private JobPriority jobPriority = JobPriority.NORMAL;
     private JobStatus jobStatus = JobStatus.PENDING;
     private boolean toBeRemoved;
@@ -115,6 +119,33 @@ public class JobInfoImpl implements JobInfo {
 
     public void setJobPriority(JobPriority jobPriority) {
         this.jobPriority = jobPriority;
+    }
+
+    @Override
+    public int getNumberOfFailedTasks() {
+        return numberOfFailedTasks;
+    }
+
+    public void setNumberOfFailedTasks(int numberOfFailedTasks) {
+        this.numberOfFailedTasks = numberOfFailedTasks;
+    }
+
+    @Override
+    public int getNumberOfFaultyTasks() {
+        return numberOfFaultyTasks;
+    }
+
+    public void setNumberOfFaultyTasks(int numberOfFaultyTasks) {
+        this.numberOfFaultyTasks = numberOfFaultyTasks;
+    }
+
+    @Override
+    public int getNumberOfInErrorTasks() {
+        return numberOfInErrorTasks;
+    }
+
+    public void setNumberOfInErrorTasks(int numberOfInErrorTasks) {
+        this.numberOfInErrorTasks = numberOfInErrorTasks;
     }
 
     @Override

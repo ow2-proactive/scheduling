@@ -132,8 +132,12 @@ public abstract class InternalJob extends JobState {
     @XmlTransient
     private final transient TerminateReplicateTaskHandler terminateReplicateTaskHandler;
 
+    @XmlTransient
+    private final transient Set<TaskId> faultyTasks;
+
     /** Hibernate default constructor */
     public InternalJob() {
+        this.faultyTasks = new HashSet<>();
         this.terminateLoopHandler = new TerminateLoopHandler(this);
         this.terminateIfTaskHandler = new TerminateIfTaskHandler(this);
         this.terminateReplicateTaskHandler = new TerminateReplicateTaskHandler(this);
@@ -154,13 +158,11 @@ public abstract class InternalJob extends JobState {
      */
 
     public InternalJob(String name, JobPriority priority, OnTaskError onTaskError, String description) {
+        this();
         this.name = name;
         this.jobInfo.setPriority(priority);
         this.setOnTaskError(onTaskError);
         this.description = description;
-        this.terminateLoopHandler = new TerminateLoopHandler(this);
-        this.terminateIfTaskHandler = new TerminateIfTaskHandler(this);
-        this.terminateReplicateTaskHandler = new TerminateReplicateTaskHandler(this);
     }
 
     /**
@@ -312,7 +314,7 @@ public abstract class InternalJob extends JobState {
     }
 
     /**
-     * Terminate a task, change status, managing dependences
+     * Terminate a task, change status, managing dependencies
      *
      * Also, apply a Control Flow Action if provided. This may alter the number
      * of tasks in the job, events have to be sent accordingly.
@@ -332,6 +334,11 @@ public abstract class InternalJob extends JobState {
     public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId, SchedulerStateUpdate frontend,
             FlowAction action, TaskResultImpl result) {
         final InternalTask descriptor = tasks.get(taskId);
+
+        if (!errorOccurred) {
+            decreaseNumberOfFaultyTasks(taskId);
+        }
+
         descriptor.setFinishedTime(System.currentTimeMillis());
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
         descriptor.setExecutionDuration(result.getTaskDuration());
@@ -819,8 +826,9 @@ public abstract class InternalJob extends JobState {
         return updatedTasks;
     }
 
-    public void setUnPauseTaskOnError(InternalTask internalTask) {
+    public void restartInErrorTask(InternalTask internalTask) {
         if (internalTask.getStatus() == TaskStatus.IN_ERROR) {
+            setNumberOfInErrorTasks(getNumberOfInErrorTasks() - 1);
             internalTask.setStatus(TaskStatus.PENDING);
             getJobDescriptor().unpause(internalTask.getId());
         }
@@ -958,6 +966,64 @@ public abstract class InternalJob extends JobState {
      */
     public void setNumberOfRunningTasks(int numberOfRunningTasks) {
         jobInfo.setNumberOfRunningTasks(numberOfRunningTasks);
+    }
+
+    public void incrementNumberOfFailedTasksBy(int increment) {
+        jobInfo.setNumberOfFailedTasks(getNumberOfFailedTasks() + increment);
+    }
+
+    /**
+     * To set the numberOfFailedTasks
+     *
+     * @param numberOfFailedTasks
+     *            the numberOfFailedTasks to set
+     */
+    public void setNumberOfFailedTasks(int numberOfFailedTasks) {
+        jobInfo.setNumberOfFailedTasks(numberOfFailedTasks);
+    }
+
+    public boolean saveFaultyTaskId(TaskId taskId) {
+        return faultyTasks.add(taskId);
+    }
+
+    public void increaseNumberOfFaultyTasks(TaskId taskId) {
+        if (faultyTasks.add(taskId)) {
+            incrementNumberOfFaultyTasksBy(1);
+        }
+    }
+
+    public void decreaseNumberOfFaultyTasks(TaskId taskId) {
+        if (faultyTasks.remove(taskId)) {
+            incrementNumberOfFaultyTasksBy(-1);
+        }
+    }
+
+    public void incrementNumberOfFaultyTasksBy(int increment) {
+        jobInfo.setNumberOfFaultyTasks(getNumberOfFaultyTasks() + increment);
+    }
+
+    /**
+     * To set the numberOfFaultyTasks
+     *
+     * @param numberOfFaultyTasks
+     *            the numberOfFaultyTasks to set
+     */
+    public void setNumberOfFaultyTasks(int numberOfFaultyTasks) {
+        jobInfo.setNumberOfFaultyTasks(numberOfFaultyTasks);
+    }
+
+    public void incrementNumberOfInErrorTasksBy(int increment) {
+        jobInfo.setNumberOfInErrorTasks(getNumberOfInErrorTasks() + increment);
+    }
+
+    /**
+     * To set the numberOfInErrorTasks
+     *
+     * @param numberOfInErrorTasks
+     *            the numberOfInErrorTasks to set
+     */
+    public void setNumberOfInErrorTasks(int numberOfInErrorTasks) {
+        jobInfo.setNumberOfInErrorTasks(numberOfInErrorTasks);
     }
 
     /**

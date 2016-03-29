@@ -699,6 +699,7 @@ public abstract class Task extends CommonAttribute {
         return "Task \'" + name + "\' : " + nl +
                 "\tDescription = '" + description + "'" + nl +
                 (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl : "") +
+                (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
                 (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" + maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
                 "\ttag = " + tag + nl +
                 "\tgenericInformations = {" + nl + Joiner.on('\n').withKeyValueSeparator("=").join(genericInformations) + nl + "}" + nl +

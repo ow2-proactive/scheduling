@@ -99,6 +99,15 @@ public class JobInfoImpl implements JobInfo {
     /** number of finished tasks */
     private int numberOfFinishedTasks = 0;
 
+    /** number of failed tasks */
+    private int numberOfFailedTasks = 0;
+
+    /** number of faulty tasks */
+    private int numberOfFaultyTasks = 0;
+
+    /** number of in-error tasks */
+    private int numberOfInErrorTasks = 0;
+
     /** job priority */
     private JobPriority priority = JobPriority.NORMAL;
 
@@ -275,6 +284,33 @@ public class JobInfoImpl implements JobInfo {
      */
     public int getNumberOfRunningTasks() {
         return numberOfRunningTasks;
+    }
+
+    @Override
+    public int getNumberOfFailedTasks() {
+        return numberOfFailedTasks;
+    }
+
+    public void setNumberOfFailedTasks(int numberOfFailedTasks) {
+        this.numberOfFailedTasks = numberOfFailedTasks;
+    }
+
+    @Override
+    public int getNumberOfFaultyTasks() {
+        return numberOfFaultyTasks;
+    }
+
+    public void setNumberOfFaultyTasks(int numberOfFaultyTasks) {
+        this.numberOfFaultyTasks = numberOfFaultyTasks;
+    }
+
+    @Override
+    public int getNumberOfInErrorTasks() {
+        return numberOfInErrorTasks;
+    }
+
+    public void setNumberOfInErrorTasks(int numberOfInErrorTasks) {
+        this.numberOfInErrorTasks = numberOfInErrorTasks;
     }
 
     /**
