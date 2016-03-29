@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -67,6 +68,8 @@ public class RestartTaskCommand extends AbstractTaskCommand implements Command {
 
     private void handleResult(ApplicationContext currentContext, boolean result) {
         resultStack(currentContext).push(result);
+
+        writeDeprecation(currentContext, CommandSet.RESTART_RUNNING_TASK);
 
         if (result) {
             writeLine(currentContext, "%s successfully restarted.", task());

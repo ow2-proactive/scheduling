@@ -260,7 +260,7 @@ public class CommandSet {
 
     public static final CommandSet.Entry JOB_RESUME =
             CommandSetEntryBuilder.newInstance().opt("rj").longOpt("resumejob")
-                    .description("Resume the specified job (restart all 'paused' tasks)")
+                    .description("Resume the specified job by restarting all 'paused' tasks (deprecated, please use --resume-all-paused-tasks)")
                     .hasArgs(true).numOfArgs(1).argNames("job-id")
                     .jsCommand("resumejob(job_id)")
                     .commandClass(ResumeJobCommand.class).entry();
@@ -325,7 +325,7 @@ public class CommandSet {
 
     public static final CommandSet.Entry TASK_RESTART =
             CommandSetEntryBuilder.newInstance().opt("rt").longOpt("restarttask")
-                    .description("Restart the specified running task (deprecated)")
+                    .description("Restart the specified running task (deprecated, please use --restart-running-task)")
                     .hasArgs(true).numOfArgs(2).argNames("job-id task-name")
                     .jsCommand("restarttask(job-id,task-name)")
                     .commandClass(RestartTaskCommand.class).entry();

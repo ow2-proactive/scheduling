@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -52,6 +53,8 @@ public class ResumeJobCommand extends AbstractJobCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+
+        writeDeprecation(currentContext, CommandSet.JOB_RESUME_ALL_PAUSED_TASKS);
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
