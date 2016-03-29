@@ -272,6 +272,13 @@ public class CommandSet {
                     .jsCommand("resumeAllPausedTasks(job_id)")
                     .commandClass(ResumeAllPausedTasksCommand.class).entry();
 
+    public static final CommandSet.Entry JOB_RESUME_ALL_PAUSED_TASKS_AND_RESTART_ALL_IN_ERROR_TASKS =
+            CommandSetEntryBuilder.newInstance().opt("raptaraiet").longOpt("resume-all-paused-tasks-and-restart-all-in-error-tasks")
+                    .description("Resume/restart all paused/in-error tasks for the specified job")
+                    .hasArgs(true).numOfArgs(1).argNames("job-id")
+                    .jsCommand("resumeAllPausedTasksAndRestartAllInErrorTasks(job_id)")
+                    .commandClass(ResumeAllPausedTasksAndRestartAllInErrorTasksCommand.class).entry();
+
     public static final CommandSet.Entry JOB_KILL =
             CommandSetEntryBuilder.newInstance().opt("kj").longOpt("killjob")
                     .description("Kill the specfied job").hasArgs(true).numOfArgs(1)
@@ -540,10 +547,10 @@ public class CommandSet {
                     SCHEDULER_START, SCHEDULER_STOP, SCHEDULER_PAUSE, SCHEDULER_RESUME, SCHEDULER_FREEZE,
                     SCHEDULER_KILL, LINK_RM, SCHEDULER_STATS, JOB_LIST, SUBMIT, JOB_STATE, JOB_OUTPUT,
                     JOB_RESULT, JOB_PRIORITY, JOB_PAUSE, JOB_RESUME, JOB_RESUME_ALL_PAUSED_TASKS,
-                    JOB_RESTART_ALL_IN_ERROR_TASKS, JOB_KILL, JOB_TASK_LIST_BY_TAG,
-                    JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT, TASK_RESULT, TASKS_STATES,
-                    UPLOAD_FILE, DOWNLOAD_FILE, PUT_THIRD_PARTY_CREDENTIAL, REMOVE_THIRD_PARTY_CREDENTIAL,
-                    THIRD_PARTY_CREDENTIAL_KEY_SET, SCHEDULER_HELP, LIVE_LOG };
+                    JOB_RESTART_ALL_IN_ERROR_TASKS, JOB_RESUME_ALL_PAUSED_TASKS_AND_RESTART_ALL_IN_ERROR_TASKS,
+                    JOB_KILL, JOB_TASK_LIST_BY_TAG, JOB_REMOVE, TASK_RESTART, TASK_PREEMPT, TASK_OUTPUT,
+                    TASK_RESULT, TASKS_STATES, UPLOAD_FILE, DOWNLOAD_FILE, PUT_THIRD_PARTY_CREDENTIAL,
+                    REMOVE_THIRD_PARTY_CREDENTIAL, THIRD_PARTY_CREDENTIAL_KEY_SET, SCHEDULER_HELP, LIVE_LOG };
 
     /**
      * CommandSet.Entry objects which are specific to Resource Manager CLI
