@@ -64,14 +64,15 @@ import static org.junit.Assert.*;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.1
  */
-public class TestJobCanceledWithReplication extends SchedulerFunctionalTestNoRestart {
+public class TestJobCanceledWithReplicationSchema33 extends SchedulerFunctionalTestNoRestart {
 
-    private static URL jobDescriptor = TestJobCanceledWithReplication.class
-            .getResource("/functionaltests/descriptors/Job_Aborted_With_Replication.xml");
+    private static URL jobDescriptor33 = TestJobCanceledWithReplicationSchema33.class
+            .getResource("/functionaltests/descriptors/Job_Aborted_With_Replication_Schema33.xml");
+
 
     @Test
-    public void testJobCanceledWithReplication() throws Throwable {
-        String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
+    public void testJobCanceledWithReplicationCompatibilitySchema33() throws Throwable {
+        String jobDescriptorPath = new File(jobDescriptor33.toURI()).getAbsolutePath();
         testJobCanceledWithReplication(jobDescriptorPath);
     }
 

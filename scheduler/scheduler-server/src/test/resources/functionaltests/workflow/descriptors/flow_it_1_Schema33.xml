@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:dev" 
+<job xmlns="urn:proactive:jobdescriptor:3.3" 
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
-     name="Job" priority="low" projectName="myProject" onTaskError="cancelJob">
-
-  <variables>
-    <variable name="bin" value="${pa.scheduler.home}/scheduler/scheduler-server/src/test/resources/functionaltests/workflow" />
-    <variable name="tmp_folder" value="${java.io.tmpdir}/" />
-  </variables>
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.3/schedulerjob.xsd"
+     name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
 
   <taskFlow>
     <task name="T" maxNumberOfExecution="4">
@@ -20,7 +15,7 @@
         <replicate>
           <script>
             <code language="javascript">
-// <![CDATA[
+// <![CDATA[ 
 runs=2;
 // ]]>
             </code>
@@ -35,15 +30,12 @@ runs=2;
       <depends>
         <task ref ="T" />
       </depends>
-	  <nativeExecutable>
-        <staticCommand value="${bin}/it.sh">
-		  <arguments>
-			<argument value="$tmp_folder" />
-			<argument value="$PA_TASK_ITERATION" />
-			<argument value="$PA_TASK_REPLICATION" />
-		  </arguments>
-		</staticCommand>
-	  </nativeExecutable>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.IterationAwareJob">
+		<parameters>
+		  <parameter name="it" value="$PA_TASK_ITERATION" />
+		  <parameter name="dup" value="$PA_TASK_REPLICATION" />
+		</parameters>
+      </javaExecutable>
     </task>
     <task name="T2" maxNumberOfExecution="4">
       <description> // <![CDATA[
@@ -59,7 +51,6 @@ runs=2;
           <script>
             <code language="groovy">
 // <![CDATA[
-
 def ID   = 3;
 def RUNS = 2;
 def f = new File(java.lang.System.getProperty("java.io.tmpdir"), "test_flow_lock_" + ID);

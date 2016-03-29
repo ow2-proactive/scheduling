@@ -572,6 +572,8 @@ class LiveJobs {
                     new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
                     System.currentTimeMillis() - task.getStartTime());
 
+            task.decreaseNumberOfExecutionLeft();
+
             if (task.getNumberOfExecutionLeft() <= 0 &&
                     onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                 endJob(jobData, terminationData, task, taskResult,

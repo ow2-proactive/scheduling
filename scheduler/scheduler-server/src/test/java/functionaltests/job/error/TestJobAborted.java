@@ -66,17 +66,29 @@ public class TestJobAborted extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestJobAborted.class
             .getResource("/functionaltests/descriptors/Job_Aborted.xml");
+    private static URL jobDescriptor33 = TestJobAborted.class
+            .getResource("/functionaltests/descriptors/Job_Aborted_Schema33.xml");
 
     @Test
     public void testJobAborted() throws Throwable {
+        String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
+        testJobAborted(jobDescriptorPath);
+    }
 
+    @Test
+    public void testJobAbortedCompatibilitySchema33() throws Throwable {
+        String jobDescriptorPath = new File(jobDescriptor33.toURI()).getAbsolutePath();
+        testJobAborted(jobDescriptorPath);
+    }
+
+    private void testJobAborted(String jobDescriptorPath) throws Exception {
         String task1Name = "task1";
         String task2Name = "task2";
 
         log("Test 1 : Submitting job...");
 
         //job submission
-        JobId id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId id = schedulerHelper.submitJob(jobDescriptorPath);
 
         //check events reception
         log("Job submitted, id " + id.toString());

@@ -56,6 +56,8 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerFunctional
 
     static URL jobDescriptor = TestSubmitJobWithUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/Job_DataSpaceUnacc.xml");
+    static URL jobDescriptor33 = TestSubmitJobWithUnaccessibleDataSpaces.class
+            .getResource("/functionaltests/dataspaces/Job_DataSpaceUnacc3.3.xml");
 
     static URL configFile = TestSubmitJobWithUnaccessibleDataSpaces.class
             .getResource("/functionaltests/dataspaces/schedulerPropertiesWrongSpaces.ini");
@@ -69,6 +71,13 @@ public class TestSubmitJobWithUnaccessibleDataSpaces extends SchedulerFunctional
     public void testSubmitJobWithUnaccessibleDataSpaces() throws Throwable {
 
         schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI())
+                .getAbsolutePath());
+    }
+
+    @Test
+    public void testSubmitJobWithUnaccessibleDataSpacesSchema33Compatability() throws Throwable {
+
+        schedulerHelper.testJobSubmission(new File(jobDescriptor33.toURI())
                 .getAbsolutePath());
     }
 

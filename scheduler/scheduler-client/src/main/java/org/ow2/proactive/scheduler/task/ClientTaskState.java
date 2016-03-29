@@ -59,6 +59,8 @@ public final class ClientTaskState extends TaskState {
         this.setParallelEnvironment(taskState.getParallelEnvironment());
         this.setGenericInformations(taskState.getGenericInformation());
 
+        this.setOnTaskError(taskState.getOnTaskErrorProperty().getValue());
+
         // Store only task IDs here; #restoreDependences is later called by
         // ClientJobState in order for this instance to store references to the
         // same ClientTaskState instances as the ones held in the
