@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
@@ -58,6 +57,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility;
+import org.apache.commons.codec.binary.StringUtils;
 
 
 public class StringUtility {
@@ -280,17 +280,14 @@ public class StringUtility {
             list.add(Tools.getFormattedDuration(0, taskInfo.getExecutionDuration()));
             list.add(Tools.getFormattedDuration(taskInfo.getFinishedTime(), taskInfo.getStartTime()));
             list.add("" + taskState.getNumberOfNodesNeeded());
-            if (taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft() < taskState
-                    .getMaxNumberOfExecution()) {
-                list.add((taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft() + 1) +
-                        "/" + taskState.getMaxNumberOfExecution());
-            } else {
-                list.add((taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft()) + "/" +
-                        taskState.getMaxNumberOfExecution());
-            }
-            list.add((taskState.getMaxNumberOfExecutionOnFailure() - taskInfo
-                    .getNumberOfExecutionOnFailureLeft()) +
-                    "/" + taskState.getMaxNumberOfExecutionOnFailure());
+
+            list.add(
+                    (taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft())
+                            + "/" + taskState.getMaxNumberOfExecution());
+            list.add(
+                    (taskState.getMaxNumberOfExecutionOnFailure() - taskInfo.getNumberOfExecutionOnFailureLeft())
+                            + "/" + taskState.getMaxNumberOfExecutionOnFailure());
+
             formatter.addLine(list);
         }
 
