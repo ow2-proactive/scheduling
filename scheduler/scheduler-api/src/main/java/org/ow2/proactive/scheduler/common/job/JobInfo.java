@@ -87,6 +87,13 @@ public interface JobInfo extends Serializable {
     long getStartTime();
 
     /**
+     * To get the inError time.
+     *
+     * @return the last time (attempt) at which the job was set in-error.
+     */
+    long getInErrorTime();
+
+    /**
      * To get the submittedTime
      *
      * @return the submittedTime

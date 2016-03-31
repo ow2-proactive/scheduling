@@ -56,6 +56,8 @@ public class JobData {
 
     private long startTime;
 
+    private long inErrorTime;
+
     private long finishedTime;
 
     private long removedTime;
@@ -116,6 +118,7 @@ public class JobData {
         jobInfo.setPriority(getPriority());
         jobInfo.setRemovedTime(getRemovedTime());
         jobInfo.setStartTime(getStartTime());
+        jobInfo.setInErrorTime(getInErrorTime());
         jobInfo.setFinishedTime(getFinishedTime());
         jobInfo.setSubmittedTime(getSubmittedTime());
         jobInfo.setRemovedTime(getRemovedTime());
@@ -161,6 +164,7 @@ public class JobData {
         jobRuntimeData.setOnTaskErrorString(job.getOnTaskErrorProperty().getValue());
         jobRuntimeData.setSubmittedTime(job.getSubmittedTime());
         jobRuntimeData.setStartTime(job.getStartTime());
+        jobRuntimeData.setInErrorTime(job.getInErrorTime());
         jobRuntimeData.setFinishedTime(job.getFinishedTime());
         jobRuntimeData.setRemovedTime(job.getRemovedTime());
         jobRuntimeData.setJobName(job.getName());
@@ -331,6 +335,15 @@ public class JobData {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    @Column(name = "IN_ERROR_TIME")
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     @Column(name = "FINISH_TIME")

@@ -44,6 +44,7 @@ public class JobInfoImpl implements JobInfo {
 
     private long submittedTime = -1;
     private long startTime = -1;
+    private long inErrorTime = -1;
     private long finishedTime = -1;
     private long removedTime = -1;
 
@@ -169,6 +170,15 @@ public class JobInfoImpl implements JobInfo {
     @Override
     public long getStartTime() {
         return startTime;
+    }
+
+    @Override
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     public void setJobStatus(JobStatus jobStatus) {

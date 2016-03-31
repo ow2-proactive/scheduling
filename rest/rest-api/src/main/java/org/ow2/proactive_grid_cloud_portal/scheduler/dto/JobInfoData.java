@@ -40,6 +40,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 public class JobInfoData {
 
     private long startTime;
+    private long inErrorTime;
     private long finishedTime;
     private long submittedTime;
     private long removedTime;
@@ -152,6 +153,14 @@ public class JobInfoData {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     public long getFinishedTime() {

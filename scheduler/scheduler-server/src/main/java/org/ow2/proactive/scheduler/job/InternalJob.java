@@ -50,7 +50,6 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -82,8 +81,8 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-
 import it.sauronsoftware.cron4j.Predictor;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -916,6 +915,16 @@ public abstract class InternalJob extends JobState {
      */
     public void setStartTime(long startTime) {
         jobInfo.setStartTime(startTime);
+    }
+
+    /**
+     * To set the inErrorTime
+     *
+     * @param inErrorTime
+     *            the inErrorTime to set
+     */
+    public void setInErrorTime(long inErrorTime) {
+        jobInfo.setInErrorTime(inErrorTime);
     }
 
     /**

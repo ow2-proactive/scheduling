@@ -524,6 +524,7 @@ class LiveJobs {
 
     private void suspendTaskOnError(JobData jobData, InternalTask task, long taskDuration) {
         InternalJob job = jobData.job;
+        job.setInErrorTime(System.currentTimeMillis());
         job.setTaskPausedOnError(task);
         job.setStatus(JobStatus.IN_ERROR);
         job.incrementNumberOfInErrorTasksBy(1);

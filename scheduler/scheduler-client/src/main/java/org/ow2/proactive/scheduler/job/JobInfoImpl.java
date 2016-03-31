@@ -79,6 +79,10 @@ public class JobInfoImpl implements JobInfo {
     //DEFAULT MUST BE -1
     private long startTime = -1;
 
+    /** job inError time*/
+    //DEFAULT MUST BE -1
+    private long inErrorTime = -1;
+
     /** job finished time*/
     //DEFAULT MUST BE -1
     private long finishedTime = -1;
@@ -134,6 +138,7 @@ public class JobInfoImpl implements JobInfo {
         this.owner = jobInfo.owner;
         this.submittedTime = jobInfo.getSubmittedTime();
         this.startTime = jobInfo.getStartTime();
+        this.inErrorTime = jobInfo.getInErrorTime();
         this.finishedTime = jobInfo.getFinishedTime();
         this.removedTime = jobInfo.getRemovedTime();
         this.totalNumberOfTasks = jobInfo.getTotalNumberOfTasks();
@@ -222,6 +227,15 @@ public class JobInfoImpl implements JobInfo {
      */
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    @Override
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     /**

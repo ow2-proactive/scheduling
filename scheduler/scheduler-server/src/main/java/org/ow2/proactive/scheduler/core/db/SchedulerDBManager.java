@@ -1161,9 +1161,11 @@ public class SchedulerDBManager {
                 }
 
                 String jobUpdate = "update JobData set status = :status, " +
-                    "numberOfFailedTasks = :numberOfFailedTasks, " +
-                    "numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                    "numberOfInErrorTasks = :numberOfInErrorTasks " + "where id = :jobId";
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks, " +
+                        "inErrorTime = :inErrorTime " +
+                        "where id = :jobId";
 
                 JobInfo jobInfo = job.getJobInfo();
 
@@ -1171,6 +1173,7 @@ public class SchedulerDBManager {
                         .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
                         .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                         .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                        .setParameter("inErrorTime", jobInfo.getInErrorTime())
                         .setParameter("jobId", jobId(job)).executeUpdate();
 
                 return null;

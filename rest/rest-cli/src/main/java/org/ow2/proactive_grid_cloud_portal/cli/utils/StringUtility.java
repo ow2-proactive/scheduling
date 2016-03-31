@@ -51,6 +51,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeSourceView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TopologyView;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
@@ -356,7 +357,12 @@ public class StringUtility {
         if (startTime != -1)
             date += " (" + StringUtility.formattedElapsedTime(startTime) + ")";
         row.add(date);
-        row.add(StringUtility.formattedDuration(startTime, jobInfo.getFinishedTime()));
+
+        if (userJobInfo.getJobInfo().getStatus() == JobStatusData.IN_ERROR) {
+            row.add(StringUtility.formattedDuration(startTime, jobInfo.getInErrorTime()));
+        } else {
+            row.add(StringUtility.formattedDuration(startTime, jobInfo.getFinishedTime()));
+        }
 
         return row;
     }

@@ -98,6 +98,7 @@ public class DataUtility {
         impl.setJobPriority(jobPriority(d.getPriority()));
         impl.setRemovedTime(d.getRemovedTime());
         impl.setStartTime(d.getStartTime());
+        impl.setInErrorTime(d.getInErrorTime());
         impl.setJobStatus(jobStatus(d.getStatus()));
         impl.setSubmittedTime(d.getSubmittedTime());
         impl.setTotalNumberOfTasks(d.getTotalNumberOfTasks());

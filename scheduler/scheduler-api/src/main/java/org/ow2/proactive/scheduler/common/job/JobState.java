@@ -380,6 +380,10 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return getJobInfo().getStartTime();
     }
 
+    public long getInErrorTime() {
+        return getJobInfo().getInErrorTime();
+    }
+
     /**
      * To get the totalNumberOfTasks
      *
