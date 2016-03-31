@@ -48,6 +48,7 @@ public class TaskInfoData implements Serializable {
     private TaskIdData taskId;
     private long startTime;
     private long finishedTime;
+    private long lastExecutionTerminationTime;
     private long scheduledTime;
     private long executionDuration;
     private TaskStatusData taskStatus;
@@ -78,6 +79,14 @@ public class TaskInfoData implements Serializable {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public long getLastExecutionTerminationTime() {
+        return lastExecutionTerminationTime;
+    }
+
+    public void setLastExecutionTerminationTime(long lastExecutionTerminationTime) {
+        this.lastExecutionTerminationTime = lastExecutionTerminationTime;
     }
 
     public long getFinishedTime() {

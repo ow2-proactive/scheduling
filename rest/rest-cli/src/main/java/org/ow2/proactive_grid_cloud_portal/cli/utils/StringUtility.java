@@ -55,6 +55,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility;
 import org.apache.commons.codec.binary.StringUtils;
@@ -277,7 +278,13 @@ public class StringUtility {
             list.add((taskState.getReplicationIndex() > 0) ? "" + taskState.getReplicationIndex() : "");
             list.add(taskInfo.getTaskStatus().toString());
             list.add((taskInfo.getExecutionHostName() == null) ? "unknown" : taskInfo.getExecutionHostName());
-            list.add(Tools.getFormattedDuration(0, taskInfo.getExecutionDuration()));
+
+            if (taskInfo.getTaskStatus() == TaskStatusData.IN_ERROR) {
+                list.add(Tools.getFormattedDuration(taskInfo.getLastExecutionTerminationTime(), taskInfo.getStartTime()));
+            } else {
+                list.add(Tools.getFormattedDuration(0, taskInfo.getExecutionDuration()));
+            }
+
             list.add(Tools.getFormattedDuration(taskInfo.getFinishedTime(), taskInfo.getStartTime()));
             list.add("" + taskState.getNumberOfNodesNeeded());
 

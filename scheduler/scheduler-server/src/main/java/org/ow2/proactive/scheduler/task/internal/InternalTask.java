@@ -583,6 +583,10 @@ public abstract class InternalTask extends TaskState {
         taskInfo.setStartTime(startTime);
     }
 
+    public void setLastExecutionTerminationTime(long lastExecutionTerminationTime) {
+        taskInfo.setLastExecutionTerminationTime(lastExecutionTerminationTime);
+    }
+
     /**
      * To set the scheduledTime
      *

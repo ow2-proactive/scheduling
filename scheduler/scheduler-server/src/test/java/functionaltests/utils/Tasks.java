@@ -122,6 +122,10 @@ public class Tasks {
             return false;
         }
 
+        if (a.getLastExecutionTerminationTime() != b.getLastExecutionTerminationTime()) {
+            return false;
+        }
+
         if (a.getFinishedTime() != b.getFinishedTime()) {
             return false;
         }

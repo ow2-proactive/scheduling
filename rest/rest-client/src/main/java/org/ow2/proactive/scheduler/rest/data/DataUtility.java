@@ -34,13 +34,10 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
-import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
@@ -53,6 +50,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -68,6 +66,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskUsageData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+
+import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
 
 
 public class DataUtility {
@@ -115,6 +115,7 @@ public class DataUtility {
         }
         impl.setExecutionDuration(d.getExecutionDuration());
         impl.setExecutionHostName(d.getExecutionHostName());
+        impl.setLastExecutionTerminationTime(d.getLastExecutionTerminationTime());
         impl.setFinishedTime(d.getFinishedTime());
         impl.setNumberOfExecutionLeft(d.getNumberOfExecutionLeft());
         impl.setNumberOfExecutionOnFailureLeft(d.getNumberOfExecutionOnFailureLeft());

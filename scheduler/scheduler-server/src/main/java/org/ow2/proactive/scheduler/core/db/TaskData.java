@@ -21,16 +21,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
@@ -68,6 +58,16 @@ import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
@@ -115,6 +115,9 @@ public class TaskData {
     private long finishedTime;
 
     private long scheduledTime; // START_AT time
+
+    // contains the timestamp at which the Task has been terminated for the last time (last attempt)
+    private long lastExecutionTerminationTime;
 
     private long executionDuration;
 
@@ -518,6 +521,7 @@ public class TaskData {
         internalTask.setName(getTaskName());
         internalTask.setExecutionDuration(getExecutionDuration());
         internalTask.setFinishedTime(getFinishedTime());
+        internalTask.setLastExecutionTerminationTime(getLastExecutionTerminationTime());
         internalTask.setStartTime(getStartTime());
         internalTask.setScheduledTime(getScheduledTime());
         internalTask.setExecutionHostName(getExecutionHostName());
@@ -843,6 +847,15 @@ public class TaskData {
         this.finishedTime = finishedTime;
     }
 
+    @Column(name = "LAST_EXECUTION_TERMINATION_TIME")
+    public long getLastExecutionTerminationTime() {
+        return lastExecutionTerminationTime;
+    }
+
+    public void setLastExecutionTerminationTime(long lastExecutionTerminationTime) {
+        this.lastExecutionTerminationTime = lastExecutionTerminationTime;
+    }
+
     @Column(name = "SCHEDULED_TIME")
     public long getScheduledTime() {
         return scheduledTime;
@@ -1024,6 +1037,7 @@ public class TaskData {
         taskInfo.setStatus(getTaskStatus());
         taskInfo.setStartTime(getStartTime());
         taskInfo.setProgress(0);
+        taskInfo.setLastExecutionTerminationTime(getLastExecutionTerminationTime());
         taskInfo.setNumberOfExecutionOnFailureLeft(getNumberOfExecutionOnFailureLeft());
         taskInfo.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
         taskInfo.setJobInfo(getJobData().toJobInfo());

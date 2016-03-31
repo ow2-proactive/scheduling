@@ -1195,7 +1195,8 @@ public class SchedulerDBManager {
 
         String taskUpdate = "update TaskData task set task.taskStatus = :taskStatus, " +
             "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
-            "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft " +
+            "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
+            "task.lastExecutionTerminationTime = :lastExecutionTerminationTime " +
             "where task.id = :taskId";
 
         Query taskUpdateQuery = session.createQuery(taskUpdate);
@@ -1205,6 +1206,7 @@ public class SchedulerDBManager {
         return taskUpdateQuery.setParameter("taskStatus", taskInfo.getStatus())
                 .setParameter("numberOfExecutionLeft", taskInfo.getNumberOfExecutionLeft())
                 .setParameter("numberOfExecutionOnFailureLeft", taskInfo.getNumberOfExecutionOnFailureLeft())
+                .setParameter("lastExecutionTerminationTime", taskInfo.getLastExecutionTerminationTime())
                 .setParameter("taskId", taskId(task.getId())).executeUpdate();
     }
 

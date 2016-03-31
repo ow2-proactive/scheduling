@@ -484,13 +484,13 @@ class LiveJobs {
                     logger.info("Number of execution left is " + numberOfExecutionLeft);
 
                     if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
-                        suspendTaskOnError(jobData, task);
+                        suspendTaskOnError(jobData, task, result.getTaskDuration());
 
                         logger.info("Task is paused on error");
 
                         return terminationData;
                     } else if (onErrorPolicyInterpreter.requiresPauseJobOnError(task)) {
-                        suspendTaskOnError(jobData, task);
+                        suspendTaskOnError(jobData, task, result.getTaskDuration());
 
                         pauseJob(task.getJobId());
 
@@ -522,11 +522,13 @@ class LiveJobs {
         }
     }
 
-    private void suspendTaskOnError(JobData jobData, InternalTask task) {
+    private void suspendTaskOnError(JobData jobData, InternalTask task, long taskDuration) {
         InternalJob job = jobData.job;
         job.setTaskPausedOnError(task);
         job.setStatus(JobStatus.IN_ERROR);
         job.incrementNumberOfInErrorTasksBy(1);
+
+        task.setLastExecutionTerminationTime(task.getStartTime() + taskDuration);
 
         dbManager.updateJobAndTasksState(job);
 
