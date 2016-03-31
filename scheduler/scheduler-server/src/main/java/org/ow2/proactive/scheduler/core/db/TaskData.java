@@ -116,8 +116,8 @@ public class TaskData {
 
     private long scheduledTime; // START_AT time
 
-    // contains the timestamp at which the Task has been terminated for the last time (last attempt)
-    private long lastExecutionTerminationTime;
+    // contains the timestamp at which the Task has been in-error for the last time (last attempt)
+    private long inErrorTime;
 
     private long executionDuration;
 
@@ -521,7 +521,7 @@ public class TaskData {
         internalTask.setName(getTaskName());
         internalTask.setExecutionDuration(getExecutionDuration());
         internalTask.setFinishedTime(getFinishedTime());
-        internalTask.setLastExecutionTerminationTime(getLastExecutionTerminationTime());
+        internalTask.setInErrorTime(getInErrorTime());
         internalTask.setStartTime(getStartTime());
         internalTask.setScheduledTime(getScheduledTime());
         internalTask.setExecutionHostName(getExecutionHostName());
@@ -847,13 +847,13 @@ public class TaskData {
         this.finishedTime = finishedTime;
     }
 
-    @Column(name = "LAST_EXECUTION_TERMINATION_TIME")
-    public long getLastExecutionTerminationTime() {
-        return lastExecutionTerminationTime;
+    @Column(name = "LAST_IN_ERROR_TIME")
+    public long getInErrorTime() {
+        return inErrorTime;
     }
 
-    public void setLastExecutionTerminationTime(long lastExecutionTerminationTime) {
-        this.lastExecutionTerminationTime = lastExecutionTerminationTime;
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     @Column(name = "SCHEDULED_TIME")
@@ -1037,7 +1037,7 @@ public class TaskData {
         taskInfo.setStatus(getTaskStatus());
         taskInfo.setStartTime(getStartTime());
         taskInfo.setProgress(0);
-        taskInfo.setLastExecutionTerminationTime(getLastExecutionTerminationTime());
+        taskInfo.setInErrorTime(getInErrorTime());
         taskInfo.setNumberOfExecutionOnFailureLeft(getNumberOfExecutionOnFailureLeft());
         taskInfo.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
         taskInfo.setJobInfo(getJobData().toJobInfo());

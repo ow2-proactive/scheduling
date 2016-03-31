@@ -122,7 +122,7 @@ public class Tasks {
             return false;
         }
 
-        if (a.getLastExecutionTerminationTime() != b.getLastExecutionTerminationTime()) {
+        if (a.getInErrorTime() != b.getInErrorTime()) {
             return false;
         }
 

@@ -280,7 +280,7 @@ public class StringUtility {
             list.add((taskInfo.getExecutionHostName() == null) ? "unknown" : taskInfo.getExecutionHostName());
 
             if (taskInfo.getTaskStatus() == TaskStatusData.IN_ERROR) {
-                list.add(Tools.getFormattedDuration(taskInfo.getLastExecutionTerminationTime(), taskInfo.getStartTime()));
+                list.add(Tools.getFormattedDuration(taskInfo.getInErrorTime(), taskInfo.getStartTime()));
             } else {
                 list.add(Tools.getFormattedDuration(0, taskInfo.getExecutionDuration()));
             }

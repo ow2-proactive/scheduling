@@ -583,8 +583,8 @@ public abstract class InternalTask extends TaskState {
         taskInfo.setStartTime(startTime);
     }
 
-    public void setLastExecutionTerminationTime(long lastExecutionTerminationTime) {
-        taskInfo.setLastExecutionTerminationTime(lastExecutionTerminationTime);
+    public void setInErrorTime(long inErrorTime) {
+        taskInfo.setInErrorTime(inErrorTime);
     }
 
     /**

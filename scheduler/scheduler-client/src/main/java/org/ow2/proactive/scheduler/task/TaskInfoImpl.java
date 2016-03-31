@@ -73,8 +73,8 @@ public class TaskInfoImpl implements TaskInfo {
     /** task started time */
     private long startTime = -1;
 
-    /** contains the timestamp at which the Task has been terminated for the last time (last attempt): DEFAULT HAS TO BE SET TO -1 */
-    private long lastExecutionTerminationTime = -1;
+    /** contains the timestamp at which the Task has been in-error for the last time (last attempt): DEFAULT HAS TO BE SET TO -1 */
+    private long inErrorTime = -1;
 
     /** task finished time: DEFAULT HAS TO BE SET TO -1 */
     private long finishedTime = -1;
@@ -111,9 +111,9 @@ public class TaskInfoImpl implements TaskInfo {
         this.taskId = taskInfo.getTaskId();
         this.jobInfo = new JobInfoImpl((JobInfoImpl) taskInfo.getJobInfo());
         this.startTime = taskInfo.getStartTime();
-        this.lastExecutionTerminationTime = taskInfo.getLastExecutionTerminationTime();
+        this.inErrorTime = taskInfo.getInErrorTime();
         this.finishedTime = taskInfo.getFinishedTime();
-        this.lastExecutionTerminationTime = taskInfo.getLastExecutionTerminationTime();
+        this.inErrorTime = taskInfo.getInErrorTime();
         this.scheduledTime = taskInfo.getScheduledTime();
         this.executionDuration = taskInfo.getExecutionDuration();
         this.taskStatus = taskInfo.getStatus();
@@ -203,12 +203,12 @@ public class TaskInfoImpl implements TaskInfo {
         this.startTime = startTime;
     }
 
-    public long getLastExecutionTerminationTime() {
-        return lastExecutionTerminationTime;
+    public long getInErrorTime() {
+        return inErrorTime;
     }
 
-    public void setLastExecutionTerminationTime(long lastExecutionTerminationTime) {
-        this.lastExecutionTerminationTime = lastExecutionTerminationTime;
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     /**

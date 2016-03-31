@@ -528,7 +528,7 @@ class LiveJobs {
         job.setStatus(JobStatus.IN_ERROR);
         job.incrementNumberOfInErrorTasksBy(1);
 
-        task.setLastExecutionTerminationTime(task.getStartTime() + taskDuration);
+        task.setInErrorTime(task.getStartTime() + taskDuration);
 
         dbManager.updateJobAndTasksState(job);
 

@@ -94,7 +94,7 @@ public interface TaskInfo extends Serializable {
      *
      * @return the time at which the Task has been terminated for the last time (last attempt).
      */
-    long getLastExecutionTerminationTime();
+    long getInErrorTime();
 
     /**
      * To get the taskId

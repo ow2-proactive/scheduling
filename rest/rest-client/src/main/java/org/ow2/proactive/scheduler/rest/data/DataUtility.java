@@ -115,7 +115,7 @@ public class DataUtility {
         }
         impl.setExecutionDuration(d.getExecutionDuration());
         impl.setExecutionHostName(d.getExecutionHostName());
-        impl.setLastExecutionTerminationTime(d.getLastExecutionTerminationTime());
+        impl.setInErrorTime(d.getInErrorTime());
         impl.setFinishedTime(d.getFinishedTime());
         impl.setNumberOfExecutionLeft(d.getNumberOfExecutionLeft());
         impl.setNumberOfExecutionOnFailureLeft(d.getNumberOfExecutionOnFailureLeft());

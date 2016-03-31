@@ -49,7 +49,7 @@ public class TaskInfoImpl implements TaskInfo {
 
     private String executionHostName;
 
-    private long lastExecutionTerminationTime = -1;
+    private long inErrorTime = -1;
 
     private long finishedTime = -1;
 
@@ -169,13 +169,12 @@ public class TaskInfoImpl implements TaskInfo {
         return startTime;
     }
 
-    @Override
-    public long getLastExecutionTerminationTime() {
-        return lastExecutionTerminationTime;
+    public long getInErrorTime() {
+        return inErrorTime;
     }
 
-    public void setLastExecutionTerminationTime(long lastExecutionTerminationTime) {
-        this.lastExecutionTerminationTime = lastExecutionTerminationTime;
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     public void setStatus(TaskStatus status) {
