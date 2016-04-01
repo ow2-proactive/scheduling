@@ -95,7 +95,7 @@ public enum TaskStatusData {
      */
     SKIPPED,
     /**
-     * The task is paused on error and waiting for a manual resume action.
+     * @see org.ow2.proactive.scheduler.common.task.TaskStatus#IN_ERROR
      */
     IN_ERROR;
 
