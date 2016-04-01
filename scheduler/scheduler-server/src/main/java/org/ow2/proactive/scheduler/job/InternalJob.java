@@ -827,6 +827,7 @@ public abstract class InternalJob extends JobState {
 
     public void restartInErrorTask(InternalTask internalTask) {
         if (internalTask.getStatus() == TaskStatus.IN_ERROR) {
+            newWaitingTask();
             setNumberOfInErrorTasks(getNumberOfInErrorTasks() - 1);
             internalTask.setStatus(TaskStatus.PENDING);
             getJobDescriptor().unpause(internalTask.getId());

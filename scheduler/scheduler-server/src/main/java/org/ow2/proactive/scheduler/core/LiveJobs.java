@@ -429,7 +429,7 @@ class LiveJobs {
     }
 
     public TerminationData taskTerminatedWithResult(TaskId taskId, TaskResultImpl result) {
-        JobData jobData = lockJob(taskId.getJobId());
+            JobData jobData = lockJob(taskId.getJobId());
         if (jobData == null) {
             return emptyResult(taskId);
         }
@@ -466,6 +466,12 @@ class LiveJobs {
                 logger.info("Task has terminated with an error ");
                 task.decreaseNumberOfExecutionLeft();
 
+                boolean requiresPauseJobOnError = onErrorPolicyInterpreter.requiresPauseJobOnError(task);
+
+                if (requiresPauseJobOnError) {
+                    pauseJob(task.getJobId());
+                }
+
                 int numberOfExecutionLeft = task.getNumberOfExecutionLeft();
 
                 if (numberOfExecutionLeft <= 0 && onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
@@ -489,10 +495,8 @@ class LiveJobs {
                         logger.info("Task is paused on error");
 
                         return terminationData;
-                    } else if (onErrorPolicyInterpreter.requiresPauseJobOnError(task)) {
+                    } else if (requiresPauseJobOnError) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration());
-
-                        pauseJob(task.getJobId());
 
                         logger.info("Job is paused on error");
 
@@ -541,7 +545,6 @@ class LiveJobs {
         JobData jobData = lockJob(jobId);
         try {
             jobData.job.restartInErrorTask(jobData.job.getTask(taskName));
-            jobData.job.newWaitingTask();
             dbManager.updateJobAndTasksState(jobData.job);
             updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
         } finally {
