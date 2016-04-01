@@ -86,11 +86,8 @@ public enum JobStatus implements java.io.Serializable {
      */
     KILLED("Killed", false),
     /**
-     * The job is paused due to one or more tasks in a paused on error state.
-     * When a job is in this state, it is assumed that all running tasks have finished.
-     * However, it is possible to have some tasks in the pending state due to
-     * the execution of the job that is suspended (because some tasks are
-     * in the paused on error state).
+     * The job has at least one in-error task and in-error tasks are the last, among others,
+     * which have changed their state (i.e. Job status is depicted by the last action).
      */
     IN_ERROR("In-Error", true);
 
