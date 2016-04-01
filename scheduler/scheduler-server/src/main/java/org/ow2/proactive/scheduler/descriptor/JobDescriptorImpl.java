@@ -314,9 +314,25 @@ public class JobDescriptorImpl implements JobDescriptor {
 
         //    EligibleTaskDescriptorImpl newTask = (EligibleTaskDescriptorImpl) acc.get(target.getId());
 
-        eligibleTasks.put(target.getId(), newStart);
+        setNewLoopTaskToPausedIfJobIsPaused(newStart);
+
+        putNewLoopTaskIntoPausedOrEligableList(target.getId(), newStart);
 
         runningTasks.remove(initiator);
+    }
+
+    private void putNewLoopTaskIntoPausedOrEligableList(TaskId taskid, EligibleTaskDescriptor newLoopTask) {
+        if (newLoopTask.getInternal().getStatus().equals(TaskStatus.PAUSED)) {
+            pausedTasks.put(taskid, newLoopTask);
+        } else {
+            eligibleTasks.put(taskid, newLoopTask);
+        }
+    }
+
+    private void setNewLoopTaskToPausedIfJobIsPaused(TaskDescriptor newLoopTask) {
+        if (internalJob.getStatus() == JobStatus.PAUSED) {
+            newLoopTask.getInternal().setStatus(TaskStatus.PAUSED);
+        }
     }
 
     /**
