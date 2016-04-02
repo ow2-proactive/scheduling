@@ -85,9 +85,9 @@ import com.google.common.base.Joiner;
  */
 public class InternalJobFactory {
 
-    public static final Logger logger = Logger.getLogger(InternalJobFactory.class);
+    private static final Logger logger = Logger.getLogger(InternalJobFactory.class);
 
-    private final static OnErrorPolicyInterpreter onErrorPolicyInterpreter = new OnErrorPolicyInterpreter();
+    private static final OnErrorPolicyInterpreter onErrorPolicyInterpreter = new OnErrorPolicyInterpreter();
 
     /**
      * Create a new internal job with the given job (user).
