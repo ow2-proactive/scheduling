@@ -84,7 +84,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     /** Job tasks to be able to be schedule */
     @XmlTransient
-    public Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<>();
+    private Map<TaskId, EligibleTaskDescriptor> eligibleTasks = new ConcurrentHashMap<>();
 
     /** Those are not directly eligible, and will be triggered by an IF control flow action */
     @XmlTransient
