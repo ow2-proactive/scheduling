@@ -26,7 +26,7 @@ public class JobDescriptorImplTest {
         pausedJob.getInternal().setStatus(JobStatus.PAUSED);
 
         // Create mocks for the loop root task
-        TaskId runningRootTaskId = TaskIdImpl.createTaskId(new JobIdImpl(1L,"Root"),"FirstLoopTask",1L);
+        TaskId runningRootTaskId = TaskIdImpl.createTaskId(new JobIdImpl(1L, "Root"), "FirstLoopTask", 1L);
         EligibleTaskDescriptorImpl mockLoopStartCurrentlyRunningTask = mock(EligibleTaskDescriptorImpl.class);
         InternalTask mockInternalLoopRootTask = mock(InternalTask.class);
         when(mockInternalLoopRootTask.getId()).thenReturn(runningRootTaskId);
@@ -35,12 +35,13 @@ public class JobDescriptorImplTest {
         when(mockLoopStartCurrentlyRunningTask.getChildren()).thenReturn(new Vector<TaskDescriptor>());
 
         // Create mocks for the new loop task
-        TaskId newLoopTaskId = TaskIdImpl.createTaskId(new JobIdImpl(1L,"Root"),"SecondLoopTask",2L);
+        TaskId newLoopTaskId = TaskIdImpl.createTaskId(new JobIdImpl(1L, "Root"), "SecondLoopTask", 2L);
         EligibleTaskDescriptorImpl mockLoopNewCreatedTaskForLoop = mock(EligibleTaskDescriptorImpl.class);
         InternalTask mockInternalNewLoopTask = mock(InternalTask.class);
         TaskInfo mockNewTaskTaskInfo = mock(TaskInfo.class);
-        when (mockNewTaskTaskInfo.getTaskId()).thenReturn(newLoopTaskId);
+        when(mockNewTaskTaskInfo.getTaskId()).thenReturn(newLoopTaskId);
         when(mockInternalNewLoopTask.getId()).thenReturn(newLoopTaskId);
+        when(mockInternalNewLoopTask.getStatus()).thenReturn(TaskStatus.SUBMITTED);
         when(mockInternalNewLoopTask.getTaskInfo()).thenReturn(mockNewTaskTaskInfo);
         when(mockLoopNewCreatedTaskForLoop.getTaskId()).thenReturn(newLoopTaskId);
         when(mockLoopNewCreatedTaskForLoop.getInternal()).thenReturn(mockInternalNewLoopTask);
