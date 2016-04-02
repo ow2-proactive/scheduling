@@ -117,7 +117,7 @@ public class TaskData {
     private long scheduledTime; // START_AT time
 
     // contains the timestamp at which the Task has been in-error for the last time (last attempt)
-    private long inErrorTime;
+    private long inErrorTime = -1;
 
     private long executionDuration;
 
