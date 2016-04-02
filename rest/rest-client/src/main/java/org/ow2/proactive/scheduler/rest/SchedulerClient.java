@@ -813,7 +813,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
             TimeoutException {
         long timestamp = 0;
-        List<Map.Entry<String, TaskResult>> taskResults = new ArrayList<>();
+        List<Map.Entry<String, TaskResult>> taskResults = new ArrayList<>(taskNames.size());
         for (String taskName : taskNames) {
             timestamp = currentTimeMillis();
             Entry<String, TaskResult> taskResultEntry = toEntry(taskName,

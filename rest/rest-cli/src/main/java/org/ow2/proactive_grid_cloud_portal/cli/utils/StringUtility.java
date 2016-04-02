@@ -103,7 +103,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<>();
+        List<String> titles = new ArrayList<>(3);
         titles.add("Host");
         titles.add("Distance (µs)");
         titles.add("Host");
@@ -115,7 +115,7 @@ public class StringUtility {
             Map<String, String> hostTopology = topology.getDistances().get(host);
             if (hostTopology != null) {
                 for (String anotherHost : hostTopology.keySet()) {
-                    line = new ArrayList<>();
+                    line = new ArrayList<>(3);
                     line.add(host);
                     line.add(hostTopology.get(anotherHost));
                     line.add(anotherHost);
@@ -133,7 +133,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(300);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<>();
+        List<String> titles = new ArrayList<>(7);
         titles.add("SOURCE_NAME");
         titles.add("HOST_NAME");
         titles.add("STATE");
@@ -147,7 +147,7 @@ public class StringUtility {
 
         if (nodeEvents != null) {
             for (NodeEventView nodeEvent : nodeEvents) {
-                List<String> line = new ArrayList<>();
+                List<String> line = new ArrayList<>(7);
                 line.add(nodeEvent.getNodeSource());
                 line.add(nodeEvent.getHostName());
                 line.add(nodeEvent.getNodeState());
@@ -171,7 +171,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<>();
+        List<String> titles = new ArrayList<>(3);
         titles.add("SOURCE_NAME");
         titles.add("DESCRIPTION");
         titles.add("ADMINISTRATOR");
@@ -180,7 +180,7 @@ public class StringUtility {
         formatter.addEmptyLine();
 
         for (NodeSourceView ns : nodeSources) {
-            List<String> line = new ArrayList<>();
+            List<String> line = new ArrayList<>(3);
             line.add(ns.getSourceName());
             line.add(ns.getSourceDescription());
             line.add(ns.getNodeSourceAdmin());
@@ -193,7 +193,7 @@ public class StringUtility {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
-        List<String> titles = new ArrayList<>();
+        List<String> titles = new ArrayList<>(2);
         titles.add("Stats:");
         titles.add("");
         formatter.setTitle(titles);
@@ -307,7 +307,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(30);
         formatter.setSpace(4);
 
-        List<String> columnNames = new ArrayList<>();
+        List<String> columnNames = new ArrayList<>(7);
         columnNames.add("ID");
         columnNames.add("NAME");
         columnNames.add("OWNER");
@@ -388,7 +388,7 @@ public class StringUtility {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(80);
         formatter.setSpace(2);
-        List<String> columnNames = new ArrayList<>();
+        List<String> columnNames = new ArrayList<>(2);
         columnNames.add("");
         columnNames.add("");
         formatter.setTitle(columnNames);

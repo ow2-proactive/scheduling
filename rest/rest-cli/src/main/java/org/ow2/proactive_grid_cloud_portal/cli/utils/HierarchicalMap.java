@@ -110,9 +110,14 @@ public class HierarchicalMap<K, V> implements Map<K, V> {
 
     @Override
     public Collection<V> values() {
-        List<V> values = new ArrayList<>();
-        values.addAll(child.values());
-        values.addAll(parent.values());
+        Collection<V> childValues = child.values();
+        Collection<V> parentValues = parent.values();
+
+        List<V> values = new ArrayList<>(childValues.size() + parentValues.size());
+
+        values.addAll(childValues);
+        values.addAll(parentValues);
+
         return values;
     }
 

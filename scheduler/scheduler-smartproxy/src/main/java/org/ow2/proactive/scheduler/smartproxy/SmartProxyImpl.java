@@ -303,9 +303,10 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         String jname = job.getName();
         log.debug("Pushing files for job " + jname + " from " + localfolder + " to " + remoteFolder);
 
-        List<DataTransferProcessor> transferCallables = new ArrayList<>();
         TaskFlowJob tfj = job;
-        for (Task t : tfj.getTasks()) {
+        ArrayList<Task> tasks = tfj.getTasks();
+        List<DataTransferProcessor> transferCallables = new ArrayList<>(tasks.size());
+        for (Task t : tasks) {
             log.debug("Pushing files for task " + t.getName());
             List<InputSelector> inputFileSelectors = t.getInputFilesList();
             //create the selector

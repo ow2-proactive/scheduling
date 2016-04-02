@@ -149,11 +149,13 @@ public class PluginDescriptor implements Serializable {
      * @throws RMException when error occurs
      */
     public Object[] packParameters(Object[] parameters) throws RMException {
-        List<Object> resultParams = new ArrayList<>();
+        int configurableFieldsSize = configurableFields.size();
+        List<Object> resultParams = new ArrayList<>(configurableFieldsSize);
 
-        if (parameters.length != configurableFields.size()) {
-            throw new RMException("Incorrect number of parameters: expected " + configurableFields.size() +
-                ", provided " + parameters.length);
+        if (parameters.length != configurableFieldsSize) {
+            throw new RMException(
+                    "Incorrect number of parameters: expected " + configurableFieldsSize
+                            + ", provided " + parameters.length);
         }
 
         int counter = 0;

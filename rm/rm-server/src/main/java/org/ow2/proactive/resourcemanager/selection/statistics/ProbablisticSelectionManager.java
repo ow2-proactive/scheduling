@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -141,8 +142,9 @@ public class ProbablisticSelectionManager extends SelectionManager {
             }
 
             // sorting results based on calculated probability
-            List<RMNode> res = new ArrayList<>();
-            res.addAll(intersectionMap.keySet());
+            Set<RMNode> nodeSet = intersectionMap.keySet();
+            List<RMNode> res = new ArrayList<>(nodeSet.size());
+            res.addAll(nodeSet);
             Collections.sort(res, new NodeProbabilityComparator(intersectionMap));
 
             if (logger.isDebugEnabled()) {
@@ -159,7 +161,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
             return res;
         } catch (NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);
-            return new ArrayList<>();
+            return new ArrayList<>(0);
         }
     }
 

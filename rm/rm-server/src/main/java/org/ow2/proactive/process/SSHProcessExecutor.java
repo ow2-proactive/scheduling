@@ -72,7 +72,7 @@ public class SSHProcessExecutor extends ProcessExecutor {
             ProcessExecutor executor = new ProcessExecutor(commandName, command, printOutput, saveOutput);
             return executor;
         } else {
-            List<String> sshCommand = new ArrayList<>();
+            List<String> sshCommand = new ArrayList<>(command.size() + 4);
             sshCommand.add(SSH_PATH);
             sshCommand.add("-o");
             sshCommand.add("StrictHostKeyChecking no");

@@ -67,7 +67,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
     private List<Node> createNodes(String name, int number) throws Exception {
         List<TestNode> nodePool = rmHelper.createNodes("node", 17);
         testNodes.addAll(nodePool);
-        ArrayList<Node> answer = new ArrayList<>();
+        ArrayList<Node> answer = new ArrayList<>(nodePool.size());
         for (TestNode tn : nodePool) {
             answer.add(tn.getNode());
         }
