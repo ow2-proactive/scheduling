@@ -169,6 +169,7 @@ public class TaskInfoImpl implements TaskInfo {
         return startTime;
     }
 
+    @Override
     public long getInErrorTime() {
         return inErrorTime;
     }

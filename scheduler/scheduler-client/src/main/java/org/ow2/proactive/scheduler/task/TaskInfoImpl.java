@@ -203,6 +203,7 @@ public class TaskInfoImpl implements TaskInfo {
         this.startTime = startTime;
     }
 
+    @Override
     public long getInErrorTime() {
         return inErrorTime;
     }

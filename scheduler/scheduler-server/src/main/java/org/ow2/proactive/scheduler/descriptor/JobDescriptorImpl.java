@@ -617,6 +617,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
     }
 
+    @Override
     public void restoreInErrorTasks() {
         final Iterator<Entry<TaskId, EligibleTaskDescriptor>> iterator = eligibleTasks.entrySet().iterator();
 

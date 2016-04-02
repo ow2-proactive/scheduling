@@ -544,7 +544,7 @@ public class SchedulingService {
                 return false;
             }
 
-            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     jobs.restartInErrorTask(jobId, taskName);
@@ -552,8 +552,6 @@ public class SchedulingService {
                     return Boolean.TRUE;
                 }
             }).get();
-
-            return result;
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
                 throw (UnknownTaskException) e.getCause();
