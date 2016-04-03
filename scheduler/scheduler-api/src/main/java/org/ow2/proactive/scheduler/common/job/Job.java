@@ -40,6 +40,7 @@ import com.google.common.base.Joiner;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -55,7 +56,7 @@ import java.util.Map;
  * {@link #setName(String)} will be used to identified the job.<br>
  * {@link #setDescription(String)} to set a short description of your job.<br>
  * {@link #setPriority(JobPriority)} to set the priority for the job, see {@link JobPriority} for more details.<br>
- * {@link #setCancelJobOnError(boolean)} used if you want to abort the job if an exception occurred in at least one of the task.<br>
+ * {@link #setOnTaskError(OnTaskError)} to set a predefined action when an exception occurred in at least one of the task.<br>
  * <p>
  * Once the job created, you can submit it to the scheduler using the UserSchedulerInterface.
  *
