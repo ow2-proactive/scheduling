@@ -55,10 +55,12 @@ import org.ow2.proactive.scheduler.task.ClientTaskState;
 
 
 /**
- * JobInfo provides some informations about a job.<br>
- * These informations and only them are able to change inside the job,
- * that's what the scheduler will send to each listener.<br>
- * To have a job up to date, you must use InternalJob.setJobInfo(JobInfo);<br>.
+ * JobInfo provides some information about the Job it is linked with.
+ * <br>
+ * These information and only them are able to change inside the job,
+ * and that's what the scheduler will send to each listener.
+ * <br>
+ * To have a job up to date, you must use {@code org.ow2.proactive.scheduler.job.InternalJob#setJobInfo(JobInfo)}.
  * This will automatically put the job up to date.
  *
  * @author The ProActive Team
@@ -67,7 +69,7 @@ import org.ow2.proactive.scheduler.task.ClientTaskState;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobInfoImpl implements JobInfo {
 
-    /** job id  : must be initialize to a value in order to create temp taskId */
+    /** job id: must be initialized to a value in order to create temp taskId */
     private JobId jobId = JobIdImpl.makeJobId("0");
 
     private String owner;
@@ -148,6 +150,7 @@ public class JobInfoImpl implements JobInfo {
         this.priority = jobInfo.getPriority();
         this.status = jobInfo.getStatus();
         this.toBeRemoved = jobInfo.toBeRemoved;
+
         if (jobInfo.getTasksSkipped() != null) {
             this.tasksSkipped = new HashSet<>(jobInfo.getTasksSkipped());
         }
@@ -156,6 +159,9 @@ public class JobInfoImpl implements JobInfo {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getJobOwner() {
         return owner;
@@ -166,69 +172,56 @@ public class JobInfoImpl implements JobInfo {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getJobId()
+     * {@inheritDoc}
      */
+    @Override
     public JobId getJobId() {
         return jobId;
     }
 
-    /**
-     * To set the jobId
-     *
-     * @param jobId the jobId to set
-     */
     public void setJobId(JobId jobId) {
         this.jobId = jobId;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getFinishedTime()
+     * {@inheritDoc}
      */
+    @Override
     public long getFinishedTime() {
         return finishedTime;
     }
 
-    /**
-     * To set the finishedTime
-     *
-     * @param finishedTime the finishedTime to set
-     */
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getRemovedTime()
+     * {@inheritDoc}
      */
+    @Override
     public long getRemovedTime() {
         return removedTime;
     }
 
-    /**
-     * To set the removedTime
-     *
-     * @param removedTime the removedTime to set
-     */
     public void setRemovedTime(long removedTime) {
         this.removedTime = removedTime;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getStartTime()
+     * {@inheritDoc}
      */
+    @Override
     public long getStartTime() {
         return startTime;
     }
 
-    /**
-     * To set the startTime
-     *
-     * @param startTime the startTime to set
-     */
     public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long getInErrorTime() {
         return inErrorTime;
@@ -239,67 +232,68 @@ public class JobInfoImpl implements JobInfo {
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getSubmittedTime()
+     * {@inheritDoc}
      */
+    @Override
     public long getSubmittedTime() {
         return submittedTime;
     }
 
-    /**
-     * To set the submittedTime
-     *
-     * @param submittedTime the submittedTime to set
-     */
     public void setSubmittedTime(long submittedTime) {
         this.submittedTime = submittedTime;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getTotalNumberOfTasks()
+     * {@inheritDoc}
      */
+    @Override
     public int getTotalNumberOfTasks() {
         return totalNumberOfTasks;
     }
 
+    public void setTotalNumberOfTasks(int totalNumberOfTasks) {
+        this.totalNumberOfTasks = totalNumberOfTasks;
+    }
+
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getNumberOfFinishedTasks()
+     * {@inheritDoc}
      */
+    @Override
     public int getNumberOfFinishedTasks() {
         return numberOfFinishedTasks;
     }
 
-    /**
-     * To set the numberOfFinishedTasks
-     *
-     * @param numberOfFinishedTasks the numberOfFinishedTasks to set
-     */
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {
         this.numberOfFinishedTasks = numberOfFinishedTasks;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getNumberOfPendingTasks()
+     * {@inheritDoc}
      */
+    @Override
     public int getNumberOfPendingTasks() {
         return numberOfPendingTasks;
     }
 
-    /**
-     * To set the numberOfPendingTasks
-     *
-     * @param numberOfPendingTasks the numberOfPendingTasks to set
-     */
     public void setNumberOfPendingTasks(int numberOfPendingTasks) {
         this.numberOfPendingTasks = numberOfPendingTasks;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getNumberOfRunningTasks()
+     * {@inheritDoc}
      */
+    @Override
     public int getNumberOfRunningTasks() {
         return numberOfRunningTasks;
     }
 
+    public void setNumberOfRunningTasks(int numberOfRunningTasks) {
+        this.numberOfRunningTasks = numberOfRunningTasks;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumberOfFailedTasks() {
         return numberOfFailedTasks;
@@ -309,6 +303,9 @@ public class JobInfoImpl implements JobInfo {
         this.numberOfFailedTasks = numberOfFailedTasks;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumberOfFaultyTasks() {
         return numberOfFaultyTasks;
@@ -318,6 +315,9 @@ public class JobInfoImpl implements JobInfo {
         this.numberOfFaultyTasks = numberOfFaultyTasks;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNumberOfInErrorTasks() {
         return numberOfInErrorTasks;
@@ -328,65 +328,37 @@ public class JobInfoImpl implements JobInfo {
     }
 
     /**
-     * To set the numberOfRunningTasks
-     *
-     * @param numberOfRunningTasks the numberOfRunningTasks to set
+     * {@inheritDoc}
      */
-    public void setNumberOfRunningTasks(int numberOfRunningTasks) {
-        this.numberOfRunningTasks = numberOfRunningTasks;
-    }
-
-    /**
-     * To set the totalNumberOfTasks
-     *
-     * @param totalNumberOfTasks the totalNumberOfTasks to set
-     */
-    public void setTotalNumberOfTasks(int totalNumberOfTasks) {
-        this.totalNumberOfTasks = totalNumberOfTasks;
-    }
-
-    /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getPriority()
-     */
+    @Override
     public JobPriority getPriority() {
         return priority;
     }
 
-    /**
-     * To set The priority.
-     *
-     * @param priority the priority to set
-     */
     public void setPriority(JobPriority priority) {
         this.priority = priority;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getStatus()
+     * {@inheritDoc}
      */
+    @Override
     public JobStatus getStatus() {
         return status;
     }
 
-    /**
-     * To set the status of the job.
-     *
-     * @param status the status to set.
-     */
     public void setStatus(JobStatus status) {
         this.status = status;
     }
 
     /**
-     * @see org.ow2.proactive.scheduler.common.job.JobInfo#isToBeRemoved()
+     * {@inheritDoc}
      */
+    @Override
     public boolean isToBeRemoved() {
         return toBeRemoved;
     }
 
-    /**
-     * Set this job to the state toBeRemoved.
-     */
     public void setToBeRemoved() {
         this.toBeRemoved = true;
     }
@@ -400,14 +372,18 @@ public class JobInfoImpl implements JobInfo {
     }
 
     public void setTasksChanges(ChangedTasksInfo changesInfo, JobState job) {
-        this.modifiedTasks = new ArrayList<>(changesInfo.getNewTasks().size() +
-                changesInfo.getUpdatedTasks().size());
+        this.modifiedTasks =
+                new ArrayList<>(
+                        changesInfo.getNewTasks().size() + changesInfo.getUpdatedTasks().size());
+
         for (TaskId id : changesInfo.getNewTasks()) {
             modifiedTasks.add(new ClientTaskState(job.getHMTasks().get(id)));
         }
+
         for (TaskId id : changesInfo.getUpdatedTasks()) {
             modifiedTasks.add(new ClientTaskState(job.getHMTasks().get(id)));
         }
+
         this.tasksSkipped = new HashSet<>(changesInfo.getSkippedTasks());
     }
 

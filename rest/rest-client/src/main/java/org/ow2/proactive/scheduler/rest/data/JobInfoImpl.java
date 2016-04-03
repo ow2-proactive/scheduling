@@ -181,17 +181,13 @@ public class JobInfoImpl implements JobInfo {
         this.inErrorTime = inErrorTime;
     }
 
-    public void setJobStatus(JobStatus jobStatus) {
-        this.jobStatus = jobStatus;
-    }
-
     @Override
     public JobStatus getStatus() {
         return jobStatus;
     }
 
-    public void setSubmittedTime(long submittedTime) {
-        this.submittedTime = submittedTime;
+    public void setJobStatus(JobStatus jobStatus) {
+        this.jobStatus = jobStatus;
     }
 
     @Override
@@ -199,8 +195,8 @@ public class JobInfoImpl implements JobInfo {
         return submittedTime;
     }
 
-    public void setTotalNumberOfTasks(int totalNumberOfTasks) {
-        this.totalNumberOfTasks = totalNumberOfTasks;
+    public void setSubmittedTime(long submittedTime) {
+        this.submittedTime = submittedTime;
     }
 
     @Override
@@ -208,13 +204,17 @@ public class JobInfoImpl implements JobInfo {
         return totalNumberOfTasks;
     }
 
-    public void setToBeRemoved() {
-        this.toBeRemoved = true;
+    public void setTotalNumberOfTasks(int totalNumberOfTasks) {
+        this.totalNumberOfTasks = totalNumberOfTasks;
     }
 
     @Override
     public boolean isToBeRemoved() {
         return toBeRemoved;
+    }
+
+    public void setToBeRemoved() {
+        this.toBeRemoved = true;
     }
 
 }
