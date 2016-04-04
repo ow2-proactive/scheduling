@@ -468,10 +468,6 @@ class LiveJobs {
 
                 boolean requiresPauseJobOnError = onErrorPolicyInterpreter.requiresPauseJobOnError(task);
 
-                if (requiresPauseJobOnError) {
-                    pauseJob(task.getJobId());
-                }
-
                 int numberOfExecutionLeft = task.getNumberOfExecutionLeft();
 
                 if (numberOfExecutionLeft <= 0 && onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
@@ -497,6 +493,7 @@ class LiveJobs {
                         return terminationData;
                     } else if (requiresPauseJobOnError) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration());
+                        pauseJob(task.getJobId());
 
                         logger.info("Job is paused on error");
 
@@ -515,6 +512,10 @@ class LiveJobs {
                     }
                 } else if (numberOfExecutionLeft <= 0) {
                     jobData.job.increaseNumberOfFaultyTasks(taskId);
+
+                    if (requiresPauseJobOnError) {
+                        pauseJob(task.getJobId());
+                    }
                 }
             }
 
