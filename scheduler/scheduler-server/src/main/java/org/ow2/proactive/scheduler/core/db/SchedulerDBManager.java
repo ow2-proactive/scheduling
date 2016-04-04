@@ -822,7 +822,7 @@ public class SchedulerDBManager {
                 .setParameterList("ids", jobIds)
                 .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
-        Map<Long, List<TaskData>> tasksMap = new HashMap<>(jobIds.size());
+        Map<Long, List<TaskData>> tasksMap = new HashMap<>(jobIds.size(), 1f);
         for (Long id : jobIds) {
             tasksMap.put(id, new ArrayList<TaskData>());
         }
