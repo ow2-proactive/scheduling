@@ -63,6 +63,7 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
@@ -325,11 +326,16 @@ public class StaxJobFactory extends JobFactory {
                 commonPropertiesHolder.setPriority(
                         JobPriority.findPriority(replace(cursorJob.getAttributeValue(i))));
             } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
-                commonPropertiesHolder.setCancelJobOnError(
-                        Boolean.parseBoolean(replace(cursorJob.getAttributeValue(i))));
+                logger.warn(
+                        XMLAttributes.COMMON_CANCELJOB_ON_ERROR.getXMLName()
+                                + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior. CancleJobOnError is translated into 'onTaskError=cancelJob'.");
+                commonPropertiesHolder.setOnTaskError(OnTaskError.CANCEL_JOB);
             } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
                 commonPropertiesHolder.setRestartTaskOnError(
                         RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
+            } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
+                commonPropertiesHolder.setOnTaskError(OnTaskError
+                        .getInstance(replace(cursorJob.getAttributeValue(i))));
             } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attrName)) {
                 commonPropertiesHolder.setMaxNumberOfExecution(
                         Integer.parseInt(replace(cursorJob.getAttributeValue(i))));
@@ -384,7 +390,7 @@ public class StaxJobFactory extends JobFactory {
             job.setName(commonPropertiesHolder.getName());
             job.setPriority(commonPropertiesHolder.getPriority());
             job.setProjectName(commonPropertiesHolder.getProjectName());
-            job.setCancelJobOnError(commonPropertiesHolder.isCancelJobOnError());
+            job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
             job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
             job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
             job.setGenericInformations(commonPropertiesHolder.getGenericInformation());
@@ -627,8 +633,13 @@ public class StaxJobFactory extends JobFactory {
                     int numberOfNodesNeeded = Integer.parseInt(replace(cursorTask.getAttributeValue(i)));
                     tmpTask.setParallelEnvironment(new ParallelEnvironment(numberOfNodesNeeded));
                 } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
-                    tmpTask.setCancelJobOnError(Boolean
-                            .parseBoolean(replace(cursorTask.getAttributeValue(i))));
+                    logger.warn(
+                            XMLAttributes.COMMON_CANCELJOB_ON_ERROR.getXMLName()
+                                    + " attribute is depricated and no longer supported from schema 3.4+. Please use on task error policy to define task error behavior. CancleJobOnError is translated into 'onTaskError=cancelJob'.");
+                    tmpTask.setOnTaskError(OnTaskError.CANCEL_JOB);
+                } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attrName)) {
+                    tmpTask.setOnTaskError(OnTaskError
+                            .getInstance(replace(cursorTask.getAttributeValue(i))));
                 } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
                     tmpTask.setRestartTaskOnError(RestartMode
                             .getMode(replace(cursorTask.getAttributeValue(i))));
@@ -701,10 +712,6 @@ public class StaxJobFactory extends JobFactory {
             autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
             autoCopyfields(Task.class, tmpTask, toReturn);
             if (toReturn != null) {
-                //set the following properties only if it is needed.
-                if (toReturn.getCancelJobOnErrorProperty().isSet()) {
-                    toReturn.setCancelJobOnError(toReturn.isCancelJobOnError());
-                }
                 if (toReturn.getRestartTaskOnErrorProperty().isSet()) {
                     toReturn.setRestartTaskOnError(toReturn.getRestartTaskOnError());
                 }
@@ -1499,7 +1506,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("description: " + job.getDescription());
             logger.debug("projectName: " + job.getProjectName());
             logger.debug("priority: " + job.getPriority());
-            logger.debug("cancelJobOnError: " + job.isCancelJobOnError());
+            logger.debug("onTaskError: " + job.getOnTaskErrorProperty().getValue().toString());
             logger.debug("restartTaskOnError: " + job.getRestartTaskOnError());
             logger.debug("maxNumberOfExecution: " + job.getMaxNumberOfExecution());
             logger.debug("inputSpace: " + job.getInputSpace());
@@ -1519,7 +1526,7 @@ public class StaxJobFactory extends JobFactory {
                 logger.debug("parallel: " + t.isParallel());
                 logger.debug(
                         "nbNodes: " + (t.getParallelEnvironment() == null ? "1" : t.getParallelEnvironment().getNodesNumber()));
-                logger.debug("cancelJobOnError: " + t.isCancelJobOnError());
+                logger.debug("onTaskError: " + t.getOnTaskErrorProperty().getValue().toString());
                 logger.debug("preciousResult: " + t.isPreciousResult());
                 logger.debug("preciousLogs: " + t.isPreciousLogs());
                 logger.debug("restartTaskOnError: " + t.getRestartTaskOnError());

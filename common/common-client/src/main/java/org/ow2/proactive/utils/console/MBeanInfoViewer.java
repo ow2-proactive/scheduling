@@ -226,7 +226,7 @@ public final class MBeanInfoViewer {
                 }
                 this.names = attrNames.toArray(new String[] {});
             }
-            // Get the list of attributes in a single JMX call  
+            // Get the list of attributes in a single JMX call
             final AttributeList list = this.connection.getAttributes(this.mbeanName, this.names);
             for (int i = 0; i < this.names.length; i++) {
                 final String attName = this.names[i];

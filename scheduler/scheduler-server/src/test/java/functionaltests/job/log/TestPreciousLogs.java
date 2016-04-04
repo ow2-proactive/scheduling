@@ -124,7 +124,7 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
             }
 
             task.setMaxNumberOfExecution(1);
-            task.setCancelJobOnError(true);
+            task.setOnTaskError(OnTaskError.CANCEL_JOB);
             task.setPreciousLogs(true);
             task.setName("Task-" + i);
             task.setPreScript(createScript(preOutput));

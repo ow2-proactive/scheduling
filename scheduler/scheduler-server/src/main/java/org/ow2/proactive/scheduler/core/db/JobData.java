@@ -19,6 +19,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -55,6 +56,8 @@ public class JobData {
 
     private long startTime;
 
+    private long inErrorTime;
+
     private long finishedTime;
 
     private long removedTime;
@@ -67,9 +70,20 @@ public class JobData {
 
     private int numberOfFinishedTasks;
 
+    /*
+     * The next three fields are there to prevent
+     * expensive queries in order to display the number of "Issues".
+     */
+    private int numberOfFailedTasks;
+
+    private int numberOfFaultyTasks;
+
+    private int numberOfInErrorTasks;
+
+
     private int maxNumberOfExecution;
 
-    private boolean cancelJobOnError;
+    private String onTaskErrorString;
 
     private JobPriority priority;
 
@@ -98,9 +112,13 @@ public class JobData {
         jobInfo.setNumberOfPendingTasks(getNumberOfPendingTasks());
         jobInfo.setNumberOfRunningTasks(getNumberOfRunningTasks());
         jobInfo.setNumberOfFinishedTasks(getNumberOfFinishedTasks());
+        jobInfo.setNumberOfFailedTasks(getNumberOfFailedTasks());
+        jobInfo.setNumberOfFaultyTasks(getNumberOfFaultyTasks());
+        jobInfo.setNumberOfInErrorTasks(getNumberOfInErrorTasks());
         jobInfo.setPriority(getPriority());
         jobInfo.setRemovedTime(getRemovedTime());
         jobInfo.setStartTime(getStartTime());
+        jobInfo.setInErrorTime(getInErrorTime());
         jobInfo.setFinishedTime(getFinishedTime());
         jobInfo.setSubmittedTime(getSubmittedTime());
         jobInfo.setRemovedTime(getRemovedTime());
@@ -134,7 +152,7 @@ public class JobData {
         internalJob.setGlobalSpace(getGlobalSpace());
         internalJob.setUserSpace(getGlobalSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
-        internalJob.setCancelJobOnError(isCancelJobOnError());
+        internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
 
         return internalJob;
     }
@@ -143,9 +161,10 @@ public class JobData {
 
         JobData jobRuntimeData = new JobData();
         jobRuntimeData.setMaxNumberOfExecution(job.getMaxNumberOfExecution());
-        jobRuntimeData.setCancelJobOnError(job.isCancelJobOnError());
+        jobRuntimeData.setOnTaskErrorString(job.getOnTaskErrorProperty().getValue());
         jobRuntimeData.setSubmittedTime(job.getSubmittedTime());
         jobRuntimeData.setStartTime(job.getStartTime());
+        jobRuntimeData.setInErrorTime(job.getInErrorTime());
         jobRuntimeData.setFinishedTime(job.getFinishedTime());
         jobRuntimeData.setRemovedTime(job.getRemovedTime());
         jobRuntimeData.setJobName(job.getName());
@@ -164,6 +183,9 @@ public class JobData {
         jobRuntimeData.setNumberOfPendingTasks(job.getNumberOfPendingTasks());
         jobRuntimeData.setNumberOfRunningTasks(job.getNumberOfRunningTasks());
         jobRuntimeData.setNumberOfFinishedTasks(job.getNumberOfFinishedTasks());
+        jobRuntimeData.setNumberOfFailedTasks(job.getNumberOfFailedTasks());
+        jobRuntimeData.setNumberOfFaultyTasks(job.getNumberOfFaultyTasks());
+        jobRuntimeData.setNumberOfInErrorTasks(job.getNumberOfInErrorTasks());
         jobRuntimeData.setTotalNumberOfTasks(job.getTotalNumberOfTasks());
 
         return jobRuntimeData;
@@ -210,13 +232,17 @@ public class JobData {
         this.maxNumberOfExecution = maxNumberOfExecution;
     }
 
-    @Column(name = "CANCEL_ON_ERROR", updatable = false, nullable = false)
-    public boolean isCancelJobOnError() {
-        return cancelJobOnError;
+    @Column(name = "ON_TASK_ERROR", updatable = false, nullable = false, length = 25)
+    public String getOnTaskErrorString() {
+        return onTaskErrorString;
     }
 
-    public void setCancelJobOnError(boolean cancelJobOnError) {
-        this.cancelJobOnError = cancelJobOnError;
+    public void setOnTaskErrorString(OnTaskError onTaskError) {
+        this.onTaskErrorString = onTaskError.toString();
+    }
+
+    public void setOnTaskErrorString(String onTaskError) {
+        this.onTaskErrorString = onTaskError;
     }
 
     @Column(name = "JOB_NAME", nullable = false, updatable = false)
@@ -311,6 +337,15 @@ public class JobData {
         this.startTime = startTime;
     }
 
+    @Column(name = "IN_ERROR_TIME")
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
+    }
+
     @Column(name = "FINISH_TIME")
     @Index(name = "JOB_FINISHED_TIME")
     public long getFinishedTime() {
@@ -365,6 +400,33 @@ public class JobData {
 
     public void setNumberOfFinishedTasks(int numberOfFinishedTasks) {
         this.numberOfFinishedTasks = numberOfFinishedTasks;
+    }
+
+    @Column(name = "FAILED_TASKS")
+    public int getNumberOfFailedTasks() {
+        return numberOfFailedTasks;
+    }
+
+    public void setNumberOfFailedTasks(int numberOfFailedTasks) {
+        this.numberOfFailedTasks = numberOfFailedTasks;
+    }
+
+    @Column(name = "FAULTY_TASKS")
+    public int getNumberOfFaultyTasks() {
+        return numberOfFaultyTasks;
+    }
+
+    public void setNumberOfFaultyTasks(int numberOfFaultyTasks) {
+        this.numberOfFaultyTasks = numberOfFaultyTasks;
+    }
+
+    @Column(name = "IN_ERROR_TASKS")
+    public int getNumberOfInErrorTasks() {
+        return numberOfInErrorTasks;
+    }
+
+    public void setNumberOfInErrorTasks(int numberOfInErrorTasks) {
+        this.numberOfInErrorTasks = numberOfInErrorTasks;
     }
 
     @Column(name = "PRIORITY", nullable = false)

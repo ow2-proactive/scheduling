@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scripting.InvalidScriptException;
@@ -118,7 +119,7 @@ public class TestDataspaceConcurrentKilling extends SchedulerFunctionalTestWithC
     public Job createJobWithFileTransfers() throws UserException, InvalidScriptException {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(JOB_NAME);
-        job.setCancelJobOnError(false);
+        job.setOnTaskError(OnTaskError.CONTINUE_JOB_EXECUTION);
         for (int i = 0; i < NB_TASKS; i++) {
             ScriptTask st = new ScriptTask();
             st.setName(TASK_NAME + i);

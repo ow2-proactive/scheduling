@@ -17,7 +17,7 @@
         <ref name="priority"/>
       </optional>
       <optional>
-        <ref name="cancelJobOnError_j"/>
+        <ref name="onTaskError_j"/>
       </optional>
       <optional>
         <ref name="restartTaskOnError_j"/>
@@ -93,11 +93,11 @@
       </choice>
     </attribute>
   </define>
-  <define name="cancelJobOnError_j">
-    <attribute name="cancelJobOnError">
-      <doc:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</doc:documentation>
+  <define name="onTaskError_j">
+    <attribute name="onTaskError">
+      <doc:documentation>Defines the base task error behavior. Cancel job, suspend task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</doc:documentation>
       <choice>
-        <data type="boolean"/>
+        <ref name="onErrorTaskType"/>
         <ref name="variableRefType"/>
       </choice>
     </attribute>
@@ -184,7 +184,7 @@
         <ref name="nodesNumber_t"/>
       </optional>
       <optional>
-        <ref name="cancelJobOnError_t"/>
+        <ref name="onTaskError_t"/>
       </optional>
       <optional>
         <ref name="restartTaskOnError_t"/>
@@ -276,11 +276,11 @@
       </choice>
     </attribute>
   </define>
-  <define name="cancelJobOnError_t">
-    <attribute name="cancelJobOnError">
-      <doc:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</doc:documentation>
+  <define name="onTaskError_t">
+    <attribute name="onTaskError">
+      <doc:documentation>Defines the base task error behavior. Cancel job, suspend task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)</doc:documentation>
       <choice>
-        <data type="boolean"/>
+        <ref name="onErrorTaskType"/>
         <ref name="variableRefType"/>
       </choice>
     </attribute>
@@ -868,6 +868,16 @@
     <choice>
       <value>anywhere</value>
       <value>elsewhere</value>
+      <ref name="variableRefType"/>
+    </choice>
+  </define>
+  <define name="onErrorTaskType">
+    <choice>
+      <value>cancelJob</value>
+      <value>suspendTask</value>
+      <value>pauseJob</value>
+      <value>continueJobExecution</value>
+      <value>none</value>
       <ref name="variableRefType"/>
     </choice>
   </define>

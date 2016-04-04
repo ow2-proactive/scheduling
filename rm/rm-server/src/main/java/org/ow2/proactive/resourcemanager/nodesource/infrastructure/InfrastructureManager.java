@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Timer;
@@ -133,10 +134,13 @@ public abstract class InfrastructureManager implements Serializable {
 	 * @return nodes whose registration status is deploying or lost.
 	 */
 	public ArrayList<RMDeployingNode> getDeployingNodes() {
-		ArrayList<RMDeployingNode> result = new ArrayList<>();
+		ArrayList<RMDeployingNode> result;
 		synchronized (deployingNodes) {
-			result.addAll(this.deployingNodes.values());
-			result.addAll(this.lostNodes.values());
+			Collection<RMDeployingNode> rmDeployingNodes = this.deployingNodes.values();
+			Collection<RMDeployingNode> rmLostNodes = this.lostNodes.values();
+			result = new ArrayList<>(rmDeployingNodes.size() + rmLostNodes.size());
+			result.addAll(rmDeployingNodes);
+			result.addAll(rmLostNodes);
 		}
 		return result;
 	}

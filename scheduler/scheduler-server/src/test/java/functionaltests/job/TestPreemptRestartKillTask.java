@@ -84,12 +84,16 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTestWithResta
 
     @Test
     public void testPreemptRestartKillTask() throws Throwable {
+        String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
+        TestPreemtRestartKillTask(jobDescriptorPath);
+    }
 
+    private void TestPreemtRestartKillTask(String jobDescriptorPath) throws Exception {
         log("Submitting job");
 
         schedulerHelper.addExtraNodes(3);
 
-        JobId id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId id = schedulerHelper.submitJob(jobDescriptorPath);
         log("Wait for event job submitted");
         schedulerHelper.waitForEventJobSubmitted(id);
         log("Wait for event t1 running");

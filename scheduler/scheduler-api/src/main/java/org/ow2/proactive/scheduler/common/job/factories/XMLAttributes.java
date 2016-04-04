@@ -54,6 +54,7 @@ public enum XMLAttributes {
 
     // COMMON
     COMMON_CANCELJOB_ON_ERROR("cancelJobOnError"),
+    COMMON_ON_TASK_ERROR("onTaskError"),
     COMMON_MAX_NUMBER_OF_EXECUTION("maxNumberOfExecution"),
     COMMON_NAME("name"),
     COMMON_RESTART_TASK_ON_ERROR("restartTaskOnError"),

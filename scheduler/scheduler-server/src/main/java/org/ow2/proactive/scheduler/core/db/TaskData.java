@@ -21,18 +21,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
@@ -67,6 +58,16 @@ import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
@@ -115,6 +116,9 @@ public class TaskData {
 
     private long scheduledTime; // START_AT time
 
+    // contains the timestamp at which the Task has been in-error for the last time (last attempt)
+    private long inErrorTime = -1;
+
     private long executionDuration;
 
     private TaskStatus taskStatus;
@@ -123,7 +127,7 @@ public class TaskData {
 
     private int maxNumberOfExecution;
 
-    private boolean cancelJobOnError;
+    private String onTaskErrorString;
 
     private int numberOfExecutionLeft;
 
@@ -407,7 +411,7 @@ public class TaskData {
         taskData.setPreciousResult(task.isPreciousResult());
         taskData.setRunAsMe(task.isRunAsMe());
         taskData.setWallTime(task.getWallTime());
-        taskData.setCancelJobOnError(task.isCancelJobOnError());
+        taskData.setOnTaskErrorString(task.getOnTaskErrorProperty().getValue());
         taskData.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         taskData.setJobData(jobRuntimeData);
         taskData.setNumberOfExecutionOnFailureLeft(
@@ -517,10 +521,11 @@ public class TaskData {
         internalTask.setName(getTaskName());
         internalTask.setExecutionDuration(getExecutionDuration());
         internalTask.setFinishedTime(getFinishedTime());
+        internalTask.setInErrorTime(getInErrorTime());
         internalTask.setStartTime(getStartTime());
         internalTask.setScheduledTime(getScheduledTime());
         internalTask.setExecutionHostName(getExecutionHostName());
-        internalTask.setCancelJobOnError(isCancelJobOnError());
+        internalTask.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
         internalTask.setPreciousLogs(isPreciousLogs());
         internalTask.setPreciousResult(isPreciousResult());
         internalTask.setRunAsMe(isRunAsMe());
@@ -764,13 +769,17 @@ public class TaskData {
         this.maxNumberOfExecution = maxNumberOfExecution;
     }
 
-    @Column(name = "CANCEL_JOB_ON_ERROR", updatable = false)
-    public boolean isCancelJobOnError() {
-        return cancelJobOnError;
+    @Column(name = "ON_TASK_ERROR", updatable = false, nullable = false, length = 25)
+    public String getOnTaskErrorString() {
+        return this.onTaskErrorString;
     }
 
-    public void setCancelJobOnError(boolean cancelJobOnError) {
-        this.cancelJobOnError = cancelJobOnError;
+    public void setOnTaskErrorString(OnTaskError onTaskError) {
+        this.onTaskErrorString = onTaskError.toString();
+    }
+
+    public void setOnTaskErrorString(String onTaskError) {
+        this.onTaskErrorString = onTaskError;
     }
 
     @Column(name = "RES_PREVIEW", length = 1000, updatable = false)
@@ -836,6 +845,15 @@ public class TaskData {
 
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
+    }
+
+    @Column(name = "LAST_IN_ERROR_TIME")
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     @Column(name = "SCHEDULED_TIME")
@@ -1019,6 +1037,7 @@ public class TaskData {
         taskInfo.setStatus(getTaskStatus());
         taskInfo.setStartTime(getStartTime());
         taskInfo.setProgress(0);
+        taskInfo.setInErrorTime(getInErrorTime());
         taskInfo.setNumberOfExecutionOnFailureLeft(getNumberOfExecutionOnFailureLeft());
         taskInfo.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
         taskInfo.setJobInfo(getJobData().toJobInfo());

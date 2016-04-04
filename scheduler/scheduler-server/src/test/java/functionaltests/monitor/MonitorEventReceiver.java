@@ -113,6 +113,7 @@ public class MonitorEventReceiver implements SchedulerEventListener {
             case JOB_CHANGE_PRIORITY:
             case JOB_PAUSED:
             case JOB_RESUMED:
+            case JOB_RESTARTED_FROM_ERROR:
             case TASK_REPLICATED:
             case TASK_SKIPPED:
                 monitorsHandler.handleJobEvent(notification.getEventType(), notification.getData());

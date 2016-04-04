@@ -1,28 +1,31 @@
 package functionaltests.service;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.truth.Truth;
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.TaskFilterCriteria;
-import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.junit.Test;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Functional tests to verify tasks pagination and criteria searches
@@ -327,6 +330,70 @@ public class SchedulerDBManagerTest extends BaseServiceTest {
         }
         assertEquals("Incorrect tasks list size due to coupled dates from/to", totalNbTasks,
                 actualPageState.getList().size());
+    }
+
+    @Test
+    public void testUpdateJobAndTasksState() throws Exception {
+        InternalJob job = createTestJob("test", "tag", 1);
+
+        service.submitJob(job);
+
+        job.setStatus(JobStatus.KILLED);
+        job.setNumberOfFailedTasks(2);
+        job.setNumberOfFaultyTasks(3);
+        job.setNumberOfInErrorTasks(5);
+        job.setInErrorTime(7);
+
+        InternalTask internalTask = job.getITasks().get(0);
+        internalTask.setStatus(TaskStatus.IN_ERROR);
+        internalTask.setInErrorTime(11);
+
+        dbManager.updateJobAndTasksState(job);
+
+        Page<JobInfo> jobs = dbManager.getJobs(0, 10, null, true, true, true, null);
+
+        assertThat(jobs.getSize()).isEqualTo(1);
+
+        JobInfo jobInfo = jobs.getList().get(0);
+
+        assertThat(jobInfo.getStatus()).isEqualTo(JobStatus.KILLED);
+        assertThat(jobInfo.getNumberOfFailedTasks()).isEqualTo(2);
+        assertThat(jobInfo.getNumberOfFaultyTasks()).isEqualTo(3);
+        assertThat(jobInfo.getNumberOfInErrorTasks()).isEqualTo(5);
+        assertThat(jobInfo.getInErrorTime()).isEqualTo(7);
+
+        Page<TaskState> tasks =
+                dbManager.getTaskStates(
+                        0, 10, null, 0, 10, null, true, true, true, new SortSpecifierContainer());
+
+        assertThat(tasks.getSize()).isEqualTo(1);
+
+        TaskState taskState = tasks.getList().get(0);
+
+        assertThat(taskState.getStatus()).isEqualTo(TaskStatus.IN_ERROR);
+        assertThat(taskState.getTaskInfo().getInErrorTime()).isEqualTo(11);
+    }
+
+    @Test
+    public void testUpdateTaskState() throws Exception {
+        InternalJob job = createTestJob("test", "tag", 1);
+
+        service.submitJob(job);
+
+        InternalTask internalTask = job.getITasks().get(0);
+        internalTask.setStatus(TaskStatus.ABORTED);
+
+        dbManager.updateTaskState(internalTask);
+
+        Page<TaskState> tasks =
+                dbManager.getTaskStates(
+                        0, 10, null, 0, 10, null, true, true, true, new SortSpecifierContainer());
+
+        assertThat(tasks.getSize()).isEqualTo(1);
+
+        TaskState taskState = tasks.getList().get(0);
+
+        assertThat(taskState.getStatus()).isEqualTo(TaskStatus.ABORTED);
     }
 
     private void initExpectedResults(String jobName, String tag) throws Throwable {

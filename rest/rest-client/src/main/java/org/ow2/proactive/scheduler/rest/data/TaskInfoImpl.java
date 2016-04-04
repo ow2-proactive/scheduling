@@ -49,6 +49,8 @@ public class TaskInfoImpl implements TaskInfo {
 
     private String executionHostName;
 
+    private long inErrorTime = -1;
+
     private long finishedTime = -1;
 
     private long scheduledTime = -1;
@@ -165,6 +167,15 @@ public class TaskInfoImpl implements TaskInfo {
     @Override
     public long getStartTime() {
         return startTime;
+    }
+
+    @Override
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     public void setStatus(TaskStatus status) {

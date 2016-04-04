@@ -48,7 +48,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
@@ -66,7 +65,17 @@ import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
-import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -107,6 +116,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
+import org.apache.log4j.Logger;
 
 
 
@@ -559,7 +569,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             UnknownJobException, UnknownTaskException, PermissionException {
         //checking permissions
         frontendState
-                .checkJobOwner("restartTask", jobId, "You do not have permission to restart this task !");
+                .checkJobOwner("restartTask", jobId, "You do not have permission to restart this task!");
         return schedulingService.restartTask(jobId, taskName, restartDelay);
     }
 
@@ -571,6 +581,20 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public boolean restartTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         return restartTask(JobIdImpl.makeJobId(jobId), taskName, restartDelay);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
+    public boolean restartInErrorTask(String jobId,
+            String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        //checking permissions
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState
+                .checkJobOwner("restartTaskOnError", jobIdObject, "You do not have permission to restart this task!");
+        return schedulingService.restartInErrorTask(jobIdObject, taskName);
     }
 
     /**
@@ -863,6 +887,14 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return this.removeJob(JobIdImpl.makeJobId(jobId));
+    }
+
+    @Override
+    public boolean restartAllInErrorTasks(
+            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkJobOwner("restartAllInErrorTasks", jobIdObject, "You do not have permission to restart in error tasks in this job!");
+        return schedulingService.restartAllInErrorTasks(jobIdObject);
     }
 
     /**

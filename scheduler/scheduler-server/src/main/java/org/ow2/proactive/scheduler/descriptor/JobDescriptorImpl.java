@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     private Map<TaskId, EligibleTaskDescriptor> branchTasks = new ConcurrentHashMap<>();
 
     /** Job running tasks */
-    private Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<>();
+    public Map<TaskId, TaskDescriptor> runningTasks = new ConcurrentHashMap<>();
 
     /** Job paused tasks */
     private Map<TaskId, EligibleTaskDescriptor> pausedTasks = new HashMap<>();
@@ -313,9 +314,25 @@ public class JobDescriptorImpl implements JobDescriptor {
 
         //    EligibleTaskDescriptorImpl newTask = (EligibleTaskDescriptorImpl) acc.get(target.getId());
 
-        eligibleTasks.put(target.getId(), newStart);
+        setNewLoopTaskToPausedIfJobIsPaused(newStart);
+
+        putNewLoopTaskIntoPausedOrEligableList(target.getId(), newStart);
 
         runningTasks.remove(initiator);
+    }
+
+    private void putNewLoopTaskIntoPausedOrEligableList(TaskId taskid, EligibleTaskDescriptor newLoopTask) {
+        if (newLoopTask.getInternal().getStatus().equals(TaskStatus.PAUSED)) {
+            pausedTasks.put(taskid, newLoopTask);
+        } else {
+            eligibleTasks.put(taskid, newLoopTask);
+        }
+    }
+
+    private void setNewLoopTaskToPausedIfJobIsPaused(TaskDescriptor newLoopTask) {
+        if (internalJob.getStatus() == JobStatus.PAUSED) {
+            newLoopTask.getInternal().setStatus(TaskStatus.PAUSED);
+        }
     }
 
     /**
@@ -328,8 +345,8 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param elseTarget the START task of the ELSE branch that will not be executed
      * @param elseTasks list of tasks contained in the not executed ELSE branch
      */
-    public void doIf(TaskId initiator, TaskId branchStart, TaskId branchEnd, TaskId ifJoin,
-            TaskId elseTarget, List<InternalTask> elseTasks) {
+    public void doIf(TaskId initiator, TaskId branchStart, TaskId branchEnd, TaskId ifJoin, TaskId elseTarget,
+            List<InternalTask> elseTasks) {
         EligibleTaskDescriptorImpl init = (EligibleTaskDescriptorImpl) runningTasks.get(initiator);
         EligibleTaskDescriptorImpl start = (EligibleTaskDescriptorImpl) branchTasks.get(branchStart);
         EligibleTaskDescriptorImpl end = null;
@@ -527,11 +544,14 @@ public class JobDescriptorImpl implements JobDescriptor {
 
             if (lt != null) {
                 for (TaskDescriptor task : lt.getChildren()) {
-                    ((EligibleTaskDescriptorImpl) task).setCount(((EligibleTaskDescriptorImpl) task)
-                            .getCount() - 1);
+                    ((EligibleTaskDescriptorImpl) task)
+                            .setCount(((EligibleTaskDescriptorImpl) task).getCount() - 1);
 
                     if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
                         if (internalJob.getStatus() == JobStatus.PAUSED) {
+                            pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                        } else if (internalJob.getStatus() == JobStatus.IN_ERROR
+                                && task.getInternal().getStatus() == TaskStatus.PAUSED) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
                         } else {
                             eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
@@ -544,6 +564,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                 }
             }
         }
+
         runningTasks.remove(taskId);
     }
 
@@ -568,21 +589,46 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public void pause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            TaskDescriptor lt = eligibleTasks.get(taskId);
+            EligibleTaskDescriptor eligibleTaskDescriptor = eligibleTasks.remove(taskId);
 
-            if (lt != null) {
-                pausedTasks.put(taskId, eligibleTasks.remove(taskId));
+            if (eligibleTaskDescriptor != null) {
+                pausedTasks.put(taskId, eligibleTaskDescriptor);
+            }
+        }
+    }
+
+    public void pausedTaskOnError(TaskId taskId) {
+        if (getInternal().getType() == JobType.TASKSFLOW) {
+            TaskDescriptor taskDescriptor = runningTasks.remove(taskId);
+
+            if (taskDescriptor != null) {
+                pausedTasks.put(taskId, (EligibleTaskDescriptor) taskDescriptor);
             }
         }
     }
 
     public void unpause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            EligibleTaskDescriptor lt = pausedTasks.get(taskId);
+            EligibleTaskDescriptor eligibleTaskDescriptor = pausedTasks.remove(taskId);
 
-            if (lt != null) {
-                eligibleTasks.put(taskId, lt);
-                pausedTasks.remove(taskId);
+            if (eligibleTaskDescriptor != null) {
+                eligibleTasks.put(taskId, eligibleTaskDescriptor);
+            }
+        }
+    }
+
+    @Override
+    public void restoreInErrorTasks() {
+        final Iterator<Entry<TaskId, EligibleTaskDescriptor>> iterator = eligibleTasks.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Entry<TaskId, EligibleTaskDescriptor> entry = iterator.next();
+            TaskId taskId = entry.getKey();
+            EligibleTaskDescriptor task = entry.getValue();
+
+            if (task.getInternal().getStatus() == TaskStatus.IN_ERROR) {
+                pausedTasks.put(taskId, task);
+                iterator.remove();
             }
         }
     }

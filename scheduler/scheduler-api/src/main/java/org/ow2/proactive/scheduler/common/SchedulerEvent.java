@@ -53,7 +53,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public enum SchedulerEvent {
 
-    //WARNING : New State must be added at the end of the existing one in order to keep associated ordinal number.
+    // WARNING: New State must be added at the end of the existing one in order to keep associated ordinal number.
 
     /** The scheduler has just been frozen, this pause will stop every process except the running one. */
     FROZEN("Frozen"),
@@ -74,8 +74,8 @@ public enum SchedulerEvent {
     /** A job has just been scheduled. At least one of its task is running. */
     JOB_PENDING_TO_RUNNING("Job pending to running"),
     /** A job has just been resumed. */
-    JOB_RESUMED("Job resumed"),
-    /** A job has just been submitted. */
+    JOB_RESUMED("Job resumed")
+,    /** A job has just been submitted. */
     JOB_SUBMITTED("Job submitted"),
     /** A job has just finished. All tasks are finished. */
     JOB_RUNNING_TO_FINISHED("Job running to finished"),
@@ -108,7 +108,17 @@ public enum SchedulerEvent {
     /** A new task progress value is available */
     TASK_PROGRESS("Task progress"),
     /** The database is no more available. */
-    DB_DOWN("DB down");
+    DB_DOWN("DB down"),
+
+    /**
+     * A job has just been paused on error. It means that job execution can no longer progress
+     * due to one or more tasks which are in paused on error state.
+     */
+    JOB_IN_ERROR("Job In-Error"),
+    /** A task has just been paused due to an error while executing */
+    TASK_IN_ERROR("Task In-Error"),
+    /** A job has just been restarted from error. */
+    JOB_RESTARTED_FROM_ERROR("Job restarted from error");
 
     /** Name of the method */
     private String methodName;

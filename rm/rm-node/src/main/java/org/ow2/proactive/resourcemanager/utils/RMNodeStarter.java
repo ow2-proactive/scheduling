@@ -387,7 +387,7 @@ public class RMNodeStarter {
     }
 
     private List<Node> createNodes(String nodeName) {
-        List<Node> nodes = new ArrayList<>();
+        List<Node> nodes = new ArrayList<>(workers);
         List<String> createdNodeNames = getWorkersNodeNames(nodeName, workers);
         for (int nodeIndex = 0; nodeIndex < workers; nodeIndex++) {
             Node node = createLocalNode(createdNodeNames.get(nodeIndex));

@@ -106,7 +106,11 @@ public enum TaskStatus implements java.io.Serializable {
     /**
      * The task was not executed: it was the non-selected branch of an IF/ELSE control flow action
      */
-    SKIPPED("Skipped", false);
+    SKIPPED("Skipped", false),
+    /**
+     * The task is suspended after first error and is waiting for a manual restart action.
+     */
+    IN_ERROR("In-Error", true);
 
     /** The name of the current status. */
     private String name;
@@ -134,4 +138,5 @@ public enum TaskStatus implements java.io.Serializable {
     public String toString() {
         return name;
     }
+    
 }

@@ -62,9 +62,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
@@ -89,6 +86,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestExce
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 @Path("/scheduler/")
 public interface SchedulerRestInterface {
@@ -957,6 +957,20 @@ public interface SchedulerRestInterface {
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
+     * Restart all tasks in error in the job represented by jobid
+     * @param sessionId a valid session id
+     * @param jobId the id of the job
+     * @return true if success, false if not
+     */
+    @PUT
+    @Path("jobs/{jobid}/restartAllInErrorTasks")
+    @Produces("application/json")
+    boolean restartAllInErrorTasks(
+            @HeaderParam("sessionid") final String sessionId,
+            @PathParam("jobid") final String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    /**
      * Resumes the job represented by jobid
      * @param sessionId a valid session id
      * @param jobId the id of the job
@@ -1479,6 +1493,16 @@ public interface SchedulerRestInterface {
             @PathParam("taskname") String taskname)
                     throws NotConnectedRestException, UnknownJobRestException,
                     UnknownTaskRestException, PermissionRestException;
+
+    @PUT
+    @Path("jobs/{jobid}/tasks/{taskname}/restartInErrorTask")
+    @Produces("application/json")
+    boolean restartInErrorTask(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobid,
+            @PathParam("taskname") String taskname)
+            throws NotConnectedRestException, UnknownJobRestException,
+            UnknownTaskRestException, PermissionRestException;
 
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/preempt")

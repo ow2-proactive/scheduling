@@ -35,6 +35,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 public enum TaskStatusData {
+
     /**
      * The task has just been submitted by the user.
      */
@@ -92,5 +93,10 @@ public enum TaskStatusData {
     /**
      * The task was not executed: it was the non-selected branch of an IF/ELSE control flow action
      */
-    SKIPPED
+    SKIPPED,
+    /**
+     * @see org.ow2.proactive.scheduler.common.task.TaskStatus#IN_ERROR
+     */
+    IN_ERROR;
+
 }

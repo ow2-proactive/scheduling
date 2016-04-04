@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job cancelJobOnError="false" maxNumberOfExecution="1" name="RecoveryReplicate" priority="normal" projectName="Not Assigned"
+<job onTaskError="continueJobExecution" maxNumberOfExecution="1" name="RecoveryReplicate" priority="normal" projectName="Not Assigned"
      restartTaskOnError="anywhere" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="urn:proactive:jobdescriptor:dev" xmlns="urn:proactive:jobdescriptor:dev">
     <description>No description</description>

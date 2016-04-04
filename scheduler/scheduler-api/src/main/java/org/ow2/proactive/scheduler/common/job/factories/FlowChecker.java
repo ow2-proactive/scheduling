@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common.job.factories;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -203,7 +204,6 @@ public class FlowChecker {
      * Enforces job name uniqueness ; already done on XML side, but API manipulations
      * are unchecked
      * 
-     * @param job the job to validate
      * @throws FlowError
      */
     private void checkNames() throws FlowError {
@@ -483,7 +483,7 @@ public class FlowChecker {
 
                     TaskTree ifT = tasks.get(tree.element.getFlowScript().getActionTarget());
                     TaskTree elseT = tasks.get(tree.element.getFlowScript().getActionTargetElse());
-                    List<TaskTree> tgs = new ArrayList<>();
+                    List<TaskTree> tgs = new ArrayList<>(2);
                     tgs.add(ifT);
                     tgs.add(elseT);
                     for (TaskTree tree2 : tgs) {
@@ -522,8 +522,9 @@ public class FlowChecker {
             }
         }
 
-        this.tasksFlat = new ArrayList<>();
-        for (TaskTree t : tasks.values()) {
+        Collection<TaskTree> values = tasks.values();
+        this.tasksFlat = new ArrayList<>(values.size());
+        for (TaskTree t : values) {
             tasksFlat.add(t);
         }
 
@@ -662,7 +663,6 @@ public class FlowChecker {
     /**
      * Checks the provided taskflow against rules specific to the IF control flow action
      * 
-     * @param job the job to check
      * @throws FlowError
      */
     private void checkIf() throws FlowError {
@@ -696,7 +696,7 @@ public class FlowChecker {
                             targetElse.element.getName());
                     }
 
-                    List<TaskTree> targets = new ArrayList<>();
+                    List<TaskTree> targets = new ArrayList<>(2);
                     targets.add(targetIf);
                     targets.add(targetElse);
 

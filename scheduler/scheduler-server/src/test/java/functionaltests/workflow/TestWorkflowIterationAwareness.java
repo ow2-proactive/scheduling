@@ -73,6 +73,12 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRes
     private static final URL native_job = TestWorkflowIterationAwareness.class
             .getResource("/functionaltests/workflow/descriptors/flow_it_2.xml");
 
+    private static final URL java_job_Schema33 = TestWorkflowIterationAwareness.class
+            .getResource("/functionaltests/workflow/descriptors/flow_it_1_Schema33.xml");
+
+    private static final URL native_job_Schema33 = TestWorkflowIterationAwareness.class
+            .getResource("/functionaltests/workflow/descriptors/flow_it_2_Schema33.xml");
+
     private static final String tmpFolder = System.getProperty("java.io.tmpdir");
 
     private static final String preScript = //
@@ -92,17 +98,30 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRes
      */
     @Test
     public void testWorkflowIterationAwareness() throws Throwable {
-        testJavaJob();
-        testNativeJob();
+        testJavaJob(new File(java_job.toURI()).getAbsolutePath());
+        testNativeJob(new File(native_job.toURI()).getAbsolutePath());
+    }
+
+    /**
+     * Checks Java and Native executables workflows in schema 33
+     * on a loop/replicate job for propagation of iteration and replication indexes in :
+     * native arguments, java arguments, pre/post scripts, native environment variables, java properties
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testWorkflowIterationAwarenessCompatibilitySchema33() throws Throwable {
+        testJavaJob(new File(java_job_Schema33.toURI()).getAbsolutePath());
+        testNativeJob(new File(native_job_Schema33.toURI()).getAbsolutePath());
     }
 
     /**
      * java task through xml
      */
-    private void testJavaJob() throws Throwable {
+    private void testJavaJob(String jobDescriptorPath) throws Throwable {
 
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
-                new File(java_job.toURI()).getAbsolutePath());
+                jobDescriptorPath);
         ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
         ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
 
@@ -134,9 +153,9 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRes
     /**
      * native task through xml
      */
-    private void testNativeJob() throws Throwable {
+    private void testNativeJob(String jobDescriptorPath) throws Throwable {
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
-                new File(native_job.toURI()).getAbsolutePath());
+                jobDescriptorPath);
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));

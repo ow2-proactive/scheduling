@@ -14,6 +14,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -186,12 +187,12 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
     private TaskFlowJob createJobWithFailingTask() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName() + "_FailingTask");
-        job.setCancelJobOnError(false);
+        job.setOnTaskError(OnTaskError.CONTINUE_JOB_EXECUTION);
         JavaTask task = new JavaTask();
         task.setExecutableClassName(FailingTestJavaTask.class.getName());
         task.setName("task1");
         task.setMaxNumberOfExecution(3);
-        task.setCancelJobOnError(false);
+        task.setOnTaskError(OnTaskError.NONE);
         job.addTask(task);
         return job;
     }

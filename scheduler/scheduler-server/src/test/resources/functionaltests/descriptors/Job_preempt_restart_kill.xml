@@ -27,7 +27,7 @@
 				</parameters>
 			</javaExecutable>
 		</task>
-		<task name="t4" cancelJobOnError="true" maxNumberOfExecution="3">
+		<task name="t4" onTaskError="cancelJob" maxNumberOfExecution="3">
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="120"/>
