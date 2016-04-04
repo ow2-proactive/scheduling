@@ -175,7 +175,7 @@ class LiveJobs {
                 }
             }
 
-            job.setStatus(JobStatus.IN_ERROR);
+            setJobStatusToInErrorIfNotPaused(job);
 
             dbManager.updateJobAndTasksState(job);
             updateJobInSchedulerState(job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
@@ -531,7 +531,7 @@ class LiveJobs {
         InternalJob job = jobData.job;
         job.setInErrorTime(System.currentTimeMillis());
         job.setTaskPausedOnError(task);
-        job.setStatus(JobStatus.IN_ERROR);
+        setJobStatusToInErrorIfNotPaused(job);
         job.incrementNumberOfInErrorTasksBy(1);
 
         task.setInErrorTime(task.getStartTime() + taskDuration);
@@ -540,6 +540,12 @@ class LiveJobs {
 
         updateTaskPausedOnerrorState(job, task.getId());
         updateJobInSchedulerState(job, SchedulerEvent.JOB_IN_ERROR);
+    }
+
+    private void setJobStatusToInErrorIfNotPaused(InternalJob job) {
+        if(!job.getStatus().equals(JobStatus.PAUSED)) {
+            job.setStatus(JobStatus.IN_ERROR);
+        }
     }
 
     void restartInErrorTask(JobId jobId, String taskName) throws UnknownTaskException {
