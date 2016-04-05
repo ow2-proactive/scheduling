@@ -53,7 +53,7 @@ public enum XMLAttributes {
     JOB_PROJECT_NAME("projectName"),
 
     // COMMON
-    COMMON_CANCELJOB_ON_ERROR("cancelJobOnError"),
+    COMMON_CANCEL_JOB_ON_ERROR("cancelJobOnError"),
     COMMON_ON_TASK_ERROR("onTaskError"),
     COMMON_MAX_NUMBER_OF_EXECUTION("maxNumberOfExecution"),
     COMMON_NAME("name"),
