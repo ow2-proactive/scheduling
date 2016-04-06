@@ -62,7 +62,6 @@ public class AuthenticationTest extends RMFunctionalTest {
         loginAsUser(auth);
         loginIncorrectAdminPassword(auth);
         loginIncorrectUserPassword(auth);
-        loginTwice(auth);
     }
 
     private void loginAsAdmin(RMAuthentication auth) throws LoginException, KeyException {
@@ -111,21 +110,6 @@ public class AuthenticationTest extends RMFunctionalTest {
                     auth.getPublicKey());
             auth.login(cred);
             fail("Error: successful authentication");
-        } catch (LoginException e) {
-            log("Passed: expected error " + e.getMessage());
-        }
-    }
-
-    private void loginTwice(RMAuthentication auth) throws KeyException {
-        log("Test 5");
-        log("Trying to connect twice from one active object");
-
-        try {
-            Credentials cred = Credentials.createCredentials(new CredData(TestUsers.DEMO.username,
-                TestUsers.DEMO.password), auth.getPublicKey());
-            auth.login(cred);
-            auth.login(cred);
-            fail("Error: second authentication was successful");
         } catch (LoginException e) {
             log("Passed: expected error " + e.getMessage());
         }
