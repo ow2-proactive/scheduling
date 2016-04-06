@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2011 INRIA/University of
+ * Copyright (C) 1997-2015 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -127,20 +127,5 @@ public class AuthenticationTest extends RMConsecutive {
         } catch (Exception e) {
             RMTHelper.log("Passed: expected error " + e.getMessage());
         }
-
-        RMTHelper.log("Test 5");
-        RMTHelper.log("Trying to connect twice from one active object");
-
-        try {
-            Credentials cred = Credentials.createCredentials(new CredData(adminName, adminPwd), auth
-                    .getPublicKey());
-            auth.login(cred);
-            auth.login(cred);
-            RMTHelper.log("Error: second authentication was successful");
-            assertTrue(false);
-        } catch (Exception e) {
-            RMTHelper.log("Passed: expected error " + e.getMessage());
-        }
-
     }
 }
