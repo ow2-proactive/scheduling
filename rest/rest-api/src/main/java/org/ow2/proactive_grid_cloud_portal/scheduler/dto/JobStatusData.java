@@ -35,6 +35,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
 public enum JobStatusData {
+
     /**
      * The job is waiting to be scheduled.
      */
@@ -71,5 +72,10 @@ public enum JobStatusData {
      * Nothing can be done anymore on this job expect read execution informations
      * such as output, time, etc...
      */
-    KILLED
+    KILLED,
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.JobStatus#IN_ERROR
+     */
+    IN_ERROR;
+
 }

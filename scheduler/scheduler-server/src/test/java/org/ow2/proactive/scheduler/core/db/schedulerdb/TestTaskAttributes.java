@@ -6,12 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
@@ -23,6 +22,8 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class TestTaskAttributes extends BaseSchedulerDBTest {
@@ -131,7 +132,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
     @Test
     public void testAttributes() throws Exception {
         JavaTask task = createDefaultTask("task");
-        task.setCancelJobOnError(true);
+        task.setOnTaskError(OnTaskError.CANCEL_JOB);
         task.setDescription("desc");
         // TODO: create test using valid flow
         // task.setFlowBlock(FlowBlock.START);
@@ -141,7 +142,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         task.setRunAsMe(true);
         task.setWallTime(123);
         InternalTask taskData = saveSingleTask(task).getTask(task.getName());
-        Assert.assertEquals(true, taskData.isCancelJobOnError());
+        Assert.assertEquals(OnTaskError.CANCEL_JOB, taskData.getOnTaskErrorProperty().getValue());
         Assert.assertEquals("desc", taskData.getDescription());
         // Assert.assertEquals(FlowBlock.START, taskData.getFlowBlock());
         Assert.assertEquals(7, taskData.getMaxNumberOfExecution());

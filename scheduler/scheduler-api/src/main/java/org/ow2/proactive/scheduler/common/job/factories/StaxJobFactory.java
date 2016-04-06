@@ -63,6 +63,7 @@ import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
@@ -318,24 +319,28 @@ public class StaxJobFactory extends JobFactory {
         int attrLen = cursorJob.getAttributeCount();
         int i = 0;
         for (; i < attrLen; i++) {
-            String attrName = cursorJob.getAttributeLocalName(i);
-            if (XMLAttributes.COMMON_NAME.matches(attrName)) {
-                commonPropertiesHolder.setName(cursorJob.getAttributeValue(i));
-            } else if (XMLAttributes.JOB_PRIORITY.matches(attrName)) {
+            String attributeName = cursorJob.getAttributeLocalName(i);
+            String attributeValue = cursorJob.getAttributeValue(i);
+
+            if (XMLAttributes.COMMON_NAME.matches(attributeName)) {
+                commonPropertiesHolder.setName(attributeValue);
+            } else if (XMLAttributes.JOB_PRIORITY.matches(attributeName)) {
                 commonPropertiesHolder.setPriority(
-                        JobPriority.findPriority(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
-                commonPropertiesHolder.setCancelJobOnError(
-                        Boolean.parseBoolean(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
+                        JobPriority.findPriority(replace(attributeValue)));
+            } else if (XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.matches(attributeName)) {
+                handleCancelJobOnErrorAttribute(commonPropertiesHolder, attributeValue);
+            } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
                 commonPropertiesHolder.setRestartTaskOnError(
-                        RestartMode.getMode(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attrName)) {
+                        RestartMode.getMode(replace(attributeValue)));
+            } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
+                commonPropertiesHolder.setOnTaskError(OnTaskError
+                        .getInstance(replace(attributeValue)));
+            } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
                 commonPropertiesHolder.setMaxNumberOfExecution(
-                        Integer.parseInt(replace(cursorJob.getAttributeValue(i))));
-            } else if (XMLAttributes.JOB_PROJECT_NAME.matches(attrName)) {
+                        Integer.parseInt(replace(attributeValue)));
+            } else if (XMLAttributes.JOB_PROJECT_NAME.matches(attributeName)) {
                 //don't replace() here it is done at the end of the job
-                commonPropertiesHolder.setProjectName(cursorJob.getAttributeValue(i));
+                commonPropertiesHolder.setProjectName(attributeValue);
             }
         }
         //parse job elements and fill the temporary one
@@ -384,7 +389,7 @@ public class StaxJobFactory extends JobFactory {
             job.setName(commonPropertiesHolder.getName());
             job.setPriority(commonPropertiesHolder.getPriority());
             job.setProjectName(commonPropertiesHolder.getProjectName());
-            job.setCancelJobOnError(commonPropertiesHolder.isCancelJobOnError());
+            job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
             job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
             job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
             job.setGenericInformations(commonPropertiesHolder.getGenericInformation());
@@ -402,6 +407,19 @@ public class StaxJobFactory extends JobFactory {
                 temporaryAttribute = cursorJob.getAttributeLocalName(i);
             }
             throw new JobCreationException(cursorJob.getLocalName(), temporaryAttribute, e);
+        }
+    }
+
+    private void handleCancelJobOnErrorAttribute(CommonAttribute commonPropertiesHolder, String attributeValue) {
+        logger.warn(
+                XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.getXMLName()
+                        + " attribute is deprecated and no longer supported from schema 3.4+. " +
+                        "Please use on task error policy to define task error behaviour. " +
+                        "The attribute 'cancelJobOnError=\"true\"' is translated into " +
+                        "'onTaskError=\"cancelJob\"'.");
+
+        if (attributeValue != null && attributeValue.equalsIgnoreCase("true")) {
+            commonPropertiesHolder.setOnTaskError(OnTaskError.CANCEL_JOB);
         }
     }
 
@@ -619,30 +637,34 @@ public class StaxJobFactory extends JobFactory {
             //parse job attributes and fill the temporary one
             int attrLen = cursorTask.getAttributeCount();
             for (i = 0; i < attrLen; i++) {
-                String attrName = cursorTask.getAttributeLocalName(i);
-                if (XMLAttributes.COMMON_NAME.matches(attrName)) {
-                    tmpTask.setName(cursorTask.getAttributeValue(i));
-                    taskName = cursorTask.getAttributeValue(i);
-                } else if (XMLAttributes.TASK_NB_NODES.matches(attrName)) {
-                    int numberOfNodesNeeded = Integer.parseInt(replace(cursorTask.getAttributeValue(i)));
+                String attributeName = cursorTask.getAttributeLocalName(i);
+                String attributeValue = cursorTask.getAttributeValue(i);
+
+                if (XMLAttributes.COMMON_NAME.matches(attributeName)) {
+                    tmpTask.setName(attributeValue);
+                    taskName = attributeValue;
+                } else if (XMLAttributes.TASK_NB_NODES.matches(attributeName)) {
+                    int numberOfNodesNeeded = Integer.parseInt(replace(attributeValue));
                     tmpTask.setParallelEnvironment(new ParallelEnvironment(numberOfNodesNeeded));
-                } else if (XMLAttributes.COMMON_CANCELJOB_ON_ERROR.matches(attrName)) {
-                    tmpTask.setCancelJobOnError(Boolean
-                            .parseBoolean(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attrName)) {
+                } else if (XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.matches(attributeName)) {
+                    handleCancelJobOnErrorAttribute(tmpTask, attributeValue);
+                } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
+                    tmpTask.setOnTaskError(OnTaskError
+                            .getInstance(replace(attributeValue)));
+                } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
                     tmpTask.setRestartTaskOnError(RestartMode
-                            .getMode(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attrName)) {
+                            .getMode(replace(attributeValue)));
+                } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
                     tmpTask.setMaxNumberOfExecution(Integer
-                            .parseInt(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.TASK_PRECIOUS_RESULT.matches(attrName)) {
-                    tmpTask.setPreciousResult(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.TASK_PRECIOUS_LOGS.matches(attrName)) {
-                    tmpTask.setPreciousLogs(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.TASK_WALLTIME.matches(attrName)) {
-                    tmpTask.setWallTime(Tools.formatDate(replace(cursorTask.getAttributeValue(i))));
-                } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attrName)) {
-                    tmpTask.setRunAsMe(Boolean.parseBoolean(replace(cursorTask.getAttributeValue(i))));
+                            .parseInt(replace(attributeValue)));
+                } else if (XMLAttributes.TASK_PRECIOUS_RESULT.matches(attributeName)) {
+                    tmpTask.setPreciousResult(Boolean.parseBoolean(replace(attributeValue)));
+                } else if (XMLAttributes.TASK_PRECIOUS_LOGS.matches(attributeName)) {
+                    tmpTask.setPreciousLogs(Boolean.parseBoolean(replace(attributeValue)));
+                } else if (XMLAttributes.TASK_WALLTIME.matches(attributeName)) {
+                    tmpTask.setWallTime(Tools.formatDate(replace(attributeValue)));
+                } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attributeName)) {
+                    tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue)));
                 }
             }
             int eventType;
@@ -701,10 +723,6 @@ public class StaxJobFactory extends JobFactory {
             autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
             autoCopyfields(Task.class, tmpTask, toReturn);
             if (toReturn != null) {
-                //set the following properties only if it is needed.
-                if (toReturn.getCancelJobOnErrorProperty().isSet()) {
-                    toReturn.setCancelJobOnError(toReturn.isCancelJobOnError());
-                }
                 if (toReturn.getRestartTaskOnErrorProperty().isSet()) {
                     toReturn.setRestartTaskOnError(toReturn.getRestartTaskOnError());
                 }
@@ -1499,7 +1517,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("description: " + job.getDescription());
             logger.debug("projectName: " + job.getProjectName());
             logger.debug("priority: " + job.getPriority());
-            logger.debug("cancelJobOnError: " + job.isCancelJobOnError());
+            logger.debug("onTaskError: " + job.getOnTaskErrorProperty().getValue().toString());
             logger.debug("restartTaskOnError: " + job.getRestartTaskOnError());
             logger.debug("maxNumberOfExecution: " + job.getMaxNumberOfExecution());
             logger.debug("inputSpace: " + job.getInputSpace());
@@ -1519,7 +1537,7 @@ public class StaxJobFactory extends JobFactory {
                 logger.debug("parallel: " + t.isParallel());
                 logger.debug(
                         "nbNodes: " + (t.getParallelEnvironment() == null ? "1" : t.getParallelEnvironment().getNodesNumber()));
-                logger.debug("cancelJobOnError: " + t.isCancelJobOnError());
+                logger.debug("onTaskError: " + t.getOnTaskErrorProperty().getValue().toString());
                 logger.debug("preciousResult: " + t.isPreciousResult());
                 logger.debug("preciousLogs: " + t.isPreciousLogs());
                 logger.debug("restartTaskOnError: " + t.getRestartTaskOnError());

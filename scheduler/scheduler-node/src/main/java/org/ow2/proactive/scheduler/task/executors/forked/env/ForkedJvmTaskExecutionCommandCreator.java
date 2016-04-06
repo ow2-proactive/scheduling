@@ -109,9 +109,11 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
             }
         }
 
-        List<String> javaCommand = new ArrayList<>();
-        javaCommand.addAll(javaPrefixCommandExtractor
-                .extractJavaPrefixCommandToCommandListFromScriptResult(forkEnvironmentScriptResult));
+        List<String> prefixes = javaPrefixCommandExtractor
+                .extractJavaPrefixCommandToCommandListFromScriptResult(forkEnvironmentScriptResult);
+
+        List<String> javaCommand = new ArrayList<>(prefixes.size() + 3 + jvmArguments.size() + 2);
+        javaCommand.addAll(prefixes);
         javaCommand.add(javaHome + javaHomePostfixJavaExecutable);
         javaCommand.add("-cp");
         javaCommand.add(classpath.toString());

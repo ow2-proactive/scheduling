@@ -66,20 +66,23 @@ public class TaskInfoImpl implements TaskInfo {
     /** id of the task */
     private TaskId taskId = null;
 
-    /** informations about the job */
+    /** information about the job */
     @XmlTransient
     private JobInfo jobInfo = null;
 
     /** task started time */
     private long startTime = -1;
 
-    /** task finished time : DEFAULT HAS TO BE SET TO -1 */
+    /** contains the timestamp at which the Task has been in-error for the last time (last attempt): DEFAULT HAS TO BE SET TO -1 */
+    private long inErrorTime = -1;
+
+    /** task finished time: DEFAULT HAS TO BE SET TO -1 */
     private long finishedTime = -1;
 
-    /** task scheduled time : DEFAULT HAS TO BE SET TO -1 */
+    /** task scheduled time: DEFAULT HAS TO BE SET TO -1 */
     private long scheduledTime = -1;
 
-    /** task real execution time : DEFAULT HAS TO BE SET TO -1 */
+    /** task real execution time: DEFAULT HAS TO BE SET TO -1 */
     private long executionDuration = -1;
 
     /** Current taskStatus of the task */
@@ -108,7 +111,9 @@ public class TaskInfoImpl implements TaskInfo {
         this.taskId = taskInfo.getTaskId();
         this.jobInfo = new JobInfoImpl((JobInfoImpl) taskInfo.getJobInfo());
         this.startTime = taskInfo.getStartTime();
+        this.inErrorTime = taskInfo.getInErrorTime();
         this.finishedTime = taskInfo.getFinishedTime();
+        this.inErrorTime = taskInfo.getInErrorTime();
         this.scheduledTime = taskInfo.getScheduledTime();
         this.executionDuration = taskInfo.getExecutionDuration();
         this.taskStatus = taskInfo.getStatus();
@@ -196,6 +201,15 @@ public class TaskInfoImpl implements TaskInfo {
      */
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    @Override
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     /**

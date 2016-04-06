@@ -8,10 +8,10 @@ start = job
 job = ## Definition of a job for the scheduler 
     element job { 
         variables?, 
-        jobDescription?, 
+        jobDescription?,
         jobName,
         priority?, 
-        cancelJobOnError_j?, 
+        onTaskError_j?,
         restartTaskOnError_j?, 
         numberOfExecution_j?, 
         genericInformation?, 
@@ -35,8 +35,8 @@ variableValue = ## The patterns ${variable_name} will be replaced by this value
     attribute value { xsd:string }
 priority = ## Priority of the job
     attribute priority { jobPriority | variableRefType}
-cancelJobOnError_j = ## For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)
-    attribute cancelJobOnError {xsd:boolean | variableRefType}
+onTaskError_j = ## Defines the base task error behavior. Cancel job, suspend task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)
+    attribute onTaskError {onErrorTaskType | variableRefType}
 restartTaskOnError_j = ## For each task, where does the task restart if an error occurred ? (default=anywhere)
     attribute restartTaskOnError {restartTaskType | variableRefType}
 numberOfExecution_j = ## Maximum number of execution for each task (default=1)
@@ -64,7 +64,7 @@ task = ## A task is the smallest computation unit for the scheduler
     element task {
         taskName,
         nodesNumber_t?,
-        cancelJobOnError_t?,
+        onTaskError_t?,
         restartTaskOnError_t?,
         numberOfExecution_t?,
         runAsMe?,
@@ -95,8 +95,8 @@ taskDescription = ## Textual description of this task
     element description { text }
 walltime = ## Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')
 	attribute walltime { walltimePattern | variableRefType}
-cancelJobOnError_t = ## Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)
-    attribute cancelJobOnError {xsd:boolean | variableRefType}
+onTaskError_t = ## Defines the base task error behavior. Cancel job, suspend task, pause job and continue job execution are possible settings. The onTaskError behavior is triggered on task failure, not node failure. (default=continue job execution)
+   attribute onTaskError {onErrorTaskType | variableRefType}
 restartTaskOnError_t = ## Where does the task restart if an error occurred ?
     attribute restartTaskOnError {restartTaskType}
 numberOfExecution_t = ## Maximum number of execution for this task
@@ -252,6 +252,7 @@ actionReplicate = ## replicate control flow action
 # +++++++++++++ User define types
 jobPriority = 'highest' | 'high' | 'normal' | 'low' | 'lowest' | variableRefType
 restartTaskType = 'anywhere' | 'elsewhere' | variableRefType
+onErrorTaskType = 'cancelJob' | 'suspendTask' | 'pauseJob' |  'continueJobExecution' | 'none' | variableRefType
 inaccessModeType = 'transferFromInputSpace' | 'transferFromOutputSpace' | 'transferFromGlobalSpace' | 'transferFromUserSpace' | 'none' | variableRefType
 outaccessModeType = 'transferToOutputSpace' | 'transferToGlobalSpace' | 'transferToUserSpace' | 'none' | variableRefType
 classPattern = xsd:string { pattern="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*" }

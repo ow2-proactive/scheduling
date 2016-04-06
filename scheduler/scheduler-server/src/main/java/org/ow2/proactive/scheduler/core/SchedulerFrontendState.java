@@ -36,32 +36,61 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import org.apache.log4j.Logger;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Vector;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.job.*;
+import org.ow2.proactive.scheduler.job.ClientJobState;
+import org.ow2.proactive.scheduler.job.IdentifiedJob;
+import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.InternalJobFactory;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
-import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-
-import java.lang.reflect.Method;
-import java.util.*;
+import org.apache.log4j.Logger;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
@@ -76,10 +105,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     /** Maximum duration of a session for a useless client */
     private static final long USER_SESSION_DURATION = PASchedulerProperties.SCHEDULER_USER_SESSION_TIME
-            .getValueAsInt() * 1000;
+            .getValueAsInt() *
+        1000;
 
     /** Stores methods that will be called on clients */
     private static final Map<String, Method> eventMethods;
+
     static {
         eventMethods = new HashMap<>();
         for (Method m : SchedulerEventListener.class.getMethods()) {
@@ -133,12 +164,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         Vector<JobState> finishedJobs = sState.getFinishedJobs();
 
         //default state = started
-        Set<JobState> jobStates =
-                new HashSet<>(pendingJobs.size() + runningJobs.size() + finishedJobs.size());
+        Set<JobState> jobStates = new HashSet<>(
+            pendingJobs.size() + runningJobs.size() + finishedJobs.size());
 
         if (logger.isInfoEnabled()) {
-            logger.info("#Pending jobs: " + pendingJobs.size() + " #Running jobs: " +
-                runningJobs.size() + " #Finished jobs: " + finishedJobs.size());
+            logger.info("#Pending jobs: " + pendingJobs.size() + " #Running jobs: " + runningJobs.size() +
+                " #Finished jobs: " + finishedJobs.size());
         }
 
         for (JobState js : pendingJobs) {
@@ -232,13 +263,13 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return getState(false);
     }
 
-    synchronized SchedulerState getState(boolean myJobsOnly) throws NotConnectedException,
-            PermissionException {
+    synchronized SchedulerState getState(boolean myJobsOnly)
+            throws NotConnectedException, PermissionException {
         //checking permissions
         checkPermission("getState", "You do not have permission to get the state !");
 
-        ListeningUser ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
-                .getSourceBodyID());
+        ListeningUser ui = identifications
+                .get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID());
         try {
             checkOwnStatePermission(myJobsOnly, ui.getUser());
             return myJobsOnly ? sState.filterOnUser(ui.getUser().getUsername()) : sState;
@@ -257,8 +288,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     synchronized void checkOwnStatePermission(boolean myOnly, UserIdentificationImpl ui)
             throws PermissionException {
-        ui.checkPermission(new GetOwnStateOnlyPermission(myOnly), ui.getUsername() +
-            " does not have permissions to retrieve full state");
+        ui.checkPermission(new GetOwnStateOnlyPermission(myOnly),
+                ui.getUsername() + " does not have permissions to retrieve full state");
     }
 
     synchronized void addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
@@ -267,8 +298,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            boolean getCurrentState, SchedulerEvent... events) throws NotConnectedException,
-            PermissionException {
+            boolean getCurrentState, SchedulerEvent... events)
+                    throws NotConnectedException, PermissionException {
         //checking permissions
         ListeningUser uIdent = checkPermissionReturningListeningUser("addEventListener",
                 "You do not have permission to add a listener !");
@@ -337,16 +368,16 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
         //setting job informations
         if (job.getTasks().size() == 0) {
-            String msg = "Job " + job.getId().value() + " contains no task. You need to insert at least one task before submitting job";
+            String msg = "Job " + job.getId().value() +
+                " contains no task. You need to insert at least one task before submitting job";
             logger.info(msg);
             throw new JobCreationException(msg);
         }
 
         //verifying that the user has right to set the given priority to his job.
         try {
-            ident.checkPermission(new ChangePriorityPermission(job.getPriority().ordinal()), ident
-                    .getUsername() +
-                " does not have rights to set job priority " + job.getPriority());
+            ident.checkPermission(new ChangePriorityPermission(job.getPriority().ordinal()),
+                    ident.getUsername() + " does not have rights to set job priority " + job.getPriority());
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
@@ -424,8 +455,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             //log and send events
             String user = ident.getUser().getUsername();
             logger.info("User '" + user + "' has disconnect the scheduler !");
-            dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident
-                    .getUser()), false);
+            dispatchUsersUpdated(
+                    new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident.getUser()),
+                    false);
         }
     }
 
@@ -470,12 +502,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         checkJobOwner("changeJobPriority", jobId,
                 "You do not have permission to change the priority of this job !");
 
-        UserIdentificationImpl ui = identifications.get(
-                PAActiveObject.getContext().getCurrentRequest().getSourceBodyID()).getUser();
+        UserIdentificationImpl ui = identifications
+                .get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID()).getUser();
 
         try {
-            ui.checkPermission(new ChangePriorityPermission(priority.getPriority()), ui.getUsername() +
-                " does not have permissions to set job priority to " + priority);
+            ui.checkPermission(new ChangePriorityPermission(priority.getPriority()),
+                    ui.getUsername() + " does not have permissions to set job priority to " + priority);
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
@@ -501,14 +533,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    synchronized JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException {
+    synchronized JobState getJobState(JobId jobId)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this job !");
         return jobsMap.get(jobId);
     }
 
-    synchronized TaskState getTaskState(JobId jobId, TaskId taskId) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
+    synchronized TaskState getTaskState(JobId jobId, TaskId taskId)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this task !");
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
@@ -520,8 +552,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return ts;
     }
 
-    synchronized TaskState getTaskState(JobId jobId, String taskName) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
+    synchronized TaskState getTaskState(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this task !");
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
@@ -542,8 +574,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return ts;
     }
 
-    synchronized TaskId getTaskId(JobId jobId, String taskName) throws UnknownTaskException,
-            UnknownJobException {
+    synchronized TaskId getTaskId(JobId jobId, String taskName)
+            throws UnknownTaskException, UnknownJobException {
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
@@ -567,8 +599,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         renewUserSession(id, ident);
 
         try {
-            ident.checkPermission(new ChangePolicyPermission(), ident.getUsername() +
-                " does not have permissions to change the policy of the scheduler");
+            ident.checkPermission(new ChangePolicyPermission(),
+                    ident.getUsername() + " does not have permissions to change the policy of the scheduler");
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
@@ -583,19 +615,25 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         renewUserSession(id, ident);
 
         try {
-            ident.checkPermission(new ConnectToResourceManagerPermission(), ident.getUsername() +
-                " does not have permissions to change RM in the scheduler");
+            ident.checkPermission(new ConnectToResourceManagerPermission(),
+                    ident.getUsername() + " does not have permissions to change RM in the scheduler");
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
         }
     }
 
-    /* ########################################################################################### */
+    /*
+     * ###########################################################################################
+     */
     /*                                                                                             */
-    /* ################################## LISTENER DISPATCHER #################################### */
+    /*
+     * ################################## LISTENER DISPATCHER ####################################
+     */
     /*                                                                                             */
-    /* ########################################################################################### */
+    /*
+     * ###########################################################################################
+     */
 
     /**
      * Clear every dirty listeners that are no more responding
@@ -706,8 +744,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     logger.debug("job " + notification.getData().getJobId() + " event [" +
                         notification.getEventType() + "]");
                 } else {
-                    jlogger.debug(notification.getData().getJobId(), " event [" +
-                        notification.getEventType() + "]");
+                    jlogger.debug(notification.getData().getJobId(),
+                            " event [" + notification.getEventType() + "]");
                 }
             }
             for (ListeningUser listeningUserId : identifications.values()) {
@@ -741,8 +779,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
             if (logger.isDebugEnabled()) {
-                tlogger.debug(notification.getData().getTaskId(), "event [" + notification.getEventType() +
-                    "]");
+                tlogger.debug(notification.getData().getTaskId(),
+                        "event [" + notification.getEventType() + "]");
             }
             for (ListeningUser listeningUserId : identifications.values()) {
                 //if this user has a listener
@@ -785,9 +823,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
                         //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
-                        if (!userId.isMyEventsOnly() ||
-                            (userId.isMyEventsOnly() && userId.getUsername().equals(
-                                    notification.getData().getUsername()))) {
+                        if (!userId.isMyEventsOnly() || (userId.isMyEventsOnly() &&
+                            userId.getUsername().equals(notification.getData().getUsername()))) {
                             listeningUserId.getListener().addEvent(eventMethods.get("usersUpdatedEvent"),
                                     notification);
                         }
@@ -839,8 +876,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case POLICY_CHANGED:
                 break;
             default:
-                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                    eventType);
+                logger.warn(
+                        "**WARNING** - Unconsistent update type received from Scheduler Core : " + eventType);
                 return;
         }
         // send the event for all case, except default
@@ -866,7 +903,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 sState.getRunningJobs().add(js);
                 break;
             case JOB_PAUSED:
+            case JOB_IN_ERROR:
             case JOB_RESUMED:
+            case JOB_RESTARTED_FROM_ERROR:
             case JOB_CHANGE_PRIORITY:
             case TASK_REPLICATED:
             case TASK_SKIPPED:
@@ -905,6 +944,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
+            case TASK_IN_ERROR:
                 dispatchTaskStateUpdated(owner, notification);
                 break;
             case TASK_PROGRESS:

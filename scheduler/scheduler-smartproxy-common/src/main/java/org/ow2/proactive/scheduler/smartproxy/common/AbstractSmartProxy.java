@@ -1,25 +1,61 @@
 package org.ow2.proactive.scheduler.smartproxy.common;
 
-import com.google.common.net.UrlEscapers;
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.*;
-import org.ow2.proactive.scheduler.common.usage.JobUsage;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-
-import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.security.KeyException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
+import javax.security.auth.login.LoginException;
+
+import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import com.google.common.net.UrlEscapers;
+import org.apache.log4j.Logger;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Throwables.propagate;
@@ -44,7 +80,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     protected static final SchedulerEvent[] PROXY_SCHED_EVENTS = new SchedulerEvent[]{
             JOB_RUNNING_TO_FINISHED, JOB_PENDING_TO_RUNNING, JOB_PENDING_TO_FINISHED, JOB_PAUSED,
             JOB_RESUMED, TASK_PENDING_TO_RUNNING, KILLED, SHUTDOWN, SHUTTING_DOWN, STOPPED, RESUMED,
-            TASK_RUNNING_TO_FINISHED, TASK_PROGRESS};
+            TASK_RUNNING_TO_FINISHED, TASK_PROGRESS, JOB_RESTARTED_FROM_ERROR, JOB_IN_ERROR, TASK_IN_ERROR
+    };
     private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
     protected T jobTracker;
     protected String schedulerUrl;

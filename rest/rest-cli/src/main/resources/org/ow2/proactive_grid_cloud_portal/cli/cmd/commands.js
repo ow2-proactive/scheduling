@@ -59,11 +59,16 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeAllPausedTasksCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartAllInErrorTasksCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeAllPausedTasksAndRestartAllInErrorTasksCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartInErrorTaskCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartRunningTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand);
@@ -229,6 +234,18 @@ function resumejob(jobId) {
     execute(new ResumeJobCommand('' + jobId));
 }
 
+function resumeAllPausedTasks(jobId) {
+    execute(new ResumeAllPausedTasksCommand('' + jobId));
+}
+
+function restartAllInErrorTasks(jobId) {
+    execute(new RestartAllInErrorTasksCommand('' + jobId));
+}
+
+function resumeAllPausedTasksAndRestartAllInErrorTasks(jobId) {
+    execute(new ResumeAllPausedTasksAndRestartAllInErrorTasksCommand('' + jobId));
+}
+
 function killjob(jobId) {
     execute(new KillJobCommand('' + jobId));
 }
@@ -367,6 +384,14 @@ function preempttask(jobId, taskId) {
 
 function restarttask(jobId, taskId) {
     execute(new RestartTaskCommand('' + jobId, '' + taskId));
+}
+
+function restartInErrorTask(jobId, taskId) {
+    execute(new RestartInErrorTaskCommand('' + jobId, '' + taskId));
+}
+
+function restartRunningTask(jobId, taskId) {
+    execute(new RestartRunningTaskCommand('' + jobId, '' + taskId));
 }
 
 function uploadfile(spaceName, filePath, fileName, localFile) {

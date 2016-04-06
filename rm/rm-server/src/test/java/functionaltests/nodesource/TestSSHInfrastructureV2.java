@@ -128,7 +128,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                     ProcessShellFactory.TtyOptions.ONlCr)));
         }
 
-        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
+        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
         userAuthFactories.add(new UserAuthPassword.Factory());
         sshd.setUserAuthFactories(userAuthFactories);
 

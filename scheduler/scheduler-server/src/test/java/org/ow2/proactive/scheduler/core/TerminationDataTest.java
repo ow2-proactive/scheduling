@@ -55,9 +55,9 @@ public class TerminationDataTest {
 	public void testAddJobToTerminate(){
 		assertThat(terminationData.isEmpty(), is(true));
 		JobId jobId = new JobIdImpl(666, "readableName");
-		terminationData.addJobToTermiante(jobId);
+		terminationData.addJobToTerminate(jobId);
 		assertThat(terminationData.isEmpty(), is(false));
-		assertThat(terminationData.jobTeminated(jobId), is(true));
+		assertThat(terminationData.jobTerminated(jobId), is(true));
 	}
 	
 	@Test
@@ -73,7 +73,7 @@ public class TerminationDataTest {
 		RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, null);
 		terminationData.addTaskData(taskData, true);
 		assertThat(terminationData.isEmpty(), is(false));
-		assertThat(terminationData.taskTeminated(jobId,"task-name"), is(true));
+		assertThat(terminationData.taskTerminated(jobId,"task-name"), is(true));
 	}
 	
 	@Test
@@ -89,7 +89,7 @@ public class TerminationDataTest {
 	@Test
 	public void testHandleTerminationForJob(){
 		JobId jobId = new JobIdImpl(666, "readableName");
-		terminationData.addJobToTermiante(jobId);
+		terminationData.addJobToTerminate(jobId);
 		terminationData.handleTermination(service);
 		Mockito.verify(service, Mockito.times(1)).terminateJobHandling(jobId);
 	}

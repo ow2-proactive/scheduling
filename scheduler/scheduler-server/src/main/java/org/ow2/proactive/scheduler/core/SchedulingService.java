@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -24,12 +25,12 @@ import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
-import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -177,10 +178,10 @@ public class SchedulingService {
         }
 
         status = SchedulerStatus.SHUTTING_DOWN;
-        logger.info("Scheduler is shutting down, this make take time to finish every jobs !");
+        logger.info("Scheduler is shutting down, this may take time to finish every jobs!");
         listener.schedulerStateUpdated(SchedulerEvent.SHUTTING_DOWN);
 
-        logger.info("Unpause all running and pending jobs !");
+        logger.info("Unpause all running and pending jobs!");
         jobs.unpauseAll();
 
         infrastructure.schedule(new Runnable() {
@@ -354,6 +355,21 @@ public class SchedulingService {
         }
     }
 
+    public boolean restartAllInErrorTasks(final JobId jobId) {
+        try {
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    Boolean result = jobs.restartAllInErrorTasks(jobId);
+                    wakeUpSchedulingThread();
+                    return result;
+                }
+            }).get();
+        } catch (Exception e) {
+            throw handleFutureWaitException(e);
+        }
+    }
+
     public boolean resumeJob(final JobId jobId) {
         try {
             return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
@@ -437,7 +453,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.killJob(jobId);
-                    boolean jobKilled = terminationData.jobTeminated(jobId);
+                    boolean jobKilled = terminationData.jobTerminated(jobId);
                     submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
                     return jobKilled;
@@ -468,7 +484,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.killTask(jobId, taskName);
-                    boolean taskKilled = terminationData.taskTeminated(jobId, taskName);
+                    boolean taskKilled = terminationData.taskTerminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
                     return taskKilled;
@@ -500,7 +516,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.restartTask(jobId, taskName, restartDelay);
-                    boolean taskRestarted = terminationData.taskTeminated(jobId, taskName);
+                    boolean taskRestarted = terminationData.taskTerminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
                     return taskRestarted;
@@ -521,6 +537,34 @@ public class SchedulingService {
         }
     }
 
+    public boolean restartInErrorTask(final JobId jobId, final String taskName)
+            throws UnknownJobException, UnknownTaskException {
+        try {
+            if (status.isUnusable()) {
+                return false;
+            }
+
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    jobs.restartInErrorTask(jobId, taskName);
+                    wakeUpSchedulingThread();
+                    return Boolean.TRUE;
+                }
+            }).get();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof UnknownTaskException) {
+                throw (UnknownTaskException) e.getCause();
+            } else if (e.getCause() instanceof UnknownJobException) {
+                throw (UnknownJobException) e.getCause();
+            } else {
+                throw launderThrowable(e.getCause());
+            }
+        } catch (Exception e) {
+            throw launderThrowable(e);
+        }
+    }
+
     public boolean preemptTask(final JobId jobId, final String taskName, final int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         try {
@@ -528,7 +572,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.preemptTask(jobId, taskName, restartDelay);
-                    boolean taskRestarted = terminationData.taskTeminated(jobId, taskName);
+                    boolean taskRestarted = terminationData.taskTerminated(jobId, taskName);
                     submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
                     return taskRestarted;
@@ -733,8 +777,16 @@ public class SchedulingService {
     }
 
     private void recover(RecoveredSchedulerState recoveredState) {
-        jobsRecovered(recoveredState.getPendingJobs());
-        jobsRecovered(recoveredState.getRunningJobs());
+        Vector<InternalJob> finishedJobs = recoveredState.getFinishedJobs();
+        Vector<InternalJob> pendingJobs = recoveredState.getPendingJobs();
+        Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
+
+        jobsRecovered(pendingJobs);
+        jobsRecovered(runningJobs);
+
+        recoverTasksState(finishedJobs, false);
+        recoverTasksState(runningJobs, true);
+        recoverTasksState(pendingJobs, true);
 
         if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
             logger.debug("Removing non-managed jobs");
@@ -756,6 +808,35 @@ public class SchedulingService {
                     jlogger.debug(job.getId(), "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) +
                         "sec");
                 }
+            }
+        }
+    }
+
+    private void recoverTasksState(Vector<InternalJob> jobs, boolean restoreInErrorTasks) {
+        Iterator<InternalJob> iterJob = jobs.iterator();
+        while (iterJob.hasNext()) {
+            InternalJob job = iterJob.next();
+
+            int faultyTasksCount = 0;
+
+            for (InternalTask internalTask : job.getITasks()) {
+                switch (internalTask.getStatus()) {
+                    case FAULTY:
+                        faultyTasksCount++;
+                        break;
+                    case WAITING_ON_ERROR:
+                        faultyTasksCount++;
+                        job.saveFaultyTaskId(internalTask.getId());
+                        break;
+                }
+            }
+
+            if (faultyTasksCount != job.getNumberOfFaultyTasks()) {
+                logger.warn("Number of faulty tasks saved in DB for Job " + job.getId() +  " does not match the one computed using task statuses");
+            }
+
+            if (restoreInErrorTasks) {
+                job.getJobDescriptor().restoreInErrorTasks();
             }
         }
     }

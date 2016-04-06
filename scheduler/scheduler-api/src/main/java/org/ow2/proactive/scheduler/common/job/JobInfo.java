@@ -42,8 +42,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * JobInfo provides some informations about a job.<br>
- * These informations and only them are able to change inside the job.
+ * JobInfo provides information about the Job it is linked with.
+ * <br>
+ * These information and only them are able to change inside the Job.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -52,79 +53,129 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public interface JobInfo extends Serializable {
 
     /**
-     * To get the jobId
+     * Returns an identifier that uniquely identifies the Job
+     * within a Scheduler instance.
      *
-     * @return the jobId
+     * @return an identifier that uniquely identifies the Job
+     * within a Scheduler instance.
      */
     JobId getJobId();
 
     /**
-     * Get job owner 
-     * 
-     * @return job owner
+     * Returns the name of the Job owner.
+     *
+     * @return the name of the Job owner (the one who submitted the Job).
      */
     String getJobOwner();
 
     /**
-     * To get the finishedTime
+     * Returns the time at which the Job has finished.
      *
-     * @return the finishedTime
+     * @return the time at which the Job has finished
+     * (i.e. all tasks have finished because of a normal or abnormal termination).
      */
     long getFinishedTime();
 
     /**
-     * To get the removedTime
+     * Returns the time at which the Job has been marked as removed.
      *
-     * @return the removedTime
+     * @return the time at which the Job has been marked as removed.
      */
     long getRemovedTime();
 
     /**
-     * To get the startTime
+     * Returns the time at which the Job has started.
      *
-     * @return the startTime
+     * @return the time at which the Job has started.
      */
     long getStartTime();
 
     /**
-     * To get the submittedTime
+     * Returns the time at which a Job was seen as in-error
+     * for the last time.
      *
-     * @return the submittedTime
+     * @return the time at which a Job was seen as in-error
+     * for the last time. The default value is {@code -1}.
+     */
+    long getInErrorTime();
+
+    /**
+     * Returns the time at which the Job was submitted.
+     *
+     * @return the time at which the Job was submitted.
      */
     long getSubmittedTime();
 
     /**
-     * To get the totalNumberOfTasks
+     * Returns the number of tasks managed by the Job.
      *
-     * @return the totalNumberOfTasks
+     * @return the number of tasks managed by the Job.
+     * The number should correspond to the sum of tasks which
+     * are grouped in pending, running and finished.
      */
     int getTotalNumberOfTasks();
 
     /**
-     * To get the numberOfFinishedTasks
+     * Returns the number of tasks managed by the Job
+     * which are finished.
      *
-     * @return the numberOfFinishedTasks
+     * @return the number of tasks managed by the Job
+     * which are finished.
      */
     int getNumberOfFinishedTasks();
 
     /**
-     * To get the numberOfPendingTasks
+     * Returns the number of tasks managed by the Job
+     * which are pending.
      *
-     * @return the numberOfPendingTasks
+     * @return the number of tasks managed by the Job
+     * which are pending.
      */
     int getNumberOfPendingTasks();
 
     /**
-     * To get the numberOfRunningTasks
+     * Returns the number of tasks managed by the Job
+     * which are running.
      *
-     * @return the numberOfRunningTasks
+     * @return the number of tasks managed by the Job
+     * which are running.
      */
     int getNumberOfRunningTasks();
 
     /**
-     * To get the priority.
+     * Returns the number of tasks managed by the Job
+     * that are in a failed state due to a resource failure.
      *
-     * @return the priority.
+     * @return the number of tasks managed by the Job
+     * that are in a failed state due to a resource failure.
+     */
+    int getNumberOfFailedTasks();
+
+    /**
+     * Returns the number of tasks managed by the Job
+     * that are in a faulty state.
+     *
+     * @return the number of tasks managed by the Job
+     * that are in a faulty state due to a task fault
+     * (exception or return code).
+     */
+    int getNumberOfFaultyTasks();
+
+
+    /**
+     * Returns the number of tasks managed by the Job
+     * that are in an in-error state.
+     *
+     * @return the number of tasks managed by the Job
+     * that are in an in-error state because of faulty
+     * tasks that were configured to suspend on error.
+     */
+    int getNumberOfInErrorTasks();
+
+    /**
+     * Returns the priority of the Job.
+     *
+     * @return the priority of the Job.
      */
     JobPriority getPriority();
 
@@ -136,9 +187,11 @@ public interface JobInfo extends Serializable {
     JobStatus getStatus();
 
     /**
-     * Get the toBeRemoved property.
+     * Returns a boolean that indicates whether the job
+     * is marked for removal or not.
      *
-     * @return the toBeRemoved property.
+     * @return a boolean that indicates whether the job
+     * is marked for removal or not.
      */
     boolean isToBeRemoved();
 

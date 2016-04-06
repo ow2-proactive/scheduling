@@ -37,6 +37,9 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
+
 public abstract class AbstractJobCommand extends AbstractCommand implements Command {
 
     protected String jobId;
@@ -48,4 +51,12 @@ public abstract class AbstractJobCommand extends AbstractCommand implements Comm
     protected String job() {
         return String.format("job('%s')", jobId);
     }
+
+    protected void writeDeprecation(ApplicationContext currentContext,
+            CommandSet.Entry newCommandEntryToUse) {
+        writeLine(currentContext, "This option is deprecated, please use --"
+                + newCommandEntryToUse.longOpt() + " from non-interactive mode or "
+                + newCommandEntryToUse.jsCommand() + " from interactive mode.");
+    }
+
 }

@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -85,26 +81,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.log4j.Logger;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResourceFactory;
-import org.atmosphere.cpr.Broadcaster;
-import org.atmosphere.websocket.WebSocketEventListenerAdapter;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -116,7 +92,14 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
@@ -144,7 +127,10 @@ import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive_grid_cloud_portal.common.*;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -174,8 +160,31 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestEx
 import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-
 import com.google.common.collect.Maps;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.log4j.Logger;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceFactory;
+import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.websocket.WebSocketEventListenerAdapter;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.util.GenericType;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
 
 /**
@@ -803,6 +812,40 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/restart");
             return s.restartTask(jobid, taskname, 5);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (UnknownTaskException e) {
+            throw new UnknownTaskRestException(e);
+        }
+    }
+
+    /**
+     * Restart a pause on error task within a job
+     * @param sessionId current session
+     * @param jobid id of the job containing the task to kill
+     * @param taskname name of the task to kill
+     * @throws NotConnectedRestException
+     * @throws UnknownJobRestException
+     * @throws UnknownTaskRestException
+     * @throws PermissionRestException
+     */
+    @Override
+    @PUT
+    @Path("jobs/{jobid}/tasks/{taskname}/restartInErrorTask")
+    @Produces("application/json")
+    public boolean restartInErrorTask(
+            @HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobid,
+            @PathParam("taskname") String taskname)
+            throws NotConnectedRestException, UnknownJobRestException,
+            UnknownTaskRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/restartInErrorTask");
+            return s.restartInErrorTask(jobid, taskname);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1977,6 +2020,36 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             final Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/pause");
             return s.pauseJob(jobId);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    /**
+     * Restart all tasks in error in the job represented by jobid
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the id of the job
+     * @return true if success, false if not
+     */
+    @Override
+    @PUT
+    @Path("jobs/{jobid}/restartAllInErrorTasks")
+    @Produces("application/json")
+    public boolean restartAllInErrorTasks(
+            @HeaderParam("sessionid") final String sessionId,
+            @PathParam("jobid") final String jobId)
+            throws NotConnectedRestException, UnknownJobRestException,
+            PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/restartAllInErrorTasks");
+            return s.restartAllInErrorTasks(jobId);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {

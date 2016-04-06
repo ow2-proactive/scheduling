@@ -324,6 +324,7 @@ public final class SchedulerStateImpl implements SchedulerState {
             case JOB_PAUSED:
             case JOB_PENDING_TO_FINISHED:
             case JOB_RESUMED:
+            case JOB_RESTARTED_FROM_ERROR:
             case JOB_PENDING_TO_RUNNING:
             case JOB_RUNNING_TO_FINISHED:
             case TASK_REPLICATED:

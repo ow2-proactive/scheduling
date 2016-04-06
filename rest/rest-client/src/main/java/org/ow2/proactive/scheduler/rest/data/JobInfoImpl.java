@@ -44,6 +44,7 @@ public class JobInfoImpl implements JobInfo {
 
     private long submittedTime = -1;
     private long startTime = -1;
+    private long inErrorTime = -1;
     private long finishedTime = -1;
     private long removedTime = -1;
 
@@ -54,6 +55,10 @@ public class JobInfoImpl implements JobInfo {
     private int numberOfPendingTasks = 0;
     private int numberOfRunningTasks = 0;
     private int numberOfFinishedTasks = 0;
+
+    private int numberOfFailedTasks = 0;
+    private int numberOfFaultyTasks = 0;
+    private int numberOfInErrorTasks = 0;
 
     private JobPriority jobPriority = JobPriority.NORMAL;
     private JobStatus jobStatus = JobStatus.PENDING;
@@ -118,6 +123,33 @@ public class JobInfoImpl implements JobInfo {
     }
 
     @Override
+    public int getNumberOfFailedTasks() {
+        return numberOfFailedTasks;
+    }
+
+    public void setNumberOfFailedTasks(int numberOfFailedTasks) {
+        this.numberOfFailedTasks = numberOfFailedTasks;
+    }
+
+    @Override
+    public int getNumberOfFaultyTasks() {
+        return numberOfFaultyTasks;
+    }
+
+    public void setNumberOfFaultyTasks(int numberOfFaultyTasks) {
+        this.numberOfFaultyTasks = numberOfFaultyTasks;
+    }
+
+    @Override
+    public int getNumberOfInErrorTasks() {
+        return numberOfInErrorTasks;
+    }
+
+    public void setNumberOfInErrorTasks(int numberOfInErrorTasks) {
+        this.numberOfInErrorTasks = numberOfInErrorTasks;
+    }
+
+    @Override
     public JobPriority getPriority() {
         return jobPriority;
     }
@@ -140,8 +172,13 @@ public class JobInfoImpl implements JobInfo {
         return startTime;
     }
 
-    public void setJobStatus(JobStatus jobStatus) {
-        this.jobStatus = jobStatus;
+    @Override
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     @Override
@@ -149,8 +186,8 @@ public class JobInfoImpl implements JobInfo {
         return jobStatus;
     }
 
-    public void setSubmittedTime(long submittedTime) {
-        this.submittedTime = submittedTime;
+    public void setJobStatus(JobStatus jobStatus) {
+        this.jobStatus = jobStatus;
     }
 
     @Override
@@ -158,8 +195,8 @@ public class JobInfoImpl implements JobInfo {
         return submittedTime;
     }
 
-    public void setTotalNumberOfTasks(int totalNumberOfTasks) {
-        this.totalNumberOfTasks = totalNumberOfTasks;
+    public void setSubmittedTime(long submittedTime) {
+        this.submittedTime = submittedTime;
     }
 
     @Override
@@ -167,13 +204,17 @@ public class JobInfoImpl implements JobInfo {
         return totalNumberOfTasks;
     }
 
-    public void setToBeRemoved() {
-        this.toBeRemoved = true;
+    public void setTotalNumberOfTasks(int totalNumberOfTasks) {
+        this.totalNumberOfTasks = totalNumberOfTasks;
     }
 
     @Override
     public boolean isToBeRemoved() {
         return toBeRemoved;
+    }
+
+    public void setToBeRemoved() {
+        this.toBeRemoved = true;
     }
 
 }

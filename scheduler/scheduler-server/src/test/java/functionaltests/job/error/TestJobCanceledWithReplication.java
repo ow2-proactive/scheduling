@@ -71,6 +71,12 @@ public class TestJobCanceledWithReplication extends SchedulerFunctionalTestNoRes
 
     @Test
     public void testJobCanceledWithReplication() throws Throwable {
+        String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
+        testJobCanceledWithReplication(jobDescriptorPath);
+    }
+
+
+    private void testJobCanceledWithReplication(String jobDescriptorPath) throws Exception {
         schedulerHelper.addExtraNodes(3);
 
         String faultyTaskName = "task2*1";
@@ -78,7 +84,7 @@ public class TestJobCanceledWithReplication extends SchedulerFunctionalTestNoRes
         log("Submitting job...");
 
         //job submission
-        JobId id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId id = schedulerHelper.submitJob(jobDescriptorPath);
 
         //check events reception
         log("Job submitted, id " + id.toString());

@@ -45,19 +45,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeSourceView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.TopologyView;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility;
+import org.apache.commons.codec.binary.StringUtils;
 
 
 public class StringUtility {
@@ -101,7 +103,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<>();
+        List<String> titles = new ArrayList<>(3);
         titles.add("Host");
         titles.add("Distance (µs)");
         titles.add("Host");
@@ -113,7 +115,7 @@ public class StringUtility {
             Map<String, String> hostTopology = topology.getDistances().get(host);
             if (hostTopology != null) {
                 for (String anotherHost : hostTopology.keySet()) {
-                    line = new ArrayList<>();
+                    line = new ArrayList<>(3);
                     line.add(host);
                     line.add(hostTopology.get(anotherHost));
                     line.add(anotherHost);
@@ -131,7 +133,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(300);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<>();
+        List<String> titles = new ArrayList<>(7);
         titles.add("SOURCE_NAME");
         titles.add("HOST_NAME");
         titles.add("STATE");
@@ -145,7 +147,7 @@ public class StringUtility {
 
         if (nodeEvents != null) {
             for (NodeEventView nodeEvent : nodeEvents) {
-                List<String> line = new ArrayList<>();
+                List<String> line = new ArrayList<>(7);
                 line.add(nodeEvent.getNodeSource());
                 line.add(nodeEvent.getHostName());
                 line.add(nodeEvent.getNodeState());
@@ -169,7 +171,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
 
-        List<String> titles = new ArrayList<>();
+        List<String> titles = new ArrayList<>(3);
         titles.add("SOURCE_NAME");
         titles.add("DESCRIPTION");
         titles.add("ADMINISTRATOR");
@@ -178,7 +180,7 @@ public class StringUtility {
         formatter.addEmptyLine();
 
         for (NodeSourceView ns : nodeSources) {
-            List<String> line = new ArrayList<>();
+            List<String> line = new ArrayList<>(3);
             line.add(ns.getSourceName());
             line.add(ns.getSourceDescription());
             line.add(ns.getNodeSourceAdmin());
@@ -191,7 +193,7 @@ public class StringUtility {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(80);
         formatter.setSpace(4);
-        List<String> titles = new ArrayList<>();
+        List<String> titles = new ArrayList<>(2);
         titles.add("Stats:");
         titles.add("");
         formatter.setTitle(titles);
@@ -277,20 +279,23 @@ public class StringUtility {
             list.add((taskState.getReplicationIndex() > 0) ? "" + taskState.getReplicationIndex() : "");
             list.add(taskInfo.getTaskStatus().toString());
             list.add((taskInfo.getExecutionHostName() == null) ? "unknown" : taskInfo.getExecutionHostName());
-            list.add(Tools.getFormattedDuration(0, taskInfo.getExecutionDuration()));
+
+            if (taskInfo.getTaskStatus() == TaskStatusData.IN_ERROR) {
+                list.add(Tools.getFormattedDuration(taskInfo.getInErrorTime(), taskInfo.getStartTime()));
+            } else {
+                list.add(Tools.getFormattedDuration(0, taskInfo.getExecutionDuration()));
+            }
+
             list.add(Tools.getFormattedDuration(taskInfo.getFinishedTime(), taskInfo.getStartTime()));
             list.add("" + taskState.getNumberOfNodesNeeded());
-            if (taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft() < taskState
-                    .getMaxNumberOfExecution()) {
-                list.add((taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft() + 1) +
-                        "/" + taskState.getMaxNumberOfExecution());
-            } else {
-                list.add((taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft()) + "/" +
-                        taskState.getMaxNumberOfExecution());
-            }
-            list.add((taskState.getMaxNumberOfExecutionOnFailure() - taskInfo
-                    .getNumberOfExecutionOnFailureLeft()) +
-                    "/" + taskState.getMaxNumberOfExecutionOnFailure());
+
+            list.add(
+                    (taskState.getMaxNumberOfExecution() - taskInfo.getNumberOfExecutionLeft())
+                            + "/" + taskState.getMaxNumberOfExecution());
+            list.add(
+                    (taskState.getMaxNumberOfExecutionOnFailure() - taskInfo.getNumberOfExecutionOnFailureLeft())
+                            + "/" + taskState.getMaxNumberOfExecutionOnFailure());
+
             formatter.addLine(list);
         }
 
@@ -302,7 +307,7 @@ public class StringUtility {
         formatter.setMaxColumnLength(30);
         formatter.setSpace(4);
 
-        List<String> columnNames = new ArrayList<>();
+        List<String> columnNames = new ArrayList<>(7);
         columnNames.add("ID");
         columnNames.add("NAME");
         columnNames.add("OWNER");
@@ -352,7 +357,12 @@ public class StringUtility {
         if (startTime != -1)
             date += " (" + StringUtility.formattedElapsedTime(startTime) + ")";
         row.add(date);
-        row.add(StringUtility.formattedDuration(startTime, jobInfo.getFinishedTime()));
+
+        if (userJobInfo.getJobInfo().getStatus() == JobStatusData.IN_ERROR) {
+            row.add(StringUtility.formattedDuration(startTime, jobInfo.getInErrorTime()));
+        } else {
+            row.add(StringUtility.formattedDuration(startTime, jobInfo.getFinishedTime()));
+        }
 
         return row;
     }
@@ -378,7 +388,7 @@ public class StringUtility {
         ObjectArrayFormatter formatter = new ObjectArrayFormatter();
         formatter.setMaxColumnLength(80);
         formatter.setSpace(2);
-        List<String> columnNames = new ArrayList<>();
+        List<String> columnNames = new ArrayList<>(2);
         columnNames.add("");
         columnNames.add("");
         formatter.setTitle(columnNames);

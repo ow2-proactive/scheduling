@@ -72,7 +72,7 @@ public class SchedulerUsers implements Serializable {
      * @return a sorted collection of all connected users
      */
     public Collection<UserIdentification> getUsers() {
-        List<UserIdentification> tmp = new ArrayList<>();
+        List<UserIdentification> tmp = new ArrayList<>(users.size());
         Iterator<UserIdentification> iter = users.iterator();
         while (iter.hasNext()) {
             tmp.add(iter.next());

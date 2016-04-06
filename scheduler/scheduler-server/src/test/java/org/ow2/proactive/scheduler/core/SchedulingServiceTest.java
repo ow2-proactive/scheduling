@@ -42,7 +42,8 @@ public class SchedulingServiceTest {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(recoveredState.getPendingJobs()).thenReturn(new Vector<InternalJob>());
 		Mockito.when(recoveredState.getRunningJobs()).thenReturn(new Vector<InternalJob>());
-		
+		Mockito.when(recoveredState.getFinishedJobs()).thenReturn(new Vector<InternalJob>());
+
 		Mockito.when(infrastructure.getRMProxiesManager()).thenReturn(rmProxiesManager);
 		Mockito.when(rmProxiesManager.getRmUrl()).thenReturn(null);
 		

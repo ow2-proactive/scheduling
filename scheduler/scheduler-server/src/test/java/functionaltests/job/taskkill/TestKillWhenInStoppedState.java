@@ -81,6 +81,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -215,7 +216,7 @@ public class TestKillWhenInStoppedState extends SchedulerFunctionalTestWithResta
     private TaskFlowJob createRunningJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
-        job.setCancelJobOnError(false);
+        job.setOnTaskError(OnTaskError.CONTINUE_JOB_EXECUTION);
 
         JavaTask javaTask1 = new JavaTask();
         javaTask1.setExecutableClassName(TestJavaTask.class.getName());
@@ -233,7 +234,7 @@ public class TestKillWhenInStoppedState extends SchedulerFunctionalTestWithResta
     private TaskFlowJob createPendingJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName("Test pending job");
-        job.setCancelJobOnError(false);
+        job.setOnTaskError(OnTaskError.CONTINUE_JOB_EXECUTION);
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestJavaTask.class.getName());

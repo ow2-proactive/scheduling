@@ -7,6 +7,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -27,13 +28,13 @@ public class SchedulingServiceTest2 extends BaseServiceTest {
         JavaTask task1 = new JavaTask();
         task1.setName("javaTask");
         task1.setExecutableClassName("class");
-        task1.setCancelJobOnError(true);
+        task1.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.addTask(task1);
 
         NativeTask task2 = new NativeTask();
         task2.setName("nativeTask");
         task2.setCommandLine("command line");
-        task2.setCancelJobOnError(true);
+        task2.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.addTask(task2);
 
         return job;

@@ -122,6 +122,10 @@ public class Tasks {
             return false;
         }
 
+        if (a.getInErrorTime() != b.getInErrorTime()) {
+            return false;
+        }
+
         if (a.getFinishedTime() != b.getFinishedTime()) {
             return false;
         }

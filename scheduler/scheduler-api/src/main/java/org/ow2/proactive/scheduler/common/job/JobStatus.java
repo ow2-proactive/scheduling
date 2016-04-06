@@ -84,7 +84,12 @@ public enum JobStatus implements java.io.Serializable {
      * Nothing can be done anymore on this job expect read execution informations
      * such as output, time, etc...
      */
-    KILLED("Killed", false);
+    KILLED("Killed", false),
+    /**
+     * The job has at least one in-error task and in-error tasks are the last, among others,
+     * which have changed their state (i.e. Job status is depicted by the last action).
+     */
+    IN_ERROR("In-Error", true);
 
     /** The textual definition of the status */
     private final String definition;

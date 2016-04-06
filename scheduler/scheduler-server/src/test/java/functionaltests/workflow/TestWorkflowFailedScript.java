@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
@@ -79,10 +80,10 @@ public class TestWorkflowFailedScript extends TRepJobs {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
         job.setMaxNumberOfExecution(1);
-        job.setCancelJobOnError(false);
+        job.setOnTaskError(OnTaskError.CONTINUE_JOB_EXECUTION);
 
         JavaTask A = new JavaTask();
-        A.setCancelJobOnError(false);
+        A.setOnTaskError(OnTaskError.NONE);
         A.setMaxNumberOfExecution(1);
         A.setName("A");
         A.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");

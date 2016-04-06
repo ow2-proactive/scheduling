@@ -1115,14 +1115,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState() {
+        Collection<RMNode> nodes = this.allNodes.values();
+        ArrayList<RMNodeEvent> nodesList = new ArrayList<>(nodes.size());
 
-        ArrayList<RMNodeEvent> nodesList = new ArrayList<>();
-        for (RMNode rmnode : this.allNodes.values()) {
+        for (RMNode rmnode : nodes) {
             nodesList.add(rmnode.createNodeEvent());
         }
 
-        ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<>();
-        for (NodeSource s : this.nodeSources.values()) {
+        Collection<NodeSource> nodeSources = this.nodeSources.values();
+        ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<>(nodeSources.size());
+        for (NodeSource s : nodeSources) {
             nodeSourcesList.add(new RMNodeSourceEvent(s.getName(), s.getDescription(), s.getAdministrator()
                     .getName()));
             for (RMDeployingNode pn : s.getDeployingNodes()) {
@@ -1456,7 +1458,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
-        Collection<PluginDescriptor> descriptors = new ArrayList<>();
+        Collection<PluginDescriptor> descriptors = new ArrayList<>(plugins.size());
         for (Class<?> cls : plugins) {
             Map<String, String> defaultValues = new HashMap<>();
             descriptors.add(new PluginDescriptor(cls, defaultValues));

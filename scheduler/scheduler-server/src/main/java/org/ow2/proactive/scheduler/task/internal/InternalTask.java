@@ -583,6 +583,10 @@ public abstract class InternalTask extends TaskState {
         taskInfo.setStartTime(startTime);
     }
 
+    public void setInErrorTime(long inErrorTime) {
+        taskInfo.setInErrorTime(inErrorTime);
+    }
+
     /**
      * To set the scheduledTime
      *

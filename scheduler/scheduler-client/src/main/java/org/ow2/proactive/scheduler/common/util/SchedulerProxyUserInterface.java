@@ -46,7 +46,6 @@ import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
@@ -54,7 +53,17 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -77,6 +86,7 @@ import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -340,6 +350,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.restartTask(jobId, taskName, restartDelay);
     }
 
+    @Override
+    public boolean restartInErrorTask(String jobId,
+            String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.restartInErrorTask(jobId, taskName);
+    }
+
     public boolean preemptTask(String jobId, String taskName, int restartDelay) throws NotConnectedException,
             UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();
@@ -412,6 +429,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException,
             PermissionException {
         return uischeduler.pauseJob(jobId);
+    }
+
+    @Override
+    public boolean restartAllInErrorTasks(
+            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        return uischeduler.restartAllInErrorTasks(jobId);
     }
 
     @Override

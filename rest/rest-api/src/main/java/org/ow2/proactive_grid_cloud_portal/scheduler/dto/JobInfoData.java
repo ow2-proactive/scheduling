@@ -40,6 +40,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 public class JobInfoData {
 
     private long startTime;
+    private long inErrorTime;
     private long finishedTime;
     private long submittedTime;
     private long removedTime;
@@ -49,6 +50,11 @@ public class JobInfoData {
     private int numberOfPendingTasks;
     private int numberOfRunningTasks;
     private int numberOfFinishedTasks;
+
+    private int numberOfFailedTasks;
+    private int numberOfFaultyTasks;
+    private int numberOfInErrorTasks;
+
     private JobPriorityData priority;
     private String jobOwner;
     private boolean toBeRemoved = false;
@@ -101,6 +107,30 @@ public class JobInfoData {
         this.numberOfFinishedTasks = numberOfFinishedTasks;
     }
 
+    public int getNumberOfFailedTasks() {
+        return numberOfFailedTasks;
+    }
+
+    public void setNumberOfFailedTasks(int numberOfFailedTasks) {
+        this.numberOfFailedTasks = numberOfFailedTasks;
+    }
+
+    public int getNumberOfFaultyTasks() {
+        return numberOfFaultyTasks;
+    }
+
+    public void setNumberOfFaultyTasks(int numberOfFaultyTasks) {
+        this.numberOfFaultyTasks = numberOfFaultyTasks;
+    }
+
+    public int getNumberOfInErrorTasks() {
+        return numberOfInErrorTasks;
+    }
+
+    public void setNumberOfInErrorTasks(int numberOfInErrorTasks) {
+        this.numberOfInErrorTasks = numberOfInErrorTasks;
+    }
+
     public String getJobOwner() {
         return jobOwner;
     }
@@ -123,6 +153,14 @@ public class JobInfoData {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public long getInErrorTime() {
+        return inErrorTime;
+    }
+
+    public void setInErrorTime(long inErrorTime) {
+        this.inErrorTime = inErrorTime;
     }
 
     public long getFinishedTime() {
@@ -159,10 +197,24 @@ public class JobInfoData {
 
     @Override
     public String toString() {
-        return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime +
-            ", submittedTime=" + submittedTime + ", status='" + status + '\'' + ", jobId=" + jobId +
-            ", totalNumberOfTasks=" + totalNumberOfTasks + ", numberOfPendingTasks=" + numberOfPendingTasks +
-            ", numberOfRunningTasks=" + numberOfRunningTasks + ", numberOfFinishedTasks=" +
-            numberOfFinishedTasks + ", priority='" + priority + '\'' + ", jobOwner='" + jobOwner + '\'' + '}';
+        return "JobInfoData{" +
+                "startTime=" + startTime +
+                ", finishedTime=" + finishedTime +
+                ", submittedTime=" + submittedTime +
+                ", removedTime=" + removedTime +
+                ", status=" + status +
+                ", jobId=" + jobId +
+                ", totalNumberOfTasks=" + totalNumberOfTasks +
+                ", numberOfPendingTasks=" + numberOfPendingTasks +
+                ", numberOfRunningTasks=" + numberOfRunningTasks +
+                ", numberOfFinishedTasks=" + numberOfFinishedTasks +
+                ", numberOfFailedTasks=" + numberOfFailedTasks +
+                ", numberOfFaultyTasks=" + numberOfFaultyTasks +
+                ", numberOfInErrorTasks=" + numberOfInErrorTasks +
+                ", priority=" + priority +
+                ", jobOwner='" + jobOwner + '\'' +
+                ", toBeRemoved=" + toBeRemoved +
+                '}';
     }
+
 }

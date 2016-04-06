@@ -1,5 +1,12 @@
 package org.ow2.proactive.scheduler.job;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -11,13 +18,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -38,7 +38,6 @@ public final class ClientJobState extends JobState {
     private String owner;
     private JobType type;
     private Map<TaskId, TaskState> tasks;
-    private boolean cancelJobOnError;
     private int maxNumberOfExecution;
     private HashMap<String, String> genericInformation;
 
@@ -58,12 +57,13 @@ public final class ClientJobState extends JobState {
         this.inputSpace = jobState.getInputSpace();
         this.outputSpace = jobState.getOutputSpace();
 
-        this.cancelJobOnError = jobState.isCancelJobOnError();
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
         this.genericInformation = new HashMap<>(jobState.getGenericInformation());
 
         this.clientJobSerializationHelper = new ClientJobSerializationHelper();
+
+        this.setOnTaskError(jobState.getOnTaskErrorProperty().getValue());
 
         List<ClientTaskState> clientTaskStates = new ArrayList<>(taskStates.size());
         for (TaskState ts : taskStates) {
@@ -76,11 +76,6 @@ public final class ClientJobState extends JobState {
     public int getMaxNumberOfExecution() {
         return this.maxNumberOfExecution;
 
-    }
-
-    @Override
-    public boolean isCancelJobOnError() {
-        return cancelJobOnError;
     }
 
     @Override

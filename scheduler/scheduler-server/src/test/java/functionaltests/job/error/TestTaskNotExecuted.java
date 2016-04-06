@@ -65,11 +65,33 @@ public class TestTaskNotExecuted extends SchedulerFunctionalTestNoRestart {
     private static URL jobDescriptor3 = TestTaskNotExecuted.class
             .getResource("/functionaltests/descriptors/Job_TaskSkipped.xml");
 
+    private static URL jobDescriptor1_Schema33 = TestTaskNotExecuted.class
+            .getResource("/functionaltests/descriptors/Job_TaskCouldNotStart_Schema33.xml");
+    private static URL jobDescriptor2_Schema33 = TestTaskNotExecuted.class
+            .getResource("/functionaltests/descriptors/Job_TaskCouldNotRestart_Schema33.xml");
+    private static URL jobDescriptor3_Schema33 = TestTaskNotExecuted.class
+            .getResource("/functionaltests/descriptors/Job_TaskSkipped_Schema33.xml");
+
     @Test
     public void testTaskNotExecuted() throws Throwable {
+        String jobDescriptorPath1 = new File(jobDescriptor1.toURI()).getAbsolutePath();
+        String jobDescriptorPath2 = new File(jobDescriptor2.toURI()).getAbsolutePath();
+        String jobDescriptorPath3 = new File(jobDescriptor3.toURI()).getAbsolutePath();
+        testTaskNotExecuted(jobDescriptorPath1, jobDescriptorPath2, jobDescriptorPath3);
+    }
 
+    @Test
+    public void testTaskNotExecutedCompatibilitySchema33() throws Throwable {
+        String jobDescriptorPath1 = new File(jobDescriptor1_Schema33.toURI()).getAbsolutePath();
+        String jobDescriptorPath2 = new File(jobDescriptor2_Schema33.toURI()).getAbsolutePath();
+        String jobDescriptorPath3 = new File(jobDescriptor3_Schema33.toURI()).getAbsolutePath();
+        testTaskNotExecuted(jobDescriptorPath1, jobDescriptorPath2, jobDescriptorPath3);
+    }
+
+    private void testTaskNotExecuted(String jobDescriptorPath1, String jobDescriptorPath2,
+            String jobDescriptorPath3) throws Exception {
         log("Submitting job 1");
-        JobId id1 = schedulerHelper.submitJob(new File(jobDescriptor1.toURI()).getAbsolutePath());
+        JobId id1 = schedulerHelper.submitJob(jobDescriptorPath1);
         log("Wait for event job 1 submitted");
         schedulerHelper.waitForEventJobSubmitted(id1);
         log("Wait for event t1 running");
@@ -81,7 +103,7 @@ public class TestTaskNotExecuted extends SchedulerFunctionalTestNoRestart {
         assertTrue(tr1.getException() instanceof TaskCouldNotStartException);
 
         log("Submitting job 2");
-        JobId id2 = schedulerHelper.submitJob(new File(jobDescriptor2.toURI()).getAbsolutePath());
+        JobId id2 = schedulerHelper.submitJob(jobDescriptorPath2);
         log("Wait for event job 2 submitted");
         schedulerHelper.waitForEventJobSubmitted(id2);
         log("Wait for event t2 running");
@@ -100,7 +122,7 @@ public class TestTaskNotExecuted extends SchedulerFunctionalTestNoRestart {
         assertTrue(tr2.getException() instanceof TaskCouldNotRestartException);
 
         log("Submitting job 3");
-        JobId id3 = schedulerHelper.submitJob(new File(jobDescriptor3.toURI()).getAbsolutePath());
+        JobId id3 = schedulerHelper.submitJob(jobDescriptorPath3);
         log("Wait for event job 3 submitted");
         schedulerHelper.waitForEventJobSubmitted(id3);
         log("Wait for event T T1 T2 finished");
@@ -112,7 +134,6 @@ public class TestTaskNotExecuted extends SchedulerFunctionalTestNoRestart {
 
         assertNull(tr3_1.getException());
         assertTrue(tr3_2.getException() instanceof TaskSkippedException);
-
     }
 
 }

@@ -39,6 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -54,17 +55,26 @@ public class RestartTaskCommand extends AbstractTaskCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
-            boolean success = scheduler.restartTask(currentContext.getSessionId(), jobId, taskId);
-            resultStack(currentContext).push(success);
-            if (success) {
-                writeLine(currentContext, "%s successfully restarted.", task());
-            } else {
-                writeLine(currentContext, "Cannot restart %s.", task());
-            }
+            boolean result = scheduler.restartTask(currentContext.getSessionId(), jobId, taskId);
+
+            handleResult(currentContext, result);
         } catch (Exception e) {
             handleError(String.format("An error occurred while attempting to restart %s:", task()), e,
                     currentContext);
+        }
+    }
+
+    private void handleResult(ApplicationContext currentContext, boolean result) {
+        resultStack(currentContext).push(result);
+
+        writeDeprecation(currentContext, CommandSet.RESTART_RUNNING_TASK);
+
+        if (result) {
+            writeLine(currentContext, "%s successfully restarted.", task());
+        } else {
+            writeLine(currentContext, "Cannot restart %s.", task());
         }
     }
 

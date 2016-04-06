@@ -36,16 +36,21 @@
  */
 package scalabilityTests.framework;
 
+import javax.security.auth.login.LoginException;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import scalabilityTests.framework.listeners.SchedulerListenerExposer;
-
-import javax.security.auth.login.LoginException;
 
 
 /**
@@ -138,6 +143,7 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<Scheduler, V>
                     SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                     SchedulerEvent.JOB_PAUSED,
                     SchedulerEvent.JOB_RESUMED,
+                    SchedulerEvent.JOB_RESTARTED_FROM_ERROR,
                     SchedulerEvent.JOB_CHANGE_PRIORITY,
                     // task-related events
                     SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
