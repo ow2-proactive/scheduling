@@ -69,7 +69,6 @@ import java.net.URI;
 @ActiveObject
 public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthentication, InitActive {
 
-    private static final String ERROR_ALREADY_CONNECTED = "This active object is already connected to the resource manager. Disconnect first.";
     private final static Logger logger = Logger.getLogger(RMAuthenticationImpl.class);
     private RMCore rmcore;
 
