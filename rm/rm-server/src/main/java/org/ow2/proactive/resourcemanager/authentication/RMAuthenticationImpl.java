@@ -96,7 +96,7 @@ public class RMAuthenticationImpl extends AuthenticationImpl implements RMAuthen
         client.setCredentials(cred);
 
         if (RMCore.clients.containsKey(client.getId())) {
-            throw new LoginException(ERROR_ALREADY_CONNECTED);
+            logger.info(client + " reconnected.");
         }
 
         RMCore.clients.put(client.getId(), client);
