@@ -2,6 +2,43 @@ apply plugin: 'java'
 
 archivesBaseName = 'scheduling' // in case current folder is not named scheduling
 
+project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
+
+configurations {
+    nativeBundle
+    restCli
+    distLib {
+        extendsFrom restCli
+    }
+}
+
+
+task extractNativeBundle(type: Copy) {
+    from {
+        configurations.nativeBundle.collect { zipTree(it) }
+    }
+    into file(project.nativeLibsDir)
+}
+
+def exportedProjects= [
+        ":common-api",
+        ":common-client",
+        ":scheduler:scheduler-api",
+        ":scheduler:scheduler-client",
+        ":rest:rest-client",
+        ":rm:rm-client",
+]
+
+task wrapper(type: Wrapper) {
+   gradleVersion = '2.3' //version required
+}
+
+task alljavadoc(type: org.gradle.api.tasks.javadoc.Javadoc) {
+    source exportedProjects.collect { project(it).sourceSets.main.allJava }
+    classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
+    destinationDir = file("${buildDir}/docs/javadoc")
+}
+
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
@@ -76,6 +113,9 @@ configure(javaSubprojects) {
         exclude 'functionaltests/**'
         exclude 'unittests/**'
         exclude 'unitTests/**'
+	exclude 'org/ow2/proactive_grid_cloud_portal/scheduler/SchedulerStateRestEncodingTest*'
+	exclude 'org/ow2/proactive/scheduler/core/db/TopologicalTaskSorterTest*'
+	
     }
 
     task serialver(type: InsertSerialVersionUIDTask) {
@@ -244,19 +284,19 @@ project('rm:rm-client') {
 
 project(':rm:rm-node') {
     dependencies {
-        compile files("${rootDir}/lib/node/winp/winp-1.17-patched.jar")
+    	compile 'org.jvnet.winp:winp:1.17-proactive'
         compile 'net.java.dev.jna:jna:3.4.0'
         compile 'commons-io:commons-io:2.4'
 
         compile 'commons-cli:commons-cli:1.1'
-        compile files("${rootDir}/lib/node/sigar/sigar.jar")
+        compile 'sigar:sigar:1.7.0-proactive'
 
         compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
         compile project(':common-client')
         compile project(':rm:rm-client')
 
-        runtime fileTree(dir: "${rootDir}/lib/node/sigar/", exclude: "*.jar")
+        runtime fileTree(dir: project.nativeLibsDir, exclude: "*.jar")
 
         // protocols
         runtime "org.objectweb.proactive:programming-extension-rmissl:${programmingVersion}"
@@ -414,7 +454,7 @@ project('scheduler:scheduler-node') {
 
     task standaloneJar(type: OneJar) {
         mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
-        binLib = fileTree(dir: "${rootDir}/lib/node/", exclude: "**/*.jar")
+        binLib = fileTree(dir: project.nativeLibsDir, exclude: "*.jar")
         additionalDir = file('src/main/resources')
         manifest {
             attributes 'One-Jar-URL-Factory': 'com.simontuffs.onejar.JarClassLoader$OneJarURLFactory'
@@ -579,6 +619,7 @@ dependencies {
     distLib(project(':scheduler:scheduler-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
     }
+    nativeBundle 'sigar:sigar:1.7.0-proactive:native'
     distLib project('rm:rm-policy:rm-policy-scheduler')
     distLib project(':scheduler:scheduler-cli')
     distLib project(':scheduler:scheduler-node')
