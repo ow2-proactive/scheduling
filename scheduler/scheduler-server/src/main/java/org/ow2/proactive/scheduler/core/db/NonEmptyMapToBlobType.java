@@ -53,6 +53,8 @@ import org.hibernate.type.SerializableToBlobType;
  */
 public class NonEmptyMapToBlobType extends SerializableToBlobType {
 
+    private static final long serialVersionUID = 60L;
+
     @Override
     public boolean[] toColumnNullness(Object value, Mapping mapping) {
         if (value instanceof Map && ((Map) value).isEmpty()) {
