@@ -531,6 +531,8 @@ public class TaskData {
         internalTask.setRunAsMe(isRunAsMe());
         internalTask.setWallTime(getWallTime());
         internalTask.setMaxNumberOfExecution(getMaxNumberOfExecution());
+        internalTask.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
+        internalTask.setNumberOfExecutionOnFailureLeft(getNumberOfExecutionOnFailureLeft());
         internalTask.setRestartTaskOnError(getRestartMode());
         internalTask.setFlowBlock(getFlowBlock());
         internalTask.setIterationIndex(getIteration());

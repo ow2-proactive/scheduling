@@ -542,14 +542,20 @@ public abstract class InternalTask extends TaskState {
         this.taskInfo = (TaskInfoImpl) taskInfo;
     }
 
-    /**
-     * @see org.ow2.proactive.scheduler.common.task.CommonAttribute#setMaxNumberOfExecution(int)
-     */
+
     @Override
     public void setMaxNumberOfExecution(int numberOfExecution) {
         super.setMaxNumberOfExecution(numberOfExecution);
         this.taskInfo.setNumberOfExecutionLeft(numberOfExecution);
         this.taskInfo.setNumberOfExecutionOnFailureLeft(maxNumberOfExecutionOnFailure);
+    }
+
+    public void setNumberOfExecutionLeft(int numberOfExecutionLeft) {
+        this.taskInfo.setNumberOfExecutionLeft(numberOfExecutionLeft);
+    }
+
+    public void setNumberOfExecutionOnFailureLeft( int numberOfExecutionOnFailureLeft) {
+        this.taskInfo.setNumberOfExecutionOnFailureLeft(numberOfExecutionOnFailureLeft);
     }
 
     /**
