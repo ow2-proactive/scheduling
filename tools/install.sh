@@ -19,7 +19,7 @@ elif which apt-get > /dev/null 2>&1; then
    OS="Debian"
    PKG_TOOL="apt-get"
 else
-    echo "This Operating system is not supported by the Proactive installer."; exit 1 ;
+    echo "This operating system is not supported by the ProActive installer."; exit 1 ;
 fi
 
 RSYNC_VER=$( rsync --version|grep "protocol version"|awk '{print $6}' )
@@ -43,7 +43,7 @@ confirm() {
 }
 
 echo "This will install the ProActive scheduler as a service."
-echo "Once the installer is started, it must process until the end otherwise the installation may be corrupted"
+echo "Once the installer is started, it must process until the end otherwise the installation may be corrupted."
 
 
 if confirm "Do you want to continue? [Y/n] " ; then
@@ -59,7 +59,7 @@ JAVA_CMD=
 if [ ! -f "$INSTALL_PADIR/jre/bin/java" ]; then
     if [[ "$JAVA_HOME" == "" ]]; then
 	    if ! which java > /dev/null 2>&1; then
-            echo "JAVA_HOME is not set, no 'java' command could be found in your PATH, and this ProActive distribution does not contain an embedded jre, please install a JRE or JDK." ; exit 1 ;
+            echo "JAVA_HOME is not set, no 'java' command could be found in your PATH, and this ProActive distribution does not contain an embedded JRE, please install a JRE or JDK." ; exit 1 ;
         else
             JAVA_CMD=java
         fi
@@ -69,7 +69,7 @@ if [ ! -f "$INSTALL_PADIR/jre/bin/java" ]; then
 fi
 
 if ! which git > /dev/null 2>&1; then
-     echo "GIT is not installed on this computer and is required by the ProActive installation."
+     echo "Git is not installed on this computer and is required by the ProActive installation."
      if confirm "Do you want to install it? [Y/n] " ; then
          if [[ "$OS" == "RedHat" ]]; then
             $PKG_TOOL -y install git
@@ -132,7 +132,7 @@ id -u "$USER" > /dev/null
 
 if (( $? != 0 )); then
     echo "The user $USER does not exist. The installation script must create this user."
-    if confirm "Proceed ? [Y/n] "; then
+    if confirm "Proceed? [Y/n] "; then
         if [ "$GROUP" == "$USER" ]; then
             useradd $USER -d $PA_ROOT
         else
@@ -198,7 +198,7 @@ sed -e "s/^web\.port=.*/web.port=$PORT/g"  -i "$PA_ROOT/default/config/web/setti
 sed -e "s/^NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"
 sed -e "s/^PA_ROOT=.*/PA_ROOT=$(escape_rhs_sed "$PA_ROOT")/g"  -i "/etc/init.d/proactive-scheduler"
 
-if confirm "Start ProActive Nodes in a single JVM process (y) or multiple JVM Processes (n) ? [Y/n] " ; then
+if confirm "Start ProActive Nodes in a single JVM process (y) or multiple JVM Processes (n)? [Y/n] " ; then
     sed -e "s/^SINGLE_JVM=.*/SINGLE_JVM=true/g"  -i "/etc/init.d/proactive-scheduler"
 fi
 
@@ -304,7 +304,7 @@ if which git > /dev/null 2>&1; then
 
             if (( $? != 0 )); then
                 echo ""
-                echo "A conflict occurred, cd to $PA_ROOT/default/config and follow the instructions displayed by git to resolve them."
+                echo "A conflict occurred, cd to $PA_ROOT/default/config and follow the instructions displayed by Git to resolve them."
                 echo "Additionnaly, if a conflict occurs on the file $PA_ROOT/default/config/proactive-scheduler,"
                 echo "you will need to manually copy the modified file after conflicts are resolved by using the command:"
                 echo "cp $PA_ROOT/default/config/proactive-scheduler /etc/init.d/"
@@ -319,7 +319,7 @@ if which git > /dev/null 2>&1; then
         if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
             # display the list of addons in the new installation
             echo ""
-            echo "Here is the list of jar files in the new installation 'addons' folder."
+            echo "Here is the list of JAR files in the new installation 'addons' folder."
             echo "If there are duplicates, you need to manually remove outdated versions."
             echo ""
 
@@ -339,7 +339,7 @@ fi
 
 chown -R $USER:$GROUP $PA_ROOT/$PA_FOLDER_NAME
 
-if confirm "Restrict the access to the ProActive installation folder to user $USER ? [Y/n] " ; then
+if confirm "Restrict the access to the ProActive installation folder to user ${USER}? [Y/n] " ; then
     # preserve credentials access
     chmod -R go-rwx $PA_ROOT/$PA_FOLDER_NAME
 fi
