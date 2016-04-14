@@ -188,24 +188,24 @@ escape_rhs_sed ()
 
 }
 
-sed -e "s/^USER=.*/USER=$USER/g"  -i "/etc/init.d/proactive-scheduler"
-sed -e "s/^PROTOCOL=.*/PROTOCOL=$PROTOCOL/g"  -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^USER=.*/USER=$USER/g" -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^PROTOCOL=.*/PROTOCOL=$PROTOCOL/g" -i "/etc/init.d/proactive-scheduler"
 
 if [[ "$PROTOCOL" == "https" ]]; then
-    sed -e "s/^web\.https=.*/web.https=true/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-    sed -e "s/http:/https:/g"  -i "$PA_ROOT/default/dist/war/rm/rm.conf"
-    sed -e "s/http:/https:/g"  -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
+    sed -e "s/^web\.https=.*/web.https=true/g" -i "$PA_ROOT/default/config/web/settings.ini"
+    sed -e "s/http:/https:/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
+    sed -e "s/http:/https:/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
 fi
 
-sed -e "s/^PORT=.*/PORT=$PORT/g"  -i "/etc/init.d/proactive-scheduler"
-sed -e "s/^web\.port=.*/web.port=$PORT/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-sed -e "s/:8080/:${PORT}/g"  -i "$PA_ROOT/default/dist/war/rm/rm.conf"
-sed -e "s/:8080/:${PORT}/g"  -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
+sed -e "s/^PORT=.*/PORT=$PORT/g" -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^web\.port=.*/web.port=$PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
+sed -e "s/:8080/:${PORT}/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
+sed -e "s/:8080/:${PORT}/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
 sed -e "s/^NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"
-sed -e "s/^PA_ROOT=.*/PA_ROOT=$(escape_rhs_sed "$PA_ROOT")/g"  -i "/etc/init.d/proactive-scheduler"
+sed -e "s/^PA_ROOT=.*/PA_ROOT=$(escape_rhs_sed "$PA_ROOT")/g" -i "/etc/init.d/proactive-scheduler"
 
 if confirm "Start ProActive Nodes in a single JVM process (y) or multiple JVM Processes (n)? [Y/n] " ; then
-    sed -e "s/^SINGLE_JVM=.*/SINGLE_JVM=true/g"  -i "/etc/init.d/proactive-scheduler"
+    sed -e "s/^SINGLE_JVM=.*/SINGLE_JVM=true/g" -i "/etc/init.d/proactive-scheduler"
 fi
 
 echo "Here are the network interfaces available on your machine and the interface which will be automatically selected by ProActive: "
