@@ -75,7 +75,7 @@ public class ParallelEnvironment implements Serializable {
      * @param nodesNumber the number of nodes required by task.
      */
     public ParallelEnvironment(int nodesNumber) {
-        if (nodesNumber <= 1) {
+        if (nodesNumber < 1) {
             throw new IllegalArgumentException("nodesNumber must be greater than 1");
         }
         this.nodesNumber = nodesNumber;

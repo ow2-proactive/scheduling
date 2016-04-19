@@ -430,7 +430,7 @@ public abstract class Task extends CommonAttribute {
      * @return true if the task is parallel, false otherwise.
      */
     public boolean isParallel() {
-        return parallelEnvironment != null && parallelEnvironment.getNodesNumber() > 1;
+        return parallelEnvironment != null && parallelEnvironment.getNodesNumber() >= 1;
     }
 
     /**
