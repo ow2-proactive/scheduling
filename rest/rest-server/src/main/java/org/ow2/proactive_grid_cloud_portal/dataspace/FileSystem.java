@@ -69,19 +69,26 @@ public class FileSystem {
     }
 
     public FileObject resolveFileInUserspace(String pathname) throws FileSystemException {
-        return fsm.resolveFile(fsm.resolveFile(userspace), pathname);
+        FileObject answer = fsm.resolveFile(fsm.resolveFile(userspace), pathname);
+        answer.refresh();
+        return answer;
     }
 
     public FileObject resolveFileInGlobalspace(String pathname) throws FileSystemException {
-        return fsm.resolveFile(fsm.resolveFile(globalspace), pathname);
+        FileObject answer = fsm.resolveFile(fsm.resolveFile(globalspace), pathname);
+        answer.refresh();
+        return answer;
     }
 
     public FileObject resolveFile(String dirPath, String pathname) throws FileSystemException {
-        return fsm.resolveFile(dirPath + (dirPath.endsWith(File.separator) ? "" : File.separator) + pathname);
+        FileObject answer = fsm.resolveFile(dirPath + (dirPath.endsWith(File.separator) ? "" : File.separator) + pathname);
+        answer.refresh();
+        return answer;
     }
 
     public FileObject createFile(String pathname) throws FileSystemException {
         FileObject fo = fsm.resolveFile(pathname);
+        fo.refresh();
         if (!fo.exists()) {
             fo.createFile();
         }
@@ -89,6 +96,7 @@ public class FileSystem {
     }
 
     public static ListFile list(FileObject fo) throws FileSystemException {
+        fo.refresh();
         ListFile list = new ListFile();
         List<String> dirList = Lists.newArrayList();
         List<String> fileList = Lists.newArrayList();
@@ -141,6 +149,7 @@ public class FileSystem {
 
     public static List<FileObject> findFiles(FileObject root, List<String> includes, List<String> excludes)
             throws FileSystemException {
+        root.refresh();
         List<FileObject> files = Lists.newArrayList();
         FileSelector selector =
                 (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) ?
@@ -151,6 +160,7 @@ public class FileSystem {
     }
 
     public static void copy(InputStream is, FileObject outFile) throws IOException {
+        outFile.refresh();
         Closer closer = Closer.create();
         closer.register(is);
         try {
@@ -165,6 +175,7 @@ public class FileSystem {
     }
 
     public static void copy(FileObject fo, OutputStream os) throws IOException {
+        fo.refresh();
         Closer closer = Closer.create();
         closer.register(os);
         try {
@@ -179,6 +190,7 @@ public class FileSystem {
     }
 
     public static boolean isEmpty(FileObject fo) throws FileSystemException {
+        fo.refresh();
         FileObject[] children = fo.getChildren();
         return children == null || children.length == 0;
     }
