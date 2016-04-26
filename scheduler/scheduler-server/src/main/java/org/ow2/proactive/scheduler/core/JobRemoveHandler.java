@@ -2,7 +2,6 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -12,11 +11,12 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
+import org.apache.log4j.Logger;
 
 
 class JobRemoveHandler implements Callable<Boolean> {
 
-    static final Logger logger = Logger.getLogger(SchedulingService.class);
+    private static final Logger logger = Logger.getLogger(SchedulingService.class);
 
     private final JobId jobId;
 
@@ -29,24 +29,35 @@ class JobRemoveHandler implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
-        logger.info("job " + jobId + " removing");
+        long start = 0;
+
+        if (logger.isInfoEnabled()) {
+            start = System.currentTimeMillis();
+            logger.info("Removing job " + jobId);
+        }
 
         SchedulerDBManager dbManager = service.infrastructure.getDBManager();
 
         TerminationData terminationData = service.jobs.killJob(jobId);
         service.submitTerminationDataHandler(terminationData);
         InternalJob job = dbManager.loadJobWithTasksIfNotRemoved(jobId);
+
         if (job == null) {
             return false;
         }
+
         job.setRemovedTime(System.currentTimeMillis());
-        boolean removeFromDB = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
-        dbManager.removeJob(jobId, job.getRemovedTime(), removeFromDB);
-        logger.info("job " + jobId + " removed");
+
+        boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
+        dbManager.removeJob(jobId, job.getRemovedTime(), removeFromDb);
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Job " + jobId + " removed in " + (System.currentTimeMillis() - start) + "ms");
+        }
 
         ServerJobAndTaskLogs.remove(jobId, job.getHMTasks().keySet());
 
-        //send event to front-end
+        // send event to front-end
         service.listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                 SchedulerEvent.JOB_REMOVE_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
