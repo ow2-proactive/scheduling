@@ -289,7 +289,7 @@ public abstract class InternalJob extends JobState {
         setNumberOfPendingTasks(getNumberOfPendingTasks() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         if (getNumberOfRunningTasks() == 0 &&
-            (getStatus() != JobStatus.PAUSED || getStatus() != JobStatus.IN_ERROR)) {
+            !(getStatus() == JobStatus.PAUSED || getStatus() == JobStatus.IN_ERROR)) {
             setStatus(JobStatus.STALLED);
         }
     }
