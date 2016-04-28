@@ -40,7 +40,6 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
-import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,6 +48,7 @@ import java.util.Stack;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
+import com.google.common.base.Throwables;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -174,7 +174,7 @@ public abstract class AbstractCommand implements Command {
         writeLine(currentContext, "Error message: %s", message);
 
         if (isDebugModeEnabled(currentContext)) {
-            writeLine(currentContext, "Stack trace: %s", stackTraceAsString((cause == null) ? error : cause));
+            writeLine(currentContext, "Stack trace: %s", Throwables.getStackTraceAsString((cause == null) ? error : cause));
         } else {
             writeDebugModeUsage(currentContext);
         }

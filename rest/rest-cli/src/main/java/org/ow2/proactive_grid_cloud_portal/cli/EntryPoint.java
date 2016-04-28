@@ -43,12 +43,12 @@ import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SC
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsageWithBreakEndLine;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
-import static org.ow2.proactive_grid_cloud_portal.cli.utils.ExceptionUtility.stackTraceAsString;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import com.google.common.base.Throwables;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -209,7 +209,7 @@ public abstract class EntryPoint {
                 if (cause instanceof CLIException && ((CLIException) cause).stackTrace() != null) {
                     writer.printf("%nStack trace: %s%n", ((CLIException) cause).stackTrace());
                 } else {
-                    writer.printf("%nStack trace: %s%n", stackTraceAsString(cause));
+                    writer.printf("%nStack trace: %s%n", Throwables.getStackTraceAsString(cause));
                 }
             } else {
                 writeDebugModeUsageWithBreakEndLine(currentContext);

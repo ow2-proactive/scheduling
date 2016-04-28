@@ -60,6 +60,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.WriterOutputStream;
+import org.python.google.common.base.Throwables;
 
 
 public class JavaClassScriptEngine extends AbstractScriptEngine {
@@ -123,7 +124,7 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             return execute;
 
         } catch (Throwable e) {
-            throw new ScriptException(new TaskException(e.getMessage(), e));
+            throw new ScriptException(new TaskException(Throwables.getStackTraceAsString(e), e));
         }
     }
 
