@@ -36,11 +36,21 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import org.apache.log4j.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
@@ -51,16 +61,13 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.ow2.proactive.utils.Formatter;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import org.apache.log4j.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.concurrent.*;
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 /**
@@ -227,7 +234,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             session.connect(shorterTimeout);
         } catch (JSchException e) {
             super.declareDeployingNodeLost(pnURL,
-                    "unable to " + msg + "\n" + Formatter.stackTraceToString(e));
+                    "unable to " + msg + "\n" + getStackTraceAsString(e));
             throw new RMException("unable to " + msg, e);
         }
 
@@ -244,7 +251,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                 channel.connect();
             } catch (JSchException e) {
                 super.declareDeployingNodeLost(pnURL,
-                        "unable to " + msg + "\n" + Formatter.stackTraceToString(e));
+                        "unable to " + msg + "\n" + getStackTraceAsString(e));
                 throw new RMException("unable to " + msg, e);
             }
             final ChannelExec chan = channel;

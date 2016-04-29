@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
@@ -53,7 +52,9 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.ow2.proactive.utils.Formatter;
+import org.apache.log4j.Logger;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 /**
@@ -233,7 +234,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             p = Utils.runSSHCommand(host, cmdLine, sshOptions);
         } catch (IOException e1) {
             super.declareDeployingNodeLost(pnURL, "Cannot run command: " + cmdLine + ", with ssh options: " +
-                sshOptions + " -\n The following exception occutred:\n " + Formatter.stackTraceToString(e1));
+                sshOptions + " -\n The following exception occutred:\n " + getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions, e1);
         }
 

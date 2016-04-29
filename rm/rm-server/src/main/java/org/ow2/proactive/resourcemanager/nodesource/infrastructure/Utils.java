@@ -146,20 +146,6 @@ public class Utils {
     }
 
     /**
-     * Extract the stacktrace of a throwable object and returns it as a String
-     * @param t The throwable object from which one the stacktrace is going to be extracted
-     * @return the stacktrace of the parameter as a String
-     */
-    public static String getStacktrace(Throwable t) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        t.printStackTrace(pw);
-        String result = sw.toString();
-        pw.close();
-        return result;
-    }
-
-    /**
      * Extracts process errput and returns it
      * @param p the remote process frow which one errput will be extracted.
      * @return the remote process' errput

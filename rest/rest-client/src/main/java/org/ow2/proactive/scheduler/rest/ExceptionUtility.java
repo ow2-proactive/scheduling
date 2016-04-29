@@ -117,13 +117,6 @@ public class ExceptionUtility {
         }
     }
 
-    public static String getStackTrace(Throwable error) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw, true);
-        error.printStackTrace(pw);
-        return sw.getBuffer().toString();
-    }
-
     public static Exception exception(Throwable t) {
         return (t instanceof Exception) ? (Exception) t : new RuntimeException(t);
     }

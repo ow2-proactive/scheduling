@@ -10,7 +10,8 @@ import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.proactive.utils.Formatter;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 /**
@@ -111,7 +112,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             p = Runtime.getRuntime().exec(commandLine);
         } catch (IOException e1) {
             super.declareDeployingNodeLost(pnURL, "Cannot run command: " + commandLine +
-                " - \n The following exception occured: " + Formatter.stackTraceToString(e1));
+                " - \n The following exception occured: " + getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + commandLine, e1);
         }
 
