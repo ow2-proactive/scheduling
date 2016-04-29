@@ -6,21 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -62,7 +48,6 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
@@ -218,8 +203,8 @@ public class TaskData {
 
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ENV_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "ENV_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getEnvScript() {
         return envScript;
     }
@@ -230,8 +215,8 @@ public class TaskData {
 
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getScript() {
         return script;
     }
@@ -676,8 +661,8 @@ public class TaskData {
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRE_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "PRE_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getPreScript() {
         return preScript;
     }
@@ -688,8 +673,8 @@ public class TaskData {
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "POST_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "POST_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getPostScript() {
         return postScript;
     }
@@ -700,8 +685,8 @@ public class TaskData {
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CLEAN_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "CLEAN_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getCleanScript() {
         return cleanScript;
     }
@@ -712,8 +697,8 @@ public class TaskData {
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FLOW_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "FLOW_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getFlowScript() {
         return flowScript;
     }

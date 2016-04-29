@@ -1,6 +1,5 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +27,6 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
-import com.sun.management.OperatingSystemMXBean;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
