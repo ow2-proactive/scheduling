@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
+import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -26,7 +28,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
-import org.hibernate.annotations.Index;
+import com.sun.management.OperatingSystemMXBean;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
@@ -35,7 +37,13 @@ import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
-@Table(name = "JOB_DATA")
+@Table(name = "JOB_DATA", indexes = {
+        @Index(name = "JOB_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
+        @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
+        @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
+        @Index(name = "JOB_DATA_START_TIME", columnList = "START_TIME"),
+        @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"),
+})
 public class JobData {
 
     private Long id;
@@ -328,7 +336,6 @@ public class JobData {
     }
 
     @Column(name = "START_TIME")
-    @Index(name = "JOB_START_TIME")
     public long getStartTime() {
         return startTime;
     }
@@ -347,7 +354,6 @@ public class JobData {
     }
 
     @Column(name = "FINISH_TIME")
-    @Index(name = "JOB_FINISHED_TIME")
     public long getFinishedTime() {
         return finishedTime;
     }
@@ -357,7 +363,6 @@ public class JobData {
     }
 
     @Column(name = "REMOVE_TIME")
-    @Index(name = "JOB_REMOVED_TIME")
     public long getRemovedTime() {
         return removedTime;
     }
@@ -439,7 +444,6 @@ public class JobData {
     }
 
     @Column(name = "STATUS", nullable = false)
-    @Index(name = "job_status")
     public JobStatus getStatus() {
         return status;
     }
@@ -458,7 +462,6 @@ public class JobData {
     }
 
     @Column(name = "OWNER", nullable = false)
-    @Index(name = "job_owner_index")
     public String getOwner() {
         return owner;
     }
@@ -479,7 +482,8 @@ public class JobData {
 
     JobUsage toJobUsage() {
         JobIdImpl jobId = new JobIdImpl(getId(), getJobName());
-        JobUsage jobUsage = new JobUsage(getOwner(), getProjectName(), jobId.value(), getJobName(), getFinishedTime() - getStartTime());
+        JobUsage jobUsage = new JobUsage(getOwner(), getProjectName(), jobId.value(), getJobName(),
+                getFinishedTime() - getStartTime());
         for (TaskData taskData : getTasks()) {
             TaskUsage taskUsage = taskData.toTaskUsage(jobId);
             jobUsage.add(taskUsage);
