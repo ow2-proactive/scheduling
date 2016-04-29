@@ -36,14 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -77,6 +69,10 @@ import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+
+import java.security.PrivateKey;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -202,6 +198,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
 
                 NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule);
+
+                currentPolicy.filterAfterSelection(nodeSet, tasksToSchedule);
 
                 //start selected tasks
                 Node node = null;
