@@ -37,30 +37,29 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
-import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
-import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsageWithBreakEndLine;
-import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
-import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import com.google.common.base.Throwables;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
+import com.google.common.collect.ObjectArrays;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
 
-import com.google.common.collect.ObjectArrays;
+import static com.google.common.base.Throwables.getStackTraceAsString;
+import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
+import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SCHEDULER_URL;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsageWithBreakEndLine;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
 
 
 public abstract class EntryPoint {
@@ -209,7 +208,7 @@ public abstract class EntryPoint {
                 if (cause instanceof CLIException && ((CLIException) cause).stackTrace() != null) {
                     writer.printf("%nStack trace: %s%n", ((CLIException) cause).stackTrace());
                 } else {
-                    writer.printf("%nStack trace: %s%n", Throwables.getStackTraceAsString(cause));
+                    writer.printf("%nStack trace: %s%n", getStackTraceAsString(cause));
                 }
             } else {
                 writeDebugModeUsageWithBreakEndLine(currentContext);

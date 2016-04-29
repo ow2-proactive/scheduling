@@ -37,10 +37,6 @@
 
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -48,12 +44,6 @@ import java.util.Stack;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import com.google.common.base.Throwables;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
@@ -63,6 +53,16 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.codehaus.jackson.type.TypeReference;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
 
 
 public abstract class AbstractCommand implements Command {
@@ -174,7 +174,7 @@ public abstract class AbstractCommand implements Command {
         writeLine(currentContext, "Error message: %s", message);
 
         if (isDebugModeEnabled(currentContext)) {
-            writeLine(currentContext, "Stack trace: %s", Throwables.getStackTraceAsString((cause == null) ? error : cause));
+            writeLine(currentContext, "Stack trace: %s", getStackTraceAsString((cause == null) ? error : cause));
         } else {
             writeDebugModeUsage(currentContext);
         }
