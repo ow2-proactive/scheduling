@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
@@ -14,7 +15,10 @@ import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 
 
 @Entity
-@Table(name = "ENVIRONMENT_MODIFIER_DATA")
+@Table(name = "ENVIRONMENT_MODIFIER_DATA", indexes = {
+        @Index(name = "ENV_MODIFIER_DATA_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "ENV_MODIFIER_DATA_TASK_ID", columnList = "TASK_ID")
+})
 public class EnvironmentModifierData {
 
     private long id;

@@ -71,6 +71,8 @@ import org.hibernate.type.SerializableToBlobType;
                 @Index(name = "TASK_DATA_START_TIME", columnList = "START_TIME"),
                 @Index(name = "TASK_DATA_STATUS", columnList = "STATUS"),
                 @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
+                @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
+                @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
                 @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME")
         })
 public class TaskData {
@@ -602,9 +604,16 @@ public class TaskData {
     }
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "TASK_DATA_DEPENDENCIES", joinColumns = {
-            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+    @CollectionTable(name = "TASK_DATA_DEPENDENCIES",
+            joinColumns = {
+                    @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+                    @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK")
+            },
+            indexes = {
+                    @Index(name = "TASK_DATA_DEP_JOB_ID", columnList = "JOB_ID"),
+                    @Index(name = "TASK_DATA_DEP_TASK_ID", columnList = "TASK_ID"),
+            }
+    )
     @BatchSize(size = 100)
     public List<DBTaskId> getDependentTasks() {
         return dependentTasks;
@@ -615,9 +624,16 @@ public class TaskData {
     }
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "TASK_DATA_JOINED_BRANCHES", joinColumns = {
-            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+    @CollectionTable(name = "TASK_DATA_JOINED_BRANCHES",
+            joinColumns = {
+                    @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+                    @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK")
+            },
+            indexes = {
+                    @Index(name = "TASK_DATA_JB_JOB_ID", columnList = "JOB_ID"),
+                    @Index(name = "TASK_DATA_JB_TASK_ID", columnList = "TASK_ID"),
+            }
+    )
     @BatchSize(size = 100)
     public List<DBTaskId> getJoinedBranches() {
         return joinedBranches;

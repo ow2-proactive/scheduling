@@ -94,4 +94,5 @@ public class ThirdPartyCredentialData implements Serializable {
         result = 31 * result + (key != null ? key.hashCode() : 0);
         return result;
     }
+
 }

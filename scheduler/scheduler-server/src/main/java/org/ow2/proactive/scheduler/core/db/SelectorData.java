@@ -10,11 +10,15 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.core.db.types.PatternType;
 
 import javax.persistence.*;
+
 import java.util.Set;
 
 
 @Entity
-@Table(name = "DS_SELECTOR_DATA")
+@Table(name = "DS_SELECTOR_DATA", indexes = {
+        @Index(name = "DS_SELECTOR_DATA_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "DS_SELECTOR_DATA_TASK_ID", columnList = "TASK_ID")
+})
 public class SelectorData {
 
     private static final String INPUT_TYPE = "input";
@@ -98,7 +102,8 @@ public class SelectorData {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+    @JoinColumns(value = {
+            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
             @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskData() {
         return taskData;
@@ -127,7 +132,8 @@ public class SelectorData {
     }
 
     @Column(name = "INCLUDES")
-    @Type(type = "org.ow2.proactive.scheduler.core.db.types.PatternType", parameters = @Parameter(name = PatternType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.ow2.proactive.scheduler.core.db.types.PatternType",
+            parameters = @Parameter(name = PatternType.CLASS_NAME, value = "java.lang.Object"))
     public Set<String> getIncludes() {
         return includes;
     }
@@ -137,7 +143,8 @@ public class SelectorData {
     }
 
     @Column(name = "EXCLUDES")
-    @Type(type = "org.ow2.proactive.scheduler.core.db.types.PatternType", parameters = @Parameter(name = PatternType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.ow2.proactive.scheduler.core.db.types.PatternType",
+            parameters = @Parameter(name = PatternType.CLASS_NAME, value = "java.lang.Object"))
     public Set<String> getExcludes() {
         return excludes;
     }

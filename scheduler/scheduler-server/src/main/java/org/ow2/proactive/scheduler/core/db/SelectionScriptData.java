@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
@@ -27,7 +28,10 @@ import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
-@Table(name = "SELECTION_SCRIPT_DATA")
+@Table(name = "SELECTION_SCRIPT_DATA", indexes = {
+        @Index(name = "SELECTION_SCRIPT_DATA_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "SELECTION_SCRIPT_DATA_TASK_ID", columnList = "TASK_ID")
+})
 @BatchSize(size = 100)
 public class SelectionScriptData {
 
@@ -52,7 +56,8 @@ public class SelectionScriptData {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+    @JoinColumns(value = {
+            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
             @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskData() {
         return taskData;
