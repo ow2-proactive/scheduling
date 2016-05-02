@@ -36,14 +36,6 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -51,6 +43,15 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.utils.NodeSet;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Properties;
+import java.util.Vector;
 
 
 /**
@@ -98,6 +99,19 @@ public abstract class Policy implements Serializable {
      * @return a vector of every tasks that are ready to be schedule.
      */
     public abstract Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
+
+
+    /**
+     * After the selection process, overriding this method allows to do some filtering on the task scheduled
+     * This is useful, for example, when stateless selection scripts cannot completely determine if a node is eligible for execution.
+     * Here the scheduling policy can make further decisions and discard the unsuited task.
+     *
+     * @param selectedNodes set of nodes which were selected to execute the task
+     * @param task         task scheduled
+     */
+    public boolean isTaskExecutable(NodeSet selectedNodes, EligibleTaskDescriptor task) {
+        return true;
+    }
 
     /**
      * Set the RM state

@@ -36,14 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -77,6 +69,10 @@ import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+
+import java.security.PrivateKey;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -211,14 +207,20 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
                         currentJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
                         InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
+                        
+						if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
+                        	// load and Initialize the executable container
+                            loadAndInit(internalTask);
 
-                        // load and Initialize the executable container
-                        loadAndInit(internalTask);
+                            //create launcher and try to start the task
+                            node = nodeSet.get(0);
+                                                   
+                            numberOfTaskStarted++;
+                            createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                        	
+                        }
 
-                        //create launcher and try to start the task
-                        node = nodeSet.get(0);
-                        numberOfTaskStarted++;
-                        createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                        
 
                         //if every task that should be launched have been removed
                         if (tasksToSchedule.isEmpty()) {
