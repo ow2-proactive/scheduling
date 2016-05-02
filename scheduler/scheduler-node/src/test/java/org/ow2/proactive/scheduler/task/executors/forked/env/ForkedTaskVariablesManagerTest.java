@@ -179,7 +179,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.USERSPACE_NAME,
+                new HashMap<String, String>(), SchedulerConstants.DS_USER_BINDING_NAME,
                 testSetString);
     }
 
@@ -195,7 +195,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.GLOBALSPACE_NAME,
+                new HashMap<String, String>(), SchedulerConstants.DS_GLOBAL_BINDING_NAME,
                 testSetString);
     }
 
