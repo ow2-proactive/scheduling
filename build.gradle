@@ -146,7 +146,7 @@ configure(javaSubprojects) {
 
 
 task wrapper(type: Wrapper) {
-   gradleVersion = '2.9' //version required
+   gradleVersion = '2.13' //version required
 }
 
 ext.schedulingFunctionalTestConfiguration = {
