@@ -116,7 +116,7 @@ public class RMDBManager {
         }
     }
 
-    private static RMDBManager createInMemoryRMDBManager() {
+    public static RMDBManager createInMemoryRMDBManager() {
         Configuration config = new Configuration();
         config.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbc.JDBCDriver");
         config.setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
