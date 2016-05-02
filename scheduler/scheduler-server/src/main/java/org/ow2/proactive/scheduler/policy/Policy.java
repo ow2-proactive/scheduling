@@ -102,15 +102,15 @@ public abstract class Policy implements Serializable {
 
 
     /**
-     * After the selection process, overriding this method allows to do some filtering on the nodes selected or the tasks scheduled
+     * After the selection process, overriding this method allows to do some filtering on the task scheduled
      * This is useful, for example, when stateless selection scripts cannot completely determine if a node is eligible for execution.
-     * Here the scheduling policy can make further decisions and discard unsuited nodes.
+     * Here the scheduling policy can make further decisions and discard the unsuited task.
      *
-     * @param selectedNodes set of nodes which were selected to execute the tasks
-     * @param tasks         tasks scheduled
+     * @param selectedNodes set of nodes which were selected to execute the task
+     * @param task         task scheduled
      */
-    public void filterAfterSelection(NodeSet selectedNodes, List<EligibleTaskDescriptor> tasks) {
-        // do nothing by default
+    public boolean isTaskExecutable(NodeSet selectedNodes, EligibleTaskDescriptor task) {
+        return true;
     }
 
     /**
