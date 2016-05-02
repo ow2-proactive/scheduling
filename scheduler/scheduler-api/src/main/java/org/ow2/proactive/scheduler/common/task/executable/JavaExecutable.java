@@ -166,8 +166,8 @@ public abstract class JavaExecutable {
     public void initDataSpaces(ScriptContext sc) {
         this.inputSpace = (String) sc.getAttribute(SchedulerConstants.DS_INPUT_BINDING_NAME);
         this.outputSpace = (String) sc.getAttribute(SchedulerConstants.DS_OUTPUT_BINDING_NAME);
-        this.globalSpace = (String) sc.getAttribute(SchedulerConstants.GLOBALSPACE_NAME);
-        this.userSpace = (String) sc.getAttribute(SchedulerConstants.USERSPACE_NAME);
+        this.globalSpace = (String) sc.getAttribute(SchedulerConstants.DS_GLOBAL_BINDING_NAME);
+        this.userSpace = (String) sc.getAttribute(SchedulerConstants.DS_USER_BINDING_NAME);
         this.localSpace = (String) sc.getAttribute(SchedulerConstants.DS_SCRATCH_BINDING_NAME);
     }
 
