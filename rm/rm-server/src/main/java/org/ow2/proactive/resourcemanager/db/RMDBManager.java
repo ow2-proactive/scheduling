@@ -49,6 +49,7 @@ import java.util.TimerTask;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.DatabaseManagerException;
+import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.resourcemanager.core.history.Alive;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
@@ -59,7 +60,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.internal.util.config.ConfigurationException;
 
 
 public class RMDBManager {
@@ -72,14 +72,6 @@ public class RMDBManager {
     private static RMDBManager instance = null;
 
     private Timer timer = null;
-
-    /**
-    * An internal class to encapsulate the semantic of your data base query.
-    * It allows to avoid try/catch in every method. 
-    */
-    private static abstract class SessionWork<T> {
-        abstract T executeWork(Session session);
-    }
 
     public synchronized static RMDBManager getInstance() {
         if (instance == null) {
@@ -191,7 +183,7 @@ public class RMDBManager {
         // updating node events with uncompleted end time        
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 int updated = session.createSQLQuery(
                         "update NodeHistory set endTime = :endTime where endTime = 0").setParameter(
                         "endTime", lastAliveTime).executeUpdate();
@@ -206,7 +198,7 @@ public class RMDBManager {
         // updating user events with uncompleted end time        
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 int updated = session.createSQLQuery(
                         "update UserHistory set endTime = :endTime where endTime = 0").setParameter(
                         "endTime", lastAliveTime).executeUpdate();
@@ -260,7 +252,7 @@ public class RMDBManager {
     /**
      * Should be used for select queries
      */
-    private <T> T runWithoutTransaction(SessionWork<T> sessionWork) {
+    public <T> T runWithoutTransaction(SessionWork<T> sessionWork) {
         Session session = sessionFactory.openSession();
         try {
             session.setDefaultReadOnly(true);
@@ -295,7 +287,7 @@ public class RMDBManager {
         try {
             return runWithTransaction(new SessionWork<Boolean>() {
                 @Override
-                Boolean executeWork(Session session) {
+                public Boolean executeWork(Session session) {
                     logger.info("Adding a new node source " + nodeSourceData.getName() + " to the data base");
                     session.save(nodeSourceData);
                     return true;
@@ -309,7 +301,7 @@ public class RMDBManager {
     public void removeNodeSource(final String sourceName) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 logger.info("Removing the node source " + sourceName + " from the data base");
                 session.createQuery("delete from NodeSourceData where name=:name").setParameter("name",
                         sourceName).executeUpdate();
@@ -321,7 +313,7 @@ public class RMDBManager {
     private void removeNodeSources() {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 logger.info("Removing all node sources from the data base");
                 session.createQuery("delete from NodeSourceData").executeUpdate();
                 return null;
@@ -333,7 +325,7 @@ public class RMDBManager {
         return runWithoutTransaction(new SessionWork<Collection<NodeSourceData>>() {
             @Override
             @SuppressWarnings("unchecked")
-            Collection<NodeSourceData> executeWork(Session session) {
+            public Collection<NodeSourceData> executeWork(Session session) {
                 Query query = session.createQuery("from NodeSourceData");
                 return (Collection<NodeSourceData>) query.list();
             }
@@ -343,7 +335,7 @@ public class RMDBManager {
     public void saveUserHistory(final UserHistory history) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 session.save(history);
                 return null;
             }
@@ -353,7 +345,7 @@ public class RMDBManager {
     public void updateUserHistory(final UserHistory history) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 session.update(history);
                 return null;
             }
@@ -363,7 +355,7 @@ public class RMDBManager {
     public void saveNodeHistory(final NodeHistory nodeHistory) {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 session.createSQLQuery(
                         "update NodeHistory set endTime=:endTime where nodeUrl=:nodeUrl and endTime=0")
                         .setParameter("endTime", nodeHistory.getStartTime()).setParameter("nodeUrl",
@@ -380,7 +372,7 @@ public class RMDBManager {
     protected void updateRmAliveTime() {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 long curMilliseconds = System.currentTimeMillis();
                 session.createSQLQuery("update Alive set time = :time").setParameter("time", curMilliseconds)
                         .executeUpdate();
@@ -392,7 +384,7 @@ public class RMDBManager {
     private void createRmAliveTime() {
         runWithTransaction(new SessionWork<Void>() {
             @Override
-            Void executeWork(Session session) {
+            public Void executeWork(Session session) {
                 Alive alive = new Alive();
                 alive.setTime(System.currentTimeMillis());
                 session.save(alive);
@@ -405,7 +397,7 @@ public class RMDBManager {
         return runWithoutTransaction(new SessionWork<List<?>>() {
             @Override
             @SuppressWarnings("unchecked")
-            List<?> executeWork(Session session) {
+            public List<?> executeWork(Session session) {
                 Query query = session.createQuery(queryStr);
                 return query.list();
             }

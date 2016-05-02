@@ -10,6 +10,7 @@ dependencies {
 
             project(':common:common-api'),
             project(':common:common-client'),
+            project(':common:common-db'),
             project(':rm:rm-client'),
             project(':rm:rm-node'),
     )
@@ -21,21 +22,6 @@ dependencies {
     testCompile 'org.python:jython-standalone:2.7.0'
 
     testCompile 'org.apache.sshd:sshd-core:0.14.0'
-
-    /**
-     * Hibernate 5.1.0 depends on Javassist 3.20.0-GA with contains
-     * a bug that prevents it to work with Java 8 and our code:
-     *
-     * https://issues.jboss.org/browse/JASSIST-248
-     *
-     * The exclusion is required in order to use Javassist 3.18.2.
-     */
-    compile('org.hibernate:hibernate-core:5.1.0.Final') {
-        exclude group: 'org.javassist', module: 'javassist'
-    }
-    runtime('org.hibernate:hibernate-hikaricp:5.1.0.Final') {
-        exclude group: 'org.javassist', module: 'javassist'
-    }
 
     runtime 'org.hsqldb:hsqldb:2.3.3'
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"

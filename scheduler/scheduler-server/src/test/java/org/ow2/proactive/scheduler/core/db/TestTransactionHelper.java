@@ -1,7 +1,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import org.ow2.proactive.db.DatabaseManagerException;
-import org.ow2.proactive.scheduler.core.db.TransactionHelper.SessionWork;
+import org.ow2.proactive.db.SessionWork;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -87,4 +87,5 @@ public class TestTransactionHelper {
         verify(session, never()).beginTransaction();
         verify(sessionWork).executeWork(session);
     }
+
 }
