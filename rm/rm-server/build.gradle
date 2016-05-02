@@ -4,8 +4,6 @@ dependencies {
     compile(
             'commons-cli:commons-cli:1.3.1',
             'it.sauronsoftware.cron4j:cron4j:2.2.5',
-            'org.hibernate:hibernate-core:4.3.11.Final',
-            'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final',
 
             "org.objectweb.proactive:programming-core:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
@@ -15,6 +13,7 @@ dependencies {
             project(':rm:rm-client'),
             project(':rm:rm-node'),
     )
+
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     testCompile project(':common:common-api').sourceSets.test.output
 
@@ -23,7 +22,18 @@ dependencies {
 
     testCompile 'org.apache.sshd:sshd-core:0.14.0'
 
-    runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
+    /**
+     * Hibernate 5.1.0 depends on Javassist 3.20.0-GA with contains
+     * a bug that prevents it to work with Java 8 and our code:
+     *
+     * https://issues.jboss.org/browse/JASSIST-248
+     *
+     * The exclusion is required in order to use Javassist 3.18.2.
+     */
+    compile('org.hibernate:hibernate-core:5.1.0.Final') {
+        exclude group: 'org.javassist', module: 'javassist'
+    }
+    runtime('org.hibernate:hibernate-hikaricp:5.1.0.Final') {
         exclude group: 'org.javassist', module: 'javassist'
     }
 

@@ -5,8 +5,7 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'javax.mail:mail:1.4.7'
     compile 'joda-time:joda-time:2.9.1'
-    compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
-    compile 'org.hibernate:hibernate-core:4.3.11.Final'
+
     compile 'org.eclipse.jetty:jetty-webapp:9.2.14.v20151106'
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
@@ -32,7 +31,18 @@ dependencies {
     testCompile project(':rm:rm-policy:rm-policy-scheduler')
     testCompile project(':scheduler:scheduler-examples')
 
-    runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
+    /**
+     * Hibernate 5.1.0 depends on Javassist 3.20.0-GA with contains
+     * a bug that prevents it to work with Java 8 and our code:
+     *
+     * https://issues.jboss.org/browse/JASSIST-248
+     *
+     * The exclusion is required in order to use Javassist 3.18.2.
+     */
+    compile('org.hibernate:hibernate-core:5.1.0.Final') {
+        exclude group: 'org.javassist', module: 'javassist'
+    }
+    runtime('org.hibernate:hibernate-hikaricp:5.1.0.Final') {
         exclude group: 'org.javassist', module: 'javassist'
     }
 
