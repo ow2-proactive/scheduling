@@ -70,11 +70,27 @@ public class SchedulerConstants {
     /** Name of the GlobalSpace for DataSpaces registration */
     public static final String GLOBALSPACE_NAME = "GLOBALSPACE";
 
-    /** Name of the GlobalSpace for DataSpaces registration */
+    /** Name of the UserSpace for DataSpaces registration */
     public static final String USERSPACE_NAME = "USERSPACE";
 
     /** Default taskid directory name (used in TaskLauncher) */
     public static final String TASKID_DIR_DEFAULT_NAME = "TASKID";
+
+    public static final String MULTI_NODE_TASK_NODESURL_BINDING_NAME = "nodesurl";
+
+    public static final String VARIABLES_BINDING_NAME = "variables";
+
+    public static final String DS_SCRATCH_BINDING_NAME = "localspace";
+
+    public static final String DS_INPUT_BINDING_NAME = "inputspace";
+
+    public static final String DS_OUTPUT_BINDING_NAME = "outputspace";
+
+    public static final String DS_GLOBAL_BINDING_NAME = "globalspace";
+
+    public static final String DS_USER_BINDING_NAME = "userspace";
+
+    public static final String FORK_ENVIRONMENT_BINDING_NAME = "forkEnvironment";
 
     /**
      * Marker in the task output to locate the remote connection hint

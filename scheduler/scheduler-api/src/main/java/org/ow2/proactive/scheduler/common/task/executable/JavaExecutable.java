@@ -43,7 +43,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.script.ScriptContext;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -66,6 +69,8 @@ public abstract class JavaExecutable {
 
     private Map<String, Serializable> propagatedVariables;
 
+    private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
+
     /**
      * Initialize the executable using the given executable Initializer.
      *
@@ -73,7 +78,7 @@ public abstract class JavaExecutable {
      *
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
-    public void internalInit(JavaStandaloneExecutableInitializer execInitializer) throws Exception {
+    public void internalInit(JavaStandaloneExecutableInitializer execInitializer, ScriptContext sc) throws Exception {
         this.execInitializer = execInitializer;
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
@@ -85,7 +90,7 @@ public abstract class JavaExecutable {
         // update arguments
         updateVariables(arguments, getVariables());
         init(arguments);
-
+        initDataSpaces(sc);
     }
 
     /**
@@ -151,6 +156,19 @@ public abstract class JavaExecutable {
             }
             current = current.getSuperclass();
         }
+    }
+
+    /**
+     * Initialization of the dataSpaces.<br>
+     *
+     * @param sc the ScriptContext including as bindings the dataSpaces locations.
+     */
+    public void initDataSpaces(ScriptContext sc) {
+        this.inputSpace = (String) sc.getAttribute(SchedulerConstants.DS_INPUT_BINDING_NAME);
+        this.outputSpace = (String) sc.getAttribute(SchedulerConstants.DS_OUTPUT_BINDING_NAME);
+        this.globalSpace = (String) sc.getAttribute(SchedulerConstants.GLOBALSPACE_NAME);
+        this.userSpace = (String) sc.getAttribute(SchedulerConstants.USERSPACE_NAME);
+        this.localSpace = (String) sc.getAttribute(SchedulerConstants.DS_SCRATCH_BINDING_NAME);
     }
 
     /**
@@ -273,5 +291,30 @@ public abstract class JavaExecutable {
 
     public void setVariables(Map<String, Serializable> propagatedVariables) {
         this.propagatedVariables = propagatedVariables;
+    }
+
+    public String getInputSpace()
+    {
+        return this.inputSpace;
+    }
+
+    public String getOutputSpace()
+    {
+        return this.outputSpace;
+    }
+
+    public String getGlobalSpace()
+    {
+        return this.globalSpace;
+    }
+
+    public String getLocalSpace()
+    {
+        return this.localSpace;
+    }
+
+    public String getUserSpace()
+    {
+        return this.userSpace;
     }
 }

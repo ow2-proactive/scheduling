@@ -12,11 +12,14 @@ import javax.script.ScriptEngineManager;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.examples.EmptyTask;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class JavaClassScriptEngineFactoryTest {
@@ -37,6 +40,17 @@ public class JavaClassScriptEngineFactoryTest {
         assertNotEquals("", error.toString());
         assertNotEquals("", result);
         assertNotEquals("", engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE).get("result"));
+    }
+
+    @Test
+    public void executable_with_localspace() throws Exception {
+        JavaClassScriptEngine engine = new JavaClassScriptEngine();
+
+        engine.eval(EmptyTask.class.getName());
+        JavaExecutable javaExecutable = engine.getExecutable(EmptyTask.class.getName());
+
+        assertNotNull(javaExecutable.getLocalSpace());
+        assertNotEquals("", javaExecutable.getLocalSpace());
     }
 
     @Test

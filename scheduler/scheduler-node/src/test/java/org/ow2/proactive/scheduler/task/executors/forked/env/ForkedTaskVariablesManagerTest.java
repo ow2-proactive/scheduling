@@ -13,6 +13,7 @@ import java.util.Map;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -58,7 +59,7 @@ public class ForkedTaskVariablesManagerTest {
         variables.put(testVariable1Key, testVariable1Value);
 
         validateThatScriptHandlerBindingsContain(scriptHandler, createTaskContext(null), variables,
-                new HashMap<String, String>(), ForkedTaskVariablesManager.VARIABLES_BINDING_NAME, variables);
+                new HashMap<String, String>(), SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
     }
 
@@ -111,7 +112,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), ForkedTaskVariablesManager.FORK_ENVIRONMENT_BINDING_NAME,
+                new HashMap<String, String>(), SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
                 forkEnvironment);
 
     }
@@ -129,7 +130,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), ForkedTaskVariablesManager.DS_SCRATCH_BINDING_NAME,
+                new HashMap<String, String>(), SchedulerConstants.DS_SCRATCH_BINDING_NAME,
                 testSetString);
     }
 
@@ -146,7 +147,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), ForkedTaskVariablesManager.DS_INPUT_BINDING_NAME,
+                new HashMap<String, String>(), SchedulerConstants.DS_INPUT_BINDING_NAME,
                 testSetString);
     }
 
@@ -162,7 +163,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), ForkedTaskVariablesManager.DS_OUTPUT_BINDING_NAME,
+                new HashMap<String, String>(), SchedulerConstants.DS_OUTPUT_BINDING_NAME,
                 testSetString);
     }
 
@@ -178,7 +179,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), ForkedTaskVariablesManager.DS_USER_BINDING_NAME,
+                new HashMap<String, String>(), SchedulerConstants.USERSPACE_NAME,
                 testSetString);
     }
 
@@ -194,7 +195,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), ForkedTaskVariablesManager.DS_GLOBAL_BINDING_NAME,
+                new HashMap<String, String>(), SchedulerConstants.GLOBALSPACE_NAME,
                 testSetString);
     }
 
