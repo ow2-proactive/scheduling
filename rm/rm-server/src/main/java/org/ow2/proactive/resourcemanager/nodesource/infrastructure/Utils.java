@@ -41,8 +41,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.InetAddress;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
