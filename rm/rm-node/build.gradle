@@ -19,7 +19,7 @@ dependencies {
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
     // script engines
-    runtime 'org.jruby:jruby-complete:9.0.1.0'
+    runtime 'org.jruby:jruby-complete:9.0.5.0'
     runtime 'org.python:jython-standalone:2.7.0'
 
     runtime 'org.codehaus.groovy:groovy-all:2.4.6'
