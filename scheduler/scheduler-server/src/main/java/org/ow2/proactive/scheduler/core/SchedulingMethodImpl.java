@@ -199,8 +199,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule);
 
-                currentPolicy.filterAfterSelection(nodeSet, tasksToSchedule);
-
                 //start selected tasks
                 Node node = null;
                 InternalJob currentJob = null;
@@ -209,14 +207,20 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
                         currentJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
                         InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
+                        
+						if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
+                        	// load and Initialize the executable container
+                            loadAndInit(internalTask);
 
-                        // load and Initialize the executable container
-                        loadAndInit(internalTask);
+                            //create launcher and try to start the task
+                            node = nodeSet.get(0);
+                                                   
+                            numberOfTaskStarted++;
+                            createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                        	
+                        }
 
-                        //create launcher and try to start the task
-                        node = nodeSet.get(0);
-                        numberOfTaskStarted++;
-                        createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                        
 
                         //if every task that should be launched have been removed
                         if (tasksToSchedule.isEmpty()) {
