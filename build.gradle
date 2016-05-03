@@ -207,7 +207,7 @@ dependencies {
     nativeBundle 'org.jvnet.winp:winp:1.23-proactive:native'
     nativeBundle 'sigar:sigar:1.7.0-proactive:native'
 
-    compile 'org.codehaus.groovy:groovy-all:2.4.5'
+    compile 'org.codehaus.groovy:groovy-all:2.4.6'
     compile 'commons-io:commons-io:2.4'
 }
 
