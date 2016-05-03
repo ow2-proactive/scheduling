@@ -1,25 +1,24 @@
 package org.ow2.proactive.scheduler.task.java;
 
+import org.junit.Test;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.examples.WaitAndPrint;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
+
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.examples.EmptyTask;
-import org.ow2.proactive.scheduler.examples.WaitAndPrint;
-import org.ow2.proactive.scheduler.task.SchedulerVars;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 
 public class JavaClassScriptEngineFactoryTest {
@@ -44,13 +43,31 @@ public class JavaClassScriptEngineFactoryTest {
 
     @Test
     public void executable_with_localspace() throws Exception {
-        JavaClassScriptEngine engine = new JavaClassScriptEngine();
+        ScriptEngineManager mgr = new ScriptEngineManager();
+        ScriptEngine engine = mgr.getEngineByName("java");
 
-        engine.eval(EmptyTask.class.getName());
-        JavaExecutable javaExecutable = engine.getExecutable(EmptyTask.class.getName());
+        StringWriter output = new StringWriter();
+        StringWriter error = new StringWriter();
+        engine.getContext().setWriter(output);
+        engine.getContext().setErrorWriter(new PrintWriter(error));
 
-        assertNotNull(javaExecutable.getLocalSpace());
-        assertNotEquals("", javaExecutable.getLocalSpace());
+        String localSpacePath = new File(".").getAbsolutePath();
+
+        engine.getContext().setAttribute(SchedulerConstants.DS_SCRATCH_BINDING_NAME,
+                localSpacePath,
+                ScriptContext.ENGINE_SCOPE);
+
+        String result = (String) engine.eval(ReturnLocalSpace.class.getName());
+
+        assertEquals(result, localSpacePath);
+    }
+
+    public static class ReturnLocalSpace extends JavaExecutable {
+
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            return getLocalSpace();
+        }
     }
 
     @Test
