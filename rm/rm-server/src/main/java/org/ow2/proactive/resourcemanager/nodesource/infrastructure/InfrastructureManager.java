@@ -36,18 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -61,6 +49,13 @@ import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -247,6 +242,37 @@ public abstract class InfrastructureManager implements Serializable {
 				throw new RMException("Not expected node registered, discarding it: " + url);
 			}
 		}
+	}
+
+	/**
+	 * Add multiple deploying nodes
+	 * @param nodeNames node names which will be created
+	 * @param obfuscatedCmd obfuscated command used to start the node
+	 * @param message user message
+	 * @param nodeTimeout node timeout used
+	 * @return a list of deploying nodes urls
+	 */
+	protected List<String> addMultipleDeployingNodes(List<String> nodeNames, String obfuscatedCmd, String message, int nodeTimeout) {
+		List<String> answer = new ArrayList<>(nodeNames.size());
+		for (String nodeName : nodeNames) {
+			String depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, message,
+					nodeTimeout);
+			answer.add(depNodeURL);
+		}
+		return answer;
+	}
+
+	/**
+	 * Declare multiple nodes lost
+	 *
+	 * @param deployingNodes list of urls of deploying nodes
+	 * @param message        user message
+	 */
+	protected void multipleDeclareDeployingNodeLost(List<String> deployingNodes, String message) {
+		for (String node : deployingNodes) {
+			this.declareDeployingNodeLost(node, message);
+		}
+
 	}
 
 	/**
@@ -569,27 +595,33 @@ public abstract class InfrastructureManager implements Serializable {
 	protected final boolean checkNodeIsAcquiredAndDo(String nodeName, Runnable toRunWhenOK, Runnable toRunWhenKO) {
 		synchronized (nodeAcquisitionLock) {
 			if (this.acquiredNodes.containsKey(nodeName)) {
-				if (toRunWhenOK != null) {
-					try {
-						toRunWhenOK.run();
-					} catch (Exception e) {
-						logger.warn("An exception occurred while running implementation's code whereas the node "
-								+ nodeName + " was found.", e);
-					}
-				}
+				checkNodePostAction(toRunWhenOK, "An exception occurred while running implementation's code whereas the node "
+						+ nodeName + " was found.");
 				return true;
 			} else {
-				if (toRunWhenKO != null) {
-					try {
-						toRunWhenKO.run();
-					} catch (Exception e) {
-						logger.warn("An exception occurred while running implementation's code whereas the node "
-								+ nodeName + " was not found.", e);
-					}
-				}
+				checkNodePostAction(toRunWhenKO, "An exception occurred while running implementation's code whereas the node "
+						+ nodeName + " was not found.");
 				return false;
 			}
 		}
+	}
+
+	private void checkNodePostAction(Runnable toRunWhenOK, String message) {
+		if (toRunWhenOK != null) {
+			try {
+				toRunWhenOK.run();
+			} catch (Exception e) {
+				logger.warn(message, e);
+			}
+		}
+	}
+
+	protected final boolean checkAllNodesAreAcquiredAndDo(List<String> nodeNames, Runnable toRunWhenOK, Runnable toRunWhenKO) {
+		boolean answer = true;
+		for (String nodeName : nodeNames) {
+			answer = answer && checkNodeIsAcquiredAndDo(nodeName, toRunWhenOK, toRunWhenKO);
+		}
+		return answer;
 	}
 
 	// **********************************************************************************************//

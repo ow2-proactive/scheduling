@@ -208,8 +208,9 @@ public class RMTHelper {
 
     public static void waitForNodeSourceCreation(String name, int nodeNumber, RMMonitorsHandler monitor) {
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, name, monitor);
+        // this sequence of events matches what's happening on the resource manager when a node source is created
+        waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, nodeNumber, monitor);
         for (int i = 0; i < nodeNumber; i++) {
-            waitForAnyNodeEvent(RMEventType.NODE_ADDED, monitor);
             waitForAnyNodeEvent(RMEventType.NODE_REMOVED, monitor);
             waitForAnyNodeEvent(RMEventType.NODE_ADDED, monitor);
             waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitor);
@@ -220,8 +221,9 @@ public class RMTHelper {
     @Deprecated
     public void waitForNodeSourceCreation(String name, int nodeNumber) {
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, name);
+        // this sequence of events matches what's happening on the resource manager when a node source is created
+        waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, nodeNumber);
         for (int i = 0; i < nodeNumber; i++) {
-            waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
             waitForAnyNodeEvent(RMEventType.NODE_ADDED);
             waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -494,9 +496,37 @@ public class RMTHelper {
         return waitForAnyNodeEvent(eventType, getMonitorsHandler());
     }
 
+    /**
+     * Wait for a given number of events of the same type on any node: added, removed....
+     *
+     * @param eventType awaited event.
+     * @return RMNodeEvent object received by event receiver.
+     */
+    public List<RMNodeEvent> waitForAnyMultipleNodeEvent(RMEventType eventType, int nbTimes) {
+        List<RMNodeEvent> answer = new ArrayList<>(nbTimes);
+        for (int i = 0; i < nbTimes; i++) {
+            answer.add(waitForAnyNodeEvent(eventType, getMonitorsHandler()));
+        }
+        return answer;
+    }
+
     public static RMNodeEvent waitForAnyNodeEvent(RMEventType eventType, RMMonitorsHandler monitorsHandler) {
         try {
             return waitForAnyNodeEvent(eventType, 0, monitorsHandler);
+        } catch (ProActiveTimeoutException e) {
+            //unreachable block, 0 means infinite, no timeout
+            //log sthing ?
+            return null;
+        }
+    }
+
+    public static List<RMNodeEvent> waitForAnyMultipleNodeEvent(RMEventType eventType, int nbTimes, RMMonitorsHandler monitorsHandler) {
+        try {
+            List<RMNodeEvent> answer = new ArrayList<>(nbTimes);
+            for (int i = 0; i < nbTimes; i++) {
+                answer.add(waitForAnyNodeEvent(eventType, 0, monitorsHandler));
+            }
+            return answer;
         } catch (ProActiveTimeoutException e) {
             //unreachable block, 0 means infinite, no timeout
             //log sthing ?

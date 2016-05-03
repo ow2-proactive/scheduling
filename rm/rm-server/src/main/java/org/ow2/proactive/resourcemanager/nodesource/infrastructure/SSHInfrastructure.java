@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.security.KeyException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -54,6 +49,13 @@ import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.Formatter;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -139,7 +141,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes) throws RMException {
         String fs = this.targetOSObj.fs;
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
         // we take care of spaces in java path
@@ -198,6 +200,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         // current rmcore shortID should be added to ensure uniqueness
         final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         clb.setNodeName(nodeName);
+        clb.setNumberOfNodes(nbNodes);
         // finally, the credential's value
         String credString = null;
         try {
@@ -224,23 +227,25 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         }
 
         // we create a new deploying node before ssh command ran
-        final String pnURL = super.addDeployingNode(nodeName, obfuscatedCmdLine,
-                "Deploying node on host " + host, this.nodeTimeOut);
-        this.pnTimeout.put(pnURL, new Boolean(false));
+        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
+        final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, "Deploying nodes on host " + host, super.nodeTimeOut));
+        addTimeouts(depNodeURLs);
+
 
         Process p = null;
         try {
             p = Utils.runSSHCommand(host, cmdLine, sshOptions);
         } catch (IOException e1) {
-            super.declareDeployingNodeLost(pnURL, "Cannot run command: " + cmdLine + ", with ssh options: " +
-                sshOptions + " -\n The following exception occutred:\n " + Formatter.stackTraceToString(e1));
+            multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + cmdLine + ", with ssh options: " +
+                    sshOptions + " -\n The following exception occutred:\n " + Formatter.stackTraceToString(e1));
             throw new RMException("Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions, e1);
         }
 
         String lf = System.lineSeparator();
 
         int circuitBreakerThreshold = 5;
-        while (!this.pnTimeout.get(pnURL) && circuitBreakerThreshold > 0) {
+        while (!anyTimedOut(depNodeURLs) && circuitBreakerThreshold > 0) {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
@@ -255,9 +260,9 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                     lf + "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " +
                     pOutPut;
                 logger.error(description);
-                if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
+                if (super.checkAllNodesAreAcquiredAndDo(createdNodeNames, null, new Runnable() {
                     public void run() {
-                        SSHInfrastructure.this.declareDeployingNodeLost(pnURL, description);
+                        SSHInfrastructure.this.multipleDeclareDeployingNodeLost(depNodeURLs, description);
                     }
                 })) {
                     return;
@@ -285,9 +290,9 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         }
 
         // if we exit because of a timeout
-        if (this.pnTimeout.get(pnURL)) {
+        if (anyTimedOut(depNodeURLs)) {
             // we remove it
-            this.pnTimeout.remove(pnURL);
+            removeTimeouts(depNodeURLs);
             // we destroy the process
             p.destroy();
             throw new RMException("Deploying Node " + nodeName + " not expected any more");

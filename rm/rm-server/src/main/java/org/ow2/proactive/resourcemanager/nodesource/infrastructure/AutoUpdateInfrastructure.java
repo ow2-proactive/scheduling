@@ -1,16 +1,19 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.security.KeyException;
-import java.util.Properties;
-
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.Formatter;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -26,11 +29,12 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     public static final String HOST_NAME = "host.name";
     public static final String NODESOURCE_NAME = "nodesource.name";
     public static final String NODESOURCE_CREDENTIALS = "nodesource.credentials";
+    public static final String NB_NODES = "nb.nodes";
 
     @Configurable(description = "Command that will be launched for every host")
     protected String command = "scp -o StrictHostKeyChecking=no ${pa.rm.home}/dist/war/rest/node.jar ${host.name}:/tmp/${node.name}.jar && " +
         "ssh -o StrictHostKeyChecking=no ${host.name} " +
-        "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +
+            "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -w ${nb.nodes} -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +
         "1>>/tmp/${node.name}.log 2>&1\"";
 
     @Override
@@ -52,7 +56,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
      * @throws org.ow2.proactive.resourcemanager.exception.RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes) throws RMException {
 
         final String nodeName = this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
 
@@ -69,13 +73,15 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         localProperties.put(HOST_NAME, host.getHostName());
         localProperties.put(NODESOURCE_CREDENTIALS, credentials);
         localProperties.put(NODESOURCE_NAME, nodeSource.getName());
+        localProperties.put(NB_NODES, nbNodes);
 
         String filledCommand = replaceProperties(command, localProperties);
         filledCommand = replaceProperties(filledCommand, System.getProperties());
 
-        final String pnURL = super.addDeployingNode(nodeName, filledCommand, "Deploying node on host " + host,
-                this.nodeTimeOut);
-        this.pnTimeout.put(pnURL, new Boolean(false));
+        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
+        final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, filledCommand, "Deploying node on host " + host, this.nodeTimeOut));
+        addTimeouts(depNodeURLs);
 
         Process p;
         try {
@@ -83,15 +89,15 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             logger.debug("Launching the command: " + filledCommand);
             p = Runtime.getRuntime().exec(new String[] { "bash", "-c", filledCommand });
         } catch (IOException e1) {
-            super.declareDeployingNodeLost(pnURL, "Cannot run command: " + filledCommand +
-                " - \n The following exception occurred: " + Formatter.stackTraceToString(e1));
+            multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + filledCommand +
+                    " - \n The following exception occurred: " + Formatter.stackTraceToString(e1));
             throw new RMException("Cannot run command: " + filledCommand, e1);
         }
 
         String lf = System.lineSeparator();
 
         int circuitBreakerThreshold = 5;
-        while (!this.pnTimeout.get(pnURL) && circuitBreakerThreshold > 0) {
+        while (!anyTimedOut(depNodeURLs) && circuitBreakerThreshold > 0) {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
@@ -108,7 +114,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
-                        AutoUpdateInfrastructure.this.declareDeployingNodeLost(pnURL, description);
+                        multipleDeclareDeployingNodeLost(depNodeURLs, description);
                     }
                 })) {
                     return;
@@ -141,9 +147,9 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         }
 
         // if we exit because of a timeout
-        if (this.pnTimeout.get(pnURL)) {
+        if (anyTimedOut(depNodeURLs)) {
             // we remove it
-            this.pnTimeout.remove(pnURL);
+            removeTimeouts(depNodeURLs);
             // we destroy the process
             p.destroy();
             throw new RMException("Deploying Node " + nodeName + " not expected any more");
