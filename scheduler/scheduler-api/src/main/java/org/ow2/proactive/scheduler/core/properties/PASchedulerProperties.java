@@ -96,6 +96,9 @@ public enum PASchedulerProperties {
     /** Number of threads used to execute internal scheduling operations */
     SCHEDULER_INTERNAL_POOL_NBTHREAD("pa.scheduler.core.internalpoolnbthreads", PropertyType.INTEGER),
 
+    /** Number of threads used to handle scheduled operations */
+    SCHEDULER_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.scheduledpoolnbthreads", PropertyType.INTEGER),
+
     /** Name of the JMX MBean for the scheduler */
     SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PropertyType.STRING),
 
