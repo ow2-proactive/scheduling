@@ -34,14 +34,19 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.utils.PAProperties;
-import org.ow2.proactive.utils.Tools;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import com.google.common.base.Joiner;
 
 
 /**
@@ -237,7 +242,7 @@ public final class CommandLineBuilder implements Cloneable {
      */
     public String buildCommandLine(boolean displayCredentials) throws IOException {
         List<String> command = this.buildCommandLineAsList(displayCredentials);
-        return Tools.join(command, " ");
+        return Joiner.on(' ').join(command);
     }
 
     /**

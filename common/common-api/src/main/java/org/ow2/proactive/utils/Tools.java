@@ -350,28 +350,6 @@ public class Tools {
     }
 
     /**
-     * Joins the elements of the list into a single String
-     * containing the provided list of elements. 
-     * @param list the array of values to join together, may be null
-     * @param delim the separator String to use
-     * @return the joined String, <code>null</code> if null array input
-     */
-    public static String join(List<?> list, String delim) {
-        if (list == null) {
-            return null;
-        }
-        int len = list.size();
-        if (len == 0)
-            return "";
-        StringBuilder sb = new StringBuilder(list.get(0).toString());
-        for (int i = 1; i < len; i++) {
-            sb.append(delim);
-            sb.append(list.get(i).toString());
-        }
-        return sb.toString();
-    }
-
-    /**
      * Log available script engines at INFO level.
      *
      * @param logger the logger instance used to log available script engines.

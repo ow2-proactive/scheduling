@@ -18,9 +18,8 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.ow2.proactive.utils.Tools;
-
-import static com.google.common.base.Throwables.getStackTraceAsString;
+import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
 
 
 public class LocalInfrastructure extends InfrastructureManager {
@@ -123,7 +122,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
 
         // The printed cmd with obfuscated credentials
-        final String obfuscatedCmd = Tools.join(cmd, " ");
+        final String obfuscatedCmd = Joiner.on(' ').join(cmd);
 
         List<String> depNodeURLs = new ArrayList<>(handledNodes.get());
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseNodeName, handledNodes.get());
@@ -149,7 +148,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         } catch (IOException e) {
             String lf = System.lineSeparator();
-            String mess = "Cannot launch rm node " + baseNodeName + lf + getStackTraceAsString(e);
+            String mess = "Cannot launch rm node " + baseNodeName + lf + Throwables.getStackTraceAsString(e);
             multipleDeclareDeployingNodeLost(depNodeURLs, mess);
             if (processExecutor != null) {
                 cleanProcess();
@@ -166,8 +165,8 @@ public class LocalInfrastructure extends InfrastructureManager {
                     String lf = System.lineSeparator();
                     String message = "RMNode exit code == " + exit + lf;
                     message += "Command: " + obfuscatedCmd + lf;
-                    String out = Tools.join(processExecutor.getOutput(), "\n");
-                    String err = Tools.join(processExecutor.getErrorOutput(), "\n");
+                    String out = Joiner.on('\n').join(processExecutor.getOutput());
+                    String err = Joiner.on('\n').join(processExecutor.getErrorOutput());
                     message += "stdout: " + out + lf + "stderr: " + err;
                     multipleDeclareDeployingNodeLost(depNodeURLs, message);
                 }
@@ -219,7 +218,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             String lf = System.lineSeparator();
             String url = super.addDeployingNode(name, "deployed as daemon",
                     "Deploying a local infrastructure node", this.nodeTimeout);
-            String st = getStackTraceAsString(e);
+            String st = Throwables.getStackTraceAsString(e);
             super.declareDeployingNodeLost(url, message + lf + st);
         }
     }
@@ -317,4 +316,5 @@ public class LocalInfrastructure extends InfrastructureManager {
     public String toString() {
         return "Local Infrastructure";
     }
+
 }
