@@ -36,22 +36,23 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.utils.FileToBytesConverter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.utils.FileToBytesConverter;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /** Abstract infrastructure Manager implementation based on hosts list file. */
@@ -70,10 +71,10 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     protected int maxDeploymentFailure = HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD;
 
     /**
-     * list of free hosts; if host AA has a capacity of 2 runtimes, the initial state
-     * of this list will contain twice host AA.
+     * map of free hosts with the number of nodes to deploy on each host
      */
-    private List<InetAddress> freeHosts = Collections.synchronizedList(new ArrayList<InetAddress>());
+    private ConcurrentHashMap<InetAddress, Integer> freeHosts = new ConcurrentHashMap<>();
+
     /** Maintains tresholds per hosts to be able to know if the deployment fails and to retry a given number of time */
     private Hashtable<InetAddress, Integer> hostsThresholds = new Hashtable<>();
 
@@ -81,6 +82,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * The set of nodes for which one the registerAcquiredNode has been run.
      */
     private Hashtable<String, InetAddress> registeredNodes = new Hashtable<>();
+
+    /**
+     * Nodes previously removed
+     */
+    final ConcurrentHashMap<InetAddress, AtomicInteger> removedNodes = new ConcurrentHashMap<>();
 
     /**
      * To notify the control loop of the deploying node timeout
@@ -92,11 +98,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     @Override
     public void acquireAllNodes() {
-        synchronized (freeHosts) {
+
             while (freeHosts.size() > 0) {
                 acquireNode();
             }
-        }
+
     }
 
     /**
@@ -104,42 +110,46 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     @Override
     public void acquireNode() {
-        InetAddress tmpHost = null;
-        synchronized (freeHosts) {
+        final InetAddress tmpHost;
+        final int nbNodes;
+
             if (freeHosts.size() == 0) {
-                logger.warn("Attempting to acquire nodes while all hosts are already deployed.");
+                logger.info("Attempting to acquire nodes while all hosts are already deployed.");
                 return;
             }
-            tmpHost = freeHosts.remove(0);
-            logger.debug("Acquiring a new node. #freeHosts:" + freeHosts.size() + " #registered: " +
+            Iterator<Map.Entry<InetAddress, Integer>> iterator = freeHosts.entrySet().iterator();
+            final Map.Entry<InetAddress, Integer> tmpEntry = iterator.next();
+            iterator.remove();
+            tmpHost = tmpEntry.getKey();
+            nbNodes = tmpEntry.getValue();
+        logger.info("Acquiring a new node. #freeHosts:" + freeHosts.size() + " #registered: " +
                 registeredNodes.size());
-        }
-        final InetAddress host = tmpHost;
+
         this.nodeSource.executeInParallel(new Runnable() {
             public void run() {
                 try {
-                    startNodeImpl(host);
-                    logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
-                        registeredNodes.size());
+                    startNodeImpl(tmpHost, nbNodes);
+
                     //node acquisition went well for host so we update the threshold
-                    synchronized (freeHosts) {
-                        hostsThresholds.put(host, maxDeploymentFailure);
-                    }
+
+                    logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
+                            registeredNodes.size());
+                    hostsThresholds.put(tmpHost, maxDeploymentFailure);
+
                 } catch (Exception e) {
-                    synchronized (freeHosts) {
-                        Integer tries = hostsThresholds.get(host);
-                        tries--;
-                        if (tries > 0) {
-                            hostsThresholds.put(host, tries);
-                            freeHosts.add(host);
-                        } else {
-                            logger.debug("Tries threshold reached for host " + host +
+
+                    Integer tries = hostsThresholds.get(tmpHost);
+                    tries--;
+                    if (tries > 0) {
+                        hostsThresholds.put(tmpHost, tries);
+                        freeHosts.putIfAbsent(tmpHost, nbNodes);
+                    } else {
+                        logger.debug("Tries threshold reached for host " + tmpHost +
                                 ". This host is not part of the deployment process anymore.");
-                        }
                     }
-                    String description = "Could not acquire node on host " + host.toString() +
-                        ". NS's state refreshed regarding last checked exception: #freeHosts:" +
-                        freeHosts.size() + " #registered: " + registeredNodes.size();
+                    String description = "Could not acquire node on host " + tmpHost +
+                            ". NS's state refreshed regarding last checked exception: #freeHosts:" +
+                            freeHosts.size() + " #registered: " + registeredNodes.size();
                     logger.error(description, e);
                     return;
                 }
@@ -224,18 +234,14 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             String host = elts[0];
             try {
                 InetAddress addr = InetAddress.getByName(host);
-                synchronized (this.freeHosts) {
-                    for (int i = 0; i < num; i++) {
-                        this.freeHosts.add(addr);
-                    }
-                }
+
+                this.freeHosts.putIfAbsent(addr, num);
+
                 hostsThresholds.put(addr, maxDeploymentFailure);
             } catch (UnknownHostException ex) {
                 throw new RuntimeException("Unknown host: " + host, ex);
             }
         }
-
-        Collections.shuffle(freeHosts);
     }
 
     /**
@@ -257,7 +263,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         this.registeredNodes.put(nodeName, node.getVMInformation().getInetAddress());
         if (logger.isDebugEnabled()) {
             logger.debug("New expected node registered: #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size());
+                    registeredNodes.size());
         }
     }
 
@@ -269,27 +275,57 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         InetAddress host = null;
         String nodeName = node.getNodeInformation().getName();
         if ((host = registeredNodes.remove(nodeName)) != null) {
-            freeHosts.add(host);
-            logger.debug("Node " + nodeName + " removed. #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size());
-            try {
-                this.killNodeImpl(node, host);
-            } catch (Exception e) {
-                logger.trace("An exception occurred during node removal", e);
+            logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " + this.getClass().getSimpleName());
+            // remember the node removed
+            removedNodes.putIfAbsent(host, new AtomicInteger(0));
+            removedNodes.get(host).incrementAndGet();
+            if (!registeredNodes.containsValue(host)) {
+                try {
+                    this.killNodeImpl(node, host);
+                } catch (Exception e) {
+                    logger.trace("An exception occurred during node removal", e);
+                }
+                // in case all nodes relative to this host were removed kill the JVM
+                freeHosts.putIfAbsent(host, removedNodes.remove(host).intValue());
             }
+            logger.info("Node " + nodeName + " removed. #freeHosts:" + freeHosts.size() + " #registered nodes: " +
+                    registeredNodes.size());
+
         } else {
             logger.error("Node " + nodeName +
-                " is not known as a node belonging to this infrastructure manager");
+                    " is not known as a node belonging to this infrastructure manager");
+        }
+    }
+
+    protected boolean anyTimedOut(List<String> nodesUrl) {
+        for (String nodeUrl : nodesUrl) {
+            if (pnTimeout.get(nodeUrl)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void removeTimeouts(List<String> nodesUrl) {
+        for (String nodeUrl : nodesUrl) {
+            pnTimeout.remove(nodeUrl);
+        }
+    }
+
+    protected void addTimeouts(List<String> nodesUrl) {
+        for (String pnUrl : nodesUrl) {
+            this.pnTimeout.put(pnUrl, false);
         }
     }
 
     /**
      * Launch the node on the host passed as parameter
      * @param host The host on which one the node will be started
+     * @param nbNodes number of nodes to deploy
      * @throws RMException If the node hasn't been started. Very important to take care of that
      * in implementations to keep the infrastructure in a coherent state.
      */
-    protected abstract void startNodeImpl(InetAddress host) throws RMException;
+    protected abstract void startNodeImpl(InetAddress host, int nbNodes) throws RMException;
 
     /**
      * Kills the node passed as parameter

@@ -51,15 +51,23 @@ import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
+import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.utils.Criteria;
+import org.ow2.proactive.utils.NodeSet;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -73,45 +81,93 @@ import static org.junit.Assert.assertEquals;
 
 public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
+    private static int port;
+    private static SshServer sshd;
+
+
+    private static String javaExePath;
+    private static Object[] infraParams;
+    private static Object[] policyParameters;
+    private static String nsname = "testSSHInfra";
+    private static int NB_NODES = 3;
+
+    private ResourceManager resourceManager;
+
     @Test
-    public void action() throws Exception {
-        ResourceManager resourceManager = this.rmHelper.getResourceManager();
+    public void testSSHInfrastructureV2() throws Exception {
+
+        resourceManager = this.rmHelper.getResourceManager();
 
         RMTHelper.log("Test - Create SSH infrastructure on ssh://localhost on port " + this.port);
 
-        String javaExePath = System.getProperty("java.home") + File.separator + "bin" + File.separator +
-            (OsUtils.isWin32() ? "java.exe" : "java");
-        javaExePath = "\"" + javaExePath + "\"";
-
-        Object[] infraParams = new Object[] { "localhost 1\n".getBytes(), //hosts
-                60000, //timeout
-                1, //attempts
-                this.port, //ssh server port
-                "toto", //ssh username
-                "toto", //ssh password
-                new byte[0], // optional ssh private key
-                new byte[0], // optional ssh options file
-                javaExePath, //java path on the remote machines
-                PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
-                OperatingSystem.getOperatingSystem(), "" }; // extra java options
-
-        final Object[] policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString() };
-
-        String nsname = "testSSHInfra";
         resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
                 StaticPolicy.class.getName(), policyParameters);
-        this.rmHelper.waitForNodeSourceCreation(nsname, 1);
+        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES);
 
         RMState s = resourceManager.getState();
-        assertEquals(1, s.getTotalNodesNumber());
-        assertEquals(1, s.getFreeNodesNumber());
+        assertEquals(NB_NODES, s.getTotalNodesNumber());
+        assertEquals(NB_NODES, s.getFreeNodesNumber());
     }
 
-    private int port;
-    private SshServer sshd;
+    @Test
+    public void testSSHInfrastructureV2WithRestartDownNodes() throws Exception {
 
-    @Before
-    public void startSSHServer() throws Exception {
+        resourceManager = this.rmHelper.getResourceManager();
+
+        RMTHelper.log("Test - Create SSH infrastructure with RestartDownNodes policy on ssh://localhost on port " + this.port);
+
+        resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
+                RestartDownNodesPolicy.class.getName(), policyParameters);
+        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES);
+
+        RMState s = resourceManager.getState();
+        assertEquals(NB_NODES, s.getTotalNodesNumber());
+        assertEquals(NB_NODES, s.getFreeNodesNumber());
+
+        NodeSet ns = resourceManager.getNodes(new Criteria(NB_NODES));
+
+        for (Node n : ns) {
+            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+        }
+
+        String nodeUrl = ns.get(0).getNodeInformation().getURL();
+        // Nodes will be redeployed only if we kill the whole runtime
+        rmHelper.killRuntime(nodeUrl);
+
+        for (Node n : ns) {
+            RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+            assertEquals(NodeState.DOWN, ev.getNodeState());
+        }
+
+        for (Node n : ns) {
+            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
+        }
+
+        rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES);
+        for (int i = 0; i < NB_NODES; i++) {
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
+
+        s = resourceManager.getState();
+        assertEquals(NB_NODES, s.getTotalNodesNumber());
+        assertEquals(NB_NODES, s.getFreeNodesNumber());
+    }
+
+
+    @After
+    public void removeNS() throws Exception {
+        try {
+            resourceManager.removeNodeSource(nsname, true);
+        } catch (Exception ignored) {
+
+        }
+    }
+
+
+    @BeforeClass
+    public static void startSSHServer() throws Exception {
         // Disable bouncy castle to avoid versions conflict
         System.setProperty("org.apache.sshd.registerBouncyCastle", "false");
 
@@ -155,11 +211,30 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         sshd.start();
 
-        this.port = sshd.getPort();
+        port = sshd.getPort();
+
+        javaExePath = System.getProperty("java.home") + File.separator + "bin" + File.separator +
+                (OsUtils.isWin32() ? "java.exe" : "java");
+        javaExePath = "\"" + javaExePath + "\"";
+
+        infraParams = new Object[]{("localhost " + NB_NODES + "\n").getBytes(), //hosts
+                60000, //timeout
+                1, //attempts
+                port, //ssh server port
+                "toto", //ssh username
+                "toto", //ssh password
+                new byte[0], // optional ssh private key
+                new byte[0], // optional ssh options file
+                javaExePath, //java path on the remote machines
+                PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
+                OperatingSystem.getOperatingSystem(), ""}; // extra java options
+
+        policyParameters = new Object[]{AccessType.ALL.toString(), AccessType.ALL.toString(), "20000"};
+
     }
 
-    @After
-    public void stopSSHServer() throws Exception {
+    @AfterClass
+    public static void stopSSHServer() throws Exception {
         if (sshd != null) {
             sshd.stop(true);
         }

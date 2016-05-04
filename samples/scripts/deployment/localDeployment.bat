@@ -7,6 +7,7 @@ set HOST_NAME=%1
 set NODE_NAME=%2
 set NODE_SOURCE_NAME=%3
 set RM_URL=%4
+set NB_NODES=%5
 
 :: Script constants
 set RM_HOME_NODE=UPDATE_ME
@@ -28,4 +29,4 @@ set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\dist\lib\ProActive.jar
 set CLASSPATH=%CLASSPATH%;%RM_HOME_NODE%\addons
 
 echo "Starting the node"
-%JAVA_HOME_NODE%\bin\java %JAVA_OPTS_NODE% org.ow2.proactive.resourcemanager.utils.RMNodeStarter -v %CREDENTIALS% -n %NODE_NAME% -s %NODE_SOURCE_NAME% -p 30000 -r %RM_URL%
+%JAVA_HOME_NODE%\bin\java %JAVA_OPTS_NODE% org.ow2.proactive.resourcemanager.utils.RMNodeStarter -v %CREDENTIALS% -n %NODE_NAME% -s %NODE_SOURCE_NAME% -p 30000 -w %NB_NODES% -r %RM_URL%

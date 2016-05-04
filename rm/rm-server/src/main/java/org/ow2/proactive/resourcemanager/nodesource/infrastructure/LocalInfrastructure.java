@@ -124,13 +124,9 @@ public class LocalInfrastructure extends InfrastructureManager {
         final String obfuscatedCmd = Tools.join(cmd, " ");
 
         List<String> depNodeURLs = new ArrayList<>(handledNodes.get());
+        final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseNodeName, handledNodes.get());
         try {
-            List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseNodeName, handledNodes.get());
-            for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
-                String depNodeURL = this.addDeployingNode(createdNodeNames.get(nodeIndex), obfuscatedCmd, "Node launched locally",
-                        this.nodeTimeout);
-                depNodeURLs.add(depNodeURL);
-            }
+            depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmd, "Node launched locally", this.nodeTimeout));
 
             // Deobfuscate the cred value
             Collections.replaceAll(cmd, CommandLineBuilder.OBFUSC, clb.getCredentialsValue());
@@ -152,9 +148,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         } catch (IOException e) {
             String lf = System.lineSeparator();
             String mess = "Cannot launch rm node " + baseNodeName + lf + Utils.getStacktrace(e);
-            for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
-                this.declareDeployingNodeLost(depNodeURLs.get(nodeIndex), mess);
-            }
+            multipleDeclareDeployingNodeLost(depNodeURLs, mess);
             if (processExecutor != null) {
                 cleanProcess();
             }
@@ -173,9 +167,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                     String out = Tools.join(processExecutor.getOutput(), "\n");
                     String err = Tools.join(processExecutor.getErrorOutput(), "\n");
                     message += "stdout: " + out + lf + "stderr: " + err;
-                    for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
-                        this.declareDeployingNodeLost(depNodeURLs.get(nodeIndex), message);
-                    }
+                    multipleDeclareDeployingNodeLost(depNodeURLs, message);
                 }
             } else {
                 logger.debug("Waiting for nodes " + baseNodeName + " acquisition");
