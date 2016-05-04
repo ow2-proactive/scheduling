@@ -61,7 +61,7 @@ public class JobRemoveHandlerTest {
 
 
     @Test
-    public void testJobRemovedAndstatusUpdated() {
+    public void testJobRemovedAndStatusUpdated() {
         boolean removed = jobRemoveHandler.call();
         assertThat(removed, is(true));
         Mockito.verify(dbManager, Mockito.times(1)).loadJobWithTasksIfNotRemoved(jobId);
@@ -72,7 +72,7 @@ public class JobRemoveHandlerTest {
     }
 
     @Test
-    public void testJobalreadyRemoved() {
+    public void testJobAlreadyRemoved() {
         Mockito.when(dbManager.loadJobWithTasksIfNotRemoved(jobId)).thenReturn(null);
         boolean removed = jobRemoveHandler.call();
         assertThat(removed, is(false));

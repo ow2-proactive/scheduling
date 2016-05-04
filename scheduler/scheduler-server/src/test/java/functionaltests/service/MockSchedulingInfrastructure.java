@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
+import org.ow2.proactive.scheduler.core.JobRemoveHandler;
 import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.SchedulingInfrastructure;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -161,6 +162,17 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     public void schedule(Callable<?> task, long delay) {
         System.out.println("Requested to schedule " + task + ", delay: " + delay);
         ScheduledFuture<?> future = scheduledExecutorService.schedule(task, 1, TimeUnit.MILLISECONDS);
+        try {
+            future.get();
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception");
+        }
+    }
+
+    @Override
+    public void scheduleHousekeeping(JobRemoveHandler jobRemoveHandler, long delay) {
+        System.out.println("Requested to schedule jobRemoveHandler " + jobRemoveHandler + ", delay: " + delay);
+        ScheduledFuture<?> future = scheduledExecutorService.schedule(jobRemoveHandler, 1, TimeUnit.MILLISECONDS);
         try {
             future.get();
         } catch (Exception e) {
