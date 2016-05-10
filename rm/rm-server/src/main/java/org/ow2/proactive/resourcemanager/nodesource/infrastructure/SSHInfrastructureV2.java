@@ -67,6 +67,15 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import org.apache.log4j.Logger;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.*;
 import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
@@ -130,7 +139,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(final InetAddress host) throws RMException {
+    protected void startNodeImpl(final InetAddress host, final int nbNodes) throws RMException {
         String fs = this.targetOSObj.fs;
         // we set the java security policy file
         ArrayList<String> sb = new ArrayList<>();
@@ -178,9 +187,9 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         clb.setJavaPath(this.javaPath);
         clb.setRmHome(this.schedulingPath);
         clb.setPaProperties(sb);
-        // current rmcore shortID should be added to ensure uniqueness
         final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         clb.setNodeName(nodeName);
+        clb.setNumberOfNodes(nbNodes);
         // finally, the credential's value
 
         String credString;
@@ -219,8 +228,11 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         JSch jsch = new JSch();
 
         final String msg = "deploy on " + host;
-        final String pnURL = super.addDeployingNode(nodeName, obfuscatedCmdLine, msg, super.nodeTimeOut);
-        this.pnTimeout.put(pnURL, false);
+
+        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
+        final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, msg, super.nodeTimeOut));
+        addTimeouts(depNodeURLs);
 
         Session session;
         try { // Create ssh session to the hostname
@@ -233,8 +245,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             session.setConfig(this.sshOptions);
             session.connect(shorterTimeout);
         } catch (JSchException e) {
-            super.declareDeployingNodeLost(pnURL,
-                    "unable to " + msg + "\n" + getStackTraceAsString(e));
+            multipleDeclareDeployingNodeLost(depNodeURLs, "unable to " + msg + "\n" + Formatter.stackTraceToString(e));
             throw new RMException("unable to " + msg, e);
         }
 
@@ -250,16 +261,15 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                 channel.setErrStream(baos);
                 channel.connect();
             } catch (JSchException e) {
-                super.declareDeployingNodeLost(pnURL,
-                        "unable to " + msg + "\n" + getStackTraceAsString(e));
+                multipleDeclareDeployingNodeLost(depNodeURLs, "unable to " + msg + "\n" + Formatter.stackTraceToString(e));
                 throw new RMException("unable to " + msg, e);
             }
             final ChannelExec chan = channel;
             Future<Void> deployResult = deployService.submit(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    while (!shutdown && !checkNodeIsAcquiredAndDo(nodeName, null, null)) {
-                        if (SSHInfrastructureV2.super.pnTimeout.get(pnURL)) {
+                    while (!shutdown && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
+                        if (anyTimedOut(depNodeURLs)) {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }
                         if (chan.getExitStatus() != -1) { // -1 means process is
@@ -280,30 +290,30 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             try {
                 deployResult.get(shorterTimeout, TimeUnit.MILLISECONDS);
             } catch (ExecutionException e) {
-                declareLostAndThrow("Unable to " + msg + " due to " + e.getCause(), pnURL, channel, baos, e);
+                declareLostAndThrow("Unable to " + msg + " due to " + e.getCause(), depNodeURLs, channel, baos, e);
             } catch (InterruptedException e) {
                 deployResult.cancel(true);
-                declareLostAndThrow("Unable to " + msg + " due to an interruption", pnURL, channel, baos, e);
+                declareLostAndThrow("Unable to " + msg + " due to an interruption", depNodeURLs, channel, baos, e);
             } catch (TimeoutException e) {
                 deployResult.cancel(true);
-                declareLostAndThrow("Unable to " + msg + " due to timeout", pnURL, channel, baos, e);
+                declareLostAndThrow("Unable to " + msg + " due to timeout", depNodeURLs, channel, baos, e);
             } finally {
                 channel.disconnect();
             }
         } finally {
-            super.pnTimeout.remove(pnURL);
+            removeTimeouts(depNodeURLs);
             session.disconnect();
             deployService.shutdownNow();
         }
     }
 
-    private void declareLostAndThrow(String errMsg, String pnURL, ChannelExec chan,
+    private void declareLostAndThrow(String errMsg, List<String> nodesUrl, ChannelExec chan,
             ByteArrayOutputStream baos, Exception e) throws RMException {
         String lf = System.lineSeparator();
         StringBuilder sb = new StringBuilder(errMsg);
         sb.append(lf).append(" > Process exit code: ").append(chan.getExitStatus());
         sb.append(lf).append(" > Process output: ").append(lf).append(new String(baos.toByteArray()));
-        this.declareDeployingNodeLost(pnURL, sb.toString());
+        this.multipleDeclareDeployingNodeLost(nodesUrl, sb.toString());
         throw new RMException(errMsg, e);
     }
 

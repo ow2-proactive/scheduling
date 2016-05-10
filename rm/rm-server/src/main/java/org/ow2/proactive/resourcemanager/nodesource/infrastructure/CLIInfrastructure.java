@@ -1,17 +1,20 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -96,30 +99,31 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes) throws RMException {
 
         final String nodeName = "SCR-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         final String commandLine = interpreter + " " + deploymentScript.getAbsolutePath() + " " +
-            host.getHostName() + " " + nodeName + " " + this.nodeSource.getName() + " " + rmUrl;
+                host.getHostName() + " " + nodeName + " " + this.nodeSource.getName() + " " + rmUrl + " " + nbNodes;
 
-        final String pnURL = super.addDeployingNode(nodeName, commandLine, "Deploying node on host " + host,
-                this.nodeTimeOut);
-        this.pnTimeout.put(pnURL, new Boolean(false));
+        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
+        final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, commandLine, "Deploying node on host " + host, this.nodeTimeOut));
+        addTimeouts(depNodeURLs);
 
         Process p;
         try {
             logger.debug("Launching the command: " + commandLine);
             p = Runtime.getRuntime().exec(commandLine);
         } catch (IOException e1) {
-            super.declareDeployingNodeLost(pnURL, "Cannot run command: " + commandLine +
-                " - \n The following exception occured: " + getStackTraceAsString(e1));
+            multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + commandLine +
+                    " - \n The following exception occured: " + Formatter.stackTraceToString(e1));
             throw new RMException("Cannot run command: " + commandLine, e1);
         }
 
         String lf = System.lineSeparator();
 
         int circuitBreakerThreshold = 5;
-        while (!this.pnTimeout.get(pnURL) && circuitBreakerThreshold > 0) {
+        while (!anyTimedOut(depNodeURLs) && circuitBreakerThreshold > 0) {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
@@ -136,7 +140,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
-                        CLIInfrastructure.this.declareDeployingNodeLost(pnURL, description);
+                        multipleDeclareDeployingNodeLost(depNodeURLs, description);
                     }
                 })) {
                     return;
@@ -165,9 +169,9 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
         }
 
         // if we exit because of a timeout
-        if (this.pnTimeout.get(pnURL)) {
+        if (this.anyTimedOut(depNodeURLs)) {
             // we remove it
-            this.pnTimeout.remove(pnURL);
+            removeTimeouts(depNodeURLs);
             // we destroy the process
             p.destroy();
             throw new RMException("Deploying Node " + nodeName + " not expected any more");
