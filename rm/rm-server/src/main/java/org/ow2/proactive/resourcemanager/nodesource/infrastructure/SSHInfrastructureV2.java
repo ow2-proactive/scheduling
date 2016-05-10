@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -67,15 +68,6 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import org.apache.log4j.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.*;
 import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
@@ -245,7 +237,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             session.setConfig(this.sshOptions);
             session.connect(shorterTimeout);
         } catch (JSchException e) {
-            multipleDeclareDeployingNodeLost(depNodeURLs, "unable to " + msg + "\n" + Formatter.stackTraceToString(e));
+            multipleDeclareDeployingNodeLost(depNodeURLs, "unable to " + msg + "\n" + getStackTraceAsString(e));
             throw new RMException("unable to " + msg, e);
         }
 
@@ -261,7 +253,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                 channel.setErrStream(baos);
                 channel.connect();
             } catch (JSchException e) {
-                multipleDeclareDeployingNodeLost(depNodeURLs, "unable to " + msg + "\n" + Formatter.stackTraceToString(e));
+                multipleDeclareDeployingNodeLost(depNodeURLs, "unable to " + msg + "\n" + getStackTraceAsString(e));
                 throw new RMException("unable to " + msg, e);
             }
             final ChannelExec chan = channel;

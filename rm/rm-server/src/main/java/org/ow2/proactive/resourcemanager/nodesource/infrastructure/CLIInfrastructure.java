@@ -1,5 +1,12 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -8,13 +15,6 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -116,7 +116,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             p = Runtime.getRuntime().exec(commandLine);
         } catch (IOException e1) {
             multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + commandLine +
-                    " - \n The following exception occured: " + Formatter.stackTraceToString(e1));
+                    " - \n The following exception occured: " + getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + commandLine, e1);
         }
 

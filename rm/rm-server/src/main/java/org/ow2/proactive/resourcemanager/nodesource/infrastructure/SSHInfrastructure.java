@@ -36,11 +36,12 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -56,13 +57,6 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.apache.log4j.Logger;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -245,7 +239,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             p = Utils.runSSHCommand(host, cmdLine, sshOptions);
         } catch (IOException e1) {
             multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + cmdLine + ", with ssh options: " +
-                    sshOptions + " -\n The following exception occutred:\n " + Formatter.stackTraceToString(e1));
+                    sshOptions + " -\n The following exception occutred:\n " + getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions, e1);
         }
 

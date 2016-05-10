@@ -1,13 +1,5 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.ProActiveCounter;
-import org.ow2.proactive.process_tree_killer.ProcessTree;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.ow2.proactive.utils.Formatter;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
@@ -15,6 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.ProActiveCounter;
+import org.ow2.proactive.process_tree_killer.ProcessTree;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 /**
  *
@@ -90,7 +90,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             p = Runtime.getRuntime().exec(new String[] { "bash", "-c", filledCommand });
         } catch (IOException e1) {
             multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + filledCommand +
-                    " - \n The following exception occurred: " + Formatter.stackTraceToString(e1));
+                    " - \n The following exception occurred: " + getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + filledCommand, e1);
         }
 

@@ -149,7 +149,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         } catch (IOException e) {
             String lf = System.lineSeparator();
-            String mess = "Cannot launch rm node " + baseNodeName + lf + Utils.getStacktrace(e);
+            String mess = "Cannot launch rm node " + baseNodeName + lf + getStackTraceAsString(e);
             multipleDeclareDeployingNodeLost(depNodeURLs, mess);
             if (processExecutor != null) {
                 cleanProcess();
