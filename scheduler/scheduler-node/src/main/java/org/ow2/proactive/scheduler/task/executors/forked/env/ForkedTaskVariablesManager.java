@@ -39,6 +39,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
@@ -48,14 +49,7 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.TaskScript;
 
 public class ForkedTaskVariablesManager implements Serializable {
-    public static final String MULTI_NODE_TASK_NODESURL_BINDING_NAME = "nodesurl";
-    public static final String VARIABLES_BINDING_NAME = "variables";
-    public static final String DS_SCRATCH_BINDING_NAME = "localspace";
-    public static final String DS_INPUT_BINDING_NAME = "inputspace";
-    public static final String DS_OUTPUT_BINDING_NAME = "outputspace";
-    public static final String DS_GLOBAL_BINDING_NAME = "globalspace";
-    public static final String DS_USER_BINDING_NAME = "userspace";
-    public static final String FORK_ENVIRONMENT_BINDING_NAME = "forkEnvironment";
+
     /**
      * Will be replaced by the matching third-party credential
      * Example: if one of the third-party credentials' key-value pairs is 'foo:bar',
@@ -75,21 +69,21 @@ public class ForkedTaskVariablesManager implements Serializable {
 
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext,
             Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials) {
-        scriptHandler.addBinding(VARIABLES_BINDING_NAME, variables);
+        scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
         scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, tasksResults(taskContext));
 
         scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
 
-        scriptHandler.addBinding(DS_SCRATCH_BINDING_NAME, taskContext.getScratchURI());
-        scriptHandler.addBinding(DS_INPUT_BINDING_NAME, taskContext.getInputURI());
-        scriptHandler.addBinding(DS_OUTPUT_BINDING_NAME, taskContext.getOutputURI());
-        scriptHandler.addBinding(DS_GLOBAL_BINDING_NAME, taskContext.getGlobalURI());
-        scriptHandler.addBinding(DS_USER_BINDING_NAME, taskContext.getUserURI());
+        scriptHandler.addBinding(SchedulerConstants.DS_SCRATCH_BINDING_NAME, taskContext.getScratchURI());
+        scriptHandler.addBinding(SchedulerConstants.DS_INPUT_BINDING_NAME, taskContext.getInputURI());
+        scriptHandler.addBinding(SchedulerConstants.DS_OUTPUT_BINDING_NAME, taskContext.getOutputURI());
+        scriptHandler.addBinding(SchedulerConstants.DS_GLOBAL_BINDING_NAME, taskContext.getGlobalURI());
+        scriptHandler.addBinding(SchedulerConstants.DS_USER_BINDING_NAME, taskContext.getUserURI());
 
-        scriptHandler.addBinding(MULTI_NODE_TASK_NODESURL_BINDING_NAME, taskContext.getOtherNodesURLs());
+        scriptHandler.addBinding(SchedulerConstants.MULTI_NODE_TASK_NODESURL_BINDING_NAME, taskContext.getOtherNodesURLs());
 
-        scriptHandler.addBinding(FORK_ENVIRONMENT_BINDING_NAME,
+        scriptHandler.addBinding(SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
                 taskContext.getInitializer().getForkEnvironment());
     }
 

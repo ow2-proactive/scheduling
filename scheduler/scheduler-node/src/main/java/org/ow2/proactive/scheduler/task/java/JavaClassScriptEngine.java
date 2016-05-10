@@ -49,17 +49,19 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
-import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.TaskScript;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.WriterOutputStream;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 public class JavaClassScriptEngine extends AbstractScriptEngine {
@@ -77,10 +79,10 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             execInitializer.setErrorSink(error);
 
             Map<String, byte[]> propagatedVariables = null;
-            if (context.getAttribute(ForkedTaskVariablesManager.VARIABLES_BINDING_NAME) != null) {
+            if (context.getAttribute(SchedulerConstants.VARIABLES_BINDING_NAME) != null) {
                 propagatedVariables = SerializationUtil
                         .serializeVariableMap((Map<String, Serializable>) context.getAttribute(
-                          ForkedTaskVariablesManager.VARIABLES_BINDING_NAME));
+                                SchedulerConstants.VARIABLES_BINDING_NAME));
                 execInitializer.setPropagatedVariables(propagatedVariables);
             } else {
                 execInitializer.setPropagatedVariables(Collections.<String, byte[]> emptyMap());
@@ -100,22 +102,22 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
                 execInitializer.setThirdPartyCredentials(Collections.<String, String> emptyMap());
             }
 
-            if (context.getAttribute(ForkedTaskVariablesManager.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
+            if (context.getAttribute(SchedulerConstants.MULTI_NODE_TASK_NODESURL_BINDING_NAME) != null) {
                 List<String> nodesURLs = (List<String>) context
-                        .getAttribute(ForkedTaskVariablesManager.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
+                        .getAttribute(SchedulerConstants.MULTI_NODE_TASK_NODESURL_BINDING_NAME);
                 execInitializer.setNodesURL(nodesURLs);
             } else {
                 execInitializer.setNodesURL(Collections.<String>emptyList());
             }
 
-            javaExecutable.internalInit(execInitializer);
+            javaExecutable.internalInit(execInitializer, context);
 
             Serializable execute = javaExecutable.execute((TaskResult[]) context
                     .getAttribute(TaskScript.RESULTS_VARIABLE));
 
             if (propagatedVariables != null) {
                 ((Map<String, Serializable>) context.getAttribute(
-                  ForkedTaskVariablesManager.VARIABLES_BINDING_NAME)).putAll(javaExecutable.getVariables());
+                        SchedulerConstants.VARIABLES_BINDING_NAME)).putAll(javaExecutable.getVariables());
             }
 
             output.close();
@@ -123,11 +125,11 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             return execute;
 
         } catch (Throwable e) {
-            throw new ScriptException(new TaskException(e.getMessage(), e));
+            throw new ScriptException(new TaskException(getStackTraceAsString(e), e));
         }
     }
 
-    private JavaExecutable getExecutable(String userExecutableClassName)
+    public JavaExecutable getExecutable(String userExecutableClassName)
             throws ExecutableCreationException {
         try {
             ClassLoader tcl = Thread.currentThread().getContextClassLoader();

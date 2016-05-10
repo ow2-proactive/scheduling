@@ -57,6 +57,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 /**
  * This class implements the basics common operations that can be performed on a
@@ -714,7 +715,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * @throws RMException
      */
     private void handleFailedDeployment(CommandLineBuilder clb, Throwable e) throws RMException {
-        String error = Utils.getStacktrace(e);
+        String error = getStackTraceAsString(e);
         String command = null;
         try {
             command = clb.buildCommandLine(false);
