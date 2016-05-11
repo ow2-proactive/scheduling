@@ -18,7 +18,7 @@ dependencies {
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     testCompile project(':common:common-api').sourceSets.test.output
 
-    testCompile 'org.jruby:jruby-complete:9.0.1.0'
+    testCompile 'org.jruby:jruby-complete:9.0.5.0'
     testCompile 'org.python:jython-standalone:2.7.0'
 
     testCompile 'org.apache.sshd:sshd-core:0.14.0'

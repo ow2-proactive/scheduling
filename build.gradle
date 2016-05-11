@@ -1,23 +1,3 @@
-def custom ={ "$rootDir/gradle/${it}.gradle"} 
-
-apply plugin: 'java'
-
-apply from: custom("sonar-scheduling")
-apply from: custom("jacoco-scheduling")
-
-archivesBaseName = 'scheduling' // in case current folder is not named scheduling
-
-project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
-project.ext.set('schedulingParentFolder', "$rootDir")
-
-configurations {
-    nativeBundle
-    restCli
-    distLib {
-        extendsFrom restCli
-    }
-}
-
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
@@ -37,20 +17,44 @@ buildscript {
         }
         classpath 'com.github.rholder:gradle-one-jar:1.0.3'
         classpath 'org.ow2.proactive:gradle-serialver:2.2'
-        classpath 'org.postgresql:postgresql:9.3-1102-jdbc41'  
+        classpath 'org.postgresql:postgresql:9.3-1102-jdbc41'
         classpath 'org.ajoberstar:gradle-jacoco:0.3.0'
         classpath('org.gradle.api.plugins:gradle-format-plugin:1.1') {
-                    exclude group: 'javassist', module: 'javassist'
+            exclude group: 'javassist', module: 'javassist'
         }
 
         classpath 'com.qmino:miredot-plugin:1.6.2'
     }
 }
 
+plugins {
+    id "org.sonarqube" version "1.2"
+}
+
+def custom ={ "$rootDir/gradle/${it}.gradle"}
+
+apply plugin: 'java'
+
+archivesBaseName = 'scheduling' // in case current folder is not named scheduling
+
+project.ext.set('nativeLibsDir', "$rootDir/dist/lib/")
+project.ext.set('schedulingParentFolder', "$rootDir")
+
+apply from: custom("sonar-scheduling")
+apply from: custom("jacoco-scheduling")
+
+configurations {
+    nativeBundle
+    restCli
+    distLib {
+        extendsFrom restCli
+    }
+}
+
 allprojects {
     apply plugin: 'maven'
-    
-    
+
+
     group = 'org.ow2.proactive'
     version = schedulingVersion
 
@@ -89,11 +93,11 @@ configure(javaSubprojects) {
     apply plugin: 'java'
     apply plugin: 'format'
     apply plugin: 'jacoco'
-    
-   
+
+
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
-    
+
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
 
     dependencies {
@@ -107,9 +111,9 @@ configure(javaSubprojects) {
         testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0'
 
         testCompile 'org.mockito:mockito-core:1.10.19'
-		testCompile 'ObjectFaker:ObjectFaker:0.1'
+        testCompile 'ObjectFaker:ObjectFaker:0.1'
         testCompile 'com.jayway.awaitility:awaitility:1.6.0'
-		testCompile 'org.apache.commons:commons-lang3:3.4'
+        testCompile 'org.apache.commons:commons-lang3:3.4'
     }
 
     test {
@@ -118,7 +122,7 @@ configure(javaSubprojects) {
         exclude 'unitTests/**'
 
         if(Boolean.valueOf(System.getProperty("java.awt.headless"))){
-        	exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
+            exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
         }
     }
 
@@ -146,16 +150,16 @@ configure(javaSubprojects) {
 
 
 task wrapper(type: Wrapper) {
-   gradleVersion = '2.9' //version required
+    gradleVersion = '2.13' //version required
 }
 
 ext.schedulingFunctionalTestConfiguration = {
 
-    include 'functionaltests/**'  
-    
+    include 'functionaltests/**'
+
     if(!project.hasProperty('regression')){
-	    def regression_tests = new File(project.rootDir, "/regression_tests.txt")
-	    regression_tests.readLines().each { exclude '**/'+it+'.class' }
+        def regression_tests = new File(project.rootDir, "/regression_tests.txt")
+        regression_tests.readLines().each { exclude '**/'+it+'.class' }
     }
 
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
@@ -174,8 +178,8 @@ ext.schedulingFunctionalTestConfiguration = {
     }
 
     def clean = {
-    	println project.nativeLibsDir
-    	   	
+        println project.nativeLibsDir
+
         project.javaexec {
             main = "org.ow2.tests.ProcessCleaner"
             classpath = fileTree(project.nativeLibsDir).include("*.jar")
@@ -207,7 +211,7 @@ dependencies {
     nativeBundle 'org.jvnet.winp:winp:1.23-proactive:native'
     nativeBundle 'sigar:sigar:1.7.0-proactive:native'
 
-    compile 'org.codehaus.groovy:groovy-all:2.4.5'
+    compile 'org.codehaus.groovy:groovy-all:2.4.6'
     compile 'commons-io:commons-io:2.4'
 }
 
@@ -241,10 +245,10 @@ clean.dependsOn cleanScripts
 
 class CustomCreateStartScripts extends CreateStartScripts {
 
-	//We override the generate() method because Gradle adds "lib/" in the classpath by default.
+    //We override the generate() method because Gradle adds "lib/" in the classpath by default.
     @Override
     void generate() {
-        
+
         def generator = new org.gradle.api.internal.plugins.StartScriptGenerator()
         generator.applicationName = getApplicationName()
         generator.mainClassName = getMainClassName()
@@ -253,10 +257,10 @@ class CustomCreateStartScripts extends CreateStartScripts {
         generator.exitEnvironmentVar = getExitEnvironmentVar()
         generator.classpath = ["dist/lib/*", "addons", "addons/*"]
         generator.scriptRelPath = "bin/${getUnixScript().name}"
-        
+
         generator.windowsStartScriptGenerator.template = project.resources.text.fromFile("src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt")
         generator.unixStartScriptGenerator.template = project.resources.text.fromFile("src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt")
-        
+
         generator.generateUnixScript(getUnixScript())
         generator.generateWindowsScript(getWindowsScript())
 

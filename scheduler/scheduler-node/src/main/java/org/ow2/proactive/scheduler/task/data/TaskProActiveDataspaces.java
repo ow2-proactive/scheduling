@@ -34,8 +34,19 @@
  */
 package org.ow2.proactive.scheduler.task.data;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
@@ -51,16 +62,10 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.utils.Formatter;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.*;
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 public class TaskProActiveDataspaces implements TaskDataspaces {
@@ -187,7 +192,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         } catch (FileSystemException fse) {
             logger.warn(dataSpaceName + " space is disabled", fse);
             this.logDataspacesStatus(dataSpaceName + " space is disabled", DataspacesStatusLevel.WARNING);
-            this.logDataspacesStatus(Formatter.stackTraceToString(fse), DataspacesStatusLevel.WARNING);
+            this.logDataspacesStatus(getStackTraceAsString(fse), DataspacesStatusLevel.WARNING);
         }
         return null;
     }
@@ -467,7 +472,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             this.logDataspacesStatus("Could not contact " + spaceName + " space at " + space.getRealURI() +
                             ". An error occurred while resolving selector " + inputSelector,
                     DataspacesStatusLevel.ERROR);
-            this.logDataspacesStatus(Formatter.stackTraceToString(e),
+            this.logDataspacesStatus(getStackTraceAsString(e),
                     DataspacesStatusLevel.ERROR);
 
             logger.error("Could not contact " + spaceName + " space at " + space.getRealURI() +
@@ -587,7 +592,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         } catch (FileSystemException fse) {
             this.logDataspacesStatus("Error while transferring to " + spaceName + " space at " +
                     space.getRealURI() + " for selector " + outputSelector, DataspacesStatusLevel.ERROR);
-            this.logDataspacesStatus(Formatter.stackTraceToString(fse),
+            this.logDataspacesStatus(getStackTraceAsString(fse),
                     DataspacesStatusLevel.ERROR);
             logger.error("Error while transferring to " + spaceName + " space at " +
                     space.getRealURI() + " for selector " + outputSelector, fse);

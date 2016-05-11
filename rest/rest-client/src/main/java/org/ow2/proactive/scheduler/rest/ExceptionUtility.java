@@ -34,8 +34,6 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
@@ -52,7 +50,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
-
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 
@@ -115,13 +112,6 @@ public class ExceptionUtility {
         } else {
             throwUJEOrNCEOrPE(e);
         }
-    }
-
-    public static String getStackTrace(Throwable error) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw, true);
-        error.printStackTrace(pw);
-        return sw.getBuffer().toString();
     }
 
     public static Exception exception(Throwable t) {

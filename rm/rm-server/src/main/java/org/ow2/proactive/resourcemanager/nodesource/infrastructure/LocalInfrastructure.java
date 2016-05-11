@@ -1,5 +1,13 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.IOException;
+import java.security.KeyException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -12,13 +20,7 @@ import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.utils.Tools;
 
-import java.io.IOException;
-import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 public class LocalInfrastructure extends InfrastructureManager {
@@ -147,7 +149,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         } catch (IOException e) {
             String lf = System.lineSeparator();
-            String mess = "Cannot launch rm node " + baseNodeName + lf + Utils.getStacktrace(e);
+            String mess = "Cannot launch rm node " + baseNodeName + lf + getStackTraceAsString(e);
             multipleDeclareDeployingNodeLost(depNodeURLs, mess);
             if (processExecutor != null) {
                 cleanProcess();
@@ -217,7 +219,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             String lf = System.lineSeparator();
             String url = super.addDeployingNode(name, "deployed as daemon",
                     "Deploying a local infrastructure node", this.nodeTimeout);
-            String st = Utils.getStacktrace(e);
+            String st = getStackTraceAsString(e);
             super.declareDeployingNodeLost(url, message + lf + st);
         }
     }
