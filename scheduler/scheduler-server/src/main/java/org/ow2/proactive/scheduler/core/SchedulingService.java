@@ -1,14 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -35,7 +27,15 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
-import org.apache.log4j.Logger;
+
+import java.net.URI;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 
 public class SchedulingService {
@@ -301,6 +301,10 @@ public class SchedulingService {
      */
     public Map<JobId, JobDescriptor> lockJobsToSchedule() {
         return jobs.lockJobsToSchedule();
+    }
+
+    public int totalNumberOfJobs() {
+        return jobs.totalNumberOfJobs();
     }
 
     /*
