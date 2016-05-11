@@ -46,6 +46,6 @@ import org.hibernate.Session;
  */
 public interface SessionWork<T> {
 
-    T executeWork(Session session);
+    T doInTransaction(Session session);
 
 }

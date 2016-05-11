@@ -2,6 +2,8 @@ package org.ow2.proactive.scheduler.core.db;
 
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
+import org.ow2.proactive.db.TransactionHelper;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -17,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-public class TestTransactionHelper {
+public class TransactionHelperTest {
 
     private TransactionHelper transactionHelper;
     private SessionFactory sessionFactory;
@@ -27,65 +29,67 @@ public class TestTransactionHelper {
 
     @Before
     public void setUp() {
-
         sessionFactory = mock(SessionFactory.class);
         session = mock(Session.class);
         transaction = mock(Transaction.class);
 
         when(sessionFactory.openSession()).thenReturn(session);
         when(session.beginTransaction()).thenReturn(transaction);
+        when(session.getTransaction()).thenReturn(transaction);
 
         transactionHelper = new TransactionHelper(sessionFactory);
         sessionWork = mock(SessionWork.class);
     }
 
     @Test
-    public void testRunWithTransaction() {
-        when(sessionWork.executeWork(session)).thenReturn(null);
+    public void testExecuteReadWriteTransaction() {
+        when(sessionWork.doInTransaction(session)).thenReturn(null);
 
-        transactionHelper.runWithTransaction(sessionWork);
+        transactionHelper.executeReadWriteTransaction(sessionWork);
 
         verify(session).beginTransaction();
-        verify(sessionWork).executeWork(session);
+        verify(sessionWork).doInTransaction(session);
         verify(transaction).commit();
     }
 
     @Test
-    public void testRunWithTransactionRetry() {
-        when(sessionWork.executeWork(session)).thenThrow(LockAcquisitionException.class).thenReturn(null);
+    public void testExecuteReadWriteTransactionRetry() {
+        PASchedulerProperties.SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES.updateProperty("5");
 
-        transactionHelper.runWithTransaction(sessionWork);
+        when(sessionWork.doInTransaction(session)).thenThrow(LockAcquisitionException.class).thenReturn(null);
+
+        transactionHelper.executeReadWriteTransaction(sessionWork);
 
         verify(session, times(2)).beginTransaction();
-        verify(sessionWork, times(2)).executeWork(session);
+        verify(sessionWork, times(2)).doInTransaction(session);
         verify(transaction).rollback();
         verify(transaction).commit();
     }
 
     @Test
-    public void testRunWithTransactionFail() {
-        when(sessionWork.executeWork(session)).thenThrow(Throwable.class);
+    public void testExecuteReadWriteTransactionFail() {
+        when(sessionWork.doInTransaction(session)).thenThrow(Throwable.class);
 
         try {
-            transactionHelper.runWithTransaction(sessionWork);
+            transactionHelper.executeReadWriteTransaction(sessionWork);
             Assert.fail("Should throw an exception");
         } catch (DatabaseManagerException e) {
         }
 
         verify(session).beginTransaction();
-        verify(sessionWork).executeWork(session);
+        verify(sessionWork).doInTransaction(session);
         verify(transaction).rollback();
         verify(transaction, never()).commit();
     }
 
     @Test
-    public void testRunWithoutTransaction() {
-        when(sessionWork.executeWork(session)).thenReturn(null);
+    public void testExecuteReadOnlyTransaction() {
+        when(sessionWork.doInTransaction(session)).thenReturn(null);
 
-        transactionHelper.runWithoutTransaction(sessionWork);
+        transactionHelper.executeReadOnlyTransaction(sessionWork);
 
-        verify(session, never()).beginTransaction();
-        verify(sessionWork).executeWork(session);
+        verify(session).beginTransaction();
+        verify(sessionWork).doInTransaction(session);
     }
 
 }
