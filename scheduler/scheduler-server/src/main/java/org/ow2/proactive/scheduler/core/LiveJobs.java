@@ -1,15 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
-
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -41,7 +32,10 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.TaskIdWrapper;
-import org.apache.log4j.Logger;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 class LiveJobs {
@@ -252,6 +246,10 @@ class LiveJobs {
             }
         }
         return result;
+    }
+
+    public int totalNumberOfJobs() {
+        return jobs.size();
     }
 
     void unlockJobsToSchedule(Collection<JobDescriptor> jobDescriptors) {

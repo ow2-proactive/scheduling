@@ -156,6 +156,14 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         //get job Descriptor list with eligible jobs (running and pending)
         Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
+
+        // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
+        // we wait for next scheduling loop
+        if (jobMap.size() < schedulingService.totalNumberOfJobs()) {
+            schedulingService.unlockJobsToSchedule(jobMap.values());
+            return 0;
+        }
+
         try {
             List<JobDescriptor> descriptors = new ArrayList<>(jobMap.size());
             descriptors.addAll(jobMap.values());
