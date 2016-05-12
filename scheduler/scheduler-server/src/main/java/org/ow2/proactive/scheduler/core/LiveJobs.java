@@ -239,17 +239,52 @@ class LiveJobs {
     }
 
     Map<JobId, JobDescriptor> lockJobsToSchedule() {
+
+        TreeSet<JobPriority> prioritiesScheduled = new TreeSet<>();
+        TreeSet<JobPriority> prioritiesNotScheduled = new TreeSet<>();
+
         Map<JobId, JobDescriptor> result = new HashMap<>();
         for (Map.Entry<JobId, JobData> entry : jobs.entrySet()) {
-            if (entry.getValue().jobLock.tryLock() && jobs.containsKey(entry.getKey())) {
-                result.put(entry.getValue().job.getId(), entry.getValue().job.getJobDescriptor());
+            JobData value = entry.getValue();
+
+            if (value.jobLock.tryLock()) {
+                InternalJob job = entry.getValue().job;
+                result.put(job.getId(), job.getJobDescriptor());
+                prioritiesScheduled.add(job.getPriority());
+
+                if (unlockIfConflict(prioritiesScheduled, prioritiesNotScheduled, result)) return new HashMap<>(0);
+            } else {
+                prioritiesNotScheduled.add(value.job.getPriority());
+                if (unlockIfConflict(prioritiesScheduled, prioritiesNotScheduled, result)) return new HashMap<>(0);
             }
         }
         return result;
     }
 
-    public int totalNumberOfJobs() {
-        return jobs.size();
+    private boolean unlockIfConflict(TreeSet<JobPriority> prioritiesScheduled, TreeSet<JobPriority> prioritiesNotScheduled, Map<JobId, JobDescriptor> result) {
+        if (priorityConflict(prioritiesScheduled, prioritiesNotScheduled)) {
+            unlockJobsToSchedule(result.values());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method checks if there is a conflict priority between the jobs selected to be scheduled and those not selected.
+     * There is a conflict if any job scheduled has a strictly lower priority than any unscheduled job
+     *
+     * @param prioritiesScheduled
+     * @param prioritiesNotScheduled
+     * @return
+     */
+    public boolean priorityConflict(TreeSet<JobPriority> prioritiesScheduled, TreeSet<JobPriority> prioritiesNotScheduled) {
+
+        for (JobPriority jp : prioritiesNotScheduled) {
+            if (!prioritiesScheduled.headSet(jp).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void unlockJobsToSchedule(Collection<JobDescriptor> jobDescriptors) {

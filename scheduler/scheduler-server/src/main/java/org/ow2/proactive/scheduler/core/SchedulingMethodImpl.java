@@ -159,9 +159,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
         // we wait for next scheduling loop
-        if (jobMap.size() < schedulingService.totalNumberOfJobs()) {
-            schedulingService.unlockJobsToSchedule(jobMap.values());
-            return 0;
+        if (jobMap.isEmpty()) {
+            return numberOfTaskStarted;
         }
 
         try {

@@ -303,10 +303,6 @@ public class SchedulingService {
         return jobs.lockJobsToSchedule();
     }
 
-    public int totalNumberOfJobs() {
-        return jobs.totalNumberOfJobs();
-    }
-
     /*
      * Should be called only by scheduling method impl after job scheduling finished
      */

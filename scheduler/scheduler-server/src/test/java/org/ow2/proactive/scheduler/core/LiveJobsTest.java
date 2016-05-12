@@ -1,11 +1,7 @@
 package org.ow2.proactive.scheduler.core;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -32,6 +28,14 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.python.google.common.collect.ImmutableSet;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 
 public class LiveJobsTest {
@@ -47,6 +51,64 @@ public class LiveJobsTest {
     public void init() {
         MockitoAnnotations.initMocks(this);
         liveJobs = new LiveJobs(dbManager, listener);
+    }
+
+    @Test
+    public void testPriorityConflict() throws Exception {
+        TreeSet<JobPriority> scheduled = createTreeSet(JobPriority.LOW);
+        TreeSet<JobPriority> notScheduled = createTreeSet(JobPriority.HIGHEST);
+
+        Assert.assertTrue(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.LOW);
+        notScheduled = createTreeSet(JobPriority.LOW);
+
+        Assert.assertFalse(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.HIGHEST);
+        notScheduled = createTreeSet(JobPriority.LOW);
+
+        Assert.assertFalse(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.LOW, JobPriority.HIGHEST);
+        notScheduled = createTreeSet(JobPriority.NORMAL);
+
+        Assert.assertTrue(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.HIGHEST, JobPriority.LOW);
+        notScheduled = createTreeSet(JobPriority.NORMAL);
+
+        Assert.assertTrue(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.LOW, JobPriority.NORMAL);
+        notScheduled = createTreeSet(JobPriority.NORMAL);
+
+        Assert.assertTrue(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.NORMAL, JobPriority.HIGHEST);
+        notScheduled = createTreeSet(JobPriority.NORMAL);
+
+        Assert.assertFalse(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.NORMAL);
+        notScheduled = createTreeSet(JobPriority.LOW, JobPriority.HIGHEST);
+
+        Assert.assertTrue(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.NORMAL);
+        notScheduled = createTreeSet(JobPriority.LOW, JobPriority.NORMAL);
+
+        Assert.assertFalse(liveJobs.priorityConflict(scheduled, notScheduled));
+
+        scheduled = createTreeSet(JobPriority.NORMAL);
+        notScheduled = createTreeSet(JobPriority.NORMAL, JobPriority.HIGHEST);
+
+        Assert.assertTrue(liveJobs.priorityConflict(scheduled, notScheduled));
+    }
+
+    @NotNull
+    private TreeSet<JobPriority> createTreeSet(JobPriority... priorities) {
+        return new TreeSet<>(ImmutableSet.copyOf(priorities));
     }
 
     @Test
