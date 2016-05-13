@@ -281,8 +281,8 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 logger.info("Removing the node source " + sourceName + " from the database");
-                session.createQuery("delete from NodeSourceData where name=:name").setParameter("name",
-                        sourceName).executeUpdate();
+                session.getNamedQuery("deleteNodeSourceDataByName")
+                        .setParameter("name", sourceName).executeUpdate();
                 return null;
             }
         });
@@ -293,7 +293,7 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 logger.info("Removing all node sources from the database");
-                session.createQuery("delete from NodeSourceData").executeUpdate();
+                session.getNamedQuery("deleteAllNodeSourceData").executeUpdate();
                 return null;
             }
         });
@@ -304,7 +304,7 @@ public class RMDBManager {
             @Override
             @SuppressWarnings("unchecked")
             public Collection<NodeSourceData> doInTransaction(Session session) {
-                Query query = session.createQuery("from NodeSourceData");
+                Query query = session.getNamedQuery("getNodeSourceData");
                 return (Collection<NodeSourceData>) query.list();
             }
         });
