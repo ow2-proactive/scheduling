@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.utils;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.node.Node;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.node.Node;
 
 
 /**
@@ -115,5 +115,14 @@ public class NodeSet extends ArrayList<Node> {
      */
     public void setExtraNodes(Collection<Node> extraNodes) {
         this.extraNodes = extraNodes;
+    }
+
+    /**
+     * Return the total number of nodes (standard + extra) included in this node set
+     *
+     * @return size
+     */
+    public int getTotalNumberOfNodes() {
+        return size() + (extraNodes != null ? extraNodes.size() : 0);
     }
 }

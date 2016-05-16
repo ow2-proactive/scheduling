@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -52,17 +53,17 @@ public class SchedulingTaskComparator {
 
     private InternalTask task;
     private int ssHashCode;
-    private String owner;
+    private InternalJob job;
 
     /**
      * Create a new instance of SchedulingTaskComparator
      *
      * @param task
      */
-    public SchedulingTaskComparator(InternalTask task, String owner) {
+    public SchedulingTaskComparator(InternalTask task, InternalJob job) {
         this.task = task;
         this.ssHashCode = SelectionScript.hashCodeFromList(task.getSelectionScripts());
-        this.owner = owner;
+        this.job = job;
     }
 
     /**
@@ -92,7 +93,10 @@ public class SchedulingTaskComparator {
         sameNodeEx = sameNodeEx ||
             (task.getNodeExclusion() != null && task.getNodeExclusion().equals(tcomp.task.getNodeExclusion()));
         //test whether owner is the same
-        boolean sameOwner = this.owner.equals(tcomp.owner);
+        boolean sameOwner = this.job.getOwner().equals(tcomp.job.getOwner());
+        //test that both tasks have the same priority (to ensure that higher priority tasks are not executed concurrently
+        // with lower priority ones)
+        boolean samePriority = this.job.getPriority().equals(tcomp.job.getPriority());
         //if the parallel environment is specified for any of tasks => not equal
         boolean isParallel = task.isParallel() || tcomp.task.isParallel();
 
@@ -104,9 +108,8 @@ public class SchedulingTaskComparator {
         // for now topology is allowed only for parallel tasks which is
         // checked before
 
-        // boolean topologySpecified = task.isTopologySpecified() || tcomp.task.isTopologySpecified();
-        //add the 5 tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && !isParallel && !requireNodeWithTokern;
+        //add the 6 tests to the returned value
+        return sameSsHash && sameNodeEx && sameOwner && samePriority && !isParallel && !requireNodeWithTokern;
     }
 
     /**
