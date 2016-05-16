@@ -732,6 +732,8 @@ public class SchedulerDBManager {
             @Override
             @SuppressWarnings("unchecked")
             public List<InternalJob> doInTransaction(Session session) {
+                logger.info("Loading Jobs from database");
+
                 Query query;
                 if (period > 0) {
                     query = session
@@ -745,6 +747,8 @@ public class SchedulerDBManager {
                 }
 
                 List<Long> ids = query.list();
+
+                logger.info(ids.size() + " Jobs to fetch from database");
 
                 return loadInternalJobs(fullState, session, ids);
             }
@@ -813,17 +817,24 @@ public class SchedulerDBManager {
 
         List<Long> batchLoadIds = new ArrayList<>(BATCH_SIZE);
 
+        int batchIndex = 1;
         for (Long id : ids) {
             batchLoadIds.add(id);
             if (batchLoadIds.size() == BATCH_SIZE) {
+                logger.info("Loading internal Jobs, batch number " + batchIndex);
                 batchLoadJobs(session, fullState, jobQuery, batchLoadIds, result);
                 batchLoadIds.clear();
                 session.clear();
+                logger.info("Fetched " + (batchIndex * BATCH_SIZE) + " internal Jobs");
+                batchIndex++;
             }
         }
+
         if (!batchLoadIds.isEmpty()) {
             batchLoadJobs(session, fullState, jobQuery, batchLoadIds, result);
         }
+
+        logger.info("All required Jobs have been fetched");
 
         return result;
     }
