@@ -310,6 +310,8 @@ public enum PASchedulerProperties {
 
     SCHEDULER_DB_TRANSACTION_SLEEP_DELAY("pa.scheduler.db.transactions.sleep.delay", PropertyType.INTEGER),
 
+    SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE("pa.scheduler.db.recovery.load.jobs.batch_size", PropertyType.INTEGER),
+
     EMAIL_NOTIFICATIONS_ENABLED("pa.scheduler.notifications.email.enabled", PropertyType.BOOLEAN),
 
     EMAIL_NOTIFICATIONS_SENDER_ADDRESS("pa.scheduler.notifications.email.from", PropertyType.STRING);

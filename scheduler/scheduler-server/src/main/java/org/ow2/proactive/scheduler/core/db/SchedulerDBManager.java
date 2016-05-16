@@ -77,7 +77,8 @@ public class SchedulerDBManager {
 
     private static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
 
-    private static final int RECOVERY_LOAD_JOBS_BATCH_SIZE = 100;
+    private static final int RECOVERY_LOAD_JOBS_BATCH_SIZE =
+            PASchedulerProperties.SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE.getValueAsInt();
 
     private static final Logger logger = Logger.getLogger(SchedulerDBManager.class);
 
