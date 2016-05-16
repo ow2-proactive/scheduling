@@ -77,6 +77,8 @@ public class SchedulerDBManager {
 
     private static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
 
+    private static final int RECOVERY_LOAD_JOBS_BATCH_SIZE = 100;
+
     private static final Logger logger = Logger.getLogger(SchedulerDBManager.class);
 
     protected static final Set<JobStatus> FINISHED_JOB_STATUSES = ImmutableSet.of(JobStatus.CANCELED,
@@ -739,11 +741,13 @@ public class SchedulerDBManager {
                     query = session
                             .getNamedQuery("loadJobsWithPeriod")
                             .setParameter("minSubmittedTime", System.currentTimeMillis() - period)
-                            .setParameterList("status", status);
+                            .setParameterList("status", status)
+                            .setReadOnly(true);
                 } else {
                     query = session
                             .getNamedQuery("loadJobs")
-                            .setParameterList("status", status);
+                            .setParameterList("status", status)
+                    .setReadOnly(true);
                 }
 
                 List<Long> ids = query.list();
@@ -792,6 +796,7 @@ public class SchedulerDBManager {
     private Map<Long, List<TaskData>> loadJobsTasks(Session session, List<Long> jobIds) {
         Query tasksQuery = session.getNamedQuery("loadJobsTasks")
                 .setParameterList("ids", jobIds)
+                .setReadOnly(true)
                 .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
         Map<Long, List<TaskData>> tasksMap = new HashMap<>(jobIds.size(), 1f);
@@ -813,19 +818,17 @@ public class SchedulerDBManager {
 
         List<InternalJob> result = new ArrayList<>(ids.size());
 
-        final int BATCH_SIZE = 100;
-
-        List<Long> batchLoadIds = new ArrayList<>(BATCH_SIZE);
+        List<Long> batchLoadIds = new ArrayList<>(RECOVERY_LOAD_JOBS_BATCH_SIZE);
 
         int batchIndex = 1;
         for (Long id : ids) {
             batchLoadIds.add(id);
-            if (batchLoadIds.size() == BATCH_SIZE) {
+            if (batchLoadIds.size() == RECOVERY_LOAD_JOBS_BATCH_SIZE) {
                 logger.info("Loading internal Jobs, batch number " + batchIndex);
                 batchLoadJobs(session, fullState, jobQuery, batchLoadIds, result);
                 batchLoadIds.clear();
                 session.clear();
-                logger.info("Fetched " + (batchIndex * BATCH_SIZE) + " internal Jobs");
+                logger.info("Fetched " + (batchIndex * RECOVERY_LOAD_JOBS_BATCH_SIZE) + " internal Jobs");
                 batchIndex++;
             }
         }
