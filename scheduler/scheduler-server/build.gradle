@@ -5,13 +5,13 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'javax.mail:mail:1.4.7'
     compile 'joda-time:joda-time:2.9.1'
-    compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
-    compile 'org.hibernate:hibernate-core:4.3.11.Final'
+
     compile 'org.eclipse.jetty:jetty-webapp:9.2.14.v20151106'
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
     compile project(':common:common-api')
     compile project(':common:common-client')
+    compile project(':common:common-db')
     compile project(':scheduler:scheduler-api')
     compile project(':scheduler:scheduler-client')
     compile project(':scheduler:scheduler-node')
@@ -31,10 +31,6 @@ dependencies {
     testCompile project(':common:common-api').sourceSets.test.output
     testCompile project(':rm:rm-policy:rm-policy-scheduler')
     testCompile project(':scheduler:scheduler-examples')
-
-    runtime('org.hibernate:hibernate-hikaricp:4.3.11.Final') {
-        exclude group: 'org.javassist', module: 'javassist'
-    }
 
     runtime 'org.hsqldb:hsqldb:2.3.3'
 

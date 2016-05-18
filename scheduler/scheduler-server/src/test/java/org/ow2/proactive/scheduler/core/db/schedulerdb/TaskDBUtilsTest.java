@@ -34,8 +34,9 @@
  */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
-import org.junit.Before;
-import org.junit.Test;
+import java.util.List;
+
+import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -44,13 +45,12 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.DBTaskDataParameters;
 import org.ow2.proactive.scheduler.core.db.TaskDBUtils;
-import org.ow2.proactive.scheduler.core.db.TransactionHelper;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -246,7 +246,7 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
         builder.setOffset(2);
         builder.setLimit(NB_JOBS - 1);
 
-        TransactionHelper.SessionWork<List<TaskInfo>> taskInfoSessionWork =
+        SessionWork<List<TaskInfo>> taskInfoSessionWork =
                 TaskDBUtils.taskInfoSessionWork(builder.build());
 
         List<TaskInfo> result = run(taskInfoSessionWork);
@@ -259,7 +259,7 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
         builder.setOffset(2);
         builder.setLimit(NB_JOBS - 1);
 
-        TransactionHelper.SessionWork<List<TaskState>> taskStateSessionWork =
+        SessionWork<List<TaskState>> taskStateSessionWork =
                 TaskDBUtils.taskStateSessionWork(builder.build());
 
         List<TaskState> result = run(taskStateSessionWork);
@@ -271,20 +271,20 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
         DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
         builder.setFrom(SCHEDULED_TIME);
         builder.setTo(SCHEDULED_TIME);
-        TransactionHelper.SessionWork<List<TaskState>> taskStateSessionWork =
+        SessionWork<List<TaskState>> taskStateSessionWork =
                 TaskDBUtils.taskStateSessionWork(builder.build());
         List<TaskState> result = run(taskStateSessionWork);
         assertThat(result).hasSize(1);
     }
 
     private void assertTotalNumberOfTasks(DBTaskDataParameters parameters, int expectedNumberOfTasks) {
-        TransactionHelper.SessionWork<Integer> totalNumberOfTasks =
+        SessionWork<Integer> totalNumberOfTasks =
                 TaskDBUtils.getTotalNumberOfTasks(parameters);
 
         assertThat(run(totalNumberOfTasks)).isEqualTo(expectedNumberOfTasks);
     }
 
-    private <T> T run(TransactionHelper.SessionWork<T> sessionWork) {
+    private <T> T run(SessionWork<T> sessionWork) {
         return dbManager.runWithTransaction(sessionWork);
     }
 

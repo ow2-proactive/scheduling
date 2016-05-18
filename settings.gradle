@@ -1,5 +1,6 @@
 include 'common:common-api'
 include 'common:common-client'
+include 'common:common-db'
 
 include 'scheduler:scheduler-api'
 include 'scheduler:scheduler-client'

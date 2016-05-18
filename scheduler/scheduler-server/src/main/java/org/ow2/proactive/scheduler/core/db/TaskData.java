@@ -6,20 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -61,8 +48,6 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
@@ -71,7 +56,25 @@ import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
-@Table(name = "TASK_DATA")
+@Table(name = "TASK_DATA",
+        indexes = {
+                @Index(name = "TASK_DATA_CLEAN_SCRIPT_ID", columnList = "CLEAN_SCRIPT_ID"),
+                @Index(name = "TASK_DATA_ENV_SCRIPT_ID", columnList = "ENV_SCRIPT_ID"),
+                @Index(name = "TASK_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
+                @Index(name = "TASK_DATA_FLOW_SCRIPT_ID", columnList = "FLOW_SCRIPT_ID"),
+                @Index(name = "TASK_DATA_IFBRANCH_JOB_ID", columnList = "IFBRANCH_TASK_ID_JOB"),
+                @Index(name = "TASK_DATA_IFBRANCH_TASK_ID", columnList = "IFBRANCH_TASK_ID_TASK"),
+                @Index(name = "TASK_DATA_JOB_ID", columnList = "JOB_ID"),
+                @Index(name = "TASK_DATA_POST_SCRIPT_ID", columnList = "POST_SCRIPT_ID"),
+                @Index(name = "TASK_DATA_PRE_SCRIPT_ID", columnList = "PRE_SCRIPT_ID"),
+                @Index(name = "TASK_DATA_SCRIPT_ID", columnList = "SCRIPT_ID"),
+                @Index(name = "TASK_DATA_START_TIME", columnList = "START_TIME"),
+                @Index(name = "TASK_DATA_STATUS", columnList = "STATUS"),
+                @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
+                @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
+                @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
+                @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME")
+        })
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
@@ -181,7 +184,7 @@ public class TaskData {
     }
 
     @Column(name = "JVM_ARGUMENTS")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public List<String> getJvmArguments() {
         return jvmArguments;
     }
@@ -191,7 +194,7 @@ public class TaskData {
     }
 
     @Column(name = "CLASSPATH")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public List<String> getAdditionalClasspath() {
         return additionalClasspath;
     }
@@ -202,9 +205,8 @@ public class TaskData {
 
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ENV_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
-    @Index(name = "TASK_ENV_SCRIPT")
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "ENV_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getEnvScript() {
         return envScript;
     }
@@ -215,9 +217,8 @@ public class TaskData {
 
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
-    @Index(name = "TASK_SCRIPT")
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getScript() {
         return script;
     }
@@ -583,7 +584,7 @@ public class TaskData {
     }
 
     @Column(name = "GENERIC_INFO", updatable = false)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
+    @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, String> getGenericInformation() {
         return genericInformation;
     }
@@ -593,7 +594,6 @@ public class TaskData {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Index(name = "JOB_ID_TASK_DATA_INDEX")
     @JoinColumn(name = "JOB_ID", nullable = false, updatable = false)
     public JobData getJobData() {
         return jobData;
@@ -604,9 +604,16 @@ public class TaskData {
     }
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "TASK_DATA_DEPENDENCIES", joinColumns = {
-            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+    @CollectionTable(name = "TASK_DATA_DEPENDENCIES",
+            joinColumns = {
+                    @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+                    @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK")
+            },
+            indexes = {
+                    @Index(name = "TASK_DATA_DEP_JOB_ID", columnList = "JOB_ID"),
+                    @Index(name = "TASK_DATA_DEP_TASK_ID", columnList = "TASK_ID"),
+            }
+    )
     @BatchSize(size = 100)
     public List<DBTaskId> getDependentTasks() {
         return dependentTasks;
@@ -617,9 +624,16 @@ public class TaskData {
     }
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "TASK_DATA_JOINED_BRANCHES", joinColumns = {
-            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+    @CollectionTable(name = "TASK_DATA_JOINED_BRANCHES",
+            joinColumns = {
+                    @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+                    @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK")
+            },
+            indexes = {
+                    @Index(name = "TASK_DATA_JB_JOB_ID", columnList = "JOB_ID"),
+                    @Index(name = "TASK_DATA_JB_TASK_ID", columnList = "TASK_ID"),
+            }
+    )
     @BatchSize(size = 100)
     public List<DBTaskId> getJoinedBranches() {
         return joinedBranches;
@@ -631,7 +645,6 @@ public class TaskData {
 
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @Index(name = "IF_BRANCH_TASK_DATA_INDEX")
     public TaskData getIfBranch() {
         return ifBranch;
     }
@@ -664,9 +677,8 @@ public class TaskData {
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRE_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
-    @Index(name = "TASK_PRE_SCRIPT")
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "PRE_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getPreScript() {
         return preScript;
     }
@@ -677,9 +689,8 @@ public class TaskData {
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "POST_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
-    @Index(name = "TASK_POST_SCRIPT")
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "POST_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getPostScript() {
         return postScript;
     }
@@ -690,9 +701,8 @@ public class TaskData {
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CLEAN_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
-    @Index(name = "TASK_CLEAN_SCRIPT")
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "CLEAN_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getCleanScript() {
         return cleanScript;
     }
@@ -703,9 +713,8 @@ public class TaskData {
 
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FLOW_SCRIPT_ID")
-    @ForeignKey(name = "none") // disable foreign key, to be able to remove runtime data
-    @Index(name = "TASK_FLOW_SCRIPT")
+    // disable foreign key, to be able to remove runtime data
+    @JoinColumn(name = "FLOW_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
     public ScriptData getFlowScript() {
         return flowScript;
     }
@@ -715,7 +724,6 @@ public class TaskData {
     }
 
     @Column(nullable = false, name = "TASK_NAME")
-    @Index(name = "TASK_NAME_TASK_DATA_INDEX")
     public String getTaskName() {
         return taskName;
     }
@@ -753,7 +761,6 @@ public class TaskData {
     }
 
     @Column(name = "TAG", updatable = false)
-    @Index(name = "TASK_TAG")
     public String getTag() {
         return this.tag;
     }
@@ -830,7 +837,6 @@ public class TaskData {
     }
 
     @Column(name = "START_TIME")
-    @Index(name = "TASK_START_TIME")
     public long getStartTime() {
         return startTime;
     }
@@ -840,7 +846,6 @@ public class TaskData {
     }
 
     @Column(name = "FINISH_TIME")
-    @Index(name = "TASK_FINISHED_TIME")
     public long getFinishedTime() {
         return finishedTime;
     }
@@ -877,7 +882,6 @@ public class TaskData {
     }
 
     @Column(name = "STATUS", nullable = false)
-    @Index(name = "task_status_index")
     public TaskStatus getTaskStatus() {
         return taskStatus;
     }
@@ -1028,8 +1032,8 @@ public class TaskData {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
 
         return new TaskUsage(taskId.value(), getTaskName(), getStartTime(), getFinishedTime(),
-            getExecutionDuration(),
-            getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
+                getExecutionDuration(),
+                getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
     }
 
     TaskInfoImpl createTaskInfo(JobIdImpl jobId) {

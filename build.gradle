@@ -339,6 +339,7 @@ generateCredentials.dependsOn generateCredentialsAdmin, generateCredentialsSched
 def exportedProjects= [
         ":common:common-api",
         ":common:common-client",
+        ":common:common-db",
         ":scheduler:scheduler-api",
         ":scheduler:scheduler-client",
         ":scheduler:scheduler-examples",

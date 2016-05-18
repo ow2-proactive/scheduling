@@ -4,6 +4,7 @@ import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.DatabaseManagerExceptionHandler;
 import org.ow2.proactive.db.FilteredExceptionCallback;
+import org.ow2.proactive.db.SessionWork;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -105,12 +106,6 @@ public class TransactionHelper implements FilteredExceptionCallback {
                 debugLogger.warn("Failed to close session", e);
             }
         }
-    }
-
-    public interface SessionWork<T> {
-
-        T executeWork(Session session);
-
     }
 
     @Override
