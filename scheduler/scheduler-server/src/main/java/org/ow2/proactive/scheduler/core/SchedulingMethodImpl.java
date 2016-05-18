@@ -76,7 +76,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 
@@ -185,7 +184,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             // ask the policy all the tasks to be schedule according to the jobs list.
 
-            Vector<EligibleTaskDescriptor> taskRetrievedFromPolicy = currentPolicy
+            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = currentPolicy
                     .getOrderedTasks(descriptors);
 
             //if there is no task to scheduled, return
@@ -330,14 +329,14 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of nodes needed to start every task present in the 'toFill' argument at the end of the method.
      */
     protected int getNextcompatibleTasks(Map<JobId, JobDescriptor> jobsMap,
-                                         Vector<EligibleTaskDescriptor> bagOfTasks, int maxResource,
+                                         LinkedList<EligibleTaskDescriptor> bagOfTasks, int maxResource,
                                          LinkedList<EligibleTaskDescriptor> toFill) {
         if (toFill == null || bagOfTasks == null) {
             throw new IllegalArgumentException("The two given lists must not be null !");
         }
         int neededResource = 0;
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
-            EligibleTaskDescriptor etd = bagOfTasks.remove(0);
+            EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
             InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
@@ -348,7 +347,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 if (!firstLoop) {
                     //if bagOfTasks is not empty
                     if (!bagOfTasks.isEmpty()) {
-                        etd = bagOfTasks.remove(0);
+                        etd = bagOfTasks.removeFirst();
                         ((EligibleTaskDescriptorImpl) etd).addAttempt();
                         currentJob = jobsMap.get(etd.getJobId()).getInternal();
                         internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
@@ -372,7 +371,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         maxResource -= neededNodes;
                         toFill.add(etd);
                     } else {
-                        bagOfTasks.add(0, etd);
+                        bagOfTasks.addFirst(etd);
                         break;
                     }
                 }
