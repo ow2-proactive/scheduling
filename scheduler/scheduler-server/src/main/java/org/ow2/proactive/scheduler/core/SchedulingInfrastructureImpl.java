@@ -2,10 +2,13 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 
 
@@ -13,17 +16,26 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
 
     private final SchedulerDBManager dbManager;
 
-    private final ScheduledExecutorService scheduledExecutorService;
-
     private final ExecutorService clientExecutorService;
 
     private final ExecutorService internalExecutorService;
+
+    private final ScheduledExecutorService scheduledExecutorService;
 
     private final RMProxiesManager rmProxiesManager;
 
     private final DataSpaceServiceStarter dsStarter;
 
     private final SchedulerSpacesSupport spacesSupport;
+    
+    private static class HousekeepingScheduledExecutorLazyHolder {
+
+        private static final ScheduledExecutorService INSTANCE =
+                Executors.newScheduledThreadPool(
+                        PASchedulerProperties.SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
+                        new NamedThreadFactory("Housekeeping Thread"));
+
+    }
 
     public SchedulingInfrastructureImpl(SchedulerDBManager dbManager, RMProxiesManager rmProxiesManager,
             DataSpaceServiceStarter dsStarter, ExecutorService clientExecutorService,
@@ -76,6 +88,13 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
     }
 
     @Override
+    public void scheduleHousekeeping(JobRemoveHandler jobRemoveHandler, long delay) {
+        HousekeepingScheduledExecutorLazyHolder.INSTANCE.schedule(
+                jobRemoveHandler, delay, TimeUnit.MILLISECONDS
+        );
+    }
+
+    @Override
     public DataSpaceServiceStarter getDataSpaceServiceStarter() {
         return dsStarter;
     }
@@ -90,8 +109,12 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
         clientExecutorService.shutdownNow();
         internalExecutorService.shutdownNow();
         scheduledExecutorService.shutdownNow();
+
+        HousekeepingScheduledExecutorLazyHolder.INSTANCE.shutdownNow();
+
         dsStarter.terminateNamingService();
         rmProxiesManager.terminateAllProxies();
         dbManager.close();
     }
+
 }

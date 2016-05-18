@@ -350,38 +350,36 @@ public class Tools {
     }
 
     /**
-     * Joins the elements of the list into a single String
-     * containing the provided list of elements. 
-     * @param list the array of values to join together, may be null
-     * @param delim the separator String to use
-     * @return the joined String, <code>null</code> if null array input
-     */
-    public static String join(List<?> list, String delim) {
-        if (list == null) {
-            return null;
-        }
-        int len = list.size();
-        if (len == 0)
-            return "";
-        StringBuilder sb = new StringBuilder(list.get(0).toString());
-        for (int i = 1; i < len; i++) {
-            sb.append(delim);
-            sb.append(list.get(i).toString());
-        }
-        return sb.toString();
-    }
-
-    /**
-     * List all available script engines
-     * @param logger to log the engines to
+     * Log available script engines at INFO level.
+     *
+     * @param logger the logger instance used to log available script engines.
      */
     public static void logAvailableScriptEngines(Logger logger) {
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        List<ScriptEngineFactory> factories = mgr.getEngineFactories();
-        List<String> engineNames = new ArrayList<>();
-        for (ScriptEngineFactory factory : factories) {
-            engineNames.add(String.format("%s(%s)", factory.getEngineName(), factory.getEngineVersion()));
+        if (!logger.isInfoEnabled()) {
+            return;
         }
-        logger.info("Available script engines: " + Joiner.on(',').join(engineNames));
+
+        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+        List<ScriptEngineFactory> engineFactories = scriptEngineManager.getEngineFactories();
+
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("Available script engines: ");
+
+        int engineFactoriesCount = engineFactories.size();
+
+        for (int i = 0; i < engineFactoriesCount; i++) {
+            ScriptEngineFactory scriptEngineFactory = engineFactories.get(i);
+            buffer.append(scriptEngineFactory.getEngineName());
+            buffer.append(" (");
+            buffer.append(scriptEngineFactory.getEngineVersion());
+            buffer.append(")");
+
+            if (i < engineFactoriesCount - 1) {
+                buffer.append(", ");
+            }
+        }
+
+        logger.info(buffer.toString());
     }
+
 }

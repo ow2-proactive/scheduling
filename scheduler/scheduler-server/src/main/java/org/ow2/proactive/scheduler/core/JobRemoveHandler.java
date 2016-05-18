@@ -14,7 +14,7 @@ import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.apache.log4j.Logger;
 
 
-class JobRemoveHandler implements Callable<Boolean> {
+public class JobRemoveHandler implements Callable<Boolean> {
 
     private static final Logger logger = Logger.getLogger(SchedulingService.class);
 
@@ -22,7 +22,7 @@ class JobRemoveHandler implements Callable<Boolean> {
 
     private final SchedulingService service;
 
-    JobRemoveHandler(SchedulingService service, JobId jobId) {
+    public JobRemoveHandler(SchedulingService service, JobId jobId) {
         this.service = service;
         this.jobId = jobId;
     }

@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.objectweb.proactive.Body;
@@ -135,10 +136,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * Delay to wait for between getting a job result and removing the job concerned
      */
-    private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
-            .getValueAsInt() * 1000;
+    private static final long SCHEDULER_REMOVED_JOB_DELAY =
+            PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() * 1000;
 
     private static final Logger logger = Logger.getLogger(SchedulingService.class);
+
     private static final JobLogger jlogger = JobLogger.getInstance();
 
     /**
@@ -241,6 +243,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                     PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
                     new NamedThreadFactory("InternalOperationsThreadPool"));
 
+            ScheduledExecutorService scheduledThreadPool = new ScheduledThreadPoolExecutor(
+                    PASchedulerProperties.SCHEDULER_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
+                    new NamedThreadFactory("SchedulingServiceTimerThread"));
+
             // at this point we must wait the resource manager
             RMConnection.waitAndJoin(rmURL.toString());
             RMProxiesManager rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
@@ -259,7 +265,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 }
             }
 
-            // Boot the JMX helper
             logger.debug("Booting jmx...");
             this.jmxHelper.boot(authentication);
 
@@ -269,8 +274,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             this.frontendState = new SchedulerFrontendState(recoveredState.getSchedulerState(), jmxHelper);
 
             SchedulingInfrastructure infrastructure = new SchedulingInfrastructureImpl(dbManager,
-                rmProxiesManager, dsServiceStarter, clientThreadPool, internalThreadPool,
-                new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("SchedulingServiceTimerThread")));
+                rmProxiesManager, dsServiceStarter, clientThreadPool, internalThreadPool, scheduledThreadPool);
 
             this.spacesSupport = infrastructure.getSpacesSupport();
 
@@ -1160,7 +1164,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 "You do not have permission to remove third-party credentials from the scheduler!");
         dbManager.removeThirdPartyCredential(ident.getUsername(), key);
     }
-    
+
     @Override
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks,
             boolean running, boolean pending, boolean finished, int offset, int limit)
@@ -1190,7 +1194,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 params.getLimit(), params.getUserName(), params.isPending(), params.isRunning(),
                 params.isFinished(), params.getSortParams());
         return pTasks;
-        
+
     }
 
     @Override
@@ -1198,5 +1202,5 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws UnknownJobException, NotConnectedException, PermissionException {
         return getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
     }
-    
+
 }
