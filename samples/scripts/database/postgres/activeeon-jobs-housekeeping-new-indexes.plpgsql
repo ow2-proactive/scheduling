@@ -1,0 +1,51 @@
+-- Function to create an index only if it is not already existing
+CREATE OR REPLACE FUNCTION create_index_if_not_exists (t_name text, i_name text, index_sql text) RETURNS void AS $$
+DECLARE
+  full_index_name varchar;
+  schema_name varchar;
+BEGIN
+
+full_index_name = i_name;
+schema_name = 'public';
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM   pg_class c
+    JOIN   pg_namespace n ON n.oid = c.relnamespace
+    WHERE  c.relname = full_index_name
+    AND    n.nspname = schema_name
+    ) THEN
+    execute 'CREATE INDEX ' || full_index_name || ' ON ' || schema_name || '.' || t_name || ' (' || index_sql || ')';
+END IF;
+END
+$$
+LANGUAGE plpgsql VOLATILE;
+
+-- Create new indexes
+SELECT create_index_if_not_exists('task_data', 'task_data_job_id', 'job_id');
+SELECT create_index_if_not_exists('task_data', 'task_data_task_id_job', 'task_id_job');
+SELECT create_index_if_not_exists('task_data', 'task_data_task_id_task', 'task_id_task');
+SELECT create_index_if_not_exists('task_data', 'task_data_ifbranch_task_id_job', 'ifbranch_task_id_job');
+SELECT create_index_if_not_exists('task_data', 'task_data_ifbranch_task_id_task', 'ifbranch_task_id_task');
+
+SELECT create_index_if_not_exists('task_result_data', 'task_result_data_job_id', 'job_id');
+SELECT create_index_if_not_exists('task_result_data', 'task_result_data_task_id', 'task_id');
+
+SELECT create_index_if_not_exists('ds_selector_data', 'ds_selector_data_job_id', 'job_id');
+SELECT create_index_if_not_exists('ds_selector_data', 'ds_selector_data_task_id', 'task_id');
+
+SELECT create_index_if_not_exists('task_data_dependencies', 'task_data_dependencies_job_id', 'job_id');
+SELECT create_index_if_not_exists('task_data_dependencies', 'task_data_dependencies_task_id', 'task_id');
+
+SELECT create_index_if_not_exists('native_task_data', 'native_task_data_gen_script_id', 'gen_script_id');
+SELECT create_index_if_not_exists('native_task_data', 'native_task_data_job_id', 'job_id');
+SELECT create_index_if_not_exists('native_task_data', 'native_task_data_task_id', 'task_id');
+
+SELECT create_index_if_not_exists('script_data', 'script_data_job_id', 'job_id');
+SELECT create_index_if_not_exists('script_data', 'script_data_task_id', 'task_id');
+
+SELECT create_index_if_not_exists('java_task_data', 'java_task_data_job_id', 'job_id');
+SELECT create_index_if_not_exists('java_task_data', 'java_task_data_task_id', 'task_id');
+
+SELECT create_index_if_not_exists('forked_java_task_data', 'forked_java_task_data_job_id', 'job_id');
+SELECT create_index_if_not_exists('forked_java_task_data', 'forked_java_task_data_task_id', 'task_id');

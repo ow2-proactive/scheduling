@@ -1,0 +1,29 @@
+﻿-- Stored procedure for deleting terminated and expired Jobs.
+-- The function takes one parameter that defines the minimum delay to wait 
+-- between the time at which a Job has finished and the time at which it 
+-- will be removed from the DB. The delay is expressed in seconds.
+CREATE OR REPLACE FUNCTION activeeon_jobs_housekeeping(job_removal_delay integer = 172800) -- default value is 2 days
+RETURNS SETOF integer AS $$
+DECLARE
+    NOW integer;
+BEGIN
+    CREATE TABLE Temp(id int);
+
+    NOW := extract(epoch FROM now())::int;
+    
+    INSERT INTO Temp(id)
+        SELECT job_data.id FROM job_data WHERE finish_time != -1 AND 
+            NOW > (finish_time/1000)+job_removal_delay;
+
+    DELETE FROM task_data_joined_branches WHERE job_id IN (SELECT id FROM Temp);
+    DELETE FROM task_data_dependencies WHERE job_id IN (SELECT id FROM Temp);
+    DELETE FROM job_data WHERE id IN (SELECT id FROM Temp);
+
+    RETURN NEXT (SELECT count(1) FROM Temp);
+
+    DROP TABLE Temp;
+
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
