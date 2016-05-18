@@ -36,12 +36,12 @@
  */
 package org.ow2.proactive.resourcemanager.common;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.util.Set;
 
 
 /**
@@ -55,14 +55,14 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 @XmlRootElement
 public class RMState implements Serializable {
 
-    private int freeNodesNumber;
-    private int totalAliveNodesNumber;
-    private int totalNodesNumber;
+    private Set<String> freeNodesUrls;
+    private Set<String> aliveNodesUrls;
+    private Set<String> allNodesUrls;
 
-    public RMState(int freeNodesNumber, int totalAliveNodesNumber, int totalNodesNumber) {
-        this.freeNodesNumber = freeNodesNumber;
-        this.totalAliveNodesNumber = totalAliveNodesNumber;
-        this.totalNodesNumber = totalNodesNumber;
+    public RMState(Set<String> freeNodesUrls, Set<String> aliveNodesUrls, Set<String> allNodesUrls) {
+        this.freeNodesUrls = freeNodesUrls;
+        this.aliveNodesUrls = aliveNodesUrls;
+        this.allNodesUrls = allNodesUrls;
     }
 
     /**
@@ -71,7 +71,7 @@ public class RMState implements Serializable {
      * @return true if the scheduler has free resources, false if not.
      */
     public BooleanWrapper hasFreeResources() {
-        return new BooleanWrapper(freeNodesNumber != 0);
+        return new BooleanWrapper(!freeNodesUrls.isEmpty());
     }
 
     /**
@@ -80,7 +80,16 @@ public class RMState implements Serializable {
      * @return free nodes number in the resource manager
      */
     public int getFreeNodesNumber() {
-        return freeNodesNumber;
+        return freeNodesUrls.size();
+    }
+
+    /**
+     * Returns a set containing all free nodes urls in the resource manager.
+     *
+     * @return free nodes urls in the resource manager
+     */
+    public Set<String> getFreeNodes() {
+        return freeNodesUrls;
     }
 
     /**
@@ -89,7 +98,16 @@ public class RMState implements Serializable {
      * @return total alive nodes number in the resource manager
      */
     public int getTotalAliveNodesNumber() {
-        return totalAliveNodesNumber;
+        return aliveNodesUrls.size();
+    }
+
+    /**
+     * Returns a set containing all alive nodes urls in the resource manager.
+     *
+     * @return all alive nodes urls in the resource manager
+     */
+    public Set<String> getAliveNodes() {
+        return aliveNodesUrls;
     }
 
     /**
@@ -98,6 +116,17 @@ public class RMState implements Serializable {
      * @return total nodes number in the resource manager
      */
     public int getTotalNodesNumber() {
-        return totalNodesNumber;
+        return allNodesUrls.size();
     }
+
+    /**
+     * Returns a set containing all nodes urls (including dead nodes) in the resource manager.
+     *
+     * @return all nodes urls in the resource manager
+     */
+    public Set<String> getAllNodes() {
+        return allNodesUrls;
+    }
+
+
 }

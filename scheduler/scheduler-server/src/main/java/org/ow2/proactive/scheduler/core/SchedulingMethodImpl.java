@@ -76,6 +76,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -174,10 +175,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //get rmState and update it in scheduling policy
             RMState rmState = getRMProxiesManager().getRmProxy().getState();
             currentPolicy.setRMState(rmState);
-            int freeResourcesNb = rmState.getFreeNodesNumber();
-            logger.debug("eligible nodes : " + freeResourcesNb);
+            Set<String> freeResources = rmState.getFreeNodes();
+            if (logger.isDebugEnabled()) {
+                logger.debug("eligible nodes : " + freeResources);
+            }
             //if there is no free resources, stop it right now
-            if (freeResourcesNb == 0) {
+            if (freeResources.isEmpty()) {
                 return numberOfTaskStarted;
             }
 
@@ -198,7 +201,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             while (!taskRetrievedFromPolicy.isEmpty()) {
 
-                if (freeResourcesNb <= 0) {
+                if (freeResources.isEmpty()) {
                     return numberOfTaskStarted;
                 }
 
@@ -208,7 +211,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
                     neededResourcesNumber = getNextcompatibleTasks(jobMap, taskRetrievedFromPolicy,
-                            freeResourcesNb, tasksToSchedule);
+                            freeResources.size(), tasksToSchedule);
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("tasksToSchedule : " + tasksToSchedule);
@@ -223,11 +226,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule);
 
                 if (nodeSet != null) {
-                    freeResourcesNb -= nodeSet.getTotalNumberOfNodes();
+                    freeResources.removeAll(nodeSet.getAllNodesUrls());
 
-                    if (conflictInNumberOfNodes(freeResourcesNb)) {
+                    if (conflictInFreeNodes(freeResources)) {
                         try {
-                            logger.info("Number of nodes changed during the scheduling loop execution, skipping until next iteration.");
+                            logger.info("Free nodes list changed during the scheduling loop execution, skipping until next iteration.");
                             releaseNodes(jobMap.get(tasksToSchedule.getFirst().getJobId()).getInternal(), nodeSet);
                         } catch (Exception e) {
                             logger.info("Unable to get back the nodeSet to the RM", e);
@@ -263,7 +266,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             //get back unused nodes to the RManager
                             if (!nodeSet.isEmpty()) {
                                 releaseNodes(currentJob, nodeSet);
-                                freeResourcesNb += nodeSet.getTotalNumberOfNodes();
+                                freeResources.addAll(nodeSet.getAllNodesUrls());
                             }
                             //and leave the loop
                             break;
@@ -275,7 +278,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     //so try to get back every remaining nodes to the resource manager
                     try {
                         releaseNodes(currentJob, nodeSet);
-                        freeResourcesNb += nodeSet.getTotalNumberOfNodes();
+                        freeResources.addAll(nodeSet.getAllNodesUrls());
                     } catch (Exception e2) {
                         logger.info("Unable to get back the nodeSet to the RM", e2);
                     }
@@ -288,7 +291,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     //so try to get back every remaining nodes to the resource manager
                     try {
                         releaseNodes(currentJob, nodeSet);
-                        freeResourcesNb += nodeSet.getTotalNumberOfNodes();
+                        freeResources.addAll(nodeSet.getAllNodesUrls());
                     } catch (Exception e2) {
                         logger.info("Unable to get back the nodeSet to the RM", e2);
                     }
@@ -302,12 +305,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     /**
-     * Checks if there is a conflict between the number of free nodes known by the scheduling loop and the actual number of free resources in the resource manager
+     * Checks if there is a conflict between the free nodes known by the scheduling loop and the actual free resources in the resource manager
      */
-    private boolean conflictInNumberOfNodes(int numberOfFreeResourcesKnown) {
+    private boolean conflictInFreeNodes(Set<String> freeResourcesKnown) {
         RMState rmState = getRMProxiesManager().getRmProxy().getState();
-        int actualFreeResourcesNb = rmState.getFreeNodesNumber();
-        if (numberOfFreeResourcesKnown != actualFreeResourcesNb) {
+        Set<String> actualFreeResources = rmState.getFreeNodes();
+        if (!actualFreeResources.equals(freeResourcesKnown)) {
             return true;
         }
         return false;
