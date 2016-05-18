@@ -32,7 +32,7 @@ dependencies {
     testCompile project(':rm:rm-policy:rm-policy-scheduler')
     testCompile project(':scheduler:scheduler-examples')
 
-    runtime 'org.hsqldb:hsqldb:2.3.3'
+    runtime 'org.hsqldb:hsqldb:2.3.4'
 
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
