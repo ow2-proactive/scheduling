@@ -36,17 +36,6 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_INFO_START_AT_KEY;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -59,6 +48,15 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_INFO_START_AT_KEY;
 
 
 /**
@@ -84,28 +82,28 @@ public class ExtendedSchedulerPolicyTest {
     @Test
     public void testWithoutStartAt() throws Exception {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(null, null, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
     }
 
     @Test
     public void testJobStartAtNow() throws Exception {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(now, null, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
     }
 
     @Test
     public void testJobStartAtLater() throws Exception {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(later, null, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 0);
     }
 
     @Test
     public void testTaskStartAtNow() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(null, now, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
 
     }
@@ -113,7 +111,7 @@ public class ExtendedSchedulerPolicyTest {
     @Test
     public void testTaskStartLater() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(null, later, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 1);
         assertNull(startAtValue(first(orderedTasks)));
     }
@@ -121,7 +119,7 @@ public class ExtendedSchedulerPolicyTest {
     @Test
     public void testOneTaskStartNowOtherLater() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(null, now, later));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         assertEquals(now, startAtValue(first(orderedTasks)));
     }
@@ -129,7 +127,7 @@ public class ExtendedSchedulerPolicyTest {
     @Test
     public void testJobStartNowOneTaskStartLater() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(now, later, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
         assertNull(startAtValue);
@@ -138,7 +136,7 @@ public class ExtendedSchedulerPolicyTest {
     @Test
     public void testJobStartNowOneTaskStartLater2() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(now, later, now));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
         assertEquals(now, startAtValue);
@@ -147,7 +145,7 @@ public class ExtendedSchedulerPolicyTest {
     @Test
     public void testJobStartLaterOneTaskStartNow() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(later, now, null));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
         assertEquals(now, startAtValue);
@@ -156,7 +154,7 @@ public class ExtendedSchedulerPolicyTest {
     @Test
     public void testJobStartLaterOneTaskStartNow2() {
         List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(later, now, later));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks.size() == 1);
         String startAtValue = startAtValue(first(orderedTasks));
         assertEquals(now, startAtValue);
@@ -166,7 +164,7 @@ public class ExtendedSchedulerPolicyTest {
     public void testMalformedTaskStartAt() {
         List<JobDescriptor> jobDescList = asModifiableList(
                 createJobDescWithTwoTasks(later, now, "malformed-start-at"));
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
     }
 
@@ -178,7 +176,7 @@ public class ExtendedSchedulerPolicyTest {
 
         List<JobDescriptor> jobDescList = asModifiableList(job1, job3, job2);
 
-        Vector<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
 
         assertEquals(job1.getJobId(), orderedTasks.get(0).getJobId());
         assertEquals(job2.getJobId(), orderedTasks.get(2).getJobId());

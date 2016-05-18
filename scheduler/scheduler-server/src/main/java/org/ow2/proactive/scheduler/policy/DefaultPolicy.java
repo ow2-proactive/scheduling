@@ -36,14 +36,14 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Vector;
-
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -74,8 +74,8 @@ public class DefaultPolicy extends Policy {
      * @see org.ow2.proactive.scheduler.policy.Policy#getOrderedTasks(java.util.List)
      */
     @Override
-    public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
-        Vector<EligibleTaskDescriptor> toReturn = new Vector<>();
+    public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
+        LinkedList<EligibleTaskDescriptor> toReturn = new LinkedList<>();
 
         Collections.sort(jobs, FIFO_BY_PRIORITY_COMPARATOR);
 
