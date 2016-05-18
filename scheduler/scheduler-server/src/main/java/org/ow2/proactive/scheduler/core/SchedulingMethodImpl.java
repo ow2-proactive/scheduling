@@ -71,7 +71,12 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 import java.security.PrivateKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 
@@ -102,8 +107,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     protected PrivateKey corePrivateKey;
 
-    private InternalPolicy internalPolicy;
-
     private TaskTerminateNotification terminateNotification;
 
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
@@ -116,7 +119,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(
                 PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
                 new NamedThreadFactory("DoTask_Action"));
-        this.internalPolicy = new InternalPolicy();
         this.corePrivateKey = Credentials.getPrivateKey(PASchedulerProperties
                 .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
     }
@@ -157,6 +159,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         //get job Descriptor list with eligible jobs (running and pending)
         Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("jobs selected to be scheduled : " + jobMap);
+        }
+
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
         // we wait for next scheduling loop
         if (jobMap.isEmpty()) {
@@ -164,31 +170,37 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         try {
-            List<JobDescriptor> descriptors = new ArrayList<>(jobMap.size());
-            descriptors.addAll(jobMap.values());
+            List<JobDescriptor> descriptors = new ArrayList<>(jobMap.values());
 
-            //ask the policy all the tasks to be schedule according to the jobs list.
-            //and filter them using internal policy
-            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = internalPolicy.filter(currentPolicy
-                    .getOrderedTasks(descriptors));
-
-            //if there is no task to scheduled, return
-            if (taskRetrievedFromPolicy == null || taskRetrievedFromPolicy.size() == 0) {
+            //get rmState and update it in scheduling policy
+            RMState rmState = getRMProxiesManager().getRmProxy().getState();
+            currentPolicy.setRMState(rmState);
+            int freeResourcesNb = rmState.getFreeNodesNumber();
+            logger.debug("eligible nodes : " + freeResourcesNb);
+            //if there is no free resources, stop it right now
+            if (freeResourcesNb == 0) {
                 return numberOfTaskStarted;
             }
 
-            logger.debug("eligible tasks : " + taskRetrievedFromPolicy.size());
+
+            // ask the policy all the tasks to be schedule according to the jobs list.
+
+            Vector<EligibleTaskDescriptor> taskRetrievedFromPolicy = currentPolicy
+                    .getOrderedTasks(descriptors);
+
+            //if there is no task to scheduled, return
+            if (taskRetrievedFromPolicy == null || taskRetrievedFromPolicy.isEmpty()) {
+                return numberOfTaskStarted;
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("eligible tasks : " + taskRetrievedFromPolicy);
+            }
 
             while (!taskRetrievedFromPolicy.isEmpty()) {
-                //get rmState and update it in scheduling policy
-                RMState rmState = getRMProxiesManager().getRmProxy().getState();
-                currentPolicy.setRMState(rmState);
-                internalPolicy.RMState = rmState;
-                int freeResourcesNb = rmState.getFreeNodesNumber();
-                logger.debug("eligible nodes : " + freeResourcesNb);
-                //if there is no free resources, stop it right now
-                if (freeResourcesNb == 0) {
-                    break;
+
+                if (freeResourcesNb <= 0) {
+                    return numberOfTaskStarted;
                 }
 
                 //get the next compatible tasks from the whole returned policy tasks
@@ -199,12 +211,32 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     neededResourcesNumber = getNextcompatibleTasks(jobMap, taskRetrievedFromPolicy,
                             freeResourcesNb, tasksToSchedule);
                 }
+                if (logger.isDebugEnabled()) {
+                    logger.debug("tasksToSchedule : " + tasksToSchedule);
+                }
+
+
                 logger.debug("required number of nodes : " + neededResourcesNumber);
-                if (neededResourcesNumber == 0) {
+                if (neededResourcesNumber == 0 || tasksToSchedule.isEmpty()) {
                     break;
                 }
 
                 NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule);
+
+                if (nodeSet != null) {
+                    freeResourcesNb -= nodeSet.getTotalNumberOfNodes();
+
+                    if (conflictInNumberOfNodes(freeResourcesNb)) {
+                        try {
+                            logger.info("Number of nodes changed during the scheduling loop execution, skipping until next iteration.");
+                            releaseNodes(jobMap.get(tasksToSchedule.getFirst().getJobId()).getInternal(), nodeSet);
+                        } catch (Exception e) {
+                            logger.info("Unable to get back the nodeSet to the RM", e);
+                        }
+                        break;
+                    }
+                }
+
 
                 //start selected tasks
                 Node node = null;
@@ -227,13 +259,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         	
                         }
 
-                        
-
                         //if every task that should be launched have been removed
                         if (tasksToSchedule.isEmpty()) {
                             //get back unused nodes to the RManager
                             if (!nodeSet.isEmpty()) {
                                 releaseNodes(currentJob, nodeSet);
+                                freeResourcesNb += nodeSet.getTotalNumberOfNodes();
                             }
                             //and leave the loop
                             break;
@@ -245,6 +276,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     //so try to get back every remaining nodes to the resource manager
                     try {
                         releaseNodes(currentJob, nodeSet);
+                        freeResourcesNb += nodeSet.getTotalNumberOfNodes();
                     } catch (Exception e2) {
                         logger.info("Unable to get back the nodeSet to the RM", e2);
                     }
@@ -257,6 +289,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     //so try to get back every remaining nodes to the resource manager
                     try {
                         releaseNodes(currentJob, nodeSet);
+                        freeResourcesNb += nodeSet.getTotalNumberOfNodes();
                     } catch (Exception e2) {
                         logger.info("Unable to get back the nodeSet to the RM", e2);
                     }
@@ -267,6 +300,18 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         } finally {
             schedulingService.unlockJobsToSchedule(jobMap.values());
         }
+    }
+
+    /**
+     * Checks if there is a conflict between the number of free nodes known by the scheduling loop and the actual number of free resources in the resource manager
+     */
+    private boolean conflictInNumberOfNodes(int numberOfFreeResourcesKnown) {
+        RMState rmState = getRMProxiesManager().getRmProxy().getState();
+        int actualFreeResourcesNb = rmState.getFreeNodesNumber();
+        if (numberOfFreeResourcesKnown != actualFreeResourcesNb) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -285,26 +330,25 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of nodes needed to start every task present in the 'toFill' argument at the end of the method.
      */
     protected int getNextcompatibleTasks(Map<JobId, JobDescriptor> jobsMap,
-            LinkedList<EligibleTaskDescriptor> bagOfTasks, int maxResource,
-            LinkedList<EligibleTaskDescriptor> toFill) {
+                                         Vector<EligibleTaskDescriptor> bagOfTasks, int maxResource,
+                                         LinkedList<EligibleTaskDescriptor> toFill) {
         if (toFill == null || bagOfTasks == null) {
             throw new IllegalArgumentException("The two given lists must not be null !");
         }
         int neededResource = 0;
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
-            EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
+            EligibleTaskDescriptor etd = bagOfTasks.remove(0);
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
             InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
-            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob
-                    .getOwner());
+            SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob);
             boolean firstLoop = true;
             do {
                 if (!firstLoop) {
                     //if bagOfTasks is not empty
                     if (!bagOfTasks.isEmpty()) {
-                        etd = bagOfTasks.removeFirst();
+                        etd = bagOfTasks.remove(0);
                         ((EligibleTaskDescriptorImpl) etd).addAttempt();
                         currentJob = jobsMap.get(etd.getJobId()).getInternal();
                         internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
@@ -322,13 +366,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     //(multi-nodes starvation may occurs)
                 } else {
                     //check if the task is compatible with the other previous one
-                    if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob.getOwner()))) {
+                    if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob))) {
                         tlogger.debug(internalTask.getId(), "scheduling");
                         neededResource += neededNodes;
                         maxResource -= neededNodes;
                         toFill.add(etd);
                     } else {
-                        bagOfTasks.addFirst(etd);
+                        bagOfTasks.add(0, etd);
                         break;
                     }
                 }
