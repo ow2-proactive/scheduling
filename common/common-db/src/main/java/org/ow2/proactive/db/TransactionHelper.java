@@ -23,13 +23,16 @@ public class TransactionHelper {
      * Execute the specified {@code sessionWork} in a session configured
      * for read-only interactions with the database. This method should be
      * used for select queries.
+     * <p>
+     * In case of a transaction failure a retry is performed or not based on
+     * the value defined by {@code PASchedulerProperties.SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES}.
      *
      * @param sessionWork the action to perform.
      * @param <T>         the result type of the session work.
      * @return session work result based on the generic type.
      */
     public <T> T executeReadOnlyTransaction(SessionWork<T> sessionWork) {
-        return tryExecuteTransaction(sessionWork, false, true);
+        return tryExecuteTransactionLoop(sessionWork, false, true);
     }
 
     /**
@@ -39,18 +42,23 @@ public class TransactionHelper {
      * then {@link #executeReadOnlyTransaction(SessionWork)} could be used.
      * <p>
      * In case of database error while executing the query, a rollback is
-     * performed.
+     * performed and a retry executed depending of the value associated to
+     * the property {@code PASchedulerProperties.SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES}.
      *
      * @param sessionWork the action to perform.
      * @param <T>         the result type of the session work.
      * @return session work result based on the generic type.
      */
     public <T> T executeReadWriteTransaction(SessionWork<T> sessionWork) {
-        return executeReadWriteTransaction(sessionWork, true);
+        return tryExecuteTransactionLoop(sessionWork, true, true);
     }
 
     public <T> T executeReadWriteTransaction(SessionWork<T> sessionWork, boolean readOnlyEntities) {
-        Exception lastException = null;
+        return tryExecuteTransactionLoop(sessionWork, true, readOnlyEntities);
+    }
+
+    private <T> T tryExecuteTransactionLoop(SessionWork<T> sessionWork, boolean readWriteTransaction, boolean readOnlyEntities) {
+        Throwable lastException = null;
 
         int dampingFactor =
                 PASchedulerProperties.SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR.getValueAsInt();
@@ -61,8 +69,8 @@ public class TransactionHelper {
 
         for (int i = 0; i <= maximumNumberOfRetries; i++) {
             try {
-                return tryExecuteTransaction(sessionWork, true, readOnlyEntities);
-            } catch (LockAcquisitionException exception) {
+                return tryExecuteTransaction(sessionWork, readWriteTransaction, readOnlyEntities);
+            } catch (Throwable exception) {
                 lastException = exception;
 
                 logger.warn(
@@ -73,9 +81,6 @@ public class TransactionHelper {
                 new Sleeper(delay, logger).sleep();
 
                 delay *= dampingFactor;
-            } catch (Throwable throwable) {
-                logger.warn("Database operation failed", throwable);
-                throw new DatabaseManagerException(throwable);
             }
         }
 
@@ -83,7 +88,7 @@ public class TransactionHelper {
                 "Maximum number of transaction retries exceeded, giving up. Last exception is: ",
                 lastException);
 
-        return null;
+        throw new DatabaseManagerException(lastException);
     }
 
     private <T> T tryExecuteTransaction(SessionWork<T> sessionWork,
