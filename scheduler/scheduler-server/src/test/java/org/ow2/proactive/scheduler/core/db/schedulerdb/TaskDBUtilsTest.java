@@ -285,7 +285,7 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
     }
 
     private <T> T run(SessionWork<T> sessionWork) {
-        return dbManager.runWithTransaction(sessionWork);
+        return dbManager.executeReadWriteTransaction(sessionWork);
     }
 
     public InternalJob insertNewJob(String user) throws Exception {

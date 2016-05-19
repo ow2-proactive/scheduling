@@ -27,6 +27,8 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
+import org.hibernate.annotations.NamedQueries;
+import org.hibernate.annotations.NamedQuery;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
@@ -35,6 +37,122 @@ import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
+@NamedQueries( {
+        @NamedQuery(
+                name = "checkJobExistence",
+                query = "select id from JobData where id = :id"
+        ),
+        @NamedQuery(
+                name = "deleteJobData",
+                query = "delete from JobData where id = :jobId"
+        ),
+        @NamedQuery(
+                name = "findUsersWithJobs",
+                query = "select owner, count(owner), max(submittedTime) from JobData group by owner"
+        ),
+        @NamedQuery(
+                name = "getJobsNumberWithStatus",
+                query = "select count(*) from JobData where status in (:status) and removedTime = -1"
+        ),
+        @NamedQuery(
+                name = "getJobSubmittedTime",
+                query = "select submittedTime from JobData where id = :id"
+        ),
+        @NamedQuery(
+                name = "getMeanJobExecutionTime",
+                query = "select avg(finishedTime - startTime) from JobData where startTime > 0 and finishedTime > 0"
+        ),
+        @NamedQuery(
+                name = "getMeanJobPendingTime",
+                query = "select avg(startTime - submittedTime) from JobData where startTime > 0 and submittedTime > 0"
+        ),
+        @NamedQuery(
+                name = "getMeanJobSubmittingPeriod",
+                query = "select count(*), min(submittedTime), max(submittedTime) from JobData"
+        ),
+        @NamedQuery(
+                name = "getTotalJobsCount",
+                query = "select count(*) from JobData where removedTime = -1"
+        ),
+        @NamedQuery(
+                name = "loadInternalJobs",
+                query = "from JobData as job where job.id in (:ids)"
+        ),
+        @NamedQuery(
+                name = "loadJobs",
+                query = "select id from JobData where status in (:status) and removedTime = -1"
+        ),
+        @NamedQuery(
+                name = "loadJobsWithPeriod",
+                query = "select id from JobData where status in (:status) and removedTime = -1 and submittedTime >= :minSubmittedTime"
+        ),
+        @NamedQuery(
+                name = "loadJobDataIfNotRemoved",
+                query = "from JobData as job where job.id in (:ids) and job.removedTime = -1"
+        ),
+        @NamedQuery(
+                name = "readAccountJobs",
+                query = "select count(*), sum(finishedTime) - sum(startTime) from JobData" +
+                        " where owner = :username and finishedTime > 0"
+        ),
+        @NamedQuery(
+                name = "updateJobAndTasksState",
+                query = "update JobData set status = :status, " +
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks, " +
+                        "inErrorTime = :inErrorTime " +
+                        "where id = :jobId"
+        ),
+        @NamedQuery(
+                name = "updateJobDataRemovedTime",
+                query = "update JobData set removedTime = :removedTime where id = :jobId"
+        ),
+        @NamedQuery(
+                name = "updateJobDataSetJobToBeRemoved",
+                query = "update JobData set toBeRemoved = :toBeRemoved where id = :jobId"
+        ),
+        @NamedQuery(
+                name = "updateJobDataPriority",
+                query = "update JobData set priority = :priority where id = :jobId"
+        ),
+        @NamedQuery(
+                name = "updateJobDataAfterTaskFinished",
+                query = "update JobData set status = :status, " +
+                        "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
+                        "numberOfFinishedTasks = :numberOfFinishedTasks, " +
+                        "numberOfRunningTasks = :numberOfRunningTasks, " +
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks " + " where id = :jobId"
+        ),
+        @NamedQuery(
+                name = "updateJobDataAfterWorkflowTaskFinished",
+                query = "update JobData set status = :status, " +
+                        "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
+                        "numberOfFinishedTasks = :numberOfFinishedTasks, " +
+                        "numberOfRunningTasks = :numberOfRunningTasks, " +
+                        "totalNumberOfTasks =:totalNumberOfTasks, " +
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks " + "where id = :jobId"
+        ),
+        @NamedQuery(
+                name = "updateJobDataTaskRestarted",
+                query = "update JobData set status = :status, " +
+                        "numberOfPendingTasks = :numberOfPendingTasks, " +
+                        "numberOfRunningTasks = :numberOfRunningTasks, " +
+                        "numberOfFailedTasks = :numberOfFailedTasks, " +
+                        "numberOfFaultyTasks = :numberOfFaultyTasks, " +
+                        "numberOfInErrorTasks = :numberOfInErrorTasks " + "where id = :jobId"
+        ),
+        @NamedQuery(
+                name = "updateJobDataTaskStarted",
+                query = "update JobData set status = :status, " +
+                        "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
+                        "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId"
+        )
+})
 @Table(name = "JOB_DATA", indexes = {
         @Index(name = "JOB_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
         @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),

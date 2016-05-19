@@ -2,20 +2,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -29,6 +16,28 @@ import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "loadJobResult",
+                query = "select taskResult, " + "task.id, " + "task.taskName, " +
+                        "task.preciousResult from TaskResultData as taskResult left outer join taskResult.taskRuntimeData as task " +
+                        "where task.jobData = :job order by task.id, taskResult.resultTime desc"
+        ),
+        @NamedQuery(
+                name = "loadTasksResultByJobAndTaskName",
+                query = "select id, taskName from TaskData where taskName = :taskName and jobData = :job"
+        ),
+        @NamedQuery(
+                name = "loadTasksResultByTask",
+                query = "from TaskResultData result where result.taskRuntimeData = :task order by result.resultTime desc"
+        ),
+        @NamedQuery(
+                name = "loadTasksResults",
+                query = "select taskResult, " + "task.id, " + "task.taskName, " +
+                        "task.preciousResult from TaskResultData as taskResult join taskResult.taskRuntimeData as task " +
+                        "where task.id in (:tasksIds) order by task.id, taskResult.resultTime desc"
+        )
+})
 @Table(name = "TASK_RESULT_DATA", indexes = {
         @Index(name = "TASK_RESULT_DATA_RUNTIME_DATA", columnList = "JOB_ID,TASK_ID")
 })

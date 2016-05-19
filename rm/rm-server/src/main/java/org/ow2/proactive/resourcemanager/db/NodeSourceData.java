@@ -5,6 +5,8 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.security.auth.Subject;
 
@@ -15,6 +17,20 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 
 
 @Entity
+@NamedQueries( {
+        @NamedQuery(
+                name = "deleteNodeSourceDataByName",
+                query = "delete from NodeSourceData where name=:name"
+        ),
+        @NamedQuery(
+                name = "deleteAllNodeSourceData",
+                query = "delete from NodeSourceData"
+        ),
+        @NamedQuery(
+                name = "getNodeSourceData",
+                query = "from NodeSourceData"
+        )
+})
 @Table(name = "NodeSourceData")
 public class NodeSourceData implements Serializable {
 
@@ -29,7 +45,8 @@ public class NodeSourceData implements Serializable {
     }
 
     public NodeSourceData(String nodeSourceName, String infrastructureType,
-            Object[] infrastructureParameters, String policyType, Object[] policyParameters, Client provider) {
+            Object[] infrastructureParameters, String policyType, Object[] policyParameters,
+            Client provider) {
 
         this.name = nodeSourceName;
         this.infrastructureType = infrastructureType;
