@@ -135,14 +135,16 @@ public class NodeSet extends ArrayList<Node> {
      */
     public Set<String> getAllNodesUrls() {
         HashSet<String> nodesUrls = new HashSet<>(size() + (extraNodes != null ? extraNodes.size() : 0));
-        for (Node node : this) {
-            nodesUrls.add(node.getNodeInformation().getURL());
-        }
+        addNodesToUrlsSet(nodesUrls, this);
         if (extraNodes != null) {
-            for (Node node : extraNodes) {
-                nodesUrls.add(node.getNodeInformation().getURL());
-            }
+            addNodesToUrlsSet(nodesUrls, extraNodes);
         }
         return nodesUrls;
+    }
+
+    private void addNodesToUrlsSet(HashSet<String> nodesUrls, Collection<Node> nodes) {
+        for (Node node : nodes) {
+            nodesUrls.add(node.getNodeInformation().getURL());
+        }
     }
 }

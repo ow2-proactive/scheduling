@@ -34,21 +34,28 @@
  */
 package functionaltests.job.scheduling;
 
+import com.google.common.collect.ImmutableMap;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.SchedulerFunctionalTestNonForkModeWithRestart;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.examples.EmptyTask;
 import org.ow2.proactive.scripting.SelectionScript;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +63,13 @@ import java.util.List;
  * Several tests related to job scheduling priorities and starvation
  */
 public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalTestNonForkModeWithRestart {
+
+    private static URL jobDescriptor = TestJobSchedulingStarvationAndPriority.class
+            .getResource("/functionaltests/descriptors/Job_With_Replication.xml");
+
+    private static final String REPLICATE_TASK_NAME = "task2replicate";
+
+    private static final String REPLICATE_TASK_NAME_FILTER = REPLICATE_TASK_NAME + ".*";
 
     /**
      * Tests that a starvation does not occur with selection scripts. A set of high-priority task with a selection script
@@ -69,7 +83,6 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
         JobId jobIdLow;
-        JobId jobIdHigh;
 
         List<JobId> jobIds = new ArrayList<>(RMTHelper.DEFAULT_NODES_NUMBER);
 
@@ -109,105 +122,77 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
     }
 
     /**
-     * Tests that a low priority job is executed AFTER many jobs with high priorities
+     * Tests that all replicated tasks in a low priority job are executed AFTER replicated tasks in a high priority one
      *
      * @throws Exception
      */
     @Test
-    public void testJobPriority() throws Exception {
-
-        schedulerHelper.log("testJobPriority");
-
-        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
-
-        int nbJobs = RMTHelper.DEFAULT_NODES_NUMBER * 2;
-
-        List<JobId> jobIds = new ArrayList<>(nbJobs);
-
-        for (int i = 0; i < nbJobs; i++) {
-            JobId jobId = scheduler.submit(createJobHigh());
-            jobIds.add(jobId);
-        }
-        JobId jobIdLow = scheduler.submit(createJobLow());
-
-        schedulerHelper.waitForEventTaskRunning(jobIdLow, "taskLow");
-
-        long maxStartTime = 0;
-        for (int i = 0; i < nbJobs; i++) {
-            JobState jobState = scheduler.getJobState(jobIds.get(i));
-            long startTime = jobState.getStartTime();
-            maxStartTime = Math.max(maxStartTime, startTime);
-        }
-
-        JobState jobStateLow = scheduler.getJobState(jobIdLow);
-
-        Assert.assertTrue("Low Priority Job Start time : " + jobStateLow.getStartTime() + " should be greater than the max start time of high priority jobs : " + maxStartTime, jobStateLow.getStartTime() > maxStartTime);
+    public void testJobPriorityStandard() throws Exception {
+        schedulerHelper.log("testJobPriorityStandard");
+        testJobPriority(false);
     }
 
     /**
-     * Tests that, when new nodes are added in the middle of a scheduling loop, a low priority job is not executed before a high priority one
+     * Tests that all replicated tasks in a low priority job are executed AFTER replicated tasks in a high priority one
+     *
+     * Additionally, add extra nodes during the run and ensure that new nodes are not picked by low priority tasks
      *
      * @throws Exception
      */
     @Test
     public void testJobPriorityWithNewNodes() throws Exception {
-
         schedulerHelper.log("testJobPriorityWithNewNodes");
+        testJobPriority(true);
+    }
+
+
+    public void testJobPriority(boolean addNewNodes) throws Exception {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
-        int nbNewNodes = 20;
+        int nbNewNodes = 15;
 
-        int nbJobsHigh = RMTHelper.DEFAULT_NODES_NUMBER * 2 + nbNewNodes;
-        int nbJobsLow = RMTHelper.DEFAULT_NODES_NUMBER * 2 + nbNewNodes;
+        int nbRunsHigh = RMTHelper.DEFAULT_NODES_NUMBER * 2 + (addNewNodes ? nbNewNodes * 3 : 0);
+        int nbRunsLow = RMTHelper.DEFAULT_NODES_NUMBER * 2 + (addNewNodes ? nbNewNodes * 2 : 0);
 
-        List<JobId> highJobIds = new ArrayList<>(nbJobsHigh);
+        String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
 
-        for (int i = 0; i < nbJobsHigh; i++) {
-            JobId jobId = scheduler.submit(createJobHigh());
-            highJobIds.add(jobId);
+        Job jobHigh = JobFactory.getFactory().createJob(jobDescriptorPath, ImmutableMap.of("RUNS", "" + nbRunsHigh));
+        jobHigh.setPriority(JobPriority.HIGH);
+        JobId jobIdHigh = schedulerHelper.submitJob(jobHigh);
+        schedulerHelper.waitForEventTaskRunning(jobIdHigh, REPLICATE_TASK_NAME);
+        Job jobLow = JobFactory.getFactory().createJob(jobDescriptorPath, ImmutableMap.of("RUNS", "" + nbRunsLow));
+        jobLow.setPriority(JobPriority.LOW);
+        JobId jobIdLow = schedulerHelper.submitJob(jobLow);
+
+        if (addNewNodes) {
+            schedulerHelper.addExtraNodes(nbNewNodes);
         }
 
-        List<JobId> lowJobIds = new ArrayList<>(nbJobsLow);
+        schedulerHelper.waitForEventJobFinished(jobIdHigh);
+        schedulerHelper.waitForEventJobFinished(jobIdLow);
 
-        for (int i = 0; i < nbJobsLow; i++) {
-            JobId jobId = scheduler.submit(createJobLow());
-            lowJobIds.add(jobId);
-        }
+        Pair<Long, Long> minMaxHigh = computeMinMaxStartingTime(scheduler, jobIdHigh, REPLICATE_TASK_NAME_FILTER);
+        Pair<Long, Long> minMaxLow = computeMinMaxStartingTime(scheduler, jobIdLow, REPLICATE_TASK_NAME_FILTER);
 
-        schedulerHelper.waitForEventTaskRunning(highJobIds.get(0), "taskHigh");
+        Assert.assertTrue("Low Priority tasks min start time : " + minMaxLow.getLeft() + " should be greater than the max start time of high priority jobs : " + minMaxHigh.getRight(), minMaxLow.getLeft() > minMaxHigh.getRight());
+    }
 
-        schedulerHelper.addExtraNodes(nbNewNodes);
-
-        for (int i = 0; i < nbJobsLow; i++) {
-            schedulerHelper.waitForEventJobFinished(highJobIds.get(i));
-        }
-
-        for (int i = 0; i < nbJobsLow; i++) {
-            schedulerHelper.waitForEventJobFinished(lowJobIds.get(i));
-        }
-
-        long maxHighStartTime = 0;
-        for (int i = 0; i < nbJobsHigh; i++) {
-            JobState jobState = scheduler.getJobState(highJobIds.get(i));
-            long startTime = jobState.getStartTime();
-            if (startTime == -1) {
-                maxHighStartTime = Long.MAX_VALUE;
-            } else {
-                maxHighStartTime = Math.max(maxHighStartTime, startTime);
+    /**
+     * Computes min start time and max start time for all tasks which match a given pattern
+     * If a task in the set did not start, then the set max will be Long.MAX_VALUE
+     */
+    Pair<Long, Long> computeMinMaxStartingTime(Scheduler scheduler, JobId jobId, String taskNameFilter) throws Exception {
+        long min = Long.MAX_VALUE;
+        long max = -1;
+        for (TaskState state : scheduler.getJobState(jobId).getTasks()) {
+            if (state.getName().matches(taskNameFilter)) {
+                long startTime = state.getStartTime() > -1 ? state.getStartTime() : Long.MAX_VALUE;
+                min = Math.min(min, startTime);
+                max = Math.max(max, startTime);
             }
         }
-
-        long minLowStartTime = Long.MAX_VALUE;
-        for (int i = 0; i < nbJobsLow; i++) {
-            JobState jobState = scheduler.getJobState(lowJobIds.get(i));
-            long startTime = jobState.getStartTime();
-            minLowStartTime = Math.min(minLowStartTime, startTime);
-        }
-
-        schedulerHelper.log("Min Low Priority Jobs Start time : " + minLowStartTime + " should be greater than the max start time of high priority jobs : " + maxHighStartTime);
-
-        Assert.assertTrue("Min Low Priority Jobs Start time : " + minLowStartTime + " should be greater than the max start time of high priority jobs : " + maxHighStartTime, minLowStartTime > maxHighStartTime);
+        return new ImmutablePair<>(min, max);
     }
 
     @After
@@ -256,7 +241,10 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
     /*
      * Job high priority with one task and high priority
      */
-    private TaskFlowJob createJobHigh() throws Exception {
+    private TaskFlowJob createJobReplicate(int nbRun, JobPriority priority) throws Exception {
+
+        String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
+
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName() + "_High");
         job.setPriority(JobPriority.HIGHEST);

@@ -223,20 +223,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     break;
                 }
 
-                NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule);
+                NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule, freeResources);
 
                 if (nodeSet != null) {
                     freeResources.removeAll(nodeSet.getAllNodesUrls());
-
-                    if (conflictInFreeNodes(freeResources)) {
-                        try {
-                            logger.info("Free nodes list changed during the scheduling loop execution, skipping until next iteration.");
-                            releaseNodes(jobMap.get(tasksToSchedule.getFirst().getJobId()).getInternal(), nodeSet);
-                        } catch (Exception e) {
-                            logger.info("Unable to get back the nodeSet to the RM", e);
-                        }
-                        break;
-                    }
                 }
 
 
@@ -396,7 +386,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * 		   null if the their was an exception when asking for the nodes (ie : selection script has failed)
      */
     protected NodeSet getRMNodes(Map<JobId, JobDescriptor> jobMap, int neededResourcesNumber,
-            LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
+                                 LinkedList<EligibleTaskDescriptor> tasksToSchedule, Set<String> freeResources) {
         NodeSet nodeSet = new NodeSet();
 
         if (neededResourcesNumber <= 0) {
@@ -431,6 +421,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         .getVariables()));
                 criteria.setBlackList(internalTask.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
+                criteria.setAcceptableNodesUrls(freeResources);
 
                 if (internalTask.getGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask.getGenericInformation().get(

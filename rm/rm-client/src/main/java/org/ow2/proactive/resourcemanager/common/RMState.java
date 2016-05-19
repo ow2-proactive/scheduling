@@ -55,9 +55,9 @@ import java.util.Set;
 @XmlRootElement
 public class RMState implements Serializable {
 
-    private Set<String> freeNodesUrls;
-    private Set<String> aliveNodesUrls;
-    private Set<String> allNodesUrls;
+    private final Set<String> freeNodesUrls;
+    private final Set<String> aliveNodesUrls;
+    private final Set<String> allNodesUrls;
 
     public RMState(Set<String> freeNodesUrls, Set<String> aliveNodesUrls, Set<String> allNodesUrls) {
         this.freeNodesUrls = freeNodesUrls;
