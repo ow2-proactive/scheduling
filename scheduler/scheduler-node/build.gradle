@@ -12,6 +12,7 @@ dependencies {
     runtime (
             "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}",
+            "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}",
     )
 
     runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')

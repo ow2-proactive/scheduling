@@ -16,6 +16,7 @@ dependencies {
 
     // protocols
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
+    runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
     // script engines
