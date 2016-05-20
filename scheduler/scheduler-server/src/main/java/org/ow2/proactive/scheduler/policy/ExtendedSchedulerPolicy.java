@@ -36,17 +36,16 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
-import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -73,9 +72,9 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
      * execution cycle.
      */
     @Override
-    public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
+    public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
         Date now = new Date();
-        Vector<EligibleTaskDescriptor> executionCycleTasks = new Vector<>();
+        LinkedList<EligibleTaskDescriptor> executionCycleTasks = new LinkedList<>();
 
         Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
 

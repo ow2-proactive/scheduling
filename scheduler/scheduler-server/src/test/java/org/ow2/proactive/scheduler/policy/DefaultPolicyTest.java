@@ -13,8 +13,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,7 +26,7 @@ public class DefaultPolicyTest {
 
     @Test
     public void empty_list_of_tasks() throws Exception {
-        Vector<EligibleTaskDescriptor> orderedTasks = new DefaultPolicy().getOrderedTasks(Collections
+        LinkedList<EligibleTaskDescriptor> orderedTasks = new DefaultPolicy().getOrderedTasks(Collections
                 .<JobDescriptor> emptyList());
 
         assertTrue(orderedTasks.isEmpty());
@@ -37,7 +37,7 @@ public class DefaultPolicyTest {
         JobDescriptorImpl job = createSingleTaskJob();
         List<JobDescriptor> jobs = submitJobs(job);
 
-        Vector<EligibleTaskDescriptor> orderedTasks = new DefaultPolicy().getOrderedTasks(jobs);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = new DefaultPolicy().getOrderedTasks(jobs);
 
         assertEquals(1, orderedTasks.size());
     }
@@ -50,7 +50,7 @@ public class DefaultPolicyTest {
 
         List<JobDescriptor> jobs = submitJobs(jobHigh, jobLow, jobNormal);
 
-        Vector<EligibleTaskDescriptor> orderedTasks = new DefaultPolicy().getOrderedTasks(jobs);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = new DefaultPolicy().getOrderedTasks(jobs);
 
         assertEquals(jobHigh.getJobId(), orderedTasks.get(0).getJobId());
         assertEquals(jobNormal.getJobId(), orderedTasks.get(1).getJobId());
@@ -65,7 +65,7 @@ public class DefaultPolicyTest {
 
         List<JobDescriptor> jobs = submitJobs(job1, job3, job2);
 
-        Vector<EligibleTaskDescriptor> orderedTasks = new DefaultPolicy().getOrderedTasks(jobs);
+        LinkedList<EligibleTaskDescriptor> orderedTasks = new DefaultPolicy().getOrderedTasks(jobs);
 
         assertEquals(job1.getJobId(), orderedTasks.get(0).getJobId());
         assertEquals(job2.getJobId(), orderedTasks.get(1).getJobId());

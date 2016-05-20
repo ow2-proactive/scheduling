@@ -5,6 +5,7 @@ import java.util.List;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.hibernate.cfg.Configuration;
 import org.junit.AfterClass;
 import org.junit.Assert;

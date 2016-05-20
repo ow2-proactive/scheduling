@@ -49,9 +49,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 
 /**
@@ -93,12 +93,13 @@ public abstract class Policy implements Serializable {
     /**
      * Return the tasks that have to be scheduled.
      * The tasks must be in the desired scheduling order.
-     * The first task to be schedule must be the first in the returned Vector.
+     * The first task to be schedule must be the first in the returned list.
+     * The list will be modified by the scheduling loop, so it may be necessary to copy the list before returning it
      *
      * @param jobs the list of pending or running job descriptors.
-     * @return a vector of every tasks that are ready to be schedule.
+     * @return a linked list of every tasks that are ready to be scheduled.
      */
-    public abstract Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
+    public abstract LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);
 
 
     /**

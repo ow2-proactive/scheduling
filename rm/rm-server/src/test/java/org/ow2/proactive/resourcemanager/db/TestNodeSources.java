@@ -6,27 +6,34 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.tests.ProActiveTest;
+import com.google.common.truth.Truth;
 import org.hibernate.cfg.Configuration;
+import org.jetbrains.annotations.NotNull;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static com.google.common.truth.Truth.assertThat;
 
 
 public class TestNodeSources extends ProActiveTest {
 
     protected static RMDBManager dbManager;
 
-    @BeforeClass
-    public static void initDB() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.updateProperty("100");
         Configuration config = new Configuration().configure("/functionaltests/config/hibernate.cfg.xml");
         dbManager = new RMDBManager(config, true, true);
     }
 
-    @AfterClass
-    public static void cleanup() {
+    @After
+    public void cleanUp() {
         if (dbManager != null) {
             dbManager.close();
         }
@@ -44,28 +51,39 @@ public class TestNodeSources extends ProActiveTest {
 
     @Test
     public void addNodeSource() throws Exception {
+        NodeSourceData nodeSourceData = createNodeSource();
 
-        NodeSourceData nodeSourceData = new NodeSourceData("ns1", DefaultInfrastructureManager.class
-                .getName(), new String[] { "infrastructure" }, StaticPolicy.class.getName(),
-            new String[] { "policy" }, new Client(null, false));
+        assertThat(dbManager.getNodeSources()).isEmpty();
 
         dbManager.addNodeSource(nodeSourceData);
-        Collection<NodeSourceData> sources = dbManager.getNodeSources();
-        Assert.assertEquals(1, sources.size());
 
-        NodeSourceData source = sources.iterator().next();
-        Assert.assertEquals("ns1", source.getName());
-        Assert.assertEquals(DefaultInfrastructureManager.class.getName(), source.getInfrastructureType());
-        Assert.assertEquals("infrastructure", source.getInfrastructureParameters()[0]);
-        Assert.assertEquals(StaticPolicy.class.getName(), source.getPolicyType());
-        Assert.assertEquals("policy", source.getPolicyParameters()[0]);
+        Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
+        assertThat(nodeSources).hasSize(1);
+
+        NodeSourceData nodeSource = nodeSources.iterator().next();
+        Assert.assertEquals("ns1", nodeSource.getName());
+        Assert.assertEquals(DefaultInfrastructureManager.class.getName(), nodeSource.getInfrastructureType());
+        Assert.assertEquals("infrastructure", nodeSource.getInfrastructureParameters()[0]);
+        Assert.assertEquals(StaticPolicy.class.getName(), nodeSource.getPolicyType());
+        Assert.assertEquals("policy", nodeSource.getPolicyParameters()[0]);
     }
 
     @Test
     public void removeNodeSource() throws Exception {
+        dbManager.addNodeSource(createNodeSource());
+
+        assertThat(dbManager.getNodeSources()).hasSize(1);
+
         dbManager.removeNodeSource("ns1");
-        Collection<NodeSourceData> sources = dbManager.getNodeSources();
-        Assert.assertEquals(0, sources.size());
+
+        assertThat(dbManager.getNodeSources()).isEmpty();
+    }
+
+    @NotNull
+    private NodeSourceData createNodeSource() {
+        return new NodeSourceData("ns1", DefaultInfrastructureManager.class
+                .getName(), new String[] { "infrastructure" }, StaticPolicy.class.getName(),
+                new String[] { "policy" }, new Client(null, false));
     }
 
 }

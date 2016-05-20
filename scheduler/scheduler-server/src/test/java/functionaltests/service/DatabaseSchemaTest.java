@@ -84,15 +84,15 @@ public class DatabaseSchemaTest {
     private void runAndCheck(final String sqlQuery, Constraint constraint) {
         SessionWork<List<String>> sessionWork = new SessionWork<List<String>>() {
             @Override
-            public List<String> executeWork(Session session) {
+            public List<String> doInTransaction(Session session) {
                 return session.createSQLQuery(sqlQuery).list();
             }
         };
 
-        List<String> result = schedulerDbManager.runWithoutTransaction(sessionWork);
+        List<String> result = schedulerDbManager.executeReadOnlyTransaction(sessionWork);
         constraint.check(result);
 
-        result = rmDbManager.runWithoutTransaction(sessionWork);
+        result = rmDbManager.executeReadTransaction(sessionWork);
         constraint.check(result);
     }
 

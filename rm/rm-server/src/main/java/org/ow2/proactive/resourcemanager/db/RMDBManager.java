@@ -50,6 +50,7 @@ import java.util.TimerTask;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
+import org.ow2.proactive.db.TransactionHelper;
 import org.ow2.proactive.resourcemanager.core.history.Alive;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
@@ -58,31 +59,33 @@ import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 
 public class RMDBManager {
 
-    private static final String JAVA_PROPERTYNAME_NODB = "rm.database.nodb";
+    private static final String RM_DATABASE_IN_MEMORY = "rm.database.nodb";
+
     private static final Logger logger = ProActiveLogger.getLogger(RMDBManager.class);
 
     private final SessionFactory sessionFactory;
 
-    private static RMDBManager instance = null;
+    private final TransactionHelper transactionHelper;
+
+    private static final class LazyHolder {
+
+        private static final RMDBManager INSTANCE = createUsingProperties();
+
+    }
 
     private Timer timer = null;
 
-    public synchronized static RMDBManager getInstance() {
-        if (instance == null) {
-            instance = createUsingProperties();
-        }
-
-        return instance;
+    public static RMDBManager getInstance() {
+        return LazyHolder.INSTANCE;
     }
 
     private static RMDBManager createUsingProperties() {
-        if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
+        if (System.getProperty(RM_DATABASE_IN_MEMORY) != null) {
             return createInMemoryRMDBManager();
         } else {
             File configFile = new File(PAResourceManagerProperties
@@ -94,8 +97,8 @@ public class RMDBManager {
 
             if (logger.isInfoEnabled()) {
                 logger.info("Starting RM DB Manager " + "with drop DB = " + drop +
-                    " and drop nodesources = " + dropNS + " and configuration file = " +
-                    configFile.getAbsolutePath());
+                        " and drop nodesources = " + dropNS + " and configuration file = " +
+                        configFile.getAbsolutePath());
             }
 
             Configuration configuration = new Configuration();
@@ -119,7 +122,8 @@ public class RMDBManager {
     public static RMDBManager createInMemoryRMDBManager() {
         Configuration config = new Configuration();
         config.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbc.JDBCDriver");
-        config.setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
+        config.setProperty("hibernate.connection.url",
+                "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
         config.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         return new RMDBManager(config, true, true);
     }
@@ -137,10 +141,12 @@ public class RMDBManager {
             if (drop) {
                 configuration.setProperty("hibernate.hbm2ddl.auto", "create");
 
-                // dropping RRD data base as well
-                File ddrDB = new File(PAResourceManagerProperties.RM_HOME.getValueAsString() +
-                    System.getProperty("file.separator") +
-                    PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
+                // dropping RRD database as well
+                File ddrDB =
+                        new File(
+                                PAResourceManagerProperties.RM_HOME.getValueAsString(),
+                                PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
+
                 if (ddrDB.exists()) {
                     ddrDB.delete();
                 }
@@ -150,6 +156,7 @@ public class RMDBManager {
             configuration.setProperty("hibernate.jdbc.use_streams_for_binary", "true");
 
             sessionFactory = configuration.buildSessionFactory();
+            transactionHelper = new TransactionHelper(sessionFactory);
 
             List<?> lastAliveTime = sqlQuery("from Alive");
             if (lastAliveTime == null || lastAliveTime.size() == 0) {
@@ -181,31 +188,39 @@ public class RMDBManager {
     private void recover(final long lastAliveTime) {
 
         // updating node events with uncompleted end time        
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
+            public Void doInTransaction(Session session) {
                 int updated = session.createSQLQuery(
                         "update NodeHistory set endTime = :endTime where endTime = 0").setParameter(
                         "endTime", lastAliveTime).executeUpdate();
                 updated = +session.createSQLQuery(
                         "update NodeHistory set endTime = startTime where endTime < startTime")
                         .executeUpdate();
-                logger.debug("Restoring the node history: " + updated + " raws updated");
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Restoring the node history: " + updated + " raws updated");
+                }
+
                 return null;
             }
         });
 
         // updating user events with uncompleted end time        
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
+            public Void doInTransaction(Session session) {
                 int updated = session.createSQLQuery(
                         "update UserHistory set endTime = :endTime where endTime = 0").setParameter(
                         "endTime", lastAliveTime).executeUpdate();
                 updated = +session.createSQLQuery(
                         "update UserHistory set endTime = startTime where endTime < startTime")
                         .executeUpdate();
-                logger.debug("Restoring the user history: " + updated + " raws updated");
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Restoring the user history: " + updated + " raws updated");
+                }
+
                 return null;
             }
         });
@@ -214,60 +229,23 @@ public class RMDBManager {
     /**
      * Should be used for insert/update/delete queries
      */
-    private <T> T runWithTransaction(SessionWork<T> sessionWork) {
-        return runWithTransaction(sessionWork, true);
+    private <T> T executeReadWriteTransaction(SessionWork<T> sessionWork) {
+        return executeReadWriteTransaction(sessionWork, true);
     }
 
     /**
      * Should be used for insert/update/delete queries
      */
-    private <T> T runWithTransaction(SessionWork<T> sessionWork, boolean readonly) {
-        Session session = sessionFactory.openSession();
-        Transaction tx = null;
-        try {
-            session.setDefaultReadOnly(readonly);
-            tx = session.beginTransaction();
-            T result = sessionWork.executeWork(session);
-            tx.commit();
-            return result;
-        } catch (Throwable e) {
-            if (tx != null) {
-                try {
-                    tx.rollback();
-                } catch (Throwable rollbackError) {
-                    logger.warn("Failed to rollback transaction", rollbackError);
-                }
-            }
-            logger.warn("DB operation failed", e);
-            return null;
-        } finally {
-            try {
-                session.close();
-            } catch (Throwable e) {
-                logger.warn("Failed to close session", e);
-            }
-        }
+    private <T> T executeReadWriteTransaction(SessionWork<T> sessionWork, boolean readOnlyEntities) {
+        return transactionHelper.executeReadWriteTransaction(sessionWork, readOnlyEntities);
     }
 
     /**
-     * Should be used for select queries
+     * Should be used for select queries only.
+     * In case of failure no rollback is performed.
      */
-    public <T> T runWithoutTransaction(SessionWork<T> sessionWork) {
-        Session session = sessionFactory.openSession();
-        try {
-            session.setDefaultReadOnly(true);
-            T result = sessionWork.executeWork(session);
-            return result;
-        } catch (Throwable e) {
-            logger.warn("DB operation failed", e);
-            return null;
-        } finally {
-            try {
-                session.close();
-            } catch (Throwable e) {
-                logger.warn("Failed to close session", e);
-            }
-        }
+    public <T> T executeReadTransaction(SessionWork<T> sessionWork) {
+        return transactionHelper.executeReadOnlyTransaction(sessionWork);
     }
 
     public void close() {
@@ -285,57 +263,57 @@ public class RMDBManager {
 
     public boolean addNodeSource(final NodeSourceData nodeSourceData) {
         try {
-            return runWithTransaction(new SessionWork<Boolean>() {
+            return executeReadWriteTransaction(new SessionWork<Boolean>() {
                 @Override
-                public Boolean executeWork(Session session) {
-                    logger.info("Adding a new node source " + nodeSourceData.getName() + " to the data base");
+                public Boolean doInTransaction(Session session) {
+                    logger.info("Adding a new node source " + nodeSourceData.getName() + " to the database");
                     session.save(nodeSourceData);
                     return true;
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Node source '" + nodeSourceData.getName() + "' already exists");
+            throw new RuntimeException("Exception occured while adding new node source '" + nodeSourceData.getName() + "'");
         }
     }
 
     public void removeNodeSource(final String sourceName) {
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
-                logger.info("Removing the node source " + sourceName + " from the data base");
-                session.createQuery("delete from NodeSourceData where name=:name").setParameter("name",
-                        sourceName).executeUpdate();
+            public Void doInTransaction(Session session) {
+                logger.info("Removing the node source " + sourceName + " from the database");
+                session.getNamedQuery("deleteNodeSourceDataByName")
+                        .setParameter("name", sourceName).executeUpdate();
                 return null;
             }
         });
     }
 
     private void removeNodeSources() {
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
-                logger.info("Removing all node sources from the data base");
-                session.createQuery("delete from NodeSourceData").executeUpdate();
+            public Void doInTransaction(Session session) {
+                logger.info("Removing all node sources from the database");
+                session.getNamedQuery("deleteAllNodeSourceData").executeUpdate();
                 return null;
             }
         });
     }
 
     public Collection<NodeSourceData> getNodeSources() {
-        return runWithoutTransaction(new SessionWork<Collection<NodeSourceData>>() {
+        return executeReadTransaction(new SessionWork<Collection<NodeSourceData>>() {
             @Override
             @SuppressWarnings("unchecked")
-            public Collection<NodeSourceData> executeWork(Session session) {
-                Query query = session.createQuery("from NodeSourceData");
+            public Collection<NodeSourceData> doInTransaction(Session session) {
+                Query query = session.getNamedQuery("getNodeSourceData");
                 return (Collection<NodeSourceData>) query.list();
             }
         });
     }
 
     public void saveUserHistory(final UserHistory history) {
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
+            public Void doInTransaction(Session session) {
                 session.save(history);
                 return null;
             }
@@ -343,9 +321,9 @@ public class RMDBManager {
     }
 
     public void updateUserHistory(final UserHistory history) {
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
+            public Void doInTransaction(Session session) {
                 session.update(history);
                 return null;
             }
@@ -353,13 +331,13 @@ public class RMDBManager {
     }
 
     public void saveNodeHistory(final NodeHistory nodeHistory) {
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
+            public Void doInTransaction(Session session) {
                 session.createSQLQuery(
                         "update NodeHistory set endTime=:endTime where nodeUrl=:nodeUrl and endTime=0")
                         .setParameter("endTime", nodeHistory.getStartTime()).setParameter("nodeUrl",
-                                nodeHistory.getNodeUrl()).executeUpdate();
+                        nodeHistory.getNodeUrl()).executeUpdate();
 
                 if (nodeHistory.isStoreInDataBase()) {
                     session.save(nodeHistory);
@@ -370,9 +348,9 @@ public class RMDBManager {
     }
 
     protected void updateRmAliveTime() {
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
+            public Void doInTransaction(Session session) {
                 long curMilliseconds = System.currentTimeMillis();
                 session.createSQLQuery("update Alive set time = :time").setParameter("time", curMilliseconds)
                         .executeUpdate();
@@ -382,9 +360,9 @@ public class RMDBManager {
     }
 
     private void createRmAliveTime() {
-        runWithTransaction(new SessionWork<Void>() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            public Void executeWork(Session session) {
+            public Void doInTransaction(Session session) {
                 Alive alive = new Alive();
                 alive.setTime(System.currentTimeMillis());
                 session.save(alive);
@@ -394,10 +372,10 @@ public class RMDBManager {
     }
 
     public List<?> sqlQuery(final String queryStr) {
-        return runWithoutTransaction(new SessionWork<List<?>>() {
+        return executeReadTransaction(new SessionWork<List<?>>() {
             @Override
             @SuppressWarnings("unchecked")
-            public List<?> executeWork(Session session) {
+            public List<?> doInTransaction(Session session) {
                 Query query = session.createQuery(queryStr);
                 return query.list();
             }

@@ -3,8 +3,10 @@ package org.ow2.proactive.scheduler.core.db.schedulerdb;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +28,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
+import com.google.common.collect.ImmutableSet;
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
 import org.junit.Assert;
@@ -66,7 +69,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         int THREAD_COUNT = 4;
         ExecutorService executorService = Executors.newCachedThreadPool();
 
-        List<InternalJob> jobs = new ArrayList<>();
+        List<InternalJob> jobs = new ArrayList<>(THREAD_COUNT);
         TaskFlowJob jobDef;
         for (int i = 0; i < THREAD_COUNT; i++) {
             jobDef = createJob(2);
@@ -79,8 +82,8 @@ public class TestJobRemove extends BaseSchedulerDBTest {
                 @Override
                 public void run() {
                     try {
-                        dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"), new TaskResultImpl(
-                            null, "OK1", null, 0));
+                        dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"),
+                                new TaskResultImpl(null, "OK1", null, 0));
                         dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"),
                                 new TaskResultImpl(null, "OK2", null, 0));
                         dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"),
@@ -111,8 +114,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
             // check can still load task results
 
-            Assert
-                    .assertEquals("OK1", dbManager.loadTaskResult(job.getTask("javaTask-0").getId(), 0)
+            Assert.assertEquals("OK1", dbManager.loadTaskResult(job.getTask("javaTask-0").getId(), 0)
                             .value());
             Assert.assertEquals("OK2", dbManager.loadTaskResult(job.getTask("forkedJavaTask-0").getId(), 0)
                     .value());
@@ -286,7 +288,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
     }
 
     private void checkAllEntitiesDeleted(String... skipClasses) {
-        List<String> skip = new ArrayList<>(Arrays.asList(skipClasses));
+        Set<String> skip = ImmutableSet.copyOf(skipClasses);
 
         Session session = dbManager.getSessionFactory().openSession();
         try {
