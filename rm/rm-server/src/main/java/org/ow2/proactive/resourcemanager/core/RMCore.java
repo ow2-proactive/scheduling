@@ -147,6 +147,12 @@ import java.util.regex.Pattern;
 @ActiveObject
 public class RMCore implements ResourceManager, InitActive, RunActive {
 
+    /** Limits the number of nodes the Resource Manager accepts. >-1 means UNLIMITED, <0 enforces the limit.
+     * Explanation: Software can be licensed to a certain amount of nodes.
+     * This variable is not final because the compiler inlines final variables and this variable is changed
+     * by the gradle release build inside the .class files (after compilation).*/
+    private static long maximumNumberOfNodes = -1;
+
     /** Log4J logger name for RMCore */
     private final static Logger logger = Logger.getLogger(RMCore.class);
 
@@ -560,6 +566,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return;
         }
 
+        //noinspection ConstantConditions
+        if(maximumNumberOfNodes >= 0 && isMaximumNumberOfNodesReached() ) {
+            logger.warn("Node " + rmnode.getNodeURL() +
+                    " is removed because the Resource Manager is limited to "+ maximumNumberOfNodes +" nodes.");
+            removeNodeFromCoreAndSource(rmnode, rmnode.getProvider());
+            throw new AddingNodesException("Maximum number of nodes reached: "+ maximumNumberOfNodes);
+        }
+
         //during the configuration process, the rmnode can be removed. Its state would be toRemove
         if (rmnode.isToRemove()) {
             removeNodeFromCoreAndSource(rmnode, rmnode.getProvider());
@@ -575,6 +589,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         internalSetFree(configuredNode);
+    }
+
+    private boolean isMaximumNumberOfNodesReached() {
+        return this.getTotalAliveNodesNumber() > maximumNumberOfNodes;
     }
 
     /**

@@ -69,3 +69,6 @@ artifacts {
 
 functionalTest.dependsOn rootProject.dist, dist
 clean.dependsOn rootProject.cleanDist
+
+task limitTheMaximumNumberOfNodes(type: maxNodes.ReplaceMaxNumberOfNodesTask) {
+}
