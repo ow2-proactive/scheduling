@@ -36,23 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
-import java.io.File;
-import java.security.Permission;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -73,8 +58,11 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
+
+import java.io.File;
+import java.security.Permission;
+import java.util.*;
+import java.util.concurrent.*;
 
 
 /**
@@ -448,6 +436,8 @@ public abstract class SelectionManager {
 
         NodeSet exclusion = criteria.getBlackList();
 
+        Set<String> inclusion = criteria.getAcceptableNodesUrls();
+
         boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
             criteria.getNodeAccessToken().length() > 0;
 
@@ -496,7 +486,7 @@ public abstract class SelectionManager {
                 }
             }
 
-            if (!contains(exclusion, node)) {
+            if (!contains(exclusion, node) && ((inclusion != null) ? inclusion.contains(node.getNodeURL()) : true)) {
                 filteredList.add(node);
             }
         }

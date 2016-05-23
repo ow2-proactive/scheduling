@@ -36,13 +36,14 @@
  */
 package org.ow2.proactive.utils;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -73,6 +74,8 @@ public class Criteria implements Serializable {
     private Collection<String> computationDescriptors;
     // token for accessing nodes
     private String nodeAccessToken;
+    // optional set of nodes urls which are acceptable
+    private Set<String> setOfAcceptableNodesUrls;
 
     /**
      * Creates criteria instance
@@ -130,6 +133,20 @@ public class Criteria implements Serializable {
      */
     public void setBlackList(NodeSet blackList) {
         this.blackList = blackList;
+    }
+
+    /**
+     * Sets acceptables nodes that can resulting nodes list.
+     */
+    public void setAcceptableNodesUrls(Set<String> acceptableNodesUrls) {
+        this.setOfAcceptableNodesUrls = acceptableNodesUrls;
+    }
+
+    /**
+     * @return urls of nodes that can be in resulting nodes list.
+     */
+    public Set<String> getAcceptableNodesUrls() {
+        return setOfAcceptableNodesUrls;
     }
 
     /**

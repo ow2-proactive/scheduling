@@ -333,6 +333,20 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Submits a job with a list of variables
+     *
+     * @param jobDescPath
+     * @param variables
+     * @return
+     * @throws Exception
+     */
+    public JobId submitJob(String jobDescPath, Map<String, String> variables) throws Exception {
+        Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath, variables);
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.submit(jobToSubmit);
+    }
+
+    /**
      * Kills a job
      * @return success or failure at killing the job
      * @throws Exception

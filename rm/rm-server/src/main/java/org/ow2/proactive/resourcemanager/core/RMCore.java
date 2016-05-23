@@ -972,18 +972,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     // Methods called by RMUser, override RMCoreInterface
     // ----------------------------------------------------------------------
 
-    /**
-     * Gives total number of alive nodes handled by RM
-     * @return total number of alive nodes
-     */
-    private int getTotalAliveNodesNumber() {
-        // TODO get the number of alive nodes in a more effective way
-        int count = 0;
-        for (RMNode node : allNodes.values()) {
-            if (!node.isDown())
-                count++;
+
+    private static Set<String> nodesListToUrlsSet(Collection<RMNode> nodeList) {
+        HashSet<String> nodesUrlsSet = new HashSet<>(nodeList.size());
+        for (RMNode node : nodeList) {
+            nodesUrlsSet.add(node.getNodeURL());
         }
-        return count;
+        return nodesUrlsSet;
     }
 
     /**
@@ -1410,7 +1405,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public RMState getState() {
-        RMState state = new RMState(freeNodes.size(), getTotalAliveNodesNumber(), allNodes.size());
+        RMState state = new RMState(nodesListToUrlsSet(freeNodes), listAliveNodeUrls(), nodesListToUrlsSet(allNodes.values()));
         return state;
     }
 

@@ -41,7 +41,9 @@ import org.objectweb.proactive.core.node.Node;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 
 /**
@@ -123,6 +125,26 @@ public class NodeSet extends ArrayList<Node> {
      * @return size
      */
     public int getTotalNumberOfNodes() {
-        return size() + (extraNodes != null ? extraNodes.size() : 0);
+        return getAllNodesUrls().size();
+    }
+
+    /**
+     * Returns a set containing all nodes urls (standard + extra) included in this node set
+     *
+     * @return set of urls
+     */
+    public Set<String> getAllNodesUrls() {
+        HashSet<String> nodesUrls = new HashSet<>(size() + (extraNodes != null ? extraNodes.size() : 0));
+        addNodesToUrlsSet(nodesUrls, this);
+        if (extraNodes != null) {
+            addNodesToUrlsSet(nodesUrls, extraNodes);
+        }
+        return nodesUrls;
+    }
+
+    private void addNodesToUrlsSet(HashSet<String> nodesUrls, Collection<Node> nodes) {
+        for (Node node : nodes) {
+            nodesUrls.add(node.getNodeInformation().getURL());
+        }
     }
 }
