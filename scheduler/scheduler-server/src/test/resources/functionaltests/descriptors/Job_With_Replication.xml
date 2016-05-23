@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="job_aborted_with_replication" priority="normal" onTaskError="continueJobExecution">
+    <variables>
+        <variable name="RUNS" value="2"/>
+    </variables>
+    <description>Job with a replication and high priority</description>
+    <taskFlow>
+        <task name="splitTask" preciousResult="true" onTaskError="cancelJob">
+            <description>split task</description>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
+            </javaExecutable>
+            <controlFlow>
+                <replicate>
+                    <script>
+                        <code language="javascript">
+                            <![CDATA[
+runs=variables.get("RUNS");
+]]>
+                        </code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="task2replicate" preciousResult="true" onTaskError="cancelJob">
+            <description>replicated task</description>
+            <depends>
+                <task ref="splitTask"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
+            </javaExecutable>
+        </task>
+        <task name="task2merge" preciousResult="true" onTaskError="cancelJob">
+            <description>merge task</description>
+            <depends>
+                <task ref="task2replicate"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask">
+            </javaExecutable>
+        </task>
+    </taskFlow>
+</job>
