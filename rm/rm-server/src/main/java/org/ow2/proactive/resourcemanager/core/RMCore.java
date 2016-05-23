@@ -598,6 +598,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return maximumNumberOfNodes != null && maximumNumberOfNodes > 0;
     }
 
+    /**
+     * Gives total number of alive nodes handled by RM
+     * @return total number of alive nodes
+     */
+    private int getTotalAliveNodesNumber() {
+        int count = 0;
+        for (RMNode node : allNodes.values()) {
+            if (!node.isDown())
+                count++;
+        }
+        return count;
+    }
+
     private boolean isMaximumNumberOfNodesReached() {
         return this.getTotalAliveNodesNumber() > maximumNumberOfNodes;
     }
