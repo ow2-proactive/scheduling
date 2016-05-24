@@ -23,12 +23,15 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import java.lang.reflect.Field;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -60,6 +63,111 @@ public class RMCoreTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         populateRMCore();
+    }
+
+    /**
+     * setUp() adds 5 nodes 2 free and 3 busy and 3 down.
+     * maximumNumberOfNodes is null; limit is not enforced
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    @Test
+    public void testThatUnlimitedNumberOfNodesWithSetToNull() throws NoSuchFieldException, IllegalAccessException {
+        setMaxNumberOfNodesTo(null);
+        rmCore.internalAddNodeToCore(mockedRemovableNode);
+        assertThat(rmCore.getFreeNodes().size(),is(2));
+    }
+
+    /**
+     * setUp() adds 5 nodes 2 free and 3 busy and 3 down.
+     * maximumNumberOfNodes is null; limit is not enforced
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    @Test
+    public void testThatUnlimitedNumberOfNodesWithSetToMinus1() throws NoSuchFieldException, IllegalAccessException {
+        setMaxNumberOfNodesTo(Long.valueOf(-1));
+        rmCore.internalAddNodeToCore(mockedRemovableNode);
+        assertThat(rmCore.getFreeNodes().size(),is(2));
+    }
+
+    /**
+     * setUp() adds 5 nodes 2 free and 3 busy and 3 down.
+     * maximumNumberOfNodes is 0; limit is enforced and exception is thrown
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    @Test(expected = org.ow2.proactive.resourcemanager.exception.AddingNodesException.class)
+    public void testThatExceptionIsThrownIfSetTo0() throws NoSuchFieldException, IllegalAccessException {
+        setMaxNumberOfNodesTo(Long.valueOf(0));
+        String nodeUrl = mockedRemovableNode.getNodeName();
+        when(mockedRemovableNode.getNodeURL()).thenReturn(nodeUrl);
+        when(mockedRemovableNode.getProvider()).thenReturn(new Client());
+        rmCore.internalAddNodeToCore(mockedRemovableNode);
+    }
+
+    /**
+     * setUp() adds 5 nodes 2 free and 3 busy and 3 down.
+     * maximumNumberOfNodes is 1; limit is enforced and exception is thrown
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    @Test(expected = org.ow2.proactive.resourcemanager.exception.AddingNodesException.class)
+    public void testThatExceptionIsThrownIfSetTo1() throws NoSuchFieldException, IllegalAccessException {
+        setMaxNumberOfNodesTo(Long.valueOf(1));
+        String nodeUrl = mockedRemovableNode.getNodeName();
+        when(mockedRemovableNode.getNodeURL()).thenReturn(nodeUrl);
+        when(mockedRemovableNode.getProvider()).thenReturn(new Client());
+        rmCore.internalAddNodeToCore(mockedRemovableNode);
+    }
+
+    /**
+     * setUp() adds 5 nodes 2 free and 3 busy and 3 down.
+     * maximumNumberOfNodes is 2; limit is not reached.
+     * The limit is not reached because the 2 free nodes include the asking node.
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    @Test
+    public void testThatNodeIsAddedfSetTo2() throws NoSuchFieldException, IllegalAccessException {
+        setMaxNumberOfNodesTo(Long.valueOf(2));
+        String nodeUrl = mockedRemovableNode.getNodeName();
+        when(mockedRemovableNode.getNodeURL()).thenReturn(nodeUrl);
+        when(mockedRemovableNode.getProvider()).thenReturn(new Client());
+        rmCore.internalAddNodeToCore(mockedRemovableNode);
+        assertThat(rmCore.getFreeNodes().size(),is(2));
+    }
+
+    /**
+     * setUp() adds 5 nodes 2 free and 3 busy.
+     * maximumNumberOfNodes is 6; limit is not reached.
+     * Previously busy node is added and set to free; +1 free node
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    @Test
+    public void testThatAddedNodeIsSetAsFree() throws NoSuchFieldException, IllegalAccessException {
+        setMaxNumberOfNodesTo(Long.valueOf(3));
+        String nodeUrl = mockedBusyNode.getNodeName();
+        when(mockedBusyNode.getNodeURL()).thenReturn(nodeUrl);
+        when(mockedBusyNode.getProvider()).thenReturn(new Client());
+
+        assertThat(rmCore.getFreeNodes().size(),is(2));
+        rmCore.internalAddNodeToCore(mockedBusyNode);
+        assertThat(rmCore.getFreeNodes().size(),is(3));
+    }
+
+    /**
+     * Set the private value maximumNumberOfNodes (Long) to a certain value.
+     * @param newValue
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    private void setMaxNumberOfNodesTo(Long newValue) throws NoSuchFieldException, IllegalAccessException {
+        Field maxNumberOfNodesField = RMCore.class.getDeclaredField("maximumNumberOfNodes");
+        maxNumberOfNodesField.setAccessible(true);
+        maxNumberOfNodesField.set(rmCore, newValue);
+        maxNumberOfNodesField.setAccessible(false);
     }
 
     /*

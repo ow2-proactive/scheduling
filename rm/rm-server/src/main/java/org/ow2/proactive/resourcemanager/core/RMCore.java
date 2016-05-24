@@ -147,8 +147,8 @@ import java.util.regex.Pattern;
 @ActiveObject
 public class RMCore implements ResourceManager, InitActive, RunActive {
 
-    /** Limits the number of nodes the Resource Manager accepts. >-1 means UNLIMITED, <0 enforces the limit.
-     * Explanation: Software can be licensed to a certain amount of nodes.
+    /** Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
+     * Explanation: This software can be licensed to a certain amount of nodes.
      * This variable is not final because the compiler inlines final variables and this variable is changed
      * by the gradle release build inside the .class files (after compilation).
      * Long is used instead of long (primitive) because this variable is replaced inside the byte code after
@@ -570,11 +570,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         //noinspection ConstantConditions
-        if(isNumberOfNodesLimited() && isMaximumNumberOfNodesReached()) {
+        if (isNumberOfNodesLimited() && isMaximumNumberOfNodesReachedIncludingAskingNode()) {
             logger.warn("Node " + rmnode.getNodeURL() +
-                    " is removed because the Resource Manager is limited to "+ maximumNumberOfNodes +" nodes.");
+                    " is removed because the Resource Manager is limited to " + maximumNumberOfNodes + " nodes.");
             removeNodeFromCoreAndSource(rmnode, rmnode.getProvider());
-            throw new AddingNodesException("Maximum number of nodes reached: "+ maximumNumberOfNodes);
+            throw new AddingNodesException("Maximum number of nodes reached: " + maximumNumberOfNodes);
         }
 
         //during the configuration process, the rmnode can be removed. Its state would be toRemove
@@ -595,7 +595,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private boolean isNumberOfNodesLimited() {
-        return maximumNumberOfNodes != null && maximumNumberOfNodes > 0;
+        return maximumNumberOfNodes != null && maximumNumberOfNodes >= 0;
     }
 
     /**
@@ -611,7 +611,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return count;
     }
 
-    private boolean isMaximumNumberOfNodesReached() {
+    /**
+     * This methods returns true if the maximum number of nodes is reached.
+     * This method assumes that the currently asking node is already regsitered
+     * inside the allNodes list.
+     * @return
+     */
+    private boolean isMaximumNumberOfNodesReachedIncludingAskingNode() {
+        // > because the currently added is is assumed to be already inside the allNodes list.
         return this.getTotalAliveNodesNumber() > maximumNumberOfNodes;
     }
 

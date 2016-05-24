@@ -72,5 +72,14 @@ artifacts {
 functionalTest.dependsOn rootProject.dist, dist
 clean.dependsOn rootProject.cleanDist
 
+//This task limits the maximum number of nodes by replacing the maximumNumberOfNodes variable
+//inside the RmCore.class
+//
+// Usage: define variable maxNumberOfNodes = 10 -> will limit the number of nodes to 10
+//
+// When called from gradle, this task must be execute in the gradle task list like:
+//gradlew build limitNumberOfNodes dist
+// Because it changes a class file it must be used in the same task list. Otherwise the class file
+// is recompiled -> the limitation changes are overwritten.
 task limitTheMaximumNumberOfNodes(type: maxNodes.ReplaceMaxNumberOfNodesTask) {
 }

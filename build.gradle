@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenLocal()
+        if (project.hasProperty('local')) mavenLocal()
 
         jcenter()
 
