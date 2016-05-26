@@ -40,11 +40,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.core.db.TransactionHelper.SessionWork;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +60,7 @@ public class TaskDBUtils {
         return new SessionWork<Integer>() {
 
             @Override
-            public Integer executeWork(Session session) {
+            public Integer doInTransaction(Session session) {
                 Set<TaskStatus> taskStatuses = params.getStatuses();
 
                 if (taskStatuses.isEmpty()) {
@@ -88,7 +88,7 @@ public class TaskDBUtils {
         return new SessionWork<List<TaskState>>() {
             @Override
             @SuppressWarnings("unchecked")
-            public List<TaskState> executeWork(Session session) {
+            public List<TaskState> doInTransaction(Session session) {
                 if (params.getStatuses().isEmpty()) {
                     return new ArrayList<TaskState>(0);
                 }
@@ -109,7 +109,7 @@ public class TaskDBUtils {
         return new SessionWork<List<TaskInfo>>() {
             @Override
             @SuppressWarnings("unchecked")
-            public List<TaskInfo> executeWork(Session session) {
+            public List<TaskInfo> doInTransaction(Session session) {
                 if (params.getStatuses().isEmpty()) {
                     return new ArrayList<TaskInfo>(0);
                 }

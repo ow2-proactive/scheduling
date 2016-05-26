@@ -1,0 +1,2 @@
+SELECT activeeon_jobs_housekeeping(172800)
+

@@ -41,21 +41,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Index;
 
 
 /**
- * 
  * This class represents the users connection history.
- *
  */
 @Entity
-@Table(name = "UserHistory")
+@Table(name = "UserHistory", indexes = {
+        @Index(name = "USER_HISTORY", columnList = "userName")
+})
 public class UserHistory {
 
     public static final Logger logger = Logger.getLogger(UserHistory.class);
@@ -67,7 +67,6 @@ public class UserHistory {
     protected long id;
 
     @Column(name = "userName")
-    @Index(name = "userNameIndex")
     private String userName;
 
     @Column(name = "startTime")
@@ -93,4 +92,5 @@ public class UserHistory {
     public void setEndTime(long endTime) {
         this.endTime = endTime;
     }
+
 }

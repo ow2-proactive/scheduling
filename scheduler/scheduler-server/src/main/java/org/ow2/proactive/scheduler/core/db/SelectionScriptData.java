@@ -4,18 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
@@ -27,7 +16,16 @@ import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
-@Table(name = "SELECTION_SCRIPT_DATA")
+@NamedQueries( {
+        @NamedQuery(
+                name = "deleteSelectionScriptData",
+                query = "delete from SelectionScriptData where taskData.id.jobId = :jobId"
+        )
+})
+@Table(name = "SELECTION_SCRIPT_DATA", indexes = {
+        @Index(name = "SELECTION_SCRIPT_DATA_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "SELECTION_SCRIPT_DATA_TASK_ID", columnList = "TASK_ID")
+})
 @BatchSize(size = 100)
 public class SelectionScriptData {
 
@@ -52,7 +50,8 @@ public class SelectionScriptData {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+    @JoinColumns(value = {
+            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
             @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskData() {
         return taskData;

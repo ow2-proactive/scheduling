@@ -96,6 +96,13 @@ public enum PASchedulerProperties {
     /** Number of threads used to execute internal scheduling operations */
     SCHEDULER_INTERNAL_POOL_NBTHREAD("pa.scheduler.core.internalpoolnbthreads", PropertyType.INTEGER),
 
+    /** Number of threads used to handle scheduled operations other than housekeeping operations */
+    SCHEDULER_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.scheduledpoolnbthreads", PropertyType.INTEGER),
+
+    /** Number of threads used to handle scheduled operations related to housekeeping */
+    SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD(
+            "pa.scheduler.core.housekeeping.scheduledpoolnbthreads", PropertyType.INTEGER),
+
     /** Name of the JMX MBean for the scheduler */
     SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PropertyType.STRING),
 
@@ -296,6 +303,14 @@ public enum PASchedulerProperties {
      * If property isn't set then all finished jobs are loaded. 
      */
     SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING),
+
+    SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR("pa.scheduler.db.transactions.damping.factor", PropertyType.INTEGER),
+
+    SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES("pa.scheduler.db.transactions.maximum.retries", PropertyType.INTEGER),
+
+    SCHEDULER_DB_TRANSACTION_SLEEP_DELAY("pa.scheduler.db.transactions.sleep.delay", PropertyType.INTEGER),
+
+    SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE("pa.scheduler.db.recovery.load.jobs.batch_size", PropertyType.INTEGER),
 
     EMAIL_NOTIFICATIONS_ENABLED("pa.scheduler.notifications.email.enabled", PropertyType.BOOLEAN),
 

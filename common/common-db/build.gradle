@@ -1,0 +1,23 @@
+dependencies {
+
+    compile project(":common:common-api")
+    compile project(":scheduler:scheduler-api")
+
+    compile "org.objectweb.proactive:programming-util:${programmingVersion}"
+
+    /**
+     * Hibernate 5.1.0 depends on Javassist 3.20.0-GA with contains
+     * a bug that prevents it to work with Java 8 and our code:
+     *
+     * https://issues.jboss.org/browse/JASSIST-248
+     *
+     * The exclusion is required in order to use Javassist 3.18.2.
+     */
+    compile('org.hibernate:hibernate-core:5.1.0.Final') {
+        exclude group: 'org.javassist', module: 'javassist'
+    }
+    runtime('org.hibernate:hibernate-hikaricp:5.1.0.Final') {
+        exclude group: 'org.javassist', module: 'javassist'
+    }
+
+}

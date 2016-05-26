@@ -405,15 +405,15 @@ public class SchedulingService {
 
     public boolean removeJob(JobId jobId) {
         try {
-            return infrastructure.getClientOperationsThreadPool().submit(new JobRemoveHandler(this, jobId))
-                    .get();
+            return infrastructure.getClientOperationsThreadPool().submit(
+                    new JobRemoveHandler(this, jobId)).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
     }
 
     public void scheduleJobRemove(JobId jobId, long delay) {
-        infrastructure.schedule(new JobRemoveHandler(this, jobId), delay);
+        infrastructure.scheduleHousekeeping(new JobRemoveHandler(this, jobId), delay);
     }
 
     public void restartTaskOnNodeFailure(final InternalTask task) {
@@ -448,7 +448,7 @@ public class SchedulingService {
             if (status.isUnusable()) {
                 return false;
             }
-            
+
             Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
@@ -767,7 +767,7 @@ public class SchedulingService {
         try {
             listenJobLogsSupport.cleanLoggers(jobId);
 
-            //auto remove
+            // auto remove
             if (SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
                 scheduleJobRemove(jobId, SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY);
             }

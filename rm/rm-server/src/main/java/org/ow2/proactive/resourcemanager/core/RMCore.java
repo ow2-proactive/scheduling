@@ -147,6 +147,15 @@ import java.util.regex.Pattern;
 @ActiveObject
 public class RMCore implements ResourceManager, InitActive, RunActive {
 
+    /** Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
+     * Explanation: This software can be licensed to a certain amount of nodes.
+     * This variable is not final because the compiler inlines final variables and this variable is changed
+     * by the gradle release build inside the .class files (after compilation).
+     * Long is used instead of long (primitive) because this variable is replaced inside the byte code after
+     * optimization, which didn't work with a long value. Because that long value was initialized inside a
+     * static block in the byte code, that interfered with replacing it.*/
+    private static Long maximumNumberOfNodes;
+
     /** Log4J logger name for RMCore */
     private final static Logger logger = Logger.getLogger(RMCore.class);
 
@@ -560,6 +569,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return;
         }
 
+        //noinspection ConstantConditions
+        if (isNumberOfNodesLimited() && isMaximumNumberOfNodesReachedIncludingAskingNode()) {
+            logger.warn("Node " + rmnode.getNodeURL() +
+                    " is removed because the Resource Manager is limited to " + maximumNumberOfNodes + " nodes.");
+            removeNodeFromCoreAndSource(rmnode, rmnode.getProvider());
+            throw new AddingNodesException("Maximum number of nodes reached: " + maximumNumberOfNodes);
+        }
+
         //during the configuration process, the rmnode can be removed. Its state would be toRemove
         if (rmnode.isToRemove()) {
             removeNodeFromCoreAndSource(rmnode, rmnode.getProvider());
@@ -575,6 +592,34 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         internalSetFree(configuredNode);
+    }
+
+    private boolean isNumberOfNodesLimited() {
+        return maximumNumberOfNodes != null && maximumNumberOfNodes >= 0;
+    }
+
+    /**
+     * Gives total number of alive nodes handled by RM
+     * @return total number of alive nodes
+     */
+    private int getTotalAliveNodesNumber() {
+        int count = 0;
+        for (RMNode node : allNodes.values()) {
+            if (!node.isDown())
+                count++;
+        }
+        return count;
+    }
+
+    /**
+     * This methods returns true if the maximum number of nodes is reached.
+     * This method assumes that the currently asking node is already regsitered
+     * inside the allNodes list.
+     * @return
+     */
+    private boolean isMaximumNumberOfNodesReachedIncludingAskingNode() {
+        // > because the currently added is is assumed to be already inside the allNodes list.
+        return this.getTotalAliveNodesNumber() > maximumNumberOfNodes;
     }
 
     /**

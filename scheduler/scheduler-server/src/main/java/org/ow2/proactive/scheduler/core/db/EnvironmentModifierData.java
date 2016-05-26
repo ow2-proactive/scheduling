@@ -5,16 +5,28 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 
 
 @Entity
-@Table(name = "ENVIRONMENT_MODIFIER_DATA")
+@NamedQueries( {
+        @NamedQuery(
+                name = "deleteEnvironmentModifierData",
+                query = "delete from EnvironmentModifierData where taskData.id.jobId = :jobId"
+        ),
+})
+@Table(name = "ENVIRONMENT_MODIFIER_DATA", indexes = {
+        @Index(name = "ENV_MODIFIER_DATA_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "ENV_MODIFIER_DATA_TASK_ID", columnList = "TASK_ID")
+})
 public class EnvironmentModifierData {
 
     private long id;
@@ -46,7 +58,7 @@ public class EnvironmentModifierData {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-      @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskData() {
         return taskData;
     }

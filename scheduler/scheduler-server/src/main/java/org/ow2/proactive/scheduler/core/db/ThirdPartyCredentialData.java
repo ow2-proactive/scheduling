@@ -35,10 +35,30 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 
 
 @Entity
+@NamedQueries( {
+        @NamedQuery(
+                name = "deleteThirdPartyCredentialsKeySetByUsernameAndKey",
+                query = "delete from ThirdPartyCredentialData where username = :username and key = :key"
+        ),
+        @NamedQuery(
+                name = "findThirdPartyCredentialsKeySetByUsername",
+                query = "select key from ThirdPartyCredentialData where username = :username"
+        ),
+        @NamedQuery(
+                name = "findThirdPartyCredentialsMapByUsername",
+                query = "select key, encryptedSymmetricKey, encryptedValue " +
+                        "from ThirdPartyCredentialData " + "where username = :username"
+        ),
+        @NamedQuery(
+                name = "hasThirdPartyCredentials",
+                query = "select count(*) from ThirdPartyCredentialData where username = :username"
+        )
+})
 @Table(name = "THIRD_PARTY_CREDENTIAL_DATA")
 public class ThirdPartyCredentialData implements Serializable {
 
@@ -84,7 +104,7 @@ public class ThirdPartyCredentialData implements Serializable {
         ThirdPartyCredentialData that = (ThirdPartyCredentialData) o;
 
         return !(key != null ? !key.equals(that.key) : that.key != null) &&
-            !(username != null ? !username.equals(that.username) : that.username != null);
+                !(username != null ? !username.equals(that.username) : that.username != null);
 
     }
 
@@ -94,4 +114,5 @@ public class ThirdPartyCredentialData implements Serializable {
         result = 31 * result + (key != null ? key.hashCode() : 0);
         return result;
     }
+
 }
