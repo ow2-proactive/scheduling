@@ -81,9 +81,14 @@ clean.dependsOn rootProject.cleanDist
 //gradlew build limitNumberOfNodes dist
 // Because it changes a class file it must be used in the same task list. Otherwise the class file
 // is recompiled -> the limitation changes are overwritten.
-if(project.hasProperty('maxNumberOfNodes')) {
-    task limitTheMaximumNumberOfNodes(type: maxNodes.ReplaceMaxNumberOfNodesTask) {
+task limitTheMaximumNumberOfNodes(type: maxNodes.ReplaceMaxNumberOfNodesTask, dependsOn: classes) {
+    if (project.hasProperty('maxNumberOfNodes')) {
+        print 'The maximum number of nodes will be limited, maxNumberOfNodes is set to: '
+        println project.maxNumberOfNodes
         maxNumberOfNodes = project.maxNumberOfNodes
+    } else {
+        println 'The maximum number of nodes will be unlimited, maxNumberOfNodes is set to -1'
+        maxNumberOfNodes = -1
     }
-    dist.dependsOn limitTheMaximumNumberOfNodes
 }
+build.dependsOn limitTheMaximumNumberOfNodes
