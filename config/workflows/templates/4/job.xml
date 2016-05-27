@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="urn:proactive:jobdescriptor:3.2"
      xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
-    name="Distributed Computation" projectName="Basic Workflows"
+    name="Distributed Computation" projectName="Big Data Workflows"
     priority="normal"
     cancelJobOnError="true">
   <description>
