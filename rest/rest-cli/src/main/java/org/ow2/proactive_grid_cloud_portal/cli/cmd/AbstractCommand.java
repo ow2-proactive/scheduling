@@ -44,17 +44,16 @@ import java.util.Stack;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
+import org.ow2.proactive.scheduling.util.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
 import org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus;
 import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpUtility;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.codehaus.jackson.type.TypeReference;
@@ -116,12 +115,12 @@ public abstract class AbstractCommand implements Command {
         if (sessionId != null) {
             request.setHeader("sessionid", sessionId);
         }
-        HttpClient client = HttpUtility.threadSafeClient();
+        HttpClientBuilder httpClientBuilder = new HttpClientBuilder().useSystemProperties();
         try {
             if ("https".equals(request.getURI().getScheme()) && currentContext.canInsecureAccess()) {
-                HttpUtility.setInsecureAccess(client);
+                httpClientBuilder.insecure(true);
             }
-            HttpResponse response = client.execute(request);
+            HttpResponse response = httpClientBuilder.build().execute(request);
             return new HttpResponseWrapper(response);
 
         } catch (SSLPeerUnverifiedException sslException) {
@@ -174,7 +173,8 @@ public abstract class AbstractCommand implements Command {
         writeLine(currentContext, "Error message: %s", message);
 
         if (isDebugModeEnabled(currentContext)) {
-            writeLine(currentContext, "Stack trace: %s", getStackTraceAsString((cause == null) ? error : cause));
+            writeLine(currentContext, "Stack trace: %s",
+                    getStackTraceAsString((cause == null) ? error : cause));
         } else {
             writeDebugModeUsage(currentContext);
         }

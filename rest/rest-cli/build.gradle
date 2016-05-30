@@ -4,13 +4,12 @@ dependencies {
         compile 'commons-io:commons-io:2.4'
         compile 'jline:jline:2.11'
 
-        compile 'org.apache.httpcomponents:httpclient:4.2.6'
-        compile 'org.apache.httpcomponents:httpmime:4.2.6'
+        compile 'org.apache.httpcomponents:httpmime:4.3.6'
 
         compile project(":common:common-api")
         compile project(':rest:rest-api')
-        
-        
+        compile project(":rest:rest-util")
+
         compile 'com.googlecode.json-simple:json-simple:1.1'
         
         testCompile functionalTestDependencies
@@ -18,7 +17,6 @@ dependencies {
         testCompile project(':rest:rest-server').sourceSets.test.output 
         
         testCompile project(':scheduler:scheduler-api')
-        
 
         testCompile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
         testCompile 'org.eclipse.jetty:jetty-server:9.2.14.v20151106'

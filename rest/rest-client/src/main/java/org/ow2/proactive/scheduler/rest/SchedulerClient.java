@@ -89,8 +89,8 @@ import org.ow2.proactive.scheduler.rest.data.TaskStateImpl;
 import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
 import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
-import org.ow2.proactive.scheduler.rest.utils.HttpUtility;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduling.util.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
@@ -181,10 +181,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     private void init(String url, String login, String password, boolean insecure) throws Exception {
-        HttpClient client = HttpUtility.threadSafeClient();
-        if (insecure) {
-            HttpUtility.setInsecureAccess(client);
-        }
+        HttpClient client = new HttpClientBuilder().insecure(insecure).useSystemProperties().build();
         SchedulerRestClient restApiClient = new SchedulerRestClient(url, new ApacheHttpClient4Engine(client));
 
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
@@ -200,7 +197,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         this.initialized = true;
 
         renewSession();
-
     }
 
     private void checkInitialized() {
