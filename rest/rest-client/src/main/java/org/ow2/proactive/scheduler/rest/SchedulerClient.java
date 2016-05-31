@@ -90,7 +90,7 @@ import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
 import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
-import org.ow2.proactive.scheduling.util.http.HttpClientBuilder;
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;

@@ -60,7 +60,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
-import org.ow2.proactive.scheduling.util.http.HttpClientBuilder;
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;

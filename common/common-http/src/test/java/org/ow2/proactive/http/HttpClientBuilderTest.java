@@ -34,11 +34,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduling.util.http;
+package org.ow2.proactive.http;
 
 import javax.net.ssl.SSLContext;
 
-import org.ow2.proactive.scheduling.util.WebProperties;
+import org.ow2.proactive.web.WebProperties;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;

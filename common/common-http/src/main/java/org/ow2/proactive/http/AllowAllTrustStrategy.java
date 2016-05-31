@@ -29,39 +29,26 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
+ *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduling.util;
+package org.ow2.proactive.http;
+
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import org.apache.http.conn.ssl.TrustStrategy;
 
 /**
- * The class defines the name of the properties related
- * to the deployment of the Web server.
- *
  * @author ActiveEon Team
  */
-public final class WebProperties {
+public class AllowAllTrustStrategy implements TrustStrategy {
 
-    public static final String WEB_DEPLOY = "web.deploy";
-
-    public static final String WEB_HTTPS = "web.https";
-
-    public static final String WEB_HTTPS_ALLOW_ANY_CERTIFICATE = "web.https.allow_any_certificate";
-
-    public static final String WEB_HTTPS_ALLOW_ANY_HOSTNAME = "web.https.allow_any_hostname";
-
-    public static final String WEB_HTTPS_KEYSTORE = "web.https.keystore";
-
-    public static final String WEB_HTTPS_KEYSTORE_PASSWORD = "web.https.keystore.password";
-
-    public static final String WEB_MAX_THREADS = "web.max_threads";
-
-    public static final String WEB_PORT = "web.port";
-
-    private WebProperties() {
-
+    @Override
+    public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        return true;
     }
 
 }

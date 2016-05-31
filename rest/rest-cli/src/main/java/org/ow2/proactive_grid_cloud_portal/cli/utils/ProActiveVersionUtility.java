@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.TimeUnit;
 
-import org.ow2.proactive.scheduling.util.http.HttpClientBuilder;
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint;
 import com.eclipsesource.json.Json;

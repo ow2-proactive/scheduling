@@ -10,8 +10,8 @@ dependencies {
     compile 'org.atmosphere:wasync:2.1.2'
 
     compile project(":common:common-api")
+    compile project(':common:common-http')
     compile project(':rest:rest-api')
-    compile project(':rest:rest-util')
     compile project(":scheduler:scheduler-api")
 
     runtime 'xerces:xercesImpl:2.11.0'

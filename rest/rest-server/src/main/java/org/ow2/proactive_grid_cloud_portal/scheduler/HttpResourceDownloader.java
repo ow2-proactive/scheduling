@@ -42,7 +42,7 @@ import java.net.HttpURLConnection;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.proactive.scheduling.util.http.HttpClientBuilder;
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;

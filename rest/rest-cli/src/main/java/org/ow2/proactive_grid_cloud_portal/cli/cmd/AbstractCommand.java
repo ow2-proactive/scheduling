@@ -44,7 +44,7 @@ import java.util.Stack;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import org.ow2.proactive.scheduling.util.http.HttpClientBuilder;
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;

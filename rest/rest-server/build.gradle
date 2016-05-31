@@ -46,7 +46,7 @@ dependencies {
     compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
     compile project(':rest:rest-api')
-    compile project(':rest:rest-util')
+    compile project(':common:common-http')
 
     testCompile functionalTestDependencies
 

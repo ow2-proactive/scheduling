@@ -12,7 +12,7 @@ dependencies {
     compile project(':common:common-api')
     compile project(':common:common-client')
     compile project(':common:common-db')
-    compile project(':rest:rest-util')
+    compile project(':common:common-http')
     compile project(':scheduler:scheduler-api')
     compile project(':scheduler:scheduler-client')
     compile project(':scheduler:scheduler-node')
