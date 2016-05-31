@@ -36,9 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.mop.MOP;
@@ -48,8 +46,10 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.apache.log4j.Logger;
 import org.ow2.proactive.utils.Criteria;
+
+import java.util.List;
+import java.util.concurrent.Callable;
 
 
 public class ScriptExecutor implements Callable<Node> {
@@ -81,7 +81,6 @@ public class ScriptExecutor implements Callable<Node> {
      * returns node if it matches, null otherwise
      */
     private Node executeScripts() {
-        //LinkedList<ScriptResult<Boolean>> scriptExecitionResults = new LinkedList<ScriptResult<Boolean>>();
         boolean selectionScriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
         boolean nodeMatch = true;
         ScriptException exception = null;
@@ -93,16 +92,12 @@ public class ScriptExecutor implements Callable<Node> {
                     // already executed static script
                     logger.info(rmnode.getNodeURL() + " : " + script.hashCode() +
                         " skipping script execution");
-                    //scriptExecitionResults.add(new ScriptResult<Boolean>(true));
                     continue;
                 }
 
                 logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " executing");
                 try {
-                    ScriptResult<Boolean> scriptResult = rmnode.executeScript(script);
-
-                    // SCHEDULING-883 : scripts must be executed sequentially to avoid unexpected script side effect
-                    //scriptExecitionResults.add(scriptResult);
+                    ScriptResult<Boolean> scriptResult = rmnode.executeScript(script, criteria.getBindings());
 
                     // processing the results
                     if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {
@@ -126,23 +121,23 @@ public class ScriptExecutor implements Callable<Node> {
                             break;
                         }
 
+                        // display the script result and output in the scheduler logs
+                        if (scriptResult != null && logger.isInfoEnabled()) {
+                            logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " result " +
+                                    scriptResult.getResult());
+
+                            if (scriptResult.getOutput() != null && scriptResult.getOutput().length() > 0) {
+                                logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " output\n" +
+                                        scriptResult.getOutput());
+                            }
+                        }
+
                         if (scriptResult != null && scriptResult.errorOccured()) {
                             nodeMatch = false;
                             exception = new ScriptException(scriptResult.getException());
                             logger.warn(rmnode.getNodeURL() + " : exception during the script execution",
                                     scriptResult.getException());
                             break;
-                        }
-
-                        if (logger.isDebugEnabled()) {
-                            if (scriptResult.getResult()) {
-                                logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " result " +
-                                    scriptResult.getResult());
-                            }
-                            if (scriptResult.getOutput() != null && scriptResult.getOutput().length() > 0) {
-                                logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " output\n" +
-                                    scriptResult.getOutput());
-                            }
                         }
 
                         // processing script result and updating knowledge base of

@@ -54,6 +54,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -160,7 +161,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
-    public <T> ScriptResult<T> executeScript(Script<T> script) {
+    public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
         throw new UnsupportedOperationException();
     }
 

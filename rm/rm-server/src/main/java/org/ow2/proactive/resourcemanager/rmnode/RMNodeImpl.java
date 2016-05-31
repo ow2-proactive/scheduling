@@ -36,11 +36,7 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -58,7 +54,12 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -352,14 +353,20 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Execute a selection Script in order to test the Node.
      * If no script handler is defined, create one, and execute the script.
      * @param script Selection script to execute
+     * @param bindings bindings to use to execute the selection scripts
      * @return Result of the test.
      *
      */
-    public <T> ScriptResult<T> executeScript(Script<T> script) {
+    public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
         try {
             this.initHandler();
         } catch (NodeException e) {
             return new ScriptResult<>(e);
+        }
+        if (bindings != null) {
+            for (String key : bindings.keySet()) {
+                this.handler.addBinding(key, bindings.get(key));
+            }
         }
         return this.handler.handle(script);
     }

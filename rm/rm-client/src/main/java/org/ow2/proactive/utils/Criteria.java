@@ -43,6 +43,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -65,6 +66,8 @@ public class Criteria implements Serializable {
     private TopologyDescriptor topology;
     // selection scripts
     private List<SelectionScript> scripts;
+    // bindings used for selection scripts
+    private Map<String, Serializable> bindings;
     // nodes that cannot be in resulting node set
     private NodeSet blackList;
     // if true RM returns up to required number of nodes that satisfy to selection scripts and topology
@@ -119,6 +122,24 @@ public class Criteria implements Serializable {
      */
     public void setScripts(List<SelectionScript> scripts) {
         this.scripts = scripts;
+    }
+
+    /**
+     * Sets variable bindings map used by selection scripts
+     *
+     * @param bindings
+     */
+    public void setBindings(Map<String, Serializable> bindings) {
+        this.bindings = bindings;
+    }
+
+    /**
+     * returns the bindings map used by selection scripts
+     *
+     * @return
+     */
+    public Map<String, Serializable> getBindings() {
+        return bindings;
     }
 
     /**

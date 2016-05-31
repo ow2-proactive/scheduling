@@ -60,6 +60,7 @@ import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
 
 import java.io.File;
+import java.io.Serializable;
 import java.security.Permission;
 import java.util.*;
 import java.util.concurrent.*;
@@ -493,7 +494,7 @@ public abstract class SelectionManager {
         return filteredList;
     }
 
-    public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes) {
+    public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes, final Map<String, Serializable> bindings) {
         // TODO: add a specific timeout for script execution
         final int timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsInt();
         final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(
@@ -507,7 +508,7 @@ public abstract class SelectionManager {
                     // Execute with a timeout the script by the remote handler 
                     // and always async-unlock the node, exceptions will be treated as ExecutionException
                     try {
-                        ScriptResult<T> res = node.executeScript(script);
+                        ScriptResult<T> res = node.executeScript(script, bindings);
                         PAFuture.waitFor(res, timeout);
                         return res;
                         //return PAFuture.getFutureValue(res, timeout);

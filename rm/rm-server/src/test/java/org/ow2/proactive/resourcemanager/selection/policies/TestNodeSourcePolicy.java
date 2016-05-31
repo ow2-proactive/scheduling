@@ -36,15 +36,9 @@
  */
 package org.ow2.proactive.resourcemanager.selection.policies;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -56,11 +50,19 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -223,7 +225,7 @@ public class TestNodeSourcePolicy {
         }
 
         @Override
-        public <T> ScriptResult<T> executeScript(Script<T> script) {
+        public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
             return null;
         }
 

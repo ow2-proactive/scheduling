@@ -80,6 +80,8 @@ public class SchedulerConstants {
 
     public static final String VARIABLES_BINDING_NAME = "variables";
 
+    public static final String GENERIC_INFO_BINDING_NAME = "genericInformation";
+
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
 
     public static final String DS_INPUT_BINDING_NAME = "inputspace";

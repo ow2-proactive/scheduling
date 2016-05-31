@@ -36,9 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
-import java.security.Permission;
-import java.util.HashMap;
-
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -50,6 +47,11 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -79,9 +81,10 @@ public interface RMNode extends Comparable<RMNode> {
      * Execute a {@link Script} on this {@link RMNode}
      * @param <T> The parameterized result type of the script 
      * @param script a selection script to execute.
+     * @param bindings bindings used to execute the selection scripts
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
-    <T> ScriptResult<T> executeScript(Script<T> script);
+    <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings);
 
     /**
      * Get a map of all selection scripts already tested on this node,
