@@ -42,6 +42,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLContext;
 
+import org.ow2.proactive.scheduling.util.WebProperties;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
@@ -49,10 +50,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 
 public class HttpClientBuilder {
-
-    public static final String HTTPS_ALLOW_ANY_CERTIFICATE = "web.https.allow_any_certificate";
-
-    public static final String HTTPS_ALLOW_ANY_HOSTNAME = "web.https.allow_any_hostname";
 
     private static final AllowAllTrustStrategy ACCEPT_ANY_CERTIFICATE_TRUST_STRATEGY = new AllowAllTrustStrategy();
 
@@ -123,12 +120,12 @@ public class HttpClientBuilder {
         if (useSystemProperties) {
             internalHttpClientBuilder.useSystemProperties();
 
-            String property = System.getProperty(HTTPS_ALLOW_ANY_CERTIFICATE);
+            String property = System.getProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE);
             if ("true".equalsIgnoreCase(property)) {
                 acceptAnyCertificate = true;
             }
 
-            property = System.getProperty(HTTPS_ALLOW_ANY_HOSTNAME);
+            property = System.getProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME);
             if ("true".equalsIgnoreCase(property)) {
                 acceptAnyHostname = true;
             }

@@ -38,6 +38,7 @@ package org.ow2.proactive.scheduling.util.http;
 
 import javax.net.ssl.SSLContext;
 
+import org.ow2.proactive.scheduling.util.WebProperties;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
@@ -79,8 +80,8 @@ public class HttpClientBuilderTest {
 
     @After
     public void tearDown() {
-        System.clearProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_CERTIFICATE);
-        System.clearProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_HOSTNAME);
+        System.clearProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE);
+        System.clearProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME);
     }
 
     @Test
@@ -202,8 +203,8 @@ public class HttpClientBuilderTest {
 
     @Test
     public void testUseSystemPropertiesTrue() throws Exception {
-        System.setProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_CERTIFICATE, "true");
-        System.setProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_HOSTNAME, "TRUE");
+        System.setProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE, "true");
+        System.setProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME, "TRUE");
 
         httpClientBuilder.useSystemProperties(true);
         httpClientBuilder.build();
@@ -229,8 +230,8 @@ public class HttpClientBuilderTest {
 
     @Test
     public void testUseSystemPropertiesFalse() throws Exception {
-        System.setProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_CERTIFICATE, "false");
-        System.setProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_HOSTNAME, "FALSE");
+        System.setProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE, "false");
+        System.setProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME, "FALSE");
 
         httpClientBuilder.useSystemProperties(false);
         httpClientBuilder.build();
@@ -244,8 +245,8 @@ public class HttpClientBuilderTest {
 
     @Test
     public void testUseSystemPropertiesFalse2() throws Exception {
-        System.setProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_CERTIFICATE, "tRuE");
-        System.setProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_HOSTNAME, "FalsE");
+        System.setProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE, "tRuE");
+        System.setProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME, "FalsE");
 
         httpClientBuilder.useSystemProperties(false);
         httpClientBuilder.build();
@@ -259,8 +260,8 @@ public class HttpClientBuilderTest {
 
     @Test
     public void testSystemPropertiesOverridenByProgrammaticSettings() {
-        System.setProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_CERTIFICATE, "true");
-        System.setProperty(HttpClientBuilder.HTTPS_ALLOW_ANY_HOSTNAME, "false");
+        System.setProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE, "true");
+        System.setProperty(WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME, "false");
 
         httpClientBuilder.useSystemProperties(true);
         httpClientBuilder.allowAnyCertificate(false);
@@ -276,9 +277,9 @@ public class HttpClientBuilderTest {
 
     @Test
     public void testSystemPropertyNames() {
-        assertThat(HttpClientBuilder.HTTPS_ALLOW_ANY_CERTIFICATE)
+        assertThat(WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE)
                 .isEqualTo("web.https.allow_any_certificate");
-        assertThat(HttpClientBuilder.HTTPS_ALLOW_ANY_HOSTNAME)
+        assertThat(WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME)
                 .isEqualTo("web.https.allow_any_hostname");
     }
 

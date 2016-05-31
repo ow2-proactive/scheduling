@@ -34,19 +34,6 @@
  */
 package org.ow2.proactive.utils;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
-import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.util.ProActiveInet;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -55,6 +42,27 @@ import java.net.BindException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
+
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduling.util.WebProperties;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.ConnectionFactory;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 
 public class JettyStarter {
@@ -80,10 +88,10 @@ public class JettyStarter {
         setSystemPropertyIfNotDefined("rm.url", rmUrl);
         setSystemPropertyIfNotDefined("scheduler.url", schedulerUrl);
 
-        if ("true".equals(properties.getProperty("web.deploy", "true"))) {
+        if ("true".equals(properties.getProperty(WebProperties.WEB_DEPLOY, "true"))) {
             logger.info("Starting the web applications...");
-            int restPort = Integer.parseInt(properties.getProperty("web.port", "8080"));
-            boolean httpsEnabled = Boolean.parseBoolean(properties.getProperty("web.https", "false"));
+            int restPort = Integer.parseInt(properties.getProperty(WebProperties.WEB_PORT, "8080"));
+            boolean httpsEnabled = Boolean.parseBoolean(properties.getProperty(WebProperties.WEB_HTTPS, "false"));
             String httpProtocol = httpsEnabled ? "https" : "http";
 
             Server server = createHttpServer(properties, restPort, httpsEnabled);
@@ -99,7 +107,7 @@ public class JettyStarter {
     }
 
     private static Server createHttpServer(Properties properties, int restPort, boolean httpsEnabled) {
-        int maxThreads = Integer.parseInt(properties.getProperty("web.max_threads", "100"));
+        int maxThreads = Integer.parseInt(properties.getProperty(WebProperties.WEB_MAX_THREADS, "100"));
         QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads);
 
         Server server = new Server(threadPool);
@@ -114,8 +122,8 @@ public class JettyStarter {
 
         if (httpsEnabled) {
             SslContextFactory sslContextFactory = new SslContextFactory();
-            sslContextFactory.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(properties.getProperty("web.https.keystore")));
-            sslContextFactory.setKeyStorePassword(properties.getProperty("web.https.keystore.password"));
+            sslContextFactory.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(properties.getProperty(WebProperties.WEB_HTTPS_KEYSTORE)));
+            sslContextFactory.setKeyStorePassword(properties.getProperty(WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD));
 
             HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
             httpsConfig.addCustomizer(new SecureRequestCustomizer());
