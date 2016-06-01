@@ -54,7 +54,7 @@ public final class WebProperties {
 
     public static final String WEB_HTTPS_KEYSTORE = "web.https.keystore";
 
-    public static final String WEB_HTTPS_KEYSTORE_PASSWORD = "web.https.keystore.password";
+    public static final String WEB_HTTPS_KEYSTORE_PASSWORD = "web.https.keystore.password"; // NOSONAR
 
     public static final String WEB_MAX_THREADS = "web.max_threads";
 
