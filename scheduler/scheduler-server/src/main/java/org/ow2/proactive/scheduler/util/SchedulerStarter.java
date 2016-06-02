@@ -161,7 +161,7 @@ public class SchedulerStarter {
         SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
 
         if (!commandLine.hasOption("no-rest")) {
-            JettyStarter.runWars(rmUrl, sai.getHostURL());
+            new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL());
         }
 
         addShutdownMessageHook();

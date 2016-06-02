@@ -46,6 +46,8 @@ public final class WebProperties {
 
     public static final String WEB_DEPLOY = "web.deploy";
 
+    public static final String WEB_HTTP_PORT = "web.http.port";
+
     public static final String WEB_HTTPS = "web.https";
 
     public static final String WEB_HTTPS_ALLOW_ANY_CERTIFICATE = "web.https.allow_any_certificate";
@@ -56,9 +58,14 @@ public final class WebProperties {
 
     public static final String WEB_HTTPS_KEYSTORE_PASSWORD = "web.https.keystore.password"; // NOSONAR
 
+    public static final String WEB_HTTPS_PORT = "web.https.port";
+
     public static final String WEB_MAX_THREADS = "web.max_threads";
 
+    @Deprecated
     public static final String WEB_PORT = "web.port";
+
+    public static final String WEB_REDIRECT_HTTP_TO_HTTPS = "web.redirect_http_to_https";
 
     private WebProperties() {
 
