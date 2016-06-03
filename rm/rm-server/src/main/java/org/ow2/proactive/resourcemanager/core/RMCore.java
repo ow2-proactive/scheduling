@@ -1815,7 +1815,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         // Return a ProActive future on the list of results
-        return this.selectionManager.executeScript(script, selectedRMNodes);
+        return this.selectionManager.executeScript(script, selectedRMNodes, null);
 
         // To avoid blocking rmcore ao the call is delegated to the selection
         // manager ao and each node is unlocked as soon as the script has

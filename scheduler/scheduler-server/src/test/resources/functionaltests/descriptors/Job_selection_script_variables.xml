@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="Job_select_variables" priority="normal">
+	<variables>
+		<variable name="TESTVAR" value="testvar"/>
+	</variables>
+	<description>Job using variables in selection scripts, check the scheduler logs if the test fails to see the selection scripts output</description>
+	<genericInformation>
+		<info name="TESTGI" value="nothing"/>
+		<info name="TESTGI2" value="testgi2"/>
+	</genericInformation>
+	<taskFlow>
+		<task name="taskSelectStandalone">
+			<description>Task with selection script which uses default job variables</description>
+			<genericInformation>
+				<info name="TESTGI" value="testgi"/>
+			</genericInformation>
+			<selection>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+						import org.ow2.proactive.scheduler.task.SchedulerVars
+						println variables
+						println genericInformation
+
+						ok = (variables.get(SchedulerVars.PA_JOB_ID.toString()) != null)
+						ok = ok && ("Job_select_variables".equals(variables.get(SchedulerVars.PA_JOB_NAME.toString())))
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_ID.toString()) != null)
+						ok = ok && ("taskSelectStandalone".equals(variables.get(SchedulerVars.PA_TASK_NAME.toString())))
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_ITERATION.toString()) != null)
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_REPLICATION.toString()) != null)
+						ok = ok && (variables.get(SchedulerVars.PA_USER.toString()) != null)
+						ok = ok && ("testvar".equals(variables.get("TESTVAR")))
+						ok = ok && ("testgi".equals(genericInformation.get("TESTGI")))
+						ok = ok && ("testgi2".equals(genericInformation.get("TESTGI2")))
+						selected = ok
+                     	]]>
+					</code>
+				</script>
+			</selection>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
+		</task>
+		<task name="taskChangeVar">
+			<scriptExecutable>
+				<script>
+					<code language="groovy">
+						variables.put("TESTVAR", "newValue")
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="taskSelectWithDep">
+			<description>Task with selection script which uses updated job variables</description>
+			<genericInformation>
+				<info name="TESTGI" value="testgi"/>
+			</genericInformation>
+			<depends>
+				<task ref="taskChangeVar"/>
+			</depends>
+			<selection>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+						import org.ow2.proactive.scheduler.task.SchedulerVars
+						println variables
+						println genericInformation
+
+						ok = (variables.get(SchedulerVars.PA_JOB_ID.toString()) != null)
+						ok = ok && ("Job_select_variables".equals(variables.get(SchedulerVars.PA_JOB_NAME.toString())))
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_ID.toString()) != null)
+						ok = ok && ("taskSelectWithDep".equals(variables.get(SchedulerVars.PA_TASK_NAME.toString())))
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_ITERATION.toString()) != null)
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_REPLICATION.toString()) != null)
+						ok = ok && (variables.get(SchedulerVars.PA_USER.toString()) != null)
+						ok = ok && ("newValue".equals(variables.get("TESTVAR")))
+						ok = ok && ("testgi".equals(genericInformation.get("TESTGI")))
+						selected = ok
+                     	]]>
+					</code>
+				</script>
+			</selection>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
+		</task>
+	</taskFlow>
+</job>
