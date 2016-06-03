@@ -400,7 +400,55 @@ public class SchedulerTHelper {
      */
     public JobId testJobSubmission(String jobDescPath) throws Exception {
         Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
-        return testJobSubmission(jobToTest);
+        return testJobSubmission(jobToTest, false);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check, with assertions,
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ job passing from running to finished (with state set to finished).
+     * 4/ every task finished without error
+     * <p>
+     * Then returns.
+     * <p>
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific events or task states (failures, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobDescPath   path to an XML job descriptor to submit
+     * @param acceptSkipped if true then skipped task will not fail the test
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job creation/submission, or during
+     *                   verification of events sequence.
+     */
+    public JobId testJobSubmission(String jobDescPath, boolean acceptSkipped) throws Exception {
+        Job jobToTest = JobFactory.getFactory().createJob(jobDescPath);
+        return testJobSubmission(jobToTest, acceptSkipped);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check, with assertions,
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ job passing from running to finished (with state set to finished).
+     * 4/ every task finished without error
+     * <p>
+     * Then returns.
+     * <p>
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific events or task states (failures, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobToSubmit job object to schedule.
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job submission, or during
+     *                   verification of events sequence.
+     */
+    public JobId testJobSubmission(Job jobToSubmit) throws Exception {
+        return testJobSubmission(jobToSubmit, false);
     }
 
     /**
@@ -418,11 +466,12 @@ public class SchedulerTHelper {
      * helper and check events sequence with waitForEvent**() functions.
      *
      * @param jobToSubmit job object to schedule.
+     * @param acceptSkipped if true then skipped task will not fail the test
      * @return JobId, the job's identifier.
      * @throws Exception if an error occurs at job submission, or during
      * verification of events sequence.
      */
-    public JobId testJobSubmission(Job jobToSubmit) throws Exception {
+    public JobId testJobSubmission(Job jobToSubmit, boolean acceptSkipped) throws Exception {
         Scheduler userInt = getSchedulerInterface();
 
         JobId id = userInt.submit(jobToSubmit);
@@ -471,10 +520,16 @@ public class SchedulerTHelper {
                         taskError = true;
                         break;
                     }
+                } else if (acceptSkipped && t.getStatus() == TaskStatus.SKIPPED) {
+                    // do nothing
                 } else if (t.getStatus() != TaskStatus.FINISHED) {
                     message = "Invalid task status for task " + t.getName() + " : " + t.getStatus();
                     taskError = true;
                     break;
+                } else {
+                    TaskResult tres = userInt.getTaskResult(jInfo.getJobId(), t.getName());
+                    System.out.println("Output of task (" + t.getName() + ") :");
+                    System.out.println(tres.getOutput().getAllLogs(true));
                 }
             }
         }
