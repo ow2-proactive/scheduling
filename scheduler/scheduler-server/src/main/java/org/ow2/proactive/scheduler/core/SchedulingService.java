@@ -328,10 +328,9 @@ public class SchedulingService {
                 TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
                 try {
                     terminationData.handleTermination(SchedulingService.this);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                } catch (Exception e)
+                {
+                    logger.warn("Exception occurred :", e);
                 }
             }
         });
@@ -433,10 +432,9 @@ public class SchedulingService {
                 TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
                 try {
                     terminationData.handleTermination(SchedulingService.this);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                } catch (Exception e)
+                {
+                    logger.warn("Exception occurred :", e);
                 }
                 wakeUpSchedulingThread();
             }
@@ -454,10 +452,9 @@ public class SchedulingService {
         public void run() {
             try {
                 terminationData.handleTermination(SchedulingService.this);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            } catch (Exception e)
+            {
+                logger.warn("Exception occurred :", e);
             }
         }
     }

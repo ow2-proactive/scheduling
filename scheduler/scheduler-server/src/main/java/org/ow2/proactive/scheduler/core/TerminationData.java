@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jetbrains.annotations.NotNull;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -114,7 +113,12 @@ final class TerminationData {
         for (TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
             RunningTaskData taskData = taskToTerminate.taskData;
 
-            Map<String, Serializable> variables = getStringSerializableMap(service, taskToTerminate);
+            Map<String, Serializable> variables = null;
+            try {
+                variables = getStringSerializableMap(service, taskToTerminate);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             try {
                 if (!taskToTerminate.normalTermination) {
@@ -149,8 +153,7 @@ final class TerminationData {
         }
     }
 
-    @NotNull
-    public Map<String, Serializable> getStringSerializableMap(SchedulingService service, TaskTerminationData taskToTerminate) throws IOException, ClassNotFoundException {
+    public Map<String, Serializable> getStringSerializableMap(SchedulingService service, TaskTerminationData taskToTerminate) throws Exception {
         Map<String, Serializable> variables = new HashMap<>();
 
         RunningTaskData taskData = taskToTerminate.taskData;
@@ -167,11 +170,7 @@ final class TerminationData {
                 Map<TaskId, TaskResult> taskResults = service.getInfrastructure().getDBManager()
                         .loadTasksResults(
                                 taskData.getTask().getJobId(), parentIds);
-                for (TaskResult currentTaskResult : taskResults.values()) {
-                    if (currentTaskResult.getPropagatedVariables() != null) {
-                        variables.putAll(SerializationUtil.deserializeVariableMap(currentTaskResult.getPropagatedVariables()));
-                    }
-                }
+                getResultsFromListOfTaskResults(variables, taskResults);
             } else {
                 if(internalJob!=null)
                     variables.putAll(internalJob.getVariables());
@@ -185,5 +184,13 @@ final class TerminationData {
             variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(true));
         }
         return variables;
+    }
+
+    private void getResultsFromListOfTaskResults(Map<String, Serializable> variables, Map<TaskId, TaskResult> taskResults) throws IOException, ClassNotFoundException {
+        for (TaskResult currentTaskResult : taskResults.values()) {
+            if (currentTaskResult.getPropagatedVariables() != null) {
+                variables.putAll(SerializationUtil.deserializeVariableMap(currentTaskResult.getPropagatedVariables()));
+            }
+        }
     }
 }

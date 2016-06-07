@@ -39,7 +39,9 @@ public class RMProxyActiveObject {
 
     protected ResourceManager rm;
 
-    /** list of nodes and clean script being executed */
+    /**
+     * list of nodes and clean script being executed
+     */
     private Map<Node, ScriptResult<?>> nodes = new HashMap<>();
 
     public RMProxyActiveObject() {
@@ -48,7 +50,7 @@ public class RMProxyActiveObject {
     static RMProxyActiveObject createAOProxy(RMAuthentication rmAuth, Credentials creds)
             throws RMProxyCreationException {
         try {
-            RMProxyActiveObject proxy = PAActiveObject.newActive(RMProxyActiveObject.class, new Object[] {});
+            RMProxyActiveObject proxy = PAActiveObject.newActive(RMProxyActiveObject.class, new Object[]{});
             proxy.connect(rmAuth, creds);
             return proxy;
         } catch (Exception e) {
@@ -119,19 +121,20 @@ public class RMProxyActiveObject {
 
     /**
      * Execute the given CleaningScript on each nodes before releasing them.
-     * @see #releaseNodes(NodeSet)
-     *@param nodes the node set to release
+     *
+     * @param nodes          the node set to release
      * @param cleaningScript the cleaning script to apply to each node before releasing
      * @param variables
+     * @see #releaseNodes(NodeSet)
      */
     @ImmediateService
-        public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, Map<String, Serializable> variables) {
+    public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, Map<String, Serializable> variables) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes);
             } else {
                 for (Node node : nodes) {
-                    handleCleaningScript(node, cleaningScript,variables);
+                    handleCleaningScript(node, cleaningScript, variables);
                 }
             }
         }
@@ -140,14 +143,15 @@ public class RMProxyActiveObject {
     /**
      * Execute the given script on the given node.
      * Also register a callback on {@link #cleanCallBack(Future)} method when script has returned.
-     *  @param node the node on which to start the script
+     *
+     * @param node           the node on which to start the script
      * @param cleaningScript the script to be executed
      * @param variables
      */
     private void handleCleaningScript(Node node, Script<?> cleaningScript, Map<String, Serializable> variables) {
         try {
             ScriptHandler handler = ScriptLoader.createHandler(node);
-            handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME,(Serializable)variables);
+            handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
             ScriptResult<?> future = handler.handle(cleaningScript);
             try {
                 PAEventProgramming.addActionOnFuture(future, "cleanCallBack");
@@ -173,7 +177,7 @@ public class RMProxyActiveObject {
      * Called when a script has returned (call is made as an active object call)
      * <p>
      * Check the nodes to release and release the one that have to (clean script has returned)
-     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(Node, Script,Map)}
+     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(Node, Script, Map)}
      */
     @ImmediateService
     public synchronized void cleanCallBack(Future<ScriptResult<?>> future) {
@@ -182,15 +186,11 @@ public class RMProxyActiveObject {
         while (iterator.hasNext()) {
             Entry<Node, ScriptResult<?>> entry = iterator.next();
             if (!PAFuture.isAwaited(entry.getValue())) { // !awaited = arrived
-                if (logger.isInfoEnabled()) {
-                    String nodeUrl = entry.getKey().getNodeInformation().getURL();
-                    logger.info("Cleaning script successfull, node freed : " + nodeUrl
-                        );
-                    try {
-                        logger.info("Cleaning script output on node " + nodeUrl + ":"+future.get().getOutput());
-                    } catch (Exception e) {
-                        logger.warn("Exception occurred while executing cleaning script on node "+ nodeUrl +":", e);
-                    }
+                String nodeUrl = entry.getKey().getNodeInformation().getURL();
+                try {
+                    printCleaningScriptInformations(future, entry, nodeUrl);
+                } catch (Exception e) {
+                    logger.warn("Exception occurred while executing cleaning script on node " + nodeUrl + ":", e);
                 }
                 ns.add(entry.getKey());
                 iterator.remove();
@@ -198,6 +198,14 @@ public class RMProxyActiveObject {
         }
         if (ns.size() > 0) {
             releaseNodes(ns);
+        }
+    }
+
+    private void printCleaningScriptInformations(Future<ScriptResult<?>> future, Entry<Node, ScriptResult<?>> entry, String nodeUrl) throws InterruptedException, java.util.concurrent.ExecutionException {
+        if (logger.isInfoEnabled()) {
+            logger.info("Cleaning script successfull, node freed : " + nodeUrl
+            );
+            logger.info("Cleaning script output on node " + nodeUrl + ":" + future.get().getOutput());
         }
     }
 

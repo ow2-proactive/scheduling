@@ -1,6 +1,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -485,8 +486,7 @@ class LiveJobs {
                 throw new IllegalStateException("No information for: " + taskId);
             }
 
-            TerminationData terminationData = TerminationData.newTerminationData();
-            terminationData.addTaskData(jobData.job, taskData, true, result);
+            TerminationData terminationData = createAndFillTerminationData(result, taskData, jobData.job, true);
 
             boolean errorOccurred = result.hadException();
             if (errorOccurred) {
@@ -560,6 +560,13 @@ class LiveJobs {
         }
     }
 
+    @NotNull
+    private TerminationData createAndFillTerminationData(TaskResultImpl result, RunningTaskData taskData, InternalJob job, boolean normalTermination) {
+        TerminationData terminationData = TerminationData.newTerminationData();
+        terminationData.addTaskData(job, taskData, normalTermination, result);
+        return terminationData;
+    }
+
     private void suspendTaskOnError(JobData jobData, InternalTask task, long taskDuration) {
         InternalJob job = jobData.job;
         job.setInErrorTime(System.currentTimeMillis());
@@ -614,9 +621,7 @@ class LiveJobs {
             TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
                     new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
                     System.currentTimeMillis() - task.getStartTime());
-            TerminationData terminationData = TerminationData.newTerminationData();
-
-            terminationData.addTaskData(jobData.job, taskData, false,taskResult);
+            TerminationData terminationData = createAndFillTerminationData(taskResult,taskData,jobData.job,false);
 
             task.decreaseNumberOfExecutionLeft();
 
@@ -663,10 +668,7 @@ class LiveJobs {
                     new SimpleTaskLogs("", "Preempted by admin"),
                     System.currentTimeMillis() - task.getStartTime());
 
-            TerminationData terminationData = TerminationData.newTerminationData();
-            terminationData.addTaskData(jobData.job, taskData, false, taskResult);
-
-
+            TerminationData terminationData = createAndFillTerminationData(taskResult,taskData,jobData.job,false);
 
             long waitTime = restartDelay * 1000L;
             restartTaskOnError(jobData, task, TaskStatus.PENDING, taskResult, waitTime, terminationData);
@@ -696,9 +698,7 @@ class LiveJobs {
                     new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
                     System.currentTimeMillis() - task.getStartTime());
 
-            TerminationData terminationData = TerminationData.newTerminationData();
-            terminationData.addTaskData(jobData.job, taskData, false, taskResult);
-
+            TerminationData terminationData = createAndFillTerminationData(taskResult,taskData,jobData.job,false);
 
             if (onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                 endJob(jobData, terminationData, task, taskResult, "The task has been manually killed. " +
