@@ -358,7 +358,7 @@ class LiveJobs {
             }
 
             TerminationData result = TerminationData.newTerminationData();
-            result.addTaskData(taskData, false);
+            result.addTaskData(jobData.job, taskData, false, null);
 
             restartTaskOnNodeFailure(task, jobData, result);
 
@@ -486,7 +486,7 @@ class LiveJobs {
             }
 
             TerminationData terminationData = TerminationData.newTerminationData();
-            terminationData.addTaskData(taskData, true);
+            terminationData.addTaskData(jobData.job, taskData, true, result);
 
             boolean errorOccurred = result.hadException();
             if (errorOccurred) {
@@ -611,12 +611,12 @@ class LiveJobs {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
 
-            TerminationData terminationData = TerminationData.newTerminationData();
-            terminationData.addTaskData(taskData, false);
-
             TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
                     new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
                     System.currentTimeMillis() - task.getStartTime());
+            TerminationData terminationData = TerminationData.newTerminationData();
+
+            terminationData.addTaskData(jobData.job, taskData, false,taskResult);
 
             task.decreaseNumberOfExecutionLeft();
 
@@ -658,14 +658,15 @@ class LiveJobs {
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
-
-            TerminationData terminationData = TerminationData.newTerminationData();
-            terminationData.addTaskData(taskData, false);
-
             TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
                     new TaskPreemptedException("Preempted by admin"),
                     new SimpleTaskLogs("", "Preempted by admin"),
                     System.currentTimeMillis() - task.getStartTime());
+
+            TerminationData terminationData = TerminationData.newTerminationData();
+            terminationData.addTaskData(jobData.job, taskData, false, taskResult);
+
+
 
             long waitTime = restartDelay * 1000L;
             restartTaskOnError(jobData, task, TaskStatus.PENDING, taskResult, waitTime, terminationData);
@@ -691,13 +692,13 @@ class LiveJobs {
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
-
-            TerminationData terminationData = TerminationData.newTerminationData();
-            terminationData.addTaskData(taskData, false);
-
             TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
                     new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
                     System.currentTimeMillis() - task.getStartTime());
+
+            TerminationData terminationData = TerminationData.newTerminationData();
+            terminationData.addTaskData(jobData.job, taskData, false, taskResult);
+
 
             if (onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                 endJob(jobData, terminationData, task, taskResult, "The task has been manually killed. " +
@@ -797,7 +798,7 @@ class LiveJobs {
                 i.remove();
                 //remove previous read progress
                 taskData.getTask().setProgress(0);
-                terminationData.addTaskData(taskData, false);
+                terminationData.addTaskData(job,taskData, false,taskResult);
             }
         }
 

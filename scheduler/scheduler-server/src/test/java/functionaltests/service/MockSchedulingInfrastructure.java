@@ -107,7 +107,7 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
                 return null;
             }
 
-        }).when(userProxy).releaseNodes((NodeSet) anyObject(), (Script<?>) anyObject());
+        }).when(userProxy).releaseNodes((NodeSet) anyObject(), (Script<?>) anyObject(), null);
 
         rmProxiesManager = mock(RMProxiesManager.class);
         when(rmProxiesManager.getUserRMProxy(anyString(), (Credentials) anyObject())).thenReturn(userProxy);

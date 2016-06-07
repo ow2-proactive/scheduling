@@ -48,5 +48,6 @@ public enum SchedulerVars {
     PA_TASK_ITERATION,
     PA_TASK_PROGRESS_FILE,
     PA_TASK_REPLICATION,
+    PA_TASK_SUCCESS,
     PA_USER
 }

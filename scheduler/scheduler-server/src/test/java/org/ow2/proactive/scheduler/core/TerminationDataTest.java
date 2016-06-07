@@ -22,6 +22,9 @@ import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.utils.NodeSet;
 
+import java.io.IOException;
+import java.util.HashMap;
+
 public class TerminationDataTest {
 	
 	private TerminationData terminationData;
@@ -71,7 +74,7 @@ public class TerminationDataTest {
 		internalTask.setStatus(TaskStatus.RUNNING);
 		internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
 		RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, null);
-		terminationData.addTaskData(taskData, true);
+		terminationData.addTaskData(null, taskData, true, null);
 		assertThat(terminationData.isEmpty(), is(false));
 		assertThat(terminationData.taskTerminated(jobId,"task-name"), is(true));
 	}
@@ -87,7 +90,7 @@ public class TerminationDataTest {
 	
 
 	@Test
-	public void testHandleTerminationForJob(){
+	public void testHandleTerminationForJob() throws IOException, ClassNotFoundException {
 		JobId jobId = new JobIdImpl(666, "readableName");
 		terminationData.addJobToTerminate(jobId);
 		terminationData.handleTermination(service);
@@ -95,7 +98,7 @@ public class TerminationDataTest {
 	}
 	
 	@Test
-	public void testHandleTerminationForTaskNotNormalTermination(){
+	public void testHandleTerminationForTaskNotNormalTermination() throws IOException, ClassNotFoundException {
 		JobId jobId = new JobIdImpl(666, "readableName");
 		InternalTask internalTask = new InternalScriptTask();
 		TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
@@ -104,14 +107,14 @@ public class TerminationDataTest {
 		internalTask.setStatus(TaskStatus.RUNNING);
 		internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
 		RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, launcher);
-		terminationData.addTaskData(taskData, false);
+		terminationData.addTaskData(null, taskData, false, null);
 		terminationData.handleTermination(service);
 		Mockito.verify(launcher, Mockito.times(1)).kill();
 	}
 
 	
 	@Test
-	public void testHandleTerminationForTaskNormalTermination() throws RMProxyCreationException{
+	public void testHandleTerminationForTaskNormalTermination() throws RMProxyCreationException, IOException, ClassNotFoundException {
 		JobId jobId = new JobIdImpl(666, "readableName");
 		InternalTask internalTask = new InternalScriptTask();
 		TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
@@ -120,16 +123,16 @@ public class TerminationDataTest {
 		internalTask.setStatus(TaskStatus.RUNNING);
 		internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
 		RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, launcher);
-		terminationData.addTaskData(taskData, true);
+		terminationData.addTaskData(null, taskData, true, null);
 		terminationData.handleTermination(service);
 		Mockito.verify(proxiesManager, Mockito.times(1)).getUserRMProxy("user", null);
-		Mockito.verify(rmProxy, Mockito.times(1)).releaseNodes(org.mockito.Matchers.any(NodeSet.class),org.mockito.Matchers.any(org.ow2.proactive.scripting.Script.class) );
+		Mockito.verify(rmProxy, Mockito.times(1)).releaseNodes(org.mockito.Matchers.any(NodeSet.class),org.mockito.Matchers.any(org.ow2.proactive.scripting.Script.class),Mockito.any(HashMap.class));
 		
 	}
 
 	
 	@Test
-	public void testHandleTerminationForTaskToRestart() throws RMProxyCreationException{
+	public void testHandleTerminationForTaskToRestart() throws RMProxyCreationException, IOException, ClassNotFoundException {
 		JobId jobId = new JobIdImpl(666, "readableName");
 		TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
 		terminationData.addRestartData(taskId, 1000L);

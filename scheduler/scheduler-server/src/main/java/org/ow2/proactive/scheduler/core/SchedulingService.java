@@ -28,6 +28,7 @@ import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Iterator;
@@ -218,7 +219,7 @@ public class SchedulingService {
             try {
                 infrastructure.getRMProxiesManager().getUserRMProxy(taskData.getUser(),
                         taskData.getCredentials())
-                        .releaseNodes(nodes, taskData.getTask().getCleaningScript());
+                        .releaseNodes(nodes, taskData.getTask().getCleaningScript(), null);
             } catch (Throwable t) {
                 logger.error("Failed to release nodes", t);
             }
@@ -325,7 +326,13 @@ public class SchedulingService {
         infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
             public void run() {
                 TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
-                terminationData.handleTermination(SchedulingService.this);
+                try {
+                    terminationData.handleTermination(SchedulingService.this);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -424,7 +431,13 @@ public class SchedulingService {
             @Override
             public void run() {
                 TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
-                terminationData.handleTermination(SchedulingService.this);
+                try {
+                    terminationData.handleTermination(SchedulingService.this);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
                 wakeUpSchedulingThread();
             }
         });
@@ -439,7 +452,13 @@ public class SchedulingService {
         }
 
         public void run() {
-            terminationData.handleTermination(SchedulingService.this);
+            try {
+                terminationData.handleTermination(SchedulingService.this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
