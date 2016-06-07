@@ -187,11 +187,13 @@ public class RMProxyActiveObject {
             Entry<Node, ScriptResult<?>> entry = iterator.next();
             if (!PAFuture.isAwaited(entry.getValue())) { // !awaited = arrived
                 String nodeUrl = entry.getKey().getNodeInformation().getURL();
+                ScriptResult<?> sResult = null;
                 try {
-                    printCleaningScriptInformations(future, entry, nodeUrl);
+                    sResult = future.get();
                 } catch (Exception e) {
                     logger.warn("Exception occurred while executing cleaning script on node " + nodeUrl + ":", e);
                 }
+                printCleaningScriptInformations(nodeUrl, sResult);
                 ns.add(entry.getKey());
                 iterator.remove();
             }
@@ -201,11 +203,11 @@ public class RMProxyActiveObject {
         }
     }
 
-    private void printCleaningScriptInformations(Future<ScriptResult<?>> future, Entry<Node, ScriptResult<?>> entry, String nodeUrl) throws InterruptedException, java.util.concurrent.ExecutionException {
+    private void printCleaningScriptInformations(String nodeUrl, ScriptResult<?> sResult){
         if (logger.isInfoEnabled()) {
-            logger.info("Cleaning script successfull, node freed : " + nodeUrl
-            );
-            logger.info("Cleaning script output on node " + nodeUrl + ":" + future.get().getOutput());
+            logger.info("Cleaning script successfull, node freed : " + nodeUrl);
+            logger.info("Cleaning script output on node " + nodeUrl + ":");
+            logger.info(sResult.getOutput());
         }
     }
 

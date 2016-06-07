@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import org.jetbrains.annotations.NotNull;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -117,7 +118,7 @@ final class TerminationData {
             try {
                 variables = getStringSerializableMap(service, taskToTerminate);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Exception occurred, fail to get variables into the cleaning script: ",e);
             }
 
             try {
@@ -177,12 +178,19 @@ final class TerminationData {
             }
             variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(),Boolean.toString(false));
         } else if (taskResult.hadException()) {
-            variables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
-            variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(),Boolean.toString(false));
+            variables = fillMapWithTaskResult(taskResult,false);
+
         } else {
-            variables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
-            variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(true));
+            variables = fillMapWithTaskResult(taskResult,true);
         }
+        return variables;
+    }
+
+    @NotNull
+    private Map<String, Serializable> fillMapWithTaskResult(TaskResultImpl taskResult,boolean normalTermination) throws IOException, ClassNotFoundException {
+        Map<String, Serializable> variables;
+        variables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
+        variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(normalTermination));
         return variables;
     }
 

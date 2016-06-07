@@ -330,7 +330,7 @@ public class SchedulingService {
                     terminationData.handleTermination(SchedulingService.this);
                 } catch (Exception e)
                 {
-                    logger.warn("Exception occurred :", e);
+                    logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
                 }
             }
         });
@@ -434,7 +434,7 @@ public class SchedulingService {
                     terminationData.handleTermination(SchedulingService.this);
                 } catch (Exception e)
                 {
-                    logger.warn("Exception occurred :", e);
+                    logger.error("Exception occurred, fail to get variables into the cleaning script: ",e);
                 }
                 wakeUpSchedulingThread();
             }
@@ -454,7 +454,7 @@ public class SchedulingService {
                 terminationData.handleTermination(SchedulingService.this);
             } catch (Exception e)
             {
-                logger.warn("Exception occurred :", e);
+                logger.error("Exception occurred, fail to get variables into the cleaning script:", e);
             }
         }
     }
