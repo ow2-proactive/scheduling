@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jetbrains.annotations.NotNull;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -186,7 +185,6 @@ final class TerminationData {
         return variables;
     }
 
-    @NotNull
     private Map<String, Serializable> fillMapWithTaskResult(TaskResultImpl taskResult,boolean normalTermination) throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables;
         variables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
