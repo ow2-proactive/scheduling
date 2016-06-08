@@ -855,13 +855,13 @@ public class RMNodeStarter {
             try {
                 Credentials credentialsFromRMHome = Credentials.getCredentials(new File(
                     PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
-                    "config/authentication/rm.cred").getAbsolutePath());
+                    "config/authentication/credentials/rm.cred").getAbsolutePath());
                 logger.info("Using default credentials from ProActive home, authenticating as user rm");
                 return credentialsFromRMHome;
             } catch (KeyException fromRMHomeKeyException) {
                 try {
                     Credentials credentialsFromJar = Credentials.getCredentials(RMNodeStarter.class
-                            .getResourceAsStream("/config/authentication/rm.cred"));
+                            .getResourceAsStream("/config/authentication/credentials/rm.cred"));
                     logger.info("Using default credentials from ProActive jars, authenticating as user rm");
                     return credentialsFromJar;
                 } catch (Exception fromJarKeyException) {

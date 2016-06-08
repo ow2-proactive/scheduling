@@ -89,7 +89,7 @@ createnodes() {
     	PA_URL=pnp://${ALIAS}:64738
     fi
 
-	CMD="nohup $PROACTIVE_HOME/bin/proactive-node -w $NB_NODES -f $PROACTIVE_HOME/config/authentication/rm.cred -s Default -r $PA_URL &> /dev/null & "
+	CMD="nohup $PROACTIVE_HOME/bin/proactive-node -w $NB_NODES -f $PROACTIVE_HOME/config/authentication/credentials/rm.cred -s Default -r $PA_URL &> /dev/null & "
 	if [ "$USER" != "" ]
         then
         	$(su $USER -c "$CMD")
