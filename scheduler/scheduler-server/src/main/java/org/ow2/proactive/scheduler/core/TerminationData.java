@@ -175,7 +175,7 @@ final class TerminationData {
                 if(internalJob!=null)
                     variables.putAll(internalJob.getVariables());
             }
-            variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(),Boolean.toString(false));
+            variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(),false);
         } else if (taskResult.hadException()) {
             variables = fillMapWithTaskResult(taskResult,false);
 
@@ -188,7 +188,7 @@ final class TerminationData {
     private Map<String, Serializable> fillMapWithTaskResult(TaskResultImpl taskResult,boolean normalTermination) throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables;
         variables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
-        variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(normalTermination));
+        variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(), normalTermination);
         return variables;
     }
 
