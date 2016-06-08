@@ -76,6 +76,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
@@ -180,7 +181,6 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.util.GenericType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -2242,6 +2242,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
                 // is the name of the browser's input field
                 InputStream is = part1.getBody(new GenericType<InputStream>() {
+
                 });
                 tmpJobFile = File.createTempFile("job", "d");
 
@@ -3146,6 +3147,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             String name = formDataMap.keySet().iterator().next();
             InputPart part1 = formDataMap.get(name).get(0);
             InputStream is = part1.getBody(new GenericType<InputStream>() {
+
             });
 
             tmpFile = File.createTempFile("valid-job", "d");

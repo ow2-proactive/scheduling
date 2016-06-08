@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.TimeUnit;
 
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint;
 import com.eclipsesource.json.Json;
@@ -48,7 +49,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 public final class ProActiveVersionUtility {
@@ -59,11 +59,13 @@ public final class ProActiveVersionUtility {
         writeProActiveVersion(currentContext, printStream, false);
     }
 
-    public static void writeProActiveVersionWithBreakEndLine(ApplicationContext currentContext, PrintStream printStream) {
+    public static void writeProActiveVersionWithBreakEndLine(ApplicationContext currentContext,
+            PrintStream printStream) {
         writeProActiveVersion(currentContext, printStream, true);
     }
 
-    private static void writeProActiveVersion(ApplicationContext currentContext, PrintStream printStream, boolean breakEndLine) {
+    private static void writeProActiveVersion(ApplicationContext currentContext, PrintStream printStream,
+            boolean breakEndLine) {
         printStream.println("ProActive client version: " + getProActiveClientVersion());
         printStream.println("ProActive server version: " + getProActiveServerVersion(currentContext));
 
@@ -91,8 +93,8 @@ public final class ProActiveVersionUtility {
                         .setConnectionRequestTimeout(timeout)
                         .setSocketTimeout(timeout).build();
 
-        try(CloseableHttpClient httpClient =
-                    HttpClientBuilder.create().setDefaultRequestConfig(config).build()) {
+        try (CloseableHttpClient httpClient =
+                     new HttpClientBuilder().setDefaultRequestConfig(config).useSystemProperties().build()) {
 
             HttpGet getMethod = new HttpGet(currentContext.getResourceUrl("version"));
             HttpResponse response = httpClient.execute(getMethod);

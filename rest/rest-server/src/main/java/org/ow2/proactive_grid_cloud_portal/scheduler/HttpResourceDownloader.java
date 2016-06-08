@@ -37,16 +37,16 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+
+import javax.ws.rs.core.Response;
+
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
-
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.net.HttpURLConnection;
 
 public class HttpResourceDownloader {
 
@@ -55,10 +55,10 @@ public class HttpResourceDownloader {
     private static ResteasyClient client;
 
     static {
-        PoolingClientConnectionManager cm = new PoolingClientConnectionManager();
-        cm.setMaxTotal(CONNECTION_POOL_SIZE);
-        cm.setDefaultMaxPerRoute(CONNECTION_POOL_SIZE);
-        ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(new DefaultHttpClient(cm));
+        ApacheHttpClient4Engine engine =
+                new ApacheHttpClient4Engine(
+                        new HttpClientBuilder().maxConnections(CONNECTION_POOL_SIZE).useSystemProperties().build());
+
         client = new ResteasyClientBuilder().httpEngine(engine).build();
     }
 
