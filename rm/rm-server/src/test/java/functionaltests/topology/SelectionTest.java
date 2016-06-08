@@ -99,7 +99,7 @@ public class SelectionTest extends RMFunctionalTest {
             !neighborHost.equals("${neighborHost}")) {
 
             String rmHome = System.getProperty("pa.rm.home");
-            String rmCredPath = rmHome + "/config/authentication/rm.cred";
+            String rmCredPath = rmHome + "/config/authentication/credentials/rm.cred";
             String javaExec = System.getenv("JAVA_HOME") + "/bin/java";
 
             // properties are defined, trying to deploy nodes to these hosts
