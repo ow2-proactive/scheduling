@@ -34,11 +34,6 @@
  */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -47,6 +42,11 @@ import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.TaskScript;
+
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ForkedTaskVariablesManager implements Serializable {
 
@@ -70,6 +70,8 @@ public class ForkedTaskVariablesManager implements Serializable {
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext,
             Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials) {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
+
+        scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, taskContext.getInitializer().getGenericInformation());
 
         scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, tasksResults(taskContext));
 
