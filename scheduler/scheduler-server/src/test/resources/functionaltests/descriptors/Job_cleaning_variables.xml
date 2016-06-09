@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.4"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.4 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.4/schedulerjob.xsd"
+    name="Job_cleaning_variables" 
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2"
+>
+  <variables>
+    <variable name="path" value="path_to_dir"/>
+    <variable name="test" value="value_of_test"/>
+  </variables>
+  <taskFlow>
+    <task name="firstTask">
+      <description>
+        <![CDATA[ The simplest task, ran by a python engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+print("ok");
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <cleaning>
+        <script>
+          <code language="python">
+            <![CDATA[
+path2 = variables["path"]
+file = open(path2, "a")
+file.write(variables["PA_TASK_NAME"] + " -- Task success: " + variables["PA_TASK_SUCCESS"] +" -- value test: " )
+file.write(variables["test"]+"\n")
+file.close()
+print(path2)
+]]>
+          </code>
+        </script>
+      </cleaning>
+    </task>
+    <task name="secondTask">
+      <description>
+        <![CDATA[ The simplest task, ran by a python engine. ]]>
+      </description>
+      <depends>
+        <task ref="firstTask"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+variables.put("test", "newValue");
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <cleaning>
+        <script>
+          <code language="python">
+            <![CDATA[
+path2 = variables["path"]
+file = open(path2, "a")
+file.write(variables["PA_TASK_NAME"] + " -- Task success: " + variables["PA_TASK_SUCCESS"] +" -- value test: ")
+file.write(variables["test"]+"\n")
+file.close()
+print(path2)
+]]>
+          </code>
+        </script>
+      </cleaning>
+    </task>
+    <task name="errorTask">
+      <description>
+        <![CDATA[ The simplest task, ran by a python engine. ]]>
+      </description>
+      <depends>
+        <task ref="secondTask"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+variables.put("test", "newNewValue");
+a=b;
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <cleaning>
+        <script>
+          <code language="python">
+            <![CDATA[
+path2 = variables["path"]
+file = open(path2, "a")
+file.write(variables["PA_TASK_NAME"] + " -- Task success: " + variables["PA_TASK_SUCCESS" ] +" -- value test: ")
+file.write(variables["test"]+"\n")
+file.close()
+print(path2)
+]]>
+          </code>
+        </script>
+      </cleaning>
+    </task>
+  </taskFlow>
+</job>

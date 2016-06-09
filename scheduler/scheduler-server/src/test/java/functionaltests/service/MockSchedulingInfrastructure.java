@@ -1,6 +1,8 @@
 package functionaltests.service;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -107,7 +109,7 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
                 return null;
             }
 
-        }).when(userProxy).releaseNodes((NodeSet) anyObject(), (Script<?>) anyObject());
+        }).when(userProxy).releaseNodes((NodeSet) anyObject(), (Script<?>) anyObject(), (Map<String,Serializable>)anyObject());
 
         rmProxiesManager = mock(RMProxiesManager.class);
         when(rmProxiesManager.getUserRMProxy(anyString(), (Credentials) anyObject())).thenReturn(userProxy);
