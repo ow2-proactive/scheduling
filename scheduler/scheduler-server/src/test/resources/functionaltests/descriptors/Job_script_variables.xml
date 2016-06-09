@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="Job_variables" priority="normal">
+    <variables>
+        <variable name="TESTVAR" value="testvar"/>
+    </variables>
+    <description>Job using variables in selection scripts, check the scheduler logs if the test fails to see the
+        selection scripts output
+    </description>
+    <genericInformation>
+        <info name="TESTGI" value="nothing"/>
+        <info name="TESTGI2" value="testgi2"/>
+    </genericInformation>
+    <taskFlow>
+        <task name="taskVariables">
+            <description>Task with multiple scripts which uses variables</description>
+            <genericInformation>
+                <info name="TESTGI" value="testgi"/>
+            </genericInformation>
+            <forkEnvironment>
+                <envScript>
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[
+						import org.ow2.proactive.scheduler.task.SchedulerVars
+						println "forkEnvironmentScript"
+						println variables
+						println genericInformation
+
+						def check_defined_var = { name -> if (variables.get(name) == null) { throw new IllegalStateException("Undefined variable: " + name); }}
+						def check_var_equals = { name, value -> if (!value.equals(variables.get(name))) { throw new IllegalStateException("Wrong value for variable " + name + ": "+ value); }}
+						def check_gi_equals = { name, value -> if (!value.equals(genericInformation.get(name))) { throw new IllegalStateException("Wrong value for generic information " + name + ": "+ value); }}
+						check_defined_var(SchedulerVars.PA_JOB_ID.toString())
+					    check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_variables")
+				        check_defined_var(SchedulerVars.PA_TASK_ID.toString())
+				        check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "taskVariables")
+				        check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString())
+				        check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString())
+				        check_defined_var(SchedulerVars.PA_USER.toString())
+				        check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString())
+						check_var_equals("TESTVAR","testvar")
+						check_gi_equals("TESTGI","testgi")
+						check_gi_equals("TESTGI2","testgi2")
+                     	]]>
+                        </code>
+                    </script>
+                </envScript>
+            </forkEnvironment>
+            <pre>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+						import org.ow2.proactive.scheduler.task.SchedulerVars
+						println "preScript"
+						println variables
+						println genericInformation
+
+						def check_defined_var = { name -> if (variables.get(name) == null) { throw new IllegalStateException("Undefined variable: " + name); }}
+						def check_var_equals = { name, value -> if (!value.equals(variables.get(name))) { throw new IllegalStateException("Wrong value for variable " + name + ": "+ value); }}
+						def check_gi_equals = { name, value -> if (!value.equals(genericInformation.get(name))) { throw new IllegalStateException("Wrong value for generic information " + name + ": "+ value); }}
+						check_defined_var(SchedulerVars.PA_JOB_ID.toString())
+					    check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_variables")
+				        check_defined_var(SchedulerVars.PA_TASK_ID.toString())
+				        check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "taskVariables")
+				        check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString())
+				        check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString())
+				        check_defined_var(SchedulerVars.PA_USER.toString())
+				        check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString())
+						check_var_equals("TESTVAR","testvar")
+						check_gi_equals("TESTGI","testgi")
+						check_gi_equals("TESTGI2","testgi2")
+
+                     	]]>
+                    </code>
+                </script>
+            </pre>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+						import org.ow2.proactive.scheduler.task.SchedulerVars
+						println "scriptExecutable"
+						println variables
+						println genericInformation
+
+						def check_defined_var = { name -> if (variables.get(name) == null) { throw new IllegalStateException("Undefined variable: " + name); }}
+						def check_var_equals = { name, value -> if (!value.equals(variables.get(name))) { throw new IllegalStateException("Wrong value for variable " + name + ": "+ value); }}
+						def check_gi_equals = { name, value -> if (!value.equals(genericInformation.get(name))) { throw new IllegalStateException("Wrong value for generic information " + name + ": "+ value); }}
+						check_defined_var(SchedulerVars.PA_JOB_ID.toString())
+					    check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_variables")
+				        check_defined_var(SchedulerVars.PA_TASK_ID.toString())
+				        check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "taskVariables")
+				        check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString())
+				        check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString())
+				        check_defined_var(SchedulerVars.PA_USER.toString())
+				        check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString())
+						check_var_equals("TESTVAR","testvar")
+						check_gi_equals("TESTGI","testgi")
+						check_gi_equals("TESTGI2","testgi2")
+
+                     	]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none">
+                <if target="T1" else="T2" continuation="">
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[
+						import org.ow2.proactive.scheduler.task.SchedulerVars
+						println "flowScript"
+						println variables
+						println genericInformation
+
+						def check_defined_var = { name -> if (variables.get(name) == null) { throw new IllegalStateException("Undefined variable: " + name); }}
+						def check_var_equals = { name, value -> if (!value.equals(variables.get(name))) { throw new IllegalStateException("Wrong value for variable " + name + ": "+ value); }}
+						def check_gi_equals = { name, value -> if (!value.equals(genericInformation.get(name))) { throw new IllegalStateException("Wrong value for generic information " + name + ": "+ value); }}
+						check_defined_var(SchedulerVars.PA_JOB_ID.toString())
+					    check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_variables")
+				        check_defined_var(SchedulerVars.PA_TASK_ID.toString())
+				        check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "taskVariables")
+				        check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString())
+				        check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString())
+				        check_defined_var(SchedulerVars.PA_USER.toString())
+				        check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString())
+						check_var_equals("TESTVAR","testvar")
+						check_gi_equals("TESTGI","testgi")
+						check_gi_equals("TESTGI2","testgi2")
+						branch = "if";
+]]>
+                        </code>
+                    </script>
+                </if>
+            </controlFlow>
+            <post>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+						import org.ow2.proactive.scheduler.task.SchedulerVars
+						println "postScript"
+						println variables
+						println genericInformation
+
+						def check_defined_var = { name -> if (variables.get(name) == null) { throw new IllegalStateException("Undefined variable: " + name); }}
+						def check_var_equals = { name, value -> if (!value.equals(variables.get(name))) { throw new IllegalStateException("Wrong value for variable " + name + ": "+ value); }}
+						def check_gi_equals = { name, value -> if (!value.equals(genericInformation.get(name))) { throw new IllegalStateException("Wrong value for generic information " + name + ": "+ value); }}
+						check_defined_var(SchedulerVars.PA_JOB_ID.toString())
+					    check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_variables")
+				        check_defined_var(SchedulerVars.PA_TASK_ID.toString())
+				        check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "taskVariables")
+				        check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString())
+				        check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString())
+				        check_defined_var(SchedulerVars.PA_USER.toString())
+				        check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString())
+						check_var_equals("TESTVAR","testvar")
+						check_gi_equals("TESTGI","testgi")
+						check_gi_equals("TESTGI2","testgi2")
+
+                     	]]>
+                    </code>
+                </script>
+            </post>
+        </task>
+        <task name="T1">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
+        </task>
+        <task name="T2">
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
+        </task>
+    </taskFlow>
+</job>

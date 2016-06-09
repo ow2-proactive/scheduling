@@ -1,27 +1,25 @@
 dependencies {
     compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
-        compile 'commons-cli:commons-cli:1.3.1'
-        compile 'commons-io:commons-io:2.4'
-        compile 'jline:jline:2.11'
+    compile 'commons-cli:commons-cli:1.3.1'
+    compile 'commons-io:commons-io:2.4'
+    compile 'jline:jline:2.11'
 
-        compile 'org.apache.httpcomponents:httpclient:4.2.6'
-        compile 'org.apache.httpcomponents:httpmime:4.2.6'
+    compile 'org.apache.httpcomponents:httpmime:4.3.6'
 
-        compile project(":common:common-api")
-        compile project(':rest:rest-api')
-        
-        
-        compile 'com.googlecode.json-simple:json-simple:1.1'
-        
-        testCompile functionalTestDependencies
-        testCompile project(':rest:rest-server')
-        testCompile project(':rest:rest-server').sourceSets.test.output 
-        
-        testCompile project(':scheduler:scheduler-api')
-        
+    compile project(":common:common-api")
+    compile project(":common:common-http")
+    compile project(':rest:rest-api')
 
-        testCompile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
-        testCompile 'org.eclipse.jetty:jetty-server:9.2.14.v20151106'
+    compile 'com.googlecode.json-simple:json-simple:1.1'
+
+    testCompile functionalTestDependencies
+    testCompile project(':rest:rest-server')
+    testCompile project(':rest:rest-server').sourceSets.test.output
+
+    testCompile project(':scheduler:scheduler-api')
+
+    testCompile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
+    testCompile 'org.eclipse.jetty:jetty-server:9.2.14.v20151106'
 }
 
 task('functionalTest', type: Test).configure functionalTestConfiguration

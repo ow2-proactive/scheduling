@@ -5,13 +5,14 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'jline:jline:2.11'
 
-    compile 'org.apache.httpcomponents:httpclient:4.2.6'
-    compile 'org.apache.httpcomponents:httpmime:4.2.6'
+    compile 'org.apache.httpcomponents:httpclient:4.3.6'
+    compile 'org.apache.httpcomponents:httpmime:4.3.6'
     compile 'org.atmosphere:wasync:2.1.2'
 
     compile project(":common:common-api")
-    compile project(":scheduler:scheduler-api")
+    compile project(':common:common-http')
     compile project(':rest:rest-api')
+    compile project(":scheduler:scheduler-api")
 
     runtime 'xerces:xercesImpl:2.11.0'
 

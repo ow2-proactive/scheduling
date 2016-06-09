@@ -36,15 +36,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableMap;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
@@ -52,6 +45,13 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scripting.Script;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -82,13 +82,15 @@ public class TaskLauncherInitializer implements Serializable {
     /** iteration index: task was replicated sequentially */
     private int iterationIndex = 0;
 
+    private ImmutableMap<String, String> genericInformation;
+
     /** DataSpaces needed parameter */
     private List<InputSelector> taskInputFiles = null;
     private List<OutputSelector> taskOutputFiles = null;
     private NamingService namingService;
     private boolean preciousLogs;
 
-    private Map<String, String> variables;
+    private ImmutableMap<String, String> variables;
     private int pingPeriod;
     private int pingAttempts = 1;
 
@@ -274,6 +276,20 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     /**
+     * @param genericInformation the generic information of this task
+     */
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = ImmutableMap.copyOf(genericInformation);
+    }
+
+    /**
+     * @return the generic information of this task
+     */
+    public ImmutableMap<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    /**
      * @return the preciousLogs
      */
     public boolean isPreciousLogs() {
@@ -292,10 +308,10 @@ public class TaskLauncherInitializer implements Serializable {
     }
 
     public void setVariables(Map<String, String> variables) {
-        this.variables = variables;
+        this.variables = ImmutableMap.copyOf(variables);
     }
 
-    public Map<String, String> getVariables() {
+    public ImmutableMap<String, String> getVariables() {
         return this.variables;
     }
 
