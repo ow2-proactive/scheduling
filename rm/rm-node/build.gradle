@@ -25,5 +25,16 @@ dependencies {
 
     runtime 'org.codehaus.groovy:groovy-all:2.4.6'
     runtime 'jsr223:jsr223-nativeshell:0.4.1'
+
     runtime 'jsr223:jsr223-docker-compose:0.2.1'
 }
+
+// This task is executed at configuration phase by Gradle
+// before executing any other task
+task copyCredentials {
+    copy {
+        from("${project(':').projectDir}/config/authentication/credentials/rm.cred")
+        into("${sourceSets.main.resources.srcDirs[0]}/config/authentication/credentials/")
+    }
+}
+
