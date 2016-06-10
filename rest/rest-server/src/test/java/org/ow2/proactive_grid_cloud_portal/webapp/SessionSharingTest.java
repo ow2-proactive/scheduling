@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.RMStateNodeUrls;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
@@ -84,7 +85,7 @@ public class SessionSharingTest {
     public void sessions_are_shared_scheduler_login() throws Exception {
         String sessionId = schedulerRest.login("login", "pw");
 
-        when(rmMock.getState()).thenReturn(new RMState(new HashSet<String>(), new HashSet<String>(), new HashSet<String>()));
+        when(rmMock.getState()).thenReturn(new RMState(new RMStateNodeUrls(new HashSet<String>(), new HashSet<String>(), new HashSet<String>()), Long.valueOf(-1)));
         RMState rmState = rmRest.getState(sessionId);
         assertNotNull(rmState);
 
@@ -119,7 +120,7 @@ public class SessionSharingTest {
         boolean frozen = schedulerRest.freezeScheduler(sessionId);
         assertTrue(frozen);
 
-        when(rmMock.getState()).thenReturn(new RMState(new HashSet<String>(), new HashSet<String>(), new HashSet<String>()));
+        when(rmMock.getState()).thenReturn(new RMState(new RMStateNodeUrls(new HashSet<String>(), new HashSet<String>(), new HashSet<String>()),Long.valueOf(-1)));
         RMState rmState = rmRest.getState(sessionId);
         assertNotNull(rmState);
 

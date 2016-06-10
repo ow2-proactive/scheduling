@@ -61,6 +61,7 @@ import org.ow2.proactive.resourcemanager.cleaning.NodesCleaner;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.RMStateNodeUrls;
 import org.ow2.proactive.resourcemanager.common.event.*;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
@@ -1425,7 +1426,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public RMState getState() {
-        RMState state = new RMState(nodesListToUrlsSet(freeNodes), listAliveNodeUrls(), nodesListToUrlsSet(allNodes.values()));
+        RMStateNodeUrls rmStateNodeUrls = new RMStateNodeUrls(nodesListToUrlsSet(freeNodes), listAliveNodeUrls(), nodesListToUrlsSet(allNodes.values()));
+        RMState state = new RMState(rmStateNodeUrls, maximumNumberOfNodes);
         return state;
     }
 
