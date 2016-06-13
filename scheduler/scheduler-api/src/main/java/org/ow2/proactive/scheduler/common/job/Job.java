@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -84,7 +85,7 @@ public abstract class Job extends CommonAttribute {
     protected String userSpace = null;
 
     /** A map to holds job descriptor variables */
-    protected Map<String, String> variables = new HashMap<>();
+    protected ConcurrentHashMap<String, String> variables = new ConcurrentHashMap<>();
 
     /** ProActive Empty Constructor */
     public Job() {
@@ -244,7 +245,7 @@ public abstract class Job extends CommonAttribute {
      * @param variables the variables map
      */
     public void setVariables(Map<String, String> variables) {
-        this.variables = variables;
+        this.variables = new ConcurrentHashMap<>(variables);
     }
 
     /**

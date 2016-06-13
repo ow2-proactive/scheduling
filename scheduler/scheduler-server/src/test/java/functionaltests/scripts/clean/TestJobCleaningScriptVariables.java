@@ -39,28 +39,22 @@ package functionaltests.scripts.clean;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.utils.SchedulerStartForFunctionalTest;
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 
 /**
  * This test checks that variable bindings are available and correctly set in cleaning scripts
- * If test succeed, you will see something like this in the console :
- * Contenu: firstTask -- Task success: true -- value test: initialValue
- *          secondTask -- Task success: true -- value test: newValue
- *          errorTask -- Task success: false -- value test: newNewValue
- *          errorTask -- Task success: false -- value test: newNewValue
- *
+ * If test fails : a file will be created in the cleaning script and you'll see
+ * the content in the console
+ * If test suceeds, nothing will appear
  * This is also a test for the PA_TASK_SUCCESS variable which indicates if a task has ended
  * with errors or not
  */
@@ -74,12 +68,12 @@ public class TestJobCleaningScriptVariables extends SchedulerFunctionalTestWithR
             .getResource("/functionaltests/descriptors/Job_cleaning_variables.xml");
 
     @Test
-    public void testJobSelScriptVariables() throws Throwable {
+    public void testJobCleaningScriptVariables() throws Throwable {
 
         HashMap<String,String> variables = new HashMap<>();
-        File ok = tmpDir.newFile("ok");
+        File ko = new File(tmpDir.getRoot(),"ko");
 
-        variables.put("path",ok.toString());
+        variables.put("path",ko.toString());
         variables.put("test","initialValue");
 
         JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI())
@@ -89,8 +83,10 @@ public class TestJobCleaningScriptVariables extends SchedulerFunctionalTestWithR
 
         while(schedulerHelper.getResourceManager().getState().getFreeNodesNumber()!= SchedulerStartForFunctionalTest.RM_NODE_NUMBER);
 
-        String content;
-        content = FileUtils.readFileToString(ok);
-        System.out.println("Contenu: "+content);
+        if(ko.exists()) {
+            String content;
+            content = FileUtils.readFileToString(ko);
+            Assert.fail(content);
+        }
     }
 }

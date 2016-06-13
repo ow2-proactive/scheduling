@@ -1062,7 +1062,7 @@ public abstract class InternalTask extends TaskState {
     /**
      * @return the generic information of the job overridden eventually by the task's generic info
      */
-    private Map<String, String> getGenericInformationOverridden(InternalJob job) {
+    public Map<String, String> getGenericInformationOverridden(InternalJob job) {
         HashMap<String, String> gInfo = new HashMap<>();
         gInfo.putAll(job.getGenericInformation());
         gInfo.putAll(getGenericInformation());
