@@ -20,6 +20,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
 
 import java.io.IOException;
@@ -126,7 +127,7 @@ public class TerminationDataTest {
 		terminationData.addTaskData(null, taskData, true, null);
 		terminationData.handleTermination(service);
 		Mockito.verify(proxiesManager, Mockito.times(1)).getUserRMProxy("user", null);
-		Mockito.verify(rmProxy, Mockito.times(1)).releaseNodes(org.mockito.Matchers.any(NodeSet.class),org.mockito.Matchers.any(org.ow2.proactive.scripting.Script.class),Mockito.any(HashMap.class));
+		Mockito.verify(rmProxy, Mockito.times(1)).releaseNodes(org.mockito.Matchers.any(NodeSet.class),org.mockito.Matchers.any(org.ow2.proactive.scripting.Script.class),Mockito.any(HashMap.class), Mockito.any(HashMap.class), Mockito.any(TaskId.class));
 		
 	}
 
