@@ -17,11 +17,12 @@ NB_NODES=1
 ALIAS=$(hostname)
 PA_ROOT=/opt/proactive
 SINGLE_JVM=false
-
-
 # e,d of variables to modify
 
 export PROACTIVE_HOME=$PA_ROOT/default
+if [[ "$JAVA_HOME" == "" ]]; then
+    JAVA_HOME="$PROACTIVE_HOME/jre"
+fi
 
 #The service name
 NAME=proactive-scheduler
@@ -125,6 +126,7 @@ start() {
 			CMD="$CMD  &"
 			#echo $CMD
 			# CMD="$CMD echo \$!"
+			setcap 'cap_net_bind_service,cap_net_raw=+eip' $JAVA_HOME/bin/java
 			if [ "$USER" != "" ]
 			then
 				$(su $USER -c "$CMD")

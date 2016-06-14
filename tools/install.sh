@@ -163,9 +163,63 @@ read -e -p "Protocol to use for accessing Web apps deployed by the proactive ser
 
 PROTOCOL=$(echo $PROTOCOL | xargs)
 
-read -e -p "Port to use for accessing Web apps deployed by the proactive server: " -i "8080" PORT
+SELF_SIGNED=false
+if [[ "$PROTOCOL" == "https" ]]; then
+    if confirm "Do you want to use the provided self-signed certificate? [Y/n] " ; then
+        SELF_SIGNED=true
+    else
+        echo "In order to install a signed certificate, you need to follow the manual configuration steps described in the ProActive documentation :"
+        echo "http://doc.activeeon.com/dev/admin/ProActiveAdminGuide.html#_enable_https"
+    fi
+
+fi
+
+if [[ "$PROTOCOL" == "https" ]]; then
+    DEFAULT_PORT=8443
+else
+    DEFAULT_PORT=8080
+fi
+
+read -e -p "Port to use for accessing Web apps deployed by the proactive server: " -i "$DEFAULT_PORT" PORT
 
 PORT=$(echo $PORT | xargs)
+
+HTTP_REDIRECT_PORT=8080
+if [[ "$PROTOCOL" == "https" ]]; then
+    HTTP_REDIRECT=false
+    if confirm "Do you want to redirect an http port to https? [Y/n] " ; then
+        HTTP_REDIRECT=true
+        read -e -p "Which port do you want to redirect? [8080] " -i "8080" HTTP_REDIRECT_PORT
+    fi
+fi
+
+if [[ "$JAVA_CMD" == "" ]]; then
+   JAVA_CMD=$PA_ROOT/default/jre/bin/java
+   JAVA_HOME=$PA_ROOT/default/jre
+fi
+
+if [[ "$PORT" -lt "1024" ]] || [[ "$HTTP_REDIRECT_PORT" -lt "1024" ]] ; then
+
+    if ! which setcap > /dev/null 2>&1; then
+        echo "libcap2 is not installed on this computer and is required to start the server on a port below 1024."
+        if confirm "Do you want to install it? [Y/n] " ; then
+            if [[ "$OS" == "RedHat" ]]; then
+                $PKG_TOOL -y install libcap2
+            elif [[ "$OS" == "Debian" ]]; then
+                $PKG_TOOL -y install libcap2-bin
+            fi
+        fi
+    fi
+    echo "Enabling priviledge to run server on port lower than 1024"
+
+    if [[ "$JAVA_HOME" == "" ]]; then
+        echo "Unable to locate JAVA_HOME, installation will exit."
+        exit 1
+    fi
+    echo "$JAVA_HOME/lib/amd64/jli" > /etc/ld.so.conf.d/proactive-java.conf
+    ldconfig | grep libjli
+fi
+
 
 read -e -p "Number of ProActive nodes to start on the server machine: " -i "4" NB_NODES
 NB_NODES=$(echo $NB_NODES | xargs)
@@ -195,10 +249,28 @@ if [[ "$PROTOCOL" == "https" ]]; then
     sed -e "s/^web\.https=.*/web.https=true/g" -i "$PA_ROOT/default/config/web/settings.ini"
     sed -e "s/http:/https:/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
     sed -e "s/http:/https:/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
+    if $SELF_SIGNED; then
+        sed -e "s/^#web\.https\.keystore=\(.*\)/web.https.keystore=\1/g" -i "$PA_ROOT/default/config/web/settings.ini"
+        sed -e "s/^#web\.https\.keystore\.password=\(.*\)/web.https.keystore.password=\1/g" -i "$PA_ROOT/default/config/web/settings.ini"
+        sed -e "s/^#web\.https\.allow_any_hostname=.*/web.https.allow_any_hostname=true/g" -i "$PA_ROOT/default/config/web/settings.ini"
+        sed -e "s/^#web\.https\.allow_any_certificate=.*/web.https.allow_any_certificate=true/g" -i "$PA_ROOT/default/config/web/settings.ini"
+        sed -e "s/^#web\.https\.allow_any_hostname=.*/web.https.allow_any_hostname=true/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
+        sed -e "s/^#web\.https\.allow_any_certificate=.*/web.https.allow_any_certificate=true/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
+        sed -e "s/^#web\.https\.allow_any_hostname=.*/web.https.allow_any_hostname=true/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
+        sed -e "s/^#web\.https\.allow_any_certificate=.*/web.https.allow_any_certificate=true/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
+    fi
 fi
 
 sed -e "s/^PORT=.*/PORT=$PORT/g" -i "/etc/init.d/proactive-scheduler"
-sed -e "s/^web\.http\.port=.*/web.http.port=$PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
+if [[ "$PROTOCOL" == "https" ]]; then
+    sed -e "s/^web\.https\.port=.*/web.https.port=$PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
+    if $HTTP_REDIRECT; then
+        sed -e "s/^web\.redirect_http_to_https=.*/web.redirect_http_to_https=true/g" -i "$PA_ROOT/default/config/web/settings.ini"
+        sed -e "s/^web\.http\.port=.*/web.http.port=$HTTP_REDIRECT_PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
+    fi
+else
+    sed -e "s/^web\.http\.port=.*/web.http.port=$PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
+fi
 sed -e "s/:8080/:${PORT}/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
 sed -e "s/:8080/:${PORT}/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
 sed -e "s/^NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"
@@ -210,9 +282,7 @@ fi
 
 echo "Here are the network interfaces available on your machine and the interface which will be automatically selected by ProActive: "
 
-if [[ "$JAVA_CMD" == "" ]]; then
-   JAVA_CMD=$PA_ROOT/default/jre/bin/java
-fi
+
 
 # Select network interface
 
