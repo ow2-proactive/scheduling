@@ -198,7 +198,7 @@ if [[ "$PROTOCOL" == "https" ]]; then
 fi
 
 sed -e "s/^PORT=.*/PORT=$PORT/g" -i "/etc/init.d/proactive-scheduler"
-sed -e "s/^web\.port=.*/web.port=$PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
+sed -e "s/^web\.http\.port=.*/web.http.port=$PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
 sed -e "s/:8080/:${PORT}/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
 sed -e "s/:8080/:${PORT}/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
 sed -e "s/^NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"

@@ -43,12 +43,14 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
+import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.Map;
 
 
 /**
@@ -129,10 +131,16 @@ public class RMProxy {
     }
 
     public void releaseNodes(NodeSet nodeSet) {
-        releaseNodes(nodeSet, null);
+        releaseNodes(nodeSet, null,  null, null, null);
     }
 
-    public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript) {
+    public void releaseNodes(NodeSet nodeSet,Script<?> cleaningScript) {
+        releaseNodes(nodeSet, cleaningScript,  null, null, null);
+    }
+
+    public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, Map<String, Serializable> variables,Map<String, String> genericInformation,
+    TaskId taskId) {
+
         if (nodeSet.size() == 0) {
             if (nodeSet.getExtraNodes() == null || nodeSet.getExtraNodes().size() == 0) {
                 throw new IllegalArgumentException("Trying to release empty NodeSet");
@@ -140,7 +148,7 @@ public class RMProxy {
         }
 
         if (proxyActiveObject != null) {
-            proxyActiveObject.releaseNodes(nodeSet, cleaningScript);
+            proxyActiveObject.releaseNodes(nodeSet, cleaningScript,variables,genericInformation,taskId);
         } else {
             logger.warn("Didn't find RM to release NodeSet (RM is down or all NodeSet's Nodes are down)");
         }

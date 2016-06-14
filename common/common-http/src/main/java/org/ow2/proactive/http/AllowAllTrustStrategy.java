@@ -1,10 +1,11 @@
 /*
- *  *
+ * ################################################################
+ *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2015 INRIA/University of
+ * Copyright (C) 1997-2016 INRIA/University of
  *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -30,24 +31,24 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *  * $$ACTIVEEON_INITIAL_DEV$$
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.http;
+
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import org.apache.http.conn.ssl.TrustStrategy;
 
 /**
- * Scheduler related java properties.
+ * @author ActiveEon Team
  */
-public enum SchedulerVars {
-    PA_JOB_ID,
-    PA_JOB_NAME,
-    PA_NODESFILE,
-    PA_NODESNUMBER,
-    PA_SCHEDULER_HOME,
-    PA_TASK_ID,
-    PA_TASK_NAME,
-    PA_TASK_ITERATION,
-    PA_TASK_PROGRESS_FILE,
-    PA_TASK_REPLICATION,
-    PA_TASK_SUCCESS,
-    PA_USER
+public class AllowAllTrustStrategy implements TrustStrategy {
+
+    @Override
+    public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        return true;
+    }
+
 }

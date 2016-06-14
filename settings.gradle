@@ -1,6 +1,7 @@
 include 'common:common-api'
 include 'common:common-client'
 include 'common:common-db'
+include 'common:common-http'
 
 include 'scheduler:scheduler-api'
 include 'scheduler:scheduler-client'
@@ -23,5 +24,6 @@ include 'rest:rest-cli'
 include 'rest:rest-server'
 include 'rest:rest-client'
 include 'rest:rest-smartproxy'
+
 
 

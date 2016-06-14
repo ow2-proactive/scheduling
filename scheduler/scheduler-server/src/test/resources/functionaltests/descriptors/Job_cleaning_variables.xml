@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns="urn:proactive:jobdescriptor:3.4"
+		xsi:schemaLocation="urn:proactive:jobdescriptor:3.4 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.4/schedulerjob.xsd"
+		name="Job_cleaning_variables"
+		priority="normal"
+		onTaskError="continueJobExecution"
+		maxNumberOfExecution="2"
+>
+	<variables>
+		<variable name="path" value="path_to_dir"/>
+		<variable name="test" value="value_of_test"/>
+	</variables>
+	<taskFlow>
+		<task name="SuccessTask">
+			<description>
+				<![CDATA[ The simplest task, ran by a python engine. ]]>
+			</description>
+			<genericInformation>
+				<info name="firstTaskGI" value="generic1"/>
+			</genericInformation>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						<![CDATA[
+print("ok");
+]]>
+					</code>
+				</script>
+			</scriptExecutable>
+			<cleaning>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+            			import org.ow2.proactive.scheduler.task.SchedulerVars
+			def writeFile = {
+							   path, text ->
+							   	def f = new File(path)
+							   	f.append("\n"+text)
+							}
+ 			def check_defined_var = {
+ 			 							name, path ->
+ 			 								if (variables.get(name) == null)
+ 			 								{
+ 			 									writeFile(path,(name + " is not defined"))
+ 			 								}
+ 			 						}
+			def check_var_equals = {
+										name, value, path ->
+											if (!value.equals(variables.get(name)))
+											{
+												writeFile(path,("Variables: " + name + " is not equal to " + variables.get(name)))
+											}
+									}
+			def check_gi_equals = {
+										name, value, path ->
+										if (!value.equals(genericInformation.get(name)))
+										{
+										writeFile(path,("GenericInformation : " + name + " is not equal to " + variables.get(name)))
+										}
+								  }
+			path2=variables.get("path")
+			check_defined_var(SchedulerVars.PA_JOB_ID.toString(),path2)
+			check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_cleaning_variables",path2)
+			check_defined_var(SchedulerVars.PA_TASK_ID.toString(),path2)
+			check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "SuccessTask",path2)
+			check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString(),path2)
+			check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString(),path2)
+			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
+			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
+			check_var_equals("test","initialValue",path2)
+			check_gi_equals("firstTaskGI","generic1",path2)
+                    	]]>
+					</code>
+				</script>
+			</cleaning>
+		</task>
+		<task name="ChangeVariableTask">
+			<description>
+				<![CDATA[ The simplest task, ran by a python engine. ]]>
+			</description>
+			<depends>
+				<task ref="SuccessTask"/>
+			</depends>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						<![CDATA[
+variables.put("test", "newValue");
+]]>
+					</code>
+				</script>
+			</scriptExecutable>
+			<cleaning>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+            			import org.ow2.proactive.scheduler.task.SchedulerVars
+			def writeFile = {
+							   path, text ->
+							   	def f = new File(path)
+							   	f.append("\n"+text)
+							}
+ 			def check_defined_var = {
+ 			 							name, path ->
+ 			 								if (variables.get(name) == null)
+ 			 								{
+ 			 									writeFile(path,(name + " is not defined"))
+ 			 								}
+ 			 						}
+			def check_var_equals = {
+										name, value, path ->
+											if (!value.equals(variables.get(name)))
+											{
+												writeFile(path,("Variables: " + name + " is not equal to " + variables.get(name)))
+											}
+									}
+			def check_gi_equals = {
+										name, value, path ->
+											if (!value.equals(genericInformation.get(name)))
+											{
+												writeFile(path,("GenericInformation : " + name + " is not equal to " + variables.get(name)))
+											}
+								  }
+			path2=variables.get("path")
+			check_defined_var(SchedulerVars.PA_JOB_ID.toString(),path2)
+			check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_cleaning_variables",path2)
+			check_defined_var(SchedulerVars.PA_TASK_ID.toString(),path2)
+			check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "ChangeVariableTask",path2)
+			check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString(),path2)
+			check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString(),path2)
+			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
+			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
+			check_var_equals("test","newValue",path2)
+                    	]]>
+					</code>
+				</script>
+			</cleaning>
+		</task>
+		<task name="errorTask">
+			<description>
+				<![CDATA[ The simplest task, ran by a python engine. ]]>
+			</description>
+			<depends>
+				<task ref="ChangeVariableTask"/>
+			</depends>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						<![CDATA[
+variables.put("test", "newNewValue");
+a=b;
+]]>
+					</code>
+				</script>
+			</scriptExecutable>
+			<cleaning>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+            			import org.ow2.proactive.scheduler.task.SchedulerVars
+		 	def writeFile = {
+							   path, text ->
+							   	def f = new File(path)
+							   	f.append("\n"+text)
+							}
+ 			def check_defined_var = {
+ 			 							name, path ->
+ 			 								if (variables.get(name) == null)
+ 			 								{
+ 			 									writeFile(path,(name + " is not defined"))
+ 			 								}
+ 			 						}
+			def check_var_equals = {
+										name, value, path ->
+											if (!value.equals(variables.get(name)))
+											{
+											writeFile(path,("Variables: " + name + " is not equal to " + variables.get(name)))
+											}
+									}
+			def check_gi_equals = {
+										name, value, path ->
+											if (!value.equals(genericInformation.get(name)))
+											{
+											writeFile(path,("GenericInformation : " + name + " is not equal to " + variables.get(name)))
+											}
+								  }
+			path2=variables.get("path")
+			check_defined_var(SchedulerVars.PA_JOB_ID.toString(),path2)
+			check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_cleaning_variables",path2)
+			check_defined_var(SchedulerVars.PA_TASK_ID.toString(),path2)
+			check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "errorTask",path2)
+			check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString(),path2)
+			check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString(),path2)
+			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
+			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
+			check_var_equals("test","newNewValue",path2)
+                    	]]>
+					</code>
+				</script>
+			</cleaning>
+		</task>
+	</taskFlow>
+</job>

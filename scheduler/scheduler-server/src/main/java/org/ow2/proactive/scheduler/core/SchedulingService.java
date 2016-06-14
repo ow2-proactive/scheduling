@@ -325,7 +325,12 @@ public class SchedulingService {
         infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
             public void run() {
                 TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
-                terminationData.handleTermination(SchedulingService.this);
+                try {
+                    terminationData.handleTermination(SchedulingService.this);
+                } catch (Exception e)
+                {
+                    logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
+                }
             }
         });
     }
@@ -424,7 +429,12 @@ public class SchedulingService {
             @Override
             public void run() {
                 TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
-                terminationData.handleTermination(SchedulingService.this);
+                try {
+                    terminationData.handleTermination(SchedulingService.this);
+                } catch (Exception e)
+                {
+                    logger.error("Exception occurred, fail to get variables into the cleaning script: ",e);
+                }
                 wakeUpSchedulingThread();
             }
         });
@@ -439,7 +449,12 @@ public class SchedulingService {
         }
 
         public void run() {
-            terminationData.handleTermination(SchedulingService.this);
+            try {
+                terminationData.handleTermination(SchedulingService.this);
+            } catch (Exception e)
+            {
+                logger.error("Exception occurred, fail to get variables into the cleaning script:", e);
+            }
         }
     }
 

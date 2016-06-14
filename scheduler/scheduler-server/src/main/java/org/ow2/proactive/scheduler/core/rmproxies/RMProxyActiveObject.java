@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core.rmproxies;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,6 +22,9 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -37,8 +41,12 @@ public class RMProxyActiveObject {
 
     protected ResourceManager rm;
 
-    /** list of nodes and clean script being executed */
-    private Map<Node, ScriptResult<?>> nodes = new HashMap<>();
+    /**
+     * list of nodes and clean script being executed
+     */
+    private Map<Node, ScriptResult<?>> nodeScriptResult = new HashMap<>();
+
+    private Map<Node, TaskId> nodesTaskId = new HashMap<>();
 
     public RMProxyActiveObject() {
     }
@@ -46,7 +54,7 @@ public class RMProxyActiveObject {
     static RMProxyActiveObject createAOProxy(RMAuthentication rmAuth, Credentials creds)
             throws RMProxyCreationException {
         try {
-            RMProxyActiveObject proxy = PAActiveObject.newActive(RMProxyActiveObject.class, new Object[] {});
+            RMProxyActiveObject proxy = PAActiveObject.newActive(RMProxyActiveObject.class, new Object[]{});
             proxy.connect(rmAuth, creds);
             return proxy;
         } catch (Exception e) {
@@ -117,19 +125,21 @@ public class RMProxyActiveObject {
 
     /**
      * Execute the given CleaningScript on each nodes before releasing them.
-     * @see #releaseNodes(NodeSet)
      *
-     * @param nodes the node set to release
+     * @param nodes          the node set to release
      * @param cleaningScript the cleaning script to apply to each node before releasing
+     * @param variables
+     * @see #releaseNodes(NodeSet)
      */
     @ImmediateService
-    public void releaseNodes(NodeSet nodes, Script<?> cleaningScript) {
+    public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, Map<String, Serializable> variables, Map<String,
+            String> genericInformation, TaskId taskId) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes);
             } else {
                 for (Node node : nodes) {
-                    handleCleaningScript(node, cleaningScript);
+                    handleCleaningScript(node, cleaningScript, variables,genericInformation,taskId);
                 }
             }
         }
@@ -138,13 +148,17 @@ public class RMProxyActiveObject {
     /**
      * Execute the given script on the given node.
      * Also register a callback on {@link #cleanCallBack(Future)} method when script has returned.
-     *
-     * @param node the node on which to start the script
+     * @param node           the node on which to start the script
      * @param cleaningScript the script to be executed
+     * @param variables
+     * @param genericInformation
      */
-    private void handleCleaningScript(Node node, Script<?> cleaningScript) {
+    private void handleCleaningScript(Node node, Script<?> cleaningScript,
+            Map<String, Serializable> variables, Map<String, String> genericInformation,TaskId taskId) {
         try {
             ScriptHandler handler = ScriptLoader.createHandler(node);
+            handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
+            handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable)genericInformation);
             ScriptResult<?> future = handler.handle(cleaningScript);
             try {
                 PAEventProgramming.addActionOnFuture(future, "cleanCallBack");
@@ -156,8 +170,11 @@ public class RMProxyActiveObject {
                                 "ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
                                 e);
             }
-            this.nodes.put(node, future);
-            logger.info("Cleaning Script handled on node" + node.getNodeInformation().getURL());
+            this.nodeScriptResult.put(node, future);
+            this.nodesTaskId.put(node,taskId);
+
+            logger.info("Cleaning Script started on node" + node.getNodeInformation().getURL());
+
         } catch (Exception e) {
             //if active object cannot be created or script has failed
             logger.error("", e);
@@ -169,19 +186,24 @@ public class RMProxyActiveObject {
      * Called when a script has returned (call is made as an active object call)
      * <p>
      * Check the nodes to release and release the one that have to (clean script has returned)
-     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(Node, Script)}
+     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(Node, Script, Map, Map,TaskId)}
      */
     @ImmediateService
     public synchronized void cleanCallBack(Future<ScriptResult<?>> future) {
-        Iterator<Entry<Node, ScriptResult<?>>> iterator = nodes.entrySet().iterator();
+        Iterator<Entry<Node, ScriptResult<?>>> iterator = nodeScriptResult.entrySet().iterator();
         NodeSet ns = new NodeSet();
         while (iterator.hasNext()) {
             Entry<Node, ScriptResult<?>> entry = iterator.next();
             if (!PAFuture.isAwaited(entry.getValue())) { // !awaited = arrived
-                if (logger.isInfoEnabled()) {
-                    logger.info("Cleaning script successfull, node freed : " +
-                        entry.getKey().getNodeInformation().getURL());
+                String nodeUrl = entry.getKey().getNodeInformation().getURL();
+                ScriptResult<?> sResult = null;
+                TaskId taskId = nodesTaskId.get(entry.getKey());
+                try {
+                    sResult = future.get();
+                } catch (Exception e) {
+                    logger.error("Exception occurred while executing cleaning script on node " + nodeUrl + ":", e);
                 }
+                printCleaningScriptInformations(nodeUrl, sResult, taskId);
                 ns.add(entry.getKey());
                 iterator.remove();
             }
@@ -191,4 +213,18 @@ public class RMProxyActiveObject {
         }
     }
 
+    private void printCleaningScriptInformations(String nodeUrl, ScriptResult<?> sResult, TaskId taskId){
+        if (logger.isInfoEnabled()) {
+            TaskLogger instance = TaskLogger.getInstance();
+            if (sResult.errorOccured()) {
+                instance.error(taskId, "Exception while running cleaning script on " + nodeUrl,sResult.getException());
+            } else {
+                instance.info(taskId, "Cleaning script successful, node freed : " + nodeUrl);
+            }
+            if (sResult.getOutput() != null && !sResult.getOutput().isEmpty()) {
+                instance.info(taskId, "Cleaning script output on node " + nodeUrl + ":");
+                instance.info(taskId, sResult.getOutput());
+            }
+        }
+    }
 }
