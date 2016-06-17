@@ -36,6 +36,10 @@
  */
 package org.ow2.proactive.scheduler.core.properties;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.PAProperties;
+import org.ow2.proactive.utils.PAPropertiesLazyLoader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,10 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.utils.PAProperties;
-import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
 /**
@@ -193,6 +193,11 @@ public enum PASchedulerProperties {
 
     /** If true script tasks are ran in a forked JVM, if false they are ran in the node's JVM */
     TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN),
+
+    /**
+     * If true tasks are always ran in RunAsMe mode (implies automatically fork), if false, the user can choose whether to run the task in runasme mode or not
+     **/
+    TASK_RUNASME("pa.scheduler.task.runasme", PropertyType.BOOLEAN),
 
     /** Number of tasks to fetch per page when pagination is used */
     TASKS_PAGE_SIZE("pa.scheduler.tasks.page.size", PropertyType.INTEGER),
