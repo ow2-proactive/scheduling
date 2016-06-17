@@ -45,7 +45,7 @@ import java.util.Set;
 
 
 /**
- * RMState represents informations about RM activity.
+ * RMState represents information about RM activity.
  *
  * @author The ProActive Team
  *
@@ -55,14 +55,20 @@ import java.util.Set;
 @XmlRootElement
 public class RMState implements Serializable {
 
-    private final Set<String> freeNodesUrls;
-    private final Set<String> aliveNodesUrls;
-    private final Set<String> allNodesUrls;
+    private final RMStateNodeUrls rmNodeUrls;
+    private final Long maxNumberOfNodes;
 
-    public RMState(Set<String> freeNodesUrls, Set<String> aliveNodesUrls, Set<String> allNodesUrls) {
-        this.freeNodesUrls = freeNodesUrls;
-        this.aliveNodesUrls = aliveNodesUrls;
-        this.allNodesUrls = allNodesUrls;
+    public RMState(RMStateNodeUrls rmNodeUrls, Long maxNumberOfNodes) {
+        this.rmNodeUrls = rmNodeUrls;
+        this.maxNumberOfNodes = maxNumberOfNodes;
+    }
+
+    public Long getMaxNumberOfNodes() {
+        return maxNumberOfNodes;
+    }
+
+    protected RMStateNodeUrls getRmNodeUrls() {
+        return rmNodeUrls;
     }
 
     /**
@@ -71,7 +77,7 @@ public class RMState implements Serializable {
      * @return true if the scheduler has free resources, false if not.
      */
     public BooleanWrapper hasFreeResources() {
-        return new BooleanWrapper(!freeNodesUrls.isEmpty());
+        return new BooleanWrapper(!getRmNodeUrls().getFreeNodesUrls().isEmpty());
     }
 
     /**
@@ -80,7 +86,7 @@ public class RMState implements Serializable {
      * @return free nodes number in the resource manager
      */
     public int getFreeNodesNumber() {
-        return freeNodesUrls.size();
+        return getRmNodeUrls().getFreeNodesUrls().size();
     }
 
     /**
@@ -89,7 +95,7 @@ public class RMState implements Serializable {
      * @return free nodes urls in the resource manager
      */
     public Set<String> getFreeNodes() {
-        return freeNodesUrls;
+        return getRmNodeUrls().getFreeNodesUrls();
     }
 
     /**
@@ -98,7 +104,7 @@ public class RMState implements Serializable {
      * @return total alive nodes number in the resource manager
      */
     public int getTotalAliveNodesNumber() {
-        return aliveNodesUrls.size();
+        return getRmNodeUrls().getAliveNodesUrls().size();
     }
 
     /**
@@ -107,7 +113,7 @@ public class RMState implements Serializable {
      * @return all alive nodes urls in the resource manager
      */
     public Set<String> getAliveNodes() {
-        return aliveNodesUrls;
+        return getRmNodeUrls().getAliveNodesUrls();
     }
 
     /**
@@ -116,7 +122,7 @@ public class RMState implements Serializable {
      * @return total nodes number in the resource manager
      */
     public int getTotalNodesNumber() {
-        return allNodesUrls.size();
+        return getRmNodeUrls().getAllNodesUrls().size();
     }
 
     /**
@@ -125,7 +131,7 @@ public class RMState implements Serializable {
      * @return all nodes urls in the resource manager
      */
     public Set<String> getAllNodes() {
-        return allNodesUrls;
+        return getRmNodeUrls().getAllNodesUrls();
     }
 
 
