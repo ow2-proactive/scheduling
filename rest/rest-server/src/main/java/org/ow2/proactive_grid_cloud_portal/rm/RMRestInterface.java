@@ -36,6 +36,7 @@ package org.ow2.proactive_grid_cloud_portal.rm;
 
 import java.io.IOException;
 import java.security.KeyException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -59,18 +60,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 
 @Path("/rm")
@@ -78,207 +80,182 @@ public interface RMRestInterface {
     @POST
     @Path("login")
     @Produces("application/json")
-    String rmConnect(@FormParam("username")
-    String username, @FormParam("password")
-    String password) throws KeyException, LoginException, RMException, ActiveObjectCreationException,
-            NodeException;
+    String rmConnect(@FormParam("username") String username, @FormParam("password") String password)
+            throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException;
 
     @POST
     @Path("disconnect")
     @Produces("application/json")
-    void rmDisconnect(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    void rmDisconnect(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
     @Produces("application/json")
-    String loginWithCredential(@MultipartForm
-    LoginForm multipart) throws ActiveObjectCreationException, NodeException, KeyException, IOException,
-            LoginException, RMException;
+    String loginWithCredential(@MultipartForm LoginForm multipart) throws ActiveObjectCreationException,
+            NodeException, KeyException, IOException, LoginException, RMException;
 
     @GET
     @Path("state")
     @Produces("application/json")
-    RMState getState(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    RMState getState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @GET
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    RMInitialState getInitialState(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @GET
     @Path("isactive")
     @Produces("application/json")
-    boolean isActive(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    boolean isActive(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @POST
     @Path("node")
     @Produces("application/json")
-    boolean addNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String url, @FormParam("nodesource")
-    String nodesource) throws NotConnectedException;
+    boolean addNode(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurl") String url,
+            @FormParam("nodesource") String nodesource) throws NotConnectedException;
 
     @GET
     @Path("node/isavailable")
     @Produces("application/json")
-    boolean nodeIsAvailable(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("nodeurl")
-    String url) throws NotConnectedException;
+    boolean nodeIsAvailable(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String url)
+            throws NotConnectedException;
 
     @POST
     @Path("nodesource/create")
     @Produces("application/json")
-    boolean createNodeSource(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeSourceName")
-    String nodeSourceName, @FormParam("infrastructureType")
-    String infrastructureType, @FormParam("infrastructureParameters")
-    String[] infrastructureParameters, @FormParam("infrastructureFileParameters")
-    String[] infrastructureFileParameters, @FormParam("policyType")
-    String policyType, @FormParam("policyParameters")
-    String[] policyParameters, @FormParam("policyFileParameters")
-    String[] policyFileParameters) throws NotConnectedException;
+    boolean createNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType,
+            @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException;
 
     @POST
     @Path("nodesource/pingfrequency")
     @Produces("application/json")
-    int getNodeSourcePingFrequency(@HeaderParam("sessionid")
-    String sessionId, @FormParam("sourcename")
-    String sourceName) throws NotConnectedException;
+    int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
+            @FormParam("sourcename") String sourceName) throws NotConnectedException;
 
     @POST
     @Path("node/release")
     @Produces("application/json")
-    boolean releaseNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("url")
-    String url) throws NodeException, NotConnectedException;
+    boolean releaseNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String url)
+            throws NodeException, NotConnectedException;
 
     @POST
     @Path("node/remove")
     @Produces("application/json")
-    boolean removeNode(@HeaderParam("sessionid")
-    String sessionId, @FormParam("url")
-    String nodeUrl, @FormParam("preempt")
-    boolean preempt) throws NotConnectedException;
+    boolean removeNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String nodeUrl,
+            @FormParam("preempt") boolean preempt) throws NotConnectedException;
 
     @POST
     @Path("nodesource/remove")
     @Produces("application/json")
-    boolean removeNodeSource(@HeaderParam("sessionid")
-    String sessionId, @FormParam("name")
-    String sourceName, @FormParam("preempt")
-    boolean preempt) throws NotConnectedException;
+    boolean removeNodeSource(@HeaderParam("sessionid") String sessionId, @FormParam("name") String sourceName,
+            @FormParam("preempt") boolean preempt) throws NotConnectedException;
 
     @POST
     @Path("node/lock")
     @Produces("application/json")
-    boolean lockNodes(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurls")
-    Set<String> nodeUrls) throws NotConnectedException;
+    boolean lockNodes(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurls") Set<String> nodeUrls)
+            throws NotConnectedException;
 
     @POST
     @Path("node/unlock")
     @Produces("application/json")
-    boolean unlockNodes(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurls")
-    Set<String> nodeUrls) throws NotConnectedException;
+    boolean unlockNodes(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeurls") Set<String> nodeUrls) throws NotConnectedException;
 
     @GET
     @GZIP
     @Produces("application/json")
     @Path("node/mbean")
-    Object getNodeMBeanInfo(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("nodejmxurl")
-    String nodeJmxUrl, @QueryParam("objectname")
-    String objectName, @QueryParam("attrs")
-    List<String> attrs) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
-            IOException, NotConnectedException, MalformedObjectNameException, NullPointerException;
+    Object getNodeMBeanInfo(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectName,
+            @QueryParam("attrs") List<String> attrs)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException;
 
     @GET
     @GZIP
     @Produces("application/json")
     @Path("node/mbean/history")
-    Object getNodeMBeanHistory(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("nodejmxurl")
-    String nodeJmxUrl, @QueryParam("objectname")
-    String objectName, @QueryParam("attrs")
-    List<String> attrs, @QueryParam("range")
-    String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+    Object getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectName,
+            @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
 
     @GET
     @GZIP
     @Produces("application/json")
     @Path("node/mbeans")
-    Object getNodeMBeansInfo(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("nodejmxurl")
-    String nodeJmxUrl, @QueryParam("objectname")
-    String objectNames, @QueryParam("attrs")
-    List<String> attrs) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
-            IOException, NotConnectedException, MalformedObjectNameException, NullPointerException;
+    Object getNodeMBeansInfo(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectNames,
+            @QueryParam("attrs") List<String> attrs)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException;
 
     @GET
     @GZIP
     @Produces("application/json")
     @Path("node/mbeans/history")
-    Object getNodeMBeansHistory(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("nodejmxurl")
-    String nodeJmxUrl, @QueryParam("objectname")
-    String objectNames, @QueryParam("attrs")
-    List<String> attrs, @QueryParam("range")
-    String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+    Object getNodeMBeansHistory(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectNames,
+            @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
 
     @GET
     @Path("shutdown")
     @Produces("application/json")
-    boolean shutdown(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("preempt")
-    @DefaultValue("false")
-    boolean preempt) throws NotConnectedException;
+    boolean shutdown(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("preempt") @DefaultValue("false") boolean preempt) throws NotConnectedException;
 
     @GET
     @Path("topology")
     @Produces("application/json")
-    Topology getTopology(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    Topology getTopology(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+
+    @GET
+    @GZIP
+    @Path("nodesource")
+    @Produces("application/json")
+    ArrayList<RMNodeSourceEvent> getExistingNodeSources(String sessionId) throws NotConnectedException;
 
     @GET
     @GZIP
     @Path("infrastructures")
     @Produces("application/json")
-    Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
+            @HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @GET
     @GZIP
     @Path("policies")
     @Produces("application/json")
-    Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedException;
+    Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException;
 
     @GET
     @GZIP
     @Path("info/{name}")
     @Produces("application/json")
-    Object getMBeanInfo(@HeaderParam("sessionid")
-    String sessionId, @PathParam("name")
-    ObjectName name, @QueryParam("attr")
-    List<String> attrs) throws InstanceNotFoundException, IntrospectionException, ReflectionException,
-            IOException, NotConnectedException;
+    Object getMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
+            @QueryParam("attr") List<String> attrs) throws InstanceNotFoundException, IntrospectionException,
+            ReflectionException, IOException, NotConnectedException;
 
     @GET
     @GZIP
     @Path("stathistory")
     @Produces("application/json")
-    String getStatHistory(@HeaderParam("sessionid")
-    String sessionId, @QueryParam("range")
-    String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+    String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             MalformedObjectNameException, NullPointerException, InterruptedException, NotConnectedException;
 
     @GET
@@ -289,29 +266,24 @@ public interface RMRestInterface {
     @GZIP
     @Path("node/script")
     @Produces("application/json")
-    ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodeurl")
-    String nodeUrl, @FormParam("script")
-    String script, @FormParam("scriptEngine")
-    String scriptEngine) throws Throwable;
+    ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeurl") String nodeUrl, @FormParam("script") String script,
+            @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
     @POST
     @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
-    List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid")
-    String sessionId, @FormParam("nodesource")
-    String nodeSource, @FormParam("script")
-    String script, @FormParam("scriptEngine")
-    String scriptEngine) throws Throwable;
+    List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodesource") String nodeSource, @FormParam("script") String script,
+            @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
     @POST
     @GZIP
     @Path("host/script")
     @Produces("application/json")
-    List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid")
-    String sessionId, @FormParam("host")
-    String host, @FormParam("script")
-    String script, @FormParam("scriptEngine")
-    String scriptEngine) throws Throwable;
+    List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid") String sessionId,
+            @FormParam("host") String host, @FormParam("script") String script,
+            @FormParam("scriptEngine") String scriptEngine) throws Throwable;
+
 }

@@ -36,12 +36,26 @@
  */
 package org.ow2.proactive.resourcemanager.common.util;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MBeanInfo;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -52,12 +66,6 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-
-import javax.management.*;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -88,7 +96,8 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#createNodeSource(java.lang.String, java.lang.String, java.lang.Object[], java.lang.String, java.lang.Object[])
      */
-    public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4) {
+    public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3,
+            Object[] arg4) {
         return target.createNodeSource(arg0, arg1, arg2, arg3, arg4);
     }
 
@@ -262,8 +271,8 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
      * @throws ReflectionException
      * @throws IOException
      */
-    public MBeanInfo getMBeanInfo(ObjectName name) throws InstanceNotFoundException, IntrospectionException,
-            ReflectionException, IOException {
+    public MBeanInfo getMBeanInfo(ObjectName name)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
         return this.jmxClient.getConnector().getMBeanServerConnection().getMBeanInfo(name);
     }
 
@@ -312,5 +321,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets) {
         return this.target.executeScript(script, scriptEngine, targetType, targets);
+    }
+
+    @Override
+    public ArrayList<RMNodeSourceEvent> getExistingNodeSourcesList() {
+        return target.getExistingNodeSourcesList();
+
     }
 }
