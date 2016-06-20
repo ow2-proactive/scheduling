@@ -46,15 +46,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.security.KeyException;
 import java.util.Set;
 
 public class ForkedProcessBuilderCreator implements Serializable {
-    public static final Set<PosixFilePermission> SHARED_FOLDER_PERMISSIONS = PosixFilePermissions.fromString(
-            "rwxrwxrwx");
     private final ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
     private final ForkEnvironmentScriptExecutor forkEnvironmentScriptExecutor = new ForkEnvironmentScriptExecutor();
@@ -124,23 +121,12 @@ public class ForkedProcessBuilderCreator implements Serializable {
             String nativeScriptPath) throws IOException, IllegalAccessException, KeyException {
         OSProcessBuilder processBuilder;
         if (context.isRunAsUser()) {
-            shareWorkingDirWithRunAsMeUser(workingDir);
+            ForkerUtils.setSharedPermissions(workingDir, true);
             processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
                     ForkerUtils.checkConfigAndGetUser(context.getDecrypter()));
         } else {
             processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder();
         }
         return processBuilder;
-    }
-
-
-    private void shareWorkingDirWithRunAsMeUser(File workingDir) throws IOException {
-        try {
-            Files.setPosixFilePermissions(workingDir.toPath(), SHARED_FOLDER_PERMISSIONS);
-        } catch (IOException e) {
-            throw new IOException("Working directory will not be writable by runAsMe user", e);
-        } catch (UnsupportedOperationException ignored) {
-            // ignored, could be running on Windows
-        }
     }
 }

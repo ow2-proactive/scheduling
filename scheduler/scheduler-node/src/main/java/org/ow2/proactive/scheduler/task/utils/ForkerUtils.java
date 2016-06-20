@@ -36,12 +36,13 @@
  */
 package org.ow2.proactive.scheduler.task.utils;
 
-import java.security.KeyException;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
-import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.security.KeyException;
 
 
 /**
@@ -130,6 +131,13 @@ public final class ForkerUtils {
             CredData data = decrypter.decrypt();
 
             // TODO: use polymorphism to avoid branches
+            if (ForkMethod.NONE == FORK_METHOD_VALUE) {
+                OSUser u = new OSUser(data.getLogin());
+                if (data.getDomain() != null) {
+                    u.setDomain(data.getDomain());
+                }
+                return u;
+            }
             if (ForkMethod.PWD == FORK_METHOD_VALUE) {
                 if (data.getPassword() == null) {
                     throw new IllegalAccessException(
@@ -156,6 +164,14 @@ public final class ForkerUtils {
                 FORK_METHOD_KEY + " is not configured.");
         } else {
             throw new IllegalArgumentException("Decrypter could not be null");
+        }
+    }
+
+    public static void setSharedPermissions(File file, boolean setExecutable) {
+        file.setReadable(true, false);
+        file.setWritable(true, false);
+        if (setExecutable) {
+            file.setExecutable(true, false);
         }
     }
 
