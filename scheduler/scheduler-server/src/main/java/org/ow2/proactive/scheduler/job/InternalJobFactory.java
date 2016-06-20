@@ -36,16 +36,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.common.base.Joiner;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
@@ -72,7 +63,15 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
-import com.google.common.base.Joiner;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -285,6 +284,7 @@ public class InternalJobFactory {
                             JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
                             new Serializable[] { args }))));
                     javaTask.setForkEnvironment(task.getForkEnvironment());
+                    configureRunAsMe(task);
                 } else {
                     javaTask = new InternalScriptTask(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript(task.getExecutableClassName(),
@@ -309,6 +309,12 @@ public class InternalJobFactory {
         return javaTask;
     }
 
+    private static void configureRunAsMe(Task task) {
+        if (isRunAsMeTask()) {
+            task.setRunAsMe(true);
+        }
+    }
+
     /**
      * Create an internal native Task with the given native task (user)
      *
@@ -329,6 +335,7 @@ public class InternalJobFactory {
             if (isForkingTask()) {
                 scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
                     new TaskScript(new SimpleScript(commandAndArguments, "native"))));
+                configureRunAsMe(task);
             } else {
                 scriptTask = new InternalScriptTask(new ScriptExecutableContainer(
                     new TaskScript(new SimpleScript(commandAndArguments, "native"))));
@@ -348,6 +355,7 @@ public class InternalJobFactory {
         InternalTask scriptTask;
         if (isForkingTask()) {
             scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()));
+            configureRunAsMe(task);
         } else {
             scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
         }
@@ -361,7 +369,11 @@ public class InternalJobFactory {
     }
 
     private static boolean isForkingTask() {
-        return PASchedulerProperties.TASK_FORK.getValueAsBoolean();
+        return PASchedulerProperties.TASK_FORK.getValueAsBoolean() || isRunAsMeTask();
+    }
+
+    private static boolean isRunAsMeTask() {
+        return PASchedulerProperties.TASK_RUNASME.getValueAsBoolean();
     }
 
     /**
