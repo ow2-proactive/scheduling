@@ -63,6 +63,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -130,6 +131,13 @@ public interface RMRestInterface {
     boolean nodeIsAvailable(@HeaderParam("sessionid")
     String sessionId, @QueryParam("nodeurl")
     String url) throws NotConnectedException;
+    
+    @GET
+    @GZIP
+    @Path("nodesource")
+    @Produces("application/json")
+    List<RMNodeSourceEvent> getExistingNodeSources(@HeaderParam("sessionid")
+    String sessionId) throws NotConnectedException;
 
     @POST
     @Path("nodesource/create")
