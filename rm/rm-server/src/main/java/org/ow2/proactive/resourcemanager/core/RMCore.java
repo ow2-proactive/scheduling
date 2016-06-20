@@ -1377,10 +1377,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * {@inheritDoc}
+     * Gives list of existing Node Sources
+     * @return list of existing Node Sources
      */
-    @Deprecated
-    public List<RMNodeSourceEvent> getNodeSourcesList() {
+    public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
         return getRMInitialState().getNodeSource();
     }
 
@@ -1841,4 +1841,5 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.internalUnlockNode(rmnode);
         }
     }
+
 }
