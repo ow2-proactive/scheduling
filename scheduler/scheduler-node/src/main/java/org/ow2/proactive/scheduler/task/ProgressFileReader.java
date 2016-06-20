@@ -2,6 +2,7 @@ package org.ow2.proactive.scheduler.task;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,10 +82,10 @@ public class ProgressFileReader {
 
         try {
             Files.createDirectories(progressFileDir);
-
+            ForkerUtils.setSharedPermissions(progressFileDir.toFile(), true);
             progressFile = progressFileDir.resolve(progressFileName);
-
             Files.createFile(progressFile);
+            ForkerUtils.setSharedPermissions(progressFile.toFile(), false);
         } catch (FileAlreadyExistsException e) {
             // ignore file already exists exception
         }
