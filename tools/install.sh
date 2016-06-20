@@ -352,7 +352,7 @@ if which git > /dev/null 2>&1; then
         echo "Detected an existing ProActive Scheduler installation at $OLD_PADIR, porting configuration into new installation."
         echo ""
 
-        rsync $RSYNC_PROGRESS -a $OLD_PADIR/addons $PA_ROOT/default/
+        rsync $RSYNC_PROGRESS -a $OLD_PADIR/{addons,data} $PA_ROOT/default/
 
         OLD_PADIR_NAME="$(basename "$OLD_PADIR")"
 
