@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -77,6 +76,8 @@ import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+import com.google.common.collect.ImmutableList;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -443,7 +444,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //start dataspace app for this job
             DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
                     .getDataSpaceServiceStarter();
-            job.startDataSpaceApplication(dsStarter.getNamingService());
+            job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
 
             // create launcher
             launcher = task.createLauncher(job, node);

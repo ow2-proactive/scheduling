@@ -95,7 +95,8 @@ import org.apache.log4j.Logger;
  * @since ProActive Scheduling 0.9
  */
 public abstract class InternalJob extends JobState {
-    public static final Logger LOGGER = Logger.getLogger(InternalJob.class);
+
+    protected static final Logger LOGGER = Logger.getLogger(InternalJob.class);
 
     /** List of every tasks in this job. */
     protected Map<TaskId, InternalTask> tasks = new HashMap<>();
@@ -107,10 +108,10 @@ public abstract class InternalJob extends JobState {
     @XmlTransient
     private JobDescriptor jobDescriptor;
 
-    /** DataSpace application manager for this job */
+    /** DataSpace application manager per task. The key is the task ID */
     // Not DB managed, created once needed.
     @XmlTransient
-    private JobDataSpaceApplication jobDataSpaceApplication;
+    private Map<Long, TaskDataSpaceApplication> taskDataSpaceApplications;
 
     /** Initial waiting time for a task before restarting in millisecond */
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
@@ -273,13 +274,22 @@ public abstract class InternalJob extends JobState {
     /**
      * Start dataspace configuration and application
      */
-    public void startDataSpaceApplication(NamingService namingService) {
-        if (jobDataSpaceApplication == null) {
-            long appId = getJobInfo().getJobId().hashCode();
-            jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService);
+    public void startDataSpaceApplication(NamingService namingService, List<InternalTask> tasks) {
+        if (taskDataSpaceApplications == null) {
+            taskDataSpaceApplications = new HashMap<>();
         }
-        jobDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(), getGlobalSpace(),
-                getUserSpace(), getOwner(), getId());
+
+        for (InternalTask internalTask : tasks) {
+            String appId = internalTask.getId().toString();
+
+            TaskDataSpaceApplication taskDataSpaceApplication =
+                    new TaskDataSpaceApplication(appId, namingService);
+
+            taskDataSpaceApplications.put(internalTask.getId().longValue(), taskDataSpaceApplication);
+
+            taskDataSpaceApplication.startDataSpaceApplication(
+                    getInputSpace(), getOutputSpace(), getGlobalSpace(), getUserSpace(), getOwner(), getId());
+        }
     }
 
     /**
@@ -660,8 +670,10 @@ public abstract class InternalJob extends JobState {
             }
         }
 
-        if (jobDataSpaceApplication != null) {
-            jobDataSpaceApplication.terminateDataSpaceApplication();
+        if (taskDataSpaceApplications != null) {
+            for (TaskDataSpaceApplication taskDataSpaceApplication : taskDataSpaceApplications.values()) {
+                taskDataSpaceApplication.terminateDataSpaceApplication();
+            }
         }
 
         return updatedTasks;
@@ -733,9 +745,11 @@ public abstract class InternalJob extends JobState {
     public void terminate() {
         setStatus(JobStatus.FINISHED);
         setFinishedTime(System.currentTimeMillis());
-        if (jobDataSpaceApplication != null) {
+        if (taskDataSpaceApplications != null) {
             if (!LOGGER.isDebugEnabled()) {
-                jobDataSpaceApplication.terminateDataSpaceApplication();
+                for (TaskDataSpaceApplication taskDataSpaceApplication : taskDataSpaceApplications.values()) {
+                    taskDataSpaceApplication.terminateDataSpaceApplication();
+                }
             }
         }
     }
@@ -1147,8 +1161,8 @@ public abstract class InternalJob extends JobState {
      *
      * @return the jobDataSpaceApplication
      */
-    public JobDataSpaceApplication getJobDataSpaceApplication() {
-        return jobDataSpaceApplication;
+    public Map<Long, TaskDataSpaceApplication> getTaskDataSpaceApplications() {
+        return taskDataSpaceApplications;
     }
 
     /**

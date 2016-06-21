@@ -49,21 +49,21 @@ import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
-public class JobDataSpaceApplication implements Serializable {
+public class TaskDataSpaceApplication implements Serializable {
 
-    public static final Logger logger = Logger.getLogger(JobDataSpaceApplication.class);
+    public static final Logger logger = Logger.getLogger(TaskDataSpaceApplication.class);
 
-    private long applicationId;
+    private String applicationId;
     private NamingService namingService;
 
     private boolean alreadyRegistered = false;
 
     /**
-     * Create a new instance of JobDataSpaceApplication
+     * Create a new instance of TaskDataSpaceApplication
      *
      * @param applicationId the application Id associated to this job
      */
-    public JobDataSpaceApplication(long applicationId, NamingService namingService) {
+    public TaskDataSpaceApplication(String applicationId, NamingService namingService) {
         this.applicationId = applicationId;
         this.namingService = namingService;
     }

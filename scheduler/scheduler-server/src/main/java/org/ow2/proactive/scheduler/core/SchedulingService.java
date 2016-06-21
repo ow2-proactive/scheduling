@@ -853,7 +853,7 @@ public class SchedulingService {
                 case STALLED:
                 case RUNNING:
                     //start dataspace app for this job
-                    job.startDataSpaceApplication(dsStarter.getNamingService());
+                    job.startDataSpaceApplication(dsStarter.getNamingService(), job.getITasks());
                     // restart classServer if needed
                     break;
                 case FINISHED:

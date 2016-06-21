@@ -18,7 +18,7 @@ try {
     try {
 
         localNode = org.objectweb.proactive.api.PAActiveObject.getActiveObjectNode(org.objectweb.proactive.api.PAActiveObject.getStubOnThis());
-        org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes.configureApplication(localNode, 0xcafe, url);
+        org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes.configureApplication(localNode, (0xcafe).toString(), url);
         def localSpaceRoot = org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces.resolveScratchForAO();
         def remoteSpaceRoot = org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces.resolveOutput(org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces.DEFAULT_IN_OUT_NAME);
         def inputDsfo = remoteSpaceRoot.findFiles(org.objectweb.proactive.extensions.dataspaces.api.FileSelector.SELECT_SELF).get(0);

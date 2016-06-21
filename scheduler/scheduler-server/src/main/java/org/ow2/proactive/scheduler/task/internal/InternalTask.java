@@ -1034,7 +1034,8 @@ public abstract class InternalTask extends TaskState {
         tli.setControlFlowScript(getFlowScript());
         tli.setTaskInputFiles(getInputFilesList());
         tli.setTaskOutputFiles(getOutputFilesList());
-        tli.setNamingService(job.getJobDataSpaceApplication().getNamingServiceStub());
+        tli.setNamingService(
+                job.getTaskDataSpaceApplications().get(getId().longValue()).getNamingServiceStub());
         tli.setIterationIndex(getIterationIndex());
         tli.setReplicationIndex(getReplicationIndex());
 
