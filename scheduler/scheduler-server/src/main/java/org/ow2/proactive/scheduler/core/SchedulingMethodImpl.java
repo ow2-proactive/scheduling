@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import com.google.common.collect.ImmutableList;
+import org.apache.http.annotation.Immutable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -547,7 +549,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //start dataspace app for this job
             DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure()
                     .getDataSpaceServiceStarter();
-            job.startDataSpaceApplication(dsStarter.getNamingService());
+            job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
 
             // create launcher
             launcher = task.createLauncher(job, node);

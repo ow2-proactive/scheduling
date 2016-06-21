@@ -83,7 +83,7 @@ public class DataSpaceServiceStarter implements Serializable {
     private static final String DEFAULT_LOCAL_USER = DEFAULT_LOCAL + File.separator + "defaultuser";
     private static final String DEFAULT_LOCAL_SCRATCH = DEFAULT_LOCAL + File.separator + "scratch";
 
-    private static HashMap<Long, HashSet<String>> spacesConfigurations = new HashMap<>();
+    private static HashMap<String, HashSet<String>> spacesConfigurations = new HashMap<>();
 
     /**
      * Naming service
@@ -109,7 +109,7 @@ public class DataSpaceServiceStarter implements Serializable {
     /**
      * Application ID last used to configure the local node, null if none
      */
-    private static Long appidConfigured = null;
+    private static String appidConfigured = null;
 
     /**
      * Dataspace servers
@@ -262,14 +262,14 @@ public class DataSpaceServiceStarter implements Serializable {
      * @param inputConfiguration if the configuration is an InputSpace configuration (read-only)
      * @param localConfiguration if the local node needs to be configured for the provided application
      */
-    public void createSpace(long appID, String name, String urlsproperty, String path, String hostname,
+    public void createSpace(String appID, String name, String urlsproperty, String path, String hostname,
             boolean inputConfiguration, boolean localConfiguration) throws FileSystemException,
             URISyntaxException, ProActiveException, MalformedURLException {
         if (!serviceStarted) {
             throw new IllegalStateException("DataSpace service is not started");
         }
 
-        if (!spacesConfigurations.containsKey(new Long(appID))) {
+        if (!spacesConfigurations.containsKey(appID)) {
             if (localConfiguration) {
                 if (appidConfigured != null) {
                     logger.warn("Node " + schedulerNode.getNodeInformation().getURL() +
@@ -327,7 +327,7 @@ public class DataSpaceServiceStarter implements Serializable {
      * @throws ProActiveException
      * @throws FileSystemException
      */
-    public void createSpaceWithUserNameSubfolder(String username, long appID, String spaceName, String urls,
+    public void createSpaceWithUserNameSubfolder(String username, String appID, String spaceName, String urls,
             String localpath, String hostname, boolean inputConfiguration, boolean localConfiguration)
             throws URISyntaxException, IOException, ProActiveException {
         // create a local folder with the username

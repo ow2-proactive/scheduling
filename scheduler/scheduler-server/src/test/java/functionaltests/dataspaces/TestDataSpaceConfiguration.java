@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.job.JobDataSpaceApplication;
+import org.ow2.proactive.scheduler.job.TaskDataSpaceApplication;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class TestDataSpaceConfiguration extends SchedulerFunctionalTestNoRestart
 
     static String HOSTNAME = null;
 
-    long appid = 666;
+    String appid = "666";
 
     static {
         try {
@@ -135,7 +135,7 @@ public class TestDataSpaceConfiguration extends SchedulerFunctionalTestNoRestart
         Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<>();
         NamingService namingService = dsServiceStarter.getNamingService();
 
-        JobDataSpaceApplication jdsa = new JobDataSpaceApplication(appid, dsServiceStarter.getNamingService());
+        TaskDataSpaceApplication jdsa = new TaskDataSpaceApplication(appid, dsServiceStarter.getNamingService());
         jdsa.startDataSpaceApplication(null, null, null, null, username, null);
 
         DataSpacesNodes.configureApplication(PAActiveObject.getNode(), appid, dsServiceStarter

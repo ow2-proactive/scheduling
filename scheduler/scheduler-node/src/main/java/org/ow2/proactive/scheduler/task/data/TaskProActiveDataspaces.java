@@ -72,6 +72,9 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     private static final Logger logger = Logger.getLogger(TaskProActiveDataspaces.class);
 
+    private static final String PA_NODE_DATASPACE_FILE_TRANSFER_THREAD_POOL_SIZE =
+            "pa.node.dataspace.filetransfer.threadpoolsize";
+
     private DataSpacesFileObject SCRATCH;
     private DataSpacesFileObject INPUT;
     private DataSpacesFileObject OUTPUT;
@@ -81,10 +84,32 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     private TaskId taskId;
     private NamingService namingService;
 
+    protected ExecutorService executorTransfer =
+            Executors.newFixedThreadPool(getFileTransferThreadPoolSize(),
+                new NamedThreadFactory("FileTransferThreadPool"));
+
     public TaskProActiveDataspaces(TaskId taskId, NamingService namingService) throws Exception {
         this.taskId = taskId;
         this.namingService = namingService;
         initDataSpaces();
+    }
+
+    private int getFileTransferThreadPoolSize() {
+        String sizeAsString = System.getProperty(PA_NODE_DATASPACE_FILE_TRANSFER_THREAD_POOL_SIZE);
+
+        int result = Runtime.getRuntime().availableProcessors();
+
+        if (sizeAsString != null) {
+            try {
+                result = Integer.parseInt(sizeAsString);
+            } catch (NumberFormatException e) {
+                // ignore but use default value
+            }
+        }
+
+        logger.info("Thread pool size for file transfer is " + result);
+
+        return result;
     }
 
     private DataSpacesFileObject createTaskIdFolder(DataSpacesFileObject space, String spaceName) {
@@ -139,19 +164,23 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     protected void initDataSpaces() throws Exception {
         // configure node for application
-        long id = taskId.getJobId().hashCode();
+        String appId = taskId.toString();
 
         //prepare scratch, input, output
 
         Node node = PAActiveObject.getNode();
-        logger.info("Configuring dataspaces for app " + id + " on " + node.getNodeInformation().getName());
-        DataSpacesNodes.configureApplication(node, id, namingService);
+        logger.info("Configuring dataspaces for app " + appId + " on " + node.getNodeInformation().getName());
+        DataSpacesNodes.configureApplication(node, appId, namingService);
 
         SCRATCH = PADataSpaces.resolveScratchForAO();
         logger.info("SCRATCH space is " + SCRATCH.getRealURI());
 
         // Set the scratch folder writable for everyone
-        getScratchFolder().setWritable(true, false);
+        if (!getScratchFolder().setWritable(true, false)) {
+            logger.warn("Missing permission to change write permissions to " + getScratchFolder());
+        } else {
+            SCRATCH.refresh();
+        }
 
         INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
@@ -383,6 +412,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                     // should never happen
                     throw new IllegalStateException();
                 }
+
                 logger.debug("* " + relativePath);
                 if (!relPathes.contains(relativePath)) {
                     logger.debug("------------ resolving " + relativePath);
@@ -411,6 +441,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                     }));
 
                 }
+
                 relPathes.add(relativePath);
             }
 
@@ -420,13 +451,14 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                 try {
                     f.get();
                 } catch (InterruptedException | ExecutionException e) {
-                    logger.error("", e);
+                    logger.error("Exception while fetching dataspace transfer result ", e);
                     exceptionMsg.append(StackTraceUtil.getStackTrace(e)).append(nl);
                 }
             }
+
             if (exceptionMsg.length() > 0) {
                 toBeThrown = new FileSystemException(
-                        "Exception(s) occurred when transferring input files : " + nl + exceptionMsg.toString());
+                        "Exception(s) occurred when transferring input file: " + nl + exceptionMsg.toString());
             }
 
             if (toBeThrown != null) {
@@ -487,9 +519,6 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
         return null;
     }
-
-    protected ExecutorService executorTransfer = Executors.newFixedThreadPool(5,
-            new NamedThreadFactory("FileTransferThreadPool"));
 
     private boolean checkOuputSpaceConfigured(DataSpacesFileObject space, String spaceName, OutputSelector os) {
         if (space == null) {
