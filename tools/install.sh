@@ -30,17 +30,23 @@ else
 	RSYNC_PROGRESS="--progress"
 fi
 
+trim() {
+    echo "$1" | sed -e 's/^[[:space:]]*//'|sed -e 's/[[:space:]]*$//'
+}
+
 confirm() {
     # call with a prompt string or use a default
     read -r -e -p "${1:-Are you sure? [Y/n]} " -i "${2:-y}" yn
     yn=${yn,,}    # tolower
-    yn=$(echo $yn | xargs)   # trim
+    yn=$(trim "$yn")
     if [[ $yn =~ ^(yes|y|)$ ]]; then
             true
     else
             false
     fi
 }
+
+
 
 echo "This will install the ProActive scheduler as a service."
 echo "Once the installer is started, it must process until the end otherwise the installation may be corrupted."
@@ -89,7 +95,7 @@ fi
  
 read -e -p "Directory where to install the scheduler: " -i "/opt/proactive" PA_ROOT
 
-PA_ROOT=$(echo $PA_ROOT | xargs)
+PA_ROOT=$(trim "$PA_ROOT")
 
 mkdir -p $PA_ROOT
 
@@ -122,11 +128,11 @@ ln -s -f $PA_ROOT/$PA_FOLDER_NAME "$PA_ROOT/default"
 
 read -e -p "Name of the user starting the ProActive service: " -i "proactive" USER
 
-USER=$(echo $USER | xargs)
+USER=$(trim "$USER")
 
 read -e -p "Group of the user starting the ProActive service: " -i "proactive" GROUP
 
-GROUP=$(echo $GROUP | xargs)
+GROUP=$(trim "$GROUP")
 
 id -u "$USER" > /dev/null
 
@@ -161,7 +167,7 @@ cp $SCRIPT_DIR/proactive-scheduler /etc/init.d/
 
 read -e -p "Protocol to use for accessing Web apps deployed by the proactive server: [http/https] " -i "http" PROTOCOL
 
-PROTOCOL=$(echo $PROTOCOL | xargs)
+PROTOCOL=$(trim "$PROTOCOL")
 
 SELF_SIGNED=false
 if [[ "$PROTOCOL" == "https" ]]; then
@@ -182,7 +188,7 @@ fi
 
 read -e -p "Port to use for accessing Web apps deployed by the proactive server: " -i "$DEFAULT_PORT" PORT
 
-PORT=$(echo $PORT | xargs)
+PORT=$(trim "$PORT")
 
 HTTP_REDIRECT_PORT=8080
 if [[ "$PROTOCOL" == "https" ]]; then
@@ -222,12 +228,12 @@ fi
 
 
 read -e -p "Number of ProActive nodes to start on the server machine: " -i "4" NB_NODES
-NB_NODES=$(echo $NB_NODES | xargs)
+NB_NODES=$(trim "$NB_NODES")
 
 if confirm "Setup cron task for cleaning old logs? [Y/n] " ; then
      read -e -p "Cleaning logs older than (in days) [50]: " -i "50" LOGS_CLEANUP_DAYS
 
-     LOGS_CLEANUP_DAYS=$(echo $LOGS_CLEANUP_DAYS | xargs)
+     LOGS_CLEANUP_DAYS=$(trim "$LOGS_CLEANUP_DAYS")
      if [[ $(grep -c "$PA_ROOT/default/logs" /etc/crontab) == 0 ]]; then
         echo "1 0   * * *   root   find $PA_ROOT/default/logs -mtime +$LOGS_CLEANUP_DAYS -name '*.log' -exec rm {} \;" >> /etc/crontab
      fi
@@ -296,7 +302,7 @@ if confirm "Do you want to change the network interface used? [y/N] " "n" ; then
      ITF_SELECTED=false
      while  ! $ITF_SELECTED ; do
         read -e -p "Enter the interface name you want to use: " ITF_NAME
-        ITF_NAME=$(echo $ITF_NAME | xargs)
+        ITF_NAME=$(trim "$ITF_NAME")
 
         if [[ " ${ITF_ARRAY[@]} " =~ " ${ITF_NAME} " ]]; then
             ITF_SELECTED=true
