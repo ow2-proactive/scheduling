@@ -42,6 +42,9 @@ workdir="$3"
 # losing the first two arguments, all that remains is the user command
 shift;shift;shift;
 
+# change umask settings to prevent file permission issues in RunAsMe mode
+umask 0000
+
 # check if the workdir is OK
 if [ -d "${workdir}" ]; then
   cd "$workdir"
