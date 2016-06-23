@@ -246,7 +246,7 @@ public class TaskLauncherTest {
         });
         runTaskLauncher(taskLauncher, executableContainer);
 
-        verify(dataspacesMock).cleanScratchSpace();
+        verify(dataspacesMock).close();
     }
 
     @Test
