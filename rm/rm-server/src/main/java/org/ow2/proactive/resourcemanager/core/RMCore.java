@@ -148,6 +148,8 @@ import java.util.regex.Pattern;
 @ActiveObject
 public class RMCore implements ResourceManager, InitActive, RunActive {
 
+    private static final String CONTACT_UPGRADE_MESSAGE = "Number of nodes exceed the limitation from your contract. Please send an email to contact@activeeon.com for an upgrade.";
+
     /** Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
      * Explanation: This software can be licensed to a certain amount of nodes.
      * This variable is not final because the compiler inlines final variables and this variable is changed
@@ -573,9 +575,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         //noinspection ConstantConditions
         if (isNumberOfNodesLimited() && isMaximumNumberOfNodesReachedIncludingAskingNode()) {
             logger.warn("Node " + rmnode.getNodeURL() +
-                    " is removed because the Resource Manager is limited to " + maximumNumberOfNodes + " nodes.");
+                    " is removed because the Resource Manager is limited to " + maximumNumberOfNodes + " nodes." +
+                    CONTACT_UPGRADE_MESSAGE);
             removeNodeFromCoreAndSource(rmnode, rmnode.getProvider());
-            throw new AddingNodesException("Maximum number of nodes reached: " + maximumNumberOfNodes);
+            throw new AddingNodesException("Maximum number of nodes reached: " + maximumNumberOfNodes + ". " +
+                    CONTACT_UPGRADE_MESSAGE);
         }
 
         //during the configuration process, the rmnode can be removed. Its state would be toRemove
