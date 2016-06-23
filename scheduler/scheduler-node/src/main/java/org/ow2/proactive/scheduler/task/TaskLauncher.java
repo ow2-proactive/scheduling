@@ -214,9 +214,11 @@ public class TaskLauncher implements InitActive {
         } finally {
             progressFileReader.stop();
             taskLogger.close();
+
             if (dataspaces != null) {
-                dataspaces.cleanScratchSpace();
+                dataspaces.close();
             }
+
             removeShutdownHook();
             terminate();
         }

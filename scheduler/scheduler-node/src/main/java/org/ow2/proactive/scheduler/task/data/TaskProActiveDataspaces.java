@@ -569,7 +569,15 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     }
 
     @Override
-    public void cleanScratchSpace() {
+    public void close() {
+        if (!executorTransfer.shutdownNow().isEmpty()) {
+            logger.error("Remaining tasks to execute while closing thread pool used for data transfer");
+        }
+
+        cleanScratchSpace();
+    }
+
+    private void cleanScratchSpace() {
         try {
             File folder = getScratchFolder();
             FileUtils.deleteQuietly(folder);
