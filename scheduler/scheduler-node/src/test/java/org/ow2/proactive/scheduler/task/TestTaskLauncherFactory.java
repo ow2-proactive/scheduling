@@ -173,7 +173,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
         }
 
         @Override
-        public void cleanScratchSpace() {
+        public void close() {
             FileUtils.deleteQuietly(getScratchFolder());
         }
     }

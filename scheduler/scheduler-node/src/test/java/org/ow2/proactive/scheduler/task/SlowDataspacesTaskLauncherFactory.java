@@ -91,7 +91,7 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
         }
 
         @Override
-        public void cleanScratchSpace() {
+        public void close() {
 
         }
     }
