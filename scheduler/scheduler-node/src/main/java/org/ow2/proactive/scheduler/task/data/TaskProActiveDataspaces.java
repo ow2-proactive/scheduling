@@ -386,18 +386,31 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
             ArrayList<DataSpacesFileObject> globalSpaceFiles, String userSpaceUri,
             ArrayList<DataSpacesFileObject> userSpaceFiles) throws FileSystemException {
 
+        // This map will contain the files that have to be copied.
         Map<String, DataSpacesFileObject> result =
                 new HashMap<>(outputSpaceFiles.size() + globalSpaceFiles.size()
                         + userSpaceFiles.size() + inputSpaceFiles.size());
 
-        createFolderHierarchySequentially(SCRATCH, inputSpaceUri, inputSpaceFiles, result);
-        createFolderHierarchySequentially(SCRATCH, outputSpaceUri, outputSpaceFiles, result);
+        // Since multiple spaces are involved, it is possible to have
+        // a file with the same name present in each space. Consequently,
+        // the one to copy has to be selected since there is only a single
+        // possible destination, the scratch space.
+        // The reverse order of the next calls gives the precedence order
+        // of the spaces when the previous situation occurs:
+        // output, input, user and global space
+        // Precedence is given to the more specific files
         createFolderHierarchySequentially(SCRATCH, globalSpaceUri, globalSpaceFiles, result);
         createFolderHierarchySequentially(SCRATCH, userSpaceUri, userSpaceFiles, result);
+        createFolderHierarchySequentially(SCRATCH, inputSpaceUri, inputSpaceFiles, result);
+        createFolderHierarchySequentially(SCRATCH, outputSpaceUri, outputSpaceFiles, result);
 
         return result;
     }
 
+    /*
+     * Create the folder hierarchy and select the files to copy
+     * from the specified list of FileObjects.
+     */
     private void createFolderHierarchySequentially(
             DataSpacesFileObject destination, String spaceUri, List<DataSpacesFileObject> spaceFiles,
             Map<String, DataSpacesFileObject> filesToCopy) throws FileSystemException {
@@ -416,7 +429,8 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
             DataSpacesFileObject oldFileObject = filesToCopy.put(relativePath, fileObject);
             if (oldFileObject != null) {
                 String message = fileObject.getRealURI()
-                        + " will be copied instead of " + oldFileObject.getRealURI();
+                        + " will be copied instead of " + oldFileObject.getRealURI() + ".\n "
+                        + "Precedence order is output space, input space, user space, global space.";
                 logger.warn(message);
                 logDataspacesStatus(message, DataspacesStatusLevel.WARNING);
             }
