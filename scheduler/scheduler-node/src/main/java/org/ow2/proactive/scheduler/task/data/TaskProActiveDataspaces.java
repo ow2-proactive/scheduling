@@ -688,7 +688,9 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
     @Override
     public void close() {
         if (!executorTransfer.shutdownNow().isEmpty()) {
-            logger.error("Remaining tasks to execute while closing thread pool used for data transfer");
+            String message = "Remaining tasks to execute while closing thread pool used for data transfer";
+            logger.error(message);
+            logDataspacesStatus(message, DataspacesStatusLevel.ERROR);
         }
 
         cleanScratchSpace();

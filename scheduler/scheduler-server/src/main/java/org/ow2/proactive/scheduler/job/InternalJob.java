@@ -280,15 +280,22 @@ public abstract class InternalJob extends JobState {
         }
 
         for (InternalTask internalTask : tasks) {
-            String appId = internalTask.getId().toString();
+            long taskId = internalTask.getId().longValue();
 
-            TaskDataSpaceApplication taskDataSpaceApplication =
-                    new TaskDataSpaceApplication(appId, namingService);
+            // reuse the already configured dataspaceApplication
+            // if a task restart due to a failure for instance
+            if (!taskDataSpaceApplications.containsKey(taskId)) {
+                String appId = internalTask.getId().toString();
+                TaskDataSpaceApplication taskDataSpaceApplication =
+                        new TaskDataSpaceApplication(appId, namingService);
 
-            taskDataSpaceApplications.put(internalTask.getId().longValue(), taskDataSpaceApplication);
+                taskDataSpaceApplications.put(taskId, taskDataSpaceApplication);
 
-            taskDataSpaceApplication.startDataSpaceApplication(
-                    getInputSpace(), getOutputSpace(), getGlobalSpace(), getUserSpace(), getOwner(), getId());
+                taskDataSpaceApplication.startDataSpaceApplication(
+                        getInputSpace(), getOutputSpace(),
+                        getGlobalSpace(), getUserSpace(),
+                        getOwner(), getId());
+            }
         }
     }
 
@@ -670,11 +677,7 @@ public abstract class InternalJob extends JobState {
             }
         }
 
-        if (taskDataSpaceApplications != null) {
-            for (TaskDataSpaceApplication taskDataSpaceApplication : taskDataSpaceApplications.values()) {
-                taskDataSpaceApplication.terminateDataSpaceApplication();
-            }
-        }
+        terminateTaskDataSpaceApplications();
 
         return updatedTasks;
     }
@@ -743,13 +746,16 @@ public abstract class InternalJob extends JobState {
      * Set all properties in order to terminate the job.
      */
     public void terminate() {
+        long finishTime = System.currentTimeMillis();
         setStatus(JobStatus.FINISHED);
-        setFinishedTime(System.currentTimeMillis());
+        setFinishedTime(finishTime);
+        terminateTaskDataSpaceApplications();
+    }
+
+    private void terminateTaskDataSpaceApplications() {
         if (taskDataSpaceApplications != null) {
-            if (!LOGGER.isDebugEnabled()) {
-                for (TaskDataSpaceApplication taskDataSpaceApplication : taskDataSpaceApplications.values()) {
-                    taskDataSpaceApplication.terminateDataSpaceApplication();
-                }
+            for (TaskDataSpaceApplication taskDataSpaceApplication : taskDataSpaceApplications.values()) {
+                taskDataSpaceApplication.terminateDataSpaceApplication();
             }
         }
     }
