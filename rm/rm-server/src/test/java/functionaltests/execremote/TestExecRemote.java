@@ -245,15 +245,15 @@ public final class TestExecRemote extends RMFunctionalTest {
                     .createOutputSpaceConfiguration(this.inputDataserverDeployer.getVFSRootURL(), null, null,
                             PADataSpaces.DEFAULT_IN_OUT_NAME);
 
-            SpaceInstanceInfo inSpaceInfo = new SpaceInstanceInfo(0xcafe, config);
-            localNamingService.registerApplication(0xcafe, Collections.singleton(inSpaceInfo));
+            SpaceInstanceInfo inSpaceInfo = new SpaceInstanceInfo(Long.toString(0xcafe), config);
+            localNamingService.registerApplication(Long.toString(0xcafe), Collections.singleton(inSpaceInfo));
             return namingServiceDeployer.getNamingServiceURL();
         }
 
         public void stopDS() throws Exception {
             try {
                 if (this.namingServiceDeployer != null) {
-                    this.namingServiceDeployer.getLocalNamingService().unregisterApplication(0xcafe);
+                    this.namingServiceDeployer.getLocalNamingService().unregisterApplication(Long.toString(0xcafe));
                 }
             } finally {
                 try {

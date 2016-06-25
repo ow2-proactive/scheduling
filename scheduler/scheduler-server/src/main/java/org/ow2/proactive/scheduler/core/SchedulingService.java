@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -868,7 +869,7 @@ public class SchedulingService {
                 case STALLED:
                 case RUNNING:
                     //start dataspace app for this job
-                    job.startDataSpaceApplication(dsStarter.getNamingService());
+                    job.startDataSpaceApplication(dsStarter.getNamingService(), job.getITasks());
                     // restart classServer if needed
                     break;
                 case FINISHED:
