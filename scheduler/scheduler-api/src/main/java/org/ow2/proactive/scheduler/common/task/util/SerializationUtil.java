@@ -61,6 +61,11 @@ public class SerializationUtil {
 
     public static Map<String, Serializable> deserializeVariableMap(Map<String, byte[]> target, ClassLoader cl)
             throws IOException, ClassNotFoundException {
+
+        if (target == null) {
+            return new HashMap<>();
+        }
+
         final Map<String, Serializable> deserialized = new HashMap<String, Serializable>(target.size());
         for (Entry<String, byte[]> e : target.entrySet()) {
             deserialized.put(e.getKey(), (Serializable) Object2ByteConverter.convertByte2Object(e.getValue(),
