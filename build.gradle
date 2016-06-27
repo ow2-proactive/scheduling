@@ -6,7 +6,6 @@ buildscript {
 
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
         maven { url "http://nexus.qmino.com/content/repositories/miredot" }
-	maven { url 'http://nexus.qmino.com/content/repositories/miredot-snapshots'}
     }
 
     dependencies {
@@ -25,7 +24,7 @@ buildscript {
             exclude group: 'javassist', module: 'javassist'
         }
 
-	classpath 'com.qmino:miredot-plugin:2.0-SNAPSHOT'
+        classpath 'com.qmino:miredot-plugin:2.0-RC3'
     }
 }
 

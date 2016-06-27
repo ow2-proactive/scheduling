@@ -11,8 +11,7 @@ miredot {
         }
         title = 'ProActive Workflows & Scheduling - REST API v' + version
     }
-    // expires friday june 16th, 2017
-    //licence = 'UHJvamVjdHxvcmcub3cyLnByb2FjdGl2ZV9ncmlkX2Nsb3VkX3BvcnRhbC5yZXN0LXNlcnZlcnwyMDE2LTA2LTE3fGZhbHNlI01Dd0NGQmRGVWVDcDBjUEFNRUtHUGQ5Mis2VUhWdCtDQWhSdWpOdE0wcGRxUGdUMVNZdUREZ3lyTEJvb3FBPT0='
+    // expires monday july 11th, 2016
     organizationId = 'f2b501ac-a823-4f92-957b-c366288c1a1a'
     restModel{
         restFramework {
