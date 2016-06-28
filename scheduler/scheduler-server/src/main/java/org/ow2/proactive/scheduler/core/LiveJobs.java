@@ -31,6 +31,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.core.helpers.StartAtUpdater;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
@@ -43,7 +44,6 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 import org.ow2.proactive.utils.TaskIdWrapper;
 
 
@@ -79,6 +79,8 @@ class LiveJobs {
     private final ConcurrentHashMap<TaskIdWrapper, RunningTaskData> runningTasksData = new ConcurrentHashMap<>();
 
     private final OnErrorPolicyInterpreter onErrorPolicyInterpreter = new OnErrorPolicyInterpreter();
+
+    private final StartAtUpdater startAtUpdater = new StartAtUpdater();
 
     LiveJobs(SchedulerDBManager dbManager, SchedulerStateUpdate listener) {
         this.dbManager = dbManager;
@@ -243,20 +245,7 @@ class LiveJobs {
             return false;
         }
         try {
-            InternalJob job = jobData.job;
-
-            long scheduledTime = ISO8601DateUtil.toDate(startAt).getTime();
-
-            Set<TaskId> updatedTasks = job.updateStartAtAndTasksScheduledTime(startAt, scheduledTime);
-
-            if (updatedTasks.size() > 0) {
-                jlogger.debug(jobId, " start at has just been set to :" + startAt);
-                dbManager.updateTaskSchedulingTime(job, scheduledTime);
-            }
-
-            updateJobInSchedulerState(job, SchedulerEvent.JOB_RESUMED);
-
-            return updatedTasks.size() > 0;
+            return startAtUpdater.updateStartAt(jobData.job, startAt, dbManager);
         } finally {
             jobData.unlock();
         }
