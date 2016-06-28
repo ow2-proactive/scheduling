@@ -995,11 +995,11 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Change the START_AT generic information at job level and reset the scheduledAt at task level
-     * @param jobid id of the job that needs to be updated
+     * @param jobId id of the job that needs to be updated
      * @param startAt its value should be ISO 8601 compliant
-     * @throws NotConnectedRestException
-     * @throws UnknownJobRestException
-     * @throws PermissionRestException
+     * @throws NotConnectedException
+     * @throws UnknownJobException
+     * @throws PermissionException
      */
     boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException;
