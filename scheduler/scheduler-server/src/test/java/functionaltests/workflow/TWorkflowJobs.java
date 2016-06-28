@@ -83,7 +83,7 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
     public abstract String getJobPrefix();
 
     /**
-     * For each job described in {@link #jobs}, submit the job,
+     * For each job described in {@link #data.jobs}, submit the job,
      * wait for finished state, and compare expected result for each task with the actual result
      * 
      * @throws Throwable

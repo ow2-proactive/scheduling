@@ -77,7 +77,6 @@ import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateIfTaskHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateLoopHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateReplicateTaskHandler;
-import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
@@ -789,26 +788,6 @@ public abstract class InternalJob extends JobState {
         return updatedTasks;
     }
 
-    public Set<TaskId> updateStartAtAndTasksScheduledTime(String startAt, long scheduledTime) {
-
-        Map<String, String> genericInformations = getGenericInformations(true);
-
-        genericInformations.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
-
-        setGenericInformations(genericInformations);
-
-        List<InternalTask> internalTasks = getITasks();
-        Set<TaskId> updatedTasks = new HashSet<>(internalTasks.size());
-
-        for (InternalTask td : internalTasks) {
-            td.setScheduledTime(scheduledTime);
-            updatedTasks.add(td.getId());
-            getJobDescriptor().updateTaskScheduledTime(td.getId(), scheduledTime);
-        }
-
-        return updatedTasks;
-    }
-
     public void setTaskPausedOnError(InternalTask internalTask) {
         internalTask.setStatus(TaskStatus.IN_ERROR);
         getJobDescriptor().pausedTaskOnError(internalTask.getId());
@@ -1249,7 +1228,7 @@ public abstract class InternalJob extends JobState {
      *            information
      *
      */
-    public Map<String, String> getGenericInformations(boolean replaceVariables) {
+    public Map<String, String> getGenericInformation(boolean replaceVariables) {
         if (replaceVariables) {
             return this.getGenericInformation();
         } else {
