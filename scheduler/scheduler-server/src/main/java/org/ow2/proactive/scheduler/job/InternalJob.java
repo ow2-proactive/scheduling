@@ -50,6 +50,7 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -76,13 +77,14 @@ import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateIfTaskHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateLoopHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateReplicateTaskHandler;
+import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+
 import it.sauronsoftware.cron4j.Predictor;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -286,15 +288,13 @@ public abstract class InternalJob extends JobState {
             // if a task restart due to a failure for instance
             if (!taskDataSpaceApplications.containsKey(taskId)) {
                 String appId = internalTask.getId().toString();
-                TaskDataSpaceApplication taskDataSpaceApplication =
-                        new TaskDataSpaceApplication(appId, namingService);
+                TaskDataSpaceApplication taskDataSpaceApplication = new TaskDataSpaceApplication(appId,
+                    namingService);
 
                 taskDataSpaceApplications.put(taskId, taskDataSpaceApplication);
 
-                taskDataSpaceApplication.startDataSpaceApplication(
-                        getInputSpace(), getOutputSpace(),
-                        getGlobalSpace(), getUserSpace(),
-                        getOwner(), getId());
+                taskDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(),
+                        getGlobalSpace(), getUserSpace(), getOwner(), getId());
             }
         }
     }
@@ -786,6 +786,26 @@ public abstract class InternalJob extends JobState {
                 updatedTasks.add(td.getId());
             }
         }
+        return updatedTasks;
+    }
+
+    public Set<TaskId> updateStartAtAndTasksScheduledTime(String startAt, long scheduledTime) {
+
+        Map<String, String> genericInformations = getGenericInformations(true);
+
+        genericInformations.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
+
+        setGenericInformations(genericInformations);
+
+        List<InternalTask> internalTasks = getITasks();
+        Set<TaskId> updatedTasks = new HashSet<>(internalTasks.size());
+
+        for (InternalTask td : internalTasks) {
+            td.setScheduledTime(scheduledTime);
+            updatedTasks.add(td.getId());
+            getJobDescriptor().updateTaskScheduledTime(td.getId(), scheduledTime);
+        }
+
         return updatedTasks;
     }
 

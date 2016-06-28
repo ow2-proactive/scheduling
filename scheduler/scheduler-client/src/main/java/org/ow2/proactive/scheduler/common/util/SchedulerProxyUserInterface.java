@@ -636,5 +636,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
             throws UnknownJobException, NotConnectedException, PermissionException {
         return uischeduler.getJobInfo(jobId);
     }
+    
+    
+    @Override
+    public boolean changeStartAt(JobId jobId, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return uischeduler.changeStartAt(jobId, startAt);
+    }
 
 }

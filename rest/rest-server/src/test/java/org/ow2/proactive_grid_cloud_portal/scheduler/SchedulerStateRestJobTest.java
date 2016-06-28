@@ -1,5 +1,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.mock;
@@ -12,12 +14,14 @@ import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+
 
 /**
  * The [offset, limit[ boundaries and tag filtering are out of the scope of these tests
@@ -26,18 +30,32 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
  *
  */
 public class SchedulerStateRestJobTest extends RestTestServer {
-    
+
     private SchedulerRestInterface restInterface = null;
     private SchedulerProxyUserInterface mockOfScheduler = null;
     private String sessionId = null;
-    
+
     @Before
     public void setUp() throws Throwable {
         restInterface = new SchedulerStateRest();
         mockOfScheduler = mock(SchedulerProxyUserInterface.class);
         sessionId = SharedSessionStoreTestUtils.createValidSession(mockOfScheduler);
     }
-    
+
+    @Test
+    public void testChangeStartAt() throws Throwable {
+
+        String JobId = "3";
+        String startAt = "2017-07-07T00:00:00+01:00";
+
+        when(mockOfScheduler.changeStartAt(JobIdImpl.makeJobId(JobId), startAt)).thenReturn(true);
+
+        boolean startAtChanged = restInterface.changeStartAt(sessionId, JobId, startAt);
+
+        assertThat(startAtChanged, is(true));
+
+    }
+
     @Test
     public void testJobs() throws Throwable {
 
@@ -63,20 +81,18 @@ public class SchedulerStateRestJobTest extends RestTestServer {
 
         RestTestUtils.assertJobsInfoPage(expectedJobs, actualPage);
     }
-    
+
     @Test
     public void testJobInfo() throws Throwable {
         String JobId = "3";
         JobState jobState = RestTestUtils.newMockedJob(JobId, null, 50);
-        
+
         when(mockOfScheduler.getJobState("3")).thenReturn(jobState);
-        
+
         JobInfoData jobInfoData = restInterface.jobInfo(sessionId, JobId);
-        
+
         RestTestUtils.assertJobInfo(jobState.getJobInfo(), jobInfoData);
-        
+
     }
 
-    
-    
 }
