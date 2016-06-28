@@ -24,7 +24,7 @@ buildscript {
             exclude group: 'javassist', module: 'javassist'
         }
 
-        classpath 'com.qmino:miredot-plugin:1.6.2'
+        classpath 'com.qmino:miredot-plugin:2.0-RC3'
     }
 }
 
