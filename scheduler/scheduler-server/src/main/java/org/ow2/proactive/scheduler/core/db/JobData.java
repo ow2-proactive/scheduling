@@ -298,7 +298,7 @@ public class JobData {
         jobRuntimeData.setOutputSpace(job.getOutputSpace());
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
         jobRuntimeData.setUserSpace(job.getUserSpace());
-        jobRuntimeData.setGenericInformation(job.getGenericInformation(false));
+        jobRuntimeData.setGenericInformation(job.getGenericInformations(false));
         jobRuntimeData.setVariables(job.getVariables());
         jobRuntimeData.setStatus(job.getStatus());
         jobRuntimeData.setOwner(job.getOwner());

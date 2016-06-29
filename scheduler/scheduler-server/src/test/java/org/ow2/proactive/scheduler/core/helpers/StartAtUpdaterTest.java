@@ -62,7 +62,7 @@ public class StartAtUpdaterTest {
         Map<String, String> genericInformation = Maps.newHashMap();
 
         genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
-        when(internalJob.getGenericInformation(true)).thenReturn(genericInformation);
+        when(internalJob.getGenericInformations(true)).thenReturn(genericInformation);
 
         assertThat(startAtUpdater.updateStartAt(internalJob, startAt, dbManager), is(false));
 
@@ -80,7 +80,7 @@ public class StartAtUpdaterTest {
 
         when(internalJob.getITasks()).thenReturn(internalTasks);
         Map<String, String> genericInformation = Maps.newHashMap();
-        when(internalJob.getGenericInformation(true)).thenReturn(genericInformation);
+        when(internalJob.getGenericInformations(true)).thenReturn(genericInformation);
 
         assertThat(startAtUpdater.updateStartAt(internalJob, startAt, dbManager), is(true));
 
@@ -101,7 +101,7 @@ public class StartAtUpdaterTest {
         when(internalJob.getITasks()).thenReturn(internalTasks);
         Map<String, String> genericInformation = Maps.newHashMap();
         genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
-        when(internalJob.getGenericInformation(true)).thenReturn(genericInformation);
+        when(internalJob.getGenericInformations(true)).thenReturn(genericInformation);
 
         assertThat(startAtUpdater.updateStartAt(internalJob, startAtUpdate, dbManager), is(true));
 
@@ -120,7 +120,7 @@ public class StartAtUpdaterTest {
         when(internalJob.getITasks()).thenReturn(internalTasks);
         Map<String, String> genericInformation = Maps.newHashMap();
         genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
-        when(internalJob.getGenericInformation(true)).thenReturn(genericInformation);
+        when(internalJob.getGenericInformations(true)).thenReturn(genericInformation);
 
         assertThat(startAtUpdater.updateStartAt(internalJob, startAtUpdate, dbManager), is(false));
 

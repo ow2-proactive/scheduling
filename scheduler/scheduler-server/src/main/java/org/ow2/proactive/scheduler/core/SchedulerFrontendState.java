@@ -48,6 +48,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
@@ -90,7 +91,6 @@ import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermissio
 import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-import org.apache.log4j.Logger;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
@@ -887,9 +887,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     @Override
     public synchronized void jobSubmitted(JobState job) {
-        JobState storedJobState = new ClientJobState(job);
+        ClientJobState storedJobState = new ClientJobState(job);
         jobsMap.put(job.getId(), storedJobState);
         sState.getPendingJobs().add(storedJobState);
+        job.setGenericInformations(storedJobState.getGenericInformation());
         dispatchJobSubmitted(job);
     }
 

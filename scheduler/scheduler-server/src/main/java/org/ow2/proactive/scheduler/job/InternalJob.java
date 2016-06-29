@@ -1228,7 +1228,7 @@ public abstract class InternalJob extends JobState {
      *            information
      *
      */
-    public Map<String, String> getGenericInformation(boolean replaceVariables) {
+    public Map<String, String> getGenericInformations(boolean replaceVariables) {
         if (replaceVariables) {
             return this.getGenericInformation();
         } else {

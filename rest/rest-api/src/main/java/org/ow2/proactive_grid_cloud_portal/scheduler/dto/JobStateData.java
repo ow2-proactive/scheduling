@@ -37,9 +37,12 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.ow2.proactive.db.types.BigString;
 
 
 @XmlRootElement
@@ -50,6 +53,15 @@ public class JobStateData {
     private JobInfoData jobInfo;
     private String projectName;
     private Map<String, TaskStateData> tasks;
+    private Map<String, BigString> genericInformations = new HashMap<String, BigString>();
+
+    public Map<String, BigString> getGenericInformations() {
+        return genericInformations;
+    }
+
+    public void setGenericInformations(Map<String, BigString> genericInformations) {
+        this.genericInformations = genericInformations;
+    }
 
     public String getPriority() {
         return priority;
@@ -105,9 +117,9 @@ public class JobStateData {
 
     @Override
     public String toString() {
-        return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
-            owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
-            tasks + '}';
+        return "JobStateData [name=" + name + ", priority=" + priority + ", owner=" + owner + ", jobInfo=" +
+            jobInfo + ", projectName=" + projectName + ", tasks=" + tasks + ", genericInformation=" +
+            genericInformations + "]";
     }
 
 }
