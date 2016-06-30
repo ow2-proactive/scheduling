@@ -116,8 +116,9 @@ public class JobStateData {
 
     @Override
     public String toString() {
-        return "JobStateData {name=" + name + ", priority=" + priority + ", owner=" + owner + ", jobInfo=" +
-            jobInfo + ", projectName=" + projectName + ", tasks=" + tasks + "}";
+        return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
+            owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
+            tasks + '}';
     }
 
 }
