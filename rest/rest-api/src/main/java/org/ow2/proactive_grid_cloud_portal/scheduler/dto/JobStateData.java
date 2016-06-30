@@ -37,38 +37,19 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.proactive.db.types.BigString;
 
 
 @XmlRootElement
 public class JobStateData {
-
-    @XmlTransient
-    private static ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Inclusion.NON_NULL);
-
     private String name;
     private String priority;
     private String owner;
     private JobInfoData jobInfo;
     private String projectName;
     private Map<String, TaskStateData> tasks;
-    private Map<String, BigString> genericInformations = new HashMap<String, BigString>();
-
-    public Map<String, BigString> getGenericInformations() {
-        return genericInformations;
-    }
-
-    public void setGenericInformations(Map<String, BigString> genericInformations) {
-        this.genericInformations = genericInformations;
-    }
 
     public String getPriority() {
         return priority;
@@ -124,15 +105,9 @@ public class JobStateData {
 
     @Override
     public String toString() {
-
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (Exception e) {
-            return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
-                owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
-                tasks + ", genericInformation=" + genericInformations + '}';
-        }
-
+        return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
+            owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
+            tasks + '}';
     }
 
 }
