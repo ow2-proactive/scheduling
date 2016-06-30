@@ -41,6 +41,8 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.ow2.proactive.db.types.BigString;
+
 
 @XmlRootElement
 public class JobStateData {
@@ -50,6 +52,15 @@ public class JobStateData {
     private JobInfoData jobInfo;
     private String projectName;
     private Map<String, TaskStateData> tasks;
+    private Map<String, BigString> genericInformation;
+
+    public Map<String, BigString> getGenericInformation() {
+        return genericInformation;
+    }
+
+    public void setGenericInformation(Map<String, BigString> genericInformation) {
+        this.genericInformation = genericInformation;
+    }
 
     public String getPriority() {
         return priority;
@@ -105,9 +116,8 @@ public class JobStateData {
 
     @Override
     public String toString() {
-        return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
-            owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
-            tasks + '}';
+        return "JobStateData {name=" + name + ", priority=" + priority + ", owner=" + owner + ", jobInfo=" +
+            jobInfo + ", projectName=" + projectName + ", tasks=" + tasks + "}";
     }
 
 }
