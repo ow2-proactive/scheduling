@@ -41,12 +41,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.proactive.db.types.BigString;
 
 
 @XmlRootElement
 public class JobStateData {
+
+    @XmlTransient
+    private static ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Inclusion.NON_NULL);
+
     private String name;
     private String priority;
     private String owner;
@@ -117,9 +124,15 @@ public class JobStateData {
 
     @Override
     public String toString() {
-        return "JobStateData [name=" + name + ", priority=" + priority + ", owner=" + owner + ", jobInfo=" +
-            jobInfo + ", projectName=" + projectName + ", tasks=" + tasks + ", genericInformation=" +
-            genericInformations + "]";
+
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (Exception e) {
+            return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
+                owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
+                tasks + ", genericInformation=" + genericInformations + '}';
+        }
+
     }
 
 }
