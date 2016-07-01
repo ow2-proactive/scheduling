@@ -53,15 +53,16 @@ public class StartAtUpdater {
 
         Map<String, String> genericInformation = job.getGenericInformation(true);
 
-        if (iaAValidStartAt(genericInformation, startAt)) {
+        if (isValidStartAt(genericInformation, startAt)) {
             genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
             job.setGenericInformations(genericInformation);
             return true;
         }
+
         return false;
     }
 
-    private boolean iaAValidStartAt(Map<String, String> genericInformation, String startAt) {
+    private boolean isValidStartAt(Map<String, String> genericInformation, String startAt) {
         String found = genericInformation.get(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT);
 
         // null is not allowed as generic information key,
