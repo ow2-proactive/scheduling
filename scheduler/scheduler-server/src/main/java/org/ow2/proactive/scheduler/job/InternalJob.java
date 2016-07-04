@@ -50,6 +50,7 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -81,8 +82,8 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+
 import it.sauronsoftware.cron4j.Predictor;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -95,7 +96,8 @@ import org.apache.log4j.Logger;
  * @since ProActive Scheduling 0.9
  */
 public abstract class InternalJob extends JobState {
-    public static final Logger LOGGER = Logger.getLogger(InternalJob.class);
+
+    protected static final Logger LOGGER = Logger.getLogger(InternalJob.class);
 
     /** List of every tasks in this job. */
     protected Map<TaskId, InternalTask> tasks = new HashMap<>();
@@ -107,10 +109,10 @@ public abstract class InternalJob extends JobState {
     @XmlTransient
     private JobDescriptor jobDescriptor;
 
-    /** DataSpace application manager for this job */
+    /** DataSpace application manager per task. The key is the task ID */
     // Not DB managed, created once needed.
     @XmlTransient
-    private JobDataSpaceApplication jobDataSpaceApplication;
+    private Map<Long, TaskDataSpaceApplication> taskDataSpaceApplications;
 
     /** Initial waiting time for a task before restarting in millisecond */
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
@@ -273,13 +275,27 @@ public abstract class InternalJob extends JobState {
     /**
      * Start dataspace configuration and application
      */
-    public void startDataSpaceApplication(NamingService namingService) {
-        if (jobDataSpaceApplication == null) {
-            long appId = getJobInfo().getJobId().hashCode();
-            jobDataSpaceApplication = new JobDataSpaceApplication(appId, namingService);
+    public void startDataSpaceApplication(NamingService namingService, List<InternalTask> tasks) {
+        if (taskDataSpaceApplications == null) {
+            taskDataSpaceApplications = new HashMap<>();
         }
-        jobDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(), getGlobalSpace(),
-                getUserSpace(), getOwner(), getId());
+
+        for (InternalTask internalTask : tasks) {
+            long taskId = internalTask.getId().longValue();
+
+            // reuse the already configured dataspaceApplication
+            // if a task restart due to a failure for instance
+            if (!taskDataSpaceApplications.containsKey(taskId)) {
+                String appId = internalTask.getId().toString();
+                TaskDataSpaceApplication taskDataSpaceApplication = new TaskDataSpaceApplication(appId,
+                    namingService);
+
+                taskDataSpaceApplications.put(taskId, taskDataSpaceApplication);
+
+                taskDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(),
+                        getGlobalSpace(), getUserSpace(), getOwner(), getId());
+            }
+        }
     }
 
     /**
@@ -660,9 +676,7 @@ public abstract class InternalJob extends JobState {
             }
         }
 
-        if (jobDataSpaceApplication != null) {
-            jobDataSpaceApplication.terminateDataSpaceApplication();
-        }
+        terminateTaskDataSpaceApplications();
 
         return updatedTasks;
     }
@@ -731,11 +745,16 @@ public abstract class InternalJob extends JobState {
      * Set all properties in order to terminate the job.
      */
     public void terminate() {
+        long finishTime = System.currentTimeMillis();
         setStatus(JobStatus.FINISHED);
-        setFinishedTime(System.currentTimeMillis());
-        if (jobDataSpaceApplication != null) {
-            if (!LOGGER.isDebugEnabled()) {
-                jobDataSpaceApplication.terminateDataSpaceApplication();
+        setFinishedTime(finishTime);
+        terminateTaskDataSpaceApplications();
+    }
+
+    private void terminateTaskDataSpaceApplications() {
+        if (taskDataSpaceApplications != null) {
+            for (TaskDataSpaceApplication taskDataSpaceApplication : taskDataSpaceApplications.values()) {
+                taskDataSpaceApplication.terminateDataSpaceApplication();
             }
         }
     }
@@ -1147,8 +1166,8 @@ public abstract class InternalJob extends JobState {
      *
      * @return the jobDataSpaceApplication
      */
-    public JobDataSpaceApplication getJobDataSpaceApplication() {
-        return jobDataSpaceApplication;
+    public Map<Long, TaskDataSpaceApplication> getTaskDataSpaceApplications() {
+        return taskDataSpaceApplications;
     }
 
     /**
@@ -1209,7 +1228,7 @@ public abstract class InternalJob extends JobState {
      *            information
      *
      */
-    public Map<String, String> getGenericInformations(boolean replaceVariables) {
+    public Map<String, String> getGenericInformation(boolean replaceVariables) {
         if (replaceVariables) {
             return this.getGenericInformation();
         } else {

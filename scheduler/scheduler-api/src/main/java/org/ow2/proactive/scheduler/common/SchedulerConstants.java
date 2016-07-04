@@ -115,5 +115,6 @@ public class SchedulerConstants {
     /**
      * The Application ID used by the scheduler for local Dataspaces
      */
-    public static long SCHEDULER_DATASPACE_APPLICATION_ID = 0;
+    public static String SCHEDULER_DATASPACE_APPLICATION_ID = "0";
+
 }

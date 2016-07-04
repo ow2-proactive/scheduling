@@ -61,5 +61,6 @@ public interface TaskDataspaces extends Serializable {
 
     void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException;
 
-    void cleanScratchSpace();
+    void close();
+
 }

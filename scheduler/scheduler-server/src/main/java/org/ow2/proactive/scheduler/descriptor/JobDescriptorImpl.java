@@ -51,6 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -62,7 +63,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -550,8 +550,8 @@ public class JobDescriptorImpl implements JobDescriptor {
                     if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
                         if (internalJob.getStatus() == JobStatus.PAUSED) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
-                        } else if (internalJob.getStatus() == JobStatus.IN_ERROR
-                                && task.getInternal().getStatus() == TaskStatus.PAUSED) {
+                        } else if (internalJob.getStatus() == JobStatus.IN_ERROR &&
+                            task.getInternal().getStatus() == TaskStatus.PAUSED) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
                         } else {
                             eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
@@ -613,6 +613,16 @@ public class JobDescriptorImpl implements JobDescriptor {
 
             if (eligibleTaskDescriptor != null) {
                 eligibleTasks.put(taskId, eligibleTaskDescriptor);
+            }
+        }
+    }
+
+    public void updateTaskScheduledTime(TaskId taskId, long scheduledTime) {
+        if (getInternal().getType() == JobType.TASKSFLOW) {
+            EligibleTaskDescriptor eligibleTaskDescriptor = eligibleTasks.get(taskId);
+
+            if (eligibleTaskDescriptor != null) {
+                eligibleTaskDescriptor.getInternal().setScheduledTime(scheduledTime);
             }
         }
     }

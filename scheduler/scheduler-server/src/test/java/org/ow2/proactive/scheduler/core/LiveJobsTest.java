@@ -1,5 +1,12 @@
 package org.ow2.proactive.scheduler.core;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,13 +36,6 @@ import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.python.google.common.collect.ImmutableSet;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 
 public class LiveJobsTest {
@@ -138,6 +138,21 @@ public class LiveJobsTest {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         assertThat(liveJobs.pauseJob(id), is(true));
+    }
+
+    @Test
+    public void testUpdateStartAt() {
+        String startAt = "2017-07-07T00:00:00+01:00";
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+            "description");
+        JobId id = new JobIdImpl(666L, "test-name");
+        job.setId(id);
+        List<InternalTask> tasksList = new ArrayList<>();
+        InternalTask internalTask = new InternalScriptTask();
+        tasksList.add(internalTask);
+        job.setTasks(tasksList);
+        liveJobs.jobSubmitted(job);
+        assertThat(liveJobs.updateStartAt(id, startAt), is(true));
     }
 
     @Test

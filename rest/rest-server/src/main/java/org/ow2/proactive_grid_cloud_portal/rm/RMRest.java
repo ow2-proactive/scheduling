@@ -82,6 +82,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -311,6 +312,22 @@ public class RMRest implements RMRestInterface {
         ResourceManager rm = checkAccess(sessionId);
         return rm.nodeIsAvailable(url).getBooleanValue();
     }
+    
+    
+    /**
+     * Gives list of existing Node Sources
+     * @return list of existing Node Sources
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("nodesource")
+    @Produces("application/json")
+	public List<RMNodeSourceEvent> getExistingNodeSources(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+		ResourceManager rm = checkAccess(sessionId);
+        return rm.getExistingNodeSourcesList();
+	}
+ 
 
     /**
      * Create a NodeSource
@@ -970,4 +987,5 @@ public class RMRest implements RMRestInterface {
     public Response index() throws URISyntaxException {
         return Response.seeOther(new URI("doc/jaxrsdocs/rm/index.html")).build();
     }
+
 }

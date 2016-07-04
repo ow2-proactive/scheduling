@@ -46,6 +46,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scripting.Script;
@@ -102,6 +103,16 @@ public interface ResourceManager {
      * @return true if the node source was removed successfully, runtime exception otherwise
      */
     BooleanWrapper removeNodeSource(String sourceName, boolean preempt);
+    
+    
+    /**
+     * Returns the list of existing node source infrastructures 
+     *
+     * @return the list of existing node source infrastructures 
+     */
+    List<RMNodeSourceEvent> getExistingNodeSourcesList();
+    
+    
 
     /**
      * Returns the list of supported node source infrastructures descriptors.

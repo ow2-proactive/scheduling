@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -84,6 +85,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public BooleanWrapper addNode(String arg0, String arg1) {
         return target.addNode(arg0, arg1);
     }
+    
+    @Override
+	public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
+		return target.getExistingNodeSourcesList();
+	}
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#createNodeSource(java.lang.String, java.lang.String, java.lang.Object[], java.lang.String, java.lang.Object[])
@@ -91,6 +97,7 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4) {
         return target.createNodeSource(arg0, arg1, arg2, arg3, arg4);
     }
+    
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getAtMostNodes(int, org.ow2.proactive.scripting.SelectionScript)
@@ -313,4 +320,5 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
             Set<String> targets) {
         return this.target.executeScript(script, scriptEngine, targetType, targets);
     }
+
 }
