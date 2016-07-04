@@ -355,7 +355,7 @@ public class TaskLauncher implements InitActive {
     public PublicKey generatePublicKey() throws NoSuchAlgorithmException {
         KeyPairGenerator keyGen;
         keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(1024, new SecureRandom());
+        keyGen.initialize(2048, new SecureRandom());
         KeyPair keyPair = keyGen.generateKeyPair();
         decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
