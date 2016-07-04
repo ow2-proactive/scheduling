@@ -838,7 +838,7 @@ public class SchedulerDBManager {
                 InternalTask internalTask = taskData.toInternalTask(internalJob);
                 if (loadFullState) {
                     internalTask.setParallelEnvironment(taskData.getParallelEnvironment());
-                    internalTask.setGenericInformations(taskData.getGenericInformation());
+                    internalTask.setGenericInformation(taskData.getGenericInformation());
                     for (SelectionScriptData scriptData : taskData.getSelectionScripts()) {
                         internalTask.addSelectionScript(scriptData.createSelectionScript());
                     }

@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -62,7 +63,6 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.apache.commons.collections4.CollectionUtils;
 
 
 public class JobComparator {
@@ -139,25 +139,24 @@ public class JobComparator {
     }
 
     private boolean isEqualCommonAttribute(CommonAttribute attrib1, CommonAttribute attrib2) {
-        if (!isEqualUpdatableProperty(attrib1.getOnTaskErrorProperty(), attrib2
-                .getOnTaskErrorProperty())) {
+        if (!isEqualUpdatableProperty(attrib1.getOnTaskErrorProperty(), attrib2.getOnTaskErrorProperty())) {
             stack.push(" CancelJobOnErrorProperty ");
             return false;
         }
 
-        if (!isEqualUpdatableProperty(attrib1.getMaxNumberOfExecutionProperty(), attrib2
-                .getMaxNumberOfExecutionProperty())) {
+        if (!isEqualUpdatableProperty(attrib1.getMaxNumberOfExecutionProperty(),
+                attrib2.getMaxNumberOfExecutionProperty())) {
             stack.push(" maxNumberOfExecution ");
             return false;
         }
 
-        if (!isEqualUpdatableProperty(attrib1.getRestartTaskOnErrorProperty(), attrib2
-                .getRestartTaskOnErrorProperty())) {
+        if (!isEqualUpdatableProperty(attrib1.getRestartTaskOnErrorProperty(),
+                attrib2.getRestartTaskOnErrorProperty())) {
             stack.push(" RestartTaskOnError ");
             return false;
         }
 
-        stack.push(" genericInformations ");
+        stack.push(" genericInformation ");
         if (!isEqualMap(attrib1.getGenericInformation(), attrib2.getGenericInformation())) {
 
             stack.push("generic info 1= " + attrib1.getGenericInformation() + " ----- generic info 2 = " +
@@ -169,8 +168,8 @@ public class JobComparator {
         return true;
     }
 
-    private boolean isTaskFlowEqual(TaskFlowJob job1, TaskFlowJob job2) throws IOException,
-            ClassNotFoundException {
+    private boolean isTaskFlowEqual(TaskFlowJob job1, TaskFlowJob job2)
+            throws IOException, ClassNotFoundException {
         ArrayList<Task> tasks1 = job1.getTasks();
         ArrayList<Task> tasks2 = job2.getTasks();
 
@@ -626,9 +625,8 @@ public class JobComparator {
         }
 
         if (topologyDescriptor1 == null ^ topologyDescriptor2 == null) {
-            return isEqualClass(TopologyDescriptor.ARBITRARY.getClass(),
-                    (topologyDescriptor1 == null ? topologyDescriptor2.getClass() : topologyDescriptor1
-                            .getClass()));
+            return isEqualClass(TopologyDescriptor.ARBITRARY.getClass(), (topologyDescriptor1 == null
+                    ? topologyDescriptor2.getClass() : topologyDescriptor1.getClass()));
         }
 
         if (!isEqualClass(topologyDescriptor1.getClass(), topologyDescriptor2.getClass())) {
@@ -642,8 +640,8 @@ public class JobComparator {
                 return false;
             }
 
-            if (((ThresholdProximityDescriptor) topologyDescriptor1).getThreshold() != ((ThresholdProximityDescriptor) topologyDescriptor2)
-                    .getThreshold()) {
+            if (((ThresholdProximityDescriptor) topologyDescriptor1)
+                    .getThreshold() != ((ThresholdProximityDescriptor) topologyDescriptor2).getThreshold()) {
                 stack.push("ThresholdProximityDescriptor.threshold");
                 return false;
             }
@@ -663,8 +661,8 @@ public class JobComparator {
 
     private static <T> boolean isEqualUpdatableProperty(UpdatableProperties<T> property1,
             UpdatableProperties<T> property2) {
-        return (property1.isSet() ^ property2.isSet()) ? false : ((property1.isSet()) ? property1.getValue()
-                .equals(property2.getValue()) : true);
+        return (property1.isSet() ^ property2.isSet()) ? false
+                : ((property1.isSet()) ? property1.getValue().equals(property2.getValue()) : true);
     }
 
     private boolean isEqualClass(Class<?> clazz1, Class<?> clazz2) {

@@ -281,12 +281,11 @@ public abstract class Task extends CommonAttribute {
             return;
         }
         if (name.length() > 255) {
-            throw new IllegalArgumentException("The name is too long, it must have 255 chars length max : " +
-                name);
+            throw new IllegalArgumentException(
+                "The name is too long, it must have 255 chars length max : " + name);
         }
         this.name = name;
     }
-
 
     /**
      * Get the tag of this task.
@@ -297,7 +296,6 @@ public abstract class Task extends CommonAttribute {
     public String getTag() {
         return this.tag;
     }
-
 
     /**
      * Set the tag of this task.
@@ -549,7 +547,8 @@ public abstract class Task extends CommonAttribute {
      */
     public void setWallTime(long walltime) {
         if (walltime < 0) {
-            throw new IllegalArgumentException("The walltime must be a positive or nul integer value (>=0) !");
+            throw new IllegalArgumentException(
+                "The walltime must be a positive or nul integer value (>=0) !");
         }
         this.wallTime = walltime;
     }
@@ -696,28 +695,23 @@ public abstract class Task extends CommonAttribute {
     public String display() {
         String nl = System.lineSeparator();
 
-        return "Task \'" + name + "\' : " + nl +
-                "\tDescription = '" + description + "'" + nl +
-                (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl : "") +
-                (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
-                (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" + maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
-                "\ttag = " + tag + nl +
-                "\tgenericInformations = {" + nl + Joiner.on('\n').withKeyValueSeparator("=").join(genericInformations) + nl + "}" + nl +
-                "\tInputFiles = " + inputFiles + nl +
-                "\tOutputFiles = " + outputFiles + nl +
-                "\tParallelEnvironment = " + parallelEnvironment + nl +
-                "\tFlowBlock = '" + flowBlock + "'" + nl +
-                "\tSelectionScripts = " + displaySelectionScripts() + nl +
-                "\tForkEnvironment = " + forkEnvironment + nl +
-                "\tPreScript = " + ((preScript != null) ? preScript.display() : null) + nl +
-                "\tPostScript = " + ((postScript != null) ? postScript.display() : null) + nl +
-                "\tCleanScript = " + ((cScript != null) ? cScript.display() : null) + nl +
-                "\tFlowScript = " + ((flowScript != null) ? flowScript.display() : null) + nl +
-                "\tPreciousResult = " + preciousResult + nl +
-                "\tPreciousLogs = " + preciousLogs + nl +
-                "\tRunAsMe = " + runAsMe + nl +
-                "\tWallTime = " + wallTime + nl +
-                "\tDependences = " + dependences;
+        return "Task \'" + name + "\' : " + nl + "\tDescription = '" + description + "'" + nl +
+            (restartTaskOnError.isSet()
+                    ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl : "") +
+            (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
+            (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
+                maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
+            "\ttag = " + tag + nl + "\tgenericInformation = {" + nl +
+            Joiner.on('\n').withKeyValueSeparator("=").join(genericInformation) + nl + "}" + nl +
+            "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
+            "\tParallelEnvironment = " + parallelEnvironment + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
+            "\tSelectionScripts = " + displaySelectionScripts() + nl + "\tForkEnvironment = " +
+            forkEnvironment + nl + "\tPreScript = " + ((preScript != null) ? preScript.display() : null) +
+            nl + "\tPostScript = " + ((postScript != null) ? postScript.display() : null) + nl +
+            "\tCleanScript = " + ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
+            ((flowScript != null) ? flowScript.display() : null) + nl + "\tPreciousResult = " +
+            preciousResult + nl + "\tPreciousLogs = " + preciousLogs + nl + "\tRunAsMe = " + runAsMe + nl +
+            "\tWallTime = " + wallTime + nl + "\tDependences = " + dependences;
     }
 
     private String displaySelectionScripts() {

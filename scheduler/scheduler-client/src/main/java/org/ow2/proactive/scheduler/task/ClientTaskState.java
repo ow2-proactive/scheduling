@@ -1,5 +1,11 @@
 package org.ow2.proactive.scheduler.task;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -11,11 +17,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -57,7 +58,7 @@ public final class ClientTaskState extends TaskState {
         this.maxNumberOfExecution = taskState.getMaxNumberOfExecution();
 
         this.setParallelEnvironment(taskState.getParallelEnvironment());
-        this.setGenericInformations(taskState.getGenericInformation());
+        this.setGenericInformation(taskState.getGenericInformation());
 
         this.setOnTaskError(taskState.getOnTaskErrorProperty().getValue());
 

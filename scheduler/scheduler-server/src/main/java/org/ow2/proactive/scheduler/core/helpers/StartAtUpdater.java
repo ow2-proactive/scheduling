@@ -49,11 +49,11 @@ public class StartAtUpdater {
 
     private boolean resetJobGenericInformation(InternalJob job, String startAt) {
 
-        Map<String, String> genericInformation = job.getGenericInformations(true);
+        Map<String, String> genericInformation = job.getGenericInformation(true);
 
         if (iaAValidStartAt(genericInformation, startAt)) {
             genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
-            job.setGenericInformations(genericInformation);
+            job.setGenericInformation(genericInformation);
             return true;
         }
         return false;

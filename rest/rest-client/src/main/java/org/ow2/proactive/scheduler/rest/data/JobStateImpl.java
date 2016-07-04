@@ -37,12 +37,9 @@ package org.ow2.proactive.scheduler.rest.data;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -62,15 +59,11 @@ public class JobStateImpl extends JobState {
 
     JobStateImpl(JobStateData d) {
         this.jobStateData = d;
-        copyGenericInformations(jobStateData);
+        copyGenericInformation(jobStateData);
     }
 
-    private void copyGenericInformations(JobStateData jobStateData) {
-        Map<String, String> genericInformations = new HashMap<>();
-        for (Entry<String, BigString> entry : jobStateData.getGenericInformation().entrySet()) {
-            genericInformations.put(entry.getKey(), entry.getValue().getValue());
-        }
-        super.setGenericInformations(genericInformations);
+    private void copyGenericInformation(JobStateData jobStateData) {
+        super.setGenericInformation(jobStateData.getGenericInformation());
     }
 
     @Override
@@ -137,5 +130,9 @@ public class JobStateImpl extends JobState {
     @Override
     public JobPriority getPriority() {
         return JobPriority.valueOf(jobStateData.getPriority());
+    }
+
+    public JobStateData getJobStateData() {
+        return this.jobStateData;
     }
 }
