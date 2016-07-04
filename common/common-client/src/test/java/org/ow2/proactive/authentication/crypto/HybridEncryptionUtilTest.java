@@ -14,7 +14,7 @@ public class HybridEncryptionUtilTest {
 
     @Test
     public void encrypt_decrypt() throws Exception {
-        KeyPair keyPair = KeyPairUtil.generateKeyPair("RSA", 1024);
+        KeyPair keyPair = KeyPairUtil.generateKeyPair("RSA", 2048);
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
 
