@@ -420,10 +420,19 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
 
             DataSpacesFileObject target = destination.resolveFile(relativePath);
 
-            if (target.isFolder()) {
+            boolean isDebugEnabled = logger.isDebugEnabled();
+            
+            if (fileObject.isFolder()) {
+                if (isDebugEnabled) {
+                    logger.debug("Creating folder " + target.getRealURI());
+                }
                 target.createFolder();
-            } else if (target.isFile()) {
-                target.getParent().createFolder();
+            } else if (fileObject.isFile()) {
+                DataSpacesFileObject parent = target.getParent();
+                if (isDebugEnabled) {
+                    logger.debug("Creating folder " + parent.getRealURI());
+                }
+                parent.createFolder();
             }
 
             DataSpacesFileObject oldFileObject = filesToCopy.put(relativePath, fileObject);
