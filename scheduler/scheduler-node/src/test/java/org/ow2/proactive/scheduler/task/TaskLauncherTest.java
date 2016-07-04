@@ -1,10 +1,11 @@
 package org.ow2.proactive.scheduler.task;
 
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Matchers;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -20,24 +21,17 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mockito.Matchers;
+
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
 
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 
 public class TaskLauncherTest {
@@ -192,7 +186,7 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
                 return dataspacesMock;
             }
         });
@@ -217,7 +211,7 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
                 return dataspacesMock;
             }
         });
@@ -240,7 +234,7 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
                 return dataspacesMock;
             }
         });

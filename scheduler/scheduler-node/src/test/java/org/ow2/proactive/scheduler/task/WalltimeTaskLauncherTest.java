@@ -9,7 +9,6 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -91,7 +90,7 @@ public class WalltimeTaskLauncherTest {
 
     private class ForkingTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
         @Override
-        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
             return new TestTaskLauncherFactory.TaskFileDataspaces();
         }
 

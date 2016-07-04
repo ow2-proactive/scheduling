@@ -2,7 +2,6 @@ package org.ow2.proactive.scheduler.task;
 
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
@@ -25,7 +24,7 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
         }
 
         @Override
-        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+        public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
             return new SlowDataspaces(taskRunning);
         }
 

@@ -34,22 +34,21 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.data.TaskProActiveDataspaces;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
+
+import java.io.File;
 
 
 public class ProActiveNonForkedTaskLauncherFactory implements TaskLauncherFactory {
 
     @Override
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception {
-        return new TaskProActiveDataspaces(taskId, namingService);
+    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) throws Exception {
+        return new TaskProActiveDataspaces(taskId, namingService, isRunAsUser);
     }
 
     @Override

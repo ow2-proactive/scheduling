@@ -34,19 +34,18 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.io.Serializable;
-
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
+
+import java.io.File;
+import java.io.Serializable;
 
 
 public interface TaskLauncherFactory extends Serializable {
 
-    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) throws Exception;
+    TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) throws Exception;
 
     TaskExecutor createTaskExecutor(File workingDir);
 
