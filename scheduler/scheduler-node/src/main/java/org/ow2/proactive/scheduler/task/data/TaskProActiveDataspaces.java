@@ -34,6 +34,25 @@
  */
 package org.ow2.proactive.scheduler.task.data;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extensions.dataspaces.Utils;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.objectweb.proactive.utils.StackTraceUtil;
+import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,24 +65,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extensions.dataspaces.Utils;
-import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
-import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
-import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.objectweb.proactive.utils.StackTraceUtil;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 
@@ -83,6 +84,8 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
 
     private TaskId taskId;
     private NamingService namingService;
+    private boolean runAsUser;
+    private boolean linuxOS;
 
     private StringBuffer clientLogs = new StringBuffer();
 
@@ -90,9 +93,11 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
             Executors.newFixedThreadPool(getFileTransferThreadPoolSize(),
                     new NamedThreadFactory("FileTransferThreadPool"));
 
-    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService) throws Exception {
+    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) throws Exception {
         this.taskId = taskId;
         this.namingService = namingService;
+        this.runAsUser = isRunAsUser;
+        this.linuxOS = OperatingSystem.getOperatingSystem() == OperatingSystem.unix;
         initDataSpaces();
     }
 
@@ -422,8 +427,10 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
 
             if (target.isFolder()) {
                 target.createFolder();
+                setFolderRightsForRunAsUserMode(target);
             } else if (target.isFile()) {
                 target.getParent().createFolder();
+                setFolderRightsForRunAsUserMode(target.getParent());
             }
 
             DataSpacesFileObject oldFileObject = filesToCopy.put(relativePath, fileObject);
@@ -434,6 +441,43 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
                 logger.warn(message);
                 logDataspacesStatus(message, DataspacesStatusLevel.WARNING);
             }
+        }
+    }
+
+    /**
+     * Sets open file permissions for files copied in RunAsMe mode
+     */
+    private void setFileRightsForRunAsUserMode(DataSpacesFileObject object) throws FileSystemException {
+        if (runAsUser) {
+            setRWPermission(object);
+        }
+    }
+
+    private void setRWPermission(DataSpacesFileObject object) throws FileSystemException {
+        object.setReadable(true, false);
+        object.setWritable(true, false);
+    }
+
+    /**
+     * Sets open file permissions for folder copied in RunAsMe mode.
+     * The method will set as well recursively the permissions on the parents folder.
+     */
+    private void setFolderRightsForRunAsUserMode(DataSpacesFileObject object) throws FileSystemException {
+        if (runAsUser) {
+            setRWPermission(object);
+            if (linuxOS) {
+                object.setExecutable(true, false);
+            }
+            DataSpacesFileObject parentObject = null;
+            try {
+                parentObject = object.getParent();
+            } catch (Exception ignored) {
+                // in case getParent throws an exception instead of null, we prefer to ignore it and not propagate the permissions further.
+            }
+            if (parentObject != null) {
+                setFolderRightsForRunAsUserMode(parentObject);
+            }
+
         }
     }
 
@@ -514,7 +558,7 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
         List<Future<Boolean>> transferFutures = new ArrayList<>(filesToCopy.size());
 
         for (Map.Entry<String, DataSpacesFileObject> entry : filesToCopy.entrySet()) {
-            transferFutures.add(parallelFileCopy(entry.getValue(), SCRATCH, entry.getKey()));
+            transferFutures.add(parallelFileCopy(entry.getValue(), SCRATCH, entry.getKey(), true));
         }
 
         return transferFutures;
@@ -523,7 +567,8 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
     private Future<Boolean> parallelFileCopy(
             final DataSpacesFileObject source,
             final DataSpacesFileObject destinationBase,
-            final String destinationRelativeToBase) {
+            final String destinationRelativeToBase,
+            final boolean isInputFile) {
 
         logger.debug("------------ resolving " + destinationRelativeToBase);
 
@@ -543,6 +588,10 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
                                     ". File not present after copy.";
                     logger.error(message);
                     logDataspacesStatus(message, DataspacesStatusLevel.ERROR);
+                } else {
+                    if (isInputFile) {
+                        setFileRightsForRunAsUserMode(target);
+                    }
                 }
                 return true;
             }
@@ -766,7 +815,7 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
         ArrayList<Future<Boolean>> transferFutures = new ArrayList<>(results.size());
 
         for (Map.Entry<String, DataSpacesFileObject> entry : filesToCopy.entrySet()) {
-            transferFutures.add(parallelFileCopy(entry.getValue(), dataspaceDestination, entry.getKey()));
+            transferFutures.add(parallelFileCopy(entry.getValue(), dataspaceDestination, entry.getKey(), false));
         }
 
         handleResults(transferFutures);

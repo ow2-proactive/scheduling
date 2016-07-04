@@ -16,7 +16,6 @@ import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.apache.commons.io.FileUtils;
 
 public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
@@ -38,7 +37,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
     }
 
     @Override
-    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService) {
+    public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
         return dataSpaces;
     }
 

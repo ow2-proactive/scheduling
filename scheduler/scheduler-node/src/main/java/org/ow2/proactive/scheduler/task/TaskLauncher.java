@@ -140,7 +140,7 @@ public class TaskLauncher implements InitActive {
 
         try {
             addShutdownHook();
-            dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService());
+            dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService(), executableContainer.isRunAsUser());
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
