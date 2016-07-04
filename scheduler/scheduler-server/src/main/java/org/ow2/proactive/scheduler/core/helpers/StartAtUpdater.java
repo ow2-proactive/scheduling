@@ -21,11 +21,13 @@ public class StartAtUpdater {
 
         Set<TaskId> updatedTasks = updateStartAtAndTasksScheduledTime(job, startAt, scheduledTime);
 
-        if (updatedTasks.size() > 0) {
+        boolean updatedTasksNotEmpty = !updatedTasks.isEmpty();
+
+        if (updatedTasksNotEmpty) {
             dbManager.updateTaskSchedulingTime(job, scheduledTime);
         }
 
-        return !updatedTasks.isEmpty();
+        return updatedTasksNotEmpty;
 
     }
 
@@ -51,21 +53,24 @@ public class StartAtUpdater {
 
         Map<String, String> genericInformation = job.getGenericInformation(true);
 
-        if (iaAValidStartAt(genericInformation, startAt)) {
+        if (isValidStartAt(genericInformation, startAt)) {
             genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
             job.setGenericInformations(genericInformation);
             return true;
         }
+
         return false;
     }
 
-    private boolean iaAValidStartAt(Map<String, String> genericInformation, String startAt) {
-        if (genericInformation.containsKey(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT)) {
-            if (genericInformation.get(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT)
-                    .equals(startAt)) {
-                return false;
-            }
+    private boolean isValidStartAt(Map<String, String> genericInformation, String startAt) {
+        String found = genericInformation.get(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT);
+
+        // null is not allowed as generic information key,
+        // this assumption should always hold in our context
+        if (found != null && found.equals(startAt)) {
+            return false;
         }
+
         return true;
     }
 
