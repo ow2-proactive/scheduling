@@ -170,20 +170,23 @@ public class Credentials implements Serializable {
         File f = new File(pubPath);
         FileInputStream fin;
 
-        String algo = "", tmp = "";
+        StringBuilder algo = new StringBuilder();
 
         // recover public key bytes
         try {
             fin = new FileInputStream(f);
             DataInputStream in = new DataInputStream(fin);
             int read, tot = 0;
+
+            // read encryption algorithm name
             while ((read = in.read()) != '\n') {
-                algo += (char) read;
+                algo.append((char) read);
                 tot++;
             }
             tot++;
-            while ((read = in.read()) != '\n') {
-                tmp += (char) read;
+
+            // skip key size (deduced from payload)
+            while (in.read() != '\n') {
                 tot++;
             }
             tot++;
@@ -201,7 +204,7 @@ public class Credentials implements Serializable {
         KeyFactory keyFactory;
 
         try {
-            keyFactory = KeyFactory.getInstance(algo);
+            keyFactory = KeyFactory.getInstance(algo.toString());
         } catch (NoSuchAlgorithmException e) {
             throw new KeyException("Cannot initialize key factory", e);
         }
