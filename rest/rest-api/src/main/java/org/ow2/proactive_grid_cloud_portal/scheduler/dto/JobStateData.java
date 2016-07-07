@@ -50,6 +50,15 @@ public class JobStateData {
     private JobInfoData jobInfo;
     private String projectName;
     private Map<String, TaskStateData> tasks;
+    private Map<String, String> genericInformation;
+
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = genericInformation;
+    }
 
     public String getPriority() {
         return priority;
@@ -107,7 +116,7 @@ public class JobStateData {
     public String toString() {
         return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
             owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
-            tasks + '}';
+            tasks + ", genericInformation=" + genericInformation + '}';
     }
 
 }

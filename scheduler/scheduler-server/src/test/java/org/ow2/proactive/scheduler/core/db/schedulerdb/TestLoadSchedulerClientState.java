@@ -174,13 +174,13 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         Map<String, String> genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
-        job1.setGenericInformations(genericInfo);
+        job1.setGenericInformation(genericInfo);
 
         InternalJob jobData1 = defaultSubmitJob(job1);
 
         TaskFlowJob job2 = new TaskFlowJob();
         job2.setName(this.getClass().getSimpleName() + "_2");
-        job2.setGenericInformations(new HashMap<String, String>());
+        job2.setGenericInformation(new HashMap<String, String>());
         job2.addTask(createDefaultTask("task1"));
         job2.setPriority(JobPriority.HIGH);
         InternalJob jobData2 = defaultSubmitJob(job2);

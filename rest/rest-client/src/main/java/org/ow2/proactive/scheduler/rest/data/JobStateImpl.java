@@ -57,9 +57,13 @@ public class JobStateImpl extends JobState {
 
     private JobStateData jobStateData;
 
-
     JobStateImpl(JobStateData d) {
         this.jobStateData = d;
+        copyGenericInformation(jobStateData);
+    }
+
+    private void copyGenericInformation(JobStateData jobStateData) {
+        super.setGenericInformation(jobStateData.getGenericInformation());
     }
 
     @Override
@@ -93,7 +97,7 @@ public class JobStateImpl extends JobState {
         List<TaskState> taskStateList = new ArrayList<>(taskStateMap.size());
         for (TaskStateData ts : taskStateMap.values()) {
             String taskTag = ts.getTag();
-            if(taskTag != null && taskTag.equals(tag)) {
+            if (taskTag != null && taskTag.equals(tag)) {
                 taskStateList.add(DataUtility.taskState(ts));
             }
         }
@@ -126,5 +130,9 @@ public class JobStateImpl extends JobState {
     @Override
     public JobPriority getPriority() {
         return JobPriority.valueOf(jobStateData.getPriority());
+    }
+
+    public JobStateData getJobStateData() {
+        return this.jobStateData;
     }
 }

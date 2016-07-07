@@ -190,7 +190,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         InternalTask taskData;
 
         genericInfo = new HashMap<>();
-        task.setGenericInformations(genericInfo);
+        task.setGenericInformation(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());
 
         Assert.assertNotNull(taskData.getGenericInformation());
@@ -199,7 +199,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
-        task.setGenericInformations(genericInfo);
+        task.setGenericInformation(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());
         Assert.assertEquals(2, taskData.getGenericInformation().size());
         Assert.assertEquals("v1", taskData.getGenericInformation().get("p1"));
@@ -211,7 +211,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         }
         genericInfo = new HashMap<>();
         genericInfo.put("longProperty", longString.toString());
-        task.setGenericInformations(genericInfo);
+        task.setGenericInformation(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());
         Assert.assertEquals(1, taskData.getGenericInformation().size());
         Assert.assertEquals(longString.toString(), taskData.getGenericInformation().get("longProperty"));

@@ -1205,7 +1205,7 @@ public abstract class InternalJob extends JobState {
      *
      */
     public Map<String, String> getGenericInformation() {
-        if (genericInformations == null) {
+        if (genericInformation == null) {
             // task is not yet properly initialized
             return new HashMap<>(0);
         }

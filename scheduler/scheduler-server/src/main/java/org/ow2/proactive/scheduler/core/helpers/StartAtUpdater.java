@@ -55,7 +55,7 @@ public class StartAtUpdater {
 
         if (isValidStartAt(genericInformation, startAt)) {
             genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);
-            job.setGenericInformations(genericInformation);
+            job.setGenericInformation(genericInformation);
             return true;
         }
 

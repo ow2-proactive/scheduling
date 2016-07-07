@@ -46,7 +46,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 
 
@@ -82,13 +81,12 @@ public abstract class CommonAttribute implements Serializable {
         new IntegerWrapper(1));
 
     /** Common user informations */
-    protected Map<String, BigString> genericInformations = new HashMap<String, BigString>();
+    protected Map<String, String> genericInformation = new HashMap<String, String>();
 
     /**
      * OnTaskError defines the behavior happening when a task fails.
      */
-    protected UpdatableProperties<OnTaskError> onTaskError = new UpdatableProperties<>(
-           OnTaskError.NONE);
+    protected UpdatableProperties<OnTaskError> onTaskError = new UpdatableProperties<>(OnTaskError.NONE);
 
     /**
      * Set onTaskError property value.
@@ -97,8 +95,7 @@ public abstract class CommonAttribute implements Serializable {
      */
     public void setOnTaskError(OnTaskError onTaskError) {
         if (onTaskError == null) {
-            throw new IllegalArgumentException(
-                    "OnTaskError cannot be set to null.");
+            throw new IllegalArgumentException("OnTaskError cannot be set to null.");
         }
         this.onTaskError.setValue(onTaskError);
     }
@@ -110,7 +107,6 @@ public abstract class CommonAttribute implements Serializable {
     public UpdatableProperties<OnTaskError> getOnTaskErrorProperty() {
         return this.onTaskError;
     }
-
 
     /**
      * Returns the restartTaskOnError state.
@@ -176,29 +172,13 @@ public abstract class CommonAttribute implements Serializable {
      * These information are transmitted to the policy that can use it for the scheduling.
      *
      * @return generic information.
-     * @deprecated Use {@link #getGenericInformation()} instead.
-     * This method is scheduled for removal in next major release.
-     */
-    @Deprecated
-    public Map<String, String> getGenericInformations() {
-        return getGenericInformation();
-    }
-
-    /**
-     * Returns generic information.
-     * <p>
-     * These information are transmitted to the policy that can use it for the scheduling.
-     *
-     * @return generic information.
      */
     public Map<String, String> getGenericInformation() {
-        Set<Entry<String, BigString>> entries = this.genericInformations.entrySet();
+        Set<Entry<String, String>> entries = this.genericInformation.entrySet();
         Map<String, String> result = new HashMap<>(entries.size());
-
-        for (Entry<String, BigString> entry : entries) {
-            result.put(entry.getKey(), entry.getValue().getValue());
+        for (Entry<String, String> entry : entries) {
+            result.put(entry.getKey(), entry.getValue());
         }
-
         return result;
     }
 
@@ -213,29 +193,24 @@ public abstract class CommonAttribute implements Serializable {
         if (key != null && key.length() > 255) {
             throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + key);
         }
-        this.genericInformations.put(key, new BigString(genericInformation));
+        this.genericInformation.put(key, genericInformation);
     }
 
     /**
      * Set the generic information as a hash map.
      *
-     * @param genericInformations the generic information to set.
+     * @param genericInformation the generic information to set.
      */
-    public void setGenericInformations(Map<String, String> genericInformations) {
-        this.genericInformations = new HashMap<>();
-        if (genericInformations != null) {
-            for (Entry<String, String> e : genericInformations.entrySet()) {
-                addGenericInformation(e.getKey(), e.getValue());
-            }
-        }
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = genericInformation;
+
     }
 
     protected Map<String, String> applyReplacementsOnGenericInformation(Map<String, String> replacements) {
         Map<String, String> replacedGenericInformation = new HashMap<String, String>();
-        for (Entry<String, BigString> e : this.genericInformations.entrySet()) {
+        for (Entry<String, String> e : this.genericInformation.entrySet()) {
             String key = e.getKey();
-            BigString bigValue = e.getValue();
-            String value = bigValue.getValue();
+            String value = e.getValue();
 
             for (Entry<String, String> replacement : replacements.entrySet()) {
                 String javaStyleProperty = replacement.getKey();
