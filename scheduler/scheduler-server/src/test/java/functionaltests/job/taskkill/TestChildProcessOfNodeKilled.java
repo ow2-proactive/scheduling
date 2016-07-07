@@ -1,5 +1,6 @@
 package functionaltests.job.taskkill;
 
+import org.objectweb.proactive.api.PAFuture;
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestNode;
@@ -29,13 +30,13 @@ public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTestWithCus
     private void startJobForkingProcesses() throws Exception {
         TaskFlowJob jobForkingProcesses = TestProcessTreeKiller.createJavaExecutableJob("test", false);
         schedulerHelper.submitJob(jobForkingProcesses);
-        TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(TestProcessTreeKiller.detachedProcNumber);
+        TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(TestProcessTreeKiller.DETACHED_PROC_NUMBER);
     }
 
     private TestNode startSchedulerAndRMWithOneNode() throws Exception {
         ResourceManager resourceManager = schedulerHelper.getResourceManager();
         testNode = schedulerHelper.createRMNodeStarterNode("test1");
-        resourceManager.addNode(testNode.getNode().getNodeInformation().getURL());
+        PAFuture.waitFor(resourceManager.addNode(testNode.getNode().getNodeInformation().getURL()));
         return testNode;
     }
 

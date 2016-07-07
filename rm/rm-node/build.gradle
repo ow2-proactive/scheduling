@@ -32,7 +32,7 @@ dependencies {
 // before executing any other task
 task copyCredentials {
     copy {
-        from("${project(':').projectDir}/config/authentication/credentials/rm.cred")
+        from("${project(':').projectDir}/config/authentication/credentials/node.cred")
         into("${sourceSets.main.resources.srcDirs[0]}/config/authentication/credentials/")
     }
 }

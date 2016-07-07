@@ -251,7 +251,7 @@ public class RestFuncTHelper {
     }
 
     private static Credentials getRmCredentials() throws Exception {
-        File rmCredentails = new File(getRmHome(), "config/authentication/credentials/rm.cred");
+        File rmCredentails = new File(getRmHome(), "config/authentication/credentials/node.cred");
         return Credentials.getCredentials(new FileInputStream(rmCredentails));
     }
 
