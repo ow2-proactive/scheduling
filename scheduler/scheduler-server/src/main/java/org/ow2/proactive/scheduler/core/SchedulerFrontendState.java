@@ -890,7 +890,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         ClientJobState storedJobState = new ClientJobState(job);
         jobsMap.put(job.getId(), storedJobState);
         sState.getPendingJobs().add(storedJobState);
-        job.setGenericInformation(storedJobState.getGenericInformation());
         dispatchJobSubmitted(job);
     }
 

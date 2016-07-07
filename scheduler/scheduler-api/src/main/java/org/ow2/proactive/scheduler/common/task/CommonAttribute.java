@@ -40,6 +40,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -173,8 +174,12 @@ public abstract class CommonAttribute implements Serializable {
      * @return generic information.
      */
     public Map<String, String> getGenericInformation() {
-        return this.genericInformation;
-
+        Set<Entry<String, String>> entries = this.genericInformation.entrySet();
+        Map<String, String> result = new HashMap<>(entries.size());
+        for (Entry<String, String> entry : entries) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 
     /**

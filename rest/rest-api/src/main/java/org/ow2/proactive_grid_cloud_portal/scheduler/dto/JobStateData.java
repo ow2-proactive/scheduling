@@ -116,7 +116,7 @@ public class JobStateData {
     public String toString() {
         return "JobStateData{" + "name='" + name + '\'' + ", priority='" + priority + '\'' + ", owner='" +
             owner + '\'' + ", jobInfo=" + jobInfo + ", projectName='" + projectName + '\'' + ", tasks=" +
-            tasks + '}';
+            tasks + ", genericInformation=" + genericInformation + '}';
     }
 
 }
