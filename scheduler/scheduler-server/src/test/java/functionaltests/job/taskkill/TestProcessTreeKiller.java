@@ -86,14 +86,15 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
     public static URL launchersDir = TestProcessTreeKiller.class
             .getResource("/functionaltests/executables/TestSleep.exe");
 
-    private final static int wait_kill_time = 60000;
+    private final static int WAIT_KILL_TIME = 60000;
 
-    public static final int detachedProcNumber = 4;
+    public static final int DETACHED_PROC_NUMBER = 4;
 
     private static final int NB_ITERATIONS = 1;
 
-    private static final String unixSleepName = "sleep";
-    private static final String windowsSleepName = "TestSleep.exe";
+    private static final String UNIX_SLEEP_NAME = "sleep";
+
+    private static final String WINDOWS_SLEEP_NAME = "TestSleep.exe";
 
     @Rule
     public Timeout testTimeout = new Timeout(10, TimeUnit.MINUTES);
@@ -139,7 +140,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             schedulerHelper.waitForEventTaskRunning(id2, task2Name);
 
             log("************** All 2 tasks running *************");
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 2);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(DETACHED_PROC_NUMBER * 2);
             //we should have 2 times (2 jobs) number of detached processes
 
             //kill the first job
@@ -148,7 +149,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             schedulerHelper.waitForEventJobFinished(id1);
             log("************** First job killed *************");
 
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(DETACHED_PROC_NUMBER);
 
             //kill the second job
             log("************** Waiting for the second job (JavaExecutable) to be killed *************");
@@ -192,7 +193,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
 
             log("************** All 2 tasks running *************");
 
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber);
+            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(DETACHED_PROC_NUMBER);
 
             //we should have 1 time (2 jobs) number of detached processes as the first job won't spawn any process
 
@@ -205,7 +206,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
 
             int runningDetachedProcNumber = countProcesses();
             log("************** number of processes : " + runningDetachedProcNumber);
-            assertEquals(detachedProcNumber, runningDetachedProcNumber);
+            assertEquals(DETACHED_PROC_NUMBER, runningDetachedProcNumber);
 
             log("************** Waiting for second job (JavaExecutable) to finish *************");
             //wait for the second job to finish normally
@@ -250,7 +251,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
         log("************** Waiting until " + expectedNumber +
           " processes are left *************");
         int runningDetachedProcNumber = 0;
-        long stopTime = System.currentTimeMillis() + wait_kill_time;
+        long stopTime = System.currentTimeMillis() + WAIT_KILL_TIME;
         while (System.currentTimeMillis() < stopTime) {
             runningDetachedProcNumber = countProcesses();
 
@@ -274,9 +275,9 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
     public static int countProcesses() throws Exception {
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                return getProcessNumberWindows(windowsSleepName);
+                return getProcessNumberWindows(WINDOWS_SLEEP_NAME);
             case unix:
-                return getProcessNumber(unixSleepName);
+                return getProcessNumber(UNIX_SLEEP_NAME);
             default:
                 throw new IllegalStateException("Unsupported operating system");
         }

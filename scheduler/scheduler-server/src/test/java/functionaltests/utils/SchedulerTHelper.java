@@ -36,6 +36,7 @@
  */
 package functionaltests.utils;
 
+import com.google.common.collect.ImmutableList;
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 import org.junit.Assert;
@@ -59,7 +60,9 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -973,7 +976,9 @@ public class SchedulerTHelper {
         Map<String, String> vmParameters = new HashMap<>();
         vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
         JVMProcessImpl nodeProcess = RMTHelper.createJvmProcess(RMNodeStarter.class.getName(),
-                Arrays.asList("-n", nodeName, "-r", getLocalUrl(), "-Dproactive.net.nolocal=false"),
+                Arrays.asList("-n", nodeName, "-r", getLocalUrl(), "-Dproactive.net.nolocal=false",
+                        "-Djava.library.path=" + PASchedulerProperties.SCHEDULER_HOME.getValueAsString()
+                                + File.separator + "dist" + File.separator + "lib"),
                 vmParameters, null);
         return RMTHelper.createNode(nodeName, nodeUrl, nodeProcess);
     }

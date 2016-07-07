@@ -99,7 +99,7 @@ public class SelectionTest extends RMFunctionalTest {
             !neighborHost.equals("${neighborHost}")) {
 
             String rmHome = System.getProperty("pa.rm.home");
-            String rmCredPath = rmHome + "/config/authentication/credentials/rm.cred";
+            String nodeCredPath = rmHome + "/config/authentication/credentials/node.cred";
             String javaExec = System.getenv("JAVA_HOME") + "/bin/java";
 
             // properties are defined, trying to deploy nodes to these hosts
@@ -111,7 +111,7 @@ public class SelectionTest extends RMFunctionalTest {
                             "2", //attempts
                             "Linux", // os
                             "", // java options
-                            FileToBytesConverter.convertFileToByteArray(new File(rmCredPath)), // rmHelper credential
+                            FileToBytesConverter.convertFileToByteArray(new File(nodeCredPath)), // rmHelper credential
                             (distantHost + " 2\n" + neighborHost).getBytes() }, StaticPolicy.class.getName(),
                     null);
 
