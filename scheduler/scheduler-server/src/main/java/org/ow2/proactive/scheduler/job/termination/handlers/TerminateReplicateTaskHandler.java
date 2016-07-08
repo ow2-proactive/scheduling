@@ -23,218 +23,222 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 import it.sauronsoftware.cron4j.Predictor;
 
+
 public class TerminateReplicateTaskHandler {
 
-	public static final Logger logger = Logger.getLogger(TerminateReplicateTaskHandler.class);
+    public static final Logger logger = Logger.getLogger(TerminateReplicateTaskHandler.class);
 
-	private final InternalJob internalJob;
+    private final InternalJob internalJob;
 
-	public TerminateReplicateTaskHandler(InternalJob internalJob) {
-		this.internalJob = internalJob;
-	}
+    public TerminateReplicateTaskHandler(InternalJob internalJob) {
+        this.internalJob = internalJob;
+    }
 
-	public boolean terminateReplicateTask(FlowAction action, InternalTask initiator, ChangedTasksInfo changesInfo,
-			SchedulerStateUpdate frontend, TaskId taskId) {
-		int runs = action.getDupNumber();
-		if (runs < 1) {
-			runs = 1;
-		}
+    public boolean terminateReplicateTask(FlowAction action, InternalTask initiator,
+            ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, TaskId taskId) {
+        int runs = action.getDupNumber();
+        if (runs < 1) {
+            runs = 1;
+        }
 
-		logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
-		List<InternalTask> toReplicate = new ArrayList<>();
+        logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
+        List<InternalTask> toReplicate = new ArrayList<>();
 
-		// find the tasks that need to be replicated
-		for (InternalTask ti : internalJob.getIHMTasks().values()) {
-			List<InternalTask> tl = ti.getIDependences();
-			if (tl != null) {
-				for (InternalTask ts : tl) {
-					if (ts.getId().equals(initiator.getId()) && !toReplicate.contains(ti)) {
-						// ti needs to be replicated
-						toReplicate.add(ti);
-					}
-				}
-			}
-		}
+        // find the tasks that need to be replicated
+        for (InternalTask ti : internalJob.getIHMTasks().values()) {
+            List<InternalTask> tl = ti.getIDependences();
+            if (tl != null) {
+                for (InternalTask ts : tl) {
+                    if (ts.getId().equals(initiator.getId()) && !toReplicate.contains(ti)) {
+                        // ti needs to be replicated
+                        toReplicate.add(ti);
+                    }
+                }
+            }
+        }
 
-		// for each initial task to replicate
-		for (InternalTask todup : toReplicate) {
+        // for each initial task to replicate
+        for (InternalTask todup : toReplicate) {
 
-			// determine the target of the replication whether it is a block or
-			// a single task
-			InternalTask target = null;
+            // determine the target of the replication whether it is a block or
+            // a single task
+            InternalTask target = null;
 
-			// target is a task block start : replication of the block
-			if (todup.getFlowBlock().equals(FlowBlock.START)) {
-				String tg = todup.getMatchingBlock();
-				for (InternalTask t : internalJob.getIHMTasks().values()) {
-					if (tg.equals(t.getName())
-							&& !(t.getStatus().equals(TaskStatus.FINISHED) || t.getStatus().equals(TaskStatus.SKIPPED))
-							&& t.dependsOn(todup)) {
-						target = t;
-						break;
-					}
-				}
-				if (target == null) {
-					logger.error("REPLICATE: could not find matching block '" + tg + "'");
-					continue;
-				}
-			}
-			// target is not a block : replication of the task
-			else {
-				target = todup;
-			}
+            // target is a task block start : replication of the block
+            if (todup.getFlowBlock().equals(FlowBlock.START)) {
+                String tg = todup.getMatchingBlock();
+                for (InternalTask t : internalJob.getIHMTasks().values()) {
+                    if (tg.equals(t.getName()) && !(t.getStatus().equals(TaskStatus.FINISHED) ||
+                        t.getStatus().equals(TaskStatus.SKIPPED)) && t.dependsOn(todup)) {
+                        target = t;
+                        break;
+                    }
+                }
+                if (target == null) {
+                    logger.error("REPLICATE: could not find matching block '" + tg + "'");
+                    continue;
+                }
+            }
+            // target is not a block : replication of the task
+            else {
+                target = todup;
+            }
 
-			// for each number of parallel run
-			for (int i = 1; i < runs; i++) {
+            // for each number of parallel run
+            for (int i = 1; i < runs; i++) {
 
-				// accumulates the tasks between the initiator and the target
-				Map<TaskId, InternalTask> dup = new HashMap<>();
-				// replicate the tasks between the initiator and the target
-				try {
-					target.replicateTree(dup, todup.getId(), false, initiator.getReplicationIndex() * runs, 0);
+                // accumulates the tasks between the initiator and the target
+                Map<TaskId, InternalTask> dup = new HashMap<>();
+                // replicate the tasks between the initiator and the target
+                try {
+                    target.replicateTree(dup, todup.getId(), false, initiator.getReplicationIndex() * runs,
+                            0);
 
-				} catch (Exception e) {
-					logger.error("REPLICATE: could not replicate tree", e);
-					break;
-				}
+                } catch (Exception e) {
+                    logger.error("REPLICATE: could not replicate tree", e);
+                    break;
+                }
 
-				((JobInfoImpl) internalJob.getJobInfo()).setNumberOfPendingTasks(
-						((JobInfoImpl) internalJob.getJobInfo()).getNumberOfPendingTasks() + dup.size());
+                ((JobInfoImpl) internalJob.getJobInfo()).setNumberOfPendingTasks(
+                        ((JobInfoImpl) internalJob.getJobInfo()).getNumberOfPendingTasks() + dup.size());
 
-				// pointers to the new replicated tasks corresponding the begin
-				// and
-				// the end of the block ; can be the same
-				InternalTask newTarget = null;
-				InternalTask newEnd = null;
+                // pointers to the new replicated tasks corresponding the begin
+                // and
+                // the end of the block ; can be the same
+                InternalTask newTarget = null;
+                InternalTask newEnd = null;
 
-				// configure the new tasks
-				for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-					InternalTask nt = it.getValue();
-					nt.setJobInfo(((JobInfoImpl) internalJob.getJobInfo()));
-					int dupIndex = getNextReplicationIndex(InternalTask.getInitialName(nt.getName()),
-							nt.getIterationIndex());
-					internalJob.addTask(nt);
-					nt.setReplicationIndex(dupIndex);
-					assignReplicationTag(nt, initiator, false, action);
-				}
-				changesInfo.newTasksAdded(dup.values());
+                // configure the new tasks
+                for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                    InternalTask nt = it.getValue();
+                    nt.setJobInfo(((JobInfoImpl) internalJob.getJobInfo()));
+                    int dupIndex = getNextReplicationIndex(InternalTask.getInitialName(nt.getName()),
+                            nt.getIterationIndex());
+                    internalJob.addTask(nt);
+                    nt.setReplicationIndex(dupIndex);
+                    assignReplicationTag(nt, initiator, false, action);
+                }
+                changesInfo.newTasksAdded(dup.values());
 
-				// find the beginning and the ending of the replicated block
-				for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
-					InternalTask nt = it.getValue();
+                // find the beginning and the ending of the replicated block
+                for (Entry<TaskId, InternalTask> it : dup.entrySet()) {
+                    InternalTask nt = it.getValue();
 
-					// connect the first task of the replicated block to the
-					// initiator
-					if (todup.getId().equals(it.getKey())) {
-						newTarget = nt;
-						newTarget.addDependence(initiator);
-						// no need to add newTarget to modifiedTasks
-						// because newTarget is among dup.values(), and we
-						// have added them all
-					}
-					// connect the last task of the block with the merge task(s)
-					if (target.getId().equals(it.getKey())) {
-						newEnd = nt;
+                    // connect the first task of the replicated block to the
+                    // initiator
+                    if (todup.getId().equals(it.getKey())) {
+                        newTarget = nt;
+                        newTarget.addDependence(initiator);
+                        // no need to add newTarget to modifiedTasks
+                        // because newTarget is among dup.values(), and we
+                        // have added them all
+                    }
+                    // connect the last task of the block with the merge task(s)
+                    if (target.getId().equals(it.getKey())) {
+                        newEnd = nt;
 
-						List<InternalTask> toAdd = new ArrayList<>();
-						// find the merge tasks ; can be multiple
-						for (InternalTask t : internalJob.getIHMTasks().values()) {
-							List<InternalTask> pdeps = t.getIDependences();
-							if (pdeps != null) {
-								for (InternalTask parent : pdeps) {
-									if (parent.getId().equals(target.getId())) {
-										toAdd.add(t);
-									}
-								}
-							}
-						}
-						// connect the merge tasks
-						for (InternalTask t : toAdd) {
-							t.addDependence(newEnd);
-							changesInfo.taskUpdated(t);
-						}
-					}
-				}
+                        List<InternalTask> toAdd = new ArrayList<>();
+                        // find the merge tasks ; can be multiple
+                        for (InternalTask t : internalJob.getIHMTasks().values()) {
+                            List<InternalTask> pdeps = t.getIDependences();
+                            if (pdeps != null) {
+                                for (InternalTask parent : pdeps) {
+                                    if (parent.getId().equals(target.getId())) {
+                                        toAdd.add(t);
+                                    }
+                                }
+                            }
+                        }
+                        // connect the merge tasks
+                        for (InternalTask t : toAdd) {
+                            t.addDependence(newEnd);
+                            changesInfo.taskUpdated(t);
+                        }
+                    }
+                }
 
-				// propagate the changes on the JobDescriptor
-				internalJob.getJobDescriptor().doReplicate(taskId, dup, newTarget, target.getId(), newEnd.getId());
+                // propagate the changes on the JobDescriptor
+                internalJob.getJobDescriptor().doReplicate(taskId, dup, newTarget, target.getId(),
+                        newEnd.getId());
 
-			}
-		}
+            }
+        }
 
-		// notify frontend that tasks were added to the job
-		((JobInfoImpl) internalJob.getJobInfo()).setTasksChanges(changesInfo, internalJob);
-		if (frontend != null) {
-			frontend.jobStateUpdated(internalJob.getOwner(),
-					new NotificationData<>(SchedulerEvent.TASK_REPLICATED, internalJob.getJobInfo()));
-		}
-		((JobInfoImpl) internalJob.getJobInfo()).clearTasksChanges();
+        // notify frontend that tasks were added to the job
+        ((JobInfoImpl) internalJob.getJobInfo()).setTasksChanges(changesInfo, internalJob);
+        if (frontend != null) {
+            frontend.jobStateUpdated(internalJob.getOwner(),
+                    new NotificationData<>(SchedulerEvent.TASK_REPLICATED, internalJob.getJobInfo()));
 
-		// no jump is performed ; now that the tasks have been replicated and
-		// configured, the flow can continue its normal operation
-		internalJob.getJobDescriptor().terminate(taskId);
+            frontend.jobUpdatedFullData(internalJob);
+        }
+        ((JobInfoImpl) internalJob.getJobInfo()).clearTasksChanges();
 
-		return true;
-	}
+        // no jump is performed ; now that the tasks have been replicated and
+        // configured, the flow can continue its normal operation
+        internalJob.getJobDescriptor().terminate(taskId);
 
-	/**
-	 * Assign a tag to new duplicated task because of a REPLICATE or LOOP.
-	 * 
-	 * @param replicatedTask
-	 *            the new duplicated task.
-	 * @param initiator
-	 *            the initiator of the duplication.
-	 * @param loopAction
-	 *            true if the duplication if after a loop or, false if it is a
-	 *            replicate.
-	 * @param action
-	 *            the duplication action.
-	 */
-	private void assignReplicationTag(InternalTask replicatedTask, InternalTask initiator, boolean loopAction,
-			FlowAction action) {
-		StringBuilder buf = new StringBuilder();
+        return true;
+    }
 
-		if (loopAction) {
-			buf.append("LOOP-");
-			buf.append(InternalTask.getInitialName(initiator.getName()));
-			if (initiator.getReplicationIndex() > 0) {
-				buf.append("*");
-				buf.append(initiator.getReplicationIndex());
-			}
-		} else {
-			buf.append("REPLICATE-");
-			buf.append(initiator.getName());
-		}
+    /**
+     * Assign a tag to new duplicated task because of a REPLICATE or LOOP.
+     * 
+     * @param replicatedTask
+     *            the new duplicated task.
+     * @param initiator
+     *            the initiator of the duplication.
+     * @param loopAction
+     *            true if the duplication if after a loop or, false if it is a
+     *            replicate.
+     * @param action
+     *            the duplication action.
+     */
+    private void assignReplicationTag(InternalTask replicatedTask, InternalTask initiator, boolean loopAction,
+            FlowAction action) {
+        StringBuilder buf = new StringBuilder();
 
-		buf.append("-");
+        if (loopAction) {
+            buf.append("LOOP-");
+            buf.append(InternalTask.getInitialName(initiator.getName()));
+            if (initiator.getReplicationIndex() > 0) {
+                buf.append("*");
+                buf.append(initiator.getReplicationIndex());
+            }
+        } else {
+            buf.append("REPLICATE-");
+            buf.append(initiator.getName());
+        }
 
-		if (loopAction) {
-			String cronExpr = action.getCronExpr();
-			if ("".equals(cronExpr)) {
-				buf.append(replicatedTask.getIterationIndex());
-			} else {
-				// cron task: the replication index is the next date that
-				// matches the cron expression
-				Date resolvedCron = (new Predictor(cronExpr)).nextMatchingDate();
-				SimpleDateFormat dt = new SimpleDateFormat("dd_MM_YY_HH_mm");
-				buf.append(dt.format(resolvedCron));
-			}
-		} else {
-			buf.append(replicatedTask.getReplicationIndex());
-		}
+        buf.append("-");
 
-		replicatedTask.setTag(buf.toString());
-	}
+        if (loopAction) {
+            String cronExpr = action.getCronExpr();
+            if ("".equals(cronExpr)) {
+                buf.append(replicatedTask.getIterationIndex());
+            } else {
+                // cron task: the replication index is the next date that
+                // matches the cron expression
+                Date resolvedCron = (new Predictor(cronExpr)).nextMatchingDate();
+                SimpleDateFormat dt = new SimpleDateFormat("dd_MM_YY_HH_mm");
+                buf.append(dt.format(resolvedCron));
+            }
+        } else {
+            buf.append(replicatedTask.getReplicationIndex());
+        }
 
-	private int getNextReplicationIndex(String baseName, int iteration) {
-		int rep = 0;
-		for (InternalTask it : internalJob.getIHMTasks().values()) {
-			String name = InternalTask.getInitialName(it.getName());
-			if (baseName.equals(name) && iteration == it.getIterationIndex()) {
-				rep = Math.max(rep, it.getReplicationIndex() + 1);
-			}
-		}
-		return rep;
-	}
+        replicatedTask.setTag(buf.toString());
+    }
+
+    private int getNextReplicationIndex(String baseName, int iteration) {
+        int rep = 0;
+        for (InternalTask it : internalJob.getIHMTasks().values()) {
+            String name = InternalTask.getInitialName(it.getName());
+            if (baseName.equals(name) && iteration == it.getIterationIndex()) {
+                rep = Math.max(rep, it.getReplicationIndex() + 1);
+            }
+        }
+        return rep;
+    }
 
 }

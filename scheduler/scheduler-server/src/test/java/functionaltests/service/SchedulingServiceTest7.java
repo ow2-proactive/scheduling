@@ -69,7 +69,8 @@ public class SchedulingServiceTest7 extends BaseServiceTest {
         }
         service.unlockJobsToSchedule(jobsMap.values());
 
-        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING);
+        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
+                SchedulerEvent.TASK_PENDING_TO_RUNNING);
 
         TaskId taskId;
 
@@ -91,8 +92,8 @@ public class SchedulingServiceTest7 extends BaseServiceTest {
         }
         service.unlockJobsToSchedule(jobsMap.values());
 
-        listener.assertEvents(SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_PENDING_TO_RUNNING);
+        listener.assertEvents(SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
+                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING);
     }
 
 }

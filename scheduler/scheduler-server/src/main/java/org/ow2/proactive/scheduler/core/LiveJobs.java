@@ -157,6 +157,8 @@ class LiveJobs {
 
             listener.jobStateUpdated(jobData.job.getOwner(), new NotificationData<JobInfo>(
                 SchedulerEvent.JOB_CHANGE_PRIORITY, new JobInfoImpl((JobInfoImpl) jobData.job.getJobInfo())));
+
+            listener.jobUpdatedFullData(jobData.job);
         } finally {
             jobData.unlock();
         }
@@ -781,6 +783,8 @@ class LiveJobs {
             //send event to client
             listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                 SchedulerEvent.JOB_RUNNING_TO_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+
+            listener.jobUpdatedFullData(job);
         }
     }
 
@@ -901,6 +905,7 @@ class LiveJobs {
         try {
             listener.jobStateUpdated(currentJob.getOwner(), new NotificationData<JobInfo>(eventType,
                 new JobInfoImpl((JobInfoImpl) currentJob.getJobInfo())));
+            listener.jobUpdatedFullData(currentJob);
         } catch (Throwable t) {
             //Just to prevent update method error
         }

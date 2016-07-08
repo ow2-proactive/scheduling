@@ -92,8 +92,9 @@ public class SchedulingServiceTest1 extends BaseServiceTest {
         jobsMap = service.lockJobsToSchedule();
         assertEquals(0, jobsMap.size());
 
-        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
+                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED);
 
         infrastructure.assertRequests(1);
     }

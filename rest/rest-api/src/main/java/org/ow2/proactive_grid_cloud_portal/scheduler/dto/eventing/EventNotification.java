@@ -39,7 +39,7 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing;
 public class EventNotification {
 
     public enum Action {
-        NONE, SCHEDULER_STATE_UPDATED, JOB_SUBMITTED, JOB_STATE_UPDATED, TASK_STATE_UPDATED, USERS_UPDATED
+        NONE, SCHEDULER_STATE_UPDATED, JOB_SUBMITTED, JOB_STATE_UPDATED, JOB_FULL_DATA_UPDATED, TASK_STATE_UPDATED, USERS_UPDATED
     };
 
     private Action action;

@@ -118,7 +118,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    /** Mapping on the UniqueId of the sender and the user/admin identifications */
+    /**
+     * Mapping on the UniqueId of the sender and the user/admin identifications
+     */
     private final Map<UniqueID, ListeningUser> identifications;
 
     /** Map that link uniqueID to user credentials */
@@ -136,7 +138,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /** JMX Helper reference */
     private final SchedulerJMXHelper jmxHelper;
 
-    /** Scheduler state maintains by this class : avoid charging the core from some request */
+    /**
+     * Scheduler state maintains by this class : avoid charging the core from
+     * some request
+     */
     private final SchedulerStateImpl sState;
 
     private final Map<JobId, JobState> jobsMap;
@@ -154,16 +159,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /**
-     * Called to recover the front end state.
-     * This method may have to rebuild the different list of userIdentification
-     * and job/user association.
+     * Called to recover the front end state. This method may have to rebuild
+     * the different list of userIdentification and job/user association.
      */
     private void recover(SchedulerStateImpl sState) {
         Vector<JobState> pendingJobs = sState.getPendingJobs();
         Vector<JobState> runningJobs = sState.getRunningJobs();
         Vector<JobState> finishedJobs = sState.getFinishedJobs();
 
-        //default state = started
+        // default state = started
         Set<JobState> jobStates = new HashSet<>(
             pendingJobs.size() + runningJobs.size() + finishedJobs.size());
 
@@ -186,9 +190,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Prepare the job in the frontend
      *
-     * @param jobStates a temporary set of jobs
-     * @param js the current job to be prepared
-     * @param finished if the job is finished or not
+     * @param jobStates
+     *            a temporary set of jobs
+     * @param js
+     *            the current job to be prepared
+     * @param finished
+     *            if the job is finished or not
      */
     private void prepare(Set<JobState> jobStates, JobState js, boolean finished) {
         jobStates.add(js);
@@ -200,12 +207,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /**
-     * Connect a new user on the scheduler.
-     * This user can interact with the scheduler according to his right.
+     * Connect a new user on the scheduler. This user can interact with the
+     * scheduler according to his right.
      *
-     * @param sourceBodyID the source ID of the connected object representing a user
-     * @param identification the identification of the connected user
-     * @throws SchedulerException If an error occurred during connection with the front-end.
+     * @param sourceBodyID
+     *            the source ID of the connected object representing a user
+     * @param identification
+     *            the identification of the connected user
+     * @throws SchedulerException
+     *             If an error occurred during connection with the front-end.
      */
     synchronized void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
@@ -217,23 +227,25 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         identifications.put(sourceBodyID, new ListeningUser(identification));
         credentials.put(sourceBodyID, cred);
         renewUserSession(sourceBodyID, identification);
-        //add this new user in the list of connected user
+        // add this new user in the list of connected user
         sState.getUsers().update(identification);
-        //send events
+        // send events
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, identification));
     }
 
     /**
-     * Create or renew the session (timer task) for the given user identification.
-     * A call to this method will cancel the previous session (timerTask), 
-     * create and schedule a new one and purge the timer.
+     * Create or renew the session (timer task) for the given user
+     * identification. A call to this method will cancel the previous session
+     * (timerTask), create and schedule a new one and purge the timer.
      * 
-     * @param id The unique ID of the user
-     * @param identification the user on which to renew the session
+     * @param id
+     *            The unique ID of the user
+     * @param identification
+     *            the user on which to renew the session
      */
     private void renewUserSession(final UniqueID id, UserIdentificationImpl identification) {
         if (identifications.get(id).isListening()) {
-            //if this id has a listener, do not renew user session
+            // if this id has a listener, do not renew user session
             return;
         }
         final String userName = identification.getUsername();
@@ -253,7 +265,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
-        //checking permissions
+        // checking permissions
         checkPermission("getStatus", "You do not have permission to get the status !");
 
         return sState.getStatus();
@@ -265,7 +277,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     synchronized SchedulerState getState(boolean myJobsOnly)
             throws NotConnectedException, PermissionException {
-        //checking permissions
+        // checking permissions
         checkPermission("getState", "You do not have permission to get the state !");
 
         ListeningUser ui = identifications
@@ -280,11 +292,16 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /**
-     * Check if the given user can get the state as it is demanded (full or user only)
+     * Check if the given user can get the state as it is demanded (full or user
+     * only)
      *
-     * @param myOnly true, if the user wants only its events or jobs, false if user want the full state
-     * @param ui the user identification
-     * @throws PermissionException if permission is denied
+     * @param myOnly
+     *            true, if the user wants only its events or jobs, false if user
+     *            want the full state
+     * @param ui
+     *            the user identification
+     * @throws PermissionException
+     *             if permission is denied
      */
     synchronized void checkOwnStatePermission(boolean myOnly, UserIdentificationImpl ui)
             throws PermissionException {
@@ -300,7 +317,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             boolean getCurrentState, SchedulerEvent... events)
                     throws NotConnectedException, PermissionException {
-        //checking permissions
+        // checking permissions
         ListeningUser uIdent = checkPermissionReturningListeningUser("addEventListener",
                 "You do not have permission to add a listener !");
 
@@ -317,35 +334,36 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throw new IllegalArgumentException(msg);
         }
 
-        //get the scheduler State
+        // get the scheduler State
         SchedulerState currentState = null;
         if (getCurrentState) {
-            //check get state permission is checked in getState method
+            // check get state permission is checked in getState method
             currentState = getState(myEventsOnly);
         } else {
-            //check get state permission
+            // check get state permission
             checkOwnStatePermission(myEventsOnly, uIdent.getUser());
         }
-        //prepare user for receiving events
+        // prepare user for receiving events
         uIdent.getUser().setUserEvents(events);
-        //set if the user wants to get its events only or every events
+        // set if the user wants to get its events only or every events
         uIdent.getUser().setMyEventsOnly(myEventsOnly);
-        //add the listener to the list of listener for this user.
+        // add the listener to the list of listener for this user.
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
         uIdent.setListener(new ClientRequestHandler(this, id, sel));
-        //cancel timer for this user : session is now managed by events
+        // cancel timer for this user : session is now managed by events
         uIdent.getUser().getSession().cancel();
-        //return to the user
+        // return to the user
         return currentState;
     }
 
     synchronized void removeEventListener() throws NotConnectedException, PermissionException {
-        //Remove the listener on that user designated by its given UniqueID,
-        //then renew its user session as it is no more managed by the listener.
+        // Remove the listener on that user designated by its given UniqueID,
+        // then renew its user session as it is no more managed by the listener.
         UniqueID id = checkAccess();
         ListeningUser uIdent = identifications.get(id);
         uIdent.clearListener();
-        //recreate the session for this user which is no more managed by listener
+        // recreate the session for this user which is no more managed by
+        // listener
         renewUserSession(id, uIdent.getUser());
     }
 
@@ -363,10 +381,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             JobCreationException {
         UniqueID id = checkAccess();
 
-        //get the internal job.
+        // get the internal job.
         InternalJob job = InternalJobFactory.createJob(userJob, this.credentials.get(id));
 
-        //setting job informations
+        // setting job informations
         if (job.getTasks().size() == 0) {
             String msg = "Job " + job.getId().value() +
                 " contains no task. You need to insert at least one task before submitting job";
@@ -374,7 +392,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throw new JobCreationException(msg);
         }
 
-        //verifying that the user has right to set the given priority to his job.
+        // verifying that the user has right to set the given priority to his
+        // job.
         try {
             ident.checkPermission(new ChangePriorityPermission(job.getPriority().ordinal()),
                     ident.getUsername() + " does not have rights to set job priority " + job.getPriority());
@@ -382,7 +401,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             logger.info(ex.getMessage());
             throw ex;
         }
-        //setting the job properties
+        // setting the job properties
         job.setOwner(ident.getUsername());
 
         return job;
@@ -391,11 +410,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized void jobSubmitted(InternalJob job, UserIdentificationImpl ident)
             throws NotConnectedException, PermissionException, SubmissionClosedException,
             JobCreationException {
-        //put the job inside the frontend management list
+        // put the job inside the frontend management list
         jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
-        //increase number of submit for this user
+        // increase number of submit for this user
         ident.addSubmit();
-        //send update user event
+        // send update user event
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
         jlogger.info(job.getId(), "submitted: name '" + job.getName() + "', tasks '" +
             job.getTotalNumberOfTasks() + "', owner '" + job.getOwner() + "'");
@@ -411,7 +430,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UniqueID id = checkAccess();
 
         ListeningUser ident = identifications.get(id);
-        //renew session for this user
+        // renew session for this user
         renewUserSession(id, ident.getUser());
 
         final String fullMethodName = SchedulerFrontend.class.getName() + "." + methodName;
@@ -439,20 +458,22 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Disconnect a user, remove and clean user dependent lists and objects
      * 
-     * @param id the uniqueID of the user
+     * @param id
+     *            the uniqueID of the user
      */
     private synchronized void disconnect(UniqueID id) {
         credentials.remove(id);
         ListeningUser ident = identifications.remove(id);
         if (ident != null) {
-            //remove listeners if needed
+            // remove listeners if needed
             ident.clearListener();
-            //remove this user to the list of connected user if it has not already been removed
+            // remove this user to the list of connected user if it has not
+            // already been removed
             ident.getUser().setToRemove();
             sState.getUsers().update(ident.getUser());
-            //cancel the timer
+            // cancel the timer
             ident.getUser().getSession().cancel();
-            //log and send events
+            // log and send events
             String user = ident.getUser().getUsername();
             logger.info("User '" + user + "' has disconnect the scheduler !");
             dispatchUsersUpdated(
@@ -473,7 +494,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized void renewSession() throws NotConnectedException {
         UniqueID id = checkAccess();
         UserIdentificationImpl ident = identifications.get(id).getUser();
-        //renew session for this user
+        // renew session for this user
         renewUserSession(id, ident);
     }
 
@@ -595,7 +616,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id).getUser();
-        //renew session for this user
+        // renew session for this user
         renewUserSession(id, ident);
 
         try {
@@ -611,7 +632,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id).getUser();
-        //renew session for this user
+        // renew session for this user
         renewUserSession(id, ident);
 
         try {
@@ -624,7 +645,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /*
-     * ###########################################################################################
+     * ######################################################################### ##################
      */
     /*                                                                                             */
     /*
@@ -632,7 +653,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     /*                                                                                             */
     /*
-     * ###########################################################################################
+     * ######################################################################### ##################
      */
 
     /**
@@ -657,7 +678,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Put this is to be removed in the dirty list.
      * 
-     * @param id the id of the user to be removed.
+     * @param id
+     *            the id of the user to be removed.
      */
     void markAsDirty(UniqueID id) {
         synchronized (dirtyList) {
@@ -668,7 +690,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Dispatch the scheduler state updated event
      * 
-     * @param eventType the type of the concrete event
+     * @param eventType
+     *            the type of the concrete event
      */
     private void dispatchSchedulerStateUpdated(SchedulerEvent eventType) {
         try {
@@ -676,9 +699,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 logger.debug("event [" + eventType.toString() + "]");
             }
             for (ListeningUser userId : identifications.values()) {
-                //if this user has a listener
+                // if this user has a listener
                 if (userId.isListening()) {
-                    //if there is no specified event OR if the specified event is allowed
+                    // if there is no specified event OR if the specified event
+                    // is allowed
                     if ((userId.getUser().getUserEvents() == null) ||
                         userId.getUser().getUserEvents().contains(eventType)) {
                         userId.getListener().addEvent(eventMethods.get("schedulerStateUpdatedEvent"),
@@ -695,7 +719,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Dispatch the job submitted event
      * 
-     * @param job the new submitted job
+     * @param job
+     *            the new submitted job
      */
     private void dispatchJobSubmitted(JobState job) {
         try {
@@ -703,14 +728,16 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 jlogger.debug(job.getJobInfo().getJobId(), " event [" + SchedulerEvent.JOB_SUBMITTED + "]");
             }
             for (ListeningUser listeningUserId : identifications.values()) {
-                //if this user has a listener
+                // if this user has a listener
                 if (listeningUserId.isListening()) {
                     try {
                         UserIdentificationImpl userId = listeningUserId.getUser();
-                        //if there is no specified event OR if the specified event is allowed
+                        // if there is no specified event OR if the specified
+                        // event is allowed
                         if ((userId.getUserEvents() == null) ||
                             userId.getUserEvents().contains(SchedulerEvent.JOB_SUBMITTED)) {
-                            //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                            // if this userId have the myEventOnly=false or
+                            // (myEventOnly=true and it is its event)
                             if (!userId.isMyEventsOnly() ||
                                 (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
                                 listeningUserId.getListener().addEvent(eventMethods.get("jobSubmittedEvent"),
@@ -718,7 +745,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                             }
                         }
                     } catch (NullPointerException e) {
-                        //can't do anything
+                        // can't do anything
                         logger.debug("", e);
                     }
                 }
@@ -732,13 +759,16 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Dispatch the job state updated event
      * 
-     * @param owner the owner of this job
-     * @param notification the data to send to every client
+     * @param owner
+     *            the owner of this job
+     * @param notification
+     *            the data to send to every client
      */
     private void dispatchJobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         try {
             if (logger.isDebugEnabled()) {
-                // if in process of job removal do not use jlogger as job log file
+                // if in process of job removal do not use jlogger as job log
+                // file
                 // was already removed and it will create it again
                 if (notification.getEventType() == SchedulerEvent.JOB_REMOVE_FINISHED) {
                     logger.debug("job " + notification.getData().getJobId() + " event [" +
@@ -749,13 +779,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 }
             }
             for (ListeningUser listeningUserId : identifications.values()) {
-                //if this user has a listener
+                // if this user has a listener
                 if (listeningUserId.isListening()) {
                     UserIdentificationImpl userId = listeningUserId.getUser();
-                    //if there is no specified event OR if the specified event is allowed
+                    // if there is no specified event OR if the specified event
+                    // is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
-                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        // if this userId have the myEventOnly=false or
+                        // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
                             listeningUserId.getListener().addEvent(eventMethods.get("jobStateUpdatedEvent"),
@@ -771,10 +803,54 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /**
+     * Dispatch the job state updated event
+     * 
+     * @param owner
+     *            the owner of this job
+     * @param notification
+     *            the data to send to every client
+     */
+    private void dispatchJobUpdatedFullData(JobState job) {
+        try {
+            if (logger.isDebugEnabled()) {
+                jlogger.debug(job.getJobInfo().getJobId(), " event [" + SchedulerEvent.JOB_UPDATED + "]");
+            }
+            for (ListeningUser listeningUserId : identifications.values()) {
+                // if this user has a listener
+                if (listeningUserId.isListening()) {
+                    try {
+                        UserIdentificationImpl userId = listeningUserId.getUser();
+                        // if there is no specified event OR if the specified
+                        // event is allowed
+                        if ((userId.getUserEvents() == null) ||
+                            userId.getUserEvents().contains(SchedulerEvent.JOB_UPDATED)) {
+                            // if this userId have the myEventOnly=false or
+                            // (myEventOnly=true and it is its event)
+                            if (!userId.isMyEventsOnly() ||
+                                (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
+                                listeningUserId.getListener()
+                                        .addEvent(eventMethods.get("jobUpdatedFullDataEvent"), job);
+                            }
+                        }
+                    } catch (NullPointerException e) {
+                        // can't do anything
+                        logger.debug("", e);
+                    }
+                }
+            }
+            clearListeners();
+        } catch (SecurityException e) {
+            logger.error("", e);
+        }
+    }
+
+    /**
      * Dispatch the task state updated event
      * 
-     * @param owner the owner of this task
-     * @param notification the data to send to every client
+     * @param owner
+     *            the owner of this task
+     * @param notification
+     *            the data to send to every client
      */
     private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
@@ -783,13 +859,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         "event [" + notification.getEventType() + "]");
             }
             for (ListeningUser listeningUserId : identifications.values()) {
-                //if this user has a listener
+                // if this user has a listener
                 if (listeningUserId.isListening()) {
                     UserIdentificationImpl userId = listeningUserId.getUser();
-                    //if there is no specified event OR if the specified event is allowed
+                    // if there is no specified event OR if the specified event
+                    // is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
-                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        // if this userId have the myEventOnly=false or
+                        // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
                             listeningUserId.getListener().addEvent(eventMethods.get("taskStateUpdatedEvent"),
@@ -807,7 +885,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Dispatch the users updated event
      * 
-     * @param notification the data to send to every client
+     * @param notification
+     *            the data to send to every client
      */
     private void dispatchUsersUpdated(NotificationData<UserIdentification> notification,
             boolean checkForDownUser) {
@@ -816,13 +895,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 logger.debug("event [" + notification.getEventType() + "]");
             }
             for (ListeningUser listeningUserId : identifications.values()) {
-                //if this user has a listener
+                // if this user has a listener
                 if (listeningUserId.isListening()) {
                     UserIdentificationImpl userId = listeningUserId.getUser();
-                    //if there is no specified event OR if the specified event is allowed
+                    // if there is no specified event OR if the specified event
+                    // is allowed
                     if ((userId.getUserEvents() == null) ||
                         userId.getUserEvents().contains(notification.getEventType())) {
-                        //if this userId have the myEventOnly=false or (myEventOnly=true and it is its event)
+                        // if this userId have the myEventOnly=false or
+                        // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() || (userId.isMyEventsOnly() &&
                             userId.getUsername().equals(notification.getData().getUsername()))) {
                             listeningUserId.getListener().addEvent(eventMethods.get("usersUpdatedEvent"),
@@ -831,7 +912,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     }
                 }
             }
-            //Important condition to avoid recursive checks
+            // Important condition to avoid recursive checks
             if (checkForDownUser) {
                 clearListeners();
             }
@@ -913,17 +994,17 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case JOB_PENDING_TO_FINISHED:
                 sState.getPendingJobs().remove(js);
                 sState.getFinishedJobs().add(js);
-                //set this job finished, user can get its result
+                // set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 break;
             case JOB_RUNNING_TO_FINISHED:
                 sState.getRunningJobs().remove(js);
                 sState.getFinishedJobs().add(js);
-                //set this job finished, user can get its result
+                // set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 break;
             case JOB_REMOVE_FINISHED:
-                //removing jobs from the global list : this job is no more managed
+                // removing jobs from the global list : this job is no more managed
                 sState.getFinishedJobs().remove(js);
                 jobsMap.remove(js.getId());
                 jobs.remove(notification.getData().getJobId());
@@ -938,6 +1019,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     @Override
+    public synchronized void jobUpdatedFullData(JobState jobstate) {
+        ClientJobState storedJobState = new ClientJobState(jobstate);
+        dispatchJobUpdatedFullData(storedJobState);
+    }
+
+    @Override
     public synchronized void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         jobsMap.get(notification.getData().getJobId()).update(notification.getData());
         switch (notification.getEventType()) {
@@ -948,9 +1035,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 dispatchTaskStateUpdated(owner, notification);
                 break;
             case TASK_PROGRESS:
-                //this event can be sent while task is already finished,
-                //as it is not a correct behavior, event is dropped if task is already finished.
-                //so if task is not finished, send event
+                // this event can be sent while task is already finished,
+                // as it is not a correct behavior, event is dropped if task is
+                // already finished.
+                // so if task is not finished, send event
                 if (notification.getData().getFinishedTime() <= 0) {
                     dispatchTaskStateUpdated(owner, notification);
                 }

@@ -117,6 +117,9 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
     }
 
+    public void jobUpdatedFullDataEvent(JobState job) {
+    }
+
     public void jobSubmittedEvent(JobState job) {
     }
 

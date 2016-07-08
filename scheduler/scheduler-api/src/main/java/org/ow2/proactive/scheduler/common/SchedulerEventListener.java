@@ -80,6 +80,13 @@ public interface SchedulerEventListener {
     void jobStateUpdatedEvent(NotificationData<JobInfo> notification);
 
     /**
+     * Invoked each time the state of a job has changed and each time a scheduler event occurs.<br>
+     *
+     * @param updated job.
+     */
+    void jobUpdatedFullDataEvent(JobState job);
+
+    /**
      * Invoked each time the state of a task has changed.<br>
      * In this case you can use the 
      * {@link org.ow2.proactive.scheduler.common.job.JobState#update(org.ow2.proactive.scheduler.common.task.TaskInfo)} 

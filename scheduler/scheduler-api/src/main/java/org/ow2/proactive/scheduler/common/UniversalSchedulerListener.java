@@ -70,36 +70,64 @@ public class UniversalSchedulerListener implements SchedulerEventListener, Seria
         this.internalListener = null;
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.
+     * proactive.scheduler.common.NotificationData)
      */
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         this.internalListener.jobStateUpdatedEvent(notification);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive.scheduler.common.job.JobState)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.
+     * proactive.scheduler.common.NotificationData)
+     */
+    public void jobUpdatedFullDataEvent(JobState job) {
+        this.internalListener.jobUpdatedFullDataEvent(job);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive
+     * .scheduler.common.job.JobState)
      */
     public void jobSubmittedEvent(JobState job) {
         this.internalListener.jobSubmittedEvent(job);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.proactive.scheduler.common.SchedulerEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.
+     * proactive.scheduler.common.SchedulerEvent)
      */
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
         this.internalListener.schedulerStateUpdatedEvent(eventType);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.
+     * proactive.scheduler.common.NotificationData)
      */
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         this.internalListener.taskStateUpdatedEvent(notification);
     }
 
-    /* (non-Javadoc)
-     * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive.scheduler.common.NotificationData)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive
+     * .scheduler.common.NotificationData)
      */
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         this.internalListener.usersUpdatedEvent(notification);

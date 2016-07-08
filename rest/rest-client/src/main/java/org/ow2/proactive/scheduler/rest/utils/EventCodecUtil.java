@@ -109,6 +109,9 @@ public class EventCodecUtil {
                 case JOB_STATE_UPDATED:
                     notification.setData(mapper.readValue(data, JobInfoData.class));
                     break;
+                case JOB_FULL_DATA_UPDATED:
+                    notification.setData(mapper.readValue(data, JobStateData.class));
+                    break;
                 case TASK_STATE_UPDATED:
                     notification.setData(mapper.readValue(data, TaskInfoData.class));
                     break;
