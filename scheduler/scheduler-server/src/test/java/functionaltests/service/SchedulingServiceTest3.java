@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -66,7 +65,7 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
         listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
                 SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
                 SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_UPDATED);
 
         infrastructure.assertRequests(2);
     }
@@ -114,8 +113,8 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
         service.taskTerminatedWithResult(nativeTaskId,
                 new TaskResultImpl(nativeTaskId, new Integer(0), null, 0));
 
-        listener.assertEvents(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+        listener.assertEvents(SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                SchedulerEvent.JOB_UPDATED);
         infrastructure.assertRequests(1);
 
         try {

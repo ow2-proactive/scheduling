@@ -1,7 +1,11 @@
 package functionaltests.service;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -9,10 +13,6 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.junit.Assert;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 
 public class SchedulingServiceTest1 extends BaseServiceTest {
@@ -94,7 +94,7 @@ public class SchedulingServiceTest1 extends BaseServiceTest {
 
         listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
                 SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_UPDATED);
 
         infrastructure.assertRequests(1);
     }

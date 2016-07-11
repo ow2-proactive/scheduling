@@ -52,9 +52,9 @@ public class SchedulingServiceTest9 extends BaseServiceTest {
 
         startTask(1);
         service.restartTaskOnNodeFailure(task);
-        listener.assertEvents(SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+        listener.assertEvents(SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                SchedulerEvent.JOB_UPDATED);
         infrastructure.assertRequests(2);
     }
 
