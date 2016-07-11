@@ -229,8 +229,9 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
             result = createTaskIdFolder(result, dataSpaceName);
             return result;
         } catch (FileSystemException fse) {
-            logger.warn(dataSpaceName + " space is disabled", fse);
-            logDataspacesStatus(dataSpaceName + " space is disabled", DataspacesStatusLevel.WARNING);
+            String message = dataSpaceName + " space is disabled";
+            logger.warn(message, fse);
+            logDataspacesStatus(message, DataspacesStatusLevel.WARNING);
             logDataspacesStatus(getStackTraceAsString(fse), DataspacesStatusLevel.WARNING);
         }
         return null;
@@ -420,26 +421,35 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
             DataSpacesFileObject destination, String spaceUri, List<DataSpacesFileObject> spaceFiles,
             Map<String, DataSpacesFileObject> filesToCopy) throws FileSystemException {
 
+        boolean isDebugEnabled = logger.isDebugEnabled();
+        long startTime = 0;
+
+        if (isDebugEnabled) {
+            startTime = System.currentTimeMillis();
+        }
+
         for (DataSpacesFileObject fileObject : spaceFiles) {
             String relativePath = relativize(spaceUri, fileObject);
 
             DataSpacesFileObject target = destination.resolveFile(relativePath);
 
-            boolean isDebugEnabled = logger.isDebugEnabled();
-
-            if (fileObject.isFolder()) {
-                if (isDebugEnabled) {
-                    logger.debug("Creating folder " + target.getRealURI());
+            try {
+                if (fileObject.isFolder()) {
+                    if (isDebugEnabled) {
+                        logger.debug("Creating folder " + target.getRealURI());
+                    }
+                    target.createFolder();
+                    setFolderRightsForRunAsUserMode(target);
+                } else if (fileObject.isFile()) {
+                    DataSpacesFileObject parent = target.getParent();
+                    if (isDebugEnabled) {
+                        logger.debug("Creating folder " + parent.getRealURI());
+                    }
+                    parent.createFolder();
+                    setFolderRightsForRunAsUserMode(parent);
                 }
-                target.createFolder();
-                setFolderRightsForRunAsUserMode(target);
-            } else if (fileObject.isFile()) {
-                DataSpacesFileObject parent = target.getParent();
-                if (isDebugEnabled) {
-                    logger.debug("Creating folder " + parent.getRealURI());
-                }
-                parent.createFolder();
-                setFolderRightsForRunAsUserMode(parent);
+            } catch (FileSystemException e) {
+                logger.warn("Could not create folder", e);
             }
 
             DataSpacesFileObject oldFileObject = filesToCopy.put(relativePath, fileObject);
@@ -450,6 +460,11 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
                 logger.warn(message);
                 logDataspacesStatus(message, DataspacesStatusLevel.WARNING);
             }
+        }
+
+        if (isDebugEnabled) {
+            long timeToCreateHierarchySequentially = System.currentTimeMillis() - startTime;
+            logger.debug("Creating hierarchy sequentially required " + timeToCreateHierarchySequentially + " ms");
         }
     }
 
