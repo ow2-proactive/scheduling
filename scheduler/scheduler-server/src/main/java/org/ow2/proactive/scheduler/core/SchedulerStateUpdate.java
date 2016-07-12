@@ -78,7 +78,7 @@ public interface SchedulerStateUpdate {
     /**
      * Invoked each time the state of a job has changed and each time a scheduler event occurs.<br>
      *
-     * @param updated job.
+     * @param job the updated job.
      */
     void jobUpdatedFullData(JobState job);
 
