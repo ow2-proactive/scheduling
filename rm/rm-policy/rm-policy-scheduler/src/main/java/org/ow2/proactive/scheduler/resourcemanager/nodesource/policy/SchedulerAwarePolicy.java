@@ -93,7 +93,6 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     @Override
     public BooleanWrapper activate() {
-        SchedulerAuthenticationInterface authentication;
         try {
             state = scheduler.addEventListener(getSchedulerListener(), false, true, getEventsList());
         } catch (Exception e) {
@@ -114,21 +113,27 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         super.shutdown(initiator);
     }
 
+    @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
     }
 
+    @Override
     public void jobUpdatedFullDataEvent(JobState job) {
     }
 
+    @Override
     public void jobSubmittedEvent(JobState job) {
     }
 
+    @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
     }
 
+    @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
     }
 
+    @Override
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
     }
 

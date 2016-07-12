@@ -76,6 +76,7 @@ public class UniversalSchedulerListener implements SchedulerEventListener, Seria
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.
      * proactive.scheduler.common.NotificationData)
      */
+    @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         this.internalListener.jobStateUpdatedEvent(notification);
     }
@@ -86,6 +87,7 @@ public class UniversalSchedulerListener implements SchedulerEventListener, Seria
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#jobStateUpdatedEvent(org.ow2.
      * proactive.scheduler.common.NotificationData)
      */
+    @Override
     public void jobUpdatedFullDataEvent(JobState job) {
         this.internalListener.jobUpdatedFullDataEvent(job);
     }
@@ -97,6 +99,7 @@ public class UniversalSchedulerListener implements SchedulerEventListener, Seria
      * org.ow2.proactive.scheduler.common.SchedulerEventListener#jobSubmittedEvent(org.ow2.proactive
      * .scheduler.common.job.JobState)
      */
+    @Override
     public void jobSubmittedEvent(JobState job) {
         this.internalListener.jobSubmittedEvent(job);
     }
@@ -108,6 +111,7 @@ public class UniversalSchedulerListener implements SchedulerEventListener, Seria
      * org.ow2.proactive.scheduler.common.SchedulerEventListener#schedulerStateUpdatedEvent(org.ow2.
      * proactive.scheduler.common.SchedulerEvent)
      */
+    @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
         this.internalListener.schedulerStateUpdatedEvent(eventType);
     }
@@ -118,6 +122,7 @@ public class UniversalSchedulerListener implements SchedulerEventListener, Seria
      * @see org.ow2.proactive.scheduler.common.SchedulerEventListener#taskStateUpdatedEvent(org.ow2.
      * proactive.scheduler.common.NotificationData)
      */
+    @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
         this.internalListener.taskStateUpdatedEvent(notification);
     }
@@ -129,6 +134,7 @@ public class UniversalSchedulerListener implements SchedulerEventListener, Seria
      * org.ow2.proactive.scheduler.common.SchedulerEventListener#usersUpdatedEvent(org.ow2.proactive
      * .scheduler.common.NotificationData)
      */
+    @Override
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         this.internalListener.usersUpdatedEvent(notification);
     }

@@ -651,7 +651,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /*
-     * ######################################################################### ##################
+     * ###########################################################################################
      */
     /*                                                                                             */
     /*
@@ -659,7 +659,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     /*                                                                                             */
     /*
-     * ######################################################################### ##################
+     * ###########################################################################################
      */
 
     /**
@@ -745,8 +745,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                            listeningUserId.getListener().addEvent(eventMethods.get(JOB_SUBMITTED_EVENT_METHOD),
-                                    job);
+                            listeningUserId.getListener()
+                                    .addEvent(eventMethods.get(JOB_SUBMITTED_EVENT_METHOD), job);
                         }
                     }
 
@@ -792,8 +792,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            listeningUserId.getListener().addEvent(eventMethods.get(JOB_STATE_UPDATED_EVENT_METHOD),
-                                    notification);
+                            listeningUserId.getListener()
+                                    .addEvent(eventMethods.get(JOB_STATE_UPDATED_EVENT_METHOD), notification);
                         }
                     }
                 }
@@ -868,8 +868,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            listeningUserId.getListener().addEvent(eventMethods.get(TASK_STATE_UPDATED_EVENT_METHOD),
-                                    notification);
+                            listeningUserId.getListener().addEvent(
+                                    eventMethods.get(TASK_STATE_UPDATED_EVENT_METHOD), notification);
                         }
                     }
                 }
@@ -904,8 +904,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() || (userId.isMyEventsOnly() &&
                             userId.getUsername().equals(notification.getData().getUsername()))) {
-                            listeningUserId.getListener().addEvent(eventMethods.get(USERS_UPDATED_EVENT_METHOD),
-                                    notification);
+                            listeningUserId.getListener()
+                                    .addEvent(eventMethods.get(USERS_UPDATED_EVENT_METHOD), notification);
                         }
                     }
                 }
