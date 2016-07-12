@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
+import org.objectweb.proactive.extensions.dataspaces.api.FileType;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
@@ -68,12 +69,15 @@ import org.apache.log4j.Logger;
 import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
-public final class TaskProActiveDataspaces implements TaskDataspaces {
+public class TaskProActiveDataspaces implements TaskDataspaces {
 
     private static final Logger logger = Logger.getLogger(TaskProActiveDataspaces.class);
 
     public static final String PA_NODE_DATASPACE_FILE_TRANSFER_THREAD_POOL_SIZE =
             "pa.node.dataspace.filetransfer.threadpoolsize";
+
+    public static final String PA_NODE_DATASPACE_CREATE_FOLDER_HIERARCHY_SEQUENTIALLY =
+            "pa.node.dataspace.create_folder_hierarchy_sequentially";
 
     private DataSpacesFileObject SCRATCH;
     private DataSpacesFileObject INPUT;
@@ -90,13 +94,20 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
             Executors.newFixedThreadPool(getFileTransferThreadPoolSize(),
                     new NamedThreadFactory("FileTransferThreadPool"));
 
+    /**
+     * Mainly for testing purposes
+     */
+    TaskProActiveDataspaces() {
+
+    }
+
     public TaskProActiveDataspaces(TaskId taskId, NamingService namingService) throws Exception {
         this.taskId = taskId;
         this.namingService = namingService;
         initDataSpaces();
     }
 
-    private int getFileTransferThreadPoolSize() {
+    protected int getFileTransferThreadPoolSize() {
         String sizeAsString = System.getProperty(PA_NODE_DATASPACE_FILE_TRANSFER_THREAD_POOL_SIZE);
 
         int result = Runtime.getRuntime().availableProcessors() * 2;
@@ -224,8 +235,9 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
             result = createTaskIdFolder(result, dataSpaceName);
             return result;
         } catch (FileSystemException fse) {
-            logger.warn(dataSpaceName + " space is disabled", fse);
-            logDataspacesStatus(dataSpaceName + " space is disabled", DataspacesStatusLevel.WARNING);
+            String message = dataSpaceName + " space is disabled";
+            logger.warn(message, fse);
+            logDataspacesStatus(message, DataspacesStatusLevel.WARNING);
             logDataspacesStatus(getStackTraceAsString(fse), DataspacesStatusLevel.WARNING);
         }
         return null;
@@ -411,28 +423,31 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
      * Create the folder hierarchy and select the files to copy
      * from the specified list of FileObjects.
      */
-    private void createFolderHierarchySequentially(
+    protected void createFolderHierarchySequentially(
             DataSpacesFileObject destination, String spaceUri, List<DataSpacesFileObject> spaceFiles,
             Map<String, DataSpacesFileObject> filesToCopy) throws FileSystemException {
+
+        boolean isDebugEnabled = logger.isDebugEnabled();
+        boolean isFolderHierarchyCreationEnabled = isCreateFolderHierarchySequentiallyEnabled();
+        long startTime = 0;
+
+        if (isDebugEnabled) {
+            startTime = System.currentTimeMillis();
+        }
 
         for (DataSpacesFileObject fileObject : spaceFiles) {
             String relativePath = relativize(spaceUri, fileObject);
 
-            DataSpacesFileObject target = destination.resolveFile(relativePath);
-
-            boolean isDebugEnabled = logger.isDebugEnabled();
-            
-            if (fileObject.isFolder()) {
-                if (isDebugEnabled) {
-                    logger.debug("Creating folder " + target.getRealURI());
+            if (isFolderHierarchyCreationEnabled) {
+                try {
+                    DataSpacesFileObject target = destination.resolveFile(relativePath);
+                    createFolderHierarchy(isDebugEnabled, fileObject, target);
+                } catch (FileSystemException e) {
+                    String message = "Could not create folder hierarchy for " +
+                            relativePath + " on " + destination.getRealURI();
+                    logger.warn(message);
+                    logDataspacesStatus(message, DataspacesStatusLevel.WARNING);
                 }
-                target.createFolder();
-            } else if (fileObject.isFile()) {
-                DataSpacesFileObject parent = target.getParent();
-                if (isDebugEnabled) {
-                    logger.debug("Creating folder " + parent.getRealURI());
-                }
-                parent.createFolder();
             }
 
             DataSpacesFileObject oldFileObject = filesToCopy.put(relativePath, fileObject);
@@ -444,9 +459,44 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
                 logDataspacesStatus(message, DataspacesStatusLevel.WARNING);
             }
         }
+
+        if (isDebugEnabled) {
+            long timeToCreateHierarchySequentially = System.currentTimeMillis() - startTime;
+            logger.debug(
+                    "Executing TaskProActiveDataspaces#createFolderHierarchySequentially has taken "
+                            + timeToCreateHierarchySequentially + " ms");
+        }
     }
 
-    private void handleResults(List<Future<Boolean>> transferFutures) throws FileSystemException {
+    protected void createFolderHierarchy(boolean isDebugEnabled, DataSpacesFileObject fileObject,
+            DataSpacesFileObject target) throws FileSystemException {
+
+        FileType fileObjectType = fileObject.getType();
+
+        if (FileType.FOLDER.equals(fileObjectType)) {
+            if (isDebugEnabled) {
+                logger.debug("Creating folder " + target.getRealURI());
+            }
+
+            target.createFolder();
+        } else if (FileType.FILE.equals(fileObjectType)) {
+            DataSpacesFileObject parent = target.getParent();
+
+            if (isDebugEnabled) {
+                logger.debug("Creating folder " + parent.getRealURI());
+            }
+
+            parent.createFolder();
+        }
+    }
+
+    protected boolean isCreateFolderHierarchySequentiallyEnabled() {
+        String property = System.getProperty(PA_NODE_DATASPACE_CREATE_FOLDER_HIERARCHY_SEQUENTIALLY);
+
+        return property == null || "true".equalsIgnoreCase(property);
+    }
+
+    protected void handleResults(List<Future<Boolean>> transferFutures) throws FileSystemException {
 
         StringBuilder message = new StringBuilder();
         String nl = System.lineSeparator();
@@ -466,7 +516,7 @@ public final class TaskProActiveDataspaces implements TaskDataspaces {
         }
     }
 
-    private String relativize(String inputSpaceUri, DataSpacesFileObject fileObject) {
+    protected String relativize(String inputSpaceUri, DataSpacesFileObject fileObject) {
         return fileObject.getVirtualURI().replaceFirst(inputSpaceUri + "/?", "");
     }
 
