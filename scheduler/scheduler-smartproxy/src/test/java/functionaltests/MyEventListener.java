@@ -72,6 +72,12 @@ public class MyEventListener implements SchedulerEventListenerExtended, Serializ
     }
 
     @Override
+    public void jobUpdatedFullDataEvent(JobState job) {
+        System.out.println("MyEventListener.jobUpdatedFullDataEvent()");
+
+    }
+
+    @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
         System.out.println("MyEventListener.jobStateUpdatedEvent() " + notification);
 

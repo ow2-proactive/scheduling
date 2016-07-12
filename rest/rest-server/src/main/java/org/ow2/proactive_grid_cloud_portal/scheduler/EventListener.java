@@ -39,6 +39,12 @@ public class EventListener implements SchedulerEventListener {
     }
 
     @Override
+    public void jobUpdatedFullDataEvent(JobState jobState) {
+        state.incrementRevision();
+
+    }
+
+    @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> event) {
         state.incrementRevision();
     }

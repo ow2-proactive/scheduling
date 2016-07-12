@@ -89,6 +89,7 @@ import org.junit.rules.TemporaryFolder;
 import static com.google.common.truth.Truth.assertThat;
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
+
 public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     private static final long ONE_SECOND = TimeUnit.SECONDS.toMillis(1);
@@ -145,7 +146,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         pushUrl = userspace;
         pullUrl = userspace;
 
-        // we add special characters and space to the folders to make sure transfer occurs normally
+        // we add special characters and space to the folders to make sure
+        // transfer occurs normally
         inputLocalFolder = tempDir.newFolder("input é");
         outputLocalFolder = tempDir.newFolder("output é");
     }
@@ -186,8 +188,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
             public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
                 JobStatus status = notification.getData().getStatus();
 
-                System.out.println("RestSmartProxyTest.jobStateUpdatedEvent, eventType="
-                        + notification.getEventType() + ", jobStatus=" + status);
+                System.out.println("RestSmartProxyTest.jobStateUpdatedEvent, eventType=" +
+                    notification.getEventType() + ", jobStatus=" + status);
 
                 if (notification.getEventType() == SchedulerEvent.JOB_RESTARTED_FROM_ERROR) {
                     restartedFromErrorEventReceived.setTrue();
@@ -222,17 +224,21 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
             public void pullDataFailed(String jobId, String taskName, String remoteFolder_URL, Throwable t) {
                 System.out.println("RestSmartProxyTest.pullDataFailed");
             }
+
+            @Override
+            public void jobUpdatedFullDataEvent(JobState job) {
+                System.out.println("RestSmartProxyTest.jobUpdatedFullDataEvent");
+
+            }
         };
 
         restSmartProxy.addEventListener(listener);
 
-        JobId jobId =
-                restSmartProxy.submit(
-                        job, inputLocalFolder.getAbsolutePath(),
-                        pushUrl, outputLocalFolder.getAbsolutePath(), pullUrl,
-                        false, false);
+        JobId jobId = restSmartProxy.submit(job, inputLocalFolder.getAbsolutePath(), pushUrl,
+                outputLocalFolder.getAbsolutePath(), pullUrl, false, false);
 
-        // the next line blocks until jobStateUpdatedEvent is called on the listener
+        // the next line blocks until jobStateUpdatedEvent is called on the
+        // listener
         // with job status set to IN_ERROR
         semaphore.acquire();
 
@@ -267,8 +273,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         return jobState;
     }
 
-    private void printJobXmlRepresentation(
-            TaskFlowJob job) throws TransformerException, ParserConfigurationException, IOException {
+    private void printJobXmlRepresentation(TaskFlowJob job)
+            throws TransformerException, ParserConfigurationException, IOException {
         // debugging the job produced
         String jobXml = new Job2XMLTransformer().jobToxmlString(job);
         System.out.println(jobXml);
@@ -281,8 +287,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         ScriptTask scriptTask = new ScriptTask();
         scriptTask.setName("task");
-        scriptTask.setScript(
-                new TaskScript(new SimpleScript("syntax error", "python")));
+        scriptTask.setScript(new TaskScript(new SimpleScript("syntax error", "python")));
         scriptTask.setOnTaskError(OnTaskError.PAUSE_TASK);
         scriptTask.setMaxNumberOfExecution(2);
         job.addTask(scriptTask);
@@ -328,11 +333,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
             restSmartProxy.addEventListener(notifier);
         }
 
-        JobId id =
-                restSmartProxy.submit(
-                        job, inputLocalFolder.getAbsolutePath(),
-                        pushUrl, outputLocalFolder.getAbsolutePath(), pullUrl,
-                        isolateTaskOutput, automaticTransfer);
+        JobId id = restSmartProxy.submit(job, inputLocalFolder.getAbsolutePath(), pushUrl,
+                outputLocalFolder.getAbsolutePath(), pullUrl, isolateTaskOutput, automaticTransfer);
 
         JobState jobState = waitForJobFinishState(id.toString());
 
@@ -356,15 +358,15 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         for (int i = 0; i < NB_TASKS; i++) {
             String outputFileName = OUTPUT_FILE_BASE_NAME + "_" + i + OUTPUT_FILE_EXT;
             File outputFile = new File(outputLocalFolder, outputFileName);
-            Assert.assertTrue(
-                    String.format("%s does not exist.", outputFile.getAbsolutePath()),
+            Assert.assertTrue(String.format("%s does not exist.", outputFile.getAbsolutePath()),
                     outputFile.exists());
         }
     }
 
     private TaskFlowJob createTestJob(boolean isolateOutputs) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
-        // add a special character to the job name to ensure the job is parsed correctly by the server
+        // add a special character to the job name to ensure the job is parsed
+        // correctly by the server
         job.setName(this.getClass().getSimpleName() + " é");
 
         for (int i = 0; i < NB_TASKS; i++) {
@@ -464,6 +466,10 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         @Override
         public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
+        }
+
+        @Override
+        public void jobUpdatedFullDataEvent(JobState job) {
         }
 
     }

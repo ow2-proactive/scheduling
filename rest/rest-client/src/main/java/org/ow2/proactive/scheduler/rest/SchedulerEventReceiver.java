@@ -221,26 +221,30 @@ public class SchedulerEventReceiver {
                 case NONE:
                     break;
                 case SCHEDULER_STATE_UPDATED:
-                    eventListener.schedulerStateUpdatedEvent(SchedulerEvent.valueOf(eventData
-                            .getSchedulerEvent()));
+                    eventListener.schedulerStateUpdatedEvent(
+                            SchedulerEvent.valueOf(eventData.getSchedulerEvent()));
                     break;
                 case JOB_SUBMITTED:
-                    eventListener.jobSubmittedEvent(DataUtility
-                            .toJobState((JobStateData) eventData.getData()));
+                    eventListener
+                            .jobSubmittedEvent(DataUtility.toJobState((JobStateData) eventData.getData()));
                     break;
                 case JOB_STATE_UPDATED:
-                    eventListener.jobStateUpdatedEvent(new NotificationData<>(SchedulerEvent
-                            .valueOf(eventData.getSchedulerEvent()), DataUtility
-                            .toJobInfo((JobInfoData) eventData.getData())));
+                    eventListener.jobStateUpdatedEvent(
+                            new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
+                                DataUtility.toJobInfo((JobInfoData) eventData.getData())));
+                    break;
+                case JOB_FULL_DATA_UPDATED:
+                    eventListener.jobUpdatedFullDataEvent(
+                            DataUtility.toJobState((JobStateData) eventData.getData()));
                     break;
                 case TASK_STATE_UPDATED:
-                    eventListener.taskStateUpdatedEvent(new NotificationData<>(SchedulerEvent
-                            .valueOf(eventData.getSchedulerEvent()), DataUtility
-                            .taskInfo((TaskInfoData) eventData.getData())));
+                    eventListener.taskStateUpdatedEvent(
+                            new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
+                                DataUtility.taskInfo((TaskInfoData) eventData.getData())));
                     break;
                 case USERS_UPDATED:
-                    eventListener.usersUpdatedEvent((NotificationData<UserIdentification>) eventData
-                            .getData());
+                    eventListener
+                            .usersUpdatedEvent((NotificationData<UserIdentification>) eventData.getData());
                     break;
                 default:
                     throw new RuntimeException(String.format("Unknown action: %s", action));

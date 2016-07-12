@@ -64,8 +64,8 @@ public class SimpleSchedulerListener implements SchedulerEventListener, Serializ
     public SimpleSchedulerListener() {
     }
 
-    public void jobSubmittedEvent(JobState jobInfo) {
-        logger.info("New job + " + jobInfo.getName() + " + has been started by " + jobInfo.getOwner());
+    public void jobSubmittedEvent(JobState jobState) {
+        logger.info("New job + " + jobState.getName() + " + has been started by " + jobState.getOwner());
     }
 
     public void jobStateUpdatedEvent(NotificationData<JobInfo> jobNotification) {
@@ -84,6 +84,12 @@ public class SimpleSchedulerListener implements SchedulerEventListener, Serializ
 
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
         logger.info("User info changed for:" + notification.getData().getUsername());
+    }
+
+    @Override
+    public void jobUpdatedFullDataEvent(JobState jobState) {
+        logger.info("New job + " + jobState.getName() + " + has been started by " + jobState.getOwner());
+
     }
 
 }
