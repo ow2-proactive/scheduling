@@ -95,6 +95,12 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
 
+    private static final String USERS_UPDATED_EVENT_METHOD = "usersUpdatedEvent";
+    private static final String TASK_STATE_UPDATED_EVENT_METHOD = "taskStateUpdatedEvent";
+    private static final String JOB_UPDATED_FULL_DATA_EVENT_METHOD = "jobUpdatedFullDataEvent";
+    private static final String JOB_STATE_UPDATED_EVENT_METHOD = "jobStateUpdatedEvent";
+    private static final String JOB_SUBMITTED_EVENT_METHOD = "jobSubmittedEvent";
+    private static final String SCHEDULER_STATE_UPDATED_EVENT_METHOD = "schedulerStateUpdatedEvent";
     /** Scheduler logger */
     private static final Logger logger = Logger.getLogger(SchedulingService.class);
     private static final TaskLogger tlogger = TaskLogger.getInstance();
@@ -705,7 +711,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     // is allowed
                     if ((userId.getUser().getUserEvents() == null) ||
                         userId.getUser().getUserEvents().contains(eventType)) {
-                        userId.getListener().addEvent(eventMethods.get("schedulerStateUpdatedEvent"),
+                        userId.getListener().addEvent(eventMethods.get(SCHEDULER_STATE_UPDATED_EVENT_METHOD),
                                 eventType);
                     }
                 }
@@ -730,24 +736,20 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             for (ListeningUser listeningUserId : identifications.values()) {
                 // if this user has a listener
                 if (listeningUserId.isListening()) {
-                    try {
-                        UserIdentificationImpl userId = listeningUserId.getUser();
-                        // if there is no specified event OR if the specified
-                        // event is allowed
-                        if ((userId.getUserEvents() == null) ||
-                            userId.getUserEvents().contains(SchedulerEvent.JOB_SUBMITTED)) {
-                            // if this userId have the myEventOnly=false or
-                            // (myEventOnly=true and it is its event)
-                            if (!userId.isMyEventsOnly() ||
-                                (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                                listeningUserId.getListener().addEvent(eventMethods.get("jobSubmittedEvent"),
-                                        job);
-                            }
+                    UserIdentificationImpl userId = listeningUserId.getUser();
+                    // if there is no specified event OR if the specified
+                    // event is allowed
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(SchedulerEvent.JOB_SUBMITTED)) {
+                        // if this userId have the myEventOnly=false or
+                        // (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
+                            listeningUserId.getListener().addEvent(eventMethods.get(JOB_SUBMITTED_EVENT_METHOD),
+                                    job);
                         }
-                    } catch (NullPointerException e) {
-                        // can't do anything
-                        logger.debug("", e);
                     }
+
                 }
             }
             clearListeners();
@@ -790,7 +792,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            listeningUserId.getListener().addEvent(eventMethods.get("jobStateUpdatedEvent"),
+                            listeningUserId.getListener().addEvent(eventMethods.get(JOB_STATE_UPDATED_EVENT_METHOD),
                                     notification);
                         }
                     }
@@ -818,24 +820,20 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             for (ListeningUser listeningUserId : identifications.values()) {
                 // if this user has a listener
                 if (listeningUserId.isListening()) {
-                    try {
-                        UserIdentificationImpl userId = listeningUserId.getUser();
-                        // if there is no specified event OR if the specified
-                        // event is allowed
-                        if ((userId.getUserEvents() == null) ||
-                            userId.getUserEvents().contains(SchedulerEvent.JOB_UPDATED)) {
-                            // if this userId have the myEventOnly=false or
-                            // (myEventOnly=true and it is its event)
-                            if (!userId.isMyEventsOnly() ||
-                                (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                                listeningUserId.getListener()
-                                        .addEvent(eventMethods.get("jobUpdatedFullDataEvent"), job);
-                            }
+                    UserIdentificationImpl userId = listeningUserId.getUser();
+                    // if there is no specified event OR if the specified
+                    // event is allowed
+                    if ((userId.getUserEvents() == null) ||
+                        userId.getUserEvents().contains(SchedulerEvent.JOB_UPDATED)) {
+                        // if this userId have the myEventOnly=false or
+                        // (myEventOnly=true and it is its event)
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
+                            listeningUserId.getListener()
+                                    .addEvent(eventMethods.get(JOB_UPDATED_FULL_DATA_EVENT_METHOD), job);
                         }
-                    } catch (NullPointerException e) {
-                        // can't do anything
-                        logger.debug("", e);
                     }
+
                 }
             }
             clearListeners();
@@ -870,7 +868,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            listeningUserId.getListener().addEvent(eventMethods.get("taskStateUpdatedEvent"),
+                            listeningUserId.getListener().addEvent(eventMethods.get(TASK_STATE_UPDATED_EVENT_METHOD),
                                     notification);
                         }
                     }
@@ -906,7 +904,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() || (userId.isMyEventsOnly() &&
                             userId.getUsername().equals(notification.getData().getUsername()))) {
-                            listeningUserId.getListener().addEvent(eventMethods.get("usersUpdatedEvent"),
+                            listeningUserId.getListener().addEvent(eventMethods.get(USERS_UPDATED_EVENT_METHOD),
                                     notification);
                         }
                     }
