@@ -1,7 +1,11 @@
 package functionaltests.service;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -13,10 +17,6 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.junit.Assert;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 
 public class SchedulingServiceTest2 extends BaseServiceTest {
@@ -58,7 +58,8 @@ public class SchedulingServiceTest2 extends BaseServiceTest {
 
         service.killJob(job.getId());
         listener.assertEvents(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_FINISHED);
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_FINISHED,
+                SchedulerEvent.JOB_UPDATED);
     }
 
     private void testFailedTask(boolean failNativeTask) throws Exception {
@@ -81,22 +82,25 @@ public class SchedulingServiceTest2 extends BaseServiceTest {
 
         if (failNativeTask) {
             InternalTask nativeTask = jobDesc.getInternal().getTask("nativeTask");
-            // native task terminates with code 1, flag 'cancelJobOnError' was set so job should be cancelled
-            service.taskTerminatedWithResult(nativeTask.getId(), new TaskResultImpl(nativeTask.getId(),
-                new RuntimeException(), null, 0));
+            // native task terminates with code 1, flag 'cancelJobOnError' was
+            // set so job should be cancelled
+            service.taskTerminatedWithResult(nativeTask.getId(),
+                    new TaskResultImpl(nativeTask.getId(), new RuntimeException(), null, 0));
         } else {
             InternalTask javaTask = jobDesc.getInternal().getTask("javaTask");
-            // java task terminates with exception, flag 'cancelJobOnError' was set so job should be cancelled
-            service.taskTerminatedWithResult(javaTask.getId(), new TaskResultImpl(javaTask.getId(),
-                new RuntimeException(), null, 0));
+            // java task terminates with exception, flag 'cancelJobOnError' was
+            // set so job should be cancelled
+            service.taskTerminatedWithResult(javaTask.getId(),
+                    new TaskResultImpl(javaTask.getId(), new RuntimeException(), null, 0));
         }
 
         jobsMap = service.lockJobsToSchedule();
         assertEquals(0, jobsMap.size());
 
-        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
+                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_UPDATED);
 
         infrastructure.assertRequests(2);
     }

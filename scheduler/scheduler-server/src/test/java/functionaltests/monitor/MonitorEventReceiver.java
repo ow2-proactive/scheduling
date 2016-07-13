@@ -152,4 +152,10 @@ public class MonitorEventReceiver implements SchedulerEventListener {
         monitorsHandler.handleSchedulerStateEvent(SchedulerEvent.USERS_UPDATE);
     }
 
+    @Override
+    public void jobUpdatedFullDataEvent(JobState job) {
+        log("JobState: " + job);
+        monitorsHandler.handleJobEvent(SchedulerEvent.JOB_UPDATED, job);
+    }
+
 }

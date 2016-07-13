@@ -50,6 +50,7 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -81,8 +82,8 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+
 import it.sauronsoftware.cron4j.Predictor;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -286,15 +287,13 @@ public abstract class InternalJob extends JobState {
             // if a task restart due to a failure for instance
             if (!taskDataSpaceApplications.containsKey(taskId)) {
                 String appId = internalTask.getId().toString();
-                TaskDataSpaceApplication taskDataSpaceApplication =
-                        new TaskDataSpaceApplication(appId, namingService);
+                TaskDataSpaceApplication taskDataSpaceApplication = new TaskDataSpaceApplication(appId,
+                    namingService);
 
                 taskDataSpaceApplications.put(taskId, taskDataSpaceApplication);
 
-                taskDataSpaceApplication.startDataSpaceApplication(
-                        getInputSpace(), getOutputSpace(),
-                        getGlobalSpace(), getUserSpace(),
-                        getOwner(), getId());
+                taskDataSpaceApplication.startDataSpaceApplication(getInputSpace(), getOutputSpace(),
+                        getGlobalSpace(), getUserSpace(), getOwner(), getId());
             }
         }
     }
@@ -575,6 +574,9 @@ public abstract class InternalJob extends JobState {
         // notify frontend that tasks were added and modified
         frontend.jobStateUpdated(this.getOwner(),
                 new NotificationData<JobInfo>(SchedulerEvent.TASK_REPLICATED, new JobInfoImpl(jobInfo)));
+
+        frontend.jobUpdatedFullData(this);
+
         this.jobInfo.clearTasksChanges();
 
         return true;
@@ -1206,7 +1208,7 @@ public abstract class InternalJob extends JobState {
      *
      */
     public Map<String, String> getGenericInformation() {
-        if (genericInformations == null) {
+        if (genericInformation == null) {
             // task is not yet properly initialized
             return new HashMap<>(0);
         }
@@ -1229,7 +1231,7 @@ public abstract class InternalJob extends JobState {
      *            information
      *
      */
-    public Map<String, String> getGenericInformations(boolean replaceVariables) {
+    public Map<String, String> getGenericInformation(boolean replaceVariables) {
         if (replaceVariables) {
             return this.getGenericInformation();
         } else {

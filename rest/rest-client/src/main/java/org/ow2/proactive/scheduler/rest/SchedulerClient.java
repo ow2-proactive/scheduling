@@ -1054,4 +1054,17 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         if (jobInfoData.isToBeRemoved()) jobInfoImpl.setToBeRemoved();
         return jobInfoImpl;
     }
+    
+    
+    @Override
+    public boolean changeStartAt(JobId jobId, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        boolean isJobStartAtChanged = false;
+        try {
+            isJobStartAtChanged = restApi().changeStartAt(sid, jobId.value(), startAt);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return isJobStartAtChanged;
+    }
 }

@@ -55,7 +55,7 @@ public class TaskStateData implements Serializable {
     private int maxNumberOfExecutionOnFailure;
     private TaskInfoData taskInfo;
     private ParallelEnvironmentData parallelEnvironment;
-    private Map<String, String> genericInformations;
+    private Map<String, String> genericInformation;
 
     public String getName() {
         return name;
@@ -73,9 +73,13 @@ public class TaskStateData implements Serializable {
         this.description = description;
     }
 
-    public String getTag() { return this.tag; }
+    public String getTag() {
+        return this.tag;
+    }
 
-    public void setTag(String tag) { this.tag = tag; }
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     public int getIterationIndex() {
         return iterationIndex;
@@ -125,10 +129,12 @@ public class TaskStateData implements Serializable {
         this.parallelEnvironment = parallelEnvironment;
     }
 
-    public Map<String, String> getGenericInformations() { return genericInformations; }
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
 
-    public void setGenericInformations(Map<String, String> genericInformations) {
-        this.genericInformations = genericInformations;
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = genericInformation;
     }
 
     public int getNumberOfNodesNeeded() {

@@ -6,14 +6,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.*;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
@@ -51,119 +71,59 @@ import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.hibernate.annotations.*;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity
-@NamedQueries( {
-        @NamedQuery(
-                name = "getFinishedTasksCount",
-                query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1"
-        ),
-        @NamedQuery(
-                name = "getMeanTaskPendingTime",
-                query = "select avg(startTime - :jobSubmittedTime) from TaskData task where task.jobData.id = :id and task.startTime > 0"
-        ),
-        @NamedQuery(
-                name = "getMeanTaskRunningTime",
-                query = "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.jobData.id = :id"
-        ),
-        @NamedQuery(
-                name = "getPendingTasksCount",
-                query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"
-        ),
-        @NamedQuery(
-                name = "getRunningTasksCount",
-                query = "select count(*) from TaskData task where taskStatus in (:taskStatus) " +
-                        "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"
-        ),
-        @NamedQuery(
-                name = "findTaskData",
-                query = "from TaskData where id in (:ids)"
-        ),
-        @NamedQuery(
-                name = "findTaskDataById",
-                query = "from TaskData td where td.id = :taskId"
-        ),
-        @NamedQuery(
-                name = "getTotalNumberOfHostsUsed",
-                query = "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id"
-        ),
-        @NamedQuery(
-                name = "getTotalTasksCount",
-                query = "select count(*) from TaskData task where task.jobData.removedTime = -1"
-        ),
-        @NamedQuery(
-                name = "loadJobsTasks",
-                query = "from TaskData as task left outer join fetch task.dependentTasks where task.id.jobId in (:ids)"
-        ),
-        @NamedQuery(
-                name = "readAccountTasks",
-                query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
-                        "where task.finishedTime > 0 and task.jobData.owner = :username"
-        ),
-        @NamedQuery(
-                name = "updateTaskData",
-                query = "update TaskData task set task.taskStatus = :taskStatus, " +
-                        "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
-                        "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
-                        "task.inErrorTime = :inErrorTime " +
-                        "where task.id = :taskId"
-        ),
-        @NamedQuery(
-                name = "updateTaskDataAfterJobFinished",
-                query = "update TaskData task set task.taskStatus = :taskStatus, " +
-                        "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
-                        "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
-                        "task.finishedTime = :finishedTime, " + "task.executionDuration = :executionDuration " +
-                        "where task.id = :taskId"
-        ),
-        @NamedQuery(
-                name = "updateTaskDataJobScripts",
-                query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
-                        "cleanScript = null  where id.jobId = :jobId"
-        ),
-        @NamedQuery(
-                name = "updateTaskDataStatusToPending",
-                query = "update TaskData task set task.taskStatus = :taskStatus " +
-                        "where task.jobData = :job"
-        ),
-        @NamedQuery(
-                name = "updateTaskDataTaskRestarted",
-                query = "update TaskData set taskStatus = :taskStatus, " +
-                        "numberOfExecutionLeft = :numberOfExecutionLeft," +
-                        "numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft" +
-                        " where id = :taskId"
-        ),
-        @NamedQuery(
-                name = "updateTaskDataTaskStarted",
-                query = "update TaskData task set task.taskStatus = :taskStatus, " +
-                        "task.startTime = :startTime, task.finishedTime = :finishedTime, " +
-                        "task.executionHostName = :executionHostName where task.id = :taskId"
-        ),
-})
-@Table(name = "TASK_DATA",
-        indexes = {
-                @Index(name = "TASK_DATA_CLEAN_SCRIPT_ID", columnList = "CLEAN_SCRIPT_ID"),
-                @Index(name = "TASK_DATA_ENV_SCRIPT_ID", columnList = "ENV_SCRIPT_ID"),
-                @Index(name = "TASK_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
-                @Index(name = "TASK_DATA_FLOW_SCRIPT_ID", columnList = "FLOW_SCRIPT_ID"),
-                @Index(name = "TASK_DATA_IFBRANCH_JOB_ID", columnList = "IFBRANCH_TASK_ID_JOB"),
-                @Index(name = "TASK_DATA_IFBRANCH_TASK_ID", columnList = "IFBRANCH_TASK_ID_TASK"),
-                @Index(name = "TASK_DATA_JOB_ID", columnList = "JOB_ID"),
-                @Index(name = "TASK_DATA_POST_SCRIPT_ID", columnList = "POST_SCRIPT_ID"),
-                @Index(name = "TASK_DATA_PRE_SCRIPT_ID", columnList = "PRE_SCRIPT_ID"),
-                @Index(name = "TASK_DATA_SCRIPT_ID", columnList = "SCRIPT_ID"),
-                @Index(name = "TASK_DATA_START_TIME", columnList = "START_TIME"),
-                @Index(name = "TASK_DATA_STATUS", columnList = "STATUS"),
-                @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
-                @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
-                @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
-                @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME")
-        })
+@NamedQueries({
+        @NamedQuery(name = "getFinishedTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1"),
+        @NamedQuery(name = "getMeanTaskPendingTime", query = "select avg(startTime - :jobSubmittedTime) from TaskData task where task.jobData.id = :id and task.startTime > 0"),
+        @NamedQuery(name = "getMeanTaskRunningTime", query = "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.jobData.id = :id"),
+        @NamedQuery(name = "getPendingTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
+        @NamedQuery(name = "getRunningTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) " +
+            "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
+        @NamedQuery(name = "findTaskData", query = "from TaskData where id in (:ids)"),
+        @NamedQuery(name = "findTaskDataById", query = "from TaskData td where td.id = :taskId"),
+        @NamedQuery(name = "getTotalNumberOfHostsUsed", query = "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id"),
+        @NamedQuery(name = "getTotalTasksCount", query = "select count(*) from TaskData task where task.jobData.removedTime = -1"),
+        @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task left outer join fetch task.dependentTasks where task.id.jobId in (:ids)"),
+        @NamedQuery(name = "readAccountTasks", query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
+            "where task.finishedTime > 0 and task.jobData.owner = :username"),
+        @NamedQuery(name = "updateTaskData", query = "update TaskData task set task.taskStatus = :taskStatus, " +
+            "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
+            "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
+            "task.inErrorTime = :inErrorTime " + "where task.id = :taskId"),
+        @NamedQuery(name = "updateTaskDataAfterJobFinished", query = "update TaskData task set task.taskStatus = :taskStatus, " +
+            "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
+            "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
+            "task.finishedTime = :finishedTime, " + "task.executionDuration = :executionDuration " +
+            "where task.id = :taskId"),
+        @NamedQuery(name = "updateTaskDataJobScripts", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
+            "cleanScript = null  where id.jobId = :jobId"),
+        @NamedQuery(name = "updateTaskDataStatusToPending", query = "update TaskData task set task.taskStatus = :taskStatus " +
+            "where task.jobData = :job"),
+        @NamedQuery(name = "updateTaskDataTaskRestarted", query = "update TaskData set taskStatus = :taskStatus, " +
+            "numberOfExecutionLeft = :numberOfExecutionLeft," +
+            "numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft" + " where id = :taskId"),
+        @NamedQuery(name = "updateTaskDataTaskStarted", query = "update TaskData task set task.taskStatus = :taskStatus, " +
+            "task.startTime = :startTime, task.finishedTime = :finishedTime, " +
+            "task.executionHostName = :executionHostName where task.id = :taskId"), })
+@Table(name = "TASK_DATA", indexes = {
+        @Index(name = "TASK_DATA_CLEAN_SCRIPT_ID", columnList = "CLEAN_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_ENV_SCRIPT_ID", columnList = "ENV_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
+        @Index(name = "TASK_DATA_FLOW_SCRIPT_ID", columnList = "FLOW_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_IFBRANCH_JOB_ID", columnList = "IFBRANCH_TASK_ID_JOB"),
+        @Index(name = "TASK_DATA_IFBRANCH_TASK_ID", columnList = "IFBRANCH_TASK_ID_TASK"),
+        @Index(name = "TASK_DATA_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "TASK_DATA_POST_SCRIPT_ID", columnList = "POST_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_PRE_SCRIPT_ID", columnList = "PRE_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_SCRIPT_ID", columnList = "SCRIPT_ID"),
+        @Index(name = "TASK_DATA_START_TIME", columnList = "START_TIME"),
+        @Index(name = "TASK_DATA_STATUS", columnList = "STATUS"),
+        @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
+        @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
+        @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
+        @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME") })
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
@@ -273,7 +233,7 @@ public class TaskData {
     }
 
     @Column(name = "JVM_ARGUMENTS")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public List<String> getJvmArguments() {
         return jvmArguments;
     }
@@ -283,7 +243,7 @@ public class TaskData {
     }
 
     @Column(name = "CLASSPATH")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public List<String> getAdditionalClasspath() {
         return additionalClasspath;
     }
@@ -295,7 +255,7 @@ public class TaskData {
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     // disable foreign key, to be able to remove runtime data
-    @JoinColumn(name = "ENV_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "ENV_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT) )
     public ScriptData getEnvScript() {
         return envScript;
     }
@@ -307,7 +267,7 @@ public class TaskData {
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     // disable foreign key, to be able to remove runtime data
-    @JoinColumn(name = "SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT) )
     public ScriptData getScript() {
         return script;
     }
@@ -507,7 +467,7 @@ public class TaskData {
         taskData.setNumberOfExecutionOnFailureLeft(
                 PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
-        taskData.setGenericInformation(task.getGenericInformations(false));
+        taskData.setGenericInformation(task.getGenericInformation(false));
 
         // set the scheduledTime if the START_AT property exists
         Map<String, String> genericInfos = taskData.getGenericInformation();
@@ -673,7 +633,7 @@ public class TaskData {
     }
 
     @Column(name = "GENERIC_INFO", updatable = false)
-    @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @Type(type = "org.ow2.proactive.scheduler.core.db.types.NonEmptyMapToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
     public Map<String, String> getGenericInformation() {
         return genericInformation;
     }
@@ -693,16 +653,11 @@ public class TaskData {
     }
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "TASK_DATA_DEPENDENCIES",
-            joinColumns = {
-                    @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-                    @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK")
-            },
-            indexes = {
+    @CollectionTable(name = "TASK_DATA_DEPENDENCIES", joinColumns = {
+            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") }, indexes = {
                     @Index(name = "TASK_DATA_DEP_JOB_ID", columnList = "JOB_ID"),
-                    @Index(name = "TASK_DATA_DEP_TASK_ID", columnList = "TASK_ID"),
-            }
-    )
+                    @Index(name = "TASK_DATA_DEP_TASK_ID", columnList = "TASK_ID"), })
     @BatchSize(size = 100)
     public List<DBTaskId> getDependentTasks() {
         return dependentTasks;
@@ -713,16 +668,11 @@ public class TaskData {
     }
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "TASK_DATA_JOINED_BRANCHES",
-            joinColumns = {
-                    @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-                    @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK")
-            },
-            indexes = {
+    @CollectionTable(name = "TASK_DATA_JOINED_BRANCHES", joinColumns = {
+            @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
+            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") }, indexes = {
                     @Index(name = "TASK_DATA_JB_JOB_ID", columnList = "JOB_ID"),
-                    @Index(name = "TASK_DATA_JB_TASK_ID", columnList = "TASK_ID"),
-            }
-    )
+                    @Index(name = "TASK_DATA_JB_TASK_ID", columnList = "TASK_ID"), })
     @BatchSize(size = 100)
     public List<DBTaskId> getJoinedBranches() {
         return joinedBranches;
@@ -767,7 +717,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     // disable foreign key, to be able to remove runtime data
-    @JoinColumn(name = "PRE_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "PRE_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT) )
     public ScriptData getPreScript() {
         return preScript;
     }
@@ -779,7 +729,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     // disable foreign key, to be able to remove runtime data
-    @JoinColumn(name = "POST_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "POST_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT) )
     public ScriptData getPostScript() {
         return postScript;
     }
@@ -791,7 +741,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     // disable foreign key, to be able to remove runtime data
-    @JoinColumn(name = "CLEAN_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "CLEAN_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT) )
     public ScriptData getCleanScript() {
         return cleanScript;
     }
@@ -803,7 +753,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToOne(fetch = FetchType.LAZY)
     // disable foreign key, to be able to remove runtime data
-    @JoinColumn(name = "FLOW_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "FLOW_SCRIPT_ID", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT) )
     public ScriptData getFlowScript() {
         return flowScript;
     }
@@ -1121,8 +1071,8 @@ public class TaskData {
         TaskId taskId = TaskIdImpl.createTaskId(jobId, getTaskName(), getId().getTaskId());
 
         return new TaskUsage(taskId.value(), getTaskName(), getStartTime(), getFinishedTime(),
-                getExecutionDuration(),
-                getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
+            getExecutionDuration(),
+            getParallelEnvironment() == null ? 1 : getParallelEnvironment().getNodesNumber());
     }
 
     TaskInfoImpl createTaskInfo(JobIdImpl jobId) {
@@ -1161,7 +1111,7 @@ public class TaskData {
         taskState.setReplicationIndex(getReplication());
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
         taskState.setParallelEnvironment(getParallelEnvironment());
-        taskState.setGenericInformations(getGenericInformation());
+        taskState.setGenericInformation(getGenericInformation());
         return taskState;
     }
 

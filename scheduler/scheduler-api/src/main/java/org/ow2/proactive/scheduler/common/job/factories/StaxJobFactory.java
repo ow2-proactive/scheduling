@@ -36,7 +36,13 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import java.io.*;
+import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -52,6 +58,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.log4j.Logger;
+import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -82,12 +90,9 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
-import com.google.common.collect.ImmutableMap;
-import org.apache.log4j.Logger;
-import org.iso_relax.verifier.VerifierConfigurationException;
 import org.xml.sax.SAXException;
 
-import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
+import com.google.common.collect.ImmutableMap;
 
 
 /**
@@ -325,19 +330,15 @@ public class StaxJobFactory extends JobFactory {
             if (XMLAttributes.COMMON_NAME.matches(attributeName)) {
                 commonPropertiesHolder.setName(attributeValue);
             } else if (XMLAttributes.JOB_PRIORITY.matches(attributeName)) {
-                commonPropertiesHolder.setPriority(
-                        JobPriority.findPriority(replace(attributeValue)));
+                commonPropertiesHolder.setPriority(JobPriority.findPriority(replace(attributeValue)));
             } else if (XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.matches(attributeName)) {
                 handleCancelJobOnErrorAttribute(commonPropertiesHolder, attributeValue);
             } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
-                commonPropertiesHolder.setRestartTaskOnError(
-                        RestartMode.getMode(replace(attributeValue)));
+                commonPropertiesHolder.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue)));
             } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
-                commonPropertiesHolder.setOnTaskError(OnTaskError
-                        .getInstance(replace(attributeValue)));
+                commonPropertiesHolder.setOnTaskError(OnTaskError.getInstance(replace(attributeValue)));
             } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
-                commonPropertiesHolder.setMaxNumberOfExecution(
-                        Integer.parseInt(replace(attributeValue)));
+                commonPropertiesHolder.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue)));
             } else if (XMLAttributes.JOB_PROJECT_NAME.matches(attributeName)) {
                 //don't replace() here it is done at the end of the job
                 commonPropertiesHolder.setProjectName(attributeValue);
@@ -361,12 +362,11 @@ public class StaxJobFactory extends JobFactory {
                                 updateVariables(updatedVariableMap);
                             }
                         } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
-                            commonPropertiesHolder.setGenericInformations(getGenericInformation(cursorJob));
+                            commonPropertiesHolder.setGenericInformation(getGenericInformation(cursorJob));
                         } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
-                            logger.warn(
-                                    "Element " + XMLTags.JOB_CLASSPATHES.getXMLName() +
-                                            " is no longer supported. Please define a " +
-                                            XMLTags.FORK_ENVIRONMENT.getXMLName() + " per task if needed.");
+                            logger.warn("Element " + XMLTags.JOB_CLASSPATHES.getXMLName() +
+                                " is no longer supported. Please define a " +
+                                XMLTags.FORK_ENVIRONMENT.getXMLName() + " per task if needed.");
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
                             commonPropertiesHolder.setDescription(getDescription(cursorJob));
                         } else if (XMLTags.DS_INPUT_SPACE.matches(current)) {
@@ -392,7 +392,7 @@ public class StaxJobFactory extends JobFactory {
             job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
             job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
             job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
-            job.setGenericInformations(commonPropertiesHolder.getGenericInformation());
+            job.setGenericInformation(commonPropertiesHolder.getGenericInformation());
             job.setInputSpace(commonPropertiesHolder.getInputSpace());
             job.setOutputSpace(commonPropertiesHolder.getOutputSpace());
             job.setGlobalSpace(commonPropertiesHolder.getGlobalSpace());
@@ -410,13 +410,12 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
-    private void handleCancelJobOnErrorAttribute(CommonAttribute commonPropertiesHolder, String attributeValue) {
-        logger.warn(
-                XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.getXMLName()
-                        + " attribute is deprecated and no longer supported from schema 3.4+. " +
-                        "Please use on task error policy to define task error behaviour. " +
-                        "The attribute 'cancelJobOnError=\"true\"' is translated into " +
-                        "'onTaskError=\"cancelJob\"'.");
+    private void handleCancelJobOnErrorAttribute(CommonAttribute commonPropertiesHolder,
+            String attributeValue) {
+        logger.warn(XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.getXMLName() +
+            " attribute is deprecated and no longer supported from schema 3.4+. " +
+            "Please use on task error policy to define task error behaviour. " +
+            "The attribute 'cancelJobOnError=\"true\"' is translated into " + "'onTaskError=\"cancelJob\"'.");
 
         if (attributeValue != null && attributeValue.equalsIgnoreCase("true")) {
             commonPropertiesHolder.setOnTaskError(OnTaskError.CANCEL_JOB);
@@ -464,8 +463,8 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
-    private Map<String, String> getAttributesAsMap(
-            XMLStreamReader cursorVariables) throws JobCreationException {
+    private Map<String, String> getAttributesAsMap(XMLStreamReader cursorVariables)
+            throws JobCreationException {
         final ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
 
         for (int i = 0; i < cursorVariables.getAttributeCount(); i++) {
@@ -543,7 +542,8 @@ public class StaxJobFactory extends JobFactory {
                 return description;
             }
             //go to the description END_ELEMENT
-            while (cursorVariables.next() != XMLEvent.END_ELEMENT) ;
+            while (cursorVariables.next() != XMLEvent.END_ELEMENT)
+                ;
 
             return description;
         } catch (JobCreationException jce) {
@@ -564,7 +564,8 @@ public class StaxJobFactory extends JobFactory {
         try {
             String url = replace(cursorVariables.getAttributeValue(0));
             //go to the END_ELEMENT
-            while (cursorVariables.next() != XMLEvent.END_ELEMENT) ;
+            while (cursorVariables.next() != XMLEvent.END_ELEMENT)
+                ;
             return url;
         } catch (JobCreationException jce) {
             throw jce;
@@ -649,14 +650,11 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.matches(attributeName)) {
                     handleCancelJobOnErrorAttribute(tmpTask, attributeValue);
                 } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
-                    tmpTask.setOnTaskError(OnTaskError
-                            .getInstance(replace(attributeValue)));
+                    tmpTask.setOnTaskError(OnTaskError.getInstance(replace(attributeValue)));
                 } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
-                    tmpTask.setRestartTaskOnError(RestartMode
-                            .getMode(replace(attributeValue)));
+                    tmpTask.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue)));
                 } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
-                    tmpTask.setMaxNumberOfExecution(Integer
-                            .parseInt(replace(attributeValue)));
+                    tmpTask.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue)));
                 } else if (XMLAttributes.TASK_PRECIOUS_RESULT.matches(attributeName)) {
                     tmpTask.setPreciousResult(Boolean.parseBoolean(replace(attributeValue)));
                 } else if (XMLAttributes.TASK_PRECIOUS_LOGS.matches(attributeName)) {
@@ -676,7 +674,7 @@ public class StaxJobFactory extends JobFactory {
                         current = cursorTask.getLocalName();
                         currentTag = null;
                         if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
-                            tmpTask.setGenericInformations(getGenericInformation(cursorTask));
+                            tmpTask.setGenericInformation(getGenericInformation(cursorTask));
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
                             tmpTask.setDescription(getDescription(cursorTask));
                         } else if (XMLTags.DS_INPUT_FILES.matches(current)) {
@@ -761,8 +759,8 @@ public class StaxJobFactory extends JobFactory {
      * @param task       the task in which to add the input/output files selector
      * @throws JobCreationException
      */
-    private void setIOFIles(XMLStreamReader cursorTask, String endTag,
-            Task task) throws JobCreationException {
+    private void setIOFIles(XMLStreamReader cursorTask, String endTag, Task task)
+            throws JobCreationException {
         int i = 0;
         try {
             int eventType;
@@ -793,11 +791,11 @@ public class StaxJobFactory extends JobFactory {
                                 }
                                 if (selector != null && accessMode != null) {
                                     if (XMLTags.DS_INPUT_FILES.matches(endTag)) {
-                                        task.addInputFiles(selector, InputAccessMode
-                                                .getAccessMode(accessMode));
+                                        task.addInputFiles(selector,
+                                                InputAccessMode.getAccessMode(accessMode));
                                     } else {
-                                        task.addOutputFiles(selector, OutputAccessMode
-                                                .getAccessMode(accessMode));
+                                        task.addOutputFiles(selector,
+                                                OutputAccessMode.getAccessMode(accessMode));
                                     }
                                 }
                             }
@@ -989,7 +987,7 @@ public class StaxJobFactory extends JobFactory {
                 if (event == XMLEvent.START_ELEMENT) {
                     break;
                 } else if (event == XMLEvent.END_ELEMENT &&
-                        XMLTags.PARALLEL_ENV.matches(cursorTask.getLocalName())) {
+                    XMLTags.PARALLEL_ENV.matches(cursorTask.getLocalName())) {
                     return new ParallelEnvironment(nodesNumber, TopologyDescriptor.ARBITRARY);
                 }
             }
@@ -1001,7 +999,7 @@ public class StaxJobFactory extends JobFactory {
                     if (event == XMLEvent.START_ELEMENT) {
                         break;
                     } else if (event == XMLEvent.END_ELEMENT &&
-                            XMLTags.TOPOLOGY.matches(cursorTask.getLocalName())) {
+                        XMLTags.TOPOLOGY.matches(cursorTask.getLocalName())) {
                         throw new RuntimeException("Incorrect topology description");
                     }
                 }
@@ -1103,9 +1101,9 @@ public class StaxJobFactory extends JobFactory {
                             //go to the next 'arguments' start element or the 'file' end element
                             while (true) {
                                 int ev = cursorScript.next();
-                                if (((ev == XMLEvent.START_ELEMENT) && XMLTags.SCRIPT_ARGUMENTS
-                                        .matches(cursorScript.getLocalName())) ||
-                                        (ev == XMLEvent.END_ELEMENT)) {
+                                if (((ev == XMLEvent.START_ELEMENT) &&
+                                    XMLTags.SCRIPT_ARGUMENTS.matches(cursorScript.getLocalName())) ||
+                                    (ev == XMLEvent.END_ELEMENT)) {
                                     break;
                                 }
                             }
@@ -1256,7 +1254,8 @@ public class StaxJobFactory extends JobFactory {
         String current = null;
         try {
             //one step ahead to go to the command (static or dynamic)
-            while (cursorExec.next() != XMLEvent.START_ELEMENT) ;
+            while (cursorExec.next() != XMLEvent.START_ELEMENT)
+                ;
 
             current = cursorExec.getLocalName();
             ArrayList<String> command = new ArrayList<>(0);
@@ -1271,9 +1270,8 @@ public class StaxJobFactory extends JobFactory {
                             command.add((cursorExec.getAttributeValue(i)));
                         }
                         if (XMLAttributes.TASK_WORKDING_DIR.matches(attrName)) {
-                            logger.warn(
-                                    XMLAttributes.TASK_WORKDING_DIR.getXMLName()
-                                            + " attribute no longer supported. Please use a forkEnvironment for defining a working directory.");
+                            logger.warn(XMLAttributes.TASK_WORKDING_DIR.getXMLName() +
+                                " attribute no longer supported. Please use a forkEnvironment for defining a working directory.");
                         }
                     }
 
@@ -1320,8 +1318,8 @@ public class StaxJobFactory extends JobFactory {
      * @param javaTask   the task in which to add the Java Executable.
      * @param cursorExec the streamReader with the cursor on the 'ELEMENT_JAVA_EXECUTABLE' tag.
      */
-    private void setJavaExecutable(JavaTask javaTask,
-            XMLStreamReader cursorExec) throws JobCreationException {
+    private void setJavaExecutable(JavaTask javaTask, XMLStreamReader cursorExec)
+            throws JobCreationException {
         int i = 0;
         String current = cursorExec.getLocalName();
         try {
@@ -1535,8 +1533,8 @@ public class StaxJobFactory extends JobFactory {
                 logger.debug("name: " + t.getName());
                 logger.debug("description: " + t.getDescription());
                 logger.debug("parallel: " + t.isParallel());
-                logger.debug(
-                        "nbNodes: " + (t.getParallelEnvironment() == null ? "1" : t.getParallelEnvironment().getNodesNumber()));
+                logger.debug("nbNodes: " +
+                    (t.getParallelEnvironment() == null ? "1" : t.getParallelEnvironment().getNodesNumber()));
                 logger.debug("onTaskError: " + t.getOnTaskErrorProperty().getValue().toString());
                 logger.debug("preciousResult: " + t.isPreciousResult());
                 logger.debug("preciousLogs: " + t.isPreciousLogs());
@@ -1608,8 +1606,8 @@ public class StaxJobFactory extends JobFactory {
      * @param from  the T object in which to get the value
      * @param to    the T object in which to set the value
      */
-    private static <T> void autoCopyfields(Class<T> klass, T from, T to) throws IllegalArgumentException,
-            IllegalAccessException {
+    private static <T> void autoCopyfields(Class<T> klass, T from, T to)
+            throws IllegalArgumentException, IllegalAccessException {
         for (Field f : klass.getDeclaredFields()) {
             if (!Modifier.isStatic(f.getModifiers())) {
                 f.setAccessible(true);

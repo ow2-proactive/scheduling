@@ -231,5 +231,9 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         @Override
         public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
         }
+
+		@Override
+		public void jobUpdatedFullDataEvent(JobState job) {			
+		}
     }
 }

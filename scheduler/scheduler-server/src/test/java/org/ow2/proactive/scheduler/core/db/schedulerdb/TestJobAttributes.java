@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -48,7 +47,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         job.setName("name");
         job.setInputSpace("input");
         job.setOutputSpace("output");
-        job.setGenericInformations(null);
+        job.setGenericInformation(null);
         job.setPriority(JobPriority.HIGHEST);
 
         InternalJob jobData = defaultSubmitJob(job, DEFAULT_USER_NAME);
@@ -79,7 +78,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         InternalJob jobData;
 
         genericInfo = new HashMap<>();
-        job.setGenericInformations(genericInfo);
+        job.setGenericInformation(genericInfo);
         jobData = defaultSubmitJobAndLoadInternal(false, job);
         Assert.assertNotNull(jobData.getGenericInformation());
         Assert.assertTrue(jobData.getGenericInformation().isEmpty());
@@ -87,7 +86,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         genericInfo = new HashMap<>();
         genericInfo.put("p1", "v1");
         genericInfo.put("p2", "v2");
-        job.setGenericInformations(genericInfo);
+        job.setGenericInformation(genericInfo);
         jobData = defaultSubmitJobAndLoadInternal(false, job);
         Assert.assertEquals(2, jobData.getGenericInformation().size());
         Assert.assertEquals("v1", jobData.getGenericInformation().get("p1"));
@@ -99,7 +98,7 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         }
         genericInfo = new HashMap<>();
         genericInfo.put("longProperty", longString.toString());
-        job.setGenericInformations(genericInfo);
+        job.setGenericInformation(genericInfo);
         jobData = defaultSubmitJobAndLoadInternal(false, job);
         Assert.assertEquals(1, jobData.getGenericInformation().size());
         Assert.assertEquals(longString.toString(), jobData.getGenericInformation().get("longProperty"));

@@ -93,15 +93,21 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
     }
 
     @Override
+    public void jobUpdatedFullDataEvent(JobState jobState) {
+        broadcast(new EventNotification(EventNotification.Action.JOB_FULL_DATA_UPDATED,
+            SchedulerEvent.JOB_UPDATED.name(), jobState));
+    }
+
+    @Override
     public void jobSubmittedEvent(JobState jobState) {
-        broadcast(new EventNotification(EventNotification.Action.JOB_SUBMITTED, SchedulerEvent.JOB_SUBMITTED
-                .name(), jobState));
+        broadcast(new EventNotification(EventNotification.Action.JOB_SUBMITTED,
+            SchedulerEvent.JOB_SUBMITTED.name(), jobState));
     }
 
     @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent schedulerEvent) {
-        broadcast(new EventNotification(EventNotification.Action.SCHEDULER_STATE_UPDATED, schedulerEvent
-                .name(), null));
+        broadcast(new EventNotification(EventNotification.Action.SCHEDULER_STATE_UPDATED,
+            schedulerEvent.name(), null));
     }
 
     @Override
@@ -120,12 +126,10 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
 
     private void broadcast(EventNotification eventNotification) {
         try {
-            ServletContext servletContext =
-                    ServletContextFactory.getDefault().getServletContext();
+            ServletContext servletContext = ServletContextFactory.getDefault().getServletContext();
 
-            ((BroadcasterFactory) servletContext.getAttribute(
-                    BroadcasterFactory.class.getName())).lookup(broadcasterUUID).broadcast(
-                        mapper.writeValueAsString(eventNotification));
+            ((BroadcasterFactory) servletContext.getAttribute(BroadcasterFactory.class.getName()))
+                    .lookup(broadcasterUUID).broadcast(mapper.writeValueAsString(eventNotification));
         } catch (Exception e) {
             log.error("Cannot broadcast event notification.", e);
             Throwables.propagate(e);

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -47,8 +46,9 @@ public class SchedulingServiceTest6 extends BaseServiceTest {
         service.unlockJobsToSchedule(jobsMap.values());
 
         Assert.assertTrue(service.removeJob(jobDesc.getJobId()));
-        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
+                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_UPDATED,
                 SchedulerEvent.JOB_REMOVE_FINISHED);
         infrastructure.assertRequests(1);
 

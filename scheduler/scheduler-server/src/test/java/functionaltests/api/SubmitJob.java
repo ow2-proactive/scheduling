@@ -127,4 +127,8 @@ public class SubmitJob implements SchedulerEventListener {
     public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
     }
 
+	@Override
+	public void jobUpdatedFullDataEvent(JobState job) {		
+	}
+
 }

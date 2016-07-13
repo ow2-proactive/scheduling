@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -43,8 +42,8 @@ public class SchedulingServiceTest9 extends BaseServiceTest {
         JobDescriptor jobDesc;
 
         jobDesc = startTask(2);
-        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_PENDING_TO_RUNNING);
+        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
+                SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING);
 
         InternalTask task = jobDesc.getInternal().getTask("javaTask1");
         service.restartTaskOnNodeFailure(task);
@@ -53,9 +52,9 @@ public class SchedulingServiceTest9 extends BaseServiceTest {
 
         startTask(1);
         service.restartTaskOnNodeFailure(task);
-        listener.assertEvents(SchedulerEvent.TASK_PENDING_TO_RUNNING,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+        listener.assertEvents(SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                SchedulerEvent.JOB_UPDATED);
         infrastructure.assertRequests(2);
     }
 

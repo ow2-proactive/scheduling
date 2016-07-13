@@ -733,5 +733,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
             throws UnknownJobException, NotConnectedException, PermissionException {
         return schedulerProxy.getJobInfo(jobId);
     }
+    
+    @Override
+    public boolean changeStartAt(JobId jobId, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return schedulerProxy.changeStartAt(jobId, startAt);
+    }
 
 }
