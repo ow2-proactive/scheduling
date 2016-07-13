@@ -11,8 +11,8 @@ miredot {
         }
         title = 'ProActive Workflows & Scheduling - REST API v' + version
     }
-    // expires friday june 16th, 2017
-    licence = 'UHJvamVjdHxvcmcub3cyLnByb2FjdGl2ZV9ncmlkX2Nsb3VkX3BvcnRhbC5yZXN0LXNlcnZlcnwyMDE2LTA2LTE3fGZhbHNlI01Dd0NGQmRGVWVDcDBjUEFNRUtHUGQ5Mis2VUhWdCtDQWhSdWpOdE0wcGRxUGdUMVNZdUREZ3lyTEJvb3FBPT0='
+    // expires Sunday 1 july  2018
+    licence = 'cHJvamVjdHxvcmcub3cyLnByb2FjdGl2ZV9ncmlkX2Nsb3VkX3BvcnRhbC5yZXN0LXNlcnZlcnwyMDE4LTA3LTAxfHRydWV8LTEjTUN3Q0ZFaEgyZWJGOHJqWXY3dG4vazNrdEx4NjcyK3RBaFFlNVVtVC9VL29kZ0RFRTBmY3dwUnVWV3dZY3c9PQ=='
     restModel{
         restFramework {
             name = 'jax-rs'
