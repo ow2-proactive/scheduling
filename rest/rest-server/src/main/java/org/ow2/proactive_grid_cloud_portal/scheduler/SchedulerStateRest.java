@@ -3308,14 +3308,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @Override
     @PUT
-    @Path("jobs/{jobid}/startAt/{startAt}")
+    @Path("jobs/{jobid}/startat/{startAt}")
     @Produces("application/json")
     public boolean changeStartAt(@HeaderParam("sessionid")
     final String sessionId, @PathParam("jobid")
     final String jobId, @PathParam("startAt")
     final String startAt) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            final Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/startAt/" + startAt);
+            final Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/startat/" + startAt);
             return s.changeStartAt(JobIdImpl.makeJobId(jobId), startAt);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
