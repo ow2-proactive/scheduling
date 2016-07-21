@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
 import javax.management.MBeanAttributeInfo;
@@ -50,8 +51,8 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeDataSupport;
 
-import org.ow2.proactive.jmx.RRDDataStore;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.jmx.RRDDataStore;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.Sample;
 
@@ -196,16 +197,23 @@ public class RRDSigarDataStore extends RRDDataStore {
                     logger.trace("Non numeric value for " + dataSource + " / " + fullName + ": " +
                         ex.getMessage());
                 }
+            } catch (InstanceNotFoundException | AttributeNotFoundException e) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Cannot read attribute " + attrName + " for object " + objectName + ": " +
+                        e.getMessage());
+                }
+
             } catch (Exception e) {
-                logger.warn("Cannot read attribute " + attrName + " for object " + objectName + ": " +
-                    e.getMessage());
+                logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ",
+                        e);
+
             }
         }
         try {
             sample.setTime(timeInMs / 1000);
             sample.update();
         } catch (Exception e) {
-            logger.warn("Cannot update RRD database: " + e.getMessage());
+            logger.error("Cannot update RRD database: " + e.getMessage());
         }
     }
 
