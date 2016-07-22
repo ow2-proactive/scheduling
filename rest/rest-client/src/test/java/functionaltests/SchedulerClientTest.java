@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 
@@ -170,7 +171,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         File tmpFile = testFolder.newFile();
         Files.write("non_admin_user_push_file_contents".getBytes(), tmpFile);
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword());
+        client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(), null, true));
         client.pushFile("USERSPACE", "/test_non_admin_user_push_file", "tmpfile.tmp",
                 tmpFile.getAbsolutePath());
         String destDirPath = URI.create(client.getUserSpaceURIs().get(0)).getPath();
@@ -180,7 +181,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     private ISchedulerClient clientInstance() throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(getRestServerUrl(), getLogin(), getPassword());
+        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
         return client;
     }
 

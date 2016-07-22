@@ -34,14 +34,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.smartproxy;
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
-
-import javax.security.auth.login.LoginException;
-
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -52,7 +47,6 @@ import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
@@ -68,6 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.rest.ds.DataSpaceClient;
@@ -81,9 +76,12 @@ import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
 import org.ow2.proactive_grid_cloud_portal.common.FileType;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
 
@@ -91,8 +89,8 @@ import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USE
  * Smart proxy implementation that relies on the REST API for communicating with dataspaces
  * and websockets to push notifications to clients.
  * <p>
- * Any instance of this class must be initialized by calling the {@link #init(String, String, String)}
- * or {@link #initInsecure(String, String, String)} method before executing any subsequent method. Not
+ * Any instance of this class must be initialized by calling the {@link ISchedulerClient#init(ConnectionInfo)}
+ * method before executing any subsequent method. Not
  * respecting this rule may lead to an NPE or an unexpected behaviour.
  *
  * @author The ProActive Team
@@ -110,25 +108,15 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
     @Override
-    public void init(String url, String user, String pwd) throws SchedulerException, LoginException {
-       init(url, user, pwd, false);
-    }
-
-    private void init(String url, String user, String pwd, boolean insecureConnection) {
+    public void init(ConnectionInfo connectionInfo) {
         try {
-            this.schedulerUrl = url;
-            this.schedulerLogin = user;
-            this.schedulerPassword = pwd;
+            this.connectionInfo = connectionInfo;
             this.restSchedulerClient = SchedulerClient.createInstance();
 
-            if (insecureConnection) {
-                this.restSchedulerClient.initInsecure(url, user, pwd);
-            } else {
-                this.restSchedulerClient.init(url, user, pwd);
-            }
+            this.restSchedulerClient.init(new ConnectionInfo(connectionInfo.getUrl(), connectionInfo.getLogin(), connectionInfo.getPassword(), connectionInfo.getCredentialFile(), connectionInfo.isInsecure()));
 
             DataSpaceClient restDsClient = new DataSpaceClient();
-            restDsClient.init(url, this.restSchedulerClient);
+            restDsClient.init(connectionInfo.getUrl(), this.restSchedulerClient);
             this.restDataSpaceClient = restDsClient;
 
             super.jobTracker.setRestDataSpaceClient(this.restDataSpaceClient);
@@ -375,11 +363,6 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     /*
      * Implementation of the ISchedulerClient interface
      */
-
-    @Override
-    public void initInsecure(String url, String user, String pwd) throws Exception {
-        init(url, user, pwd, true);
-    }
 
     @Override
     public void setSession(String sid) {

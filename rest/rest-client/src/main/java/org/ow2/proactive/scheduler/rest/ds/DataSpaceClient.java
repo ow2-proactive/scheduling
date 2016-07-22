@@ -36,32 +36,6 @@
  */
 package org.ow2.proactive.scheduler.rest.ds;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.Variant;
-
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
-import org.ow2.proactive.scheduler.rest.ISchedulerClient;
-import org.ow2.proactive.scheduler.rest.SchedulerClient;
-import org.ow2.proactive.http.HttpClientBuilder;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
@@ -70,6 +44,26 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.ow2.proactive.http.HttpClientBuilder;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
+import org.ow2.proactive.authentication.ConnectionInfo;
+import org.ow2.proactive.scheduler.rest.ISchedulerClient;
+import org.ow2.proactive.scheduler.rest.SchedulerClient;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 
 public class DataSpaceClient implements IDataSpaceClient {
@@ -96,10 +90,10 @@ public class DataSpaceClient implements IDataSpaceClient {
         this.sessionId = client.getSession();
     }
 
-    public void init(String restServerUrl, String login, String password) throws Exception {
+    public void init(ConnectionInfo connectionInfo) throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(restServerUrl, login, password);
-        init(restServerUrl, client);
+        client.init(connectionInfo);
+        init(connectionInfo.getUrl(), client);
     }
 
     @Override

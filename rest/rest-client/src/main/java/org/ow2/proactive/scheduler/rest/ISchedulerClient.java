@@ -34,11 +34,7 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
-
+import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -48,37 +44,23 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeoutException;
+
 
 public interface ISchedulerClient extends Scheduler {
 
     /**
      * Initialize this instance.
      *
-     * @param url
-     *            the REST server URL
-     * @param login
-     *            the login
-     * @param password
-     *            the password
-     * @throws Exception
-     *             if an error occurs during the initialization
-     */
-    void init(String url, String login, String password) throws Exception;
-
-    /**
-     * Initialize this instance.
-     * HTTPS certificate checking is disabled.
      *
-     * @param url
-     *            the REST server URL
-     * @param login
-     *            the login
-     * @param password
-     *            the password
+     * @param connectionInfo various info about the connection attempt
      * @throws Exception
      *             if an error occurs during the initialization
      */
-    void initInsecure(String url, String login, String password) throws Exception;
+    void init(ConnectionInfo connectionInfo) throws Exception;
 
     /**
      * Sets the session identifier explicitly.
