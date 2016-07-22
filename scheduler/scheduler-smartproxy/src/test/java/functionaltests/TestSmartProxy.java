@@ -13,6 +13,7 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.objectweb.proactive.utils.TimeoutAccounter;
+import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -113,7 +114,7 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
         String schedulerUrl = SchedulerTHelper.getLocalUrl();
         schedProxy.setSessionName(TEST_SESSION_NAME);
 
-        schedProxy.init(schedulerUrl, functionaltests.utils.TestUsers.DEMO.username, TestUsers.DEMO.password);
+        schedProxy.init(new ConnectionInfo(schedulerUrl, TestUsers.DEMO.username, TestUsers.DEMO.password, null, true));
 
         eventListener = new MyEventListener();
         MyEventListener myListenerRemoteReference = PAActiveObject.turnActive(eventListener);

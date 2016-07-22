@@ -1,50 +1,13 @@
 package org.ow2.proactive.scheduler.smartproxy.common;
 
-import java.io.File;
-import java.security.KeyException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import javax.security.auth.login.LoginException;
-
+import com.google.common.net.UrlEscapers;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.SchedulerConstants;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SchedulerException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -54,8 +17,15 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import com.google.common.net.UrlEscapers;
-import org.apache.log4j.Logger;
+
+import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.security.KeyException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Throwables.propagate;
@@ -84,14 +54,13 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             TASK_RUNNING_TO_FINISHED, TASK_PROGRESS, JOB_RESTARTED_FROM_ERROR, JOB_IN_ERROR, TASK_IN_ERROR };
     private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
     protected T jobTracker;
-    protected String schedulerUrl;
-    protected String schedulerLogin;
-    protected String schedulerPassword;
+    protected ConnectionInfo connectionInfo;
     protected Set<SchedulerEventListenerExtended> eventListeners = Collections
             .synchronizedSet(new HashSet<SchedulerEventListenerExtended>());
     private ThreadFactory threadFactory = new NamedThreadFactory("SmartProxyDataTransferThread");
     protected final ExecutorService threadPool = Executors.newFixedThreadPool(MAX_NB_OF_DATA_TRANSFER_THREADS,
             threadFactory);
+
 
     private boolean initialized = false;
     private boolean terminated = false;
@@ -138,13 +107,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     /**
      * Connects to the scheduler
      *
-     * @param url  url of the scheduler
-     * @param user user name
-     * @param pwd  password
-     * @throws SchedulerException
+     *
+     * @param connectionInfo@throws SchedulerException
      * @throws LoginException
      */
-    public abstract void init(String url, String user, String pwd) throws SchedulerException, LoginException;
+    public abstract void init(ConnectionInfo connectionInfo) throws SchedulerException, LoginException;
 
     /**
      * Disconnect from the scheduler
@@ -212,7 +179,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      */
     public void reconnect() throws SchedulerException, LoginException {
         disconnect();
-        init(schedulerUrl, schedulerLogin, schedulerPassword);
+        init(connectionInfo);
     }
 
     /**
@@ -353,8 +320,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         this.initialized = initialized;
     }
 
-    protected void reinitializeState(String schedulerUrl) throws NotConnectedException, PermissionException {
-        this.schedulerUrl = schedulerUrl;
+    protected void reinitializeState()
+            throws NotConnectedException, PermissionException {
         jobTracker.loadJobs();
         registerAsListener();
         syncAwaitedJobs();

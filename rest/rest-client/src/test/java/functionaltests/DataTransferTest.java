@@ -42,6 +42,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.rest.ds.*;
 import org.ow2.proactive_grid_cloud_portal.common.FileType;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
@@ -331,7 +332,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     private IDataSpaceClient clientInstance() throws Exception {
         DataSpaceClient client = new DataSpaceClient();
-        client.init(getRestServerUrl(), getLogin(), getPassword());
+        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
         return client;
     }
 
