@@ -31,15 +31,15 @@ public class MockSchedulingListener implements SchedulerStateUpdate {
 
     @Override
     public void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
-        System.out.println("Job state updated " + notification.getData().getJobId() + " " +
-            notification.getEventType());
+        System.out.println(
+                "Job state updated " + notification.getData().getJobId() + " " + notification.getEventType());
         events.add(notification.getEventType());
     }
 
     @Override
     public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
-        System.out.println("Task state updated " + notification.getData().getName() + " " +
-            notification.getEventType());
+        System.out.println(
+                "Task state updated " + notification.getData().getName() + " " + notification.getEventType());
         events.add(notification.getEventType());
     }
 
@@ -51,6 +51,12 @@ public class MockSchedulingListener implements SchedulerStateUpdate {
 
     @Override
     public void usersUpdated(NotificationData<UserIdentification> notification) {
+    }
+
+    @Override
+    public void jobUpdatedFullData(JobState jobState) {
+        System.out.println("Updated " + jobState.getName() + " " + jobState.getJobInfo().getJobId());
+        events.add(SchedulerEvent.JOB_UPDATED);
     }
 
 }

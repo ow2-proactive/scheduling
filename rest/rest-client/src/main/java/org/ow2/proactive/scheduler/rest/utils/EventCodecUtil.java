@@ -75,7 +75,7 @@ public class EventCodecUtil {
         try {
             return mapper.readValue(jsonString, valueType);
         } catch (Exception e) {
-            throw new RuntimeException("Parser error.", e);
+            throw new RuntimeException("Parser error for jsonString : " + jsonString, e);
         }
     }
 
@@ -94,8 +94,8 @@ public class EventCodecUtil {
         }
 
         @Override
-        public EventNotification deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException,
-                JsonProcessingException {
+        public EventNotification deserialize(JsonParser jp, DeserializationContext ctxt)
+                throws IOException, JsonProcessingException {
             EventNotification notification = new EventNotification();
             ObjectMapper mapper = (ObjectMapper) jp.getCodec();
             ObjectNode root = (ObjectNode) mapper.readTree(jp);
@@ -108,6 +108,9 @@ public class EventCodecUtil {
                     break;
                 case JOB_STATE_UPDATED:
                     notification.setData(mapper.readValue(data, JobInfoData.class));
+                    break;
+                case JOB_FULL_DATA_UPDATED:
+                    notification.setData(mapper.readValue(data, JobStateData.class));
                     break;
                 case TASK_STATE_UPDATED:
                     notification.setData(mapper.readValue(data, TaskInfoData.class));

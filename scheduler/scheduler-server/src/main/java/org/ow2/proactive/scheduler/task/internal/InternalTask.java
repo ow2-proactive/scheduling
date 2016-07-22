@@ -36,6 +36,18 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -60,17 +72,6 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.utils.NodeSet;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -138,8 +139,6 @@ public abstract class InternalTask extends TaskState {
     public InternalTask getReplicatedFrom() {
         return replicatedFrom;
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -437,7 +436,8 @@ public abstract class InternalTask extends TaskState {
         if (this.getId().equals(parent.getId())) {
             return (depth >= 0);
         }
-        if (this.getIDependences() == null && this.getJoinedBranches() == null && this.getIfBranch() == null) {
+        if (this.getIDependences() == null && this.getJoinedBranches() == null &&
+            this.getIfBranch() == null) {
             return false;
         }
         if (this.joinedBranches != null) {
@@ -541,7 +541,6 @@ public abstract class InternalTask extends TaskState {
         this.taskInfo = (TaskInfoImpl) taskInfo;
     }
 
-
     @Override
     public void setMaxNumberOfExecution(int numberOfExecution) {
         super.setMaxNumberOfExecution(numberOfExecution);
@@ -553,7 +552,7 @@ public abstract class InternalTask extends TaskState {
         this.taskInfo.setNumberOfExecutionLeft(numberOfExecutionLeft);
     }
 
-    public void setNumberOfExecutionOnFailureLeft( int numberOfExecutionOnFailureLeft) {
+    public void setNumberOfExecutionOnFailureLeft(int numberOfExecutionOnFailureLeft) {
         this.taskInfo.setNumberOfExecutionOnFailureLeft(numberOfExecutionOnFailureLeft);
     }
 
@@ -768,8 +767,8 @@ public abstract class InternalTask extends TaskState {
 
         String n = this.getTaskNameSuffix();
         if (newName.length() + n.length() > 255) {
-            throw new IllegalArgumentException("The name is too long, it must have 255 chars length max : " +
-                newName + n);
+            throw new IllegalArgumentException(
+                "The name is too long, it must have 255 chars length max : " + newName + n);
         }
 
         super.setName(newName + n);
@@ -1093,7 +1092,7 @@ public abstract class InternalTask extends TaskState {
      */
     public Map<String, String> getGenericInformation() {
 
-        if (taskInfo == null || genericInformations == null) {
+        if (taskInfo == null || genericInformation == null) {
             // task is not yet properly initialized
             return new HashMap<>();
         }
@@ -1121,7 +1120,7 @@ public abstract class InternalTask extends TaskState {
      * @param replaceVariables - if set to true method replaces variables in the generic information
      *
      */
-    public Map<String, String> getGenericInformations(boolean replaceVariables) {
+    public Map<String, String> getGenericInformation(boolean replaceVariables) {
         if (replaceVariables) {
             return this.getGenericInformation();
         } else {

@@ -574,6 +574,9 @@ public abstract class InternalJob extends JobState {
         // notify frontend that tasks were added and modified
         frontend.jobStateUpdated(this.getOwner(),
                 new NotificationData<JobInfo>(SchedulerEvent.TASK_REPLICATED, new JobInfoImpl(jobInfo)));
+
+        frontend.jobUpdatedFullData(this);
+
         this.jobInfo.clearTasksChanges();
 
         return true;
@@ -1205,7 +1208,7 @@ public abstract class InternalJob extends JobState {
      *
      */
     public Map<String, String> getGenericInformation() {
-        if (genericInformations == null) {
+        if (genericInformation == null) {
             // task is not yet properly initialized
             return new HashMap<>(0);
         }

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -69,7 +68,8 @@ public class SchedulingServiceTest7 extends BaseServiceTest {
         }
         service.unlockJobsToSchedule(jobsMap.values());
 
-        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.TASK_PENDING_TO_RUNNING);
+        listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING, SchedulerEvent.JOB_UPDATED,
+                SchedulerEvent.TASK_PENDING_TO_RUNNING);
 
         TaskId taskId;
 
@@ -80,7 +80,8 @@ public class SchedulingServiceTest7 extends BaseServiceTest {
         result.setAction(action);
         service.taskTerminatedWithResult(taskId, result);
 
-        listener.assertEvents(SchedulerEvent.TASK_REPLICATED, SchedulerEvent.TASK_RUNNING_TO_FINISHED);
+        listener.assertEvents(SchedulerEvent.TASK_REPLICATED, SchedulerEvent.JOB_UPDATED,
+                SchedulerEvent.TASK_RUNNING_TO_FINISHED);
 
         jobsMap = service.lockJobsToSchedule();
         assertEquals(1, jobsMap.size());

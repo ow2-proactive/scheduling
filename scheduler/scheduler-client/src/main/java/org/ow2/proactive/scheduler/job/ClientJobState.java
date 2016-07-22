@@ -39,7 +39,6 @@ public final class ClientJobState extends JobState {
     private JobType type;
     private Map<TaskId, TaskState> tasks;
     private int maxNumberOfExecution;
-    private HashMap<String, String> genericInformation;
 
     public ClientJobState(JobState jobState) {
         List<TaskState> taskStates = jobState.getTasks();
@@ -59,11 +58,11 @@ public final class ClientJobState extends JobState {
 
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 
-        this.genericInformation = new HashMap<>(jobState.getGenericInformation());
-
         this.clientJobSerializationHelper = new ClientJobSerializationHelper();
 
         this.setOnTaskError(jobState.getOnTaskErrorProperty().getValue());
+
+        this.genericInformation = new HashMap<>(jobState.getGenericInformation());
 
         List<ClientTaskState> clientTaskStates = new ArrayList<>(taskStates.size());
         for (TaskState ts : taskStates) {
@@ -76,11 +75,6 @@ public final class ClientJobState extends JobState {
     public int getMaxNumberOfExecution() {
         return this.maxNumberOfExecution;
 
-    }
-
-    @Override
-    public Map<String, String> getGenericInformation() {
-        return this.genericInformation;
     }
 
     @Override
@@ -170,7 +164,6 @@ public final class ClientJobState extends JobState {
         throw new RuntimeException(
             "Not implemented: the restart task on error property is not available on client side.");
     }
-
 
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();

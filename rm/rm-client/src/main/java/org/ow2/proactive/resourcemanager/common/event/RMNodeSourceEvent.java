@@ -37,7 +37,6 @@
 package org.ow2.proactive.resourcemanager.common.event;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.db.types.BigString;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
@@ -67,7 +66,7 @@ public class RMNodeSourceEvent extends RMEvent {
     private String nodeSourceName = null;
 
     /** description of the source concerned by the event. */
-    private BigString nodeSourceDescription = null;
+    private String nodeSourceDescription = null;
 
     private String nodeSourceAdmin = null;
 
@@ -83,7 +82,7 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription, String nodeSourceAdmin) {
         this.nodeSourceName = nodeSourceName;
-        this.nodeSourceDescription = new BigString(nodeSourceDescription);
+        this.nodeSourceDescription = nodeSourceDescription;
         this.nodeSourceAdmin = nodeSourceAdmin;
     }
 
@@ -95,7 +94,7 @@ public class RMNodeSourceEvent extends RMEvent {
         super(type);
         this.initiator = initiator;
         this.nodeSourceName = nodeSourceName;
-        this.nodeSourceDescription = new BigString(nodeSourceDescription);
+        this.nodeSourceDescription = nodeSourceDescription;
         this.nodeSourceAdmin = nodeSourceAdmin;
     }
 
@@ -125,7 +124,7 @@ public class RMNodeSourceEvent extends RMEvent {
      * @return node source type of the event.
      */
     public String getSourceDescription() {
-        return this.nodeSourceDescription.getValue();
+        return this.nodeSourceDescription;
     }
 
     /**
