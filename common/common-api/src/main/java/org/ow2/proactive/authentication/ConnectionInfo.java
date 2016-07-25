@@ -39,6 +39,7 @@ package org.ow2.proactive.authentication;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  * Composite object storing information to connect to the scheduler/rm
@@ -46,7 +47,7 @@ import java.io.File;
  * @author The ProActive Team
  */
 @PublicAPI
-public class ConnectionInfo {
+public class ConnectionInfo implements Serializable {
     private String url;
     private String login;
     private String password;
