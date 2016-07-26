@@ -57,6 +57,17 @@ public class SchedulingTaskComparatorTest {
     }
 
     @Test
+    public void testSelectionScriptsUseVariables() throws Exception {
+        Mockito.when(task1.getSelectionScripts()).thenReturn(ImmutableList.of(new SelectionScript("variables.get(\"PA_JOB\");selected = true", "javascript")));
+        Mockito.when(task2.getSelectionScripts()).thenReturn(ImmutableList.of(new SelectionScript("selected = true", "javascript")));
+        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2, job2)));
+
+        Mockito.when(task1.getSelectionScripts()).thenReturn(ImmutableList.of(new SelectionScript("selected = true", "javascript")));
+        Mockito.when(task2.getSelectionScripts()).thenReturn(ImmutableList.of(new SelectionScript("variables.get(\"PA_JOB\");selected = false", "javascript")));
+        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2, job2)));
+    }
+
+    @Test
     public void testJobOwnerDiffers() throws Exception {
         Mockito.when(job2.getOwner()).thenReturn("notadmin");
         Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2, job2)));
