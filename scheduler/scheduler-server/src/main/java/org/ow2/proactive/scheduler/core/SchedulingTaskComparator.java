@@ -100,6 +100,8 @@ public class SchedulingTaskComparator {
         //if the parallel environment is specified for any of tasks => not equal
         boolean isParallel = task.isParallel() || tcomp.task.isParallel();
 
+        boolean selectionScriptUseVariables = (doesSelectionScriptsUseVariables(task) || doesSelectionScriptsUseVariables(tcomp.task));
+
         boolean requireNodeWithTokern = task.getGenericInformation().containsKey(
                 SchedulerConstants.NODE_ACCESS_TOKEN) ||
             tcomp.task.getGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN);
@@ -109,7 +111,18 @@ public class SchedulingTaskComparator {
         // checked before
 
         //add the 6 tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && samePriority && !isParallel && !requireNodeWithTokern;
+        return sameSsHash && sameNodeEx && sameOwner && samePriority && !isParallel && !selectionScriptUseVariables && !requireNodeWithTokern;
+    }
+
+    private boolean doesSelectionScriptsUseVariables(InternalTask task) {
+        if (task.getSelectionScripts() != null) {
+            for (SelectionScript script : task.getSelectionScripts()) {
+                if (script.getScript().contains(SchedulerConstants.VARIABLES_BINDING_NAME.toString())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
