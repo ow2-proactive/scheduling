@@ -12,7 +12,6 @@ import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -40,7 +39,6 @@ public class TaskContextSerializerTest {
         new TaskContextSerializer().serializeContext(taskContext ,invalidDirectory);
     }
 
-    @NotNull
     private TaskContext createTaskContext() throws NodeException, InvalidScriptException {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setTaskId(TaskIdImpl.createTaskId(

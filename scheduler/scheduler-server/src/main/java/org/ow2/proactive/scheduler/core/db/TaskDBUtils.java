@@ -47,7 +47,6 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility methods to fetch or update task related information from database.
@@ -144,7 +143,6 @@ public class TaskDBUtils {
         return query.list();
     }
 
-    @NotNull
     private static Query getQuery(Session session, DBTaskDataParameters params, Set<TaskStatus> taskStatuses,
                                   boolean hasUser, boolean hasTag, boolean hasDateFrom, boolean hasDateTo,
                                   SortSpecifierContainer sortParams, String queryPrefix) {
