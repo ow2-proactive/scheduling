@@ -64,7 +64,7 @@ public class KeyGen {
         String algo = "RSA"; // should work fine with default providers
         String pubKey = null;
         String privKey = null;
-        int size = 1024;
+        int size = 2048;
 
         /**
          * Arguments handling

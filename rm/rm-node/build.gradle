@@ -27,3 +27,12 @@ dependencies {
     runtime 'jsr223:jsr223-nativeshell:0.4.1'
     runtime 'jsr223:jsr223-docker-compose:0.0.2'
 }
+
+// This task is executed at configuration phase by Gradle
+// before executing any other task
+task copyCredentials {
+    copy {
+        from("${project(':').projectDir}/config/authentication/credentials/node.cred")
+        into("${sourceSets.main.resources.srcDirs[0]}/config/authentication/credentials/")
+    }
+}

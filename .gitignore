@@ -33,3 +33,12 @@ dist/war/*.war
 
 # gradle commandline completion cache
 *.gradletasknamecache
+
+# credentials are centralized in a single location (config/authentication/credentials)
+# and moved by Gradle at configuration phase when required
+rm/rm-node/src/main/resources/config/authentication/credentials/
+
+# keys are centralized in a single location (config/authentication/keys)
+# and moved by Gradle at configuration phase when required
+scheduler/scheduler-server/src/test/resources/functionaltests/config/pub.key
+

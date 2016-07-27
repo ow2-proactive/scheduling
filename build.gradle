@@ -325,14 +325,14 @@ def createGenerateCredentialTask(String name, List<String> cliArgs) {
     }
 }
 
-createGenerateCredentialTask('Rm', [ '-F', 'config/authentication/keys/pub.key',
-                                     '-l', 'rm', '-p', 'rm_pwd', '-o', 'config/authentication/rm.cred'])
-createGenerateCredentialTask('Scheduler', ['-F', 'config/authentication/keys/pub.key',
-                                           '-l', 'scheduler', '-p', 'scheduler_pwd', '-o', 'config/authentication/scheduler.cred'])
 createGenerateCredentialTask('Admin', ['-F', 'config/authentication/keys/pub.key',
-                                       '-l', 'admin', '-p', 'admin', '-o', 'config/authentication/admin_user.cred'])
+                                       '-l', 'admin', '-p', 'admin', '-o', 'config/authentication/credentials/admin.cred'])
 createGenerateCredentialTask('Node', ['-F', 'config/authentication/keys/pub.key',
-                                      '-l', 'rm', '-p', 'rm_pwd', '-o', 'rm/rm-node/src/main/resources/config/authentication/rm.cred'])
+                                      '-l', 'node', '-p', 'node_pwd', '-o', 'config/authentication/credentials/node.cred'])
+createGenerateCredentialTask('Rm', [ '-F', 'config/authentication/keys/pub.key',
+                                     '-l', 'rm', '-p', 'rm_pwd', '-o', 'config/authentication/credentials/rm.cred'])
+createGenerateCredentialTask('Scheduler', ['-F', 'config/authentication/keys/pub.key',
+                                           '-l', 'scheduler', '-p', 'scheduler_pwd', '-o', 'config/authentication/credentials/scheduler.cred'])
 
 task generateCredentials
 generateCredentials.dependsOn generateCredentialsAdmin, generateCredentialsScheduler, generateCredentialsRm, generateCredentialsNode
