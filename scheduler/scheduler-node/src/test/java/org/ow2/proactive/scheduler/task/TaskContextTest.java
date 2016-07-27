@@ -8,7 +8,6 @@ import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +27,6 @@ public class TaskContextTest {
         assertEquals(2, context.getNodesHosts().size());
     }
 
-    @NotNull
     private TaskContext createTaskContext() throws NodeException, InvalidScriptException {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setTaskId(TaskIdImpl.createTaskId(

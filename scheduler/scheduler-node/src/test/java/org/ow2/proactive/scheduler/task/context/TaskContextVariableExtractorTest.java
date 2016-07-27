@@ -17,7 +17,6 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -167,7 +166,6 @@ public class TaskContextVariableExtractorTest {
         assertThat((String) contextVariables.get(testVariable1Key), is(testVariable1Value));
     }
 
-    @NotNull
     private TaskLauncherInitializer getTaskLauncherInitializerWithWorkflowVariable() {
         // Create and setup task launcher initializer
         TaskLauncherInitializer taskLauncherInitializer = createTaskLauncherInitializer();
@@ -218,7 +216,6 @@ public class TaskContextVariableExtractorTest {
                 is(taskReplicationValue));
     }
 
-    @NotNull
     private TaskLauncherInitializer createTaskLauncherInitializer() {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         TaskId taskId = createTaskId();
@@ -230,7 +227,6 @@ public class TaskContextVariableExtractorTest {
         return taskLauncherInitializer;
     }
 
-    @NotNull
     private TaskId createTaskId() {
         return TaskIdImpl.createTaskId(new JobIdImpl(jobIdValue, jobNameValue), taskNameValue, taskIdValue);
     }

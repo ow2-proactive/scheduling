@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,7 +105,6 @@ public class LiveJobsTest {
         Assert.assertTrue(liveJobs.priorityConflict(scheduled, notScheduled));
     }
 
-    @NotNull
     private TreeSet<JobPriority> createTreeSet(JobPriority... priorities) {
         return new TreeSet<>(ImmutableSet.copyOf(priorities));
     }

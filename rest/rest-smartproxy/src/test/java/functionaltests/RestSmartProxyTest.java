@@ -38,7 +38,6 @@ package functionaltests;
 
 import com.google.common.base.Throwables;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -257,7 +256,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         assertThat(taskStatus).isEqualTo(TaskStatus.FAULTY);
     }
 
-    @NotNull
     private JobState waitForJobFinishState(String jobIdAsString)
             throws InterruptedException, NotConnectedException, UnknownJobException, PermissionException {
 
@@ -280,7 +278,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         System.out.println(jobXml);
     }
 
-    @NotNull
     private TaskFlowJob createInErrorJob() throws InvalidScriptException, UserException {
         TaskFlowJob job = new TaskFlowJob();
         job.setName("JobWithInErrorTask");
