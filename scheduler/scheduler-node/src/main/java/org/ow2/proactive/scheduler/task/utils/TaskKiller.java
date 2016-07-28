@@ -34,16 +34,19 @@
  */
 package org.ow2.proactive.scheduler.task.utils;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.utils.Sleeper;
+
 public class TaskKiller {
 
-    public enum Status {
-        KILLED_MANUALLY, WALLTIME_REACHED, NOT_YET_KILLED;
-    }
+    private static final Logger LOGGER = Logger.getLogger(TaskKiller.class);
 
+    private static final int SECONDS_TO_WAIT_UNTIL_AGGRESSIVELY_INTERRUPT_TASK = 10;
+    private static final int THREAD_INTERRUPT_SLEEP_TO_SECONDS_MULTIPLIER = 100;
+    private static final long SLEEP_MILLISECONDS_DURING_THREAD_INTERRUPT = 10;
+    private static final Sleeper threadInterruptSleeper = new Sleeper(SLEEP_MILLISECONDS_DURING_THREAD_INTERRUPT, LOGGER);
     private Thread threadToKill;
-
     private boolean wasKilled = false;
-
     private Status status = Status.NOT_YET_KILLED;
 
     public TaskKiller(Thread threadToKill) { // executor service?
@@ -60,10 +63,19 @@ public class TaskKiller {
     private void interruptRepeatedly() {
         while (threadToKill.isAlive()) {
             threadToKill.interrupt();
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
+            threadInterruptSleeper.sleep();
+        }
+    }
+
+    /**
+     * Interrupts and gives the thread time to cleanup
+     */
+    private void interruptAndWaitCleanupTime() {
+        threadToKill.interrupt();
+        int iterationsToHitWaitingTimeLimit =
+                SECONDS_TO_WAIT_UNTIL_AGGRESSIVELY_INTERRUPT_TASK * THREAD_INTERRUPT_SLEEP_TO_SECONDS_MULTIPLIER;
+        for (int i = 0; threadToKill.isAlive() && i < iterationsToHitWaitingTimeLimit; i++) {
+            threadInterruptSleeper.sleep();
         }
     }
 
@@ -72,11 +84,16 @@ public class TaskKiller {
             wasKilled = true;
             this.status = status;
         }
+        interruptAndWaitCleanupTime();
         interruptRepeatedly();
     }
 
     public synchronized Status getStatus() {
         return status;
+    }
+
+    public enum Status {
+        KILLED_MANUALLY, WALLTIME_REACHED, NOT_YET_KILLED;
     }
 
 }
