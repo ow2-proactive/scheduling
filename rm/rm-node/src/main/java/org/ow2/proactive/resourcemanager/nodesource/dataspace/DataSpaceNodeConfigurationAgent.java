@@ -36,13 +36,18 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.dataspace;
 
-import java.io.Serializable;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
-import org.apache.log4j.Logger;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.util.Arrays;
 
 
 /**
@@ -55,11 +60,31 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
 
     private static Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
 
-    /** 
-     * This property is used by scheduling when configuring node and must be renamed carefully.
+    /**
+     * This property is used by scheduling when configuring node to define the location of the scratch dir and must be renamed carefully.
      * It is also defined in TaskLauncher.
      */
     protected static final String NODE_DATASPACE_SCRATCHDIR = "node.dataspace.scratchdir";
+
+    /**
+     * This property is used by scheduling when configuring node to define the location of the scratch dir. If the property is not defined,
+     * the scratch location will be used to create the cache dir
+     */
+    protected static final String NODE_DATASPACE_CACHEDIR = "node.dataspace.cachedir";
+
+    /**
+     * Name of the CacheSpace for DataSpaces registration
+     */
+    public static final String CACHESPACE_NAME = "CACHESPACE";
+
+    /**
+     * Default subfolder name for the cache
+     **/
+    public static final String DEFAULT_CACHE_SUBFOLDER_NAME = "cache";
+
+
+    private FileSystemServerDeployer cacheServer;
+    private static InputOutputSpaceConfiguration cacheSpaceConfiguration;
 
     /**
      * Create a new instance of DataSpaceNodeConfigurationAgent
@@ -71,16 +96,9 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
     public boolean configureNode() {
         try {
             // configure node for Data Spaces
-            String scratchDir;
-            if (System.getProperty(NODE_DATASPACE_SCRATCHDIR) == null) {
-                //if scratch dir java property is not set, set to default
-                scratchDir = System.getProperty("java.io.tmpdir");
-            } else {
-                //else use the property
-                scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
-            }
+            String baseScratchDir = getBaseScratchDir();
             final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(
-                (String) null, scratchDir);
+                    (String) null, baseScratchDir);
             DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
                     scratchConf);
         } catch (Throwable t) {
@@ -91,8 +109,55 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
         return true;
     }
 
+    private String getBaseScratchDir() {
+        String scratchDir;
+        if (System.getProperty(NODE_DATASPACE_SCRATCHDIR) == null) {
+            //if scratch dir java property is not set, set to default
+            scratchDir = System.getProperty("java.io.tmpdir");
+        } else {
+            //else use the property
+            scratchDir = System.getProperty(NODE_DATASPACE_SCRATCHDIR);
+        }
+        return scratchDir;
+    }
+
+    private String getCacheDir() {
+        String cacheDir;
+        if (System.getProperty(NODE_DATASPACE_CACHEDIR) == null) {
+            //if scratch dir java property is not set, set to default
+            cacheDir = (new File(getBaseScratchDir(), DEFAULT_CACHE_SUBFOLDER_NAME)).getAbsolutePath();
+        } else {
+            // else use the property
+            cacheDir = System.getProperty(NODE_DATASPACE_CACHEDIR);
+        }
+        return cacheDir;
+    }
+
+    public static InputOutputSpaceConfiguration getCacheSpaceConfiguration() {
+        return cacheSpaceConfiguration;
+    }
+
+    public boolean startCacheSpace() {
+        if (cacheSpaceConfiguration == null) {
+            try {
+                cacheServer = new FileSystemServerDeployer(CACHESPACE_NAME, getCacheDir(), true, true);
+                logger.info("Cache server started at " + cacheServer.getVFSRootURLs());
+                String hostname = InetAddress.getLocalHost().getHostName();
+                cacheSpaceConfiguration = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(Arrays.asList(cacheServer.getVFSRootURLs()), getCacheDir(), hostname, CACHESPACE_NAME);
+
+            } catch (Exception e) {
+                logger.error("Error occurred when starting the cache server", e);
+                return false;
+            }
+        }
+        return true;
+    }
+
     public BooleanWrapper closeNodeConfiguration() {
+
         try {
+            cacheServer.terminate();
+
             DataSpacesNodes.closeNodeConfig(PAActiveObject
                     .getActiveObjectNode(PAActiveObject.getStubOnThis()));
         } catch (Throwable t) {

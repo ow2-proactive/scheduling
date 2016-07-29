@@ -53,6 +53,11 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
         }
 
         @Override
+        public String getCacheURI() {
+            return null;
+        }
+
+        @Override
         public String getInputURI() {
             return null;
         }

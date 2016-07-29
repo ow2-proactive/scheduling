@@ -1,12 +1,8 @@
 package org.ow2.proactive.scheduler.task.context;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -17,8 +13,10 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -58,7 +56,7 @@ public class TaskContextVariableExtractorTest {
         TaskResult[] taskResultArray = { taskResult };
 
         TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, taskResultArray,
-                null, null,
+                null, null, null,
                 null, null, null, null, null);
 
         new TaskContextVariableExtractor().extractTaskVariables(taskContext, (TaskResult) null);
@@ -90,7 +88,7 @@ public class TaskContextVariableExtractorTest {
         TaskResult[] taskResultArray = { taskResult };
 
         TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, taskResultArray,
-                null, null,
+                null, null, null,
                 null, null, null, null, null);
 
 
@@ -109,7 +107,7 @@ public class TaskContextVariableExtractorTest {
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariable();
 
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null, null,
                 null, null, null, null, null);
 
         Map<String, byte[]> taskResultVariables = new HashMap<>();
@@ -135,7 +133,7 @@ public class TaskContextVariableExtractorTest {
                         "print('hello'); result='hello'", "javascript")));
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariable();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null, null,
                 null, null, null, null, null);
         Map<String, Serializable> contextVariables
                 = new TaskContextVariableExtractor().extractTaskVariables(taskContext, nodesfileContent);
@@ -158,7 +156,7 @@ public class TaskContextVariableExtractorTest {
                         "print('hello'); result='hello'", "javascript")));
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariable();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null, null,
                 null, null, null, null, null);
 
         Map<String, Serializable> contextVariables
@@ -182,7 +180,7 @@ public class TaskContextVariableExtractorTest {
         ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(
                 new TaskScript(new SimpleScript(
                         "print('hello'); result='hello'", "javascript")));
-        TaskContext taskContext = new TaskContext(scriptContainer, createTaskLauncherInitializer(), null,
+        TaskContext taskContext = new TaskContext(scriptContainer, createTaskLauncherInitializer(), null, null,
                 null, null, null, null, null, null, null);
 
         Map<String, Serializable> contextVariables

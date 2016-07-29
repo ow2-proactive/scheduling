@@ -78,6 +78,7 @@ public class ForkedTaskVariablesManager implements Serializable {
         scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
 
         scriptHandler.addBinding(SchedulerConstants.DS_SCRATCH_BINDING_NAME, taskContext.getScratchURI());
+        scriptHandler.addBinding(SchedulerConstants.DS_CACHE_BINDING_NAME, taskContext.getCacheURI());
         scriptHandler.addBinding(SchedulerConstants.DS_INPUT_BINDING_NAME, taskContext.getInputURI());
         scriptHandler.addBinding(SchedulerConstants.DS_OUTPUT_BINDING_NAME, taskContext.getOutputURI());
         scriptHandler.addBinding(SchedulerConstants.DS_GLOBAL_BINDING_NAME, taskContext.getGlobalURI());
