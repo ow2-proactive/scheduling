@@ -402,6 +402,14 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                             inputSelectors, inputSpaceFiles, outputSpaceFiles,
                             globalSpaceFiles, userSpaceFiles, inputSpaceCacheFiles, outputSpaceCacheFiles, globalSpaceCacheFiles, userSpaceCacheFiles);
 
+            if (exception != null) {
+                throw exception;
+            }
+
+            String inputSpaceUri = virtualResolve(INPUT);
+            String outputSpaceUri = virtualResolve(OUTPUT);
+            String globalSpaceUri = virtualResolve(GLOBAL);
+            String userSpaceUri = virtualResolve(USER);
 
             boolean cacheTransferPresent = !inputSpaceCacheFiles.isEmpty() || !outputSpaceCacheFiles.isEmpty() || !globalSpaceCacheFiles.isEmpty() || !userSpaceCacheFiles.isEmpty();
 
@@ -410,33 +418,12 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             }
             try {
 
-                if (exception != null) {
-                    throw exception;
-                }
-
-                String inputSpaceUri = virtualResolve(INPUT);
-                String outputSpaceUri = virtualResolve(OUTPUT);
-                String globalSpaceUri = virtualResolve(GLOBAL);
-                String userSpaceUri = virtualResolve(USER);
-
-                Map<String, DataSpacesFileObject> filesToCopyToScratch =
-                        createFolderHierarchySequentially(SCRATCH,
-                                inputSpaceUri, inputSpaceFiles,
-                                outputSpaceUri, outputSpaceFiles,
-                                globalSpaceUri, globalSpaceFiles,
-                                userSpaceUri, userSpaceFiles);
-
                 Map<String, DataSpacesFileObject> filesToCopyToCache =
                         createFolderHierarchySequentially(CACHE,
                                 inputSpaceUri, inputSpaceCacheFiles,
                                 outputSpaceUri, outputSpaceCacheFiles,
                                 globalSpaceUri, globalSpaceCacheFiles,
                                 userSpaceUri, userSpaceCacheFiles);
-
-                List<Future<Boolean>> transferFuturesScratch =
-                        doCopyInputDataToSpace(SCRATCH, filesToCopyToScratch);
-
-                handleResults(transferFuturesScratch);
 
                 List<Future<Boolean>> transferFuturesCache =
                         doCopyInputDataToSpace(CACHE, filesToCopyToCache);
@@ -447,6 +434,18 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
                     cacheTransferLock.unlock();
                 }
             }
+
+            Map<String, DataSpacesFileObject> filesToCopyToScratch =
+                    createFolderHierarchySequentially(SCRATCH,
+                            inputSpaceUri, inputSpaceFiles,
+                            outputSpaceUri, outputSpaceFiles,
+                            globalSpaceUri, globalSpaceFiles,
+                            userSpaceUri, userSpaceFiles);
+
+            List<Future<Boolean>> transferFuturesScratch =
+                    doCopyInputDataToSpace(SCRATCH, filesToCopyToScratch);
+
+            handleResults(transferFuturesScratch);
 
         } finally {
             // display dataspaces error and warns if any
