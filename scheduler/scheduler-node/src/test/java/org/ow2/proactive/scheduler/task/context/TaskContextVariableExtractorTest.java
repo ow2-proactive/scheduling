@@ -1,8 +1,12 @@
 package org.ow2.proactive.scheduler.task.context;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -13,10 +17,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -165,7 +166,6 @@ public class TaskContextVariableExtractorTest {
         assertThat((String) contextVariables.get(testVariable1Key), is(testVariable1Value));
     }
 
-    @NotNull
     private TaskLauncherInitializer getTaskLauncherInitializerWithWorkflowVariable() {
         // Create and setup task launcher initializer
         TaskLauncherInitializer taskLauncherInitializer = createTaskLauncherInitializer();
@@ -216,7 +216,6 @@ public class TaskContextVariableExtractorTest {
                 is(taskReplicationValue));
     }
 
-    @NotNull
     private TaskLauncherInitializer createTaskLauncherInitializer() {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         TaskId taskId = createTaskId();
@@ -228,7 +227,6 @@ public class TaskContextVariableExtractorTest {
         return taskLauncherInitializer;
     }
 
-    @NotNull
     private TaskId createTaskId() {
         return TaskIdImpl.createTaskId(new JobIdImpl(jobIdValue, jobNameValue), taskNameValue, taskIdValue);
     }

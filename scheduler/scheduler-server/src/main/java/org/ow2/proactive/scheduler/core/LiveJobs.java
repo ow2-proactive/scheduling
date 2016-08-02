@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -587,7 +586,6 @@ class LiveJobs {
         }
     }
 
-    @NotNull
     private TerminationData createAndFillTerminationData(TaskResultImpl result, RunningTaskData taskData,
             InternalJob job, boolean normalTermination) {
         TerminationData terminationData = TerminationData.newTerminationData();

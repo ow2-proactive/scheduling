@@ -6,16 +6,11 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.tests.ProActiveTest;
-import com.google.common.truth.Truth;
 import org.hibernate.cfg.Configuration;
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -79,7 +74,6 @@ public class TestNodeSources extends ProActiveTest {
         assertThat(dbManager.getNodeSources()).isEmpty();
     }
 
-    @NotNull
     private NodeSourceData createNodeSource() {
         return new NodeSourceData("ns1", DefaultInfrastructureManager.class
                 .getName(), new String[] { "infrastructure" }, StaticPolicy.class.getName(),

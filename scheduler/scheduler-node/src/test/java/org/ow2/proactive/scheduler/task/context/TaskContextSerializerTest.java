@@ -1,7 +1,8 @@
 package org.ow2.proactive.scheduler.task.context;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import java.io.File;
+import java.io.IOException;
+
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -11,9 +12,7 @@ import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-
-import java.io.File;
-import java.io.IOException;
+import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -40,7 +39,6 @@ public class TaskContextSerializerTest {
         new TaskContextSerializer().serializeContext(taskContext ,invalidDirectory);
     }
 
-    @NotNull
     private TaskContext createTaskContext() throws NodeException, InvalidScriptException {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setTaskId(TaskIdImpl.createTaskId(

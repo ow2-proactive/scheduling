@@ -46,7 +46,6 @@ import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
-import org.jetbrains.annotations.NotNull;
 
 public class TaskContextVariableExtractor implements Serializable {
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
