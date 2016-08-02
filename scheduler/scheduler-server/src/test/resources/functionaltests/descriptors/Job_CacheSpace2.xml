@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.4"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.4 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.4/schedulerjob.xsd"
+        name="JobCacheSpace1"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+    <taskFlow>
+
+        <task name="Process">
+            <description>
+                <![CDATA[ This task will be replicated according to the 'runs' value specified in the replication script.                The replication index is used in each task's instance to select the input. ]]>
+            </description>
+            <inputFiles>
+                <files includes="dataToCopy" accessMode="cacheFromUserSpace"/>
+                <files includes="dataToUpdate" accessMode="cacheFromUserSpace"/>
+            </inputFiles>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println cachespace
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
