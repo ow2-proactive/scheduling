@@ -3,6 +3,7 @@ package org.ow2.proactive.scheduler.task;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
@@ -42,13 +43,7 @@ public class TaskContextTest {
                                         new SimpleScript("", "python")))),
                 taskLauncherInitializer,
                 null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null,
                 null);
     }
 }

@@ -36,20 +36,13 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-
+import com.jayway.awaitility.Duration;
+import functionaltests.utils.ProcessStreamReader;
+import functionaltests.utils.RestFuncTUtils;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -66,14 +59,20 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
-import com.jayway.awaitility.Duration;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
-import functionaltests.utils.ProcessStreamReader;
-import functionaltests.utils.RestFuncTUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
 
@@ -162,7 +161,7 @@ public class RestFuncTHelper {
         restServerUrl = "http://localhost:8080/rest/";
         restfulSchedulerUrl = restServerUrl + "scheduler";
 
-        await().atMost(Duration.ONE_MINUTE).until(restIsStarted());
+        await().atMost(Duration.FIVE_MINUTES).until(restIsStarted());
     }
 
     public static void stopRestfulSchedulerWebapp() {

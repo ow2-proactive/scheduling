@@ -1,9 +1,6 @@
 package functionaltests;
 
-import functionaltests.AbstractRestFuncTestCase;
 import jline.WindowsTerminal;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -33,6 +30,8 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase{
 
     protected ByteArrayOutputStream capturedOutput;
 
+    protected PrintStream stdOut;
+
 
     public void setUp() throws Exception {
         this.userInput = new StringBuffer();
@@ -54,6 +53,7 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase{
         System.setProperty(WindowsTerminal.DIRECT_CONSOLE, "false"); // to be able to type input on Windows
         capturedOutput = new ByteArrayOutputStream();
         PrintStream captureOutput = new PrintStream(capturedOutput);
+        stdOut = System.out;
         System.setOut(captureOutput);
         System.setIn(new ByteArrayInputStream(userInput.toString().getBytes()));
         new TestEntryPoint().runTest("-k", "-u", RestFuncTHelper.getRestServerUrl());

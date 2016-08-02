@@ -397,7 +397,7 @@ public class RMNodeStarter {
             Node node = createLocalNode(createdNodeNames.get(nodeIndex));
             configureForDataSpace(node);
             nodes.add(node);
-            logger.debug("URL of node " + nodeIndex + " " + node.getNodeInformation().getURL());
+            logger.info("URL of node " + nodeIndex + " " + node.getNodeInformation().getURL());
         }
         return nodes;
     }
@@ -648,7 +648,6 @@ public class RMNodeStarter {
                 throw new NotConfiguredException(
                     "Failed to configure dataspaces, check the logs for more details");
             }
-            conf.startCacheSpace();
             closeDataSpaceOnShutdown(node);
             node.setProperty(DATASPACES_STATUS_PROP_NAME, Boolean.TRUE.toString());
         } catch (Throwable t) {

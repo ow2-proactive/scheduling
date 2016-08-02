@@ -15,6 +15,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.TestTaskOutput;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
@@ -55,8 +56,8 @@ public class ForkedTaskExecutorTest {
                                                 new SimpleScript(
                                                         "result=System.getProperty('"
                                                                 + PASchedulerProperties.TASK_FORK.getKey() + "')"
-                                                        , "groovy"))), initializer, null, "", "", "", "", "", "",
-                                "", ""),
+                                                        , "groovy"))), initializer, null,
+                                new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
                         taskOutput.outputStream, taskOutput.error);
 
         Assert.assertEquals("true", result.value());
@@ -73,7 +74,7 @@ public class ForkedTaskExecutorTest {
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
-                                "javascript"))), initializer, null, "", "", "", "", "", "", "", ""),
+                                "javascript"))), initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertEquals(String.format("hello%n"), taskOutput.output());
@@ -93,7 +94,7 @@ public class ForkedTaskExecutorTest {
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))),
-                        initializer, null, "", "", "", "", "", "", "", ""),
+                        initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -111,7 +112,7 @@ public class ForkedTaskExecutorTest {
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))),
-                        initializer, null, "", "", "", "", "", "", "", ""),
+                        initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -133,7 +134,7 @@ public class ForkedTaskExecutorTest {
 
         container.setRunAsUser(true);
 
-        TaskContext taskContext = new TaskContext(container, initializer, null, "", "", "", "", "", "", "", "",
+        TaskContext taskContext = new TaskContext(container, initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", "",
                 decrypter);
 
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
@@ -164,7 +165,7 @@ public class ForkedTaskExecutorTest {
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript(taskScript, "groovy"))),
-                        initializer, null, "", "", "", "", "", "", "", ""),
+                        initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
                 taskOutput.outputStream,
                 taskOutput.error);
 
@@ -189,8 +190,8 @@ public class ForkedTaskExecutorTest {
 
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
                         "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); " +
-                                "println new File('.').getCanonicalPath()", "groovy"))), initializer, null, "", "",
-                        "", "", "", "", "", ""), taskOutput.outputStream,
+                                "println new File('.').getCanonicalPath()", "groovy"))), initializer, null,
+                        new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream,
                 taskOutput.error);
 
         assertEquals(String.format("envValue%njvmValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
@@ -216,8 +217,8 @@ public class ForkedTaskExecutorTest {
 
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
                         "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
-                                + "println new File('.').getCanonicalPath()", "groovy"))), initializer, null, "", "",
-                        "", "", "", "", "", ""),
+                                + "println new File('.').getCanonicalPath()", "groovy"))), initializer, null,
+                        new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertEquals(String.format("aValue%naValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
@@ -240,7 +241,7 @@ public class ForkedTaskExecutorTest {
         initializer.setForkEnvironment(forkEnvironment);
 
         TaskResultImpl taskResult = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript("", "groovy"))), initializer, null, "", "", "", "", "", "", "",
+                        new TaskScript(new SimpleScript("", "groovy"))), initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "",
                         ""), taskOutput.outputStream,
                 taskOutput.error);
 

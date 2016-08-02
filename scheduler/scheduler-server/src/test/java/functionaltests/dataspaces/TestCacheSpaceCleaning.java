@@ -70,7 +70,7 @@ public class TestCacheSpaceCleaning extends SchedulerFunctionalTestWithCustomCon
     static String dataToCopyFileName = "dataToCopy";
     static String dataToUpdateFileName = "dataToUpdate";
 
-    static int NB_WAIT_PERIOD = 2 * 60 * 2;
+    static int NB_WAIT_PERIOD = 5 * 60 * 2;
 
     @BeforeClass
     public static void startDedicatedScheduler() throws Exception {
@@ -79,8 +79,8 @@ public class TestCacheSpaceCleaning extends SchedulerFunctionalTestWithCustomCon
         schedulerHelper = new SchedulerTHelper(true, true);
         List<String> arguments = new ArrayList<>();
         arguments.addAll(RMTHelper.setup.getJvmParametersAsList());
-        arguments.add("-D" + DataSpaceNodeConfigurationAgent.NODE_DATASPACE_CACHE_CLEANING_PERIOD + "=" + 5000);
-        arguments.add("-D" + DataSpaceNodeConfigurationAgent.NODE_DATASPACE_CACHE_INVALIDATION_PERIOD + "=" + 20000);
+        arguments.add("-D" + DataSpaceNodeConfigurationAgent.NODE_DATASPACE_CACHE_CLEANING_PERIOD + "=" + 2000);
+        arguments.add("-D" + DataSpaceNodeConfigurationAgent.NODE_DATASPACE_CACHE_INVALIDATION_PERIOD + "=" + 30000);
         schedulerHelper.createNodeSource("CleaningNS", 5, arguments);
     }
 
@@ -120,7 +120,7 @@ public class TestCacheSpaceCleaning extends SchedulerFunctionalTestWithCustomCon
         // wait until the first file is deleted by the cleaning mechanism
         int nbWait = 0;
         while (transferredDataToCopyFile.exists() && nbWait < NB_WAIT_PERIOD) {
-            Thread.sleep(500);
+            Thread.sleep(200);
             nbWait++;
         }
         // ensure that the second file (modified at a later date), remains

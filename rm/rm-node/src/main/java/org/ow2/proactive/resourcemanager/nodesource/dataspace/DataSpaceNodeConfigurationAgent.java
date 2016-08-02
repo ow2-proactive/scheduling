@@ -65,7 +65,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DataSpaceNodeConfigurationAgent implements Serializable {
 
-    private static Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
+    private static transient Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
 
     /**
      * This property is used by scheduling when configuring node to define the location of the scratch dir and must be renamed carefully.
@@ -112,17 +112,17 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
     /**
      * file system server controlling the cache
      */
-    private FileSystemServerDeployer cacheServer;
+    private transient FileSystemServerDeployer cacheServer;
 
     /**
      * Configuration of the cache server (used by the TaskLauncher to register the dataspace to the naming service
      */
-    private static InputOutputSpaceConfiguration cacheSpaceConfiguration;
+    private static transient InputOutputSpaceConfiguration cacheSpaceConfiguration;
 
     /**
      * VFS direct interface to the cache, used by the cleaning mechanism to delete files
      */
-    private static DefaultFileSystemManager fileSystemManager;
+    private static transient DefaultFileSystemManager fileSystemManager;
 
     /**
      * URL of the cache root folder
@@ -132,12 +132,12 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
     /**
      * Timer used by the cleaning mechanism
      */
-    private static Timer cleaningTimer;
+    private static transient Timer cleaningTimer;
 
     /**
      * Lock used by the cleaning mechanism to ensure that the cleaning is not run concurrently with a Task
      */
-    private static ReentrantReadWriteLock cacheCleaningRWLock = new ReentrantReadWriteLock();
+    private static transient ReentrantReadWriteLock cacheCleaningRWLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -159,6 +159,8 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
             logger.error("Cannot configure dataSpace", t);
             return false;
         }
+
+        startCacheSpace();
         PAActiveObject.terminateActiveObject(false);
         return true;
     }
@@ -223,7 +225,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
             try {
                 String cacheLocation = getCacheDir();
                 cacheServer = new FileSystemServerDeployer(CACHESPACE_NAME, cacheLocation, true, true);
-                logger.info("Cache server started at " + cacheServer.getVFSRootURLs());
+                logger.info("Cache server started at " + Arrays.toString(cacheServer.getVFSRootURLs()));
                 String hostname = InetAddress.getLocalHost().getHostName();
                 cacheSpaceConfiguration = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(Arrays.asList(cacheServer.getVFSRootURLs()), cacheLocation, hostname, CACHESPACE_NAME);
                 fileSystemManager = VFSFactory.createDefaultFileSystemManager();

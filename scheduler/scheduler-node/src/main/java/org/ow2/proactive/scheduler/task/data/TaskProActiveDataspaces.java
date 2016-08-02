@@ -48,6 +48,7 @@ import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfig
 import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.objectweb.proactive.utils.StackTraceUtil;
@@ -76,7 +77,7 @@ import static com.google.common.base.Throwables.getStackTraceAsString;
 
 public class TaskProActiveDataspaces implements TaskDataspaces {
 
-    private static final Logger logger = Logger.getLogger(TaskProActiveDataspaces.class);
+    private static final transient Logger logger = Logger.getLogger(TaskProActiveDataspaces.class);
 
     public static final String PA_NODE_DATASPACE_FILE_TRANSFER_THREAD_POOL_SIZE =
             "pa.node.dataspace.filetransfer.threadpoolsize";
@@ -84,23 +85,24 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     public static final String PA_NODE_DATASPACE_CREATE_FOLDER_HIERARCHY_SEQUENTIALLY =
             "pa.node.dataspace.create_folder_hierarchy_sequentially";
 
-    private DataSpacesFileObject SCRATCH;
-    private DataSpacesFileObject CACHE;
-    private DataSpacesFileObject INPUT;
-    private DataSpacesFileObject OUTPUT;
-    private DataSpacesFileObject GLOBAL;
-    private DataSpacesFileObject USER;
+    private transient DataSpacesFileObject SCRATCH;
+    private transient DataSpacesFileObject CACHE;
+    private transient DataSpacesFileObject INPUT;
+    private transient DataSpacesFileObject OUTPUT;
+    private transient DataSpacesFileObject GLOBAL;
+    private transient DataSpacesFileObject USER;
 
     private TaskId taskId;
-    private NamingService namingService;
+    private transient NamingService namingService;
     private boolean runAsUser;
     private boolean linuxOS;
 
-    private static ReentrantLock cacheTransferLock = new ReentrantLock();
+    private static transient ReentrantLock cacheTransferLock = new ReentrantLock();
+    private SpaceInstanceInfo cacheSpaceInstanceInfo;
 
-    private StringBuffer clientLogs = new StringBuffer();
+    private transient StringBuffer clientLogs = new StringBuffer();
 
-    private ExecutorService executorTransfer =
+    private transient ExecutorService executorTransfer =
             Executors.newFixedThreadPool(getFileTransferThreadPoolSize(),
                     new NamedThreadFactory("FileTransferThreadPool"));
 
@@ -210,16 +212,28 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         }
 
         InputOutputSpaceConfiguration cacheConfiguration = DataSpaceNodeConfigurationAgent.getCacheSpaceConfiguration();
-        final String cacheName = cacheConfiguration.getName();
 
-        namingService.register(new SpaceInstanceInfo(appId, cacheConfiguration));
+        if (cacheConfiguration != null) {
+            final String cacheName = cacheConfiguration.getName();
 
-        CACHE = initDataSpace(new Callable<DataSpacesFileObject>() {
-            @Override
-            public DataSpacesFileObject call() throws Exception {
-                return PADataSpaces.resolveOutput(cacheName);
+            cacheSpaceInstanceInfo = new SpaceInstanceInfo(appId, cacheConfiguration);
+            try {
+                namingService.register(cacheSpaceInstanceInfo);
+            } catch (SpaceAlreadyRegisteredException e) {
+                // this is a rare case where the cache space has already been registered for the same task and there was a node failure.
+                namingService.unregister(cacheSpaceInstanceInfo.getMountingPoint());
+                namingService.register(cacheSpaceInstanceInfo);
             }
-        }, "CACHE", false);
+
+            CACHE = initDataSpace(new Callable<DataSpacesFileObject>() {
+                @Override
+                public DataSpacesFileObject call() throws Exception {
+                    return PADataSpaces.resolveOutput(cacheName);
+                }
+            }, "CACHE", false);
+        } else {
+            logger.error("No Cache space configuration found, cache space is disabled.");
+        }
 
         INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
@@ -412,27 +426,28 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             String userSpaceUri = virtualResolve(USER);
 
             boolean cacheTransferPresent = !inputSpaceCacheFiles.isEmpty() || !outputSpaceCacheFiles.isEmpty() || !globalSpaceCacheFiles.isEmpty() || !userSpaceCacheFiles.isEmpty();
-
-            if (cacheTransferPresent) {
+            if (cacheTransferPresent && CACHE != null) {
                 cacheTransferLock.lockInterruptibly();
-            }
-            try {
+                try {
 
-                Map<String, DataSpacesFileObject> filesToCopyToCache =
-                        createFolderHierarchySequentially(CACHE,
-                                inputSpaceUri, inputSpaceCacheFiles,
-                                outputSpaceUri, outputSpaceCacheFiles,
-                                globalSpaceUri, globalSpaceCacheFiles,
-                                userSpaceUri, userSpaceCacheFiles);
+                    Map<String, DataSpacesFileObject> filesToCopyToCache =
+                            createFolderHierarchySequentially(CACHE,
+                                    inputSpaceUri, inputSpaceCacheFiles,
+                                    outputSpaceUri, outputSpaceCacheFiles,
+                                    globalSpaceUri, globalSpaceCacheFiles,
+                                    userSpaceUri, userSpaceCacheFiles);
 
-                List<Future<Boolean>> transferFuturesCache =
-                        doCopyInputDataToSpace(CACHE, filesToCopyToCache);
+                    List<Future<Boolean>> transferFuturesCache =
+                            doCopyInputDataToSpace(CACHE, filesToCopyToCache);
 
-                handleResults(transferFuturesCache);
-            } finally {
-                if (cacheTransferPresent) {
-                    cacheTransferLock.unlock();
+                    handleResults(transferFuturesCache);
+                } finally {
+                    if (cacheTransferPresent) {
+                        cacheTransferLock.unlock();
+                    }
                 }
+            } else if (cacheTransferPresent) {
+                logDataspacesStatus("CACHE dataspace is not available while file transfers to cache were required. Check the Node logs for errors.", DataspacesStatusLevel.ERROR);
             }
 
             Map<String, DataSpacesFileObject> filesToCopyToScratch =
@@ -887,6 +902,15 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             String message = "Remaining tasks to execute while closing thread pool used for data transfer";
             logger.error(message);
             logDataspacesStatus(message, DataspacesStatusLevel.ERROR);
+        }
+
+        if (CACHE != null) {
+            try {
+                logger.info("Unregistering cache space : " + cacheSpaceInstanceInfo.getMountingPoint());
+                namingService.unregister(cacheSpaceInstanceInfo.getMountingPoint());
+            } catch (Exception e) {
+                logger.warn("Error occurred when unregistering Cache space", e);
+            }
         }
 
         cleanScratchSpace();
