@@ -52,10 +52,28 @@ public enum InputAccessMode {
     TransferFromInputSpace("transferFromInputSpace"),
     /** Transfer files from OUTPUT space to LOCAL space */
     TransferFromOutputSpace("transferFromOutputSpace"),
-    /** GLOBAL to LOCAL */
+    /**
+     * Transfer files from GLOBAL space to LOCAL space
+     */
     TransferFromGlobalSpace("transferFromGlobalSpace"),
-    /** USER to LOCAL */
+    /** Transfer files from USER space to LOCAL space */
     TransferFromUserSpace("transferFromUserSpace"),
+    /**
+     * cache files from INPUT space to CACHE space
+     */
+    CacheFromInputSpace("cacheFromInputSpace"),
+    /**
+     * cache files from OUTPUT space to CACHE space
+     */
+    CacheFromOutputSpace("cacheFromOutputSpace"),
+    /**
+     * cache files from GLOBAL space to CACHE space
+     */
+    CacheFromGlobalSpace("cacheFromGlobalSpace"),
+    /**
+     * cache files from GLOBAL space to CACHE space
+     */
+    CacheFromUserSpace("cacheFromUserSpace"),
     /** Do nothing */
     none("none");
 
@@ -74,6 +92,14 @@ public enum InputAccessMode {
             return TransferFromGlobalSpace;
         } else if (TransferFromUserSpace.title.equalsIgnoreCase(accessMode)) {
             return TransferFromUserSpace;
+        } else if (CacheFromInputSpace.title.equalsIgnoreCase(accessMode)) {
+            return CacheFromInputSpace;
+        } else if (CacheFromOutputSpace.title.equalsIgnoreCase(accessMode)) {
+            return CacheFromOutputSpace;
+        } else if (CacheFromGlobalSpace.title.equalsIgnoreCase(accessMode)) {
+            return CacheFromGlobalSpace;
+        } else if (CacheFromUserSpace.title.equalsIgnoreCase(accessMode)) {
+            return CacheFromUserSpace;
         } else if (none.title.equalsIgnoreCase(accessMode)) {
             return none;
         } else {

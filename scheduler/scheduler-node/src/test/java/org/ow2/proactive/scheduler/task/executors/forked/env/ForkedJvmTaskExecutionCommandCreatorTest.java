@@ -1,11 +1,6 @@
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.junit.Test;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -13,13 +8,19 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.forked.env.command.JavaPrefixCommandExtractor;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.Test;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -171,8 +172,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest {
                         "print('hello'); result='hello'", "javascript")));
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariableAndForkEnvironment();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
-                null, null, null, null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
         return taskContext;
     }
 

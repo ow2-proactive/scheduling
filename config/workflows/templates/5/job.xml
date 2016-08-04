@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="urn:proactive:jobdescriptor:3.2"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
-    name="Data Management" projectName="Advanced Workflows"
-    priority="normal"
-    cancelJobOnError="false">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.5"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+        name="Data Management" projectName="Advanced Workflows"
+        priority="normal"
+        onTaskError="continueJobExecution">
   <description>
     <![CDATA[ Dataspaces are automatically started with the Scheduler.        Here we write a file in a task and transfer it to the userspace.        Then in a dependent task, we transfer the file from the userspace and read it.        Patterns can be used to include or exclude input/output files. ]]>
   </description>

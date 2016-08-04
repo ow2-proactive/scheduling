@@ -34,13 +34,13 @@
  */
 package org.ow2.proactive.scheduler.task.data;
 
-import java.io.File;
-import java.io.Serializable;
-import java.util.List;
-
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+
+import java.io.File;
+import java.io.Serializable;
+import java.util.List;
 
 
 public interface TaskDataspaces extends Serializable {
@@ -48,6 +48,8 @@ public interface TaskDataspaces extends Serializable {
     File getScratchFolder();
 
     String getScratchURI();
+
+    String getCacheURI();
 
     String getInputURI();
 
@@ -57,7 +59,7 @@ public interface TaskDataspaces extends Serializable {
 
     String getGlobalURI();
 
-    void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException;
+    void copyInputDataToScratch(List<InputSelector> inputFiles) throws FileSystemException, InterruptedException;
 
     void copyScratchDataToOutput(List<OutputSelector> outputFiles) throws FileSystemException;
 

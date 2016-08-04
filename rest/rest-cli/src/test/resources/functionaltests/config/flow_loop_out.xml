@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="urn:proactive:jobdescriptor:3.2"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
-    name="flow_loop" projectName="myProject"
-    priority="normal"
-    cancelJobOnError="false">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.5"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+        name="flow_loop" projectName="myProject"
+        priority="normal"
+        onTaskError="continueJobExecution">
   <genericInformation>
     <info name="var1" value="val1"/>
     <info name="var2" value="val2"/>
