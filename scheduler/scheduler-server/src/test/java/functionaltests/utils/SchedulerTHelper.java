@@ -1008,21 +1008,30 @@ public class SchedulerTHelper {
         // If AO remains the test will fail with a timeout.
         boolean remainingAO = true;
 
+        Set<Node> nodesWithRemainingAO = new HashSet<>();
+
         long wait = 0;
-        while (remainingAO && wait < 5000) {
+        while (remainingAO && wait < 10000) {
             Thread.sleep(50);
             wait += 50;
             remainingAO = false;
+            nodesWithRemainingAO.clear();
             for (String nodeUrl : nodeUrls) {
-                remainingAO = remainingAO || (NodeFactory.getNode(nodeUrl).getNumberOfActiveObjects() > 0);
+                Node node = NodeFactory.getNode(nodeUrl);
+                boolean aoInThisNode = (node.getNumberOfActiveObjects() > 0);
+                if (aoInThisNode) {
+                    nodesWithRemainingAO.add(node);
+                }
+                remainingAO = remainingAO || aoInThisNode;
             }
         }
         if (remainingAO) {
-            for (String nodeUrl : nodeUrls) {
-                Node node = NodeFactory.getNode(nodeUrl);
-
+            for (Node node : nodesWithRemainingAO) {
                 log("Found remaining AOs on node " + node.getNodeInformation().getURL() + " " +
                     Arrays.toString(node.getActiveObjects()));
+
+                log("Full stack:");
+                System.out.println(node.getThreadDump());
             }
         }
         assertFalse("No Active Objects should remain", remainingAO);
