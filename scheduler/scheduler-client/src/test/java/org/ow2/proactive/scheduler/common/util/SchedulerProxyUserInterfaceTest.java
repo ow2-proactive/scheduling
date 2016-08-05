@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
+import javax.ws.rs.core.StreamingOutput;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -11,6 +13,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 
@@ -38,5 +41,17 @@ public class SchedulerProxyUserInterfaceTest {
 
         assertThat(schedulerProxyUserInterface.changeStartAt(jobId, startAt), is(true));
     }
+    
+    @Test
+    public void testGetJobContent() throws NotConnectedException, UnknownJobException, PermissionException {
 
+    	Job mockedJob = Mockito.mock(Job.class);
+    	
+        JobId jobId = JobIdImpl.makeJobId("66");
+
+        when(uischedulerMock.getInitialJobContent(jobId)).thenReturn(mockedJob);
+
+        assertThat(schedulerProxyUserInterface.getInitialJobContent(jobId), is(mockedJob));
+    }
+    
 }

@@ -34,10 +34,17 @@
  */
 package org.ow2.proactive_grid_cloud_portal.smartproxy;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
+import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
+
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -62,7 +69,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.rest.ds.DataSpaceClient;
@@ -77,13 +83,8 @@ import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
 import org.ow2.proactive_grid_cloud_portal.common.FileType;
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
-
-import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 
 /**
  * Smart proxy implementation that relies on the REST API for communicating with dataspaces
@@ -533,5 +534,10 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
             throws NotConnectedException, UnknownJobException, PermissionException {
         return ((ISchedulerClient) _getScheduler()).changeStartAt(jobId, startAt);
     }
+
+	@Override
+	public Job getInitialJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+		return  ((ISchedulerClient) _getScheduler()).getInitialJobContent(jobId);
+	}
 
 }

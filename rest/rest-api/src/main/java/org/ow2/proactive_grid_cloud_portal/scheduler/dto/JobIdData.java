@@ -41,7 +41,12 @@ import java.io.Serializable;
 
 public class JobIdData implements Serializable {
 
-    private long id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private long id;
     private String readableName;
 
     public long getId() {

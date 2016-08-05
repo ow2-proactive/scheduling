@@ -53,81 +53,81 @@ import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
-
 public class SchedulerStateRestSecurityTest {
 
-    private final SchedulerRestInterface restInterface = new SchedulerStateRest();
+	private final SchedulerRestInterface restInterface = new SchedulerStateRest();
 
-    private final Set<String> EXCLUDED_METHODS = ImmutableSet.of("loginOrRenewSession");
+	private final Set<String> EXCLUDED_METHODS = ImmutableSet.of("loginOrRenewSession");
 
-    // call all interface's methods using reflection
-    @Test
-    public void testAllMethodsAreSecured() throws Exception {
-        for (Method method : SchedulerRestInterface.class.getMethods()) {
-            if (methodShouldBeSecured(method)) {
-                Object[] params = createMethodParameters(method);
-                try {
-                    // by default we are not connected, any call should fail
-                    method.invoke(restInterface, params);
-                    fail(method + " should throw a NotConnectedException");
-                } catch (InvocationTargetException exception) {
-                    if (!exception.getCause().getClass().equals(NotConnectedRestException.class)) {
-                        fail(method + " should throw a NotConnectedException");
-                    }
-                }
-            }
-        }
-    }
+	// call all interface's methods using reflection
+	@Test
+	public void testAllMethodsAreSecured() throws Exception {
+		for (Method method : SchedulerRestInterface.class.getMethods()) {
+			if (methodShouldBeSecured(method)) {
+				Object[] params = createMethodParameters(method);
+				try {
+					// by default we are not connected, any call should fail
+					method.invoke(restInterface, params);
+					fail(method + " should throw a NotConnectedException");
+				} catch (InvocationTargetException exception) {
+					if (!exception.getCause().getClass().equals(NotConnectedRestException.class) 
+							&& !exception.getCause().getCause().getClass().equals(NotConnectedRestException.class)) {
+						fail(method + " should throw a NotConnectedException");
+					}
+				}
+			}
+		}
+	}
 
-    private boolean methodShouldBeSecured(Method method) {
-        if (EXCLUDED_METHODS.contains(method.getName())) {
-            return false;
-        }
+	private boolean methodShouldBeSecured(Method method) {
+		if (EXCLUDED_METHODS.contains(method.getName())) {
+			return false;
+		}
 
-        if (method.getParameterTypes().length > 0) {
-            Class<?> sessionIdParameterType = method.getParameterTypes()[0];
-            if (method.getParameterAnnotations()[0].length > 0) {
-                Annotation sessionIdAnnotation = method.getParameterAnnotations()[0][0];
-                if (parameterIsSessionId(sessionIdParameterType, sessionIdAnnotation)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+		if (method.getParameterTypes().length > 0) {
+			Class<?> sessionIdParameterType = method.getParameterTypes()[0];
+			if (method.getParameterAnnotations()[0].length > 0) {
+				Annotation sessionIdAnnotation = method.getParameterAnnotations()[0][0];
+				if (parameterIsSessionId(sessionIdParameterType, sessionIdAnnotation)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    private boolean parameterIsSessionId(Class<?> sessionIdParameterType, Annotation sessionIdAnnotation) {
-        return sessionIdParameterType.equals(String.class) &&
-            sessionIdAnnotation.annotationType().equals(HeaderParam.class) &&
-            ((HeaderParam) sessionIdAnnotation).value().equals("sessionid");
-    }
+	private boolean parameterIsSessionId(Class<?> sessionIdParameterType, Annotation sessionIdAnnotation) {
+		return sessionIdParameterType.equals(String.class)
+				&& sessionIdAnnotation.annotationType().equals(HeaderParam.class)
+				&& ((HeaderParam) sessionIdAnnotation).value().equals("sessionid");
+	}
 
-    private Object[] createMethodParameters(Method method) throws IllegalAccessException {
-        Object[] params = new Object[method.getParameterTypes().length];
-        int i = 0;
-        for (Class<?> parameterTypes : method.getParameterTypes()) {
-            try {
-                params[i] = parameterTypes.newInstance();
-            } catch (InstantiationException e) {
-                params[i] = defaultValues.get(parameterTypes);
-            }
+	private Object[] createMethodParameters(Method method) throws IllegalAccessException {
+		Object[] params = new Object[method.getParameterTypes().length];
+		int i = 0;
+		for (Class<?> parameterTypes : method.getParameterTypes()) {
+			try {
+				params[i] = parameterTypes.newInstance();
+			} catch (InstantiationException e) {
+				params[i] = defaultValues.get(parameterTypes);
+			}
 
-            i++;
-        }
-        return params;
-    }
+			i++;
+		}
+		return params;
+	}
 
-    private final static Map<Class<?>, Object> defaultValues = new HashMap<>();
+	private final static Map<Class<?>, Object> defaultValues = new HashMap<>();
 
-    static {
-        defaultValues.put(String.class, "");
-        defaultValues.put(Integer.class, 0);
-        defaultValues.put(int.class, 0);
-        defaultValues.put(Long.class, 0L);
-        defaultValues.put(long.class, 0L);
-        defaultValues.put(Character.class, '\0');
-        defaultValues.put(char.class, '\0');
-        defaultValues.put(boolean.class, false);
-    }
+	static {
+		defaultValues.put(String.class, "");
+		defaultValues.put(Integer.class, 0);
+		defaultValues.put(int.class, 0);
+		defaultValues.put(Long.class, 0L);
+		defaultValues.put(long.class, 0L);
+		defaultValues.put(Character.class, '\0');
+		defaultValues.put(char.class, '\0');
+		defaultValues.put(boolean.class, false);
+	}
 
 }

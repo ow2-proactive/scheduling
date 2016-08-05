@@ -5,6 +5,7 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'javax.mail:mail:1.4.7'
     compile 'joda-time:joda-time:2.9.1'
+    compile 'org.apache.commons:commons-lang3:3.4'
 
     compile 'org.eclipse.jetty:jetty-webapp:9.2.14.v20151106'
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"

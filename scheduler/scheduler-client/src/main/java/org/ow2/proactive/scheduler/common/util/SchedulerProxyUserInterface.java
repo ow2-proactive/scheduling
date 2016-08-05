@@ -46,6 +46,7 @@ import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
@@ -86,7 +87,6 @@ import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -96,7 +96,12 @@ import org.apache.log4j.Logger;
 @ActiveObject
 public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
-    protected Scheduler uischeduler;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	protected Scheduler uischeduler;
     protected MBeanInfoViewer mbeaninfoviewer;
 
     public static final Logger logger = Logger.getLogger(SchedulerProxyUserInterface.class);
@@ -643,5 +648,10 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
             throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.changeStartAt(jobId, startAt);
     }
+
+	@Override
+	public Job getInitialJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+		return uischeduler.getInitialJobContent(jobId);
+	}
 
 }
