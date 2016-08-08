@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.3"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+    name="Send Email" 
+    priority="normal"
+    cancelJobOnError="false">
+  <description>
+    <![CDATA[ A workflow that sends an email. ]]>
+  </description>
+  <taskFlow>
+    <task name="SendEmail">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+import org.ow2.proactive.addons.email.EmailSender;
+
+from = "noreply@activeeon.com"
+to = "user@domain.org"
+subject = "Scale Beyond Limits!"
+content = "Try out ProActive:\nhttps://try.activeeon.com"
+
+EmailSender.Builder builder = new EmailSender.Builder(credentials);
+
+builder.setFrom(from)
+builder.addRecipient(to)
+builder.setSubject(subject)
+builder.setBody(content)
+
+builder.build().sendPlainTextEmail();
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>
