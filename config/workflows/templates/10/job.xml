@@ -7,82 +7,21 @@
     priority="normal"
     onTaskError="continueJobExecution"
      maxNumberOfExecution="2">
+  <description>
+    <![CDATA[ A workflow to trigger a HTTP notification to an URL ]]>
+  </description>
   <taskFlow>
-    <task name="Groovy_Task">
+    <task name="Webhook">
       <description>
-        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+        <![CDATA[ Trigger a HTTP notification to an URL ]]>
       </description>
-      <scriptExecutable>
-        <script>
-          <code language="groovy">
-            <![CDATA[
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-
-// INPUTS /////////////////////////////////////////////////////
-
-
-String USER_AGENT = "Mozilla/5.0";
-
-String method = "GET";
-String URL = "http://www.google.com/search?q=mkyong";
-
-//String method = "POST";
-//String URL = "http://localhost:9090/SpringMVCExample/home";
-//String POST_PARAMS = "userName=Pankaj";
-
-
-// GET - POST /////////////////////////////////////////////////////
-
-
-URL obj = new URL(URL);
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod(method);
-con.setRequestProperty("User-Agent", USER_AGENT);
-
-if (method == "GET")
-{	
-	// nothing more
-}
-else (method == "POST")
-{
-	con.setDoOutput(true);
-	OutputStream os = con.getOutputStream();
-	os.write(POST_PARAMS.getBytes());
-	os.flush();
-	os.close();
-}
-
-int responseCode = con.getResponseCode();
-System.out.println(method + " Response Code :: " + responseCode);
-
-if (responseCode == HttpURLConnection.HTTP_OK) 
-{ 
-	InputStream is = con.getInputStream();
-	InputStreamReader isr = new InputStreamReader(is);
-	BufferedReader br = new BufferedReader(isr);
-	String inputLine;
-	StringBuffer response = new StringBuffer();
-
-	while ((inputLine = br.readLine()) != null) {
-		response.append(inputLine);
-	}
-	br.close();
-
-	// print result
-	System.out.println(response.toString());
-} else {
-	System.out.println(method + " request not worked");
-}
-]]>
-          </code>
-        </script>
-      </scriptExecutable>
+      <javaExecutable class="manualtasks.webhook.WebhookTask">
+        <parameters>
+          <parameter name="User-Agent" value="Mozilla/5.0"/>
+          <parameter name="method" value="GET"/>
+          <parameter name="url" value="http://www.google.com/search?q=mkyong"/>
+        </parameters>
+      </javaExecutable>
     </task>
   </taskFlow>
 </job>
