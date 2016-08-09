@@ -111,6 +111,7 @@ public class TestCacheSpaceCleaning extends SchedulerFunctionalTestWithCustomCon
 
         // change the file to update
         dataToUpdateFile.delete();
+        Thread.sleep(500);
         dataToUpdateFile.createNewFile();
 
         // submit the job a second time.
