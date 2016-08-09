@@ -15,7 +15,7 @@
       <description>
         <![CDATA[ Trigger a HTTP notification to an URL ]]>
       </description>
-      <javaExecutable class="manualtasks.webhook.WebhookTask">
+      <javaExecutable class="org.ow2.proactive.addons.webhook.task.WebhookTask">
         <parameters>
           <parameter name="User-Agent" value="Mozilla/5.0"/>
           <parameter name="method" value="GET"/>
