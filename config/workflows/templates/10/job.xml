@@ -1,27 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="urn:proactive:jobdescriptor:3.4"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:3.4 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.4/schedulerjob.xsd"
-    name="Webhook" projectName="Manual Task"
-    priority="normal"
-    onTaskError="continueJobExecution"
-     maxNumberOfExecution="2">
-  <description>
-    <![CDATA[ A workflow to trigger a HTTP notification to an URL ]]>
-  </description>
-  <taskFlow>
-    <task name="Webhook">
-      <description>
-        <![CDATA[ Trigger a HTTP notification to an URL ]]>
-      </description>
-      <javaExecutable class="org.ow2.proactive.addons.webhook.task.WebhookTask">
-        <parameters>
-          <parameter name="User-Agent" value="Mozilla/5.0"/>
-          <parameter name="method" value="GET"/>
-          <parameter name="url" value="http://www.google.com/search?q=mkyong"/>
-        </parameters>
-      </javaExecutable>
-    </task>
-  </taskFlow>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.3"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+        name="EmailNotification"
+        projectName="Notifications"
+        priority="normal"
+        cancelJobOnError="false">
+    <description>
+        <![CDATA[ A workflow that sends an email. ]]>
+    </description>
+    <taskFlow>
+        <task name="EmailNotification">
+            <description>
+                <![CDATA[ A task to send an email notification. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+import org.ow2.proactive.addons.email.EmailSender;
+
+// Please fill variables
+from = "noreply@activeeon.com"
+to = "user@domain.org"
+subject = "Scale Beyond Limits!"
+content = "Try out ProActive:\nhttps://try.activeeon.com"
+
+// Don't change code below
+EmailSender.Builder builder = new EmailSender.Builder(credentials);
+builder.setFrom(from)
+builder.addRecipient(to)
+builder.setSubject(subject)
+builder.setBody(content)
+builder.build().sendPlainTextEmail();
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
 </job>
