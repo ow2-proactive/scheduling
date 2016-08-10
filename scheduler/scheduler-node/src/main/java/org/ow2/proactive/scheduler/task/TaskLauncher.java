@@ -147,14 +147,13 @@ public class TaskLauncher implements InitActive {
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-                    dataspaces.getScratchURI(), dataspaces.getCacheURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+                    dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
                     dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
                     .toString(), getHostname(), decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
             logger.info("Task working dir: " + workingDir);
-            logger.info("Cache space: " + context.getCacheURI());
             logger.info("Input space: " + context.getInputURI());
             logger.info("Output space: " + context.getOutputURI());
             logger.info("User space: " + context.getUserURI());

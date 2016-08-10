@@ -12,10 +12,11 @@ import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class TaskContextSerializerTest {
 
@@ -39,6 +40,7 @@ public class TaskContextSerializerTest {
         new TaskContextSerializer().serializeContext(taskContext ,invalidDirectory);
     }
 
+    @NotNull
     private TaskContext createTaskContext() throws NodeException, InvalidScriptException {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setTaskId(TaskIdImpl.createTaskId(
@@ -53,7 +55,6 @@ public class TaskContextSerializerTest {
                                 new ForkEnvironmentScript(
                                         new SimpleScript("", "python")))),
                 taskLauncherInitializer,
-                null,
                 null,
                 null,
                 null,

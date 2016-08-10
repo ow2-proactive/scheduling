@@ -84,8 +84,6 @@ public class SchedulerConstants {
 
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
 
-    public static final String DS_CACHE_BINDING_NAME = "cachespace";
-
     public static final String DS_INPUT_BINDING_NAME = "inputspace";
 
     public static final String DS_OUTPUT_BINDING_NAME = "outputspace";

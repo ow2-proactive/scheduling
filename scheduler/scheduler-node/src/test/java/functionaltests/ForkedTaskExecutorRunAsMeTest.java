@@ -53,7 +53,7 @@ public class ForkedTaskExecutorRunAsMeTest {
 
         container.setRunAsUser(true);
 
-        TaskContext taskContext = new TaskContext(container, initializer, null, "", "", "", "", "", "", "", "",
+        TaskContext taskContext = new TaskContext(container, initializer, null, "", "", "", "", "", "", "",
                 decrypter);
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 

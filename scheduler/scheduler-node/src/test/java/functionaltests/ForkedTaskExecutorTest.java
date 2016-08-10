@@ -55,7 +55,7 @@ public class ForkedTaskExecutorTest {
                                                 new SimpleScript(
                                                         "result=System.getProperty('"
                                                                 + PASchedulerProperties.TASK_FORK.getKey() + "')"
-                                                        , "groovy"))), initializer, null, "", "", "", "", "", "",
+                                                        , "groovy"))), initializer, null, "", "", "", "", "",
                                 "", ""),
                         taskOutput.outputStream, taskOutput.error);
 
@@ -73,7 +73,7 @@ public class ForkedTaskExecutorTest {
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
-                                "javascript"))), initializer, null, "", "", "", "", "", "", "", ""),
+                                "javascript"))), initializer, null, "", "", "", "", "", "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertEquals(String.format("hello%n"), taskOutput.output());
@@ -93,7 +93,7 @@ public class ForkedTaskExecutorTest {
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))),
-                        initializer, null, "", "", "", "", "", "", "", ""),
+                        initializer, null, "", "", "", "", "", "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -111,7 +111,7 @@ public class ForkedTaskExecutorTest {
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))),
-                        initializer, null, "", "", "", "", "", "", "", ""),
+                        initializer, null, "", "", "", "", "", "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertNotNull(result.getException());
@@ -133,7 +133,7 @@ public class ForkedTaskExecutorTest {
 
         container.setRunAsUser(true);
 
-        TaskContext taskContext = new TaskContext(container, initializer, null, "", "", "", "", "", "", "", "",
+        TaskContext taskContext = new TaskContext(container, initializer, null, "", "", "", "", "", "", "",
                 decrypter);
 
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
@@ -164,7 +164,7 @@ public class ForkedTaskExecutorTest {
 
         TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript(taskScript, "groovy"))),
-                        initializer, null, "", "", "", "", "", "", "", ""),
+                        initializer, null, "", "", "", "", "", "", ""),
                 taskOutput.outputStream,
                 taskOutput.error);
 
@@ -190,7 +190,7 @@ public class ForkedTaskExecutorTest {
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
                         "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); " +
                                 "println new File('.').getCanonicalPath()", "groovy"))), initializer, null, "", "",
-                        "", "", "", "", "", ""), taskOutput.outputStream,
+                        "", "", "", "", ""), taskOutput.outputStream,
                 taskOutput.error);
 
         assertEquals(String.format("envValue%njvmValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
@@ -217,7 +217,7 @@ public class ForkedTaskExecutorTest {
         taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
                         "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
                                 + "println new File('.').getCanonicalPath()", "groovy"))), initializer, null, "", "",
-                        "", "", "", "", "", ""),
+                        "", "", "", "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertEquals(String.format("aValue%naValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
@@ -240,7 +240,7 @@ public class ForkedTaskExecutorTest {
         initializer.setForkEnvironment(forkEnvironment);
 
         TaskResultImpl taskResult = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript("", "groovy"))), initializer, null, "", "", "", "", "", "", "",
+                        new TaskScript(new SimpleScript("", "groovy"))), initializer, null, "", "", "", "", "", "",
                         ""), taskOutput.outputStream,
                 taskOutput.error);
 

@@ -36,11 +36,23 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import org.apache.commons.cli.*;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.*;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarLoader;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.Policy;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.security.auth.login.LoginException;
+
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -66,22 +78,23 @@ import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Tools;
-
-import javax.security.auth.login.LoginException;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.Policy;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarLoader;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
@@ -648,7 +661,6 @@ public class RMNodeStarter {
                 throw new NotConfiguredException(
                     "Failed to configure dataspaces, check the logs for more details");
             }
-            conf.startCacheSpace();
             closeDataSpaceOnShutdown(node);
             node.setProperty(DATASPACES_STATUS_PROP_NAME, Boolean.TRUE.toString());
         } catch (Throwable t) {
