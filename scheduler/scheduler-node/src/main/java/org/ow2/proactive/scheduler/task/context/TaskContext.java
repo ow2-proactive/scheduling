@@ -34,6 +34,10 @@
  */
 package org.ow2.proactive.scheduler.task.context;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -44,10 +48,6 @@ import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.ClasspathUtils;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class TaskContext implements Serializable {
@@ -60,29 +60,40 @@ public class TaskContext implements Serializable {
     private final Decrypter decrypter;
     private final TaskResult[] previousTasksResults;
 
-    private final NodeDataSpacesURIs nodeDataSpacesURIs;
+    private final String scratchURI;
 
+
+    private final String inputURI;
+    private final String outputURI;
+    private final String userURI;
+    private final String globalURI;
     private final String schedulerHome;
 
     private final String progressFilePath;
 
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
-                       TaskResult[] previousTasksResults,
-                       NodeDataSpacesURIs nodeDataSpacesURIs, String progressFilePath, String currentNodeHostname) throws NodeException {
-        this(executableContainer, initializer, previousTasksResults,
-                nodeDataSpacesURIs, progressFilePath, currentNodeHostname, null);
+            TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI,
+            String userURI,
+            String globalURI, String progressFilePath, String currentNodeHostname) throws NodeException {
+        this(executableContainer, initializer, previousTasksResults, scratchURI, inputURI, outputURI, userURI,
+                globalURI, progressFilePath, currentNodeHostname, null);
     }
 
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
-                       TaskResult[] previousTasksResults,
-                       NodeDataSpacesURIs nodeDataSpacesURIs, String progressFilePath, String currentNodeHostname,
-                       Decrypter decrypter) throws NodeException {
+            TaskResult[] previousTasksResults, String scratchURI, String inputURI, String outputURI,
+            String userURI,
+            String globalURI, String progressFilePath, String currentNodeHostname,
+            Decrypter decrypter) throws NodeException {
         this.initializer = initializer;
         initializer.setNamingService(null);
         this.previousTasksResults = previousTasksResults;
-        this.nodeDataSpacesURIs = nodeDataSpacesURIs;
+        this.scratchURI = scratchURI;
+        this.inputURI = inputURI;
+        this.outputURI = outputURI;
+        this.userURI = userURI;
+        this.globalURI = globalURI;
         this.progressFilePath = progressFilePath;
         this.schedulerHome = ClasspathUtils.findSchedulerHome();
         this.executableContainer = executableContainer;
@@ -148,8 +159,24 @@ public class TaskContext implements Serializable {
         return otherNodesURLs;
     }
 
-    public NodeDataSpacesURIs getNodeDataSpaceURIs() {
-        return nodeDataSpacesURIs;
+    public String getScratchURI() {
+        return scratchURI;
+    }
+
+    public String getInputURI() {
+        return inputURI;
+    }
+
+    public String getOutputURI() {
+        return outputURI;
+    }
+
+    public String getUserURI() {
+        return userURI;
+    }
+
+    public String getGlobalURI() {
+        return globalURI;
     }
 
     public String getProgressFilePath() {

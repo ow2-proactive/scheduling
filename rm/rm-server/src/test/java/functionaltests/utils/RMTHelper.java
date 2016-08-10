@@ -62,7 +62,6 @@ import org.ow2.tests.ProActiveSetup;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.rmi.AlreadyBoundException;
 import java.util.*;
@@ -90,7 +89,7 @@ public class RMTHelper {
      */
     public static final int DEFAULT_NODES_NUMBER = 2;
 
-    public final static ProActiveSetup setup = new ProActiveSetup();
+    private final static ProActiveSetup setup = new ProActiveSetup();
 
     private static TestRM rm = new TestRM();
     static {
@@ -362,15 +361,6 @@ public class RMTHelper {
         if (!vmParameters.containsKey(PAResourceManagerProperties.RM_HOME.getKey())) {
             vmParameters.put(PAResourceManagerProperties.RM_HOME.getKey(),
                     PAResourceManagerProperties.RM_HOME.getValueAsString());
-        }
-
-        if (!vmParameters.containsKey(CentralPAPropertyRepository.LOG4J.getName())) {
-            try {
-                File log4jFile = new File(CentralPAPropertyRepository.PA_HOME.getValue(), "config/log/node.properties");
-                vmParameters.put(CentralPAPropertyRepository.LOG4J.getName(), log4jFile.toURI().toURL().toString());
-            } catch (MalformedURLException ignore) {
-
-            }
         }
 
         for (Entry<String, String> entry : vmParameters.entrySet()) {

@@ -15,7 +15,7 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class TaskContextSerializerTest {
 
@@ -54,7 +54,12 @@ public class TaskContextSerializerTest {
                                         new SimpleScript("", "python")))),
                 taskLauncherInitializer,
                 null,
-                new NodeDataSpacesURIs(null, null, null, null, null, null), null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 null);
     }
 

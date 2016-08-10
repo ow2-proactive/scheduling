@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="urn:proactive:jobdescriptor:3.5"
-        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-        name="Variables Propagation" projectName="Basic Workflows"
-        priority="normal"
-        onTaskError="continueJobExecution">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.3"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+    name="Variables Propagation" projectName="Basic Workflows"
+    priority="normal"
+    cancelJobOnError="false">
   <variables>
     <variable name="numberOfLights" value="1"/>
     <variable name="minRequiredAngle" value="120"/>

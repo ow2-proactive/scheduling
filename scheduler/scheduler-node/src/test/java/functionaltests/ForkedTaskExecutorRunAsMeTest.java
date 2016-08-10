@@ -12,7 +12,6 @@ import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.TestTaskOutput;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
@@ -54,7 +53,7 @@ public class ForkedTaskExecutorRunAsMeTest {
 
         container.setRunAsUser(true);
 
-        TaskContext taskContext = new TaskContext(container, initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", "",
+        TaskContext taskContext = new TaskContext(container, initializer, null, "", "", "", "", "", "", "",
                 decrypter);
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 

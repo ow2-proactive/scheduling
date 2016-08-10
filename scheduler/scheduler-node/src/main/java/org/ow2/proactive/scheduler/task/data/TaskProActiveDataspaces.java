@@ -44,15 +44,11 @@ import org.objectweb.proactive.extensions.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extensions.dataspaces.api.FileType;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
-import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.utils.NamedThreadFactory;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.objectweb.proactive.utils.StackTraceUtil;
-import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
@@ -70,14 +66,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 public class TaskProActiveDataspaces implements TaskDataspaces {
 
-    private static final transient Logger logger = Logger.getLogger(TaskProActiveDataspaces.class);
+    private static final Logger logger = Logger.getLogger(TaskProActiveDataspaces.class);
 
     public static final String PA_NODE_DATASPACE_FILE_TRANSFER_THREAD_POOL_SIZE =
             "pa.node.dataspace.filetransfer.threadpoolsize";
@@ -85,24 +80,20 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     public static final String PA_NODE_DATASPACE_CREATE_FOLDER_HIERARCHY_SEQUENTIALLY =
             "pa.node.dataspace.create_folder_hierarchy_sequentially";
 
-    private transient DataSpacesFileObject SCRATCH;
-    private transient DataSpacesFileObject CACHE;
-    private transient DataSpacesFileObject INPUT;
-    private transient DataSpacesFileObject OUTPUT;
-    private transient DataSpacesFileObject GLOBAL;
-    private transient DataSpacesFileObject USER;
+    private DataSpacesFileObject SCRATCH;
+    private DataSpacesFileObject INPUT;
+    private DataSpacesFileObject OUTPUT;
+    private DataSpacesFileObject GLOBAL;
+    private DataSpacesFileObject USER;
 
     private TaskId taskId;
-    private transient NamingService namingService;
+    private NamingService namingService;
     private boolean runAsUser;
     private boolean linuxOS;
 
-    private static transient ReentrantLock cacheTransferLock = new ReentrantLock();
-    private SpaceInstanceInfo cacheSpaceInstanceInfo;
+    private StringBuffer clientLogs = new StringBuffer();
 
-    private transient StringBuffer clientLogs = new StringBuffer();
-
-    private transient ExecutorService executorTransfer =
+    private ExecutorService executorTransfer =
             Executors.newFixedThreadPool(getFileTransferThreadPoolSize(),
                     new NamedThreadFactory("FileTransferThreadPool"));
 
@@ -211,30 +202,6 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             logger.warn("Missing permission to change write permissions to " + getScratchFolder());
         }
 
-        InputOutputSpaceConfiguration cacheConfiguration = DataSpaceNodeConfigurationAgent.getCacheSpaceConfiguration();
-
-        if (cacheConfiguration != null) {
-            final String cacheName = cacheConfiguration.getName();
-
-            cacheSpaceInstanceInfo = new SpaceInstanceInfo(appId, cacheConfiguration);
-            try {
-                namingService.register(cacheSpaceInstanceInfo);
-            } catch (SpaceAlreadyRegisteredException e) {
-                // this is a rare case where the cache space has already been registered for the same task and there was a node failure.
-                namingService.unregister(cacheSpaceInstanceInfo.getMountingPoint());
-                namingService.register(cacheSpaceInstanceInfo);
-            }
-
-            CACHE = initDataSpace(new Callable<DataSpacesFileObject>() {
-                @Override
-                public DataSpacesFileObject call() throws Exception {
-                    return PADataSpaces.resolveOutput(cacheName);
-                }
-            }, "CACHE", false);
-        } else {
-            logger.error("No Cache space configuration found, cache space is disabled.");
-        }
-
         INPUT = initDataSpace(new Callable<DataSpacesFileObject>() {
             @Override
             public DataSpacesFileObject call() throws Exception {
@@ -320,14 +287,6 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     }
 
     @Override
-    public String getCacheURI() {
-        if (CACHE == null) {
-            return "";
-        }
-        return convertDataSpaceURIToFileIfPossible(CACHE.getRealURI(), false);
-    }
-
-    @Override
     public String getInputURI() {
         if (INPUT == null) {
             return "";
@@ -395,7 +354,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
     }
 
     @Override
-    public void copyInputDataToScratch(List<InputSelector> inputSelectors) throws FileSystemException, InterruptedException {
+    public void copyInputDataToScratch(List<InputSelector> inputSelectors) throws FileSystemException {
         try {
             if (inputSelectors == null) {
                 logger.debug("Input selector is empty, no file to copy");
@@ -406,15 +365,11 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             ArrayList<DataSpacesFileObject> outputSpaceFiles = new ArrayList<>();
             ArrayList<DataSpacesFileObject> globalSpaceFiles = new ArrayList<>();
             ArrayList<DataSpacesFileObject> userSpaceFiles = new ArrayList<>();
-            ArrayList<DataSpacesFileObject> inputSpaceCacheFiles = new ArrayList<>();
-            ArrayList<DataSpacesFileObject> outputSpaceCacheFiles = new ArrayList<>();
-            ArrayList<DataSpacesFileObject> globalSpaceCacheFiles = new ArrayList<>();
-            ArrayList<DataSpacesFileObject> userSpaceCacheFiles = new ArrayList<>();
 
             FileSystemException exception =
-                    findFilesToCopyFromInput(
+                    findFilesToCopyFromInputToScratch(
                             inputSelectors, inputSpaceFiles, outputSpaceFiles,
-                            globalSpaceFiles, userSpaceFiles, inputSpaceCacheFiles, outputSpaceCacheFiles, globalSpaceCacheFiles, userSpaceCacheFiles);
+                            globalSpaceFiles, userSpaceFiles);
 
             if (exception != null) {
                 throw exception;
@@ -425,54 +380,28 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             String globalSpaceUri = virtualResolve(GLOBAL);
             String userSpaceUri = virtualResolve(USER);
 
-            boolean cacheTransferPresent = !inputSpaceCacheFiles.isEmpty() || !outputSpaceCacheFiles.isEmpty() || !globalSpaceCacheFiles.isEmpty() || !userSpaceCacheFiles.isEmpty();
-            if (cacheTransferPresent && CACHE != null) {
-                cacheTransferLock.lockInterruptibly();
-                try {
-
-                    Map<String, DataSpacesFileObject> filesToCopyToCache =
-                            createFolderHierarchySequentially(CACHE,
-                                    inputSpaceUri, inputSpaceCacheFiles,
-                                    outputSpaceUri, outputSpaceCacheFiles,
-                                    globalSpaceUri, globalSpaceCacheFiles,
-                                    userSpaceUri, userSpaceCacheFiles);
-
-                    List<Future<Boolean>> transferFuturesCache =
-                            doCopyInputDataToSpace(CACHE, filesToCopyToCache);
-
-                    handleResults(transferFuturesCache);
-                } finally {
-                    if (cacheTransferPresent) {
-                        cacheTransferLock.unlock();
-                    }
-                }
-            } else if (cacheTransferPresent) {
-                logDataspacesStatus("CACHE dataspace is not available while file transfers to cache were required. Check the Node logs for errors.", DataspacesStatusLevel.ERROR);
-            }
-
-            Map<String, DataSpacesFileObject> filesToCopyToScratch =
-                    createFolderHierarchySequentially(SCRATCH,
+            Map<String, DataSpacesFileObject> filesToCopy =
+                    createFolderHierarchySequentially(
                             inputSpaceUri, inputSpaceFiles,
                             outputSpaceUri, outputSpaceFiles,
                             globalSpaceUri, globalSpaceFiles,
                             userSpaceUri, userSpaceFiles);
 
-            List<Future<Boolean>> transferFuturesScratch =
-                    doCopyInputDataToSpace(SCRATCH, filesToCopyToScratch);
+            List<Future<Boolean>> transferFutures =
+                    doCopyInputDataToScratchSpace(filesToCopy);
 
-            handleResults(transferFuturesScratch);
-
+            handleResults(transferFutures);
         } finally {
             // display dataspaces error and warns if any
             displayDataspacesStatus();
         }
     }
 
-    private Map<String, DataSpacesFileObject> createFolderHierarchySequentially(DataSpacesFileObject space, String inputSpaceUri,
-                                                                                ArrayList<DataSpacesFileObject> inputSpaceFiles,
-                                                                                String outputSpaceUri, ArrayList<DataSpacesFileObject> outputSpaceFiles,
-                                                                                String globalSpaceUri, ArrayList<DataSpacesFileObject> globalSpaceFiles,
-                                                                                String userSpaceUri, ArrayList<DataSpacesFileObject> userSpaceFiles) throws FileSystemException {
+    private Map<String, DataSpacesFileObject> createFolderHierarchySequentially(String inputSpaceUri,
+            ArrayList<DataSpacesFileObject> inputSpaceFiles, String outputSpaceUri,
+            ArrayList<DataSpacesFileObject> outputSpaceFiles, String globalSpaceUri,
+            ArrayList<DataSpacesFileObject> globalSpaceFiles, String userSpaceUri,
+            ArrayList<DataSpacesFileObject> userSpaceFiles) throws FileSystemException {
 
         // This map will contain the files that have to be copied.
         Map<String, DataSpacesFileObject> result =
@@ -487,10 +416,10 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         // of the spaces when the previous situation occurs:
         // output, input, user and global space
         // Precedence is given to the more specific files
-        createFolderHierarchySequentially(space, globalSpaceUri, globalSpaceFiles, result);
-        createFolderHierarchySequentially(space, userSpaceUri, userSpaceFiles, result);
-        createFolderHierarchySequentially(space, inputSpaceUri, inputSpaceFiles, result);
-        createFolderHierarchySequentially(space, outputSpaceUri, outputSpaceFiles, result);
+        createFolderHierarchySequentially(SCRATCH, globalSpaceUri, globalSpaceFiles, result);
+        createFolderHierarchySequentially(SCRATCH, userSpaceUri, userSpaceFiles, result);
+        createFolderHierarchySequentially(SCRATCH, inputSpaceUri, inputSpaceFiles, result);
+        createFolderHierarchySequentially(SCRATCH, outputSpaceUri, outputSpaceFiles, result);
 
         return result;
     }
@@ -553,21 +482,18 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             if (isDebugEnabled) {
                 logger.debug("Creating folder " + target.getRealURI());
             }
-            if (!target.exists()) {
-                target.createFolder();
-                setFolderRightsForRunAsUserMode(target);
-            }
 
+            target.createFolder();
+            setFolderRightsForRunAsUserMode(target);
         } else if (FileType.FILE.equals(fileObjectType)) {
             DataSpacesFileObject parent = target.getParent();
 
             if (isDebugEnabled) {
                 logger.debug("Creating folder " + parent.getRealURI());
             }
-            if (!parent.exists()) {
-                parent.createFolder();
-                setFolderRightsForRunAsUserMode(parent);
-            }
+
+            parent.createFolder();
+            setFolderRightsForRunAsUserMode(parent);
         }
     }
 
@@ -646,11 +572,9 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         }
     }
 
-    private FileSystemException findFilesToCopyFromInput(List<InputSelector> inputSelectors,
-                                                         ArrayList<DataSpacesFileObject> inResults, ArrayList<DataSpacesFileObject> outResults,
-                                                         ArrayList<DataSpacesFileObject> globResults, ArrayList<DataSpacesFileObject> userResults,
-                                                         ArrayList<DataSpacesFileObject> inResultsCache, ArrayList<DataSpacesFileObject> outResultsCache,
-                                                         ArrayList<DataSpacesFileObject> globResultsCache, ArrayList<DataSpacesFileObject> userResultsCache) {
+    private FileSystemException findFilesToCopyFromInputToScratch(List<InputSelector> inputSelectors,
+            ArrayList<DataSpacesFileObject> inResults, ArrayList<DataSpacesFileObject> outResults,
+            ArrayList<DataSpacesFileObject> globResults, ArrayList<DataSpacesFileObject> userResults) {
 
         FileSystemException toBeThrown = null;
 
@@ -665,35 +589,19 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             switch (is.getMode()) {
                 case TransferFromInputSpace:
                     toBeThrown =
-                            findFilesToCopyFromInput(INPUT, "INPUT", is, selector, inResults);
+                            findFilesToCopyFromInputToScratch(INPUT, "INPUT", is, selector, inResults);
                     break;
                 case TransferFromOutputSpace:
                     toBeThrown =
-                            findFilesToCopyFromInput(OUTPUT, "OUTPUT", is, selector, outResults);
+                            findFilesToCopyFromInputToScratch(OUTPUT, "OUTPUT", is, selector, outResults);
                     break;
                 case TransferFromGlobalSpace:
                     toBeThrown =
-                            findFilesToCopyFromInput(GLOBAL, "GLOBAL", is, selector, globResults);
+                            findFilesToCopyFromInputToScratch(GLOBAL, "GLOBAL", is, selector, globResults);
                     break;
                 case TransferFromUserSpace:
                     toBeThrown =
-                            findFilesToCopyFromInput(USER, "USER", is, selector, userResults);
-                    break;
-                case CacheFromInputSpace:
-                    toBeThrown =
-                            findFilesToCopyFromInput(INPUT, "INPUT", is, selector, inResultsCache);
-                    break;
-                case CacheFromOutputSpace:
-                    toBeThrown =
-                            findFilesToCopyFromInput(OUTPUT, "OUTPUT", is, selector, outResultsCache);
-                    break;
-                case CacheFromGlobalSpace:
-                    toBeThrown =
-                            findFilesToCopyFromInput(GLOBAL, "GLOBAL", is, selector, globResultsCache);
-                    break;
-                case CacheFromUserSpace:
-                    toBeThrown =
-                            findFilesToCopyFromInput(USER, "USER", is, selector, userResultsCache);
+                            findFilesToCopyFromInputToScratch(USER, "USER", is, selector, userResults);
                 case none:
                     //do nothing
                     break;
@@ -703,13 +611,13 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         return toBeThrown;
     }
 
-    private List<Future<Boolean>> doCopyInputDataToSpace(
-            DataSpacesFileObject space, Map<String, DataSpacesFileObject> filesToCopy) {
+    private List<Future<Boolean>> doCopyInputDataToScratchSpace(
+            Map<String, DataSpacesFileObject> filesToCopy) {
 
         List<Future<Boolean>> transferFutures = new ArrayList<>(filesToCopy.size());
 
         for (Map.Entry<String, DataSpacesFileObject> entry : filesToCopy.entrySet()) {
-            transferFutures.add(parallelFileCopy(entry.getValue(), space, entry.getKey(), true));
+            transferFutures.add(parallelFileCopy(entry.getValue(), SCRATCH, entry.getKey(), true));
         }
 
         return transferFutures;
@@ -726,27 +634,16 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         return executorTransfer.submit(new Callable<Boolean>() {
             @Override
             public Boolean call() throws FileSystemException {
-
+                logger.info("Copying " + source.getRealURI() + " to "
+                        + destinationBase.getRealURI() + "/" + destinationRelativeToBase);
 
                 DataSpacesFileObject target = destinationBase.resolveFile(destinationRelativeToBase);
-                if (!target.exists()) {
-                    logger.info("Copying " + source.getRealURI() + " to "
-                            + destinationBase.getRealURI() + "/" + destinationRelativeToBase);
-                    target.copyFrom(source, FileSelector.SELECT_SELF);
-                } else if (source.getContent().getLastModifiedTime() > target.getContent().getLastModifiedTime()) {
-                    logger.info("Copying " + source.getRealURI() + " to "
-                            + destinationBase.getRealURI() + "/" + destinationRelativeToBase + " (newer version)");
-                    target.copyFrom(source, FileSelector.SELECT_SELF);
-                } else {
-                    logger.info("Destination file " + target.getRealURI() + " is already present and newer.");
-                }
-
-                target.refresh();
+                target.copyFrom(source, FileSelector.SELECT_SELF);
 
                 if (!target.exists()) {
                     String message =
                             "There was a problem during the copy of " + source.getRealURI() +
-                                    " to " + target.getRealURI() +
+                                    " to " + target.getRealURI() + "/" + destinationRelativeToBase +
                                     ". File not present after copy.";
                     logger.error(message);
                     logDataspacesStatus(message, DataspacesStatusLevel.ERROR);
@@ -760,7 +657,7 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
         });
     }
 
-    private FileSystemException findFilesToCopyFromInput(
+    private FileSystemException findFilesToCopyFromInputToScratch(
             DataSpacesFileObject space, String spaceName, InputSelector inputSelector,
             org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector selector,
             List<DataSpacesFileObject> results) {
@@ -902,15 +799,6 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             String message = "Remaining tasks to execute while closing thread pool used for data transfer";
             logger.error(message);
             logDataspacesStatus(message, DataspacesStatusLevel.ERROR);
-        }
-
-        if (CACHE != null) {
-            try {
-                logger.info("Unregistering cache space : " + cacheSpaceInstanceInfo.getMountingPoint());
-                namingService.unregister(cacheSpaceInstanceInfo.getMountingPoint());
-            } catch (Exception e) {
-                logger.warn("Error occurred when unregistering Cache space", e);
-            }
         }
 
         cleanScratchSpace();

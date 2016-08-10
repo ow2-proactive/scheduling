@@ -887,10 +887,6 @@
       <value>transferFromOutputSpace</value>
       <value>transferFromGlobalSpace</value>
       <value>transferFromUserSpace</value>
-      <value>cacheFromInputSpace</value>
-      <value>cacheFromOutputSpace</value>
-      <value>cacheFromGlobalSpace</value>
-      <value>cacheFromUserSpace</value>
       <value>none</value>
       <ref name="variableRefType"/>
     </choice>

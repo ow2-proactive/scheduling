@@ -36,9 +36,10 @@
  */
 package functionaltests;
 
-import functionaltests.jobs.NonTerminatingJob;
-import functionaltests.jobs.SimpleJob;
-import functionaltests.utils.RestFuncTUtils;
+import java.security.Policy;
+
+import javax.ws.rs.core.MediaType;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -64,8 +65,9 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 
-import javax.ws.rs.core.MediaType;
-import java.security.Policy;
+import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.SimpleJob;
+import functionaltests.utils.RestFuncTUtils;
 
 
 public abstract class AbstractRestFuncTestCase {
@@ -75,12 +77,9 @@ public abstract class AbstractRestFuncTestCase {
         configureLog4j();
     }
 
-    static Logger logger;
-
     private static void configureLog4j() {
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.INFO);
-        logger = Logger.getLogger(AbstractRestFuncTestCase.class);
     }
 
     private static void configureSecurityManager() {

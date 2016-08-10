@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -57,7 +56,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
@@ -68,11 +66,7 @@ import org.ow2.proactive.scheduler.task.utils.WallTimer;
 
 import java.io.File;
 import java.io.Serializable;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -146,8 +140,6 @@ public class TaskLauncher implements InitActive {
 
         try {
             addShutdownHook();
-            // lock the cache space cleaning mechanism
-            DataSpaceNodeConfigurationAgent.lockCacheSpaceCleaning();
             dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService(), executableContainer.isRunAsUser());
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
@@ -155,17 +147,17 @@ public class TaskLauncher implements InitActive {
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-                    new NodeDataSpacesURIs(dataspaces.getScratchURI(), dataspaces.getCacheURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(), dataspaces.getUserURI(), dataspaces.getGlobalURI()), progressFileReader.getProgressFile()
+                    dataspaces.getScratchURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+                    dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
                     .toString(), getHostname(), decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
             logger.info("Task working dir: " + workingDir);
-            logger.info("Cache space: " + context.getNodeDataSpaceURIs().getCacheURI());
-            logger.info("Input space: " + context.getNodeDataSpaceURIs().getInputURI());
-            logger.info("Output space: " + context.getNodeDataSpaceURIs().getOutputURI());
-            logger.info("User space: " + context.getNodeDataSpaceURIs().getUserURI());
-            logger.info("Global space: " + context.getNodeDataSpaceURIs().getGlobalURI());
+            logger.info("Input space: " + context.getInputURI());
+            logger.info("Output space: " + context.getOutputURI());
+            logger.info("User space: " + context.getUserURI());
+            logger.info("Global space: " + context.getGlobalURI());
 
             wallTimer.start();
 
@@ -226,8 +218,7 @@ public class TaskLauncher implements InitActive {
             if (dataspaces != null) {
                 dataspaces.close();
             }
-            // unlocks the cache space cleaning thread
-            DataSpaceNodeConfigurationAgent.unlockCacheSpaceCleaning();
+
             removeShutdownHook();
             terminate();
         }
