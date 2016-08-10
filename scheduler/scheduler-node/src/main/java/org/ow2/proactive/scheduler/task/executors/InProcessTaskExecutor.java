@@ -34,8 +34,18 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
-import com.google.common.base.Stopwatch;
-import org.apache.commons.io.FileUtils;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.io.Writer;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -50,11 +60,8 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.PAProperties;
-
-import java.io.*;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.google.common.base.Stopwatch;
+import org.apache.commons.io.FileUtils;
 
 
 /**
@@ -86,10 +93,10 @@ public class InProcessTaskExecutor implements TaskExecutor {
             return "";
         } else {
             File directory;
-            if (taskContext.getNodeDataSpaceURIs().getScratchURI() == null || taskContext.getNodeDataSpaceURIs().getScratchURI().isEmpty()) {
+            if (taskContext.getScratchURI() == null || taskContext.getScratchURI().isEmpty()) {
                 directory = new File(".");
             } else {
-                directory = new File(taskContext.getNodeDataSpaceURIs().getScratchURI());
+                directory = new File(taskContext.getScratchURI());
             }
             File nodesFile = File.createTempFile(NODES_FILE_DIRECTORY_NAME, null, directory);
 

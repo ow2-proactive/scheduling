@@ -60,29 +60,41 @@ public class TaskContext implements Serializable {
     private final Decrypter decrypter;
     private final TaskResult[] previousTasksResults;
 
-    private final NodeDataSpacesURIs nodeDataSpacesURIs;
+    private final String scratchURI;
 
+    private final String cacheURI;
+    private final String inputURI;
+    private final String outputURI;
+    private final String userURI;
+    private final String globalURI;
     private final String schedulerHome;
 
     private final String progressFilePath;
 
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
-                       TaskResult[] previousTasksResults,
-                       NodeDataSpacesURIs nodeDataSpacesURIs, String progressFilePath, String currentNodeHostname) throws NodeException {
-        this(executableContainer, initializer, previousTasksResults,
-                nodeDataSpacesURIs, progressFilePath, currentNodeHostname, null);
+                       TaskResult[] previousTasksResults, String scratchURI, String cacheURI, String inputURI, String outputURI,
+                       String userURI,
+                       String globalURI, String progressFilePath, String currentNodeHostname) throws NodeException {
+        this(executableContainer, initializer, previousTasksResults, scratchURI, cacheURI, inputURI, outputURI, userURI,
+                globalURI, progressFilePath, currentNodeHostname, null);
     }
 
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
-                       TaskResult[] previousTasksResults,
-                       NodeDataSpacesURIs nodeDataSpacesURIs, String progressFilePath, String currentNodeHostname,
+                       TaskResult[] previousTasksResults, String scratchURI, String cacheURI, String inputURI, String outputURI,
+                       String userURI,
+                       String globalURI, String progressFilePath, String currentNodeHostname,
                        Decrypter decrypter) throws NodeException {
         this.initializer = initializer;
         initializer.setNamingService(null);
         this.previousTasksResults = previousTasksResults;
-        this.nodeDataSpacesURIs = nodeDataSpacesURIs;
+        this.scratchURI = scratchURI;
+        this.cacheURI = cacheURI;
+        this.inputURI = inputURI;
+        this.outputURI = outputURI;
+        this.userURI = userURI;
+        this.globalURI = globalURI;
         this.progressFilePath = progressFilePath;
         this.schedulerHome = ClasspathUtils.findSchedulerHome();
         this.executableContainer = executableContainer;
@@ -148,8 +160,28 @@ public class TaskContext implements Serializable {
         return otherNodesURLs;
     }
 
-    public NodeDataSpacesURIs getNodeDataSpaceURIs() {
-        return nodeDataSpacesURIs;
+    public String getScratchURI() {
+        return scratchURI;
+    }
+
+    public String getCacheURI() {
+        return cacheURI;
+    }
+
+    public String getInputURI() {
+        return inputURI;
+    }
+
+    public String getOutputURI() {
+        return outputURI;
+    }
+
+    public String getUserURI() {
+        return userURI;
+    }
+
+    public String getGlobalURI() {
+        return globalURI;
     }
 
     public String getProgressFilePath() {

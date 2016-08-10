@@ -54,7 +54,13 @@ public class TaskContextSerializerTest {
                                         new SimpleScript("", "python")))),
                 taskLauncherInitializer,
                 null,
-                new NodeDataSpacesURIs(null, null, null, null, null, null), null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 null);
     }
 

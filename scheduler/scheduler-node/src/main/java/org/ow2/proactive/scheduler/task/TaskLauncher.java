@@ -57,7 +57,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
@@ -155,17 +154,18 @@ public class TaskLauncher implements InitActive {
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-                    new NodeDataSpacesURIs(dataspaces.getScratchURI(), dataspaces.getCacheURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(), dataspaces.getUserURI(), dataspaces.getGlobalURI()), progressFileReader.getProgressFile()
+                    dataspaces.getScratchURI(), dataspaces.getCacheURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(),
+                    dataspaces.getUserURI(), dataspaces.getGlobalURI(), progressFileReader.getProgressFile()
                     .toString(), getHostname(), decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
             logger.info("Task working dir: " + workingDir);
-            logger.info("Cache space: " + context.getNodeDataSpaceURIs().getCacheURI());
-            logger.info("Input space: " + context.getNodeDataSpaceURIs().getInputURI());
-            logger.info("Output space: " + context.getNodeDataSpaceURIs().getOutputURI());
-            logger.info("User space: " + context.getNodeDataSpaceURIs().getUserURI());
-            logger.info("Global space: " + context.getNodeDataSpaceURIs().getGlobalURI());
+            logger.info("Cache space: " + context.getCacheURI());
+            logger.info("Input space: " + context.getInputURI());
+            logger.info("Output space: " + context.getOutputURI());
+            logger.info("User space: " + context.getUserURI());
+            logger.info("Global space: " + context.getGlobalURI());
 
             wallTimer.start();
 

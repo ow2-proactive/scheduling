@@ -8,7 +8,6 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.forked.env.command.JavaPrefixCommandExtractor;
 import org.ow2.proactive.scripting.InvalidScriptException;
@@ -172,8 +171,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest {
                         "print('hello'); result='hello'", "javascript")));
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariableAndForkEnvironment();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null, null,
+                null, null, null, null, null);
         return taskContext;
     }
 

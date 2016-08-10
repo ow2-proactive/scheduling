@@ -1,11 +1,23 @@
 package functionaltests;
 
+import jline.WindowsTerminal;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+
+import static org.junit.Assert.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Sandrine on 18/09/2015.
@@ -31,7 +43,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
             //submit a job with a loop and out and err outputs
             System.out.println("submit a job with loop, out and err outputs");
             jobId = submitJob("flow_loop_out.xml", JobStatus.FINISHED);
-            System.out.println("Job " + jobId + " finished");
+            System.out.println("Job finished");
         }
     }
 
@@ -43,8 +55,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListJobTaskIds:");
         System.out.println(out);
         assertTrue(out.contains("T1#1"));
         assertTrue(out.contains("Print1#1"));
@@ -64,8 +74,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListJobTaskIdsWithTag:");
         System.out.println(out);
         assertTrue(out.contains("T1#1"));
         assertTrue(out.contains("Print1#1"));
@@ -85,8 +93,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListJobTaskIdsWithUnknownTag:");
         System.out.println(out);
         assertTrue(!out.contains("T1#1"));
         assertTrue(!out.contains("Print1#1"));
@@ -106,8 +112,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListJobTaskIdsUnknownJob:");
         System.out.println(out);
         assertTrue(out.contains("error"));
         assertTrue(!out.contains("T1#1"));
@@ -127,8 +131,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListTaskStates:");
         System.out.println(out);
         assertTrue(out.contains("T1#1"));
         assertTrue(out.contains("Print1#1"));
@@ -148,8 +150,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListTaskStateWithTag:");
         System.out.println(out);
         assertTrue(out.contains("T1#1"));
         assertTrue(out.contains("Print1#1"));
@@ -169,8 +169,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListTaskStatesWithUnknownTag:");
         System.out.println(out);
         assertTrue(!out.contains("T1#1"));
         assertTrue(!out.contains("Print1#1"));
@@ -190,8 +188,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListTaskStatesUnknownJob:");
         System.out.println(out);
         assertTrue(out.contains("error"));
         assertTrue(!out.contains("T1#1"));
@@ -213,8 +209,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testJobOutput:");
         System.out.println(out);
         assertTrue(StringUtils.countMatches(out, "Task 1 : Test STDERR") == 2);
         assertTrue(StringUtils.countMatches(out, "Task 1 : Test STDOUT") == 2);
@@ -232,8 +226,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testJobOutputWithTag:");
         System.out.println(out);
         assertEquals(2, StringUtils.countMatches(out, "Task 1 : Test STDERR"));
         assertEquals(2, StringUtils.countMatches(out, "Task 1 : Test STDOUT"));
@@ -251,8 +243,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testJobOutputWithUnknownTag:");
         System.out.println(out);
         assertTrue(!out.contains("Task 1 : Test STDERR"));
         assertTrue(!out.contains("Task 1 : Test STDOUT"));
@@ -267,8 +257,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListJobOutputUnknownJob:");
         System.out.println(out);
         assertTrue(out.contains("error"));
     }
@@ -281,8 +269,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testJobResult:");
         System.out.println(out);
         assertTrue(out.contains("T1#1"));
         assertTrue(out.contains("Print1#1"));
@@ -302,8 +288,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testJobResultWithTag:");
         System.out.println(out);
         assertTrue(out.contains("T1#1"));
         assertTrue(out.contains("Print1#1"));
@@ -323,8 +307,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testJobResultWithUnknownTag:");
         System.out.println(out);
         assertTrue(!out.contains("T1#1"));
         assertTrue(!out.contains("Print1#1"));
@@ -344,8 +326,6 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         runCli();
 
         String out = this.capturedOutput.toString();
-        System.setOut(stdOut);
-        System.out.println("------------- testListJobResultUnknownJob:");
         System.out.println(out);
         assertTrue(out.contains("error"));
     }

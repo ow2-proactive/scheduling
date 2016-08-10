@@ -12,7 +12,6 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.InvalidScriptException;
@@ -125,7 +124,8 @@ public class ForkedTaskVariablesManagerTest {
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
 
         TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(testSetString, null, null, null, null, null), null, null);
+                testSetString, null, null,
+                null, null, null, null, null);
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
@@ -140,8 +140,9 @@ public class ForkedTaskVariablesManagerTest {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, testSetString, null, null, null, null), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null,
+                testSetString, null, null,
+                null, null, null, null);
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
@@ -156,8 +157,9 @@ public class ForkedTaskVariablesManagerTest {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, null, testSetString, null, null, null), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
+                testSetString,
+                null, null, null, null, null);
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
@@ -172,8 +174,8 @@ public class ForkedTaskVariablesManagerTest {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, null, null, testSetString, null, null), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null, null,
+                testSetString, null, null, null, null);
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
@@ -188,8 +190,8 @@ public class ForkedTaskVariablesManagerTest {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, null, null, null, testSetString, null), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null, null,
+                null, testSetString, null, null, null);
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
@@ -204,8 +206,8 @@ public class ForkedTaskVariablesManagerTest {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, null, null, null, null, testSetString), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
+                null, null, null, testSetString, null, null);
 
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
@@ -222,8 +224,8 @@ public class ForkedTaskVariablesManagerTest {
 
         Decrypter decrypter = createCredentials(testUser, testPass);
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null, decrypter);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
+                null, null, null, null, null, null, decrypter);
 
         ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
         Map<String, String> creds = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
@@ -275,8 +277,8 @@ public class ForkedTaskVariablesManagerTest {
     public void testExtractThirdPartyCredentialsThrowsExceptionIfTaskLauncherInitializerIsNull() throws Exception {
         ScriptExecutableContainer scriptContainer = createScriptContainer();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, null, null,
-                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, null, null, null, null, null,
+                null, null, null, null, null);
 
         ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
         forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
@@ -310,8 +312,8 @@ public class ForkedTaskVariablesManagerTest {
         taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
 
         TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer,
-                previousTasksResults,
-                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
+                previousTasksResults, null, null, null,
+                null, null, null, null, null);
         return taskContext;
     }
 
