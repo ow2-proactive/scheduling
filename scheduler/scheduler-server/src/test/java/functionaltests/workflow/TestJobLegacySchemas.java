@@ -67,7 +67,7 @@ import static functionaltests.utils.SchedulerTHelper.log;
 public class TestJobLegacySchemas extends SchedulerFunctionalTestWithRestart {
 
     private static String[] jobDescriptorsLoc = { "3_0/Job_Schemas.xml", "3_1/Job_Schemas.xml",
-            "3_2/Job_Schemas.xml", "3_3/Job_Schemas.xml", "3_4/Job_Schemas.xml", "3_5/Job_Schemas.xml"};
+            "3_2/Job_Schemas.xml" };
 
     private URL[] jobDescriptors = new URL[jobDescriptorsLoc.length];
 

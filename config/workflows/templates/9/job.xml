@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="urn:proactive:jobdescriptor:3.5"
-        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-        name="Docker Exec. Env." projectName="Cloud Automation"
-        priority="normal"
-        onTaskError="continueJobExecution"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.3"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.3/schedulerjob.xsd"
+    name="Docker Exec. Env." projectName="Cloud Automation"
+    priority="normal"
+    cancelJobOnError="false"
 >
   <description>
     <![CDATA[ This workflow demonstrates the usage of a Docker Fork Execution Environment. Including the usage of variables passing and Dataspaces ]]>
