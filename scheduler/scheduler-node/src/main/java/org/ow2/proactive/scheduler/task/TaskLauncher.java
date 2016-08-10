@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -67,11 +66,7 @@ import org.ow2.proactive.scheduler.task.utils.WallTimer;
 
 import java.io.File;
 import java.io.Serializable;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -145,8 +140,6 @@ public class TaskLauncher implements InitActive {
 
         try {
             addShutdownHook();
-            // lock the cache space cleaning mechanism
-            DataSpaceNodeConfigurationAgent.lockCacheSpaceCleaning();
             dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService(), executableContainer.isRunAsUser());
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
@@ -226,8 +219,7 @@ public class TaskLauncher implements InitActive {
             if (dataspaces != null) {
                 dataspaces.close();
             }
-            // unlocks the cache space cleaning thread
-            DataSpaceNodeConfigurationAgent.unlockCacheSpaceCleaning();
+
             removeShutdownHook();
             terminate();
         }

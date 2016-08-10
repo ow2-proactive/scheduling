@@ -89,7 +89,7 @@ public class RMTHelper {
      */
     public static final int DEFAULT_NODES_NUMBER = 2;
 
-    public final static ProActiveSetup setup = new ProActiveSetup();
+    private final static ProActiveSetup setup = new ProActiveSetup();
 
     private static TestRM rm = new TestRM();
     static {
