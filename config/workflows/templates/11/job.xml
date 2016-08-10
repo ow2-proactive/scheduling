@@ -10,12 +10,12 @@
         maxNumberOfExecution="2"
 >
   <description>
-    <![CDATA[ A workflow that sends an email. ]]>
+    <![CDATA[ A workflow that sends an email ]]>
   </description>
   <taskFlow>
     <task name="EmailNotification">
       <description>
-        <![CDATA[ A task to send an email notification. ]]>
+        <![CDATA[ A task to send an email notification ]]>
       </description>
       <scriptExecutable>
         <script>
