@@ -43,6 +43,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.lf5.util.Resource;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -223,6 +224,10 @@ public class RestFuncTHelper {
 
     public static Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public static ResourceManager getRm() {
+        return rm;
     }
 
     public static PublicKey getSchedulerPublicKey() {

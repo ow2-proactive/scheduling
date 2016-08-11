@@ -89,7 +89,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         }
     }
 
-    @Test
+//    @Test
     public void testLogin() throws Exception {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
         String url = getResourceUrl("login");
@@ -103,7 +103,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertContentNotEmpty(response);
     }
 
-    @Test
+//    @Test
     public void testLoginWithCredentials() throws Exception {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
         Credentials credentials = RestFuncTUtils.createCredentials(config.getLogin(), config.getPassword(),
@@ -119,7 +119,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertContentNotEmpty(response);
     }
 
-    @Test
+//    @Test
     public void testSubmit() throws Exception {
         String schedulerUrl = getResourceUrl("submit");
         HttpPost httpPost = new HttpPost(schedulerUrl);
@@ -134,7 +134,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertNotNull(jsonObj.get("id").toString());
     }
 
-    @Test
+//    @Test
     public void urlMatrixParams_shouldReplace_jobVariabls() throws Exception {
         File jobFile = new File(RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml")
                 .toURI());
@@ -155,7 +155,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         waitJobState(jobId, JobStatus.FINISHED, TimeUnit.MINUTES.toMillis(1));
     }
 
-    @Test
+//    @Test
     public void testListJobs() throws Exception {
         String jobId = submitDefaultJob().value();
         String schedulerUrl = getResourceUrl("jobs/" + jobId);
@@ -181,7 +181,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertNotNull(taskResult);
     }
 
-    @Test
+//    @Test
     public void testGetNoJob() throws Exception {
         String resourceUrl = getResourceUrl("jobs");
         HttpGet httpGet = new HttpGet(resourceUrl);
@@ -192,7 +192,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         JSONArray jsonArray = (JSONArray) jsonObject.get("list");
         assertTrue(jsonArray.isEmpty());
     }
-
+//
     @Test
     public void testJobResultValue() throws Exception {
         String jobId = submitFinishedJob();
@@ -205,7 +205,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertEquals("TEST-JOB", jsonObject.get(getDefaultTaskName()).toString());
     }
 
-    @Test(expected = UnknownJobException.class)
+//    @Test(expected = UnknownJobException.class)
     public void testRemoveJob() throws Exception {
         String jobId = submitDefaultJob().value();
         String resource = "jobs/" + jobId;
@@ -219,7 +219,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         fail("UnknownJobException should be thrown");
     }
 
-    @Test
+//    @Test
     public void testKillJob() throws Exception {
         String jobId = submitPendingJobId();
         String resource = "jobs/" + jobId + "/kill";
@@ -232,7 +232,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertEquals(JobStatus.KILLED, jobState.getStatus());
     }
 
-    @Test
+//    @Test
     public void testGetJobTaskIds() throws Exception {
         String jobId = submitDefaultJob().value();
         String resource = "jobs/" + jobId + "/tasks";
