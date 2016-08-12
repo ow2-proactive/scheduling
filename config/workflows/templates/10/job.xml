@@ -17,13 +17,23 @@
       <description>
         <![CDATA[ Trigger a HTTP notification to an URL ]]>
       </description>
-      <javaExecutable class="org.ow2.proactive.addons.webhook.task.WebhookTask">
-        <parameters>
-          <parameter name="User-Agent" value="Mozilla/5.0"/>
-          <parameter name="method" value="GET"/>
-          <parameter name="url" value="http://www.google.com/search?q=mkyong"/>
-        </parameters>
-      </javaExecutable>
+        <scriptExecutable>
+            <script>
+                <code language="groovy">
+                    <![CDATA[
+// Please fill variables
+String method = "GET or POST"
+String url = "http://www.activeeon.com";
+String headers = "{key0 = value0, key1 = value1, ...}"
+String content = "the content";
+
+// Don't change code below
+import org.ow2.proactive.addons.webhook.Webhook;
+Webhook.execute ( method, url, headers, content);
+]]>
+                </code>
+            </script>
+        </scriptExecutable>
     </task>
   </taskFlow>
 </job>
