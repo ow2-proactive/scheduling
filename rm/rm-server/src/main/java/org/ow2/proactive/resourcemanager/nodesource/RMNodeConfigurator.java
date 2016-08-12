@@ -124,9 +124,7 @@ public class RMNodeConfigurator implements RunActive {
      * @throws ActiveObjectCreationException
      */
     protected void configureForDataSpace(Node node) throws ActiveObjectCreationException, NodeException {
-        DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject.newActive(
-                DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-        conf.configureNode();
+        RMNodeStarter.simpleConfigureNodeForDataspace(node);
     }
 
     /**

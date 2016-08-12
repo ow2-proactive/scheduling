@@ -65,7 +65,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DataSpaceNodeConfigurationAgent implements Serializable {
 
-    private static transient Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
+    private static final transient Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
 
     /**
      * This property is used by scheduling when configuring node to define the location of the scratch dir and must be renamed carefully.
@@ -161,7 +161,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
         }
 
         startCacheSpace();
-        PAActiveObject.terminateActiveObject(false);
+        
         return true;
     }
 
@@ -304,6 +304,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
                     FileObject[] files = rootFO.findFiles(Selectors.EXCLUDE_SELF);
                     for (FileObject file : files) {
                         if (currentTime - file.getContent().getLastModifiedTime() > invalidationPeriod) {
+                            logger.info("[Cache Space cleaner] deleting " + file);
                             file.delete();
                         }
                     }

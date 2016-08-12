@@ -41,12 +41,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.*;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarLoader;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -641,9 +643,7 @@ public class RMNodeStarter {
      */
     private void configureForDataSpace(final Node node) {
         try {
-            DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
-                    .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-            boolean dataspaceConfigured = conf.configureNode();
+            boolean dataspaceConfigured = RMNodeStarter.simpleConfigureNodeForDataspace(node);
             if (!dataspaceConfigured) {
                 throw new NotConfiguredException(
                     "Failed to configure dataspaces, check the logs for more details");
@@ -679,6 +679,16 @@ public class RMNodeStarter {
 
             }
         }));
+    }
+
+    public static boolean simpleConfigureNodeForDataspace(Node node) throws ActiveObjectCreationException, NodeException {
+        DataSpaceNodeConfigurationAgent nodeConfigurationAgent = (DataSpaceNodeConfigurationAgent) PAActiveObject
+                .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
+        boolean result = nodeConfigurationAgent.configureNode();
+
+        PAActiveObject.terminateActiveObject(nodeConfigurationAgent, false);
+
+        return result;
     }
 
     protected String fillParameters(final CommandLine cl, final Options options) {

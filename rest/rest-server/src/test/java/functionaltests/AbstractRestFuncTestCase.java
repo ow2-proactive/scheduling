@@ -54,18 +54,26 @@ import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.utils.Criteria;
+import org.ow2.proactive.utils.NodeSet;
 
 import javax.ws.rs.core.MediaType;
 import java.security.Policy;
+import java.util.Set;
+
+import org.objectweb.proactive.core.node.Node;
 
 
 public abstract class AbstractRestFuncTestCase {
@@ -200,10 +208,25 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected String submitFinishedJob() throws Exception {
+        Set<String> nodes = RestFuncTHelper.getRm().listAliveNodeUrls();
+        System.out.println("AbstractRestFuncTestCase.submitFinishedJob RM STATE");
+        System.out.println("NB NODES=" + nodes.size());
+        System.out.println("ALIVE NODE URLS=" + nodes);
+        System.out.println("AbstractRestFuncTestCase.submitFinishedJob TOTAL NUMBER OF NODES " + RestFuncTHelper.getRm().getState().getTotalNodesNumber());
+
+
+        System.out.println("AbstractRestFuncTestCase.submitFinishedJob SCHEDULER STATE");
+        System.out.println("AbstractRestFuncTestCase.submitFinishedJob SCHEDULER STATE PENDING " + RestFuncTHelper.getScheduler().getState().getPendingJobs());
+        System.out.println("AbstractRestFuncTestCase.submitFinishedJob SCHEDULER STATE RUNNING " + RestFuncTHelper.getScheduler().getState().getRunningJobs());
+        System.out.println("AbstractRestFuncTestCase.submitFinishedJob SCHEDULER STATE FINISHED " + RestFuncTHelper.getScheduler().getState().getFinishedJobs());
+        Page<JobInfo> page = RestFuncTHelper.getScheduler().getJobs(-1, -1,
+                new JobFilterCriteria(false, true, true, true), null);
+        System.out.println("AbstractRestFuncTestCase.submitFinishedJob SCHEDULER JOBS" + page.getList());
+
         Scheduler scheduler = getScheduler();
         Job job = defaultJob();
         JobId jobId = scheduler.submit(job);
-        waitJobState(jobId, JobStatus.FINISHED, 120000);
+        waitJobState(jobId, JobStatus.FINISHED, 1200000);
         return jobId.value();
     }
 
