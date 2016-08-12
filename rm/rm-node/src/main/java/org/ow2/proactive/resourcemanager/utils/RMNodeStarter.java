@@ -686,25 +686,8 @@ public class RMNodeStarter {
                 .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
         boolean result = nodeConfigurationAgent.configureNode();
 
-//        try {
-//            Files.write(
-//                    Paths.get("C:\\Users\\Administrator\\OUTPUT-TESTS.TXT"),
-//                    " BEFORE TERMINATE".getBytes(), StandardOpenOption.APPEND);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        System.out.println("RMNodeStarter.simpleConfigureNodeForDataspace ICICICICI");
         PAActiveObject.terminateActiveObject(nodeConfigurationAgent, false);
-        System.out.println("RMNodeStarter.simpleConfigureNodeForDataspace ICICICICI2222");
 
-//        try {
-//            Files.write(
-//                    Paths.get("C:\\Users\\Administrator\\OUTPUT-TESTS.TXT"),
-//                    " AFTER TERMINATE".getBytes(), StandardOpenOption.APPEND);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         return result;
     }
 

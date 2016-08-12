@@ -161,7 +161,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
         }
 
         startCacheSpace();
-//        PAActiveObject.terminateActiveObject(false);
+        
         return true;
     }
 
