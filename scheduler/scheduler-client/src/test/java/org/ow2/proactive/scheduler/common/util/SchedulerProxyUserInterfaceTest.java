@@ -4,8 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-import javax.ws.rs.core.StreamingOutput;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

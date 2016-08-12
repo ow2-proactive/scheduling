@@ -165,6 +165,14 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
         client.removeEventListener();
     }
+    
+    @Test
+    public void testGetJobContent() throws Exception {
+    	ISchedulerClient client = clientInstance();
+    	Job job = defaultJob();
+        JobId jobId = client.submit(job);
+        TaskFlowJob content = (TaskFlowJob) client.getInitialJobContent(jobId);
+    }
 
     @Test(timeout = MAX_WAIT_TIME)
     public void testPushFileWithNonAdminUserPwdShouldSucceed() throws Exception {

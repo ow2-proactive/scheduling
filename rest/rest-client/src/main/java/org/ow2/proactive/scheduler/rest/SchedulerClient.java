@@ -109,6 +109,7 @@ import org.ow2.proactive.scheduler.rest.data.DataUtility;
 import org.ow2.proactive.scheduler.rest.data.JobInfoImpl;
 import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
 import org.ow2.proactive.scheduler.rest.data.TaskStateImpl;
+import org.ow2.proactive.scheduler.rest.provider.UpdatablePropertyJacksonProvider;
 import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
 import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
@@ -174,6 +175,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 		factory.register(new WildCardTypeReader());
 		factory.register(new OctetStreamReader());
 		factory.register(new TaskResultReader());
+		factory.register(new UpdatablePropertyJacksonProvider());
 
 		setApiClient(restApiClient);
 
@@ -1041,15 +1043,29 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 	}
 
 	@Override
-	public Job getInitialJobContent(JobId jobId)
+	public TaskFlowJob getInitialJobContent(JobId jobId)
 			throws NotConnectedException, UnknownJobException, PermissionException {
-		Job result = null;
+		TaskFlowJob result = null;
 		try {
 			result = restApi().getInitialJobContent(sid, jobId.value());
 		} catch (Exception e) {
 			throwUJEOrNCEOrPE(e);
 		}
 		return result;
+	}
+
+	@Override
+	public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
+			throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
+			JobCreationException {
+		try {
+			JobIdData id = restApi().copyAndResubmitWithGeneralInfo(sid, jobId.value(), generalInfo);
+			
+			return id == null ? null : DataUtility.jobId(id);
+		} catch (Exception e) {
+			throwNCEOrPEOrSCEOrJCE(e);
+		}
+		return null;
 	}
 
 }

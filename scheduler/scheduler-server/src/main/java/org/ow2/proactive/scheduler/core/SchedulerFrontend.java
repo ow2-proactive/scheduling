@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -44,14 +43,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -100,7 +98,6 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -1225,6 +1222,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 	@Override
 	public Job getInitialJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
 		return dbManager.loadInitalJobContent(jobId);
+	}
+
+	@Override
+	public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
+			throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
+			JobCreationException {
+		TaskFlowJob job = (TaskFlowJob) getInitialJobContent(jobId);
+		for(Entry<String, String> entry : generalInfo.entrySet()) {
+			job.addGenericInformation(entry.getKey(), entry.getValue());
+		}
+		return submit(job);
 	}
 
 }

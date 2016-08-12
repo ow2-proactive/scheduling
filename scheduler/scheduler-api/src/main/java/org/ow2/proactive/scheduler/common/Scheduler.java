@@ -37,6 +37,7 @@
 package org.ow2.proactive.scheduler.common;
 
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.db.SortParameter;
@@ -1389,5 +1390,23 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 	 * @throws PermissionException
 	 */
 	Job getInitialJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
-	
+
+	/**
+	 * retrieve a job content with the given job id, replace the general
+	 * information with the given one, resubmit the job
+	 * 
+	 * @param jobId
+	 *            job id used to retrieve the job content
+	 * @param generalInfo
+	 *            general information to replace or add to the job
+	 * @return job id of the new created job
+	 * @throws NotConnectedException
+	 * @throws UnknownJobException
+	 * @throws PermissionException
+	 * @throws SubmissionClosedException
+	 * @throws JobCreationException
+	 */
+	JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo) throws NotConnectedException,
+			UnknownJobException, PermissionException, SubmissionClosedException, JobCreationException;
+
 }

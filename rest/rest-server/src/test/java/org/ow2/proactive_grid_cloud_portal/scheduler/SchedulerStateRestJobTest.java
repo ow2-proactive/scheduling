@@ -15,6 +15,7 @@ import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
@@ -102,11 +103,11 @@ public class SchedulerStateRestJobTest extends RestTestServer {
 
         String JobId = "3";
         
-        Job job = Mockito.mock(Job.class);
+        TaskFlowJob job = Mockito.mock(TaskFlowJob.class);
 
         when(mockOfScheduler.getInitialJobContent(JobIdImpl.makeJobId(JobId))).thenReturn(job);
 
-        Job returned = restInterface.getInitialJobContent(sessionId, JobId);
+        TaskFlowJob returned = restInterface.getInitialJobContent(sessionId, JobId);
 
         assertThat(returned, is(job));
 

@@ -6,6 +6,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -752,6 +753,13 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 	public Job getInitialJobContent(JobId jobId)
 			throws NotConnectedException, UnknownJobException, PermissionException {
 		return schedulerProxy.getInitialJobContent(jobId);
+	}
+
+	@Override
+	public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
+			throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
+			JobCreationException {
+		return schedulerProxy.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
 	}
 
 }

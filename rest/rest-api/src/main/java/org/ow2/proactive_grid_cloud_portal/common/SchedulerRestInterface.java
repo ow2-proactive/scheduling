@@ -66,7 +66,7 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
-import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -1791,9 +1791,10 @@ public interface SchedulerRestInterface {
 	@GET
 	@Path("jobs/{jobid}/workflow-content")
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Job getInitialJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") final String jobId)
+	public TaskFlowJob getInitialJobContent(@HeaderParam("sessionid") String sessionId,
+			@PathParam("jobid") final String jobId)
 			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
-	
+
 	/**
 	 * get initial submitted job content in xml stream
 	 * 
@@ -1807,7 +1808,29 @@ public interface SchedulerRestInterface {
 	@GET
 	@Path("jobs/{jobid}/workflow-xml-content")
 	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-	public InputStream getInitialJobXmlContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") final String jobId)
+	public InputStream getInitialJobXmlContent(@HeaderParam("sessionid") String sessionId,
+			@PathParam("jobid") final String jobId)
 			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+
+	/**
+	 * 
+	 * @param sessionId
+	 * @param jobId
+	 * @param generalInformation
+	 * @return
+	 * @throws NotConnectedRestException
+	 * @throws PermissionRestException
+	 * @throws UnknownJobRestException
+	 * @throws JobCreationRestException
+	 * @throws SubmissionClosedRestException
+	 */
+	@POST
+	@Path("jobs")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public JobIdData copyAndResubmitWithGeneralInfo(@HeaderParam("sessionid") String sessionId,
+			@QueryParam("jobid") final String jobId, Map<String, String> generalInformation)
+			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException,
+			JobCreationRestException, SubmissionClosedRestException;
 
 }

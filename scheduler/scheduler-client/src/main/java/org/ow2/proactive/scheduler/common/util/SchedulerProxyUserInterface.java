@@ -654,4 +654,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 		return uischeduler.getInitialJobContent(jobId);
 	}
 
+	@Override
+	public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
+			throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
+			JobCreationException {
+		return uischeduler.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+	}
+
 }
