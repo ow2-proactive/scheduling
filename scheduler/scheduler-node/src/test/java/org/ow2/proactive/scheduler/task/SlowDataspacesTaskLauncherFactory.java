@@ -11,6 +11,7 @@ import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
@@ -44,7 +45,7 @@ public class SlowDataspacesTaskLauncherFactory extends ProActiveForkedTaskLaunch
 
         @Override
         public File getScratchFolder() {
-            return new File(".");
+            return new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
         }
 
         @Override

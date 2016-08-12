@@ -36,6 +36,14 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.dataspace;
 
+import java.io.File;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.Selectors;
 import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
@@ -47,14 +55,6 @@ import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
-
-import java.io.File;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -161,7 +161,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
         }
 
         startCacheSpace();
-        PAActiveObject.terminateActiveObject(false);
+
         return true;
     }
 

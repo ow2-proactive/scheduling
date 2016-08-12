@@ -220,16 +220,19 @@ public class TaskLauncher implements InitActive {
                     sendResultToScheduler(terminateNotification, taskResult);
             }
         } finally {
-            progressFileReader.stop();
-            taskLogger.close();
+            try {
+                progressFileReader.stop();
+                taskLogger.close();
 
-            if (dataspaces != null) {
-                dataspaces.close();
+                if (dataspaces != null) {
+                    dataspaces.close();
+                }
+                // unlocks the cache space cleaning thread
+                DataSpaceNodeConfigurationAgent.unlockCacheSpaceCleaning();
+                removeShutdownHook();
+            } finally {
+                terminate();
             }
-            // unlocks the cache space cleaning thread
-            DataSpaceNodeConfigurationAgent.unlockCacheSpaceCleaning();
-            removeShutdownHook();
-            terminate();
         }
     }
 

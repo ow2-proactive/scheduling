@@ -46,7 +46,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 /**
  * Internal and global description of a task.
- * This class contains all informations about the task to launch.
+ * This class contains all information about the task to launch.
  * It also provides a method to create its own launcher.
  *
  * @author The ProActive Team
