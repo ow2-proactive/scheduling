@@ -36,7 +36,7 @@ public class KillTaskLauncherTest {
     }
 
     @Test
-    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
+//    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_while_sleeping_in_task() throws Exception {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
@@ -60,7 +60,7 @@ public class KillTaskLauncherTest {
     }
 
     @Test
-    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
+//    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_while_looping_in_task() throws Exception {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
@@ -83,7 +83,7 @@ public class KillTaskLauncherTest {
     }
 
     @Test
-    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
+//    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void finished_but_terminate_not_called_back() throws Throwable {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
@@ -107,7 +107,7 @@ public class KillTaskLauncherTest {
     }
 
     @Test
-    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
+//    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_when_finished() throws Throwable {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
@@ -138,7 +138,7 @@ public class KillTaskLauncherTest {
     }
 
     @Test
-    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
+//    @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_when_copying() throws Throwable {
 
         final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
