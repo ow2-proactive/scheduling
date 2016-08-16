@@ -109,7 +109,6 @@ import org.ow2.proactive.scheduler.rest.data.DataUtility;
 import org.ow2.proactive.scheduler.rest.data.JobInfoImpl;
 import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
 import org.ow2.proactive.scheduler.rest.data.TaskStateImpl;
-import org.ow2.proactive.scheduler.rest.provider.UpdatablePropertyJacksonProvider;
 import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
 import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
 import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
@@ -177,7 +176,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         factory.register(new WildCardTypeReader());
         factory.register(new OctetStreamReader());
         factory.register(new TaskResultReader());
-        factory.register(new UpdatablePropertyJacksonProvider());
 
         setApiClient(restApiClient);
 
