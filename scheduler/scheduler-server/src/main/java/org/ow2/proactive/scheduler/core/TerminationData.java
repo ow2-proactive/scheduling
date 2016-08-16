@@ -136,6 +136,12 @@ final class TerminationData {
                 logger
                         .info("Cannot terminate task launcher for task '" + taskData.getTask().getId() + "'",
                                 t);
+                try {
+                    logger.info("Task launcher that cannot be terminated is identified by " +
+                            taskData.getLauncher().toString());
+                } catch (Throwable ignore) {
+                    logger.info("Getting information about Task launcher failed (remote object not accessible?)");
+                }
             }
 
             try {

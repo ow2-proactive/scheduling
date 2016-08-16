@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
+import com.google.common.collect.Iterables;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -54,6 +55,7 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -69,24 +71,27 @@ import functionaltests.utils.RestFuncTUtils;
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        init();
-    }
-
     @Before
     public void setUp() throws Exception {
+        init();
+
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<>();
-        jobStates.addAll(state.getPendingJobs());
-        jobStates.addAll(state.getRunningJobs());
-        jobStates.addAll(state.getFinishedJobs());
-        for (JobState jobState : jobStates) {
+
+        Iterable<JobState> jobs =
+                Iterables.concat(
+                        state.getPendingJobs(), state.getRunningJobs(), state.getFinishedJobs());
+
+        for (JobState jobState : jobs) {
             JobId jobId = jobState.getId();
             scheduler.killJob(jobId);
             scheduler.removeJob(jobId);
         }
+    }
+
+    @After
+    public void tearDown() {
+        RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
 
     @Test

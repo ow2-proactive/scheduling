@@ -111,10 +111,10 @@ public class RMFactory {
             String RMCoreName = RMConstants.NAME_ACTIVE_OBJECT_RMCORE;
             rmcore = (RMCore) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { RMCoreName, nodeRM }, nodeRM);
-            logger.debug("New RM core localy started");
+            logger.debug("New RM core started locally");
             return RMConnection.waitAndJoin(null);
         } else {
-            throw new RMException("RM Core already localy running");
+            throw new RMException("RM Core already running locally");
         }
     }
 

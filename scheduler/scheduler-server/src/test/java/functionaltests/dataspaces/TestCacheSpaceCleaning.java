@@ -80,7 +80,7 @@ public class TestCacheSpaceCleaning extends SchedulerFunctionalTestWithCustomCon
         List<String> arguments = new ArrayList<>();
         arguments.addAll(RMTHelper.setup.getJvmParametersAsList());
         arguments.add("-D" + DataSpaceNodeConfigurationAgent.NODE_DATASPACE_CACHE_CLEANING_PERIOD + "=" + 2000);
-        arguments.add("-D" + DataSpaceNodeConfigurationAgent.NODE_DATASPACE_CACHE_INVALIDATION_PERIOD + "=" + 30000);
+        arguments.add("-D" + DataSpaceNodeConfigurationAgent.NODE_DATASPACE_CACHE_INVALIDATION_PERIOD + "=" + 40000);
         schedulerHelper.createNodeSource("CleaningNS", 5, arguments);
     }
 
@@ -111,6 +111,7 @@ public class TestCacheSpaceCleaning extends SchedulerFunctionalTestWithCustomCon
 
         // change the file to update
         dataToUpdateFile.delete();
+        Thread.sleep(8000);
         dataToUpdateFile.createNewFile();
 
         // submit the job a second time.

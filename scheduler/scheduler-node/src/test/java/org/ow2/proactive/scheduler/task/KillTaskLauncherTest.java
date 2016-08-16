@@ -57,6 +57,7 @@ public class KillTaskLauncherTest {
         taskLauncherPA.kill();
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
+        PAActiveObject.terminateActiveObject(taskLauncherPA, true);
     }
 
     @Test
@@ -80,6 +81,7 @@ public class KillTaskLauncherTest {
         taskLauncherPA.kill();
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
+        PAActiveObject.terminateActiveObject(taskLauncherPA, true);
     }
 
     @Test
@@ -104,6 +106,7 @@ public class KillTaskLauncherTest {
         assertEquals("done", taskResultWaiter.getTaskResult().value());
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
+        PAActiveObject.terminateActiveObject(taskLauncherPA, true);
     }
 
     @Test
@@ -133,8 +136,8 @@ public class KillTaskLauncherTest {
             // task launcher can be terminated before the kill message is received
         }
 
-
         assertTaskLauncherIsTerminated(taskLauncherPA);
+        PAActiveObject.terminateActiveObject(taskLauncherPA, true);
     }
 
     @Test
@@ -158,6 +161,7 @@ public class KillTaskLauncherTest {
         taskLauncherPA.kill();
 
         assertTaskLauncherIsTerminated(taskLauncherPA);
+        PAActiveObject.terminateActiveObject(taskLauncherPA, true);
     }
 
     private void assertTaskLauncherIsTerminated(TaskLauncher taskLauncherPA) throws InterruptedException {
