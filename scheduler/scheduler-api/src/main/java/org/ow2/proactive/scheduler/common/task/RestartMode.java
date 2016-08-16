@@ -70,6 +70,8 @@ public class RestartMode implements java.io.Serializable {
 
     @XmlAttribute
     private String description;
+    
+    public RestartMode(){}
 
     /**
      * Implicit constructor of a restart mode.
