@@ -459,5 +459,4 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 		}
 		return string.toString();
 	}
-	
 }

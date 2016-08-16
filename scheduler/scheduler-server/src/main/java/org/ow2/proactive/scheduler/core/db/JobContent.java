@@ -1,0 +1,126 @@
+package org.ow2.proactive.scheduler.core.db;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.log4j.Logger;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.util.ByteCompressionUtils;
+
+/**
+ * JobContent Entity class, store workflow content to database
+ * 
+ * @author ActiveEon team
+ *
+ */
+@Entity
+@NamedQueries({ @NamedQuery(name = "loadJobContent", query = "from JobContent as content where content.jobId = :id") })
+@Table(name = "JOB_CONTENT", indexes = { @Index(name = "INITIAL_JOB_INDEX", columnList = "JOB_ID") })
+public class JobContent implements Serializable {
+
+	private static final Logger log = Logger.getLogger(JobContent.class);
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7243435266521345353L;
+
+	@Lob
+	@Column(name = "CONTENT", length = Integer.MAX_VALUE)
+	private byte[] jobContentAsByteArray;
+
+	@Id
+	@Column(name = "JOB_ID", unique = true, nullable = false)
+	@GeneratedValue(generator = "keyGenerator")
+	@GenericGenerator(name = "keyGenerator", strategy = "foreign", parameters = {
+			@Parameter(value = "jobData", name = "property") })
+	private Long jobId;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "JOB_ID", referencedColumnName = "ID")
+	@MapsId
+	private JobData jobData;
+
+	public Long getJobId() {
+		return jobId;
+	}
+
+	public void setJobId(Long jobId) {
+		this.jobId = jobId;
+	}
+
+	public byte[] getJobContentAsByteArray() {
+		return jobContentAsByteArray;
+	}
+
+	public JobData getJobData() {
+		return jobData;
+	}
+
+	public void setJobData(JobData jobData) {
+		this.jobData = jobData;
+	}
+
+	public void setJobContentAsByteArray(byte[] jobContentAsByteArray) {
+		this.jobContentAsByteArray = jobContentAsByteArray;
+	}
+
+	@Transient
+	public TaskFlowJob getInitJobContent() {
+		try {
+			byte[] deCompressed = ByteCompressionUtils.decompress(jobContentAsByteArray);
+			TaskFlowJob job = SerializationUtils.deserialize(deCompressed);
+			return job;
+		} catch (Exception e) {
+			log.error(e);
+		}
+		return SerializationUtils.deserialize(jobContentAsByteArray);
+	}
+
+	public void setInitJobContent(Job job) {
+		byte[] jobByte = SerializationUtils.serialize(job);
+		try {
+			this.jobContentAsByteArray = ByteCompressionUtils.compress(jobByte);
+		} catch (Exception e) {
+			log.error(e);
+			this.jobContentAsByteArray = jobByte;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return jobId.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		JobContent other = (JobContent) obj;
+		if (other.getJobId().equals(this.getJobId()))
+			return false;
+		return true;
+	}
+}
