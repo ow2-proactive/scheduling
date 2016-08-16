@@ -38,11 +38,6 @@ public class JobContent implements Serializable {
 
 	private static final Logger log = Logger.getLogger(JobContent.class);
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7243435266521345353L;
-
 	@Lob
 	@Column(name = "CONTENT", length = Integer.MAX_VALUE)
 	private byte[] jobContentAsByteArray;

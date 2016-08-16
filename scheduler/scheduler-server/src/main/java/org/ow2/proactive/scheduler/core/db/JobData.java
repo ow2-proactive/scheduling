@@ -96,11 +96,6 @@ import com.google.common.collect.Lists;
         @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"), })
 public class JobData implements Serializable {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3312485293157864084L;
-
     private Long id;
 
     private List<TaskData> tasks;
