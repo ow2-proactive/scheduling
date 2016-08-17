@@ -36,21 +36,7 @@
  */
 package functionaltests;
 
-import com.google.common.io.Files;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.ow2.proactive.scheduler.common.NotificationData;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.authentication.ConnectionInfo;
-import org.ow2.proactive.scheduler.rest.ISchedulerClient;
-import org.ow2.proactive.scheduler.rest.SchedulerClient;
+import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
 import java.io.File;
 import java.net.URI;
@@ -58,7 +44,27 @@ import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static functionaltests.RestFuncTHelper.getRestServerUrl;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.authentication.ConnectionInfo;
+import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.rest.ISchedulerClient;
+import org.ow2.proactive.scheduler.rest.SchedulerClient;
+
+import com.google.common.io.Files;
+
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
@@ -165,23 +171,14 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
         client.removeEventListener();
     }
-    
-    @Test
-    public void testGetJobContent() throws Exception {
-    	ISchedulerClient client = clientInstance();
-    	Job job = defaultJob();
-        JobId jobId = client.submit(job);
-        // FIXME due to the TaskFlowJob deserialization issue, the following line has to be commented out
-        // will fix it after
-        //TaskFlowJob content = (TaskFlowJob) client.getInitialJobContent(jobId);
-    }
 
     @Test(timeout = MAX_WAIT_TIME)
     public void testPushFileWithNonAdminUserPwdShouldSucceed() throws Exception {
         File tmpFile = testFolder.newFile();
         Files.write("non_admin_user_push_file_contents".getBytes(), tmpFile);
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(), null, true));
+        client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(),
+            null, true));
         client.pushFile("USERSPACE", "/test_non_admin_user_push_file", "tmpfile.tmp",
                 tmpFile.getAbsolutePath());
         String destDirPath = URI.create(client.getUserSpaceURIs().get(0)).getPath();
@@ -243,8 +240,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
         }
 
-		@Override
-		public void jobUpdatedFullDataEvent(JobState job) {			
-		}
+        @Override
+        public void jobUpdatedFullDataEvent(JobState job) {
+        }
     }
 }
