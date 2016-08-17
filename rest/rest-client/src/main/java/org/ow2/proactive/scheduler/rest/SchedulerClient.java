@@ -1062,18 +1062,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public TaskFlowJob getJobContent(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
-        TaskFlowJob result = null;
-        try {
-            result = restApi().getJobContent(sid, jobId.value());
-        } catch (Exception e) {
-            throwUJEOrNCEOrPE(e);
-        }
-        return result;
-    }
-
-    @Override
     public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
             throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
             JobCreationException {

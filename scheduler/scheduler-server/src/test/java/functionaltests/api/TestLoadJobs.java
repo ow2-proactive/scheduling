@@ -25,7 +25,6 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -288,25 +287,6 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
     private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running,
             boolean finished) {
         return new JobFilterCriteria(myJobsOnly, pending, running, finished);
-    }
-
-    @Test
-    public void testJobContent() throws Exception {
-        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
-        FileLock fileLock = new FileLock();
-        Path lock = fileLock.lock();
-        String fileLockPath = lock.toString();
-
-        logger.info("File lock location is " + fileLockPath);
-        TaskFlowJob job = createJob(fileLockPath);
-        JobId jobid = scheduler.submit(job);
-
-        Job content = scheduler.getJobContent(jobid);
-
-        assertTrue(content.getName().equals(this.getClass().getSimpleName()));
-        assertTrue(content instanceof TaskFlowJob);
-
-        assertTrue(((TaskFlowJob) content).getTasks().size() == 1);
     }
 
 }

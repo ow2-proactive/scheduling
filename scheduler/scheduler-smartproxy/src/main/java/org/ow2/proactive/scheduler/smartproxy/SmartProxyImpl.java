@@ -140,7 +140,8 @@ import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExten
  * @author The ProActive Team
  */
 @ActiveObject
-public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implements InitActive, EndActive, Serializable {
+public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl>
+        implements InitActive, EndActive, Serializable {
 
     private static final Logger log = Logger.getLogger(SmartProxyImpl.class);
 
@@ -759,12 +760,6 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     public boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.changeStartAt(jobId, startAt);
-    }
-
-    @Override
-    public Job getJobContent(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
-        return schedulerProxy.getJobContent(jobId);
     }
 
     @Override

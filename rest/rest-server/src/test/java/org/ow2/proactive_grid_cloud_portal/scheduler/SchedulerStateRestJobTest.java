@@ -9,13 +9,10 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
@@ -97,20 +94,5 @@ public class SchedulerStateRestJobTest extends RestTestServer {
         RestTestUtils.assertJobInfo(jobState.getJobInfo(), jobInfoData);
 
     }
-    
-    @Test
-    public void testGetJobContent() throws Throwable {
 
-        String JobId = "3";
-        
-        TaskFlowJob job = Mockito.mock(TaskFlowJob.class);
-
-        when(mockOfScheduler.getJobContent(JobIdImpl.makeJobId(JobId))).thenReturn(job);
-
-        TaskFlowJob returned = restInterface.getJobContent(sessionId, JobId);
-
-        assertThat(returned, is(job));
-
-    }
-    
 }

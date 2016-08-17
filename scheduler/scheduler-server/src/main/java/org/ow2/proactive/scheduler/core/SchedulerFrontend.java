@@ -1239,16 +1239,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
-    public Job getJobContent(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
-        return dbManager.loadInitalJobContent(jobId);
-    }
-
-    @Override
     public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
             throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
             JobCreationException {
-        TaskFlowJob job = (TaskFlowJob) getJobContent(jobId);
+        TaskFlowJob job = (TaskFlowJob) dbManager.loadInitalJobContent(jobId);
         for (Entry<String, String> entry : generalInfo.entrySet()) {
             job.addGenericInformation(entry.getKey(), entry.getValue());
         }

@@ -66,7 +66,6 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -1774,43 +1773,6 @@ public interface SchedulerRestInterface {
 	boolean changeStartAt(@HeaderParam("sessionid") final String sessionId, @PathParam("jobid") final String jobId,
 			@PathParam("startAt") final String startAt)
 			throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
-
-	/**
-	 * get initial submitted job content object
-	 * 
-	 * @param sessionId
-	 *            current session
-	 * @param jobId
-	 *            id of the job content to return
-	 * @return TaskFlowJob object
-	 *         {@link org.ow2.proactive.scheduler.common.job.TaskFlowJob}
-	 * @throws NotConnectedRestException
-	 * @throws PermissionRestException
-	 * @throws UnknownJobRestException
-	 */
-	@GET
-	@Path("jobs/{jobid}/workflow-content")
-	@Produces({ MediaType.APPLICATION_JSON })
-	public TaskFlowJob getJobContent(@HeaderParam("sessionid") String sessionId,
-			@PathParam("jobid") final String jobId)
-			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
-
-	/**
-	 * get initial submitted job content in xml stream
-	 * 
-	 * @param sessionId
-	 * @param jobId
-	 * @return
-	 * @throws NotConnectedRestException
-	 * @throws PermissionRestException
-	 * @throws UnknownJobRestException
-	 */
-	@GET
-	@Path("jobs/{jobid}/workflow-xml-content")
-	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-	public InputStream getJobXmlContent(@HeaderParam("sessionid") String sessionId,
-			@PathParam("jobid") final String jobId)
-			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 
 	/**
 	 * 
