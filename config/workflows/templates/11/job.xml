@@ -23,7 +23,7 @@
             <![CDATA[
 // Sending an email requires to configure an SMTP connection
 // Please look at the following link for the configuration:
-// http://doc.activeeon.com/7.14.0/admin/ProActiveAdminGuide.html#_email_notification
+// http://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_email_notification
 
 // Please fill variables
 from = "noreply@activeeon.com"
