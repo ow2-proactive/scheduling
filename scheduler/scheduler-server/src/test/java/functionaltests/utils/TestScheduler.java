@@ -195,6 +195,7 @@ public class TestScheduler {
         if (schedulerProcess != null) {
             schedulerProcess.destroy();
             schedulerProcess.waitFor();
+
             processTreeKiller.kill();
             schedulerProcess = null;
             isStarted = false;

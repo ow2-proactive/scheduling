@@ -1,12 +1,6 @@
 package org.ow2.proactive.scheduler.task;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
-
+import org.apache.commons.io.FileUtils;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -16,7 +10,14 @@ import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
-import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
     private Semaphore taskRunning;
@@ -24,7 +25,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
     private TaskFileDataspaces dataSpaces;
 
     public TestTaskLauncherFactory() {
-        this(new File(System.getProperty("java.io.tmpdir")));
+        this(new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
     }
 
     public TestTaskLauncherFactory(Semaphore taskRunning) {
@@ -61,6 +62,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
     public static class TaskFileDataspaces implements TaskDataspaces {
 
         private final File scratchFolder;
+        private final File cacheFolder;
         private final File userspaceFolder;
         private final File globalspaceFolder;
         private final File inputspaceFolder;
@@ -72,6 +74,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
 
         public TaskFileDataspaces(File rootFolder) {
             scratchFolder = createDataspaceFolder(rootFolder, "scratch");
+            cacheFolder = createDataspaceFolder(rootFolder, "cache");
             userspaceFolder = createDataspaceFolder(rootFolder, "userspace");
             globalspaceFolder = createDataspaceFolder(rootFolder, "globalspace");
             inputspaceFolder = createDataspaceFolder(rootFolder, "inputspace");
@@ -98,6 +101,11 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
         @Override
         public String getScratchURI() {
             return scratchFolder.getAbsolutePath();
+        }
+
+        @Override
+        public String getCacheURI() {
+            return cacheFolder.getAbsolutePath();
         }
 
         @Override

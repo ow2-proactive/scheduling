@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -57,8 +55,7 @@ public class TaskContextVariableExtractorTest {
         TaskResult[] taskResultArray = { taskResult };
 
         TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, taskResultArray,
-                null, null,
-                null, null, null, null, null);
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
 
         new TaskContextVariableExtractor().extractTaskVariables(taskContext, (TaskResult) null);
 
@@ -89,8 +86,7 @@ public class TaskContextVariableExtractorTest {
         TaskResult[] taskResultArray = { taskResult };
 
         TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, taskResultArray,
-                null, null,
-                null, null, null, null, null);
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
 
 
         Map<String, Serializable> contextVariables
@@ -108,8 +104,8 @@ public class TaskContextVariableExtractorTest {
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariable();
 
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
-                null, null, null, null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
 
         Map<String, byte[]> taskResultVariables = new HashMap<>();
 
@@ -134,8 +130,8 @@ public class TaskContextVariableExtractorTest {
                         "print('hello'); result='hello'", "javascript")));
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariable();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
-                null, null, null, null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
         Map<String, Serializable> contextVariables
                 = new TaskContextVariableExtractor().extractTaskVariables(taskContext, nodesfileContent);
 
@@ -157,8 +153,8 @@ public class TaskContextVariableExtractorTest {
                         "print('hello'); result='hello'", "javascript")));
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariable();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null, null, null,
-                null, null, null, null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
 
         Map<String, Serializable> contextVariables
                 = new TaskContextVariableExtractor().extractTaskVariables(taskContext);
@@ -181,7 +177,7 @@ public class TaskContextVariableExtractorTest {
                 new TaskScript(new SimpleScript(
                         "print('hello'); result='hello'", "javascript")));
         TaskContext taskContext = new TaskContext(scriptContainer, createTaskLauncherInitializer(), null,
-                null, null, null, null, null, null, null);
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
 
         Map<String, Serializable> contextVariables
                 = new TaskContextVariableExtractor().extractTaskVariables(taskContext);

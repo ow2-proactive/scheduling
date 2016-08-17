@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.3/schedulerjob.xsd"
+     name="TestJobLegacySchemas" projectName="TestJobLegacySchemas" priority="high" cancelJobOnError="false"
+     restartTaskOnError="anywhere" maxNumberOfExecution="1">
+    <!-- Tests many functionalities of the scheduler -->
+
+    <variables>
+        <!-- pa.rm.home is known as java property - ie : start with -Dpa.scheduler.home=value -->
+        <variable name="HOME"
+                  value="${pa.rm.home}/scheduler/scheduler-server/src/test/resources/functionaltests/schemas"/>
+        <variable name="DS" value="${pa.rm.home}/scheduler/scheduler-server/build/JobLegacySchemas_dataspace"/>
+    </variables>
+    <description>Tests various descriptor syntax.</description>
+    <genericInformation>
+        <info name="myinfo" value="myvalue"/>
+    </genericInformation>
+    <inputSpace url="${HOME}"/>
+    <outputSpace url="${DS}"/>
+    <globalSpace url="${DS}"/>
+    <userSpace url="${DS}"/>
+    <taskFlow>
+
+        <task name="CheckPreciousLog">
+            <description>Checks that the log file exists</description>
+            <inputFiles>
+                <files includes="TaskLogs-*.log" accessMode="transferFromOutputSpace"/>
+            </inputFiles>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
+                <parameters>
+                    <parameter name="inputFile" value="TaskLogs-*.log"/>
+                    <parameter name="outputFile" value="CheckPreciousLogOut"/>
+                </parameters>
+            </javaExecutable>
+            <outputFiles>
+                <files includes="CheckPreciousLogOut" accessMode="transferToOutputSpace"/>
+            </outputFiles>
+        </task>
+
+        <!-- Tests JavaTask with ForkEnv and dependencies -->
+
+        <task name="Computation1">
+            <description>Compute Pi and return it</description>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
+                <parameters>
+                    <parameter name="steps" value="2"/>
+                    <parameter name="iterations" value="10000"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task name="Computation2">
+            <description>Compute Pi and return it</description>
+            <forkEnvironment>
+                <jvmArgs>
+                    <jvmArg value="-Dproactive.test=true"/>
+                </jvmArgs>
+            </forkEnvironment>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
+                <parameters>
+                    <parameter name="steps" value="2"/>
+                    <parameter name="iterations" value="10000"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task name="LastAverage" preciousResult="true">
+            <description>Do the average and return it.</description>
+            <depends>
+                <task ref="Computation1"/>
+                <task ref="Computation2"/>
+            </depends>
+            <javaExecutable
+                    class="org.ow2.proactive.scheduler.examples.MonteCarloAverage"/>
+        </task>
+
+        <!-- Tests spaces -->
+
+        <task name="CopyFiles1">
+            <description>Copies a file to output</description>
+            <inputFiles>
+                <files includes="myfilein1" accessMode="transferFromInputSpace"/>
+            </inputFiles>
+            <forkEnvironment></forkEnvironment>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
+                <parameters>
+                    <parameter name="inputFile" value="myfilein1"/>
+                    <parameter name="outputFile" value="myfileout1"/>
+                </parameters>
+            </javaExecutable>
+            <outputFiles>
+                <files includes="myfileout1" accessMode="transferToOutputSpace"/>
+            </outputFiles>
+        </task>
+        <task name="CopyFiles2">
+            <description>Copies a file to output</description>
+            <depends>
+                <task ref="CopyFiles1"/>
+            </depends>
+            <inputFiles>
+                <files includes="myfileout1" accessMode="transferFromOutputSpace"/>
+            </inputFiles>
+            <forkEnvironment></forkEnvironment>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
+                <parameters>
+                    <parameter name="inputFile" value="myfileout1"/>
+                    <parameter name="outputFile" value="myfileout2"/>
+                </parameters>
+            </javaExecutable>
+            <outputFiles>
+                <files includes="myfileout2" accessMode="transferToGlobalSpace"/>
+            </outputFiles>
+        </task>
+        <task name="CopyFiles3">
+            <description>Copies a file to output</description>
+            <depends>
+                <task ref="CopyFiles2"/>
+            </depends>
+            <inputFiles>
+                <files includes="myfileout2" accessMode="transferFromGlobalSpace"/>
+            </inputFiles>
+            <forkEnvironment></forkEnvironment>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
+                <parameters>
+                    <parameter name="inputFile" value="myfileout2"/>
+                    <parameter name="outputFile" value="myfileout3"/>
+                </parameters>
+            </javaExecutable>
+            <outputFiles>
+                <files includes="myfileout3" accessMode="transferToUserSpace"/>
+            </outputFiles>
+        </task>
+        <task name="CopyFiles4">
+            <description>Copies a file to output</description>
+            <depends>
+                <task ref="CopyFiles3"/>
+            </depends>
+            <inputFiles>
+                <files includes="myfileout3" accessMode="transferFromUserSpace"/>
+            </inputFiles>
+            <forkEnvironment></forkEnvironment>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.CopyFile">
+                <parameters>
+                    <parameter name="inputFile" value="myfileout3"/>
+                    <parameter name="outputFile" value="myfileout4"/>
+                </parameters>
+            </javaExecutable>
+            <outputFiles>
+                <files includes="myfileout4" accessMode="transferToUserSpace"/>
+            </outputFiles>
+        </task>
+
+        <!-- Tests topology -->
+
+        <task name="Topology1" preciousResult="true">
+            <description>Do the average and return it.</description>
+            <parallel numberOfNodes="2">
+                <topology>
+                    <arbitrary/>
+                </topology>
+            </parallel>
+            <javaExecutable
+                    class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+            </javaExecutable>
+        </task>
+        <task name="Topology2" preciousResult="true">
+            <description>Do the average and return it.</description>
+            <parallel numberOfNodes="2">
+                <topology>
+                    <bestProximity/>
+                </topology>
+            </parallel>
+            <javaExecutable
+                    class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+            </javaExecutable>
+        </task>
+        <task name="Topology3" preciousResult="true">
+            <description>Do the average and return it.</description>
+            <parallel numberOfNodes="2">
+                <topology>
+                    <thresholdProximity threshold="100"/>
+                </topology>
+            </parallel>
+            <javaExecutable
+                    class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+            </javaExecutable>
+        </task>
+        <task name="Topology4" preciousResult="true">
+            <description>Do the average and return it.</description>
+            <parallel numberOfNodes="2">
+                <topology>
+                    <singleHost/>
+                </topology>
+            </parallel>
+            <javaExecutable
+                    class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+            </javaExecutable>
+        </task>
+        <task name="Topology5" preciousResult="true">
+            <description>Do the average and return it.</description>
+            <parallel numberOfNodes="2">
+                <topology>
+                    <singleHostExclusive/>
+                </topology>
+            </parallel>
+            <javaExecutable
+                    class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+                <parameters>
+                    <parameter name="numberToFind" value="10"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+        <task name="Topology6" preciousResult="true">
+            <description>Do the average and return it.</description>
+            <parallel numberOfNodes="2">
+                <topology>
+                    <multipleHostsExclusive/>
+                </topology>
+            </parallel>
+            <javaExecutable
+                    class="org.ow2.proactive.scheduler.examples.MultiNodeExample">
+                <parameters>
+                    <parameter name="numberToFind" value="10"/>
+                </parameters>
+            </javaExecutable>
+        </task>
+
+
+        <!-- Tests pre/post/clean scripts -->
+
+        <task name="PrePost" preciousResult="true">
+            <description>Testing the pre and post scripts.</description>
+            <selection>
+                <script>
+                    <code language="javascript">selected=true;</code>
+                </script>
+            </selection>
+            <pre>
+                <script>
+                    <file path="${HOME}/set.groovy"/>
+                </script>
+            </pre>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.PropertyTask"/>
+            <post>
+                <script>
+                    <file path="${HOME}/unset.groovy"/>
+                </script>
+            </post>
+            <cleaning>
+                <script>
+                    <file path="${HOME}/clean.groovy"/>
+                </script>
+            </cleaning>
+        </task>
+
+        <!-- Tests dynamic commands -->
+
+        <task name="Static">
+            <forkEnvironment workingDir="$PA_SCHEDULER_HOME">
+            </forkEnvironment>
+            <nativeExecutable>
+                <staticCommand value="hostname">
+                </staticCommand>
+            </nativeExecutable>
+        </task>
+
+        <!-- Tests workflows -->
+
+        <task name="WF" maxNumberOfExecution="4">
+            <description>// <![CDATA[
+      x=200,y=80
+      // ]]> </description>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+            <controlFlow block="start">
+                <replicate>
+                    <script>
+                        <code language="javascript">
+                            // <![CDATA[
+runs = 2;
+// ]]>
+                        </code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="WF4" maxNumberOfExecution="4">
+            <description>// <![CDATA[
+      x=243,y=219
+      // ]]> </description>
+            <depends>
+                <task ref="WF1"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+        </task>
+        <task name="WF5" maxNumberOfExecution="4">
+            <description>// <![CDATA[
+      x=200,y=288
+      // ]]> </description>
+            <depends>
+                <task ref="WF4"/>
+                <task ref="WF3"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+            <controlFlow block="end"/>
+        </task>
+        <task name="WF1" maxNumberOfExecution="4">
+            <description>// <![CDATA[
+      x=200,y=157
+      // ]]> </description>
+            <depends>
+                <task ref="WF"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+            <controlFlow block="start"/>
+        </task>
+        <task name="WF3" maxNumberOfExecution="4">
+            <description>// <![CDATA[
+      x=154,y=221
+      // ]]> </description>
+            <depends>
+                <task ref="WF1"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+        </task>
+        <task name="WF2" maxNumberOfExecution="4">
+            <description>// <![CDATA[
+      x=203,y=362,a=354,b=233
+      // ]]> </description>
+            <depends>
+                <task ref="WF5"/>
+            </depends>
+            <javaExecutable class="org.ow2.proactive.scheduler.examples.IncrementJob">
+            </javaExecutable>
+            <controlFlow block="end">
+                <loop target="WF">
+                    <script>
+                        <code language="javascript">
+                            // <![CDATA[
+if (result < 15) {
+loop = true;
+} else {
+loop = false;
+}
+// ]]>
+                        </code>
+                    </script>
+                </loop>
+            </controlFlow>
+        </task>
+
+        <!-- Tests Script Executable -->
+        <task name="ScriptExecutable">
+            <scriptExecutable>
+                <script>
+                    <code language="javascript">
+                        result = '42'
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+
+    </taskFlow>
+</job>

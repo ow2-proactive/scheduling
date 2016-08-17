@@ -1,15 +1,8 @@
 package org.ow2.proactive.scheduler.task;
 
-import java.io.Serializable;
-import java.security.KeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
@@ -21,6 +14,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
@@ -28,15 +22,18 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.ClasspathUtils;
 import org.ow2.proactive.utils.NodeSet;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.io.Serializable;
+import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
@@ -60,7 +57,7 @@ public class InProcessTaskExecutorTest {
                 new ScriptExecutableContainer(new TaskScript(
                         new SimpleScript("println('hello'); java.lang.Thread.sleep(5); result='hello'",
                                 "groovy"))),
-                initializer, null, "", "", "", "", "", "", ""), taskOutput.outputStream, taskOutput.error);
+                initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
 
         assertEquals(String.format("pre%nhello%npost%n"), taskOutput.output());
         assertEquals("hello", result.value());
@@ -80,7 +77,7 @@ public class InProcessTaskExecutorTest {
         new InProcessTaskExecutor().execute(new TaskContext(
                 new ScriptExecutableContainer(new TaskScript(
                         new SimpleScript("print variables.get('PA_USER')", "python"))),
-                initializer, null, "", "", "", "", "", "", ""), taskOutput.outputStream, taskOutput.error);
+                initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
 
         assertEquals(jobOwner, taskOutput.output().trim());
     }
@@ -95,7 +92,7 @@ public class InProcessTaskExecutorTest {
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                 new ScriptExecutableContainer(new TaskScript(
                         new SimpleScript("dsfsdfsdf", "groovy"))),
-                initializer, null, "", "", "", "", "", "", ""), taskOutput.outputStream, taskOutput.error);
+                initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
 
         assertTrue(result.hadException());
         assertFalse(taskOutput.error().isEmpty());
@@ -116,7 +113,7 @@ public class InProcessTaskExecutorTest {
 
         new InProcessTaskExecutor().execute(new TaskContext(
                 new ScriptExecutableContainer(new TaskScript(new SimpleScript(printEnvVariables, "groovy"))),
-                initializer, null, "", "", "", "", "", "", ""), taskOutput.outputStream, taskOutput.error);
+                initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
 
         String[] lines = taskOutput.output().split("\\n");
         assertEquals("job@1000@task@42", lines[0]);
@@ -136,7 +133,7 @@ public class InProcessTaskExecutorTest {
 
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                 new ScriptExecutableContainer(new TaskScript(new SimpleScript(script, "groovy"))),
-                initializer, null, "", "", "", "", "", "", ""), taskOutput.outputStream, taskOutput.error);
+                initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
 
         assertEquals(42, result.value());
     }
@@ -156,7 +153,7 @@ public class InProcessTaskExecutorTest {
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                         new ScriptExecutableContainer(new TaskScript(new SimpleScript(
                                 "print(variables.get('var')); variables.put('var', 'task')", "groovy"))), initializer,
-                        null, "", "", "", "", "", "", ""),
+                        null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
                 taskOutput.outputStream, taskOutput.error);
 
         assertEquals("valuepretask", taskOutput.output());
@@ -181,7 +178,7 @@ public class InProcessTaskExecutorTest {
         new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(
                         new SimpleScript("print(variables.get('var'));print(variables.get('PA_TASK_ID'))",
                                 "groovy"))),
-                        initializer, previousTasksResults, "", "", "", "", "", "", ""), taskOutput.outputStream,
+                        initializer, previousTasksResults, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream,
                 taskOutput.error);
 
 
@@ -199,7 +196,7 @@ public class InProcessTaskExecutorTest {
 
         new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(
                 new TaskScript(new SimpleScript("print(results[0]);", "groovy"))), initializer,
-                previousTasksResults, "", "", "", "", "", "", ""), taskOutput.outputStream, taskOutput.error);
+                previousTasksResults, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("aresult", taskOutput.output());
     }
@@ -213,7 +210,7 @@ public class InProcessTaskExecutorTest {
 
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                 new ScriptExecutableContainer(new TaskScript(new SimpleScript("return 10/0", "groovy"))),
-                initializer, null, "", "", "", "", "", "", ""), taskOutput.outputStream, taskOutput.error);
+                initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
 
         assertEquals("", taskOutput.output());
         assertNotEquals("", taskOutput.error());
@@ -230,8 +227,8 @@ public class InProcessTaskExecutorTest {
 
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                         new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-                                "print('hello'); result='hello'", "groovy"))), initializer, null, "", "", "", "", "",
-                        "", ""), taskOutput.outputStream,
+                                "print('hello'); result='hello'", "groovy"))), initializer, null,
+                        new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream,
                 taskOutput.error);
 
         assertEquals("", taskOutput.output());
@@ -249,8 +246,8 @@ public class InProcessTaskExecutorTest {
 
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                         new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-                                "print('hello'); result='hello'", "groovy"))), initializer, null, "", "", "", "", "",
-                        "", ""), taskOutput.outputStream,
+                                "print('hello'); result='hello'", "groovy"))), initializer, null,
+                        new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream,
                 taskOutput.error);
 
         assertEquals("hello", taskOutput.output());
@@ -269,8 +266,8 @@ public class InProcessTaskExecutorTest {
 
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                         new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-                                "print('hello'); result='hello'", "groovy"))), initializer, null, "", "", "", "", "",
-                        "", ""), taskOutput.outputStream,
+                                "print('hello'); result='hello'", "groovy"))), initializer, null,
+                        new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream,
                 taskOutput.error);
 
         assertEquals(FlowActionType.REPLICATE, result.getAction().getType());
@@ -287,8 +284,8 @@ public class InProcessTaskExecutorTest {
 
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                         new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-                                "print('hello'); result='hello'", "groovy"))), initializer, null, "", "", "", "", "",
-                        "", ""), taskOutput.outputStream,
+                                "print('hello'); result='hello'", "groovy"))), initializer, null,
+                        new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream,
                 taskOutput.error);
 
         assertEquals("hello", taskOutput.output());
@@ -308,7 +305,7 @@ public class InProcessTaskExecutorTest {
 
         new InProcessTaskExecutor().execute(
                 new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("", "groovy"))),
-                        initializer, null, "", "", "", "", "", "", ""), taskOutput.outputStream,
+                        initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream,
                 taskOutput.error);
 
         assertEquals("Hello", taskOutput.output());
@@ -329,7 +326,7 @@ public class InProcessTaskExecutorTest {
         Decrypter decrypter = createCredentials("somebody_that_does_not_exists");
         TaskContext taskContext = new TaskContext(new ScriptExecutableContainer(new TaskScript(
                 new SimpleScript(printArgs, "groovy", new Serializable[] { "$credentials_PASSWORD",
-                        "${PA_JOB_ID}" }))), initializer, null, "", "", "", "", "", "", "", decrypter);
+                        "${PA_JOB_ID}"}))), initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", "", decrypter);
         new InProcessTaskExecutor().execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
         assertEquals(String.format("p4ssw0rd1000%np4ssw0rd1000%np4ssw0rd1000%n"),
@@ -345,7 +342,7 @@ public class InProcessTaskExecutorTest {
 
         new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(
                 new TaskScript(new SimpleScript("print(variables.get('PA_SCHEDULER_HOME'))", "groovy"))),
-                initializer, null, "", "", "", "", "", "", ""), taskOutput.outputStream, taskOutput.error);
+                initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
 
         assertEquals(ClasspathUtils.findSchedulerHome(), taskOutput.output());
     }
@@ -362,8 +359,8 @@ public class InProcessTaskExecutorTest {
                         new SimpleScript("print new File(variables.get('PA_NODESFILE')).text", "groovy")));
         printNodesFileTask.setNodes(mockedNodeSet());
 
-        TaskContext context = new TaskContext(printNodesFileTask, initializer, null, tmpFolder.newFolder()
-                .getAbsolutePath(), "", "", "", "", "", "thisHost");
+        TaskContext context = new TaskContext(printNodesFileTask, initializer, null, new NodeDataSpacesURIs(tmpFolder.newFolder()
+                .getAbsolutePath(), "", "", "", "", ""), "", "thisHost");
         TaskResultImpl taskResult = new InProcessTaskExecutor().execute(context, taskOutput.outputStream,
                 taskOutput.error);
 
@@ -383,7 +380,7 @@ public class InProcessTaskExecutorTest {
         printNodesFileTask.setNodes(mockedNodeSet());
 
         TaskContext context = new TaskContext(printNodesFileTask, initializer, null,
-                tmpFolder.newFolder().getAbsolutePath(), "", "", "", "", "", "thisHost");
+                new NodeDataSpacesURIs(tmpFolder.newFolder().getAbsolutePath(), "", "", "", "", ""), "", "thisHost");
         TaskResultImpl taskResult = new InProcessTaskExecutor().execute(context, taskOutput.outputStream,
                 taskOutput.error);
 

@@ -175,7 +175,6 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
 
     @Test
     public void test() throws Exception {
-
         testLogs();
     }
 
@@ -268,6 +267,9 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
             System.out.println("Task output:");
             System.out.println(taskResult.getOutput().getAllLogs(false));
         }
+
+        PAActiveObject.terminateActiveObject(communicationObject1, true);
+        PAActiveObject.terminateActiveObject(communicationObject2, true);
     }
 
     public class TestAppender extends AppenderSkeleton {

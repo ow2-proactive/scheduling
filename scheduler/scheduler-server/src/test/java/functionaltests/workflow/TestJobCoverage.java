@@ -37,12 +37,17 @@
 package functionaltests.workflow;
 
 import functionaltests.job.error.TestJobAborted;
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.utils.StackTraceUtil;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -86,7 +91,7 @@ import static org.junit.Assert.*;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestJobCoverage extends SchedulerFunctionalTestNoRestart {
+public class TestJobCoverage extends SchedulerFunctionalTestWithRestart {
 
     private static URL jobDescriptor = TestJobAborted.class
             .getResource("/functionaltests/descriptors/Job_Coverage.xml");
@@ -108,28 +113,6 @@ public class TestJobCoverage extends SchedulerFunctionalTestNoRestart {
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
         JobId id = schedulerHelper.submitJob(job);
-
-        //waiting for job termination
-        log("Waiting for job to finish...");
-        jinfo = schedulerHelper.waitForEventJobFinished(id);
-
-        //checking results
-        log("Checking results...");
-        JobResult result = schedulerHelper.getJobResult(id);
-        assertEquals(8, result.getAllResults().size());
-        assertEquals(2, result.getPreciousResults().size());
-        assertNotNull(result.getPreciousResults().get("task1"));
-        assertNotNull(result.getPreciousResults().get("task6"));
-
-        assertEquals("Working", result.getPreciousResults().get("task1").value());
-        assertTrue(StackTraceUtil.getStackTrace(result.getResult("task2").getException()).contains(
-                "WorkingAt3rd - Status : Number is 1"));
-        assertTrue(result.getResult("task3").value().toString()
-                .contains("WorkingAt3rd - Status : OK / File deleted :"));
-        assertTrue(result.getResult("task4").getException().getCause().getMessage().contains("Throwing"));
-        assertTrue(result.getResult("task5").getException().getCause().getMessage().contains("Throwing"));
-        assertNotNull(result.getResult("task7").getException());
-        assertNotNull(result.getResult("task8").getException());
 
         //checking all processes
         log("Checking all received events :");
@@ -269,6 +252,28 @@ public class TestJobCoverage extends SchedulerFunctionalTestNoRestart {
         tinfo = schedulerHelper.waitForEventTaskFinished(id, "task8");
         jstate.update(tinfo);
         assertEquals(TaskStatus.FAULTY, tinfo.getStatus());
+
+        //waiting for job termination
+        log("Waiting for job to finish...");
+        jinfo = schedulerHelper.waitForEventJobFinished(id);
+
+        //checking results
+        log("Checking results...");
+        JobResult result = schedulerHelper.getJobResult(id);
+        assertEquals(8, result.getAllResults().size());
+        assertEquals(2, result.getPreciousResults().size());
+        assertNotNull(result.getPreciousResults().get("task1"));
+        assertNotNull(result.getPreciousResults().get("task6"));
+
+        assertEquals("Working", result.getPreciousResults().get("task1").value());
+        assertTrue(StackTraceUtil.getStackTrace(result.getResult("task2").getException()).contains(
+                "WorkingAt3rd - Status : Number is 1"));
+        assertTrue(result.getResult("task3").value().toString()
+                .contains("WorkingAt3rd - Status : OK / File deleted :"));
+        assertTrue(result.getResult("task4").getException().getCause().getMessage().contains("Throwing"));
+        assertTrue(result.getResult("task5").getException().getCause().getMessage().contains("Throwing"));
+        assertNotNull(result.getResult("task7").getException());
+        assertNotNull(result.getResult("task8").getException());
 
         //checking end of the job...
         jstate.update(jinfo);

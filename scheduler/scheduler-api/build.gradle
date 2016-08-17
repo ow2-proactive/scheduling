@@ -17,7 +17,7 @@ dependencies {
 
 apply plugin: 'trang'
 task convertSchemas
-['3.0', '3.1', '3.2', '3.3', '3.4', 'dev'].each { schemaVersion ->
+['3.0', '3.1', '3.2', '3.3', '3.4', '3.5', 'dev'].each { schemaVersion ->
     task("convertSchemasXsd-$schemaVersion", type: org.hsudbrock.tranggradleplugin.TrangTask) {
         sourceDirectory = project.file("src/main/resources/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/${schemaVersion}")
         targetDirectory = sourceDirectory

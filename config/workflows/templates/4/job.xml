@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="urn:proactive:jobdescriptor:3.2"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.2/schedulerjob.xsd"
-    name="Distributed Computation" projectName="Big Data Workflows"
-    priority="normal"
-    cancelJobOnError="true">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.5"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+        name="Distributed Computation" projectName="Big Data Workflows"
+        priority="normal"
+        onTaskError="continueJobExecution">
   <description>
     <![CDATA[ Computing PI according to MonteCarlo method. This job will launch 6 MonteCarlo tasks, then 2 tasks will average 3 results each. So a last task will average the 2 last        result. Finally this last task will be the final result. ]]>
   </description>

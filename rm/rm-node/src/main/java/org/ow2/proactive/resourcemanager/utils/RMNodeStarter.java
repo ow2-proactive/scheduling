@@ -36,29 +36,19 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.Policy;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.security.auth.login.LoginException;
-
+import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.*;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarLoader;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -78,23 +68,22 @@ import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Tools;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarLoader;
+
+import javax.security.auth.login.LoginException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.Policy;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
@@ -410,7 +399,7 @@ public class RMNodeStarter {
             Node node = createLocalNode(createdNodeNames.get(nodeIndex));
             configureForDataSpace(node);
             nodes.add(node);
-            logger.debug("URL of node " + nodeIndex + " " + node.getNodeInformation().getURL());
+            logger.info("URL of node " + nodeIndex + " " + node.getNodeInformation().getURL());
         }
         return nodes;
     }
@@ -654,9 +643,7 @@ public class RMNodeStarter {
      */
     private void configureForDataSpace(final Node node) {
         try {
-            DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject
-                    .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-            boolean dataspaceConfigured = conf.configureNode();
+            boolean dataspaceConfigured = RMNodeStarter.configureNodeForDataSpace(node);
             if (!dataspaceConfigured) {
                 throw new NotConfiguredException(
                     "Failed to configure dataspaces, check the logs for more details");
@@ -692,6 +679,16 @@ public class RMNodeStarter {
 
             }
         }));
+    }
+
+    public static boolean configureNodeForDataSpace(Node node) throws ActiveObjectCreationException, NodeException {
+        DataSpaceNodeConfigurationAgent nodeConfigurationAgent = (DataSpaceNodeConfigurationAgent) PAActiveObject
+                .newActive(DataSpaceNodeConfigurationAgent.class.getName(), null, node);
+        boolean result = nodeConfigurationAgent.configureNode();
+
+        PAActiveObject.terminateActiveObject(nodeConfigurationAgent, false);
+
+        return result;
     }
 
     protected String fillParameters(final CommandLine cl, final Options options) {
