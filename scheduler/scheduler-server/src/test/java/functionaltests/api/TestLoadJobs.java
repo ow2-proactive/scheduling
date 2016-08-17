@@ -301,7 +301,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         TaskFlowJob job = createJob(fileLockPath);
         JobId jobid = scheduler.submit(job);
 
-        Job content = scheduler.getInitialJobContent(jobid);
+        Job content = scheduler.getJobContent(jobid);
 
         assertTrue(content.getName().equals(this.getClass().getSimpleName()));
         assertTrue(content instanceof TaskFlowJob);

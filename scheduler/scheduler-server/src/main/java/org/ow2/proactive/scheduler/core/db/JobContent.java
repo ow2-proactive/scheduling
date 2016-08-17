@@ -36,7 +36,7 @@ import org.ow2.proactive.scheduler.util.ByteCompressionUtils;
 @Table(name = "JOB_CONTENT", indexes = { @Index(name = "INITIAL_JOB_INDEX", columnList = "JOB_ID") })
 public class JobContent implements Serializable {
 
-	private static final Logger log = Logger.getLogger(JobContent.class);
+	private static final Logger LOGGER = Logger.getLogger(JobContent.class);
 
 	@Lob
 	@Column(name = "CONTENT", length = Integer.MAX_VALUE)
@@ -82,10 +82,9 @@ public class JobContent implements Serializable {
 	public TaskFlowJob getInitJobContent() {
 		try {
 			byte[] deCompressed = ByteCompressionUtils.decompress(jobContentAsByteArray);
-			TaskFlowJob job = SerializationUtils.deserialize(deCompressed);
-			return job;
+			return SerializationUtils.deserialize(deCompressed);
 		} catch (Exception e) {
-			log.error(e);
+			LOGGER.error(e);
 		}
 		return SerializationUtils.deserialize(jobContentAsByteArray);
 	}
@@ -95,7 +94,7 @@ public class JobContent implements Serializable {
 		try {
 			this.jobContentAsByteArray = ByteCompressionUtils.compress(jobByte);
 		} catch (Exception e) {
-			log.error(e);
+			LOGGER.error(e);
 			this.jobContentAsByteArray = jobByte;
 		}
 	}

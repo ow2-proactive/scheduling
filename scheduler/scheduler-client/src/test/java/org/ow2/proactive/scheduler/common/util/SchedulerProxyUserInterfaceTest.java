@@ -47,9 +47,9 @@ public class SchedulerProxyUserInterfaceTest {
     	
         JobId jobId = JobIdImpl.makeJobId("66");
 
-        when(uischedulerMock.getInitialJobContent(jobId)).thenReturn(mockedJob);
+        when(uischedulerMock.getJobContent(jobId)).thenReturn(mockedJob);
 
-        assertThat(schedulerProxyUserInterface.getInitialJobContent(jobId), is(mockedJob));
+        assertThat(schedulerProxyUserInterface.getJobContent(jobId), is(mockedJob));
     }
     
 }

@@ -3439,13 +3439,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 	@GET
 	@Path("jobs/{jobid}/workflow-content")
 	@Produces({ MediaType.APPLICATION_JSON })
-	public TaskFlowJob getInitialJobContent(@HeaderParam("sessionid") final String sessionId,
+	public TaskFlowJob getJobContent(@HeaderParam("sessionid") final String sessionId,
 			@PathParam("jobid") final String jobId)
 			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
 		try {
 			final Scheduler s = checkAccess(sessionId, "GET jobs/" + jobId + "/workflow-content");
 
-			return (TaskFlowJob) s.getInitialJobContent(JobIdImpl.makeJobId(jobId));
+			return (TaskFlowJob) s.getJobContent(JobIdImpl.makeJobId(jobId));
 
 		} catch (PermissionException e) {
 			throw new PermissionRestException(e);
@@ -3464,14 +3464,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 	@Path("jobs/{jobid}/workflow-xml-content")
 	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
 	@Override
-	public InputStream getInitialJobXmlContent(@HeaderParam("sessionid") final String sessionId,
+	public InputStream getJobXmlContent(@HeaderParam("sessionid") final String sessionId,
 			@PathParam("jobid") final String jobId)
 			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
 
 		try {
 			final Scheduler s = checkAccess(sessionId, "GET jobs/" + jobId + "/workflow-xml-content");
 
-			TaskFlowJob job = (TaskFlowJob) s.getInitialJobContent(JobIdImpl.makeJobId(jobId));
+			TaskFlowJob job = (TaskFlowJob) s.getJobContent(JobIdImpl.makeJobId(jobId));
 
 			Job2XMLTransformer transformer = new Job2XMLTransformer();
 

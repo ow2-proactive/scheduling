@@ -1062,11 +1062,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public TaskFlowJob getInitialJobContent(JobId jobId)
+    public TaskFlowJob getJobContent(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         TaskFlowJob result = null;
         try {
-            result = restApi().getInitialJobContent(sid, jobId.value());
+            result = restApi().getJobContent(sid, jobId.value());
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
         }

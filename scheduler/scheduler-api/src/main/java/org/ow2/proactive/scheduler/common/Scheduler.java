@@ -1389,7 +1389,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 	 * @throws UnknownJobException
 	 * @throws PermissionException
 	 */
-	Job getInitialJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
+	Job getJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
 	/**
 	 * retrieve a job content with the given job id, replace the general

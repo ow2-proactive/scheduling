@@ -1791,7 +1791,7 @@ public interface SchedulerRestInterface {
 	@GET
 	@Path("jobs/{jobid}/workflow-content")
 	@Produces({ MediaType.APPLICATION_JSON })
-	public TaskFlowJob getInitialJobContent(@HeaderParam("sessionid") String sessionId,
+	public TaskFlowJob getJobContent(@HeaderParam("sessionid") String sessionId,
 			@PathParam("jobid") final String jobId)
 			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 
@@ -1808,7 +1808,7 @@ public interface SchedulerRestInterface {
 	@GET
 	@Path("jobs/{jobid}/workflow-xml-content")
 	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-	public InputStream getInitialJobXmlContent(@HeaderParam("sessionid") String sessionId,
+	public InputStream getJobXmlContent(@HeaderParam("sessionid") String sessionId,
 			@PathParam("jobid") final String jobId)
 			throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 

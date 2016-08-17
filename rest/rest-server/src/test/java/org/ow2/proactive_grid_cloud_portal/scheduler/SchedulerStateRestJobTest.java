@@ -105,9 +105,9 @@ public class SchedulerStateRestJobTest extends RestTestServer {
         
         TaskFlowJob job = Mockito.mock(TaskFlowJob.class);
 
-        when(mockOfScheduler.getInitialJobContent(JobIdImpl.makeJobId(JobId))).thenReturn(job);
+        when(mockOfScheduler.getJobContent(JobIdImpl.makeJobId(JobId))).thenReturn(job);
 
-        TaskFlowJob returned = restInterface.getInitialJobContent(sessionId, JobId);
+        TaskFlowJob returned = restInterface.getJobContent(sessionId, JobId);
 
         assertThat(returned, is(job));
 

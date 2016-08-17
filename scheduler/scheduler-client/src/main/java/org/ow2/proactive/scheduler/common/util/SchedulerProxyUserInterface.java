@@ -645,8 +645,8 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
 	@Override
-	public Job getInitialJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
-		return uischeduler.getInitialJobContent(jobId);
+	public Job getJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+		return uischeduler.getJobContent(jobId);
 	}
 
 	@Override

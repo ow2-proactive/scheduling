@@ -536,8 +536,8 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
     }
 
 	@Override
-	public Job getInitialJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
-		return  ((ISchedulerClient) _getScheduler()).getInitialJobContent(jobId);
+	public Job getJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+		return  ((ISchedulerClient) _getScheduler()).getJobContent(jobId);
 	}
 
 	@Override
