@@ -1,10 +1,15 @@
 package functionaltests.api;
 
-import com.google.common.collect.ImmutableList;
-import functionaltests.monitor.MonitorEventReceiver;
-import functionaltests.monitor.SchedulerMonitorsHandler;
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
-import functionaltests.utils.TestUsers;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.log4j.Level;
 import org.junit.After;
 import org.junit.Before;
@@ -14,22 +19,28 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.FileLock;
 
-import java.io.Serializable;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.ImmutableList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import functionaltests.monitor.MonitorEventReceiver;
+import functionaltests.monitor.SchedulerMonitorsHandler;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -37,13 +48,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
-    private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_ASC =
-            ImmutableList.of(
-                    new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
+    private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_ASC = ImmutableList
+            .of(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
 
-    private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_DESC =
-            ImmutableList.of(
-                    new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
+    private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_DESC = ImmutableList
+            .of(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
 
     private MonitorEventReceiver eventReceiver;
 
@@ -53,7 +62,8 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
-        List<JobInfo> jobs = scheduler.getJobs(0, 1000, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
+        List<JobInfo> jobs = scheduler.getJobs(0, 1000, criteria(true, true, true, true), SORT_BY_ID_ASC)
+                .getList();
 
         for (JobInfo job : jobs) {
             scheduler.removeJob(job.getJobId());
@@ -87,7 +97,8 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         logger.info("File lock location is " + fileLockPath);
 
         JobInfo job;
-        List<JobInfo> jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
+        List<JobInfo> jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC)
+                .getList();
         checkJobs(jobs);
 
         JobId firstJob = scheduler.submit(createJob(fileLockPath));
@@ -153,8 +164,8 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         SchedulerMonitorsHandler monitorsHandler = new SchedulerMonitorsHandler();
 
         SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(new CredData(TestUsers.USER.username,
-                TestUsers.USER.password), auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(
+                new CredData(TestUsers.USER.username, TestUsers.USER.password), auth.getPublicKey());
         scheduler = auth.login(cred);
 
         eventReceiver = new MonitorEventReceiver(monitorsHandler);

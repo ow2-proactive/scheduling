@@ -34,40 +34,22 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
-import org.apache.http.client.HttpClient;
-import org.apache.log4j.Logger;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.authentication.ConnectionInfo;
-import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.http.HttpClientBuilder;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.usage.JobUsage;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
-import org.ow2.proactive.scheduler.rest.data.DataUtility;
-import org.ow2.proactive.scheduler.rest.data.JobInfoImpl;
-import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
-import org.ow2.proactive.scheduler.rest.data.TaskStateImpl;
-import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
-import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
-import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
-import org.ow2.proactive.scheduler.task.TaskIdImpl;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
 import java.io.Closeable;
 import java.io.FileInputStream;
@@ -86,10 +68,71 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.*;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.*;
+import org.apache.http.client.HttpClient;
+import org.apache.log4j.Logger;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.authentication.ConnectionInfo;
+import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.http.HttpClientBuilder;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.scheduler.rest.data.DataUtility;
+import org.ow2.proactive.scheduler.rest.data.JobInfoImpl;
+import org.ow2.proactive.scheduler.rest.data.TaskResultImpl;
+import org.ow2.proactive.scheduler.rest.data.TaskStateImpl;
+import org.ow2.proactive.scheduler.rest.readers.OctetStreamReader;
+import org.ow2.proactive.scheduler.rest.readers.TaskResultReader;
+import org.ow2.proactive.scheduler.rest.readers.WildCardTypeReader;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -105,7 +148,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private boolean initialized = false;
 
     private SchedulerEventReceiver schedulerEventReceiver;
-    
+
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerClient.class);
 
     private SchedulerClient() {
@@ -124,8 +167,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public void init(ConnectionInfo connectionInfo) throws Exception {
-        HttpClient client = new HttpClientBuilder().insecure(connectionInfo.isInsecure()).useSystemProperties().build();
-        SchedulerRestClient restApiClient = new SchedulerRestClient(connectionInfo.getUrl(), new ApacheHttpClient4Engine(client));
+        HttpClient client = new HttpClientBuilder().insecure(connectionInfo.isInsecure())
+                .useSystemProperties().build();
+        SchedulerRestClient restApiClient = new SchedulerRestClient(connectionInfo.getUrl(),
+            new ApacheHttpClient4Engine(client));
 
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         factory.register(new WildCardTypeReader());
@@ -327,9 +372,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             try {
                 TaskResult currentResult = getTaskResult(jobId, taskName);
                 results.add(currentResult);
-            }
-            catch(UnknownTaskException ex){
-                //never occurs because tasks are filtered by tag so they cannot be unknown.
+            } catch (UnknownTaskException ex) {
+                // never occurs because tasks are filtered by tag so they cannot
+                // be unknown.
                 logger.warn("Unknown task.", ex);
             }
         }
@@ -473,8 +518,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean restartAllInErrorTasks(
-            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean restartAllInErrorTasks(String jobId)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         boolean isAllInErrorTasksRestarted = false;
         try {
             isAllInErrorTasksRestarted = restApi().restartAllInErrorTasks(sid, jobId);
@@ -539,8 +584,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean restartInErrorTask(String jobId,
-            String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean restartInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         boolean result = false;
         try {
             result = restApi().restartInErrorTask(sid, jobId, taskName);
@@ -839,9 +884,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             SchedulerEvent... events) throws NotConnectedException, PermissionException {
         try {
             removeEventListener();
-            schedulerEventReceiver = (new SchedulerEventReceiver.Builder()).restServerUrl(connectionInfo.getUrl()).sessionId(sid)
-                    .schedulerEventListener(listener).myEventsOnly(myEventsOnly).selectedEvents(events)
-                    .build();
+            schedulerEventReceiver = (new SchedulerEventReceiver.Builder())
+                    .restServerUrl(connectionInfo.getUrl()).sessionId(sid).schedulerEventListener(listener)
+                    .myEventsOnly(myEventsOnly).selectedEvents(events).build();
             schedulerEventReceiver.start();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -930,10 +975,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
-                    throws NotConnectedException, PermissionException {
+            throws NotConnectedException, PermissionException {
         RestPage<TaskStateData> page = null;
         try {
-            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset, limit, null);
+            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset, limit,
+                    null);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         } catch (PermissionRestException e) {
@@ -951,15 +997,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks,
-                                         boolean running, boolean pending, boolean finished,
-                                         int offset, int limit, SortSpecifierContainer sortParams)
-                    throws NotConnectedException, PermissionException {
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
+            throws NotConnectedException, PermissionException {
         RestPage<TaskStateData> page = null;
         SortSpecifierContainer sortContainer = new SortSpecifierContainer(sortParams.toString());
         try {
-            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset,
-                    limit, sortContainer);
+            page = restApi().getTaskStates(sid, from, to, mytasks, running, pending, finished, offset, limit,
+                    sortContainer);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         } catch (PermissionRestException e) {
@@ -999,11 +1044,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setNumberOfRunningTasks(jobInfoData.getNumberOfRunningTasks());
         jobInfoImpl.setJobPriority(JobPriority.findPriority(jobInfoData.getPriority().toString()));
         jobInfoImpl.setJobStatus(JobStatus.findPriority(jobInfoData.getStatus().toString()));
-        if (jobInfoData.isToBeRemoved()) jobInfoImpl.setToBeRemoved();
+        if (jobInfoData.isToBeRemoved())
+            jobInfoImpl.setToBeRemoved();
         return jobInfoImpl;
     }
-    
-    
+
     @Override
     public boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException {
@@ -1015,4 +1060,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
         return isJobStartAtChanged;
     }
+
+    @Override
+    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
+            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
+            JobCreationException {
+        try {
+            JobIdData id = restApi().copyAndResubmitWithGeneralInfo(sid, jobId.value(), generalInfo);
+
+            return id == null ? null : DataUtility.jobId(id);
+        } catch (Exception e) {
+            throwNCEOrPEOrSCEOrJCE(e);
+        }
+        return null;
+    }
+
 }
