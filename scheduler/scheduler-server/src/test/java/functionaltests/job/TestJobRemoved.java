@@ -42,6 +42,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.net.URL;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -52,7 +53,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 /**
  * Checking that job removal works for pending/running/finished jobs
  */
-public class TestJobRemoved extends SchedulerFunctionalTestWithRestart {
+public class TestJobRemoved extends SchedulerFunctionalTestNoRestart {
 
     private static URL pendingJob = TestJobRemoved.class
             .getResource("/functionaltests/descriptors/Job_pending.xml");
@@ -65,7 +66,6 @@ public class TestJobRemoved extends SchedulerFunctionalTestWithRestart {
 
     @Test
     public void testJobRemoved() throws Throwable {
-
         SchedulerState state = schedulerHelper.getSchedulerInterface().getState();
         int jobsNumber = state.getFinishedJobs().size() + state.getPendingJobs().size() +
             state.getRunningJobs().size();

@@ -71,10 +71,13 @@ import functionaltests.utils.RestFuncTUtils;
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        init();
+    }
+
     @Before
     public void setUp() throws Exception {
-        init();
-
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
 
@@ -87,11 +90,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
             scheduler.killJob(jobId);
             scheduler.removeJob(jobId);
         }
-    }
-
-    @After
-    public void tearDown() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
 
     @Test
