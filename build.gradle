@@ -164,6 +164,7 @@ ext.schedulingFunctionalTestConfiguration = {
     systemProperties << ['proactive.test.timeout': 600000]
     systemProperties << ['java.awt.headless': 'true']
     systemProperties << ['java.library.path': project.nativeLibsDir]
+    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
     systemProperties << ['file.encoding': 'UTF-8']
 
     testLogging {
