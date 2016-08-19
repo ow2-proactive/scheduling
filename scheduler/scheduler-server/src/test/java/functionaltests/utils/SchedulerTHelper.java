@@ -39,6 +39,7 @@ package functionaltests.utils;
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 import org.junit.Assert;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -997,8 +998,9 @@ public class SchedulerTHelper {
 
     public void removeNodeSource(String nsName) throws Exception {
         try {
-            getResourceManager().removeNodeSource(nsName, true).getBooleanValue();
-        } catch (Throwable ignored) {
+            PAFuture.waitFor(getResourceManager().removeNodeSource(nsName, true));
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 
