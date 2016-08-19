@@ -34,6 +34,7 @@
  */
 package functionaltests.utils;
 
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
@@ -186,7 +187,7 @@ public class TestScheduler {
             while (rm.getState().getTotalAliveNodesNumber() < SchedulerStartForFunctionalTest.RM_NODE_NUMBER) {
                 Thread.sleep(50);
             }
-            rm.disconnect();
+            PAFuture.waitFor(rm.disconnect());
             System.out.println("Nodes are deployed");
         }
     }

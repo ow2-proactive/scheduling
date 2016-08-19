@@ -74,6 +74,7 @@ public class RestFuncTUtils {
             stream.close();
         } catch (IOException ioe) {
             System.err.println("An error occurred while closing the stream.");
+            ioe.printStackTrace();
         }
     }
 

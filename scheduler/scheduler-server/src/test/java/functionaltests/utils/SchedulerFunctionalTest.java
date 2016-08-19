@@ -41,6 +41,7 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.tests.ProActiveTest;
@@ -67,11 +68,9 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     protected List<TestNode> testNodes = new ArrayList<>();
 
-
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
         TimeUnit.MILLISECONDS);
-
 
     protected Job parseXml(String workflowFile) throws JobCreationException {
         return Jobs.parseXml(getClass().getResource(workflowFile).getPath());
@@ -106,9 +105,12 @@ public class SchedulerFunctionalTest extends ProActiveTest {
             SchedulerTHelper.log("Do not kill the scheduler after test, but clean extra nodes.");
             schedulerHelper.removeExtraNodeSource();
 
-            int numberOfNodesAfterTest = schedulerHelper.getResourceManager().listAliveNodeUrls().size();
-            if (schedulerHelper.getResourceManager().listAliveNodeUrls().size() != RMTHelper.DEFAULT_NODES_NUMBER) {
-                SchedulerTHelper.log("Unexpected number of nodes after test : " + numberOfNodesAfterTest + ", scheduler will be restarted and test declared failing.");
+            ResourceManager resourceManager = schedulerHelper.getResourceManager();
+            int numberOfNodesAfterTest = resourceManager.listAliveNodeUrls().size();
+
+            if (resourceManager.listAliveNodeUrls().size() != RMTHelper.DEFAULT_NODES_NUMBER) {
+                SchedulerTHelper.log("Unexpected number of nodes after test: " + numberOfNodesAfterTest +
+                    ", scheduler will be restarted and test declared failing.");
                 schedulerHelper.killScheduler();
                 fail("Unexpected number of nodes after test : " + numberOfNodesAfterTest);
             }
