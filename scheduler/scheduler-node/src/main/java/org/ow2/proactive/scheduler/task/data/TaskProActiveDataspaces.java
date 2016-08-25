@@ -113,6 +113,13 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
 
     }
 
+    public TaskProActiveDataspaces(TaskId taskId, NamingService namingService) throws Exception{
+        this.taskId = taskId;
+        this.namingService = namingService;
+        this.linuxOS = OperatingSystem.getOperatingSystem() == OperatingSystem.unix;
+        initDataSpaces();
+    }
+
     public TaskProActiveDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) throws Exception {
         this.taskId = taskId;
         this.namingService = namingService;
