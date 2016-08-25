@@ -43,6 +43,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -209,7 +210,7 @@ public class RestFuncTHelper {
             public Boolean call() throws Exception {
                 try {
                     String resourceUrl = getResourceUrl("version");
-                    HttpResponse response = new DefaultHttpClient().execute(new HttpGet(resourceUrl));
+                    HttpResponse response = HttpClientBuilder.create().build().execute(new HttpGet(resourceUrl));
                     int statusCode = response.getStatusLine().getStatusCode();
                     if (statusCode == HttpStatus.SC_OK) {
                         return true;

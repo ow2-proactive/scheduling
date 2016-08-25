@@ -101,8 +101,6 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
 
     @Test
     public void testRestart() throws Exception {
-
-
         FileLock fileLock = new FileLock();
         testTaskKillNode(fileLock, false);
         testTaskKillNode(fileLock, true);
@@ -157,6 +155,8 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
         checkJobResult(schedulerHelper.getSchedulerInterface(), jobId);
 
         schedulerHelper.getResourceManager().removeNode(newNode.getNodeURL(), true);
+
+        newNode.kill();
     }
 
     private static int startedNodesCounter;

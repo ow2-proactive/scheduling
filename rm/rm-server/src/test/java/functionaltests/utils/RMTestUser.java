@@ -38,6 +38,7 @@ import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -116,7 +117,7 @@ public class RMTestUser {
         if (rmProxy != null) {
             RMTHelper.log("Kill RM Proxy");
             try {
-                rmProxy.disconnect().getBooleanValue();
+                PAFuture.waitFor(rmProxy.disconnect());
             } catch (Exception ignored) {
             }
             PAActiveObject.terminateActiveObject(rmProxy, true);

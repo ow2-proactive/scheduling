@@ -40,7 +40,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -48,7 +47,6 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.apache.log4j.Logger;
@@ -124,9 +122,7 @@ public class RMNodeConfigurator implements RunActive {
      * @throws ActiveObjectCreationException
      */
     protected void configureForDataSpace(Node node) throws ActiveObjectCreationException, NodeException {
-        DataSpaceNodeConfigurationAgent conf = (DataSpaceNodeConfigurationAgent) PAActiveObject.newActive(
-                DataSpaceNodeConfigurationAgent.class.getName(), null, node);
-        conf.configureNode();
+        RMNodeStarter.configureNodeForDataSpace(node);
     }
 
     /**
