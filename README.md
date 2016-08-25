@@ -1,6 +1,6 @@
 # ProActive Workflows & Scheduling
 
-[![Build Status](http://jenkins.activeeon.com/job/scheduling/badge/icon)](http://jenkins.activeeon.com/job/scheduling/)
+[![Build Status](http://jenkins.activeeon.com/buildStatus/icon?job=scheduling)](http://jenkins.activeeon.com/job/scheduling)
 
 You can download binaries and access a trial platform for free at:
 
