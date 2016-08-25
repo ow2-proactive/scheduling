@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.4"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.4 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.4/schedulerjob.xsd"
+        name="Email Notification"
+        projectName="Notifications"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+    <description>
+        <![CDATA[ A workflow that sends an email ]]>
+    </description>
+    <taskFlow>
+        <task name="EmailNotification">
+            <description>
+                <![CDATA[ A task to send an email notification ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+// Sending an email requires to configure an SMTP connection
+// Please look at the following link for the configuration:
+// http://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_email_notification
+// Please fill variables
+from = "noreply@activeeon.com"
+to = "user@domain.org"
+subject = "Scale Beyond Limits!"
+content = "Try out ProActive:\nhttps://try.activeeon.com"
+// Don't change code below
+import org.ow2.proactive.addons.email.EmailSender;
+EmailSender.Builder builder = new EmailSender.Builder(credentials);
+builder.setFrom(from)
+builder.addRecipient(to)
+builder.setSubject(subject)
+builder.setBody(content)
+builder.build().sendPlainTextEmail();
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
