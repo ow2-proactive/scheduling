@@ -1,5 +1,20 @@
 apply plugin: 'java-library-distribution'
 apply plugin: 'gradle-one-jar'
+
+
+buildscript {
+    repositories {
+        if (project.hasProperty('local')) {
+            mavenLocal()
+        }
+        jcenter()
+        maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
+        maven { url 'http://dl.bintray.com/content/abashev/vfs-s3'}
+    }
+}
+
+
+
 dependencies {
     compile(
             "org.objectweb.proactive:programming-extension-processbuilder:${programmingVersion}",
