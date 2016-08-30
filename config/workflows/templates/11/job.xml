@@ -9,28 +9,26 @@
         onTaskError="continueJobExecution"
         maxNumberOfExecution="2"
 >
-  <description>
-    <![CDATA[ A workflow that sends an email ]]>
-  </description>
-  <taskFlow>
-    <task name="EmailNotification">
-      <description>
-        <![CDATA[ A task to send an email notification ]]>
-      </description>
-      <scriptExecutable>
-        <script>
-          <code language="groovy">
-            <![CDATA[
+    <description>
+        <![CDATA[ A workflow that sends an email ]]>
+    </description>
+    <taskFlow>
+        <task name="EmailNotification">
+            <description>
+                <![CDATA[ A task to send an email notification ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
 // Sending an email requires to configure an SMTP connection
 // Please look at the following link for the configuration:
 // http://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_email_notification
-
 // Please fill variables
 from = "noreply@activeeon.com"
 to = "user@domain.org"
 subject = "Scale Beyond Limits!"
 content = "Try out ProActive:\nhttps://try.activeeon.com"
-
 // Don't change code below
 import org.ow2.proactive.addons.email.EmailSender;
 EmailSender.Builder builder = new EmailSender.Builder(credentials);
@@ -39,11 +37,10 @@ builder.addRecipient(to)
 builder.setSubject(subject)
 builder.setBody(content)
 builder.build().sendPlainTextEmail();
-
 ]]>
-          </code>
-        </script>
-      </scriptExecutable>
-    </task>
-  </taskFlow>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
 </job>

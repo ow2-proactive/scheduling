@@ -309,7 +309,9 @@ public class DataSpaceServiceStarter implements Serializable {
         logger.debug("Space " + name + " for appid = " + appID + " with urls = " + finalurls + " registered");
 
     }
-
+    public void clearSpaceConfigurations() {
+        spacesConfigurations.clear();
+    }
     /**
      * Similar to createSpace, but in addition it will use a provided username to append it to the given urls
      * If the localpath is provided, it will also create sub folders to the dataspace root with this username

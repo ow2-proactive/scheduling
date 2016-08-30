@@ -25,8 +25,12 @@
 String method = "POST"
 String url = "http://localhost:8080/notification-service/notifications"
 String headers = '{"Content-Type" : "application/json" }'
+<<<<<<< HEAD
+String content = '{"date": "2016-08-17T08:30:22.862Z", "description": "Put your notification here"}'
+=======
 String content = '{"description": "Put your notification here"}'
 
+>>>>>>> proactive/master
 // Don't change code below
 import org.ow2.proactive.addons.webhook.Webhook;
 Webhook.execute ( method, url, headers, content);
