@@ -45,13 +45,13 @@ public class NodeDataspace implements EndActive, Serializable {
 
         NamingService namingServiceStub = NamingService.createNamingServiceStub(namingServiceUrl);
 
-        taskProActiveDataspaces = new TaskProActiveDataspaces(taskId, namingServiceStub);
+        taskProActiveDataspaces = new TaskProActiveDataspaces(taskId, namingServiceStub, false);
 
         System.out.println("Node scratch folder is " + getScratchFolder());
     }
 
     @ImmediateService
-    public void copyInputDataToScratch(List<InputSelector> inputSelectors) throws FileSystemException {
+    public void copyInputDataToScratch(List<InputSelector> inputSelectors) throws FileSystemException, InterruptedException {
         taskProActiveDataspaces.copyInputDataToScratch(inputSelectors);
     }
 
