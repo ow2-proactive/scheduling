@@ -1,5 +1,18 @@
 package org.ow2.proactive.scheduler.smartproxy;
 
+import java.io.Serializable;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
@@ -16,8 +29,21 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -34,20 +60,10 @@ import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
 
-import javax.security.auth.login.LoginException;
-import java.io.Serializable;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
- * Smart proxy implementation that relies on active objects for communicating with dataspaces
- * and pushing notifications to clients.
+ * Smart proxy implementation that relies on active objects for communicating
+ * with dataspaces and pushing notifications to clients.
  * <p>
  * This implementation assumes that:
  * <p>
@@ -59,19 +75,17 @@ import java.util.concurrent.Future;
  * <li>the output data is to be copied to the local file system (or on location
  * accessible on NFS)</li>
  * <li>the local file system is not visible from the computation nodes side</li>
- * <li>There is a location (let's call it SHARED_INPUT_LOCATION), for transferring
- * input data, accessible from both sides, client side and computation node
- * side. Same for output data (let's call it SHARED_OUTPUT_LOCATION). These
- * locations could be the same. It might be a shared folder or a data server.
- * Let´s call push_url the url used by the client application in order to push
- * the input data to SHARED_INPUT_LOCATION.
+ * <li>There is a location (let's call it SHARED_INPUT_LOCATION), for
+ * transferring input data, accessible from both sides, client side and
+ * computation node side. Same for output data (let's call it
+ * SHARED_OUTPUT_LOCATION). These locations could be the same. It might be a
+ * shared folder or a data server. Let´s call push_url the url used by the
+ * client application in order to push the input data to SHARED_INPUT_LOCATION.
  * Let´s call pull_url the url used by the client application in order to pull
- * the output data from SHARED_OUTPUT_LOCATION.
- * The job needs to specify, as input space, an url pointing to
- * SHARED_INPUT_LOCATION. The job needs to specify, as output space, an url
- * pointing to SHARED_OUTPUT_LOCATION. These urls might or not be the same as
- * push_url and pull_url.
- * </li>
+ * the output data from SHARED_OUTPUT_LOCATION. The job needs to specify, as
+ * input space, an url pointing to SHARED_INPUT_LOCATION. The job needs to
+ * specify, as output space, an url pointing to SHARED_OUTPUT_LOCATION. These
+ * urls might or not be the same as push_url and pull_url.</li>
  * </ul>
  * The client application will use this Proxy for communicating with the
  * Scheduler. This Proxy is an ActiveObject.
@@ -83,8 +97,9 @@ import java.util.concurrent.Future;
  * The client could add a Listener to this object in order to receive
  * notifications from the Scheduler. The listener is of type
  * {@link SchedulerEventListenerExtended} which, in addition to the
- * notifications declared by its super type {@link org.ow2.proactive.scheduler.common.SchedulerEventListener}, can
- * be notified with events related to data transfer.
+ * notifications declared by its super type
+ * {@link org.ow2.proactive.scheduler.common.SchedulerEventListener}, can be
+ * notified with events related to data transfer.
  * <p>
  * Remember this is an active object. The listener object needs to be an active
  * or remote object (in order to avoid passing the listener through deep copy).
@@ -104,8 +119,8 @@ import java.util.concurrent.Future;
  * <p>
  * <ul>
  * <li>A temporary folder, for this execution, is created on the
- * SHARED_INPUT_LOCATION and the
- * SHARED_OUTPUT_LOCATION (if SHARED_INPUT_LOCATION!=SHARED_OUTPUT_LOCATION).</li>
+ * SHARED_INPUT_LOCATION and the SHARED_OUTPUT_LOCATION (if
+ * SHARED_INPUT_LOCATION!=SHARED_OUTPUT_LOCATION).</li>
  * <li>The job INPUT_SPACE and OUTPUT_SPACE urls are updated with the new
  * created temporary folders.</li>
  * <li>The input data is pushed, via the push_url, from the local file system,
@@ -125,7 +140,8 @@ import java.util.concurrent.Future;
  * @author The ProActive Team
  */
 @ActiveObject
-public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implements InitActive, EndActive, Serializable {
+public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl>
+        implements InitActive, EndActive, Serializable {
 
     private static final Logger log = Logger.getLogger(SmartProxyImpl.class);
 
@@ -160,17 +176,17 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     /**
-     * Returns a stub to the only active instance of the proxy (proactive singleton pattern)
+     * Returns a stub to the only active instance of the proxy (proactive
+     * singleton pattern)
      *
      * @return instance of the proxy
      * @throws org.objectweb.proactive.ActiveObjectCreationException
      * @throws org.objectweb.proactive.core.node.NodeException
      */
-    public static synchronized SmartProxyImpl getActiveInstance() throws ActiveObjectCreationException,
-            NodeException {
-        if (!((activeInstance != null)
-                && activeInstance.bodyOnThis != null
-                && activeInstance.bodyOnThis.isActive())) {
+    public static synchronized SmartProxyImpl getActiveInstance()
+            throws ActiveObjectCreationException, NodeException {
+        if (!((activeInstance != null) && activeInstance.bodyOnThis != null &&
+            activeInstance.bodyOnThis.isActive())) {
             instance = getInstance();
             activeInstance = PAActiveObject.turnActive(instance);
         }
@@ -196,13 +212,15 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         this.connectionInfo = connectionInfo;
         if (connectionInfo.getCredentialFile() != null) {
             try {
-                Credentials credentials = Credentials.getCredentials(connectionInfo.getCredentialFile().getAbsolutePath());
+                Credentials credentials = Credentials
+                        .getCredentials(connectionInfo.getCredentialFile().getAbsolutePath());
                 init(connectionInfo.getUrl(), credentials);
             } catch (KeyException e) {
                 throw new LoginException(e.getMessage());
             }
         } else {
-            CredData cred = new CredData(CredData.parseLogin(connectionInfo.getLogin()), CredData.parseDomain(connectionInfo.getLogin()), connectionInfo.getPassword());
+            CredData cred = new CredData(CredData.parseLogin(connectionInfo.getLogin()),
+                CredData.parseDomain(connectionInfo.getLogin()), connectionInfo.getPassword());
             init(connectionInfo.getUrl(), cred);
         }
     }
@@ -215,7 +233,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         this.init(url, null, credData);
     }
 
-    private void init(String url, Credentials credentials, CredData credData) throws SchedulerException, LoginException {
+    private void init(String url, Credentials credentials, CredData credData)
+            throws SchedulerException, LoginException {
         if (this.connectionInfo == null) {
             this.connectionInfo = new ConnectionInfo(url, null, null, null, false);
         }
@@ -294,7 +313,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
         if ((push_URL == null) || (push_URL.trim().equals(""))) {
             return false;
-        }// push inputData
+        } // push inputData
 
         // TODO - if the copy fails, try to remove the files from the remote
         // folder before throwing an exception
@@ -309,10 +328,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         for (Task t : tasks) {
             log.debug("Pushing files for task " + t.getName());
             List<InputSelector> inputFileSelectors = t.getInputFilesList();
-            //create the selector
+            // create the selector
             org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fileSelector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector();
             for (InputSelector is : inputFileSelectors) {
-                org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fs = is.getInputFiles();
+                org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fs = is
+                        .getInputFiles();
                 if (!fs.getIncludes().isEmpty()) {
                     fileSelector.addIncludes(fs.getIncludes());
                 }
@@ -320,10 +340,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
                 if (!fs.getExcludes().isEmpty()) {
                     fileSelector.addExcludes(fs.getExcludes());
                 }
-                //We should check if a pattern exist in both includes and excludes. But that would be a user mistake.
+                // We should check if a pattern exist in both includes and
+                // excludes. But that would be a user mistake.
             }
-            DataTransferProcessor dtp = new DataTransferProcessor(localfolder, remoteFolder, tfj.getName(), t
-                    .getName(), fileSelector);
+            DataTransferProcessor dtp = new DataTransferProcessor(localfolder, remoteFolder, tfj.getName(),
+                t.getName(), fileSelector);
             transferCallables.add(dtp);
         }
 
@@ -340,16 +361,15 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
             try {
                 if (!answer.get()) {
                     // this should not happen
-                    throw new RuntimeException("Files of task " + tname + " for job " + jname +
-                            " could not be transferred");
+                    throw new RuntimeException(
+                        "Files of task " + tname + " for job " + jname + " could not be transferred");
                 }
             } catch (InterruptedException e) {
-                log.error("Interrupted while transferring files of task " + tname + " for job " + jname,
-                        e);
+                log.error("Interrupted while transferring files of task " + tname + " for job " + jname, e);
                 throw new RuntimeException(e);
             } catch (ExecutionException e) {
-                log.error("Exception occured while transferring files of task " + tname + " for job " +
-                        jname, e);
+                log.error("Exception occured while transferring files of task " + tname + " for job " + jname,
+                        e);
                 throw new RuntimeException(e);
             }
         }
@@ -359,11 +379,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    protected void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name, String localFolder) throws Exception {
+    protected void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name,
+            String localFolder) throws Exception {
         AwaitedTask atask = awaitedjob.getAwaitedTask(t_name);
         if (atask == null) {
-            throw new IllegalArgumentException("The task " + t_name + " does not belong to job " + jobId +
-                    " or has already been removed");
+            throw new IllegalArgumentException(
+                "The task " + t_name + " does not belong to job " + jobId + " or has already been removed");
         }
         if (atask.isTransferring()) {
             log.warn("The task " + t_name + " of job " + jobId + " is already transferring its output");
@@ -391,8 +412,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         String sourceUrl = remotePullFolderFO.getURL().toString();
         String destUrl = localfolderFO.getURL().toString();
 
-        org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fileSelector =
-                new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector();
+        org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector fileSelector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector();
 
         List<OutputSelector> ouputFileSelectors = atask.getOutputSelectors();
         for (OutputSelector os : ouputFileSelectors) {
@@ -407,8 +427,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Looking at files in " + sourceUrl + " with "
-                    + fileSelector.getIncludes() + "-" + fileSelector.getExcludes());
+            log.debug("Looking at files in " + sourceUrl + " with " + fileSelector.getIncludes() + "-" +
+                fileSelector.getExcludes());
             boolean goon = true;
             int cpt = 0;
             FileObject[] fos = null;
@@ -430,13 +450,13 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
                     log.debug("Found " + fo.getName());
                 }
             } else {
-                log.warn("Couldn't find " + fileSelector.getIncludes()
-                        + "-" + fileSelector.getExcludes() + " in " + sourceUrl);
+                log.warn("Couldn't find " + fileSelector.getIncludes() + "-" + fileSelector.getExcludes() +
+                    " in " + sourceUrl);
             }
         }
         if (awaitedjob.isAutomaticTransfer()) {
             DataTransferProcessor dtp = new DataTransferProcessor(remotePullFolderFO, localfolderFO, jobId,
-                    t_name, fileSelector);
+                t_name, fileSelector);
             jobTracker.setTaskTransferring(jobId, t_name, true);
             threadPool.submit((Runnable) dtp);
         } else {
@@ -458,7 +478,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public JobId submit(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId submit(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException {
         if (schedulerProxy == null) {
             throw new NotConnectedException("Not connected to the scheduler.");
         }
@@ -467,13 +488,14 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobState getJobState(String jobId)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.getJobState(jobId);
     }
 
     @Override
-    public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
+    public TaskResult getTaskResult(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         if (schedulerProxy == null) {
             throw new NotConnectedException("Not connected to the scheduler.");
         }
@@ -481,8 +503,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         return schedulerProxy.getTaskResult(jobId, taskName);
     }
 
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException,
-            UnknownJobException, UnknownTaskException, PermissionException {
+    public TaskResult getTaskResult(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         if (schedulerProxy == null) {
             throw new NotConnectedException("Not connected to the scheduler.");
         }
@@ -501,14 +523,14 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public boolean restartInErrorTask(String jobId,
-            String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean restartInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return schedulerProxy.restartInErrorTask(jobId, taskName);
     }
 
     @Override
-    public boolean restartAllInErrorTasks(
-            String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean restartAllInErrorTasks(String jobId)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.restartAllInErrorTasks(jobId);
     }
 
@@ -523,7 +545,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public void addEventListener(SchedulerEventListenerExtended listener, boolean myEventsOnly, SchedulerEvent[] events) throws NotConnectedException, PermissionException {
+    public void addEventListener(SchedulerEventListenerExtended listener, boolean myEventsOnly,
+            SchedulerEvent[] events) throws NotConnectedException, PermissionException {
         eventListeners.add(listener);
     }
 
@@ -579,8 +602,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     /**
-     * This method forcefully terminates the activity of the proxy
-     * This method should not be called via a proactive stub
+     * This method forcefully terminates the activity of the proxy This method
+     * should not be called via a proactive stub
      */
     public void terminateFast() {
         // if the service thread is locked on a user-level Thread.sleep():
@@ -609,8 +632,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     /**
-     * Handles the transfer of data asynchronously.
-     * The run method is used when pulling data, the call method is used for pushing data.
+     * Handles the transfer of data asynchronously. The run method is used when
+     * pulling data, the call method is used for pushing data.
      */
     private class DataTransferProcessor implements Runnable, Callable<Boolean> {
 
@@ -623,13 +646,16 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         private String destUrl;
 
         /**
-         * @param source source folder
-         * @param dest   dest folder
-         * @param _jobId - only used for pull operations. For push operations, the
-         *               jobId is null
+         * @param source
+         *            source folder
+         * @param dest
+         *            dest folder
+         * @param _jobId
+         *            - only used for pull operations. For push operations, the
+         *            jobId is null
          */
         public DataTransferProcessor(FileObject source, FileObject dest, String _jobId, String tname,
-                                     FileSelector fileSelector) {
+                FileSelector fileSelector) {
             this.source = source;
             this.dest = dest;
             this.jobId = _jobId;
@@ -640,8 +666,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         protected void transfer() throws Exception {
             sourceUrl = source.getURL().toString();
             destUrl = dest.getURL().toString();
-            log.debug("Copying files of task " + taskName + " of job " + jobId + " from " + source +
-                    " to " + dest);
+            log.debug("Copying files of task " + taskName + " of job " + jobId + " from " + source + " to " +
+                dest);
             if (log.isDebugEnabled()) {
 
                 FileObject[] fos = source.findFiles(fileSelector);
@@ -651,8 +677,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
             }
             dest.copyFrom(source, fileSelector);
-            log.debug("Finished copying files of task " + taskName + " of job " + jobId + " from " +
-                    source + " to " + dest);
+            log.debug("Finished copying files of task " + taskName + " of job " + jobId + " from " + source +
+                " to " + dest);
         }
 
         @Override
@@ -660,15 +686,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
             try {
                 transfer();
             } catch (Exception e) {
-                log.error("An error occurred while copying files of task " + taskName + " of job " +
-                        jobId + " from " + source + " to " + dest, e);
+                log.error("An error occurred while copying files of task " + taskName + " of job " + jobId +
+                    " from " + source + " to " + dest, e);
 
-                log.warn("Task " +
-                        taskName +
-                        " of job " +
-                        jobId +
-                        " will be removed from the known task list. The system will not attempt again to retrieve data for this task. You could try to manually copy the data from the location  " +
-                        sourceUrl);
+                log.warn("Task " + taskName + " of job " + jobId +
+                    " will be removed from the known task list. The system will not attempt again to retrieve data for this task. You could try to manually copy the data from the location  " +
+                    sourceUrl);
 
                 Iterator<SchedulerEventListenerExtended> it = eventListeners.iterator();
                 while (it.hasNext()) {
@@ -703,7 +726,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
                 transfer();
             } catch (Exception e) {
                 log.error("An error occured while copying files of task " + taskName + " of job " + jobId +
-                        " from " + source + " to " + dest, e);
+                    " from " + source + " to " + dest, e);
                 throw e;
             }
 
@@ -712,20 +735,19 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String taskTag, long from, long to,
-            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit)
-                    throws NotConnectedException, PermissionException {
-        return schedulerProxy.getTaskIds(taskTag, from, to, mytasks, running, pending, finished,
-                offset, limit);
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+            throws NotConnectedException, PermissionException {
+        return schedulerProxy.getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset,
+                limit);
     }
 
     @Override
-    public Page<TaskState> getTaskStates(String taskTag, long from, long to,
-                                         boolean mytasks, boolean running, boolean pending, boolean finished,
-                                         int offset, int limit, SortSpecifierContainer sortParams)
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
             throws NotConnectedException, PermissionException {
-        return schedulerProxy.getTaskStates(taskTag, from, to, mytasks, running, pending, finished,
-                offset, limit, sortParams);
+        return schedulerProxy.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset,
+                limit, sortParams);
     }
 
     @Override
@@ -733,11 +755,18 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
             throws UnknownJobException, NotConnectedException, PermissionException {
         return schedulerProxy.getJobInfo(jobId);
     }
-    
+
     @Override
     public boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.changeStartAt(jobId, startAt);
+    }
+
+    @Override
+    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
+            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
+            JobCreationException {
+        return schedulerProxy.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
     }
 
 }

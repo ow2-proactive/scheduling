@@ -243,7 +243,7 @@ public class SchedulerFactory {
                     policyFullClassName });
 
             //ready
-            logger.debug("Scheduler is now ready to be started !");
+            logger.debug("Scheduler is now ready to be started!");
             ServerJobAndTaskLogs.configure();
         } catch (Exception e) {
             logger.error(e);

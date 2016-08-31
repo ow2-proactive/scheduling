@@ -41,6 +41,8 @@ import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.TestUsers;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -111,4 +113,5 @@ public class TestGetUsers extends SchedulerFunctionalTestNoRestart {
         job.addTask(task);
         return job;
     }
+    
 }

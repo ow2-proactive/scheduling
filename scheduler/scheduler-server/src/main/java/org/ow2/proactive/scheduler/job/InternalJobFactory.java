@@ -150,6 +150,8 @@ public class InternalJobFactory {
         }
 
         InternalJob job = new InternalTaskFlowJob();
+        // keep an initial job content
+        job.setTaskFlowJob(userJob);
         Map<Task, InternalTask> tasksList = new LinkedHashMap<>();
         boolean hasPreciousResult = false;
 

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {
@@ -24,7 +25,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
     private TaskFileDataspaces dataSpaces;
 
     public TestTaskLauncherFactory() {
-        this(new File(System.getProperty("java.io.tmpdir")));
+        this(new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
     }
 
     public TestTaskLauncherFactory(Semaphore taskRunning) {

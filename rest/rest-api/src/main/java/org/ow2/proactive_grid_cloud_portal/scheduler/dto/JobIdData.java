@@ -40,8 +40,8 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 import java.io.Serializable;
 
 public class JobIdData implements Serializable {
-
-    private long id;
+	
+	private long id;
     private String readableName;
 
     public long getId() {

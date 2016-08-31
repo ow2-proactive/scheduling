@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.4"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.4 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.4/schedulerjob.xsd"
+        name="Web Notification" projectName="Notifications"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+    <description>
+        <![CDATA[ Workflow to send a message to a notification service ]]>
+    </description>
+    <taskFlow>
+        <task name="WebNotification"
+        >
+            <description>
+                <![CDATA[ Task to send a message to a notification service ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+// Please fill variables
+String method = "POST"
+String url = "http://localhost:8080/notification-service/notifications"
+String headers = '{"Content-Type" : "application/json" }'
+String content = '{"description": "Put your notification here"}'
+
+// Don't change code below
+import org.ow2.proactive.addons.webhook.Webhook;
+Webhook.execute ( method, url, headers, content);
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

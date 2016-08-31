@@ -71,7 +71,8 @@ public class SchedulerStateRestSecurityTest {
                     method.invoke(restInterface, params);
                     fail(method + " should throw a NotConnectedException");
                 } catch (InvocationTargetException exception) {
-                    if (!exception.getCause().getClass().equals(NotConnectedRestException.class)) {
+                    if (!exception.getCause().getClass().equals(NotConnectedRestException.class) &&
+                        !exception.getCause().getCause().getClass().equals(NotConnectedRestException.class)) {
                         fail(method + " should throw a NotConnectedException");
                     }
                 }

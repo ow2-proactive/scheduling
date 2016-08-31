@@ -36,14 +36,16 @@
  */
 package functionaltests;
 
-import functionaltests.jobs.NonTerminatingJob;
-import functionaltests.jobs.SimpleJob;
-import functionaltests.utils.RestFuncTUtils;
+import java.security.Policy;
+
+import javax.ws.rs.core.MediaType;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -64,8 +66,9 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 
-import javax.ws.rs.core.MediaType;
-import java.security.Policy;
+import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.SimpleJob;
+import functionaltests.utils.RestFuncTUtils;
 
 
 public abstract class AbstractRestFuncTestCase {
@@ -143,7 +146,7 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected HttpResponse executeUriRequest(HttpUriRequest request) throws Exception {
-        return new DefaultHttpClient().execute(request);
+        return HttpClientBuilder.create().build().execute(request);
     }
 
     protected void assertEquals(int expected, int actual) {
@@ -283,7 +286,7 @@ public abstract class AbstractRestFuncTestCase {
         StringEntity entity = new StringEntity(buffer.toString());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
-        HttpResponse response = (new DefaultHttpClient()).execute(httpPost);
+        HttpResponse response = HttpClientBuilder.create().build().execute(httpPost);
         String responseContent = EntityUtils.toString(response.getEntity());
         if (STATUS_OK != getStatusCode(response)) {
             throw new RuntimeException(String.format("Authentication error: %n%s", responseContent));

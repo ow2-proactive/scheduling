@@ -36,6 +36,14 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.dataspace;
 
+import java.io.File;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.Selectors;
 import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
@@ -48,14 +56,6 @@ import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfig
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
-import java.io.File;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 
 /**
  * DataSpaceNodeConfigurationAgent is used to configure and close DataSpaces knowledge
@@ -65,7 +65,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DataSpaceNodeConfigurationAgent implements Serializable {
 
-    private static transient Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
+    private static final transient Logger logger = Logger.getLogger(DataSpaceNodeConfigurationAgent.class);
 
     /**
      * This property is used by scheduling when configuring node to define the location of the scratch dir and must be renamed carefully.
@@ -161,7 +161,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
         }
 
         startCacheSpace();
-        PAActiveObject.terminateActiveObject(false);
+
         return true;
     }
 
@@ -304,6 +304,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
                     FileObject[] files = rootFO.findFiles(Selectors.EXCLUDE_SELF);
                     for (FileObject file : files) {
                         if (currentTime - file.getContent().getLastModifiedTime() > invalidationPeriod) {
+                            logger.info("[Cache Space cleaner] deleting " + file);
                             file.delete();
                         }
                     }

@@ -43,17 +43,22 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
+import com.google.common.collect.Iterables;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,26 +72,29 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 import functionaltests.utils.RestFuncTUtils;
 
-public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        init();
-    }
+public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
     @Before
     public void setUp() throws Exception {
+        init();
+
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
-        List<JobState> jobStates = new ArrayList<>();
-        jobStates.addAll(state.getPendingJobs());
-        jobStates.addAll(state.getRunningJobs());
-        jobStates.addAll(state.getFinishedJobs());
-        for (JobState jobState : jobStates) {
+
+        Iterable<JobState> jobs = Iterables.concat(state.getPendingJobs(), state.getRunningJobs(),
+                state.getFinishedJobs());
+
+        for (JobState jobState : jobs) {
             JobId jobId = jobState.getId();
             scheduler.killJob(jobId);
             scheduler.removeJob(jobId);
         }
+    }
+
+    @After
+    public void tearDown() {
+        RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
 
     @Test
@@ -94,8 +102,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
         String url = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(url);
-        StringEntity entity = new StringEntity("username=" + config.getLogin() + "&password=" +
-            config.getPassword());
+        StringEntity entity = new StringEntity(
+            "username=" + config.getLogin() + "&password=" + config.getPassword());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
         HttpResponse response = executeUriRequest(httpPost);
@@ -110,10 +118,9 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
                 RestFuncTHelper.getSchedulerPublicKey());
         String schedulerUrl = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(schedulerUrl);
-        MultipartEntity multipartEntity = new MultipartEntity();
-        multipartEntity.addPart("credential", new ByteArrayBody(credentials.getBase64(),
-            MediaType.APPLICATION_OCTET_STREAM, null));
-        httpPost.setEntity(multipartEntity);
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("credential",
+                new ByteArrayBody(credentials.getBase64(), ContentType.APPLICATION_OCTET_STREAM, null));
+        httpPost.setEntity(multipartEntityBuilder.build());
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
         assertContentNotEmpty(response);
@@ -125,9 +132,9 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpPost httpPost = new HttpPost(schedulerUrl);
         setSessionHeader(httpPost);
         File jobFile = RestFuncTHelper.getDefaultJobXmlfile();
-        MultipartEntity multipartEntity = new MultipartEntity();
-        multipartEntity.addPart("", new FileBody(jobFile, MediaType.APPLICATION_XML));
-        httpPost.setEntity(multipartEntity);
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("",
+                new FileBody(jobFile, ContentType.APPLICATION_XML));
+        httpPost.setEntity(multipartEntityBuilder.build());
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
         JSONObject jsonObj = toJsonObject(response);
@@ -135,16 +142,17 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     }
 
     @Test
-    public void urlMatrixParams_shouldReplace_jobVariabls() throws Exception {
-        File jobFile = new File(RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml")
-                .toURI());
+    public void testUrlMatrixParamsShouldReplaceJobVariables() throws Exception {
+        File jobFile = new File(
+            RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml").toURI());
 
         String schedulerUrl = getResourceUrl("submit;var=matrix_param_val");
         HttpPost httpPost = new HttpPost(schedulerUrl);
         setSessionHeader(httpPost);
-        MultipartEntity multipartEntity = new MultipartEntity();
-        multipartEntity.addPart("", new FileBody(jobFile, MediaType.APPLICATION_XML));
-        httpPost.setEntity(multipartEntity);
+
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("",
+                new FileBody(jobFile, ContentType.APPLICATION_XML));
+        httpPost.setEntity(multipartEntityBuilder.build());
 
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);

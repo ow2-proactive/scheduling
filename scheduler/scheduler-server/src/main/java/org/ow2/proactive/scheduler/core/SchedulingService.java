@@ -870,7 +870,6 @@ public class SchedulingService {
 
     private void jobsRecovered(Collection<InternalJob> jobs) {
         DataSpaceServiceStarter dsStarter = infrastructure.getDataSpaceServiceStarter();
-        SchedulerSpacesSupport spacesSupport = infrastructure.getSpacesSupport();
 
         for (InternalJob job : jobs) {
             this.jobs.jobRecovered(job);

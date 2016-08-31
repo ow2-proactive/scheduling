@@ -20,6 +20,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.core.db.JobContent;
 import org.ow2.proactive.scheduler.core.db.JobData;
 import org.ow2.proactive.scheduler.core.db.TaskData;
 import org.ow2.proactive.scheduler.core.db.TaskResultData;
@@ -49,7 +50,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
 
         dbManager.updateAfterTaskFinished(job, null, null);
 
-        checkAllEntitiesDeleted(JobData.class.getName(), TaskData.class.getName(),
+        checkAllEntitiesDeleted(JobData.class.getName(), JobContent.class.getName(), TaskData.class.getName(),
                 TaskResultData.class.getName());
 
         // check can still load task results
@@ -105,7 +106,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
             List<InternalJob> jobsNotFinished = dbManager.loadNotFinishedJobs(true);
             Assert.assertEquals("All jobs should be finished", 0, jobsNotFinished.size());
 
-            checkAllEntitiesDeleted(JobData.class.getName(), TaskData.class.getName(),
+            checkAllEntitiesDeleted(JobData.class.getName(), JobContent.class.getName(), TaskData.class.getName(),
                     TaskResultData.class.getName());
 
             // check can still load task results

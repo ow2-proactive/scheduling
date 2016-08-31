@@ -1,8 +1,10 @@
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,10 +13,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Lob;
+import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NamedQueries;
 import org.hibernate.annotations.NamedQuery;
 import org.hibernate.annotations.OnDelete;
@@ -23,6 +30,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -34,6 +42,8 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
+
+import com.google.common.collect.Lists;
 
 
 @Entity
@@ -84,7 +94,7 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
         @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
         @Index(name = "JOB_DATA_START_TIME", columnList = "START_TIME"),
         @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"), })
-public class JobData {
+public class JobData implements Serializable {
 
     private Long id;
 
@@ -149,6 +159,8 @@ public class JobData {
     private String description;
 
     private String projectName;
+
+    private List<JobContent> jobContent = Lists.newArrayList();
 
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
@@ -234,12 +246,13 @@ public class JobData {
         jobRuntimeData.setNumberOfFaultyTasks(job.getNumberOfFaultyTasks());
         jobRuntimeData.setNumberOfInErrorTasks(job.getNumberOfInErrorTasks());
         jobRuntimeData.setTotalNumberOfTasks(job.getTotalNumberOfTasks());
+        jobRuntimeData.addJobContent(job.getTaskFlowJob());
 
         return jobRuntimeData;
     }
 
     @Column(name = "GENERIC_INFO", length = Integer.MAX_VALUE)
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, String> getGenericInformation() {
         return genericInformation;
     }
@@ -249,7 +262,7 @@ public class JobData {
     }
 
     @Column(name = "VARIABLES", length = Integer.MAX_VALUE)
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object") )
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, String> getVariables() {
         return variables;
     }
@@ -517,6 +530,32 @@ public class JobData {
 
     public void setCredentials(Credentials credentials) {
         this.credentials = credentials;
+    }
+
+    // NOTE: the jobData and jobContent is basically a one to one association,
+    // but hibernate doesn't support lazy fetch mode in an one to one
+    // association. Consider about the application performance, the jobContent
+    // should not be loaded along with the jobData every time jobData needed, so
+    // the workaround is to make the association as one to many
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "jobData")
+    @Fetch(FetchMode.SELECT)
+    @BatchSize(size = 10)
+    @MapKey(name = "jobId")
+    @PrimaryKeyJoinColumn(name = "JOB_ID")
+    public List<JobContent> getJobContent() {
+        return jobContent;
+    }
+
+    public void setJobContent(List<JobContent> jobContent) {
+        this.jobContent = jobContent;
+    }
+
+    public void addJobContent(Job job) {
+        JobContent content = new JobContent();
+        content.setJobId(id);
+        content.setJobData(this);
+        content.setInitJobContent(job);
+        getJobContent().add(content);
     }
 
     JobUsage toJobUsage() {
