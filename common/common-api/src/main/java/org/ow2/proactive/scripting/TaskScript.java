@@ -66,11 +66,6 @@ public class TaskScript extends Script<Serializable> {
      */
     public static final String CREDENTIALS_VARIABLE = "credentials";
 
-    /**
-     * The variable containing a proxy to the scheduler server
-     */
-    public static final String SCHEDULER_CLIENT_VARIABLE = "scheduler";
-
     public TaskScript(Script script) throws InvalidScriptException {
         super(script);
     }

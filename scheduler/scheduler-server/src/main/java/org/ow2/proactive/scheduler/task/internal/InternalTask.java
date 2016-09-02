@@ -1032,7 +1032,7 @@ public abstract class InternalTask extends TaskState {
         TaskLauncherInitializer tli = new TaskLauncherInitializer();
         tli.setTaskId(getId());
         tli.setJobOwner(job.getJobInfo().getJobOwner());
-        tli.setSchedulerRestUrl(PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString());
+        tli.setSchedulerRestUrl(PASchedulerProperties.SCHEDULER_REST_URL.getValueAsStringOrNull());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
         tli.setControlFlowScript(getFlowScript());

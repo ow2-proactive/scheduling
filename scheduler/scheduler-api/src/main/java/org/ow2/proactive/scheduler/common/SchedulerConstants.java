@@ -97,6 +97,11 @@ public class SchedulerConstants {
     public static final String FORK_ENVIRONMENT_BINDING_NAME = "forkEnvironment";
 
     /**
+     * The variable containing a proxy to the scheduler server
+     */
+    public static final String SCHEDULER_CLIENT_BINDING_NAME = "schedulerapi";
+
+    /**
      * Marker in the task output to locate the remote connection hint
      *  
      * for the hint to be detected client side, the following String has 

@@ -160,14 +160,6 @@ public class InProcessTaskExecutor implements TaskExecutor {
             if (nodesFile != null && !nodesFile.isEmpty()) {
                 FileUtils.deleteQuietly(new File(nodesFile));
             }
-            if (client != null) {
-                if (client.isConnected()) {
-                    try {
-                        client.disconnect();
-                    } catch (Exception ignored) {
-                    }
-                }
-            }
         }
     }
 

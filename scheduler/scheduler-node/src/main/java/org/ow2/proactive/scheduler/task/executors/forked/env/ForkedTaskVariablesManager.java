@@ -35,6 +35,7 @@
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
 
+import com.google.common.base.Strings;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -79,7 +80,7 @@ public class ForkedTaskVariablesManager implements Serializable {
 
         scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
         if (client != null) {
-            scriptHandler.addBinding(TaskScript.SCHEDULER_CLIENT_VARIABLE, client);
+            scriptHandler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, client);
         }
 
         scriptHandler.addBinding(SchedulerConstants.DS_SCRATCH_BINDING_NAME, taskContext.getNodeDataSpaceURIs().getScratchURI());
@@ -108,7 +109,7 @@ public class ForkedTaskVariablesManager implements Serializable {
     }
 
     public SchedulerNodeClient createSchedulerNodeClient(TaskContext container) {
-        if (container.getDecrypter() != null) {
+        if (container.getDecrypter() != null && !Strings.isNullOrEmpty(container.getSchedulerRestUrl())) {
             return new SchedulerNodeClient(container.getDecrypter(), container.getSchedulerRestUrl());
         }
         return null;
