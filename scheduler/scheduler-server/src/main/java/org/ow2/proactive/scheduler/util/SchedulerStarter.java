@@ -159,7 +159,9 @@ public class SchedulerStarter {
             if (applicationUrls != null) {
                 for (String applicationUrl : applicationUrls) {
                     if (applicationUrl.endsWith("/rest")) {
-                        System.setProperty("rest.server.url", applicationUrl);
+                        if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+                            PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
+                        }
                     }
                 }
             }

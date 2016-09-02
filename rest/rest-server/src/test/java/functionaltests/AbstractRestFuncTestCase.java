@@ -304,7 +304,7 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     public static void init() throws Exception {
-        init(RestFuncTHelper.defaultNumberOfNodes);
+        init(RestFuncTHelper.DEFAULT_NUMBER_OF_NODES);
     }
 
     @AfterClass

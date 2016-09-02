@@ -89,7 +89,7 @@ public class RestFuncTHelper {
     final static URL schedHibernateConfig = RestFuncTHelper.class
             .getResource("config/schedHibernateConfig.xml");
 
-    public final static int defaultNumberOfNodes = 1;
+    public final static int DEFAULT_NUMBER_OF_NODES = 1;
 
     private static String restServerUrl;
     private static String restfulSchedulerUrl;

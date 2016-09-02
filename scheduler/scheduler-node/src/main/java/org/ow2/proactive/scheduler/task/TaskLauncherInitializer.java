@@ -77,7 +77,7 @@ public class TaskLauncherInitializer implements Serializable {
 
     private String jobOwner = "Unknown";
 
-    private String restUrl;
+    private String schedulerRestUrl;
 
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
@@ -302,12 +302,12 @@ public class TaskLauncherInitializer implements Serializable {
         this.jobOwner = jobOwner;
     }
 
-    public void setRestUrl(String restUrl) {
-        this.restUrl = restUrl;
+    public void setSchedulerRestUrl(String schedulerRestUrl) {
+        this.schedulerRestUrl = schedulerRestUrl;
     }
 
-    public String getRestUrl() {
-        return restUrl;
+    public String getSchedulerRestUrl() {
+        return schedulerRestUrl;
     }
 
     /**

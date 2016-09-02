@@ -93,7 +93,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testJobsPagination() throws Exception {
-        Assert.assertEquals("Test expects only one node", 1, RestFuncTHelper.defaultNumberOfNodes);
+        Assert.assertEquals("Test expects only one node", 1, RestFuncTHelper.DEFAULT_NUMBER_OF_NODES);
 
         JobId jobId1 = getScheduler().submit(createJob(NonTerminatingJob.class));
         waitJobState(jobId1, JobStatus.RUNNING, 30000);

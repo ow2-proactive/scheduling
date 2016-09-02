@@ -36,13 +36,12 @@
  */
 package org.ow2.proactive.scripting;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+import javax.script.Bindings;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
-
-import javax.script.Bindings;
-
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -68,7 +67,7 @@ public class TaskScript extends Script<Serializable> {
     public static final String CREDENTIALS_VARIABLE = "credentials";
 
     /**
-     * The variable containing a connexion to the scheduler server
+     * The variable containing a proxy to the scheduler server
      */
     public static final String SCHEDULER_CLIENT_VARIABLE = "scheduler";
 

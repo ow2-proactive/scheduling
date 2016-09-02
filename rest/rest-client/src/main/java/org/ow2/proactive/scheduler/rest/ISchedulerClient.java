@@ -55,7 +55,7 @@ import java.util.concurrent.TimeoutException;
  * Scheduler interface available in the rest-client framework. It extends the default scheduler interface with new methods
  * which can be used to transfer files or wait for jobs or tasks to finish.
  *
- * @author The ProActive Team
+ * @author ActiveEon Team
  */
 @PublicAPI
 public interface ISchedulerClient extends Scheduler {

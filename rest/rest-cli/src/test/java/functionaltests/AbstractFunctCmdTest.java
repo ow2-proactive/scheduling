@@ -70,10 +70,10 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase{
         scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
         System.out.println("Cleaning scheduler.");
-        List<JobState> aliveJobsStates = new ArrayList<>();
+        List<JobState> aliveJobsStates = new ArrayList<>(state.getPendingJobs().size() + state.getRunningJobs().size());
         aliveJobsStates.addAll(state.getPendingJobs());
         aliveJobsStates.addAll(state.getRunningJobs());
-        List<JobState> finishedJobsStates = new ArrayList<>();
+        List<JobState> finishedJobsStates = new ArrayList<>(state.getFinishedJobs().size());
         finishedJobsStates.addAll(state.getFinishedJobs());
         for (JobState jobState : aliveJobsStates) {
             JobId jobId = jobState.getId();
@@ -83,12 +83,12 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase{
             } catch (Exception ignored) {
 
             }
-            System.out.println("Removing job " + jobId);
+            System.out.println("Removing killed job " + jobId);
             scheduler.removeJob(jobId);
         }
         for (JobState jobState : finishedJobsStates) {
             JobId jobId = jobState.getId();
-            System.out.println("Removing job " + jobId);
+            System.out.println("Removing finished job " + jobId);
             scheduler.removeJob(jobId);
         }
     }

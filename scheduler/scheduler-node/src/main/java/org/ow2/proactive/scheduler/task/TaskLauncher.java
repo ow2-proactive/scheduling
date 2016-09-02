@@ -175,7 +175,7 @@ public class TaskLauncher implements InitActive {
             logger.info("Output space: " + context.getNodeDataSpaceURIs().getOutputURI());
             logger.info("User space: " + context.getNodeDataSpaceURIs().getUserURI());
             logger.info("Global space: " + context.getNodeDataSpaceURIs().getGlobalURI());
-            logger.info("Scheduler url: " + context.getRestUrl());
+            logger.info("Scheduler rest url: " + context.getSchedulerRestUrl());
 
             wallTimer.start();
 

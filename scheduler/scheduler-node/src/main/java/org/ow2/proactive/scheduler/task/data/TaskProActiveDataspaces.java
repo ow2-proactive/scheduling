@@ -174,7 +174,9 @@ public class TaskProActiveDataspaces implements TaskDataspaces {
             logger.info(spaceName + " space is disabled");
             return null;
         }
-        logger.debug("Resolving " + spaceName + ": " + space.getAllRealURIs());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Resolving " + spaceName + ": " + space.getAllRealURIs());
+        }
         // ensure that the remote folder exists (in case we didn't replace any pattern)
         try {
             space = space.ensureExistingOrSwitch(!input);

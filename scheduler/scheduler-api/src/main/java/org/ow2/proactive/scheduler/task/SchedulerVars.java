@@ -50,5 +50,5 @@ public enum SchedulerVars {
     PA_TASK_REPLICATION,
     PA_TASK_SUCCESS,
     PA_USER,
-    PA_REST_URL
+    PA_SCHEDULER_REST_URL
 }
