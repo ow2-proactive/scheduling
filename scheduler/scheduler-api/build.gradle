@@ -1,7 +1,5 @@
 dependencies {
-    compile("org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}") {
-        exclude module: 'vfs-s3'
-    }
+    compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"
 
     compile 'it.sauronsoftware.cron4j:cron4j:2.2.5'
     compile 'org.apache.commons:commons-collections4:4.0'
