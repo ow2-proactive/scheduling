@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,26 +96,43 @@ public class FileSystem {
         return fo;
     }
 
-    public static ListFile list(FileObject fo) throws FileSystemException {
+    public static ListFile list(FileObject fo, List<String> includes, List<String> excludes, boolean recursive) throws FileSystemException {
         fo.refresh();
         ListFile list = new ListFile();
         List<String> dirList = Lists.newArrayList();
         List<String> fileList = Lists.newArrayList();
-        for (FileObject child : fo.getChildren()) {
+        List<String> allList = Lists.newArrayList();
+        List<FileObject> foundFileObjects = new LinkedList<>();
+        if ((isNullOrEmpty(includes) && isNullOrEmpty(excludes))) {
+            if (recursive) {
+                fo.findFiles(Selectors.EXCLUDE_SELF, false, foundFileObjects);
+            } else {
+                fo.findFiles(Selectors.SELECT_CHILDREN, false, foundFileObjects);
+            }
+        } else {
+            FileSelector selector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes, excludes);
+            fo.findFiles(selector, false, foundFileObjects);
+        }
+
+        for (FileObject child : foundFileObjects) {
             FileType type = child.getType();
+            FileName childName = child.getName();
             switch (type) {
                 case FOLDER:
                     dirList.add(baseName(child));
+                    allList.add(fo.getName().getRelativeName(childName));
                     break;
                 case FILE:
                     fileList.add(baseName(child));
+                    allList.add(fo.getName().getRelativeName(childName));
                     break;
                 default:
-                    throw new RuntimeException("Unknow : " + type);
+                    throw new RuntimeException("Unknown : " + type);
             }
         }
         list.setDirectories(dirList);
         list.setFiles(fileList);
+        list.setAll(allList);
         return list;
     }
 

@@ -93,7 +93,7 @@ public interface IDataSpaceClient {
      *             if the user does not have permission to upload the file to
      *             the specified location in the server
      */
-    ListFile list(IRemoteSource source) throws NotConnectedException, PermissionException;
+    ListFile list(IRemoteSource source, boolean recursive) throws NotConnectedException, PermissionException;
 
     /**
      * Deletes the specified directory or the file from the <i>dataspace</i>.

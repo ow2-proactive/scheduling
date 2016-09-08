@@ -53,7 +53,12 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -105,7 +110,7 @@ public class RestDataspaceImpl {
         try {
             writeFile(is, resolveFile(session, dataspace, pathname), encoding);
         } catch (Throwable error) {
-            logger.error(String.format("Cannot save the requested file in %s.", dataspace), error);
+            logger.error(String.format("Cannot save the requested file to %s in %s.", pathname, dataspace), error);
             rethrow(error);
         }
         return Response.status(Response.Status.CREATED).build();
@@ -128,7 +133,13 @@ public class RestDataspaceImpl {
      * <b>Notes:</b>
      * <ul>
      * <li>If 'list' is specified as the 'comp' query parameter, an
-     * {@link ListFile} type object will be return in JSON format.</li>
+     * {@link ListFile} type object will be return in JSON format. It will contain a list of files and folder contained in the selected
+     * path.
+     * </li>
+     * <li>If 'recursive' is specified as the 'comp' query parameter, an
+     * {@link ListFile} type object will be return in JSON format. It will contain a list of files and folder contained in the selected
+     * path and all subfolders.
+     * </li>
      * <li>If the pathname represents a file its contents will be returned as:
      * <ul>
      * <li>an octet stream, if its a compressed file or the client doesn't
@@ -164,7 +175,7 @@ public class RestDataspaceImpl {
                 return notFoundRes();
             }
             if (!Strings.isNullOrEmpty(component)) {
-                return componentResponse(component, fo);
+                return componentResponse(component, fo, includes, excludes);
             }
             if (fo.getType() == FileType.FILE) {
                 if (VFSZipper.isZipFile(fo)) {
@@ -186,6 +197,7 @@ public class RestDataspaceImpl {
                 }
             }
         } catch (Throwable error) {
+            logger.error(String.format("Cannot retrieve %s in %s.", pathname, dataspace), error);
             throw rethrow(error);
         }
     }
@@ -232,10 +244,12 @@ public class RestDataspaceImpl {
             if (fo.getType() == FileType.FOLDER) {
                 return deleteDir(fo, includes, excludes);
             } else {
-                return (fo.delete()) ? noContentRes()
+                fo.close();
+                return fo.delete() ? noContentRes()
                         : serverErrorRes("Cannot delete the file: %s", pathname);
             }
         } catch (Throwable error) {
+            logger.error(String.format("Cannot delete %s in %s.", pathname, dataspace), error);
             throw rethrow(error);
         }
     }
@@ -302,18 +316,21 @@ public class RestDataspaceImpl {
             logger.error(String.format("Cannot create folder for %s in %s", pathname, dataspacePath), e);
             throw rethrow(e);
         } catch (Throwable e) {
-            logger.error(
-                    String.format(
-                            "Cannot retrieve metadata for %s in %s.",
-                            pathname, dataspacePath), e);
+            logger.error(String.format("Cannot create folder for %s in %s", pathname, dataspacePath), e);
             throw rethrow(e);
         }
     }
 
-    private Response componentResponse(String type, FileObject fo) throws FileSystemException {
-        return ("list".equals(type)) ? Response.ok(FileSystem.list(fo), MediaType.APPLICATION_JSON).build()
-                : Response.status(Response.Status.BAD_REQUEST).entity(
+    private Response componentResponse(String type, FileObject fo, List<String> includes, List<String> excludes) throws FileSystemException {
+        switch (type) {
+            case "list":
+                return Response.ok(FileSystem.list(fo, includes, excludes, false), MediaType.APPLICATION_JSON).build();
+            case "recursive":
+                return Response.ok(FileSystem.list(fo, includes, excludes, true), MediaType.APPLICATION_JSON).build();
+            default:
+                return Response.status(Response.Status.BAD_REQUEST).entity(
                         String.format("Unknown query parameter: comp=%s", type)).build();
+        }
     }
 
     private Response zipComponentResponse(final FileObject fo, final List<String> includes,

@@ -36,15 +36,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal.dataspace.dto;
 
-import java.util.List;
-
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import java.util.List;
 
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_EMPTY)
 public class ListFile {
     private List<String> directories;
     private List<String> files;
+    private List<String> all;
 
     public List<String> getDirectories() {
         return directories;
@@ -61,4 +62,14 @@ public class ListFile {
     public void setFiles(List<String> files) {
         this.files = files;
     }
+
+    public void setAll(List<String> all) {
+        this.all = all;
+    }
+
+    public List<String> getAll() {
+        return all;
+    }
+
+
 }
