@@ -34,10 +34,13 @@
  */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
+
+import com.google.common.base.Strings;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
+import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -68,7 +71,7 @@ public class ForkedTaskVariablesManager implements Serializable {
 
 
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext,
-            Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials) {
+            Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client) {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
         scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, taskContext.getInitializer().getGenericInformation());
@@ -76,6 +79,9 @@ public class ForkedTaskVariablesManager implements Serializable {
         scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, tasksResults(taskContext));
 
         scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
+        if (client != null) {
+            scriptHandler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, client);
+        }
 
         scriptHandler.addBinding(SchedulerConstants.DS_SCRATCH_BINDING_NAME, taskContext.getNodeDataSpaceURIs().getScratchURI());
         scriptHandler.addBinding(SchedulerConstants.DS_CACHE_BINDING_NAME, taskContext.getNodeDataSpaceURIs().getCacheURI());
@@ -100,6 +106,13 @@ public class ForkedTaskVariablesManager implements Serializable {
         } catch (Exception e) {
             throw new Exception("Could read encrypted third party credentials", e);
         }
+    }
+
+    public SchedulerNodeClient createSchedulerNodeClient(TaskContext container) {
+        if (container.getDecrypter() != null && !Strings.isNullOrEmpty(container.getSchedulerRestUrl())) {
+            return new SchedulerNodeClient(container.getDecrypter(), container.getSchedulerRestUrl());
+        }
+        return null;
     }
 
     public void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,

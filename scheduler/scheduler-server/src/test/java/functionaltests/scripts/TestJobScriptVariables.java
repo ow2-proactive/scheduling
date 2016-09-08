@@ -36,7 +36,9 @@
  */
 package functionaltests.scripts;
 
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -46,10 +48,19 @@ import java.net.URL;
 /**
  * This test checks that variable bindings are available and correctly set in various scripts (pre/post/fork/task)
  */
-public class TestJobScriptVariables extends SchedulerFunctionalTestNoRestart {
+public class TestJobScriptVariables extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+
+    static URL configFile = TestJobScriptVariables.class
+            .getResource("/functionaltests/scripts/schedulerPropertiesCustomSchedulerRestUrl.ini");
 
     private static URL jobDescriptor = TestJobScriptVariables.class
             .getResource("/functionaltests/descriptors/Job_script_variables.xml");
+
+    @BeforeClass
+    public static void before() throws Throwable {
+        File propertiesfile = new File(configFile.toURI());
+        schedulerHelper = new SchedulerTHelper(true, propertiesfile.getAbsolutePath());
+    }
 
     @Test
     public void testJobScriptVariables() throws Throwable {

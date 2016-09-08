@@ -36,15 +36,13 @@
  */
 package functionaltests;
 
-import java.security.Policy;
-
-import javax.ws.rs.core.MediaType;
-
+import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.SimpleJob;
+import functionaltests.utils.RestFuncTUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -66,9 +64,8 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 
-import functionaltests.jobs.NonTerminatingJob;
-import functionaltests.jobs.SimpleJob;
-import functionaltests.utils.RestFuncTUtils;
+import javax.ws.rs.core.MediaType;
+import java.security.Policy;
 
 
 public abstract class AbstractRestFuncTestCase {
@@ -295,15 +292,19 @@ public abstract class AbstractRestFuncTestCase {
         }
     }
 
-    public static void init() throws Exception {
+    public static void init(int nbNodes) throws Exception {
         try {
             System.out.println("Starting the Scheduler & REST server");
-            RestFuncTHelper.startRestfulSchedulerWebapp();
+            RestFuncTHelper.startRestfulSchedulerWebapp(nbNodes);
         } catch (Exception e) {
             e.printStackTrace();
             RestFuncTHelper.stopRestfulSchedulerWebapp();
             throw e;
         }
+    }
+
+    public static void init() throws Exception {
+        init(RestFuncTHelper.DEFAULT_NUMBER_OF_NODES);
     }
 
     @AfterClass

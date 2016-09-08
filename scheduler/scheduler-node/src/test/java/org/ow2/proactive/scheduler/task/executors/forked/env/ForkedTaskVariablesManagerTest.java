@@ -11,6 +11,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.isA;
 
 public class ForkedTaskVariablesManagerTest {
     private String jobNameValue = "TestJobName";
@@ -115,6 +117,26 @@ public class ForkedTaskVariablesManagerTest {
                 new HashMap<String, Serializable>(),
                 new HashMap<String, String>(), SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
                 forkEnvironment);
+
+    }
+
+    @Test
+    public void testAddBindingsToScriptHandlerContainsSchedulerNodeClientVariable() throws InvalidScriptException, NodeException, NoSuchFieldException, IllegalAccessException, KeyException, NoSuchAlgorithmException {
+        ScriptExecutableContainer scriptContainer = createScriptContainer();
+        TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
+        taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
+        taskLauncherInitializer.setSchedulerRestUrl("http://localhost:8080/rest");
+
+        Decrypter decrypter = createCredentials(testUser, testPass);
+
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null, decrypter);
+
+        // variable should belong to the expected class
+        validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(), taskContext,
+                new HashMap<String, Serializable>(),
+                new HashMap<String, String>(), SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME,
+                SchedulerNodeClient.class);
 
     }
 
@@ -286,6 +308,27 @@ public class ForkedTaskVariablesManagerTest {
             TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials,
             String key,
             T entry) throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
+        Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler, taskContext, variables, credentials);
+
+
+        // Check if element exists
+        assertThat((T) scriptHandlerBindings.get(key),
+                is(entry));
+    }
+
+
+    private <T> void validateThatScriptHandlerBindingsInstanceOf(ScriptHandler scriptHandler,
+                                                                 TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials,
+                                                                 String key,
+                                                                 Class clazz) throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
+        Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler, taskContext, variables, credentials);
+
+        // Check if element exists
+        assertThat((T) scriptHandlerBindings.get(key),
+                isA(clazz));
+    }
+
+    private Map<String, Object> initializeForkedTaskVariableManager(ScriptHandler scriptHandler, TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials) throws IllegalAccessException, NoSuchFieldException {
         // Create class
         ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
 
@@ -296,11 +339,8 @@ public class ForkedTaskVariablesManagerTest {
 
         // Execute method which adds bindings
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext,
-                variables, credentials);
-
-        // Check if element exists
-        assertThat((T) scriptHandlerBindings.get(key),
-                is(entry));
+                variables, credentials, forkedTaskVariablesManager.createSchedulerNodeClient(taskContext));
+        return scriptHandlerBindings;
     }
 
     private TaskContext createTaskContext(

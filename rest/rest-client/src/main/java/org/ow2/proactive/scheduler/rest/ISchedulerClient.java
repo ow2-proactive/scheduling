@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -50,6 +51,13 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeoutException;
 
 
+/**
+ * Scheduler interface available in the rest-client framework. It extends the default scheduler interface with new methods
+ * which can be used to transfer files or wait for jobs or tasks to finish.
+ *
+ * @author ActiveEon Team
+ */
+@PublicAPI
 public interface ISchedulerClient extends Scheduler {
 
     /**

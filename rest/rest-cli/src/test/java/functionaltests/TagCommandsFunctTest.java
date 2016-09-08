@@ -24,14 +24,16 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
-        if(jobId == null) {
-            cleanScheduler();
+        synchronized (TagCommandsFunctTest.class) {
+            super.setUp();
+            if (jobId == null) {
+                cleanScheduler();
 
-            //submit a job with a loop and out and err outputs
-            System.out.println("submit a job with loop, out and err outputs");
-            jobId = submitJob("flow_loop_out.xml", JobStatus.FINISHED);
-            System.out.println("Job " + jobId + " finished");
+                //submit a job with a loop and out and err outputs
+                System.out.println("submit a job with loop, out and err outputs");
+                jobId = submitJob("flow_loop_out.xml", JobStatus.FINISHED);
+                System.out.println("Job " + jobId + " finished");
+            }
         }
     }
 

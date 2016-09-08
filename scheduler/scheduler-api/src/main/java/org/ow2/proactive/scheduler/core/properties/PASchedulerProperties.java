@@ -267,6 +267,11 @@ public enum PASchedulerProperties {
     /** Scheduler home directory */
     SCHEDULER_HOME("pa.scheduler.home", PropertyType.STRING),
 
+    /**
+     * Scheduler rest url directory
+     */
+    SCHEDULER_REST_URL("pa.scheduler.rest.url", PropertyType.STRING),
+
     /* ***************************************************************** */
     /* ************************** RM PROPERTIES ************************ */
     /* ***************************************************************** */

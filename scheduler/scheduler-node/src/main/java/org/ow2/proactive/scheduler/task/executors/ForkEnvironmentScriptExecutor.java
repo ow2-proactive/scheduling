@@ -73,7 +73,7 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
                 .addBindingsToScriptHandler(scriptHandler,
                         context,
                         variables,
-                        thirdPartyCredentials);
+                        thirdPartyCredentials, null);
 
         forkedTaskVariablesManager.replaceScriptParameters(script,
                 thirdPartyCredentials,

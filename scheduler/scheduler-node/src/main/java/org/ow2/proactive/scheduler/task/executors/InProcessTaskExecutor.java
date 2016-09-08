@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
@@ -117,6 +118,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
     public TaskResultImpl execute(TaskContext taskContext, PrintStream output, PrintStream error) {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         String nodesFile = null;
+        SchedulerNodeClient client = null;
         try {
             nodesFile = writeNodesFile(taskContext);
             Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(
@@ -124,8 +126,10 @@ public class InProcessTaskExecutor implements TaskExecutor {
                     nodesFile);
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
                     taskContext);
+            client = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
+
             forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext, variables,
-                    thirdPartyCredentials);
+                    thirdPartyCredentials, client);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;

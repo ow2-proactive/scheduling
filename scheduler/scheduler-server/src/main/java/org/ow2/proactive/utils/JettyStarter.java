@@ -34,35 +34,30 @@
  */
 package org.ow2.proactive.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.BindException;
-import java.util.Properties;
-
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.util.ProActiveInet;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.web.WebProperties;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.web.WebProperties;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.BindException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 
 public class JettyStarter {
@@ -88,7 +83,7 @@ public class JettyStarter {
         new JettyStarter().deployWebApplications("", "");
     }
 
-    public void deployWebApplications(String rmUrl, String schedulerUrl) {
+    public List<String> deployWebApplications(String rmUrl, String schedulerUrl) {
         Properties properties = readRestProperties();
 
         setSystemPropertyIfNotDefined("rm.url", rmUrl);
@@ -137,8 +132,10 @@ public class JettyStarter {
             addWarsToHandlerList(handlerList, defaultVirtualHost);
             server.setHandler(handlerList);
 
-            startServer(server, ProActiveInet.getInstance().getHostname(), restPort, httpProtocol);
+            String schedulerHost = ProActiveInet.getInstance().getHostname();
+            return startServer(server, schedulerHost, restPort, httpProtocol);
         }
+        return new ArrayList<>();
     }
 
     protected int getJettyHttpPort(Properties properties) {
@@ -248,14 +245,14 @@ public class JettyStarter {
         return httpConnector;
     }
 
-    private void startServer(Server server, String schedulerHost, int restPort, String httpProtocol) {
+    private List<String> startServer(Server server, String schedulerHost, int restPort, String httpProtocol) {
         try {
             if (server.getHandler() == null) {
                 logger.info("SCHEDULER_HOME/dist/war folder is empty, nothing is deployed");
             } else {
                 server.start();
                 if (server.isStarted()) {
-                    printDeployedApplications(server, schedulerHost, restPort, httpProtocol);
+                    return printDeployedApplications(server, schedulerHost, restPort, httpProtocol);
                 } else {
                     logger.error("Failed to start web applications");
                     System.exit(1);
@@ -269,11 +266,18 @@ public class JettyStarter {
             logger.error("Failed to start web applications", e);
             System.exit(3);
         }
+        return new ArrayList<>();
     }
 
-    private void printDeployedApplications(Server server, String schedulerHost, int restPort,
+    private String getApplicationUrl(String httpProtocol, String schedulerHost, int restPort, WebAppContext webAppContext) {
+        return httpProtocol + "://" + schedulerHost + ":" + restPort +
+                webAppContext.getContextPath();
+    }
+
+    private List<String> printDeployedApplications(Server server, String schedulerHost, int restPort,
             String httpProtocol) {
         HandlerList handlerList = (HandlerList) server.getHandler();
+        ArrayList<String> applicationsUrls = new ArrayList<>();
         if (handlerList.getHandlers() != null) {
             for (Handler handler : handlerList.getHandlers()) {
                 if (!(handler instanceof WebAppContext)) {
@@ -284,9 +288,10 @@ public class JettyStarter {
                 Throwable startException = webAppContext.getUnavailableException();
                 if (startException == null) {
                     if (!"/".equals(webAppContext.getContextPath())) {
+                        String applicationUrl = getApplicationUrl(httpProtocol, schedulerHost, restPort, webAppContext);
+                        applicationsUrls.add(applicationUrl);
                         logger.info("The web application " + webAppContext.getContextPath() + " created on " +
-                                httpProtocol + "://" + schedulerHost + ":" + restPort +
-                                webAppContext.getContextPath());
+                                applicationUrl);
                     }
                 } else {
                     logger.warn("Failed to start context " + webAppContext.getContextPath(), startException);
@@ -295,6 +300,7 @@ public class JettyStarter {
             logger.info("*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort +
                     " ***");
         }
+        return applicationsUrls;
     }
 
     private void addWarsToHandlerList(HandlerList handlerList, String[] virtualHost) {

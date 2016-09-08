@@ -146,9 +146,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
         task.getExecutableContainer().setRunAsUser(isRunAsMeEnabled);
 
-        if (isRunAsMeEnabled || areThirdPartyCredentialsDefined()) {
-            createAndSetCredentials();
-        }
+        createAndSetCredentials();
     }
 
     private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException {

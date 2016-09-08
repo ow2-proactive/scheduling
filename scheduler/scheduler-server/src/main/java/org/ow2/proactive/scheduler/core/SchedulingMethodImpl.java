@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.core;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.http.annotation.Immutable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;

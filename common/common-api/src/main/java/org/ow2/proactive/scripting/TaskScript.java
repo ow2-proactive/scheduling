@@ -36,13 +36,12 @@
  */
 package org.ow2.proactive.scripting;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+import javax.script.Bindings;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
-
-import javax.script.Bindings;
-
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**

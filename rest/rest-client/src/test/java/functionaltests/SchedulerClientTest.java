@@ -36,14 +36,8 @@
  */
 package functionaltests;
 
-import static functionaltests.RestFuncTHelper.getRestServerUrl;
-
-import java.io.File;
-import java.net.URI;
-import java.util.Stack;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
+import com.google.common.io.Files;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -58,12 +52,24 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 
-import com.google.common.io.Files;
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.util.Stack;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static functionaltests.RestFuncTHelper.getRestServerUrl;
 
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
@@ -76,7 +82,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        init();
+        init(2);
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -113,6 +119,30 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         JobId jobId = submitJob(job, client);
         // should return immediately
         client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testSchedulerNodeClient() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = schedulerNodeClientJob();
+        JobId jobId = submitJob(job, client);
+        TaskResult tres = client.waitForTask(jobId.toString(), "SchedulerNodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tres.getOutput().getAllLogs(false));
+        Assert.assertNotNull(tres);
+        Assert.assertEquals("Hello SchedulerNodeClientTask I'm HelloTask", tres.value());
+    }
+
+    protected Job schedulerNodeClientJob() throws Exception {
+
+        URL scriptURL = SchedulerClientTest.class.getResource("/functionaltests/descriptors/scheduler_client_node.groovy");
+
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName("SchedulerNodeClientJob");
+        ScriptTask task = new ScriptTask();
+        task.setName("SchedulerNodeClientTask");
+        task.setScript(new TaskScript(new SimpleScript(IOUtils.toString(scriptURL.toURI()), "groovy")));
+        job.addTask(task);
+        return job;
     }
 
     @Test(timeout = MAX_WAIT_TIME, expected = TimeoutException.class)
@@ -170,6 +200,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
             submittedJob = listener.getSubmittedJob();
         }
         client.removeEventListener();
+
+        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));
     }
 
     @Test(timeout = MAX_WAIT_TIME)

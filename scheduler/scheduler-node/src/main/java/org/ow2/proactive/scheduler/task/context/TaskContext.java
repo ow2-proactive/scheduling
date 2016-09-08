@@ -132,6 +132,10 @@ public class TaskContext implements Serializable {
         return initializer.getTaskId();
     }
 
+    public String getSchedulerRestUrl() {
+        return initializer.getSchedulerRestUrl();
+    }
+
     public TaskLauncherInitializer getInitializer() {
         return initializer;
     }
