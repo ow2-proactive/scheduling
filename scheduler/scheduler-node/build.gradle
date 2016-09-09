@@ -9,7 +9,6 @@ buildscript {
         }
         jcenter()
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
-        maven { url 'http://dl.bintray.com/content/abashev/vfs-s3'}
     }
 }
 
