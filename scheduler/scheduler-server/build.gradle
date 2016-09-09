@@ -76,3 +76,12 @@ artifacts {
 
 functionalTest.dependsOn rootProject.dist, dist
 clean.dependsOn rootProject.cleanDist
+
+// This task is executed at configuration phase by Gradle
+// before executing any other task
+task copyPublicKey {
+    copy {
+        from("${project(':').projectDir}/config/authentication/keys/pub.key")
+        into("${sourceSets.test.resources.srcDirs[0]}/functionaltests/config/")
+    }
+}
