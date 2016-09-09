@@ -6,7 +6,6 @@ buildscript {
 
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
         maven { url "http://nexus.qmino.com/content/repositories/miredot" }
-        maven { url 'http://dl.bintray.com/content/abashev/vfs-s3'}
     }
 
     dependencies {

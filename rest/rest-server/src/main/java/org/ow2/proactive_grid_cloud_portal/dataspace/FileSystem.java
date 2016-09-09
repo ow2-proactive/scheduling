@@ -36,17 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closer;
-import org.apache.commons.vfs2.*;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
-
-import javax.ws.rs.core.HttpHeaders;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +43,25 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.HttpHeaders;
+
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSelectInfo;
+import org.apache.commons.vfs2.FileSelector;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closer;
 
 
 public class FileSystem {
@@ -81,7 +89,8 @@ public class FileSystem {
     }
 
     public FileObject resolveFile(String dirPath, String pathname) throws FileSystemException {
-        FileObject answer = fsm.resolveFile(dirPath + (dirPath.endsWith(File.separator) ? "" : File.separator) + pathname);
+        FileObject answer = fsm
+                .resolveFile(dirPath + (dirPath.endsWith(File.separator) ? "" : File.separator) + pathname);
         answer.refresh();
         return answer;
     }
@@ -151,10 +160,9 @@ public class FileSystem {
             throws FileSystemException {
         root.refresh();
         List<FileObject> files = Lists.newArrayList();
-        FileSelector selector =
-                (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) ?
-                        new AllFilesSelector() :
-                        new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes, excludes);
+        FileSelector selector = (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) ? new AllFilesSelector()
+                : new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes,
+                    excludes);
         root.findFiles(selector, true, files);
         return files;
     }
@@ -210,8 +218,8 @@ public class FileSystem {
     static class Builder {
         public static FileSystem create(SchedulerProxyUserInterface schedulerProxy)
                 throws FileSystemException, NotConnectedException, PermissionException {
-            return new FileSystem(schedulerProxy.getUserSpaceURIs().get(0), schedulerProxy
-                    .getGlobalSpaceURIs().get(0), VFS.getManager());
+            return new FileSystem(schedulerProxy.getUserSpaceURIs().get(0),
+                schedulerProxy.getGlobalSpaceURIs().get(0), VFSFactory.createDefaultFileSystemManager());
         }
     }
 
