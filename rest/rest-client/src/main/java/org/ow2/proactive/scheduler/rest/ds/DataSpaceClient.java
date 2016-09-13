@@ -407,7 +407,7 @@ public class DataSpaceClient implements IDataSpaceClient {
             List<String> answer = new LinkedList<>();
             try {
                 ListFile listFiles = DataSpaceClient.this.list(source, recursive);
-                for (String fileOrDirectory : listFiles.getAll()) {
+                for (String fileOrDirectory : listFiles.getFullListing()) {
                     answer.add(fileOrDirectory);
                 }
                 return answer;

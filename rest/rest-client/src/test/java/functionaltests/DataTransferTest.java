@@ -287,11 +287,11 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         ListFile listFile = client.list(source, false);
 
-        List<String> directories = listFile.getDirectories();
+        List<String> directories = listFile.getDirectoryListing();
         assertEquals(1, directories.size());
         assertEquals("tempDir", directories.get(0));
 
-        List<String> files = listFile.getFiles();
+        List<String> files = listFile.getFileListing();
         assertEquals(1, files.size());
         assertEquals("tempFile.txt", files.get(0));
 
@@ -317,11 +317,11 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         ListFile listFile = client.list(source, true);
 
-        List<String> directories = listFile.getDirectories();
+        List<String> directories = listFile.getDirectoryListing();
         assertEquals(1, directories.size());
         assertEquals("tempDir", directories.get(0));
 
-        List<String> files = listFile.getFiles();
+        List<String> files = listFile.getFileListing();
         assertEquals(2, files.size());
         assertEquals("tempFile.tmp", files.get(0));
         assertEquals("tempFile.txt", files.get(1));
@@ -344,10 +344,10 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         ListFile listFile = client.list(source, true);
 
-        List<String> directories = listFile.getDirectories();
+        List<String> directories = listFile.getDirectoryListing();
         assertEquals(0, directories.size());
 
-        List<String> files = listFile.getFiles();
+        List<String> files = listFile.getFileListing();
         assertEquals(1, files.size());
         assertEquals("tempFile.tmp", files.get(0));
 

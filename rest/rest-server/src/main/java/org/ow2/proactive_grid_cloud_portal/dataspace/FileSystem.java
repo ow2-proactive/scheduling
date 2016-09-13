@@ -101,7 +101,7 @@ public class FileSystem {
         ListFile list = new ListFile();
         List<String> dirList = Lists.newArrayList();
         List<String> fileList = Lists.newArrayList();
-        List<String> allList = Lists.newArrayList();
+        List<String> fullList = Lists.newArrayList();
         List<FileObject> foundFileObjects = new LinkedList<>();
         if ((isNullOrEmpty(includes) && isNullOrEmpty(excludes))) {
             if (recursive) {
@@ -120,19 +120,19 @@ public class FileSystem {
             switch (type) {
                 case FOLDER:
                     dirList.add(baseName(child));
-                    allList.add(fo.getName().getRelativeName(childName));
+                    fullList.add(fo.getName().getRelativeName(childName));
                     break;
                 case FILE:
                     fileList.add(baseName(child));
-                    allList.add(fo.getName().getRelativeName(childName));
+                    fullList.add(fo.getName().getRelativeName(childName));
                     break;
                 default:
                     throw new RuntimeException("Unknown : " + type);
             }
         }
-        list.setDirectories(dirList);
-        list.setFiles(fileList);
-        list.setAll(allList);
+        list.setDirectoryListing(dirList);
+        list.setFileListing(fileList);
+        list.setFullListing(fullList);
         return list;
     }
 
