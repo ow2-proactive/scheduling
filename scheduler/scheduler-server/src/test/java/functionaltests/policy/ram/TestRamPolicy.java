@@ -43,6 +43,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
@@ -50,7 +51,6 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.python.google.common.collect.Maps;
 
 import functionaltests.utils.SchedulerFunctionalTestRamPolicy;
 
@@ -63,7 +63,7 @@ public class TestRamPolicy extends SchedulerFunctionalTestRamPolicy {
     @Test
     public void testRamPolicy() throws Throwable {
 
-        Map<String, String> variables = Maps.newHashMap();
+        Map<String, String> variables = new HashMap<String, String>();
         variables.put("MERGE_RAM", getHalfLocalRam());
         JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath(), variables);
 
