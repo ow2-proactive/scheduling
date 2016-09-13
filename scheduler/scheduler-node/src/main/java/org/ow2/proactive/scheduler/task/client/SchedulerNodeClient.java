@@ -327,6 +327,12 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
+    public boolean finishInErrorTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        renewSession();
+        return client.finishInErrorTask(jobId, taskName);
+    }
+
+    @Override
     public boolean restartInErrorTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.restartInErrorTask(jobId, taskName);

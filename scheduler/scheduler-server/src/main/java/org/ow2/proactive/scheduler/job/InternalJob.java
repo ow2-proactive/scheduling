@@ -851,6 +851,14 @@ public abstract class InternalJob extends JobState {
         return updatedTasks;
     }
 
+    public void finishInErrorTask(InternalTask internalTask) {
+        if (internalTask.getStatus() == TaskStatus.IN_ERROR) {
+            setNumberOfInErrorTasks(getNumberOfInErrorTasks() - 1);
+            internalTask.setStatus(TaskStatus.FINISHED);
+            getJobDescriptor().unpause(internalTask.getId());
+        }
+    }
+
     public void restartInErrorTask(InternalTask internalTask) {
         if (internalTask.getStatus() == TaskStatus.IN_ERROR) {
             newWaitingTask();

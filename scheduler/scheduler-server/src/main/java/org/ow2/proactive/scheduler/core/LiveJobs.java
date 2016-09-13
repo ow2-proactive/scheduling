@@ -614,6 +614,17 @@ class LiveJobs {
         }
     }
 
+    void finishInErrorTask(JobId jobId, String taskName) throws UnknownTaskException {
+        JobData jobData = lockJob(jobId);
+        try {
+            jobData.job.finishInErrorTask(jobData.job.getTask(taskName));
+            dbManager.updateJobAndTasksState(jobData.job);
+            updateJobInSchedulerState(jobData.job, SchedulerEvent.TASK_IN_ERROR_TO_FINISHED);
+        } finally {
+            jobData.unlock();
+        }
+    }
+
     void restartInErrorTask(JobId jobId, String taskName) throws UnknownTaskException {
         JobData jobData = lockJob(jobId);
         try {

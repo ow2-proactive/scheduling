@@ -125,6 +125,57 @@ public class LiveJobsTest {
     }
 
     @Test
+    public void testFinishInErrorTask() throws UnknownTaskException {
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
+                "description");
+        JobId id = new JobIdImpl(666L, "test-name");
+        job.setId(id);
+        List<InternalTask> tasksList = new ArrayList<>();
+        InternalTask internalTask = new InternalScriptTask();
+        internalTask.setName("task-name");
+        internalTask.setStatus(TaskStatus.IN_ERROR);
+        tasksList.add(internalTask);
+        job.setTasks(tasksList);
+        liveJobs.jobSubmitted(job);
+        liveJobs.finishInErrorTask(job.getId(), "task-name");
+        assertThat(internalTask.getStatus(), is(TaskStatus.FINISHED));
+    }
+
+    @Test
+    public void testFinishInErrorTaskDoesNotFinishPausedTask() throws UnknownTaskException {
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
+                "description");
+        JobId id = new JobIdImpl(666L, "test-name");
+        job.setId(id);
+        List<InternalTask> tasksList = new ArrayList<>();
+        InternalTask internalTask = new InternalScriptTask();
+        internalTask.setName("task-name");
+        internalTask.setStatus(TaskStatus.PAUSED);
+        tasksList.add(internalTask);
+        job.setTasks(tasksList);
+        liveJobs.jobSubmitted(job);
+        liveJobs.finishInErrorTask(job.getId(), "task-name");
+        assertThat(internalTask.getStatus(), is(TaskStatus.PAUSED));
+    }
+
+    @Test
+    public void testFinishInErrorTaskDoesNotFinishPendingTask() throws UnknownTaskException {
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
+                "description");
+        JobId id = new JobIdImpl(666L, "test-name");
+        job.setId(id);
+        List<InternalTask> tasksList = new ArrayList<>();
+        InternalTask internalTask = new InternalScriptTask();
+        internalTask.setName("task-name");
+        internalTask.setStatus(TaskStatus.PENDING);
+        tasksList.add(internalTask);
+        job.setTasks(tasksList);
+        liveJobs.jobSubmitted(job);
+        liveJobs.finishInErrorTask(job.getId(), "task-name");
+        assertThat(internalTask.getStatus(), is(TaskStatus.PENDING));
+    }
+
+    @Test
     public void testPauseJob() {
         InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
             "description");

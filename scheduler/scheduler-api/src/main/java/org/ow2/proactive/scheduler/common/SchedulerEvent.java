@@ -72,6 +72,8 @@ public enum SchedulerEvent {
     TASK_PENDING_TO_RUNNING("Task pending to running"), /** A task has just finished. */
     TASK_RUNNING_TO_FINISHED(
             "Task running to finished"), /** A task has just had an error, it will wait for restart. */
+    TASK_IN_ERROR_TO_FINISHED(
+                    "Task In-Error to finished"), /** A task has just had an error, was marked as finished. */
     TASK_WAITING_FOR_RESTART("Task waiting for restart"), /** The priority of a job has just been change. */
     JOB_CHANGE_PRIORITY(
             "Job change piority"), /** The scheduler has just been paused. Every running job will be finished. */
