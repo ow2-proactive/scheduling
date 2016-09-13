@@ -112,7 +112,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
     /**
      * file system server controlling the cache
      */
-    private transient FileSystemServerDeployer cacheServer;
+    private static transient FileSystemServerDeployer cacheServer;
 
     /**
      * Configuration of the cache server (used by the TaskLauncher to register the dataspace to the naming service
