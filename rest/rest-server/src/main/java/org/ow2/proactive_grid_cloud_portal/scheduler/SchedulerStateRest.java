@@ -825,7 +825,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @Override
     @PUT
-    @Path("jobs/{jobid}/tasks/{taskname}/restartInErrorTask")
+    @Path("jobs/{jobid}/tasks/{taskname}/finishInErrorTask")
     @Produces("application/json")
     public boolean finishInErrorTask(@HeaderParam("sessionid") String sessionId,
                                       @PathParam("jobid") String jobid, @PathParam("taskname") String taskname)
