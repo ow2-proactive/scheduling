@@ -48,7 +48,7 @@ public class SchedulerFunctionalTestRamPolicy extends SchedulerFunctionalTestWit
     public static void startDedicatedScheduler() throws Exception {
         schedulerHelper.log("Start Scheduler in non-fork mode.");
         schedulerHelper = new SchedulerTHelper(false,
-            new File(SchedulerFunctionalTest.class
+            new File(SchedulerFunctionalTestRamPolicy.class
                     .getResource("/functionaltests/config/functionalTSchedulerProperties-rampolicy.ini")
                     .toURI()).getAbsolutePath());
     }
