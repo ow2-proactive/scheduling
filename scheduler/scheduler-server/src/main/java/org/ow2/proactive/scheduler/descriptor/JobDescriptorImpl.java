@@ -606,7 +606,6 @@ public class JobDescriptorImpl implements JobDescriptor {
             }
         }
     }
-
     public void unpause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
             EligibleTaskDescriptor eligibleTaskDescriptor = pausedTasks.remove(taskId);
@@ -616,6 +615,15 @@ public class JobDescriptorImpl implements JobDescriptor {
             }
         }
     }
+
+    public EligibleTaskDescriptor removePausedTask(TaskId taskId) {
+        if (getInternal().getType() == JobType.TASKSFLOW) {
+            return pausedTasks.remove(taskId);
+        }
+        return null;
+    }
+
+
 
     public void updateTaskScheduledTime(TaskId taskId, long scheduledTime) {
         if (getInternal().getType() == JobType.TASKSFLOW) {

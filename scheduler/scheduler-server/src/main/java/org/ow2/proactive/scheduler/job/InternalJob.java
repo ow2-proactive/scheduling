@@ -855,7 +855,7 @@ public abstract class InternalJob extends JobState {
         if (internalTask.getStatus() == TaskStatus.IN_ERROR) {
             setNumberOfInErrorTasks(getNumberOfInErrorTasks() - 1);
             internalTask.setStatus(TaskStatus.FINISHED);
-            getJobDescriptor().unpause(internalTask.getId());
+            getJobDescriptor().removePausedTask(internalTask.getId());
         }
     }
 

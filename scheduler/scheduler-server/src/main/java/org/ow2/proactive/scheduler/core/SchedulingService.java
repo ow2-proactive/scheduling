@@ -579,6 +579,7 @@ public class SchedulingService {
                 @Override
                 public Boolean call() throws Exception {
                     jobs.finishInErrorTask(jobId, taskName);
+                    wakeUpSchedulingThread();
                     return Boolean.TRUE;
                 }
             }).get();
