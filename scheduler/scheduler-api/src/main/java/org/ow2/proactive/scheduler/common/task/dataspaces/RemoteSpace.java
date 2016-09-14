@@ -55,18 +55,6 @@ import java.util.Set;
 public interface RemoteSpace {
 
     /**
-     * List the content of the given remote directory
-     *
-     * @param remotePath  path in the RemoteSpace where files should be listed
-     * @param recursive if recursive listing should be performed
-     * @return a list of remote paths
-     * @throws FileSystemException
-     * @see "https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)"
-     */
-    List<String> listFiles(String remotePath, boolean recursive) throws FileSystemException;
-
-
-    /**
      * List the content of the given remote directory, using a glob pattern
      * <p>
      * The following special characters can be used inside the pattern : <br>

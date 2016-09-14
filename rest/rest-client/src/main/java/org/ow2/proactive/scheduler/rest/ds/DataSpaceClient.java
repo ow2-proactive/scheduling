@@ -80,7 +80,7 @@ public class DataSpaceClient implements IDataSpaceClient {
     private String restDataspaceUrl;
     private String sessionId;
     private ClientHttpEngine httpEngine;
-    private ISchedulerClient client;
+    private ISchedulerClient schedulerClient;
 
     public DataSpaceClient() {
     }
@@ -96,7 +96,7 @@ public class DataSpaceClient implements IDataSpaceClient {
                         new HttpClientBuilder().disableContentCompression().useSystemProperties().build());
         this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
         this.sessionId = client.getSession();
-        this.client = client;
+        this.schedulerClient = client;
     }
 
     public void init(ConnectionInfo connectionInfo) throws Exception {
@@ -260,12 +260,12 @@ public class DataSpaceClient implements IDataSpaceClient {
     }
 
     @Override
-    public ListFile list(IRemoteSource source, boolean recursive) throws NotConnectedException, PermissionException {
+    public ListFile list(IRemoteSource source) throws NotConnectedException, PermissionException {
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
                 source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath()).queryParam(
-                "comp", recursive ? "recursive" : "list");
+                "comp", "list");
 
         List<String> includes = source.getIncludes();
         if (includes != null && !includes.isEmpty()) {
@@ -389,24 +389,17 @@ public class DataSpaceClient implements IDataSpaceClient {
             this.space = space;
         }
 
-
-        @Override
-        public List<String> listFiles(String remotePath, boolean recursive) throws FileSystemException {
-            RemoteSource source = new RemoteSource(space, remotePath);
-            return findFiles(source, recursive);
-        }
-
         @Override
         public List<String> listFiles(String remotePath, String pattern) throws FileSystemException {
             RemoteSource source = new RemoteSource(space, remotePath);
             source.setIncludes(pattern);
-            return findFiles(source, true);
+            return findFiles(source);
         }
 
-        private List<String> findFiles(RemoteSource source, boolean recursive) throws FileSystemException {
+        private List<String> findFiles(RemoteSource source) throws FileSystemException {
             List<String> answer = new LinkedList<>();
             try {
-                ListFile listFiles = DataSpaceClient.this.list(source, recursive);
+                ListFile listFiles = DataSpaceClient.this.list(source);
                 for (String fileOrDirectory : listFiles.getFullListing()) {
                     answer.add(fileOrDirectory);
                 }
@@ -515,13 +508,13 @@ public class DataSpaceClient implements IDataSpaceClient {
         public List<String> getSpaceURLs() throws FileSystemException {
             if (space == Dataspace.GLOBAL) {
                 try {
-                    return DataSpaceClient.this.client.getGlobalSpaceURIs();
+                    return DataSpaceClient.this.schedulerClient.getGlobalSpaceURIs();
                 } catch (Exception e) {
                     throw new FileSystemException(e);
                 }
             } else {
                 try {
-                    return DataSpaceClient.this.client.getUserSpaceURIs();
+                    return DataSpaceClient.this.schedulerClient.getUserSpaceURIs();
                 } catch (Exception e) {
                     throw new FileSystemException(e);
                 }

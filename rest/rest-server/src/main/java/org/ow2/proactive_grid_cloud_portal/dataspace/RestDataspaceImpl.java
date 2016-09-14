@@ -42,6 +42,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
@@ -73,6 +74,8 @@ import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
 public class RestDataspaceImpl {
 
     private static final Logger logger = Logger.getLogger(RestDataspaceImpl.class);
+    public static final String USER = "user";
+    public static final String GLOBAL = "global";
 
     private static SessionStore sessions = SharedSessionStore.getInstance();
 
@@ -324,9 +327,7 @@ public class RestDataspaceImpl {
     private Response componentResponse(String type, FileObject fo, List<String> includes, List<String> excludes) throws FileSystemException {
         switch (type) {
             case "list":
-                return Response.ok(FileSystem.list(fo, includes, excludes, false), MediaType.APPLICATION_JSON).build();
-            case "recursive":
-                return Response.ok(FileSystem.list(fo, includes, excludes, true), MediaType.APPLICATION_JSON).build();
+                return Response.ok(FileSystem.list(fo, includes, excludes), MediaType.APPLICATION_JSON).build();
             default:
                 return Response.status(Response.Status.BAD_REQUEST).entity(
                         String.format("Unknown query parameter: comp=%s", type)).build();
@@ -417,20 +418,26 @@ public class RestDataspaceImpl {
                 (args == null || args.length == 0) ? format : String.format(format, args)).build();
     }
 
-    private FileObject resolveFile(Session session, String dataspace, String pathname)
-            throws FileSystemException, NotConnectedException, PermissionException {
-        return "user".equals(dataspace) ? fileSystem(session).resolveFileInUserspace(pathname) : fileSystem(
-                session).resolveFileInGlobalspace(pathname);
+    public FileObject resolveFile(Session session, String dataspace, String pathname)
+            throws FileSystemException, NotConnectedRestException, PermissionRestException {
+        try {
+            return USER.equalsIgnoreCase(dataspace) || SchedulerConstants.USERSPACE_NAME.toString().equalsIgnoreCase(dataspace) ? fileSystem(session).resolveFileInUserspace(pathname) : fileSystem(
+                    session).resolveFileInGlobalspace(pathname);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
     }
 
     private void checkPathParams(String dataspace, String pathname) {
         checkArgument(!Strings.isNullOrEmpty(dataspace), "Dataspace name cannot be null or empty.");
-        checkArgument("user".equals(dataspace) || "global".equals(dataspace),
-                "Invalid dataspace name: '%s', only 'user' or 'global' is allowed.", dataspace);
+        checkArgument(USER.equalsIgnoreCase(dataspace) || GLOBAL.equalsIgnoreCase(dataspace) || SchedulerConstants.USERSPACE_NAME.toString().equalsIgnoreCase(dataspace) || SchedulerConstants.GLOBALSPACE_NAME.toString().equalsIgnoreCase(dataspace),
+                "Invalid dataspace name: '%s'.", dataspace);
         checkArgument(!Strings.isNullOrEmpty(pathname), "Pathname cannot be null or empty.");
     }
 
-    private void writeFile(InputStream inputStream, FileObject outputFile, String encoding)
+    public void writeFile(InputStream inputStream, FileObject outputFile, String encoding)
             throws FileSystemException, IOException {
         try {
             if (outputFile.exists()) {
@@ -478,7 +485,7 @@ public class RestDataspaceImpl {
         return fs;
     }
 
-    private Session checkSessionValidity(String sessionId) throws NotConnectedRestException {
+    public Session checkSessionValidity(String sessionId) throws NotConnectedRestException {
         Session session = Strings.isNullOrEmpty(sessionId) ? null : sessions.get(sessionId);
         if (session == null || session.getScheduler() == null) {
             throw new NotConnectedRestException("User not authenticated or session timeout.");

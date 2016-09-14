@@ -36,6 +36,18 @@
  */
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closer;
+import org.apache.commons.vfs2.*;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+
+import javax.ws.rs.core.HttpHeaders;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,25 +56,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.ws.rs.core.HttpHeaders;
-
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSelectInfo;
-import org.apache.commons.vfs2.FileSelector;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileType;
-import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closer;
 
 
 public class FileSystem {
@@ -105,19 +98,15 @@ public class FileSystem {
         return fo;
     }
 
-    public static ListFile list(FileObject fo, List<String> includes, List<String> excludes, boolean recursive) throws FileSystemException {
+    public static ListFile list(FileObject fo, List<String> includes, List<String> excludes) throws FileSystemException {
         fo.refresh();
         ListFile list = new ListFile();
         List<String> dirList = Lists.newArrayList();
         List<String> fileList = Lists.newArrayList();
         List<String> fullList = Lists.newArrayList();
         List<FileObject> foundFileObjects = new LinkedList<>();
-        if ((isNullOrEmpty(includes) && isNullOrEmpty(excludes))) {
-            if (recursive) {
-                fo.findFiles(Selectors.EXCLUDE_SELF, false, foundFileObjects);
-            } else {
-                fo.findFiles(Selectors.SELECT_CHILDREN, false, foundFileObjects);
-            }
+        if (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) {
+            fo.findFiles(Selectors.SELECT_CHILDREN, false, foundFileObjects);
         } else {
             FileSelector selector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes, excludes);
             fo.findFiles(selector, false, foundFileObjects);
@@ -128,12 +117,17 @@ public class FileSystem {
             FileName childName = child.getName();
             switch (type) {
                 case FOLDER:
-                    dirList.add(baseName(child));
-                    fullList.add(fo.getName().getRelativeName(childName));
+                    if (!child.equals(fo)) {
+                        // exclude root directory from the list
+                        String relativePath = fo.getName().getRelativeName(childName);
+                        dirList.add(relativePath);
+                        fullList.add(relativePath);
+                    }
                     break;
                 case FILE:
-                    fileList.add(baseName(child));
-                    fullList.add(fo.getName().getRelativeName(childName));
+                    String relativePath = fo.getName().getRelativeName(childName);
+                    fileList.add(relativePath);
+                    fullList.add(relativePath);
                     break;
                 default:
                     throw new RuntimeException("Unknown : " + type);
