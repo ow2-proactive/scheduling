@@ -8,9 +8,11 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
@@ -139,6 +141,32 @@ public class ForkedTaskVariablesManagerTest {
                 SchedulerNodeClient.class);
 
     }
+
+    @Test
+    public void testAddBindingsToScriptHandlerContainsUserAndGlobalSpaceApiVariable() throws InvalidScriptException, NodeException, NoSuchFieldException, IllegalAccessException, KeyException, NoSuchAlgorithmException {
+        ScriptExecutableContainer scriptContainer = createScriptContainer();
+        TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
+        taskLauncherInitializer.setForkEnvironment(new ForkEnvironment());
+        taskLauncherInitializer.setSchedulerRestUrl("http://localhost:8080/rest");
+
+        Decrypter decrypter = createCredentials(testUser, testPass);
+
+        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
+                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null, decrypter);
+
+        // variable should belong to the expected class
+        validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(), taskContext,
+                new HashMap<String, Serializable>(),
+                new HashMap<String, String>(), SchedulerConstants.DS_USER_API_BINDING_NAME,
+                DataSpaceNodeClient.class);
+
+        // variable should belong to the expected class
+        validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(), taskContext,
+                new HashMap<String, Serializable>(),
+                new HashMap<String, String>(), SchedulerConstants.DS_GLOBAL_API_BINDING_NAME,
+                DataSpaceNodeClient.class);
+    }
+
 
     @Test
     public void testAddBindingsToScriptHandlerContainsScratchURI() throws InvalidScriptException, NodeException, NoSuchFieldException, IllegalAccessException {
@@ -337,9 +365,11 @@ public class ForkedTaskVariablesManagerTest {
         setPrivateField(ScriptHandler.class.getDeclaredField("additionalBindings"), scriptHandler,
                 scriptHandlerBindings);
 
+        SchedulerNodeClient schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
+
         // Execute method which adds bindings
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext,
-                variables, credentials, forkedTaskVariablesManager.createSchedulerNodeClient(taskContext));
+                variables, credentials, schedulerNodeClient, forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.USER), forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.GLOBAL));
         return scriptHandlerBindings;
     }
 

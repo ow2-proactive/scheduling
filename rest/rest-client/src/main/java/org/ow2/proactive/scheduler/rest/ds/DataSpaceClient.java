@@ -187,6 +187,7 @@ public class DataSpaceClient implements IDataSpaceClient {
 
             return true;
         } finally{
+
             if (response != null) {
                 response.close();
             }
@@ -324,7 +325,7 @@ public class DataSpaceClient implements IDataSpaceClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
-                    throw new RuntimeException("Cannot delete file(s). Status code:" + response.getStatus());
+                    throw new RuntimeException("Cannot delete file(s). Status :" + response.getStatusInfo() + " Entity : " + response.getEntity());
                 }
             } else {
                 noContent = true;

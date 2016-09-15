@@ -1,0 +1,2 @@
+userspaceapi.connect()
+globalspaceapi.connect()
