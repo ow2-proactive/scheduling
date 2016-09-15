@@ -102,53 +102,71 @@ public class DataSpaceNodeClient implements RemoteSpace {
         this.dataSpaceClient.init(url, schedulerNodeClient);
     }
 
+    private void renewSession() {
+        try {
+            schedulerNodeClient.renewSession();
+        } catch (NotConnectedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public List<String> listFiles(String remotePath, String pattern) throws FileSystemException {
+        renewSession();
         return spaceProxy.listFiles(remotePath, pattern);
     }
 
     @Override
     public void pushFile(File localPath, String remotePath) throws FileSystemException {
+        renewSession();
         spaceProxy.pushFile(localPath, remotePath);
     }
 
     @Override
     public void pushFiles(File localDirectory, String pattern, String remotePath) throws FileSystemException {
+        renewSession();
         spaceProxy.pushFiles(localDirectory, pattern, remotePath);
     }
 
     @Override
     public File pullFile(String remotePath, File localPath) throws FileSystemException {
+        renewSession();
         return spaceProxy.pullFile(remotePath, localPath);
     }
 
     @Override
     public Set<File> pullFiles(String remotePath, String pattern, File localPath) throws FileSystemException {
+        renewSession();
         return spaceProxy.pullFiles(remotePath, pattern, localPath);
     }
 
     @Override
     public void deleteFile(String remotePath) throws FileSystemException {
+        renewSession();
         spaceProxy.deleteFile(remotePath);
     }
 
     @Override
     public void deleteFiles(String remotePath, String pattern) throws FileSystemException {
+        renewSession();
         spaceProxy.deleteFiles(remotePath, pattern);
     }
 
     @Override
     public List<String> getSpaceURLs() throws NotConnectedException, PermissionException, FileSystemException {
+        renewSession();
         return spaceProxy.getSpaceURLs();
     }
 
     @Override
     public InputStream getInputStream(String remotePath) throws FileSystemException {
+        renewSession();
         return spaceProxy.getInputStream(remotePath);
     }
 
     @Override
     public OutputStream getOutputStream(String remotePath) throws FileSystemException {
+        renewSession();
         return spaceProxy.getOutputStream(remotePath);
     }
 }
