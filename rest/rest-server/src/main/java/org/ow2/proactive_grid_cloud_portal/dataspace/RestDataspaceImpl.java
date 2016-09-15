@@ -111,6 +111,7 @@ public class RestDataspaceImpl {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
+            logger.debug(String.format("Storing %s in %s", pathname, dataspace));
             writeFile(is, resolveFile(session, dataspace, pathname), encoding);
         } catch (Throwable error) {
             logger.error(String.format("Cannot save the requested file to %s in %s.", pathname, dataspace), error);
@@ -182,18 +183,23 @@ public class RestDataspaceImpl {
             }
             if (fo.getType() == FileType.FILE) {
                 if (VFSZipper.isZipFile(fo)) {
+                    logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace));
                     return fileComponentResponse(fo);
                 } else if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") ||
                     encoding.contains("gzip")) {
+                    logger.debug(String.format("Retrieving file %s as gzip in %s", pathname, dataspace));
                     return gzipComponentResponse(pathname, fo);
                 } else if (encoding.contains("zip")) {
+                    logger.debug(String.format("Retrieving file %s as zip in %s", pathname, dataspace));
                     return zipComponentResponse(fo, null, null);
                 } else {
+                    logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace));
                     return fileComponentResponse(fo);
                 }
             } else {
                 // folder
                 if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") || encoding.contains("zip")) {
+                    logger.debug(String.format("Retrieving folder %s as zip in %s", pathname, dataspace));
                     return zipComponentResponse(fo, includes, excludes);
                 } else {
                     return badRequestRes("Folder retrieval only supported with zip encoding.");
@@ -245,8 +251,10 @@ public class RestDataspaceImpl {
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
             if (fo.getType() == FileType.FOLDER) {
+                logger.debug(String.format("Deleting directory %s in %s", pathname, dataspace));
                 return deleteDir(fo, includes, excludes);
             } else {
+                logger.debug(String.format("Deleting file %s in %s", pathname, dataspace));
                 fo.close();
                 return fo.delete() ? noContentRes()
                         : serverErrorRes("Cannot delete the file: %s", pathname);
@@ -280,6 +288,7 @@ public class RestDataspaceImpl {
             if (!fo.exists()) {
                 return notFoundRes();
             }
+            logger.debug(String.format("Retrieving metadata for %s in %s", pathname, dataspacePath));
             MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>(FileSystem
                     .metadata(fo));
             return Response.ok().replaceAll(headers).build();
@@ -299,27 +308,25 @@ public class RestDataspaceImpl {
 
         checkPathParams(dataspacePath, pathname);
         Session session = checkSessionValidity(sessionId);
-
         try {
             FileObject fileObject = resolveFile(session, dataspacePath, pathname);
 
             if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FOLDER.getMimeType())) {
+                logger.debug(String.format("Creating folder %s in %s", pathname, dataspacePath));
                 fileObject.createFolder();
             } else if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FILE.getMimeType())) {
+                logger.debug(String.format("Creating file %s in %s", pathname, dataspacePath));
                 fileObject.createFile();
             } else {
                 return serverErrorRes("Cannot create specified file since mimetype is not specified");
             }
 
-            MultivaluedMap<String, Object> headers =
-                    new MultivaluedHashMap(FileSystem.metadata(fileObject));
-
-            return Response.ok().replaceAll(headers).build();
+            return Response.ok().build();
         } catch (FileSystemException e) {
-            logger.error(String.format("Cannot create folder for %s in %s", pathname, dataspacePath), e);
+            logger.error(String.format("Cannot create %s in %s", pathname, dataspacePath), e);
             throw rethrow(e);
         } catch (Throwable e) {
-            logger.error(String.format("Cannot create folder for %s in %s", pathname, dataspacePath), e);
+            logger.error(String.format("Cannot create %s in %s", pathname, dataspacePath), e);
             throw rethrow(e);
         }
     }
