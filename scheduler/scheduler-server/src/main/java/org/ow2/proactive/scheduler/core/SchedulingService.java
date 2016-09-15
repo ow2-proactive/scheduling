@@ -578,9 +578,11 @@ public class SchedulingService {
             return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
-                    jobs.finishInErrorTask(jobId, taskName);
+                    TerminationData terminationData = jobs.finishInErrorTask(jobId, taskName);
+                    boolean taskfinished = terminationData.taskTerminated(jobId, taskName);
+                    submitTerminationDataHandler(terminationData);
                     wakeUpSchedulingThread();
-                    return Boolean.TRUE;
+                    return taskfinished;
                 }
             }).get();
         } catch (ExecutionException e) {

@@ -125,7 +125,7 @@ public class LiveJobsTest {
     }
 
     @Test
-    public void testFinishInErrorTask() throws UnknownTaskException {
+    public void testFinishInErrorTask() throws UnknownTaskException, UnknownJobException {
         InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
                 "description");
         JobId id = new JobIdImpl(666L, "test-name");
@@ -142,7 +142,7 @@ public class LiveJobsTest {
     }
 
     @Test
-    public void testFinishInErrorTaskDoesNotFinishPausedTask() throws UnknownTaskException {
+    public void testFinishInErrorTaskDoesNotFinishPausedTask() throws UnknownTaskException, UnknownJobException {
         InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
                 "description");
         JobId id = new JobIdImpl(666L, "test-name");
@@ -159,7 +159,7 @@ public class LiveJobsTest {
     }
 
     @Test
-    public void testFinishInErrorTaskDoesNotFinishPendingTask() throws UnknownTaskException {
+    public void testFinishInErrorTaskDoesNotFinishPendingTask() throws UnknownTaskException, UnknownJobException {
         InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
                 "description");
         JobId id = new JobIdImpl(666L, "test-name");

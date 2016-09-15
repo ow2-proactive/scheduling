@@ -539,8 +539,23 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param taskId the task to remove from running task.
      */
     public void terminate(TaskId taskId) {
+        terminate(taskId, false);
+    }
+
+    /**
+     * Update the eligible list of task and dependencies if necessary.
+     * This function considered that the taskId is in eligible task list.
+     * Visibility is package because user cannot use this method.
+     *
+     * @param taskId the task to remove from running task.
+     */
+    public void terminate(TaskId taskId, boolean inErrorTask) {
+        
+        Map<TaskId, ? extends TaskDescriptor> currentTasks = 
+                inErrorTask ? pausedTasks : runningTasks;
+        
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            TaskDescriptor lt = runningTasks.get(taskId);
+            TaskDescriptor lt = currentTasks.get(taskId);
 
             if (lt != null) {
                 for (TaskDescriptor task : lt.getChildren()) {
@@ -565,7 +580,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             }
         }
 
-        runningTasks.remove(taskId);
+        currentTasks.remove(taskId);
     }
 
     public void recoverTask(TaskId taskId) {
