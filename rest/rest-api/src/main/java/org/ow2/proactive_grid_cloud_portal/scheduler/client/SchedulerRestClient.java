@@ -34,8 +34,32 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.client;
 
-import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+import com.google.common.net.UrlEscapers;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.*;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,39 +76,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.Variant;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
-
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
-import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-
-import com.google.common.collect.Maps;
-import com.google.common.io.Files;
-import com.google.common.net.UrlEscapers;
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 
 public class SchedulerRestClient {

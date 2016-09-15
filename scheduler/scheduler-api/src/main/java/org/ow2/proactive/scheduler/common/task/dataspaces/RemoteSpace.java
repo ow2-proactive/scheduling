@@ -34,12 +34,15 @@
  */
 package org.ow2.proactive.scheduler.common.task.dataspaces;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Set;
-
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -52,11 +55,26 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public interface RemoteSpace {
 
     /**
+     * List the content of the given remote directory, using a glob pattern
+     * <p>
+     * The following special characters can be used inside the pattern : <br>
+     * ** matches zero or more directories <br>
+     * * matches zero or more characters<br>
+     * ? matches one character
+     *
+     * @param remotePath path in the RemoteSpace where files should be listed
+     * @param pattern    pattern to locate files
+     * @return a list of remote paths matching the pattern
+     * @throws FileSystemException
+     * @see "https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)"
+     */
+    List<String> listFiles(String remotePath, String pattern) throws FileSystemException;
+
+    /**
      * Push the given file or directory(including its content) from the local space to the remote space.
      *
-     * Several scenarios can occur :
-     * - If the localPath is a file and the remotePath represents a directory, the file will be copied inside the remote directory
-     * @param localPath path to the local file or folder
+     * When pushing a file or directory, the remotePath must contain the target new file or directory
+     * @param localPath path to the local file or directory
      * @param remotePath path in the RemoteSpace where to put the file or folder
      * @throws FileSystemException
      */
@@ -70,16 +88,19 @@ public interface RemoteSpace {
      *  * matches zero or more characters<br>
      *  ? matches one character
      *
-     * @param pattern pattern to locate files inside the LocalSpace
+     * @param localDirectory local directory used as base
+     * @param pattern pattern to locate files inside the localDirectory
      * @param remotePath path in the RemoteSpace where to put the files
      * @throws FileSystemException
+     * @see "https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)"
      */
-    void pushFiles(String pattern, String remotePath) throws FileSystemException;
+    void pushFiles(File localDirectory, String pattern, String remotePath) throws FileSystemException;
 
     /**
      * Pull the given file or folder(including its content) from the remote space to the local space
+     *
      * @param remotePath path to the remote file (relative to the RemoteSpace root)
-     * @param localPath path in the LocalSpace where to put the file or folder
+     * @param localPath path in the local file system where to put the file or folder
      * @return the path to the file or directory pulled
      * @throws FileSystemException
      */
@@ -93,12 +114,14 @@ public interface RemoteSpace {
      *  * matches zero or more characters<br>
      *  ? matches one character
      *
+     * @param remotePath path in the RemoteSpace used as base for the pattern (e.g. "/")
      * @param pattern pattern to locate files inside the RemoteSpace
-     * @param localPath path in the LocalSpace where to put the files
+     * @param localPath path in the local file system where to put the files
      * @return a set of files pulled
      * @throws FileSystemException
+     * @see "https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)"
      */
-    Set<File> pullFiles(String pattern, String localPath) throws FileSystemException;
+    Set<File> pullFiles(String remotePath, String pattern, File localPath) throws FileSystemException;
 
     /**
      * Delete the given file or folder(including its content) inside the remote space
@@ -115,16 +138,18 @@ public interface RemoteSpace {
      *  * matches zero or more characters<br>
      *  ? matches one character
      *
+     * @param remotePath path in the RemoteSpace used as base for the pattern (e.g. "/")
      * @param pattern pattern to locate files inside the RemoteSpace
      * @throws FileSystemException
+     * @see "https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)"
      */
-    void deleteFiles(String pattern) throws FileSystemException;
+    void deleteFiles(String remotePath, String pattern) throws FileSystemException;
 
     /**
-     * Returns the root URL of the RemoteSpace
+     * Returns the URLs of the RemoteSpace
      * @return URL to the space
      */
-    String getSpaceURL();
+    List<String> getSpaceURLs() throws NotConnectedException, PermissionException, FileSystemException;
 
     /**
      * Returns an input stream on the specified remote file. It will throw an exception if the file does not exist.
