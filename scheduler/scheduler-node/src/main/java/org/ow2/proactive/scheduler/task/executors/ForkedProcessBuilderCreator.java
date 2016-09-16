@@ -46,10 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.security.KeyException;
-import java.util.Set;
 
 public class ForkedProcessBuilderCreator implements Serializable {
     private final ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
@@ -98,6 +95,7 @@ public class ForkedProcessBuilderCreator implements Serializable {
         if (forkEnvironment != null) {
 
             if (forkEnvironment.getEnvScript() != null) {
+
                 forkEnvironmentScriptResult = forkEnvironmentScriptExecutor
                         .executeForkEnvironmentScript(context, outputSink, errorSink);
             }

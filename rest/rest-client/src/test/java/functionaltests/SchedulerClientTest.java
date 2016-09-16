@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -124,22 +125,49 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test(timeout = MAX_WAIT_TIME)
     public void testSchedulerNodeClient() throws Throwable {
         ISchedulerClient client = clientInstance();
-        Job job = schedulerNodeClientJob();
+        Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy", "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
         JobId jobId = submitJob(job, client);
-        TaskResult tres = client.waitForTask(jobId.toString(), "SchedulerNodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
         Assert.assertNotNull(tres);
-        Assert.assertEquals("Hello SchedulerNodeClientTask I'm HelloTask", tres.value());
+        Assert.assertEquals("Hello NodeClientTask I'm HelloTask", tres.value());
     }
 
-    protected Job schedulerNodeClientJob() throws Exception {
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testDataSpaceNodeClientPushPull() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_pull.groovy", "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+        JobId jobId = submitJob(job, client);
+        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tres.getOutput().getAllLogs(false));
+        Assert.assertNotNull(tres);
+        Assert.assertEquals("HelloWorld", tres.value());
+    }
 
-        URL scriptURL = SchedulerClientTest.class.getResource("/functionaltests/descriptors/scheduler_client_node.groovy");
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testDataSpaceNodeClientPushDelete() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy", "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+        JobId jobId = submitJob(job, client);
+        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tres.getOutput().getAllLogs(false));
+        Assert.assertNotNull(tres);
+        Assert.assertEquals("OK", tres.value());
+    }
+
+
+    protected Job nodeClientJob(String groovyScript, String forkScript) throws Exception {
+
+        URL scriptURL = SchedulerClientTest.class.getResource(groovyScript);
+        URL forkScriptURL = SchedulerClientTest.class.getResource(forkScript);
 
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("SchedulerNodeClientJob");
+        job.setName("NodeClientJob");
         ScriptTask task = new ScriptTask();
-        task.setName("SchedulerNodeClientTask");
+        task.setName("NodeClientTask");
+        ForkEnvironment forkEnvironment = new ForkEnvironment();
+        forkEnvironment.setEnvScript(new SimpleScript(IOUtils.toString(forkScriptURL.toURI()), "groovy"));
+        task.setForkEnvironment(forkEnvironment);
         task.setScript(new TaskScript(new SimpleScript(IOUtils.toString(scriptURL.toURI()), "groovy")));
         job.addTask(task);
         return job;
@@ -184,7 +212,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                 emptyFile.delete());
 
         // Delete the file in the user space
-        // client.deleteFile("USERSPACE", emptyFile.getName()); TODO: TEST THIS
+        client.deleteFile("USERSPACE", "/" + emptyFile.getName()); //TODO: TEST THIS
         // LATER
     }
 

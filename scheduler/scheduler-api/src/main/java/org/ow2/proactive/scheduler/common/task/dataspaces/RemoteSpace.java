@@ -62,7 +62,7 @@ public interface RemoteSpace {
      * * matches zero or more characters<br>
      * ? matches one character
      *
-     * @param remotePath path in the RemoteSpace where files should be listed
+     * @param remotePath path in the RemoteSpace where files should be listed. Use "." for remote root path.
      * @param pattern    pattern to locate files
      * @return a list of remote paths matching the pattern
      * @throws FileSystemException
@@ -75,7 +75,7 @@ public interface RemoteSpace {
      *
      * When pushing a file or directory, the remotePath must contain the target new file or directory
      * @param localPath path to the local file or directory
-     * @param remotePath path in the RemoteSpace where to put the file or folder
+     * @param remotePath path in the RemoteSpace where to put the file or folder. Use "." for remote root path.
      * @throws FileSystemException
      */
     void pushFile(File localPath, String remotePath) throws FileSystemException;
@@ -90,7 +90,7 @@ public interface RemoteSpace {
      *
      * @param localDirectory local directory used as base
      * @param pattern pattern to locate files inside the localDirectory
-     * @param remotePath path in the RemoteSpace where to put the files
+     * @param remotePath path in the RemoteSpace where to put the files. Use "." for remote root path.
      * @throws FileSystemException
      * @see "https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)"
      */

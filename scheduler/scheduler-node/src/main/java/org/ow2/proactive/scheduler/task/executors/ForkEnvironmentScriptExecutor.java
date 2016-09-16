@@ -34,10 +34,9 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.util.Map;
-
+import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
+import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
@@ -45,6 +44,10 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
+
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.Map;
 
 public class ForkEnvironmentScriptExecutor implements Serializable {
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
@@ -69,11 +72,16 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         Script<?> script = context.getInitializer().getForkEnvironment().getEnvScript();
 
+        SchedulerNodeClient schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(context);
+        RemoteSpace userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(context, schedulerNodeClient, IDataSpaceClient.Dataspace.USER);
+        RemoteSpace globalSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(context, schedulerNodeClient, IDataSpaceClient.Dataspace.GLOBAL);
+
+
         forkedTaskVariablesManager
                 .addBindingsToScriptHandler(scriptHandler,
                         context,
                         variables,
-                        thirdPartyCredentials, null);
+                        thirdPartyCredentials, schedulerNodeClient, userSpaceClient, globalSpaceClient);
 
         forkedTaskVariablesManager.replaceScriptParameters(script,
                 thirdPartyCredentials,
