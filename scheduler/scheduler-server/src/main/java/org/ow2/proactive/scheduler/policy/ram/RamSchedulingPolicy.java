@@ -16,6 +16,9 @@ import org.ow2.proactive.utils.NodeSet;
  * When the task contains the generic information ALLOC_RAM_GIGABYTES, 
  * this policy will return false if there is not enough RAM available 
  * or true if there is RAM available (in this last case it will set the ALLOC_RAM_GIGABYTES property at node level to book the RAM in the node machine)
+ * 
+ * It's important to set the ALLOC_RAM_GIGABYTES task property to 0 in the clean script to release the preallocation. For example for a groovy clean script :
+ * org.objectweb.proactive.api.PAActiveObject.getNode().setProperty("ALLOC_RAM_GIGABYTES","0");
  *
  */
 public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
@@ -27,9 +30,9 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
     @Override
     public boolean isTaskExecutable(NodeSet selectedNodes, EligibleTaskDescriptor task) {
 
-        logger.info("Selected Nodes: " + selectedNodes);
+        logger.debug("Selected Nodes: " + selectedNodes);
 
-        logger.info("Analysing task: " + task.getInternal().getName());
+        logger.debug("Analysing task: " + task.getInternal().getName());
 
         String allocRam = task.getInternal().getGenericInformation().get(RAM_VARIABLE_NAME);
 
@@ -45,10 +48,10 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
         Node n = selectedNodes.get(0);
         try {
             long freeRam = getFreeRamFromNode(n);
-            logger.info("Free Ram for node (" + n.getNodeInformation().getName() + ") : " + freeRam +
+            logger.debug("Free Ram for node (" + n.getNodeInformation().getName() + ") : " + freeRam +
                 " , neededRam : " + neededRam);
             if (freeRam >= neededRam) {
-                logger.info("Task " + task.getInternal().getName() + " can execute on " + n);
+                logger.debug("Task " + task.getInternal().getName() + " can execute on " + n);
                 n.setProperty(RAM_VARIABLE_NAME, "" + neededRam);
                 return true;
             }
@@ -60,7 +63,7 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
 
     private long getFreeRamFromNode(Node n) throws ActiveObjectCreationException, NodeException {
         RamCompute ramCompute = PAActiveObject.newActive(RamCompute.class, new Object[] {}, n);
-        long freeRam = ramCompute.getAvailableRAM();
+        long freeRam = ramCompute.getAvailableRAMInGB();
         try {
             PAActiveObject.terminateActiveObject(ramCompute, true);
         } catch (Exception e) {
