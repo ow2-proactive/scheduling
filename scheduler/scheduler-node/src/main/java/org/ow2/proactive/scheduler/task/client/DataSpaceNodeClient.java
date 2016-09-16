@@ -57,12 +57,12 @@ import java.util.Set;
 @PublicAPI
 public class DataSpaceNodeClient implements RemoteSpace {
 
-    SchedulerNodeClient schedulerNodeClient;
-    DataSpaceClient dataSpaceClient;
-    IDataSpaceClient.Dataspace space;
-    String schedulerRestUrl;
+    private final SchedulerNodeClient schedulerNodeClient;
+    private final DataSpaceClient dataSpaceClient;
+    private final IDataSpaceClient.Dataspace space;
+    private final String schedulerRestUrl;
 
-    RemoteSpace spaceProxy;
+    private final RemoteSpace spaceProxy;
 
 
     public DataSpaceNodeClient(SchedulerNodeClient schedulerNodeClient, IDataSpaceClient.Dataspace space, String schedulerRestUrl) {
