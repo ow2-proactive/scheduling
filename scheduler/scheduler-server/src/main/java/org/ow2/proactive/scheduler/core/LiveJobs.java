@@ -632,8 +632,8 @@ class LiveJobs {
                 return emptyResult(task.getId());
             }
 
-            TaskResultImpl taskResult = new TaskResultImpl(task.getId(), "", 
-                    null, System.currentTimeMillis() - task.getStartTime());
+            TaskResultImpl taskResult = new TaskResultCreator()
+                    .getEmptyTaskResultWithTaskIdAndExecutionTime(task);
             
             RunningTaskData data = new RunningTaskData(task, job.getOwner(), 
                     job.getCredentials(), task.getExecuterInformation().getLauncher());
