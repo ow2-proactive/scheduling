@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Run a task through a script handler.
- * <p/>
+ *
  * Responsible for:
  * - running the different scripts
  * - variable propagation
