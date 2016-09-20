@@ -37,7 +37,7 @@ goto fail
 set JAVA_HOME=%JAVA_HOME:"=%
 set JAVA_EXE=%JAVA_HOME%/bin/java.exe
 
-if exist "%JAVA_EXE%" goto checkRadicaleHome
+if exist "%JAVA_EXE%" goto execute
 
 echo.
 echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME%
@@ -47,44 +47,16 @@ echo location of your Java installation.
 
 goto fail
 
-:checkRadicaleHome
-if defined RADICALE_HOME goto findRadicaleHome
-
-echo.
-echo ERROR: RADICALE_HOME is not set.
-echo.
-echo Please set the RADICALE_HOME variable in your environment to match the
-echo location of your Radicale installation.
-
-goto fail
-
-:findRadicaleHome
-set RADICALE_HOME=%RADICALE_HOME:"=%
-
-@rem copy data folders and config files 
-xcopy %RADICLAE_HOME%\App\DefaultData %RADICLAE_HOME%\Data /s /e /y 
-xcopy radicale\windows\conf\config.ini %RADICLAE_HOME%\Data\config\ /y
-
+@rem Execute proactive-server
+:execute
 @rem import proactive user accounts to radicale
 TYPE %APP_HOME%\config\authentication\login.cfg > %RADICLAE_HOME%\Data\config\htpasswd.txt
 
-@rem Execute radicale
-start "" %RADICALE_HOME%\RadicalePortable.exe
+"%JAVA_EXE%" -Dpa.scheduler.home=%APP_HOME% -jar %APP_HOME%\addons\calendar-service*.jar
 
 :end
 @rem End local scope for the variables with windows NT shell
-echo *** OK ***
-
-set /p input="Would you like to start Calendar Service right now? (Y/N) :"
-if "%input%"=="y" goto runCs
-if "%input%"=="Y" goto runCs
-if "%input%"=="n" goto mainEnd
-if "%input%"=="N" goto mainEnd
 if "%ERRORLEVEL%"=="0" goto mainEnd
-
-:runCs
-call %APP_HOME%\tools\calendar-service.bat
-goto mainEnd
 
 :fail
 @rem Set variable ${exitEnvironmentVar} if you need the _script_ return code instead of

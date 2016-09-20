@@ -55,7 +55,7 @@ read -e -p "Would you like to start Calendar Service right now? (Y/N) :" input
 answer=$input
 if ((answer == "y")) || ((answer == "Y"))
 	then
-	source $cwd/bin/calendar-service.sh start
+	source $cwd/tools/calendar-service.sh start
 elif ((answer == "n")) || ((answer == "N"))
 	then
 	exit 1
