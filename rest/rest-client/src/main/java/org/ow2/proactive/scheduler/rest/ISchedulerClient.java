@@ -100,7 +100,7 @@ public interface ISchedulerClient extends Scheduler {
      * @param job a job provided as a local File
      * @return the generated new job ID.
      * @throws NotConnectedException
-     * @throws UnknownJobException
+     * @throws JobCreationException
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
@@ -119,7 +119,7 @@ public interface ISchedulerClient extends Scheduler {
      * @param job a job provided as a url
      * @return the generated new job ID.
      * @throws NotConnectedException
-     * @throws UnknownJobException
+     * @throws JobCreationException
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
@@ -139,7 +139,7 @@ public interface ISchedulerClient extends Scheduler {
      * @param variables job variables to use during the job execution
      * @return the generated new job ID.
      * @throws NotConnectedException
-     * @throws UnknownJobException
+     * @throws JobCreationException
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
@@ -159,7 +159,7 @@ public interface ISchedulerClient extends Scheduler {
      * @param variables job variables to use during the job execution
      * @return the generated new job ID.
      * @throws NotConnectedException
-     * @throws UnknownJobException
+     * @throws JobCreationException
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
