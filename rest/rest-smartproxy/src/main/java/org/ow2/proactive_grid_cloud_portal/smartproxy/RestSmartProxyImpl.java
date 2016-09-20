@@ -34,19 +34,12 @@
  */
 package org.ow2.proactive_grid_cloud_portal.smartproxy;
 
-import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
-
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
-
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -83,8 +76,14 @@ import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
 import org.ow2.proactive_grid_cloud_portal.common.FileType;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
+
+import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
 
 
 /**
@@ -149,7 +148,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    protected Scheduler _getScheduler() {
+    protected ISchedulerClient _getScheduler() {
         checkInitialized();
         return restSchedulerClient;
     }
@@ -200,6 +199,26 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
                     " the SmartProxy. As a default, you may use the 'UserSpace' value.");
         }
         return _getScheduler().submit(job);
+    }
+
+    @Override
+    public JobId submit(File job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job);
+    }
+
+    @Override
+    public JobId submit(URL job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job);
+    }
+
+    @Override
+    public JobId submit(File job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job, variables);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job, variables);
     }
 
     @Override

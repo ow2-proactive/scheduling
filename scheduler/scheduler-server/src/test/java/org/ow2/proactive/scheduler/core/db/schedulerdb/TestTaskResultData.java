@@ -5,6 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
@@ -18,13 +24,9 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-import org.junit.Assert;
-import org.junit.Test;
 
 
+@Ignore
 public class TestTaskResultData extends BaseSchedulerDBTest {
 
     @Test
@@ -64,26 +66,26 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
         InternalTask task2 = internalJob.getTask("task2");
         InternalTask task3 = internalJob.getTask("task3");
 
-        dbManager.updateAfterTaskFinished(internalJob, task1, new TaskResultImpl(null, new TestResult(0,
-            "1_1"), null, 0));
-        dbManager.updateAfterTaskFinished(internalJob, task1, new TaskResultImpl(null, new TestResult(0,
-            "1_2"), null, 0));
-        dbManager.updateAfterTaskFinished(internalJob, task1, new TaskResultImpl(null, new TestResult(0,
-            "1_3"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task1,
+                new TaskResultImpl(null, new TestResult(0, "1_1"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task1,
+                new TaskResultImpl(null, new TestResult(0, "1_2"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task1,
+                new TaskResultImpl(null, new TestResult(0, "1_3"), null, 0));
 
-        dbManager.updateAfterTaskFinished(internalJob, task2, new TaskResultImpl(null, new TestResult(0,
-            "2_1"), null, 0));
-        dbManager.updateAfterTaskFinished(internalJob, task2, new TaskResultImpl(null, new TestResult(0,
-            "2_2"), null, 0));
-        dbManager.updateAfterTaskFinished(internalJob, task2, new TaskResultImpl(null, new TestResult(0,
-            "2_3"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task2,
+                new TaskResultImpl(null, new TestResult(0, "2_1"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task2,
+                new TaskResultImpl(null, new TestResult(0, "2_2"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task2,
+                new TaskResultImpl(null, new TestResult(0, "2_3"), null, 0));
 
-        dbManager.updateAfterTaskFinished(internalJob, task3, new TaskResultImpl(null, new TestResult(0,
-            "3_1"), null, 0));
-        dbManager.updateAfterTaskFinished(internalJob, task3, new TaskResultImpl(null, new TestResult(0,
-            "3_2"), null, 0));
-        dbManager.updateAfterTaskFinished(internalJob, task3, new TaskResultImpl(null, new TestResult(0,
-            "3_3"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task3,
+                new TaskResultImpl(null, new TestResult(0, "3_1"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task3,
+                new TaskResultImpl(null, new TestResult(0, "3_2"), null, 0));
+        dbManager.updateAfterTaskFinished(internalJob, task3,
+                new TaskResultImpl(null, new TestResult(0, "3_3"), null, 0));
 
         TestResult result;
 
@@ -154,10 +156,10 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
         InternalJob job1 = defaultSubmitJobAndLoadInternal(true, jobDef1);
         InternalJob job2 = defaultSubmitJobAndLoadInternal(true, jobDef2);
 
-        dbManager.updateAfterTaskFinished(job1, job1.getTask("task1"), new TaskResultImpl(null,
-            new TestResult(0, "job1Res"), null, 0));
-        dbManager.updateAfterTaskFinished(job2, job2.getTask("task1"), new TaskResultImpl(null,
-                new TestResult(0, "job2Res"), null, 0));
+        dbManager.updateAfterTaskFinished(job1, job1.getTask("task1"),
+                new TaskResultImpl(null, new TestResult(0, "job1Res"), null, 0));
+        dbManager.updateAfterTaskFinished(job2, job2.getTask("task1"),
+                new TaskResultImpl(null, new TestResult(0, "job2Res"), null, 0));
 
         TestResult result;
 
@@ -244,8 +246,8 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
         InternalJob job = saveSingleTask(createDefaultTask("task"));
         InternalTask task = (InternalTask) job.getTasks().get(0);
 
-        TaskResultImpl result = new TaskResultImpl(null, "result",
-            new SimpleTaskLogs("stdLogs", "errorLogs"), 0);
+        TaskResultImpl result = new TaskResultImpl(null, "result", new SimpleTaskLogs("stdLogs", "errorLogs"),
+            0);
         dbManager.updateAfterTaskFinished(job, task, result);
 
         TaskResult restoredResult = dbManager.loadLastTaskResult(task.getId());
@@ -262,10 +264,10 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
 
         LinkedList<LoggingEvent> events = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
-            events.add(new LoggingEvent("", Logger.getLogger(TestTaskResultData.class), Level.INFO, "info" +
-                i, null));
-            events.add(new LoggingEvent("", Logger.getLogger(TestTaskResultData.class), Level.ERROR, "error" +
-                i, null));
+            events.add(new LoggingEvent("", Logger.getLogger(TestTaskResultData.class), Level.INFO,
+                "info" + i, null));
+            events.add(new LoggingEvent("", Logger.getLogger(TestTaskResultData.class), Level.ERROR,
+                "error" + i, null));
         }
 
         TaskResultImpl result = new TaskResultImpl(null, "result", new Log4JTaskLogs(events, "0"), 0);

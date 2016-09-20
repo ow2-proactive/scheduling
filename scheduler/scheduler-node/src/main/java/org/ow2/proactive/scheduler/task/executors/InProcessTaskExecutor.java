@@ -36,9 +36,11 @@ package org.ow2.proactive.scheduler.task.executors;
 
 import com.google.common.base.Stopwatch;
 import org.apache.commons.io.FileUtils;
+import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
@@ -60,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Run a task through a script handler.
- * <p/>
+ *
  * Responsible for:
  * - running the different scripts
  * - variable propagation
@@ -118,7 +120,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
     public TaskResultImpl execute(TaskContext taskContext, PrintStream output, PrintStream error) {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         String nodesFile = null;
-        SchedulerNodeClient client = null;
+        SchedulerNodeClient schedulerNodeClient = null;
+        RemoteSpace userSpaceClient = null;
+        RemoteSpace globalSpaceClient = null;
         try {
             nodesFile = writeNodesFile(taskContext);
             Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(
@@ -126,10 +130,12 @@ public class InProcessTaskExecutor implements TaskExecutor {
                     nodesFile);
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
                     taskContext);
-            client = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
+            schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
+            userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.USER);
+            globalSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.GLOBAL);
 
             forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext, variables,
-                    thirdPartyCredentials, client);
+                    thirdPartyCredentials, schedulerNodeClient, userSpaceClient, globalSpaceClient);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;

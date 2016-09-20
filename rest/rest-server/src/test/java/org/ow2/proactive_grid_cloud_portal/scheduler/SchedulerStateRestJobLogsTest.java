@@ -34,10 +34,12 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Collections;
-
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
@@ -47,14 +49,13 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.*;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -126,6 +127,7 @@ public class SchedulerStateRestJobLogsTest {
 
         when(mockScheduler.getJobState("123")).thenReturn(jobState);
         when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
+        when(mockScheduler.getGlobalSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
 
         InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
 
@@ -148,6 +150,7 @@ public class SchedulerStateRestJobLogsTest {
 
         when(mockScheduler.getJobState("123")).thenReturn(jobState);
         when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
+        when(mockScheduler.getGlobalSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
 
         InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
 

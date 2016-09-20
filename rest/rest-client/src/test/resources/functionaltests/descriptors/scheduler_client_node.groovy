@@ -10,7 +10,7 @@ try {
     task = new ScriptTask()
     task.setName("HelloTask")
     inFile = new File("inFile.txt");
-    inFile.write("SchedulerNodeClientTask")
+    inFile.write("NodeClientTask")
     task.addInputFiles("inFile.txt", InputAccessMode.TransferFromUserSpace)
     task.addOutputFiles("outFile.txt", OutputAccessMode.TransferToUserSpace)
     task.setScript(new TaskScript(new SimpleScript("outFile = new File(\"outFile.txt\"); outFile.write(\"Hello \" + (new File(\"inFile.txt\").text) + \" I'm HelloTask\")", "groovy")))

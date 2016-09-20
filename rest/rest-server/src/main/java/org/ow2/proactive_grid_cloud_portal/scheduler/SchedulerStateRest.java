@@ -157,6 +157,7 @@ import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
@@ -209,19 +210,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
-    private static FileSystemManager fsManager = null;
+    private static RestDataspaceImpl dataspaceRestApi = new RestDataspaceImpl();
 
     private static Map<String, String> sortableTaskAttrMap = null;
 
     private static final int TASKS_PAGE_SIZE = PASchedulerProperties.TASKS_PAGE_SIZE.getValueAsInt();
 
     static {
-        try {
-            fsManager = VFSFactory.createDefaultFileSystemManager();
-            sortableTaskAttrMap = createSortableTaskAttrMap();
-        } catch (FileSystemException e) {
-            logger.error("Could not create Default FileSystem Manager", e);
-        }
+        sortableTaskAttrMap = createSortableTaskAttrMap();
     }
 
     protected static final List<SortParameter<JobSortParameter>> DEFAULT_JOB_SORT_PARAMS = Arrays.asList(
@@ -2290,6 +2286,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    private String normalizeFilePath(String filePath, String fileName) {
+        if (filePath == null) {
+            filePath = "";
+        }
+        if (fileName != null && filePath.length() > 0 && !filePath.endsWith("/")) {
+            filePath = (filePath + "/" + fileName);
+        } else if (fileName != null) {
+            filePath = fileName;
+        }
+
+        if (filePath.length() > 0 && filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
+        }
+        return filePath;
+    }
+
     /**
      * Pushes a file from the local file system into the given DataSpace
      * 
@@ -2313,7 +2325,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("spaceName") String spaceName, @PathParam("filePath") String filePath,
             MultipartFormDataInput multipart)
             throws IOException, NotConnectedRestException, PermissionRestException {
-        Scheduler s = checkAccess(sessionId, "pushFile");
+        checkAccess(sessionId, "pushFile");
+
+        Session session = dataspaceRestApi.checkSessionValidity(sessionId);
 
         Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
 
@@ -2335,19 +2349,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new IllegalArgumentException("Wrong file name : " + fileName);
         }
 
-        String spaceURI = resolveSpaceUri(s, spaceName);
-        if (filePath == null) {
-            filePath = "";
-        }
-        if (!filePath.startsWith("/")) {
-            filePath = "/" + filePath;
-        }
-        String destUri = spaceURI + filePath;
-        if (!destUri.endsWith("/")) {
-            destUri += "/";
-        }
-        destUri += fileName;
-        FileObject destfo = fsManager.resolveFile(destUri);
+        filePath = normalizeFilePath(filePath, fileName);
+
+        FileObject destfo = dataspaceRestApi.resolveFile(session, spaceName, filePath);
+
+        URL targetUrl = destfo.getURL();
+        logger.info("[pushFile] pushing file to " + targetUrl);
+
         if (!destfo.isWriteable()) {
             RuntimeException ex = new IllegalArgumentException(
                 "File " + filePath + " is not writable in space " + spaceName);
@@ -2359,38 +2367,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
         // used to create the necessary directories if needed
         destfo.createFile();
-        URL targetUrl = destfo.getURL();
 
-        if (targetUrl.toString().startsWith("file:")) {
-            // if the url is a file:// url, we push directly the InputStream to
-            // the destination file
-            File targetFile = null;
-            try {
-                targetFile = new File(targetUrl.toURI());
-            } catch (URISyntaxException e) {
-                throw new IllegalStateException(e);
-            }
-            logger.info("[pushFile] pushing input file to " + targetFile);
-            try {
-                FileUtils.copyInputStreamToFile(fileContent, targetFile);
-            } catch (IOException e) {
-                if (targetFile.exists()) {
-                    targetFile.delete();
-                }
-                throw e;
-            }
-        } else {
-            // in the other case, we need to push the inputStream to a tempFile
-            // and then transfer the file via dataspaces
-            File tmpFile = File.createTempFile("pushedFile", ".tmp");
-            try {
-                FileUtils.copyInputStreamToFile(fileContent, tmpFile);
-                FileObject sourcefo = fsManager.resolveFile(tmpFile.getCanonicalPath());
-                destfo.copyFrom(sourcefo, Selectors.SELECT_SELF);
-            } finally {
-                tmpFile.delete();
-            }
-        }
+        dataspaceRestApi.writeFile(fileContent, destfo, null);
 
         return true;
     }
@@ -2416,17 +2394,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("spaceName") String spaceName, @PathParam("filePath") String filePath)
             throws IOException, NotConnectedRestException, PermissionRestException {
 
-        Scheduler s = checkAccess(sessionId, "pullFile");
+        checkAccess(sessionId, "pullFile");
+        Session session = dataspaceRestApi.checkSessionValidity(sessionId);
 
-        String spaceURI = resolveSpaceUri(s, spaceName);
-        if (filePath == null) {
-            filePath = "";
-        }
-        if (!filePath.startsWith("/")) {
-            filePath = "/" + filePath;
-        }
-        String destUri = spaceURI + filePath;
-        FileObject sourcefo = fsManager.resolveFile(destUri);
+        filePath = normalizeFilePath(filePath, null);
+
+        FileObject sourcefo = dataspaceRestApi.resolveFile(session, spaceName, filePath);
+
         if (!sourcefo.exists() || !sourcefo.isReadable()) {
             RuntimeException ex = new IllegalArgumentException(
                 "File " + filePath + " does not exist or is not readable in space " + spaceName);
@@ -2471,18 +2445,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public boolean deleteFile(@HeaderParam("sessionid") String sessionId,
             @PathParam("spaceName") String spaceName, @PathParam("filePath") String filePath)
             throws IOException, NotConnectedRestException, PermissionRestException {
-        Scheduler s = checkAccess(sessionId, "deleteFile");
+        checkAccess(sessionId, "deleteFile");
 
-        String spaceURI = resolveSpaceUri(s, spaceName);
-        if (filePath == null) {
-            filePath = "";
-        }
-        if (!filePath.startsWith("/")) {
-            filePath = "/" + filePath;
-        }
-        String destUri = spaceURI + filePath;
+        Session session = dataspaceRestApi.checkSessionValidity(sessionId);
 
-        FileObject sourcefo = fsManager.resolveFile(destUri);
+        filePath = normalizeFilePath(filePath, null);
+
+        FileObject sourcefo = dataspaceRestApi.resolveFile(session, spaceName, filePath);
+
         if (!sourcefo.exists() || !sourcefo.isWriteable()) {
             RuntimeException ex = new IllegalArgumentException(
                 "File or Folder " + filePath + " does not exist or is not writable in space " + spaceName);
@@ -2502,26 +2472,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw ex;
         }
         return true;
-    }
-
-    private String resolveSpaceUri(Scheduler s, String spaceName)
-            throws NotConnectedRestException, PermissionRestException {
-        try {
-            if (SchedulerConstants.GLOBALSPACE_NAME.equals(spaceName)) {
-                return s.getGlobalSpaceURIs().get(0);
-
-            } else if (SchedulerConstants.USERSPACE_NAME.equals(spaceName)) {
-                return s.getUserSpaceURIs().get(0);
-            } else {
-                RuntimeException ex = new IllegalArgumentException("Wrong Data Space name : " + spaceName);
-                logger.error(ex);
-                throw ex;
-            }
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
-        } catch (PermissionException e) {
-            throw new PermissionRestException(e);
-        }
     }
 
     /**

@@ -37,14 +37,18 @@ package org.ow2.proactive.scheduler.rest;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
+import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -83,6 +87,84 @@ public interface ISchedulerClient extends Scheduler {
      * @return the current session identifier
      */
     String getSession();
+
+    /**
+     * Submit a new job to the scheduler.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
+     * @param job a job provided as a local File
+     * @return the generated new job ID.
+     * @throws NotConnectedException
+     * @throws JobCreationException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     */
+    JobId submit(File job) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
+     * @param job a job provided as a url
+     * @return the generated new job ID.
+     * @throws NotConnectedException
+     * @throws JobCreationException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     */
+    JobId submit(URL job) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
+     * @param job       a job provided as a local File
+     * @param variables job variables to use during the job execution
+     * @return the generated new job ID.
+     * @throws NotConnectedException
+     * @throws JobCreationException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     */
+    JobId submit(File job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
+     * @param job       a job provided as a url
+     * @param variables job variables to use during the job execution
+     * @return the generated new job ID.
+     * @throws NotConnectedException
+     * @throws JobCreationException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     */
+    JobId submit(URL job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException;
 
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the

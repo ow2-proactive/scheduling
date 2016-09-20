@@ -94,6 +94,10 @@ public class SchedulerConstants {
 
     public static final String DS_USER_BINDING_NAME = "userspace";
 
+    public static final String DS_GLOBAL_API_BINDING_NAME = "globalspaceapi";
+
+    public static final String DS_USER_API_BINDING_NAME = "userspaceapi";
+
     public static final String FORK_ENVIRONMENT_BINDING_NAME = "forkEnvironment";
 
     /**

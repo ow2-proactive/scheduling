@@ -34,16 +34,6 @@
  */
 package functionaltests;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -64,6 +54,15 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
+
+import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 
 /**
@@ -102,12 +101,12 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
     public void testPushPull() throws Exception {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
 
-        File[] destPaths = { new File("/test/push/pull"), new File("/") };
+        String[] destPaths = {"another", "test/push/pull"};
 
         String[] spacesNames = { SchedulerConstants.GLOBALSPACE_NAME, SchedulerConstants.USERSPACE_NAME };
 
         String[] spacesUris = { scheduler.getGlobalSpaceURIs().get(0), scheduler.getUserSpaceURIs().get(0) };
-        for (File destPath : destPaths) {
+        for (String destPath : destPaths) {
             for (int i = 0; i < spacesNames.length; i++) {
                 String spaceName = spacesNames[i];
                 String spacePath = (new File(new URI(spacesUris[i]))).getAbsolutePath();
@@ -127,7 +126,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testFailureWithNonEncodedParametersInUrlPath() throws Exception {
-        String destPath = "/";
+        String destPath = "testNonEncoded";
 
         String pullListUrl = getResourceUrl("dataspace/" +
                 SchedulerConstants.GLOBALSPACE_NAME + "/" + destPath);
@@ -140,19 +139,19 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
         assertEquals(500, response.getStatusLine().getStatusCode());
     }
 
-    public void testIt(String spaceName, String spacePath, File destPath, boolean encode) throws Exception {
+    public void testIt(String spaceName, String spacePath, String destPath, boolean encode) throws Exception {
         File testPushFile = RestFuncTHelper.getDefaultJobXmlfile();
         // you can test pushing pulling a big file :
         // testPushFile = new File("path_to_a_big_file");
-        File destFile = new File(new File(spacePath, destPath.toString()), testPushFile.getName());
+        File destFile = new File(new File(spacePath, destPath), testPushFile.getName());
         if (destFile.exists()) {
             destFile.delete();
         }
 
         // PUSHING THE FILE
         String pushfileUrl = getResourceUrl("dataspace/" +
-            spaceName +
-            (encode ? URLEncoder.encode(destPath.toString(), "UTF-8") : destPath.toString()
+                spaceName + "/" +
+                (encode ? URLEncoder.encode(destPath, "UTF-8") : destPath
                     .replace("\\", "/")));
         // either we encode or we test human readable path (with no special character inside)
 
@@ -169,7 +168,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
 
         System.out.println(response.getStatusLine());
         assertHttpStatusOK(response);
-        Assert.assertTrue(destFile + " exists", destFile.exists());
+        Assert.assertTrue(destFile + " exists for " + spaceName, destFile.exists());
 
         Assert.assertTrue("Original file and result are equals for " + spaceName, FileUtils.contentEquals(
                 testPushFile, destFile));
@@ -178,7 +177,7 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
         String pullListUrl = getResourceUrl("dataspace/" +
             spaceName +
             "/" +
-            (encode ? URLEncoder.encode(destPath.toString(), "UTF-8") : destPath.toString()
+                (encode ? URLEncoder.encode(destPath, "UTF-8") : destPath
                     .replace("\\", "/")));
 
         HttpGet reqPullList = new HttpGet(pullListUrl);
@@ -199,8 +198,8 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
         String pullfileUrl = getResourceUrl("dataspace/" +
             spaceName +
             "/" +
-            (encode ? URLEncoder.encode(destPath.toString() + "/" + testPushFile.getName(), "UTF-8")
-                    : destPath.toString().replace("\\", "/") + "/" + testPushFile.getName()));
+                (encode ? URLEncoder.encode(destPath + "/" + testPushFile.getName(), "UTF-8")
+                        : destPath.replace("\\", "/") + "/" + testPushFile.getName()));
 
         HttpGet reqPull = new HttpGet(pullfileUrl);
         setSessionHeader(reqPull);
@@ -219,12 +218,9 @@ public class RestSchedulerPushPullFileTest extends AbstractRestFuncTestCase {
                 answerFile, testPushFile));
 
         // DELETING THE HIERARCHY
-        File rootDir = destPath;
-        while (rootDir.getParentFile() != null) {
-            rootDir = rootDir.getParentFile();
-        }
+        String rootPath = destPath.substring(0, destPath.contains("/") ? destPath.indexOf("/") : destPath.length());
         String deleteUrl = getResourceUrl("dataspace/" + spaceName + "/" +
-            (encode ? URLEncoder.encode(rootDir.toString(), "UTF-8") : rootDir.toString().replace("\\", "/")));
+                (encode ? URLEncoder.encode(rootPath, "UTF-8") : rootPath.replace("\\", "/")));
         HttpDelete reqDelete = new HttpDelete(deleteUrl);
         setSessionHeader(reqDelete);
 

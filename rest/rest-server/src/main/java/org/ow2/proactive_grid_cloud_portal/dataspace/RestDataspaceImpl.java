@@ -42,6 +42,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
@@ -53,7 +54,12 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -68,6 +74,8 @@ import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
 public class RestDataspaceImpl {
 
     private static final Logger logger = Logger.getLogger(RestDataspaceImpl.class);
+    public static final String USER = "user";
+    public static final String GLOBAL = "global";
 
     private static SessionStore sessions = SharedSessionStore.getInstance();
 
@@ -103,9 +111,10 @@ public class RestDataspaceImpl {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
+            logger.debug(String.format("Storing %s in %s", pathname, dataspace));
             writeFile(is, resolveFile(session, dataspace, pathname), encoding);
         } catch (Throwable error) {
-            logger.error(String.format("Cannot save the requested file in %s.", dataspace), error);
+            logger.error(String.format("Cannot save the requested file to %s in %s.", pathname, dataspace), error);
             rethrow(error);
         }
         return Response.status(Response.Status.CREATED).build();
@@ -128,7 +137,13 @@ public class RestDataspaceImpl {
      * <b>Notes:</b>
      * <ul>
      * <li>If 'list' is specified as the 'comp' query parameter, an
-     * {@link ListFile} type object will be return in JSON format.</li>
+     * {@link ListFile} type object will be return in JSON format. It will contain a list of files and folder contained in the selected
+     * path.
+     * </li>
+     * <li>If 'recursive' is specified as the 'comp' query parameter, an
+     * {@link ListFile} type object will be return in JSON format. It will contain a list of files and folder contained in the selected
+     * path and all subfolders.
+     * </li>
      * <li>If the pathname represents a file its contents will be returned as:
      * <ul>
      * <li>an octet stream, if its a compressed file or the client doesn't
@@ -164,28 +179,34 @@ public class RestDataspaceImpl {
                 return notFoundRes();
             }
             if (!Strings.isNullOrEmpty(component)) {
-                return componentResponse(component, fo);
+                return componentResponse(component, fo, includes, excludes);
             }
             if (fo.getType() == FileType.FILE) {
                 if (VFSZipper.isZipFile(fo)) {
+                    logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace));
                     return fileComponentResponse(fo);
                 } else if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") ||
                     encoding.contains("gzip")) {
+                    logger.debug(String.format("Retrieving file %s as gzip in %s", pathname, dataspace));
                     return gzipComponentResponse(pathname, fo);
                 } else if (encoding.contains("zip")) {
+                    logger.debug(String.format("Retrieving file %s as zip in %s", pathname, dataspace));
                     return zipComponentResponse(fo, null, null);
                 } else {
+                    logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace));
                     return fileComponentResponse(fo);
                 }
             } else {
                 // folder
                 if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") || encoding.contains("zip")) {
+                    logger.debug(String.format("Retrieving folder %s as zip in %s", pathname, dataspace));
                     return zipComponentResponse(fo, includes, excludes);
                 } else {
                     return badRequestRes("Folder retrieval only supported with zip encoding.");
                 }
             }
         } catch (Throwable error) {
+            logger.error(String.format("Cannot retrieve %s in %s.", pathname, dataspace), error);
             throw rethrow(error);
         }
     }
@@ -230,12 +251,16 @@ public class RestDataspaceImpl {
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
             if (fo.getType() == FileType.FOLDER) {
+                logger.debug(String.format("Deleting directory %s in %s", pathname, dataspace));
                 return deleteDir(fo, includes, excludes);
             } else {
-                return (fo.delete()) ? noContentRes()
+                logger.debug(String.format("Deleting file %s in %s", pathname, dataspace));
+                fo.close();
+                return fo.delete() ? noContentRes()
                         : serverErrorRes("Cannot delete the file: %s", pathname);
             }
         } catch (Throwable error) {
+            logger.error(String.format("Cannot delete %s in %s.", pathname, dataspace), error);
             throw rethrow(error);
         }
     }
@@ -263,6 +288,7 @@ public class RestDataspaceImpl {
             if (!fo.exists()) {
                 return notFoundRes();
             }
+            logger.debug(String.format("Retrieving metadata for %s in %s", pathname, dataspacePath));
             MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>(FileSystem
                     .metadata(fo));
             return Response.ok().replaceAll(headers).build();
@@ -282,38 +308,37 @@ public class RestDataspaceImpl {
 
         checkPathParams(dataspacePath, pathname);
         Session session = checkSessionValidity(sessionId);
-
         try {
             FileObject fileObject = resolveFile(session, dataspacePath, pathname);
 
             if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FOLDER.getMimeType())) {
+                logger.debug(String.format("Creating folder %s in %s", pathname, dataspacePath));
                 fileObject.createFolder();
             } else if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FILE.getMimeType())) {
+                logger.debug(String.format("Creating file %s in %s", pathname, dataspacePath));
                 fileObject.createFile();
             } else {
                 return serverErrorRes("Cannot create specified file since mimetype is not specified");
             }
 
-            MultivaluedMap<String, Object> headers =
-                    new MultivaluedHashMap(FileSystem.metadata(fileObject));
-
-            return Response.ok().replaceAll(headers).build();
+            return Response.ok().build();
         } catch (FileSystemException e) {
-            logger.error(String.format("Cannot create folder for %s in %s", pathname, dataspacePath), e);
+            logger.error(String.format("Cannot create %s in %s", pathname, dataspacePath), e);
             throw rethrow(e);
         } catch (Throwable e) {
-            logger.error(
-                    String.format(
-                            "Cannot retrieve metadata for %s in %s.",
-                            pathname, dataspacePath), e);
+            logger.error(String.format("Cannot create %s in %s", pathname, dataspacePath), e);
             throw rethrow(e);
         }
     }
 
-    private Response componentResponse(String type, FileObject fo) throws FileSystemException {
-        return ("list".equals(type)) ? Response.ok(FileSystem.list(fo), MediaType.APPLICATION_JSON).build()
-                : Response.status(Response.Status.BAD_REQUEST).entity(
+    private Response componentResponse(String type, FileObject fo, List<String> includes, List<String> excludes) throws FileSystemException {
+        switch (type) {
+            case "list":
+                return Response.ok(FileSystem.list(fo, includes, excludes), MediaType.APPLICATION_JSON).build();
+            default:
+                return Response.status(Response.Status.BAD_REQUEST).entity(
                         String.format("Unknown query parameter: comp=%s", type)).build();
+        }
     }
 
     private Response zipComponentResponse(final FileObject fo, final List<String> includes,
@@ -400,20 +425,26 @@ public class RestDataspaceImpl {
                 (args == null || args.length == 0) ? format : String.format(format, args)).build();
     }
 
-    private FileObject resolveFile(Session session, String dataspace, String pathname)
-            throws FileSystemException, NotConnectedException, PermissionException {
-        return "user".equals(dataspace) ? fileSystem(session).resolveFileInUserspace(pathname) : fileSystem(
-                session).resolveFileInGlobalspace(pathname);
+    public FileObject resolveFile(Session session, String dataspace, String pathname)
+            throws FileSystemException, NotConnectedRestException, PermissionRestException {
+        try {
+            return USER.equalsIgnoreCase(dataspace) || SchedulerConstants.USERSPACE_NAME.toString().equalsIgnoreCase(dataspace) ? fileSystem(session).resolveFileInUserspace(pathname) : fileSystem(
+                    session).resolveFileInGlobalspace(pathname);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
     }
 
     private void checkPathParams(String dataspace, String pathname) {
         checkArgument(!Strings.isNullOrEmpty(dataspace), "Dataspace name cannot be null or empty.");
-        checkArgument("user".equals(dataspace) || "global".equals(dataspace),
-                "Invalid dataspace name: '%s', only 'user' or 'global' is allowed.", dataspace);
+        checkArgument(USER.equalsIgnoreCase(dataspace) || GLOBAL.equalsIgnoreCase(dataspace) || SchedulerConstants.USERSPACE_NAME.toString().equalsIgnoreCase(dataspace) || SchedulerConstants.GLOBALSPACE_NAME.toString().equalsIgnoreCase(dataspace),
+                "Invalid dataspace name: '%s'.", dataspace);
         checkArgument(!Strings.isNullOrEmpty(pathname), "Pathname cannot be null or empty.");
     }
 
-    private void writeFile(InputStream inputStream, FileObject outputFile, String encoding)
+    public void writeFile(InputStream inputStream, FileObject outputFile, String encoding)
             throws FileSystemException, IOException {
         try {
             if (outputFile.exists()) {
@@ -461,7 +492,7 @@ public class RestDataspaceImpl {
         return fs;
     }
 
-    private Session checkSessionValidity(String sessionId) throws NotConnectedRestException {
+    public Session checkSessionValidity(String sessionId) throws NotConnectedRestException {
         Session session = Strings.isNullOrEmpty(sessionId) ? null : sessions.get(sessionId);
         if (session == null || session.getScheduler() == null) {
             throw new NotConnectedRestException("User not authenticated or session timeout.");

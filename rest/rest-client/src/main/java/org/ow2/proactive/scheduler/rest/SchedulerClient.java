@@ -34,40 +34,6 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
-import static java.lang.String.format;
-import static java.lang.System.currentTimeMillis;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.exception;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwJAFEOrUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwNCEOrPEOrSCEOrJCE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPE;
-import static org.ow2.proactive.scheduler.rest.ExceptionUtility.throwUJEOrNCEOrPEOrUTE;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.jobId;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.taskState;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfos;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobResult;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobState;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
-
-import java.io.Closeable;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.lang.reflect.Proxy;
-import java.security.KeyException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.apache.http.client.HttpClient;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
@@ -76,28 +42,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
-import org.ow2.proactive.scheduler.common.JobFilterCriteria;
-import org.ow2.proactive.scheduler.common.JobSortParameter;
-import org.ow2.proactive.scheduler.common.Page;
-import org.ow2.proactive.scheduler.common.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
-import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.*;
+import org.ow2.proactive.scheduler.common.exception.*;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -116,23 +63,35 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.lang.reflect.Proxy;
+import java.net.URL;
+import java.security.KeyException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static org.ow2.proactive.scheduler.rest.ExceptionUtility.*;
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.*;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -676,6 +635,59 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try {
             InputStream is = (new Job2XMLTransformer()).jobToxml((TaskFlowJob) job);
             jobIdData = restApiClient().submitXml(sid, is);
+        } catch (Exception e) {
+            throwNCEOrPEOrSCEOrJCE(e);
+        }
+        return jobId(jobIdData);
+    }
+
+    @Override
+    public JobId submit(File job) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException {
+        JobIdData jobIdData = null;
+        try {
+            InputStream is = new FileInputStream(job);
+            jobIdData = restApiClient().submitXml(sid, is);
+        } catch (Exception e) {
+            throwNCEOrPEOrSCEOrJCE(e);
+        }
+        return jobId(jobIdData);
+    }
+
+    @Override
+    public JobId submit(URL job) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException {
+        JobIdData jobIdData = null;
+        try {
+            InputStream is = job.openStream();
+            jobIdData = restApiClient().submitXml(sid, is);
+        } catch (Exception e) {
+            throwNCEOrPEOrSCEOrJCE(e);
+        }
+        return jobId(jobIdData);
+    }
+
+
+    @Override
+    public JobId submit(File job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException {
+        JobIdData jobIdData = null;
+        try {
+            InputStream is = new FileInputStream(job);
+            jobIdData = restApiClient().submitXml(sid, is, variables);
+        } catch (Exception e) {
+            throwNCEOrPEOrSCEOrJCE(e);
+        }
+        return jobId(jobIdData);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException,
+            JobCreationException {
+        JobIdData jobIdData = null;
+        try {
+            InputStream is = job.openStream();
+            jobIdData = restApiClient().submitXml(sid, is, variables);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }

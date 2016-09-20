@@ -97,7 +97,7 @@ configure(javaSubprojects) {
 
 
     sourceCompatibility = JavaVersion.VERSION_1_7
-    targetCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
 
@@ -345,6 +345,7 @@ def exportedProjects= [
         ":scheduler:scheduler-api",
         ":scheduler:scheduler-client",
         ":scheduler:scheduler-examples",
+        ":scheduler:scheduler-node",
         ":scheduler:scheduler-smartproxy",
         ":scheduler:scheduler-smartproxy-common",
         ":rest:rest-client",

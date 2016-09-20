@@ -57,6 +57,8 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
+import java.io.File;
+import java.net.URL;
 import java.security.KeyException;
 import java.util.Date;
 import java.util.List;
@@ -258,6 +260,30 @@ public class SchedulerNodeClient implements ISchedulerClient {
     public JobId submit(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job);
+    }
+
+    @Override
+    public JobId submit(File job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        renewSession();
+        return client.submit(job);
+    }
+
+    @Override
+    public JobId submit(URL job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        renewSession();
+        return client.submit(job);
+    }
+
+    @Override
+    public JobId submit(File job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        renewSession();
+        return client.submit(job, variables);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        renewSession();
+        return client.submit(job, variables);
     }
 
     @Override

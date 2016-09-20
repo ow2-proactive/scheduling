@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.5"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+    name="Untitled workflow 1" 
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2"
+>
+  <variables>
+	<variable name="sim_merge_commands_file_name" value="/"/>
+	<variable name="MERGE_RAM" value="1"/>
+  </variables>
+  <genericInformation>
+    <info name="var1" value="val1"/>
+    <info name="var2" value="val2"/>
+  </genericInformation>
+  <taskFlow>
+    <task name="Java_Task"
+    maxNumberOfExecution="4">
+      <genericInformation>
+        <info name="ALLOC_RAM_GIGABYTES" value="${MERGE_RAM}"/>
+      </genericInformation>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
+      <cleaning>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+org.objectweb.proactive.api.PAActiveObject.getNode().setProperty("ALLOC_RAM_GIGABYTES","0");
+]]>
+          </code>
+        </script>
+      </cleaning>
+      
+    </task>
+    
+    <task name="Java_Task2"
+    maxNumberOfExecution="4">
+      <genericInformation>
+        <info name="ALLOC_RAM_GIGABYTES" value="${MERGE_RAM}"/>
+      </genericInformation>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
+      <cleaning>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+org.objectweb.proactive.api.PAActiveObject.getNode().setProperty("ALLOC_RAM_GIGABYTES","0");
+]]>
+          </code>
+        </script>
+      </cleaning>
+      
+    </task>
+    
+      <task name="Java_Task3"
+    maxNumberOfExecution="4">
+      <genericInformation>
+        <info name="ALLOC_RAM_GIGABYTES" value="${MERGE_RAM}"/>
+      </genericInformation>
+      <javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
+      <cleaning>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+org.objectweb.proactive.api.PAActiveObject.getNode().setProperty("ALLOC_RAM_GIGABYTES","0");
+]]>
+          </code>
+        </script>
+      </cleaning>
+      
+    </task>
+    
+  </taskFlow>
+</job>
