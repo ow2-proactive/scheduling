@@ -51,7 +51,7 @@ start() {
   done < "$loginFile"
 
   # Redirects default and error output to a log file
-  java -Dpa.scheduler.home=$cwd -jar $cwd/addons/calendar-service*.jar
+  java -Dpa.scheduler.home=$cwd -jar $cwd/tools/calendar-service*.jar
   echo " *** Calendar service gets started *** "
 }
 
