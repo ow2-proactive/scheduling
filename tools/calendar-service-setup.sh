@@ -3,22 +3,22 @@
 # Updated to use python 3.4
 
 ## Install required packages
-if [[ $(id -u) -ne 0 ]] ; then echo "Please run the installation script as root" ; exit 1 ; fi
-
-apt-get update
-apt-get -y install python3
-apt-get -y install python3-setuptools
-apt-get -y install apache2-utils
 
 cd ..
 cwd=$(pwd)
 ## Install radicale
 cd $cwd/tools/radicale/linux
 tar xvzf Radicale-1.1.1.tar.gz
-cd Radicale-1.1.1
-python3 setup.py install
 
-mkdir /etc/radicale
+sudo apt-get update
+sudo apt-get -y install python3
+sudo apt-get -y install python3-setuptools
+sudo apt-get -y install apache2-utils
+cd Radicale-1.1.1
+sudo python3 setup.py install
+cd $cwd
+sudo rm -rf $cwd/tools/radicale/linux/Radicale-1.1.1
+
 mkdir -p ~/.config/radicale/collections
 
 #check if path is not empty string
@@ -30,25 +30,21 @@ if [ ! -e "$loginFile" ]
     exit
 fi
 
-cp -f $cwd/tools/radicale/linux/config /etc/radicale/config
-rm -rf /etc/radicale/users
-touch /etc/radicale/users
-
-while IFS=':' read -r user password
-do
-    htpasswd -bs /etc/radicale/users "$user" "$password"    
-done < "$loginFile"
+cp -f $cwd/tools/radicale/linux/config ~/.config/radicale/config
+cp -f $cwd/tools/radicale/linux/logging ~/.config/radicale/logging
+rm -rf ~/.config/radicale/users
+touch ~/.config/radicale/users
+mkdir ~/.config/radicale/log
 
 echo "Radicale server is installed, starting the server..."
+cd ~/.config/radicale/log
 
 radicale -d -S
 
 echo "Radicale server started"
 
 #delete radicale folder
-rm -rf $cwd/tools/radicale/linux/Radicale-1.1.1
-
-cd $cwd/tools
+cd $cwd/tools/
 
 read -e -p "Would you like to start Calendar Service right now? (Y/N) :" input
 

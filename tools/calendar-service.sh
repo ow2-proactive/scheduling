@@ -6,7 +6,6 @@
 # Check the application status
 #
 # This function checks if the application is running
-if [[ $(id -u) -ne 0 ]] ; then echo "Please run the installation script as root" ; exit 1 ; fi
 
 cd ..
 cwd=$(pwd)
@@ -42,16 +41,16 @@ start() {
 
   #copy scheduler users to radicale server
   loginFile="$cwd/config/authentication/login.cfg"
-  rm -rf /etc/radicale/users
-  touch /etc/radicale/users
+  rm -rf ~/.config/radicale/users
+  touch ~/.config/radicale/users
 
   while IFS=':' read -r user password
   do
-      htpasswd -bs /etc/radicale/users "$user" "$password"    
+      htpasswd -bs ~/.config/radicale/users "$user" "$password"    
   done < "$loginFile"
 
   # Redirects default and error output to a log file
-  java -Dpa.scheduler.home=$cwd -jar $cwd/addons/calendar-service*.jar
+  java -Dpa.scheduler.home=$cwd -Dspring.config.location=$cwd/config/calendar-service/application.properties -jar $cwd/tools/calendar-service*.jar
   echo " *** Calendar service gets started *** "
 }
 
