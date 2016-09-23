@@ -5,7 +5,7 @@
 @rem
 @rem ##########################################################################
 
-echo Calendar Service setting up ...
+echo Calendar Service is starting up ...
 
 @rem Set local scope for the variables with windows NT shell
 if "%OS%"=="Windows_NT" setlocal
@@ -35,7 +35,7 @@ goto fail
 
 :findJavaFromJavaHome
 set JAVA_HOME=%JAVA_HOME:"=%
-set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+set JAVA_EXE=%JAVA_HOME%/bin/javaw.exe
 
 if exist "%JAVA_EXE%" goto execute
 
@@ -52,7 +52,9 @@ goto fail
 @rem import proactive user accounts to radicale
 TYPE %APP_HOME%\config\authentication\login.cfg > %RADICLAE_HOME%\Data\config\htpasswd.txt
 
-"%JAVA_EXE%" -Dpa.scheduler.home=%APP_HOME% -Dspring.config.location=%APP_HOME%\config\calendar-service\application.properties -jar %APP_HOME%\tools\calendar-service*.jar
+start "" "%JAVA_EXE%" -Dpa.scheduler.home=%APP_HOME% -Dspring.config.location=%APP_HOME%\config\calendar-service\application.properties -jar %APP_HOME%\tools\calendar-service*.jar >NUL 2>&1
+
+echo Done
 
 :end
 @rem End local scope for the variables with windows NT shell
