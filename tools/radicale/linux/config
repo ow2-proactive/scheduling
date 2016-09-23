@@ -5,7 +5,7 @@
 type = htpasswd
 
 # Htpasswd filename
-htpasswd_filename = /etc/radicale/users
+htpasswd_filename = ~/.config/radicale/users
 
 # Htpasswd encryption method
 # Value: plain | sha1 | ssha | crypt | bcrypt | md5
@@ -35,3 +35,7 @@ htpasswd_encryption = sha1
 # Rights backend
 # Value: None | authenticated | owner_only | owner_write | from_file | custom
 type = owner_write
+
+[logging]
+
+config = ~/.config/radicale/logging

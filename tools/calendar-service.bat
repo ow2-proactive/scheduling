@@ -52,7 +52,7 @@ goto fail
 @rem import proactive user accounts to radicale
 TYPE %APP_HOME%\config\authentication\login.cfg > %RADICLAE_HOME%\Data\config\htpasswd.txt
 
-"%JAVA_EXE%" -Dpa.scheduler.home=%APP_HOME% -jar %APP_HOME%\tools\calendar-service*.jar
+"%JAVA_EXE%" -Dpa.scheduler.home=%APP_HOME% -Dspring.config.location=%APP_HOME%\config\calendar-service\application.properties -jar %APP_HOME%\tools\calendar-service*.jar
 
 :end
 @rem End local scope for the variables with windows NT shell
