@@ -580,8 +580,10 @@ public class SchedulingService {
                 public Boolean call() throws Exception {
                     TerminationData terminationData = jobs.finishInErrorTask(jobId, taskName);
                     boolean taskfinished = terminationData.taskTerminated(jobId, taskName);
-                    submitTerminationDataHandler(terminationData);
-                    wakeUpSchedulingThread();
+                    if( taskfinished) {
+                        submitTerminationDataHandler(terminationData);
+                        wakeUpSchedulingThread();
+                    }
                     return taskfinished;
                 }
             }).get();

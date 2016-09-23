@@ -1,16 +1,5 @@
 package org.ow2.proactive.scheduler.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -44,6 +33,17 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.TaskIdWrapper;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 class LiveJobs {
@@ -625,63 +625,59 @@ class LiveJobs {
             if (task == null) {
                 throw new UnknownTaskException(taskName);
             }
-            
+
             TaskId taskId = task.getId();
-            if (!task.getStatus().isTaskAlive()) {
-                tlogger.info(task.getId(), "task isn't alive: " + task.getStatus());
+            if (task.getStatus() != TaskStatus.IN_ERROR) {
+                tlogger.info(task.getId(), "Task must be in state IN_ERROR: " + task.getStatus());
                 return emptyResult(task.getId());
             }
 
             TaskResultImpl taskResult = new TaskResultCreator()
                     .getEmptyTaskResultWithTaskIdAndExecutionTime(task);
-            
-            RunningTaskData data = new RunningTaskData(task, job.getOwner(), 
+
+            RunningTaskData data = new RunningTaskData(task, job.getOwner(),
                     job.getCredentials(), task.getExecuterInformation().getLauncher());
-            
+
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(job, data, false, taskResult);
 
-            if (onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
-                endJob(jobData, terminationData, task, taskResult, "The task has been manually killed. " +
-                    "You also ask to cancel the job in such a situation!", JobStatus.CANCELED);
+
+            tlogger.debug(taskId, "result added to job " + job.getId());
+            //to be done before terminating the task, once terminated it is not running anymore..
+            ChangedTasksInfo changesInfo = job.finishInErrorTask(taskId, taskResult, listener);
+
+            boolean jobFinished = job.isFinished();
+
+            //update job info if it is terminated
+            if (jobFinished) {
+                //terminating job
+                job.terminate();
+                jlogger.debug(job.getId(), "terminated");
+                jobs.remove(job.getId());
+                terminationData.addJobToTerminate(job.getId());
+            }
+
+            //Update database
+            if (taskResult.getAction() != null) {
+                dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, taskResult);
             } else {
+                dbManager.updateAfterTaskFinished(job, task, taskResult);
+            }
 
-                tlogger.debug(taskId, "result added to job " + job.getId());
-                //to be done before terminating the task, once terminated it is not running anymore..
-                ChangedTasksInfo changesInfo = job.finishInErrorTask(taskId, taskResult, listener);
-                
-                boolean jobFinished = job.isFinished();
-
-                //update job info if it is terminated
-                if (jobFinished) {
-                    //terminating job
-                    job.terminate();
-                    jlogger.debug(job.getId(), "terminated");
-                    jobs.remove(job.getId());
-                    terminationData.addJobToTerminate(job.getId());
-                }
-
-                //Update database
-                if (taskResult.getAction() != null) {
-                    dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, taskResult);
-                } else {
-                    dbManager.updateAfterTaskFinished(job, task, taskResult);
-                }
-
-                //send event
-                listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
+            //send event
+            listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
                     SchedulerEvent.TASK_IN_ERROR_TO_FINISHED, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
-                //if this job is finished (every task have finished)
-                jlogger.info(job.getId(), "finished tasks " + job.getNumberOfFinishedTasks() + ", total tasks " +
+            //if this job is finished (every task have finished)
+            jlogger.info(job.getId(), "finished tasks " + job.getNumberOfFinishedTasks() + ", total tasks " +
                     job.getTotalNumberOfTasks() + ", finished " + jobFinished);
-                if (jobFinished) {
-                    //send event to client
-                    listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
+            if (jobFinished) {
+                //send event to client
+                listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                         SchedulerEvent.JOB_RUNNING_TO_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
-                    listener.jobUpdatedFullData(job);
-                }
+                listener.jobUpdatedFullData(job);
             }
+
 
             return terminationData;
         } finally {
