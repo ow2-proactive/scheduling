@@ -46,6 +46,19 @@ confirm() {
     fi
 }
 
+# Escape functions for sed
+escape_rhs_sed ()
+{
+        echo $(printf '%s\n' "$1" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
+
+}
+
+escape_lhs_sed ()
+{
+        echo $(printf '%s\n' "$1" | sed 's:[][\/.^$*]:\\&:g')
+
+}
+
 
 
 echo "This will install the ProActive scheduler as a service."
@@ -123,6 +136,8 @@ rsync $RSYNC_PROGRESS -a $INSTALL_PADIR $PA_ROOT
 
 ln -s -f $PA_ROOT/$PA_FOLDER_NAME "$PA_ROOT/default"
 
+AUTH_ROOT=$PA_ROOT/default/config/authentication
+
 
 # creation of the proactive user
 
@@ -154,6 +169,75 @@ fi
 chown $USER:$GROUP $PA_ROOT
 chown $USER:$GROUP $PA_ROOT/default
 chown -R $USER:$GROUP $PA_ROOT/$PA_FOLDER_NAME
+
+echo "ProActive use internal system accounts which should me modified in a production environment."
+
+if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; then
+
+    # generate random password for internal scheduler accounts
+    echo "Generating random password for internal scheduler accounts."
+    RM_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
+    SCHED_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
+    WATCHER_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
+
+    ADMIN_PWD_ENTERED=false
+    while  ! $ADMIN_PWD_ENTERED ; do
+        read -s -p "Enter ProActive \"admin\" account password: " ADMIN_PWD
+        echo ""
+        read -s -p "Retype \"admin\" account password: " ADMIN_PWD2
+        echo ""
+        if [[ "$ADMIN_PWD" == "$ADMIN_PWD2" ]]; then
+                ADMIN_PWD_ENTERED=true
+        else
+                ADMIN_PWD_ENTERED=false
+                echo "Passwords don't match."
+
+        fi
+    done
+
+    sed -e "s/^admin:.*/admin=$ADMIN_PWD/g" -i "$AUTH_ROOT/login.cfg"
+    sed -e "s/^rm:.*/rm=$RM_PWD/g" -i "$AUTH_ROOT/login.cfg"
+    sed -e "s/^scheduler:.*/scheduler=$SCHED_PWD/g" -i "$AUTH_ROOT/login.cfg"
+    sed -e "s/^watcher:.*/watcher=$WATCHER_PWD/g" -i "$AUTH_ROOT/login.cfg"
+
+    # generate new private/public key pair
+
+    echo "Generating New Private/Public key pair for the scheduler"
+
+    ./proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
+
+    echo "Generating credential files for ProActive System accounts"
+
+    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l admin -p "$ADMIN_PWD" -o $AUTH_ROOT/admin_user.cred
+    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l scheduler -p "$SCHED_PWD" -o $AUTH_ROOT/scheduler.cred
+    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l rm -p "$RM_PWD" -o $AUTH_ROOT/rm.cred
+    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l watcher -p "$WATCHER_PWD" -o $AUTH_ROOT/watcher.cred
+
+    ( cd /opt/proactive/default && zip -f dist/lib/rm-node-*.jar config/authentication/rm.cred )
+    ( cd /opt/proactive/default/dist && zip -f war/rest/node.jar lib/rm-node-*.jar )
+fi
+
+# removing test accounts
+
+remove_user() {
+    sed "/$1:/d" -i "$AUTH_ROOT/login.cfg"
+    sed "/$1:/d" -i "$AUTH_ROOT/group.cfg"
+}
+
+remove_user "demo"
+remove_user "user"
+remove_user "guest"
+remove_user "test"
+remove_user "radmin"
+remove_user "nsadmin"
+remove_user "provider"
+remove_user "test_executor"
+
+# configure watcher account
+sed "s/scheduler\.cache\.password=.*/scheduler.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+sed "s/scheduler\.cache\.credential=.*/scheduler.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+sed "s/rm\.cache\.password=.*/rm.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+sed "s/rm\.cache\.credential=.*/rm.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
 
 
 # Configuration of the service script
@@ -240,13 +324,6 @@ if confirm "Setup cron task for cleaning old logs? [Y/n] " ; then
 fi
 
 
-
-# Escape functions for sed 
-escape_rhs_sed ()
-{
-        echo $(printf '%s\n' "$1" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
-
-}
 
 sed -e "s/^USER=.*/USER=$USER/g" -i "/etc/init.d/proactive-scheduler"
 sed -e "s/^PROTOCOL=.*/PROTOCOL=$PROTOCOL/g" -i "/etc/init.d/proactive-scheduler"
@@ -397,22 +474,21 @@ if which git > /dev/null 2>&1; then
         # copy merged changes on the service (if ever a conflict occurs, the user will have to manually copy the merge)
         cp proactive-scheduler /etc/init.d/
 
-
-        if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
-            # display the list of addons in the new installation
-            echo ""
-            echo "Here is the list of JAR files in the new installation 'addons' folder."
-            echo "If there are duplicates, you need to manually remove outdated versions."
-            echo ""
-
-            ls -l $PA_ROOT/default/addons/*.jar
-        fi
-
     fi
     cd $OLD_PWD
 else
     # in case we don't use git
     rsync $RSYNC_PROGRESS -a $OLD_PADIR/{addons,data,config} $PA_ROOT/default/
+fi
+
+if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
+   # display the list of addons in the new installation
+   echo ""
+   echo "Here is the list of JAR files in the new installation 'addons' folder."
+   echo "If there are duplicates, you need to manually remove outdated versions."
+   echo ""
+
+   ls -l $PA_ROOT/default/addons/*.jar
 fi
 
 if [[ "$OLD_PADIR" != "" ]]; then
@@ -425,6 +501,11 @@ if confirm "Restrict the access to the ProActive installation folder to user ${U
     # preserve credentials access
     chmod -R go-rwx $PA_ROOT/$PA_FOLDER_NAME
 fi
+
+echo "Resource Manager credentials are used by remote ProActive Agents to register to the scheduler."
+echo "If you plan to use ProActive Agents, please replace in their respective \"schedworker\" folder the following files taken from the server installation:"
+ls /opt/proactive/default/config/authentication/rm.cred
+ls /opt/proactive/default/dist/lib/rm-node*.jar
 
 if  ! $CONFLICT ; then
     if confirm "Do you want to start the scheduler service now? [Y/n] " ; then
