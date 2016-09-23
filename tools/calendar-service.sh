@@ -13,7 +13,7 @@ cwd=$(pwd)
 check_status() {
 
   # Running ps with some arguments to check if the PID exists 
-  s=$(ps aux | grep '/bin/java.*calendar-service' | grep -v 'grep' | awk '{print $2}')
+  s=$(ps aux | grep 'java.*calendar-service' | grep -v 'grep' | awk '{print $2}')
 
   # If somethig was returned by the ps command, this function returns the PID
   if [ $s ] ; then
