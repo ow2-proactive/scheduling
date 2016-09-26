@@ -568,6 +568,38 @@ public class SchedulingService {
         }
     }
 
+    public boolean finishInErrorTask(final JobId jobId, final String taskName)
+            throws UnknownJobException, UnknownTaskException {
+        try {
+            if (status.isUnusable()) {
+                return false;
+            }
+
+            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    TerminationData terminationData = jobs.finishInErrorTask(jobId, taskName);
+                    boolean taskfinished = terminationData.taskTerminated(jobId, taskName);
+                    if( taskfinished) {
+                        submitTerminationDataHandler(terminationData);
+                        wakeUpSchedulingThread();
+                    }
+                    return taskfinished;
+                }
+            }).get();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof UnknownTaskException) {
+                throw (UnknownTaskException) e.getCause();
+            } else if (e.getCause() instanceof UnknownJobException) {
+                throw (UnknownJobException) e.getCause();
+            } else {
+                throw launderThrowable(e.getCause());
+            }
+        } catch (Exception e) {
+            throw launderThrowable(e);
+        }
+    }
+
     public boolean restartInErrorTask(final JobId jobId, final String taskName)
             throws UnknownJobException, UnknownTaskException {
         try {
