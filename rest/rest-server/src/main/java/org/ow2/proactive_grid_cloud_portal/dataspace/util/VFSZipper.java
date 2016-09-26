@@ -23,6 +23,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 
+
 public class VFSZipper {
 
     private VFSZipper() {
@@ -83,16 +84,10 @@ public class VFSZipper {
                 ZipEntry zipEntry = zis.getNextEntry();
                 while (zipEntry != null) {
                     FileObject entryFile = outfileObj.resolveFile(zipEntry.getName());
-
-                    if (zipEntry.isDirectory()) {
-                        entryFile.createFolder();
-                    } else {
-                        if (!entryFile.exists()) {
-                            entryFile.createFile();
-                        }
-                        Zipper.ZIP.unzipEntry(zis, entryFile.getContent().getOutputStream());
+                    if (!entryFile.exists()) {
+                        entryFile.createFile();
                     }
-
+                    Zipper.ZIP.unzipEntry(zis, entryFile.getContent().getOutputStream());
                     zipEntry = zis.getNextEntry();
                 }
             } catch (IOException ioe) {
