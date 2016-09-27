@@ -72,8 +72,6 @@ public enum SchedulerEvent {
     TASK_PENDING_TO_RUNNING("Task pending to running"), /** A task has just finished. */
     TASK_RUNNING_TO_FINISHED(
             "Task running to finished"), /** A task has just had an error, it will wait for restart. */
-    TASK_IN_ERROR_TO_FINISHED(
-                    "Task In-Error to finished"), /** A task has just had an error, was marked as finished. */
     TASK_WAITING_FOR_RESTART("Task waiting for restart"), /** The priority of a job has just been change. */
     JOB_CHANGE_PRIORITY(
             "Job change piority"), /** The scheduler has just been paused. Every running job will be finished. */
@@ -95,7 +93,9 @@ public enum SchedulerEvent {
     JOB_IN_ERROR("Job In-Error"), /** A task has just been paused due to an error while executing */
     TASK_IN_ERROR("Task In-Error"), /** A job has just been restarted from error. */
     JOB_RESTARTED_FROM_ERROR("Job restarted from error"), /** A job has just been updated.*/
-    JOB_UPDATED("job updated");
+    JOB_UPDATED("job updated"),
+    TASK_IN_ERROR_TO_FINISHED(
+            "Task In-Error to finished"); /** A task has just had an error, was marked as finished. */
 
     /** Name of the method */
     private String methodName;
