@@ -628,7 +628,7 @@ class LiveJobs {
             
             TaskId taskId = task.getId();
             if (task.getStatus() != TaskStatus.IN_ERROR) {
-                tlogger.info(task.getId(), "task isn't alive: " + task.getStatus());
+                tlogger.info(task.getId(), "Task must be in state IN_ERROR: " + task.getStatus());
                 return emptyResult(task.getId());
             }
 
