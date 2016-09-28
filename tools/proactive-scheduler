@@ -126,7 +126,9 @@ start() {
 			CMD="$CMD  &"
 			#echo $CMD
 			# CMD="$CMD echo \$!"
-			setcap 'cap_net_bind_service,cap_net_raw=+eip' $JAVA_HOME/bin/java
+            if [[ "$PORT" -lt "1024" ]] ; then
+			    setcap 'cap_net_bind_service,cap_net_raw=+eip' $JAVA_HOME/bin/java
+			fi
 			if [ "$USER" != "" ]
 			then
 				$(su $USER -c "$CMD")
