@@ -1261,7 +1261,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *            defines types of job (myonly, pending, running, finished).
      *            Important! If user tries to get all jobs (myonly is false) but
      *            does not have permissions to do it (namely
-     *            GetOwnStateOnlyPermission(true)) user will get his own jobs
+     *            HandleOnlyMyJobsPermission(true)) user will get his own jobs
      *            instead of a PermissionException. This behavior should
      *            simplify the client design.
      *
@@ -1276,7 +1276,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters)
-            throws NotConnectedException, PermissionException;
+                    throws NotConnectedException, PermissionException;
 
     /**
      * Returns a list of connected users.
@@ -1321,7 +1321,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
-            throws NotConnectedException, PermissionException;
+                    throws NotConnectedException, PermissionException;
 
     /**
      * Retrieve a taskstates list from the scheduler.
@@ -1355,7 +1355,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-            throws NotConnectedException, PermissionException;
+                    throws NotConnectedException, PermissionException;
 
     /**
      * Retrieve a job info by it id.

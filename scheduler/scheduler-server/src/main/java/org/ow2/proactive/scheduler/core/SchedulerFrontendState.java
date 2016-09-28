@@ -88,7 +88,7 @@ import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
-import org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission;
+import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
@@ -288,13 +288,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
         ListeningUser ui = identifications
                 .get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID());
-        try {
-            checkOwnStatePermission(myJobsOnly, ui.getUser());
-            return myJobsOnly ? sState.filterOnUser(ui.getUser().getUsername()) : sState;
-        } catch (PermissionException ex) {
-            logger.info(ex.getMessage());
-            throw ex;
-        }
+
+        return myJobsOnly ? sState.filterOnUser(ui.getUser().getUsername()) : sState;
+
     }
 
     /**
@@ -309,10 +305,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @throws PermissionException
      *             if permission is denied
      */
-    synchronized void checkOwnStatePermission(boolean myOnly, UserIdentificationImpl ui)
-            throws PermissionException {
-        ui.checkPermission(new GetOwnStateOnlyPermission(myOnly),
-                ui.getUsername() + " does not have permissions to retrieve full state");
+    synchronized void handleOnlyMyJobsPermission(boolean myOnly, UserIdentificationImpl ui,
+            String errorMessage) throws PermissionException {
+        ui.checkPermission(new HandleOnlyMyJobsPermission(myOnly), ui.getUsername() +
+            " does not have permissions to handle other users jobs (" + errorMessage + ")");
     }
 
     synchronized void addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
@@ -347,7 +343,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             currentState = getState(myEventsOnly);
         } else {
             // check get state permission
-            checkOwnStatePermission(myEventsOnly, uIdent.getUser());
+            handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(),
+                    "You do not have permission to add a listener !");
         }
         // prepare user for receiving events
         uIdent.getUser().setUserEvents(events);
@@ -504,10 +501,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         renewUserSession(id, ident);
     }
 
-    synchronized IdentifiedJob checkJobOwner(String methodName, JobId jobId, String permissionMsg)
-            throws NotConnectedException, UnknownJobException, PermissionException {
-        ListeningUser ident = checkPermissionReturningListeningUser(methodName, permissionMsg);
-
+    synchronized IdentifiedJob getIdentifiedJob(JobId jobId) throws UnknownJobException {
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
@@ -516,17 +510,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throw new UnknownJobException(msg);
         }
 
-        if (!ij.hasRight(ident.getUser())) {
-            logger.info(permissionMsg);
-            throw new PermissionException(permissionMsg);
-        }
-
         return ij;
+
     }
 
     synchronized void checkChangeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
             UnknownJobException, PermissionException, JobAlreadyFinishedException {
-        checkJobOwner("changeJobPriority", jobId,
+
+        checkPermissions("changeJobPriority", getIdentifiedJob(jobId),
                 "You do not have permission to change the priority of this job !");
 
         UserIdentificationImpl ui = identifications
@@ -547,6 +538,25 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
+    synchronized void checkPermissions(String methodName, IdentifiedJob identifiedJob, String errorMessage)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        try {
+            checkJobOwner(methodName, identifiedJob, errorMessage);
+        } catch (PermissionException pe) {
+            UserIdentificationImpl ident = checkPermission(methodName, errorMessage);
+            handleOnlyMyJobsPermission(false, ident, errorMessage);
+        }
+    }
+
+    synchronized void checkJobOwner(String methodName, IdentifiedJob IdentifiedJob, String permissionMsg)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        ListeningUser ident = checkPermissionReturningListeningUser(methodName, permissionMsg);
+
+        if (!IdentifiedJob.hasRight(ident.getUser())) {
+            throw new PermissionException(permissionMsg);
+        }
+    }
+
     synchronized Set<TaskId> getJobTasks(JobId jobId) {
         JobState jobState = jobsMap.get(jobId);
         if (jobState == null) {
@@ -562,13 +572,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     synchronized JobState getJobState(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this job !");
+        checkPermissions("getJobState", getIdentifiedJob(jobId),
+                "You do not have permission to get the state of this job !");
         return jobsMap.get(jobId);
     }
 
     synchronized TaskState getTaskState(JobId jobId, TaskId taskId)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this task !");
+        checkPermissions("getJobState", getIdentifiedJob(jobId),
+                "You do not have permission to get the state of this task !");
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
@@ -581,7 +593,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     synchronized TaskState getTaskState(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        checkJobOwner("getJobState", jobId, "You do not have permission to get the state of this task !");
+
+        checkPermissions("getJobState", getIdentifiedJob(jobId),
+                "You do not have permission to get the state of this task !");
+
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
