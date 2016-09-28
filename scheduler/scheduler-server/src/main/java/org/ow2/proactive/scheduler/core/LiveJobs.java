@@ -31,6 +31,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.helpers.StartAtUpdater;
+import org.ow2.proactive.scheduler.core.helpers.TaskResultCreator;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
@@ -631,9 +632,8 @@ class LiveJobs {
                 tlogger.info(task.getId(), "Task must be in state IN_ERROR: " + task.getStatus());
                 return emptyResult(task.getId());
             }
-
-            TaskResultImpl taskResult = new TaskResultCreator()
-                    .getEmptyTaskResultWithTaskIdAndExecutionTime(task);
+            
+            TaskResultImpl taskResult = TaskResultCreator.getTaskResult(dbManager, job, task);            
             
             RunningTaskData data = new RunningTaskData(task, job.getOwner(), 
                     job.getCredentials(), task.getExecuterInformation().getLauncher());
@@ -644,7 +644,7 @@ class LiveJobs {
             tlogger.debug(taskId, "result added to job " + job.getId());
             //to be done before terminating the task, once terminated it is not running anymore..
             ChangedTasksInfo changesInfo = job.finishInErrorTask(taskId, taskResult, listener);
-            
+
             boolean jobFinished = job.isFinished();
 
             //update job info if it is terminated

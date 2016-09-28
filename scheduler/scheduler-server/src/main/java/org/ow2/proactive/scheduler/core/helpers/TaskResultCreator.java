@@ -34,28 +34,83 @@
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 public class TaskResultCreator {
-    
-    private static TaskResultCreator taskResultCreator;
-    
-    public static TaskResultCreator getInstance(){
-        if (taskResultCreator == null){
-            taskResultCreator = new TaskResultCreator();
-        }
-        return taskResultCreator;
-    }
 
-    public TaskResultImpl getEmptyTaskResultWithTaskIdAndExecutionTime(InternalTask task) {
+    public static TaskResultImpl getTaskResult(SchedulerDBManager dbManager, InternalJob job, InternalTask task) {
         if (task == null){
             return null;
         }
         
-        //TODO check whether second argument should be "" or null
+        TaskResultImpl taskResult;
+        JobDescriptor jobDescriptor = job.getJobDescriptor();
+        if (jobDescriptor.getRunningTasks().get(task.getId()) != null){
+            taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(), Collections.singletonList(task.getId()))
+            .get(task.getId());
+        }
+        else {
+            //TODO check whether second argument should be "" or null
+            taskResult =  getEmptyTaskResultWithTaskIdAndExecutionTime(task);
+            if (jobDescriptor.getPausedTasks().get(task.getId()) != null){
+                taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, job, task));
+            }
+        }
+        
+        return taskResult;
+    }
+    
+    public static TaskResultImpl getEmptyTaskResultWithTaskIdAndExecutionTime(InternalTask task){
         return new TaskResultImpl(task.getId(), "",
                 null, System.currentTimeMillis() - task.getStartTime());
+    }
+    
+    private static Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager, InternalJob job, 
+            InternalTask task){
+        Map<String, byte[]> variables = new HashMap<>();
+        
+        JobDescriptor jobDescriptor = job.getJobDescriptor();
+
+        EligibleTaskDescriptor etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());
+        int resultSize = etd.getParents().size();
+        if (job.getType() == JobType.TASKSFLOW) {
+            // retrieve from the database the previous task results if available
+            if ((resultSize > 0) && task.handleResultsArguments()) {
+                List<TaskId> parentIds = new ArrayList<>(resultSize);
+                for (int i = 0; i < resultSize; i++) {
+                    parentIds.add(etd.getParents().get(i).getTaskId());
+                }
+                Map<TaskId, TaskResult> taskResults = dbManager
+                        .loadTasksResults(
+                                job.getId(), parentIds);
+                for (TaskResult taskResult : taskResults.values()) {
+                    if (taskResult.getPropagatedVariables() != null) {
+                        variables.putAll(taskResult.getPropagatedVariables());
+                    }
+                }
+            } else {
+                // otherwise use the default job variables
+                for (Entry<String, String> entry : job.getVariables().entrySet()){
+                    variables.put(entry.getKey(), entry.getValue().getBytes());
+                }
+            }
+        }
+        return variables;
     }
 }
