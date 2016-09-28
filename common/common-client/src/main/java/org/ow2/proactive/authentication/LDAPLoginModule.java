@@ -36,8 +36,9 @@
  */
 package org.ow2.proactive.authentication;
 
-import java.util.Hashtable;
-import java.util.Map;
+import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -53,10 +54,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
-
-import org.apache.log4j.Logger;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import java.util.Hashtable;
+import java.util.Map;
 
 
 /**
@@ -282,15 +281,14 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication and group membership fails.
      */
-    @Override
     protected boolean logUser(String username, String password) throws LoginException {
-        try {
-            if (fallbackUserAuth) {
-                return super.logUser(username, password);
-            } else {
+        if (fallbackUserAuth) {
+            try {
+                return super.logUser(username, password, false);
+            } catch (LoginException ex) {
                 return internalLogUser(username, password);
             }
-        } catch (LoginException ex) {
+        } else {
             return internalLogUser(username, password);
         }
     }
