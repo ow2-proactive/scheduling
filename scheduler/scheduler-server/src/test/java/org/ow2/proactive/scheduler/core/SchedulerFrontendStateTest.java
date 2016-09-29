@@ -1,7 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -85,7 +84,7 @@ public class SchedulerFrontendStateTest extends ProActiveTest {
         final SchedulerFrontendState schedulerFrontendState = new SchedulerFrontendState(schedulerStateImpl,
             mockJMX);
 
-        assertThat(schedulerFrontendState.getIdentifiedJob(jobId).getJobId(), is(jobId));
+        assertEquals(schedulerFrontendState.getIdentifiedJob(jobId).getJobId(), (jobId));
 
     }
 }

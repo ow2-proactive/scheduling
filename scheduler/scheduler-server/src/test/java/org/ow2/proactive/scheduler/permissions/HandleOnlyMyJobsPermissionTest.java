@@ -1,7 +1,6 @@
 package org.ow2.proactive.scheduler.permissions;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -15,11 +14,11 @@ public class HandleOnlyMyJobsPermissionTest {
         HandleOnlyMyJobsPermission permissionDefinedAtJaasConfigurationLevel = new HandleOnlyMyJobsPermission(
             "false");
 
-        assertThat(permissionDefinedAtJaasConfigurationLevel.implies(new HandleOnlyMyJobsPermission(false)),
-                is(true));
+        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleOnlyMyJobsPermission(false)),
+                (true));
 
-        assertThat(permissionDefinedAtJaasConfigurationLevel.implies(new HandleOnlyMyJobsPermission(true)),
-                is(true));
+        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleOnlyMyJobsPermission(true)),
+                (true));
 
     }
 
@@ -31,11 +30,11 @@ public class HandleOnlyMyJobsPermissionTest {
         HandleOnlyMyJobsPermission permissionDefinedAtJaasConfigurationLevel = new HandleOnlyMyJobsPermission(
             "true");
 
-        assertThat(permissionDefinedAtJaasConfigurationLevel.implies(new HandleOnlyMyJobsPermission(false)),
-                is(false));
+        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleOnlyMyJobsPermission(false)),
+                (false));
 
-        assertThat(permissionDefinedAtJaasConfigurationLevel.implies(new HandleOnlyMyJobsPermission(true)),
-                is(true));
+        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleOnlyMyJobsPermission(true)),
+                (true));
 
     }
 
