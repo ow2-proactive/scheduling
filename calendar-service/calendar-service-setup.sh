@@ -7,7 +7,7 @@
 cd ..
 cwd=$(pwd)
 ## Install radicale
-cd $cwd/tools/radicale/linux
+cd $cwd/calendar-service/radicale/linux
 tar xvzf Radicale-1.1.1.tar.gz
 
 sudo apt-get update
@@ -17,7 +17,7 @@ sudo apt-get -y install apache2-utils
 cd Radicale-1.1.1
 sudo python3 setup.py install
 cd $cwd
-sudo rm -rf $cwd/tools/radicale/linux/Radicale-1.1.1
+sudo rm -rf $cwd/calendar-service/radicale/linux/Radicale-1.1.1
 
 mkdir -p ~/.config/radicale/collections
 
@@ -30,8 +30,8 @@ if [ ! -e "$loginFile" ]
     exit
 fi
 
-cp -f $cwd/tools/radicale/linux/config ~/.config/radicale/config
-cp -f $cwd/tools/radicale/linux/logging ~/.config/radicale/logging
+cp -f $cwd/calendar-service/radicale/linux/config ~/.config/radicale/config
+cp -f $cwd/calendar-service/radicale/linux/logging ~/.config/radicale/logging
 rm -rf ~/.config/radicale/users
 touch ~/.config/radicale/users
 mkdir ~/.config/radicale/log
@@ -44,15 +44,12 @@ radicale -d -S
 echo "Radicale server started"
 
 #delete radicale folder
-cd $cwd/tools/
+cd $cwd/calendar-service/
 
 read -e -p "Would you like to start Calendar Service right now? (Y/N) :" input
 
-answer=$input
-if ((answer == "y")) || ((answer == "Y"))
-	then
-	source $cwd/tools/calendar-service.sh start
-elif ((answer == "n")) || ((answer == "N"))
-	then
+if [ "$input" == "y" ] || [ "$input" == "Y" ]; then
+	source $cwd/calendar-service/calendar-service.sh start
+elif [ "$input" == "n" ] || [ "$input" == "N" ]; then
 	exit 1
 fi
