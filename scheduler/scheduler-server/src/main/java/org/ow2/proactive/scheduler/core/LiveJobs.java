@@ -715,9 +715,8 @@ class LiveJobs {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
 
-            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
-                new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
-                System.currentTimeMillis() - task.getStartTime());
+            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task, 
+                    new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"));
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
 
@@ -761,10 +760,9 @@ class LiveJobs {
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
-            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
-                new TaskPreemptedException("Preempted by admin"),
-                new SimpleTaskLogs("", "Preempted by admin"),
-                System.currentTimeMillis() - task.getStartTime());
+            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task, 
+                    new TaskPreemptedException("Preempted by admin"), 
+                    new SimpleTaskLogs("", "Preempted by admin"));
 
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
