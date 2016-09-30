@@ -54,6 +54,8 @@ class LiveJobs {
     private static final JobLogger jlogger = JobLogger.getInstance();
 
     private static final TaskLogger tlogger = TaskLogger.getInstance();
+    
+    private static final TaskResultCreator taskResultCreator = TaskResultCreator.getInstance();
 
     private static class JobData {
 
@@ -633,7 +635,7 @@ class LiveJobs {
                 return emptyResult(task.getId());
             }
             
-            TaskResultImpl taskResult = TaskResultCreator.getTaskResult(dbManager, job, task);            
+            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, job, task);            
             
             RunningTaskData data = new RunningTaskData(task, job.getOwner(), 
                     job.getCredentials(), task.getExecuterInformation().getLauncher());
@@ -791,9 +793,9 @@ class LiveJobs {
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
-            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
-                new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
-                System.currentTimeMillis() - task.getStartTime());
+            
+            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task,
+                    new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user")); 
 
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
