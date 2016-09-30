@@ -43,32 +43,33 @@ import org.ow2.proactive.permissions.ClientPermission;
 
 /**
  *
- * This permission allows to get the full state or not
+ * This permission allows to handle other users jobs or not
  *
  *
  */
-public class GetOwnStateOnlyPermission extends ClientPermission {
+public class HandleOnlyMyJobsPermission extends ClientPermission {
 
-    private boolean fullStateAllowed = true;
+    private final static String DESCRIPTION = "Handle only my jobs";
+    private boolean handleOnlyMyJobsPermissionAllowed = true;
 
     /**
      * Construct the permission with specified authorization string.
      *
-     * @param fullState string that represents a boolean
+     * @param handleOnlyMyJobsPermissionAllowed string that represents a boolean
      */
-    public GetOwnStateOnlyPermission(String fullState) {
-        super("get full state");
-        this.fullStateAllowed = "true".equalsIgnoreCase(fullState);
+    public HandleOnlyMyJobsPermission(String handleOnlyMyJobsPermissionAllowed) {
+        super(DESCRIPTION);
+        this.handleOnlyMyJobsPermissionAllowed = "true".equalsIgnoreCase(handleOnlyMyJobsPermissionAllowed);
     }
 
     /**
      * Construct the permission with specified authorization boolean.
      *
-     * @param fullState specified authorization boolean
+     * @param handleOnlyMyJobsPermissionAllowed specified authorization boolean
      */
-    public GetOwnStateOnlyPermission(boolean fullState) {
-        super("get full state");
-        this.fullStateAllowed = fullState;
+    public HandleOnlyMyJobsPermission(boolean handleOnlyMyJobsPermissionAllowed) {
+        super(DESCRIPTION);
+        this.handleOnlyMyJobsPermissionAllowed = handleOnlyMyJobsPermissionAllowed;
     }
 
     /**
@@ -76,11 +77,11 @@ public class GetOwnStateOnlyPermission extends ClientPermission {
      */
     @Override
     public boolean implies(Permission p) {
-        if (!(p instanceof GetOwnStateOnlyPermission)) {
+        if (!(p instanceof HandleOnlyMyJobsPermission)) {
             return false;
         }
-        GetOwnStateOnlyPermission fsp = (GetOwnStateOnlyPermission) p;
+        HandleOnlyMyJobsPermission fsp = (HandleOnlyMyJobsPermission) p;
         //check incoming permission and permission given by the security file
-        return !fullStateAllowed || fsp.fullStateAllowed;
+        return !handleOnlyMyJobsPermissionAllowed || fsp.handleOnlyMyJobsPermissionAllowed;
     }
 }
