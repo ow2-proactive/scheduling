@@ -95,6 +95,38 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
 
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS = "You do not have permission to get the status !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER = "You do not have permission to add a listener !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB = "You do not have permission to change the priority of this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE = "You do not have permission to get the state !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK = "You do not have permission to get the state of this task !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB = "You do not have permission to get the state of this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB = "You do not have permission to get the task logs of this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK = "You do not have permission to restart this task !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK = "You do not have permission to preempt this task !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB = "You do not have permission to kill this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER = "You do not have permission to remove third-party credentials from the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK = "You do not have permission to kill this task !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB = "You do not have permission to submit a job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER = "You do not have permission to stop the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER = "You do not have permission to start the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_SHUTDOWN_THE_SCHEDULER = "You do not have permission to shutdown the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB = "You do not have permission to pause this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER = "You do not have permission to put third-party credentials in the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB = "You do not have permission to restart in error tasks in this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB = "You do not have permission to get the task result of this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB = "You do not have permission to remove this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB = "You do not have permission to resume this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB = "You do not have permission to listen the log of this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB = "You do not have permission to get the result of this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB = "You do not have permissions to get the logs of this job !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THE_SCHEDULER = "You do not have permission to pause the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THE_SCHEDULER = "You do not have permission to resume the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER = "You do not have permission to freeze the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_LIST_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER = "You do not have permission to list third-party credentials in the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION = "You do not have permission to reload policy configuration !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER = "You do not have permission to kill the scheduler !";
+
     private static final String USERS_UPDATED_EVENT_METHOD = "usersUpdatedEvent";
     private static final String TASK_STATE_UPDATED_EVENT_METHOD = "taskStateUpdatedEvent";
     private static final String JOB_UPDATED_FULL_DATA_EVENT_METHOD = "jobUpdatedFullDataEvent";
@@ -272,7 +304,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     synchronized SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         // checking permissions
-        checkPermission("getStatus", "You do not have permission to get the status !");
+        checkPermission("getStatus", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS);
 
         return sState.getStatus();
     }
@@ -284,7 +316,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized SchedulerState getState(boolean myJobsOnly)
             throws NotConnectedException, PermissionException {
         // checking permissions
-        checkPermission("getState", "You do not have permission to get the state !");
+        checkPermission("getState", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE);
 
         ListeningUser ui = identifications
                 .get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID());
@@ -321,7 +353,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     throws NotConnectedException, PermissionException {
         // checking permissions
         ListeningUser uIdent = checkPermissionReturningListeningUser("addEventListener",
-                "You do not have permission to add a listener !");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
 
         // check if listener is not null
         if (sel == null) {
@@ -344,7 +376,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         } else {
             // check get state permission
             handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(),
-                    "You do not have permission to add a listener !");
+                    YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
         }
         // prepare user for receiving events
         uIdent.getUser().setUserEvents(events);
@@ -518,7 +550,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             UnknownJobException, PermissionException, JobAlreadyFinishedException {
 
         checkPermissions("changeJobPriority", getIdentifiedJob(jobId),
-                "You do not have permission to change the priority of this job !");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB);
 
         UserIdentificationImpl ui = identifications
                 .get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID()).getUser();
@@ -573,14 +605,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized JobState getJobState(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         checkPermissions("getJobState", getIdentifiedJob(jobId),
-                "You do not have permission to get the state of this job !");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return jobsMap.get(jobId);
     }
 
     synchronized TaskState getTaskState(JobId jobId, TaskId taskId)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkPermissions("getJobState", getIdentifiedJob(jobId),
-                "You do not have permission to get the state of this task !");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
@@ -595,7 +627,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
 
         checkPermissions("getJobState", getIdentifiedJob(jobId),
-                "You do not have permission to get the state of this task !");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
 
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
