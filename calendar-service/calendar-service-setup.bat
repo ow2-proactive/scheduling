@@ -62,14 +62,11 @@ goto fail
 set RADICALE_HOME=%RADICALE_HOME:"=%
 
 @rem copy data folders and config files 
-xcopy %RADICLAE_HOME%\App\DefaultData %RADICLAE_HOME%\Data /s /e /y 
-xcopy radicale\windows\conf\config.ini %RADICLAE_HOME%\Data\config\ /y
-
-@rem import proactive user accounts to radicale
-TYPE %APP_HOME%\config\authentication\login.cfg > %RADICLAE_HOME%\Data\config\htpasswd.txt
+xcopy "%RADICLAE_HOME%\App\DefaultData" "%RADICLAE_HOME%\Data" /s /e /y 
+xcopy radicale\windows\conf\config.ini "%RADICLAE_HOME%\Data\config\" /y
 
 @rem Execute radicale
-start "" %RADICALE_HOME%\RadicalePortable.exe
+start "" "%RADICALE_HOME%\RadicalePortable.exe"
 
 :end
 @rem End local scope for the variables with windows NT shell
@@ -83,7 +80,7 @@ if "%input%"=="N" goto mainEnd
 if "%ERRORLEVEL%"=="0" goto mainEnd
 
 :runCs
-call %APP_HOME%\calendar-service\calendar-service.bat
+call "%APP_HOME%\calendar-service\calendar-service.bat"
 goto mainEnd
 
 :fail

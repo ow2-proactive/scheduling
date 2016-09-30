@@ -50,7 +50,7 @@ start() {
   done < "$loginFile"
 
   # Redirects default and error output to a log file
-  java -Dpa.scheduler.home=$cwd -Dspring.config.location=$cwd/config/calendar-service/application.properties -jar $cwd/calendar-service/calendar-service*.jar > /dev/null 2>&1 &
+  java -Dpa.scheduler.home="$cwd" -Dspring.config.location="$cwd/config/calendar-service/application.properties" -jar "$cwd/calendar-service/calendar-service*.jar" > /dev/null 2>&1 &
   echo " *** Calendar service gets started *** "
 }
 

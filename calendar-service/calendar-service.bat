@@ -49,10 +49,17 @@ goto fail
 
 @rem Execute proactive-server
 :execute
-@rem import proactive user accounts to radicale
-TYPE %APP_HOME%\config\authentication\login.cfg > %RADICLAE_HOME%\Data\config\htpasswd.txt
 
-start "" "%JAVA_EXE%" -Dpa.scheduler.home=%APP_HOME% -Dspring.config.location=%APP_HOME%\config\calendar-service\application.properties -jar %APP_HOME%\calendar-service\calendar-service*.jar >NUL 2>&1
+@rem import proactive user accounts to radicale
+TYPE "%APP_HOME%\config\authentication\login.cfg" > "%RADICLAE_HOME%\Data\config\htpasswd.txt"
+
+@rem get calendar-service jar name and launch jar command 
+
+for /f "tokens=*" %%F in ('dir /b /a:-d "calendar-service*.jar"') do (
+	set jarFile=%%F
+)
+
+start "" "%JAVA_EXE%" -Dpa.scheduler.home="%APP_HOME%" -Dspring.config.location="%APP_HOME%\config\calendar-service\application.properties" -jar "%APP_HOME%\calendar-service\%jarFile%" >NUL 2>&1
 
 echo Done
 

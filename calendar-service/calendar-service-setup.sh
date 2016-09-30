@@ -7,7 +7,7 @@
 cd ..
 cwd=$(pwd)
 ## Install radicale
-cd $cwd/calendar-service/radicale/linux
+cd "$cwd/calendar-service/radicale/linux"
 tar xvzf Radicale-1.1.1.tar.gz
 
 sudo apt-get update
@@ -16,8 +16,8 @@ sudo apt-get -y install python3-setuptools
 sudo apt-get -y install apache2-utils
 cd Radicale-1.1.1
 sudo python3 setup.py install
-cd $cwd
-sudo rm -rf $cwd/calendar-service/radicale/linux/Radicale-1.1.1
+cd "$cwd"
+sudo rm -rf "$cwd/calendar-service/radicale/linux/Radicale-1.1.1"
 
 mkdir -p ~/.config/radicale/collections
 
@@ -30,8 +30,8 @@ if [ ! -e "$loginFile" ]
     exit
 fi
 
-cp -f $cwd/calendar-service/radicale/linux/config ~/.config/radicale/config
-cp -f $cwd/calendar-service/radicale/linux/logging ~/.config/radicale/logging
+cp -f "$cwd/calendar-service/radicale/linux/config" ~/.config/radicale/config
+cp -f "$cwd/calendar-service/radicale/linux/logging" ~/.config/radicale/logging
 rm -rf ~/.config/radicale/users
 touch ~/.config/radicale/users
 mkdir ~/.config/radicale/log
@@ -44,7 +44,7 @@ radicale -d -S
 echo "Radicale server started"
 
 #delete radicale folder
-cd $cwd/calendar-service/
+cd "$cwd/calendar-service/"
 
 read -e -p "Would you like to start Calendar Service right now? (Y/N) :" input
 
