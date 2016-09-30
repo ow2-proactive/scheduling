@@ -78,7 +78,7 @@ public class TaskResultCreator {
         if (task == null){
             throw new UnknownTaskException();
         }
-        
+
         TaskResultImpl taskResult;
         JobDescriptor jobDescriptor = job.getJobDescriptor();
         if (jobDescriptor.getRunningTasks().get(task.getId()) != null){
@@ -87,37 +87,36 @@ public class TaskResultCreator {
         }
         else {
             taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception,output);
-            taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, job, task));
+
+            EligibleTaskDescriptor etd = null;
+
+            if (jobDescriptor.getPausedTasks().get(task.getId()) != null){
+                etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());            
+            }else if (jobDescriptor.getRunningTasks().get(task.getId()) != null){
+                etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());  
+            }
+
+            if (etd != null){
+                taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, etd, job, task));
+            }
+
+
         }
-        
+
         return taskResult;
-        
+
     }
-    
+
     public TaskResultImpl getEmptyTaskResultWithTaskIdAndExecutionTime(InternalTask task,
             Throwable exception, TaskLogs output){
         return new TaskResultImpl(task.getId(), exception,
                 output, System.currentTimeMillis() - task.getStartTime());
     }
-    
-    private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager, InternalJob job, 
-            InternalTask task) throws UnknownTaskException{
-        Map<String, byte[]> variables = new HashMap<>();
-        
-        JobDescriptor jobDescriptor = job.getJobDescriptor();
 
-        EligibleTaskDescriptor etd = null;
-        
-        if (jobDescriptor.getPausedTasks().get(task.getId()) != null){
-            etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());            
-        }else if (jobDescriptor.getRunningTasks().get(task.getId()) != null){
-            etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());  
-        }
-        
-        if (etd == null){
-            throw new UnknownTaskException();
-        }
-        
+    private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager, 
+            EligibleTaskDescriptor etd, InternalJob job, InternalTask task) throws UnknownTaskException{
+        Map<String, byte[]> variables = new HashMap<>();
+
         int resultSize = etd.getParents().size();
         if (job.getType() == JobType.TASKSFLOW) {
             // retrieve from the database the previous task results if available
