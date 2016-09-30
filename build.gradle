@@ -294,6 +294,7 @@ createStartScripts('org.objectweb.proactive.extensions.vfsprovider.console.PADat
 createStartScripts('org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser', 'proactive-dataserver-gui', 'tools')
 createStartScripts('org.ow2.proactive.authentication.crypto.CreateCredentials', 'proactive-create-cred', 'tools')
 createStartScripts('org.ow2.proactive.authentication.crypto.KeyGen', 'proactive-key-gen', 'tools')
+createStartScripts('org.ow2.proactive.scheduler.authentication.ManageUsers', 'proactive-users', 'tools')
 createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-router', 'bin')
 
 subprojects {

@@ -1,24 +1,18 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import org.ow2.proactive.db.DatabaseManagerException;
-import org.ow2.proactive.db.SessionWork;
-import org.ow2.proactive.db.TransactionHelper;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.hibernate.JDBCException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.exception.LockAcquisitionException;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.proactive.db.DatabaseManagerException;
+import org.ow2.proactive.db.SessionWork;
+import org.ow2.proactive.db.TransactionHelper;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class TransactionHelperTest {
@@ -87,6 +81,8 @@ public class TransactionHelperTest {
 
     @Test
     public void testExecuteReadOnlyTransactionFail() {
+        PASchedulerProperties.SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES.updateProperty("0");
+
         when(sessionWork.doInTransaction(session)).thenThrow(Throwable.class);
 
         try {

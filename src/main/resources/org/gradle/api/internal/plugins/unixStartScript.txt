@@ -65,7 +65,7 @@ cd "`dirname \"\$PRG\"`/${appHomeRelativePath}" >&-
 APP_HOME="`pwd -P`"
 cd "\$SAVED" >&-
 
-DEFAULT_JVM_OPTS="\$DEFAULT_JVM_OPTS -Djava.library.path=\$APP_HOME/dist/lib"
+DEFAULT_JVM_OPTS="\$DEFAULT_JVM_OPTS -Djava.library.path=\$APP_HOME/dist/lib -Dpa.scheduler.home=\$APP_HOME"
 
 CLASSPATH=$classpath
 

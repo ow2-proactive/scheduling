@@ -36,11 +36,14 @@
  */
 package org.ow2.proactive.resourcemanager.authentication;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.LDAPLoginModule;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+
+import java.io.File;
+import java.security.KeyException;
+import java.security.PrivateKey;
 
 
 /**
@@ -99,6 +102,12 @@ public class RMLDAPLoginModule extends LDAPLoginModule {
         }
 
         return groupFile;
+    }
+
+    @Override
+    protected PrivateKey getPrivateKey() throws KeyException {
+        return Credentials.getPrivateKey(PAResourceManagerProperties
+                .getAbsolutePath(PAResourceManagerProperties.RM_AUTH_PRIVKEY_PATH.getValueAsString()));
     }
 
     /**

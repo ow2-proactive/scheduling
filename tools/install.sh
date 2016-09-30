@@ -195,16 +195,16 @@ if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; th
         fi
     done
 
-    sed -e "s/^admin:.*/admin=$ADMIN_PWD/g" -i "$AUTH_ROOT/login.cfg"
-    sed -e "s/^rm:.*/rm=$RM_PWD/g" -i "$AUTH_ROOT/login.cfg"
-    sed -e "s/^scheduler:.*/scheduler=$SCHED_PWD/g" -i "$AUTH_ROOT/login.cfg"
-    sed -e "s/^watcher:.*/watcher=$WATCHER_PWD/g" -i "$AUTH_ROOT/login.cfg"
-
     # generate new private/public key pair
 
     echo "Generating New Private/Public key pair for the scheduler"
 
     ./proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
+
+    $PA_ROOT/default/tools/proactive-users.sh -U -l admin -p "$ADMIN_PWD"
+    $PA_ROOT/default/tools/proactive-users.sh -U -l rm -p "$RM_PWD"
+    $PA_ROOT/default/tools/proactive-users.sh -U -l scheduler -p "$SCHED_PWD"
+    $PA_ROOT/default/tools/proactive-users.sh -U -l watcher -p "$WATCHER_PWD"
 
     echo "Generating credential files for ProActive System accounts"
 
@@ -217,8 +217,8 @@ if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; th
     ( cd /opt/proactive/default/dist && zip -f war/rest/node.jar lib/rm-node-*.jar )
 fi
 
-echo "ProActive can integrate with Linux PAM (Pluggable Authentication Modules) to authenticate users."
-echo "Warning: this requires to add the $USER account to the \"shadow\" group"
+echo "ProActive can integrate with Linux PAM (Pluggable Authentication Modules) to authenticate users of the linux system."
+echo "Warning: this will add the $USER account to the linux \"shadow\" group"
 
 if confirm "Do you want to set PAM integration for ProActive scheduler? [y/N] " "n" ; then
      sed "s/pa\.rm\.authentication\.loginMethod=.*/pa.rm.authentication.loginMethod=RMPAMLoginMethod/g"  -i "$PA_ROOT/default/config/rm/settings.ini"
@@ -231,19 +231,14 @@ fi
 
 # removing test accounts
 
-remove_user() {
-    sed "/$1:/d" -i "$AUTH_ROOT/login.cfg"
-    sed "/$1:/d" -i "$AUTH_ROOT/group.cfg"
-}
-
-remove_user "demo"
-remove_user "user"
-remove_user "guest"
-remove_user "test"
-remove_user "radmin"
-remove_user "nsadmin"
-remove_user "provider"
-remove_user "test_executor"
+$PA_ROOT/default/tools/proactive-users.sh -D -l demo
+$PA_ROOT/default/tools/proactive-users.sh -D -l user
+$PA_ROOT/default/tools/proactive-users.sh -D -l guest
+$PA_ROOT/default/tools/proactive-users.sh -D -l test
+$PA_ROOT/default/tools/proactive-users.sh -D -l radmin
+$PA_ROOT/default/tools/proactive-users.sh -D -l nsadmin
+$PA_ROOT/default/tools/proactive-users.sh -D -l provider
+$PA_ROOT/default/tools/proactive-users.sh -D -l test_executor
 
 # configure watcher account
 sed "s/scheduler\.cache\.password=.*/scheduler.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
