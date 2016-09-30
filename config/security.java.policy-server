@@ -54,7 +54,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 	//use the following line to allow a user to download full scheduler state and get events from any user
 	//"true" means that this user can get only its job in the state and listen for its events
 	//"false" means user can get full state and listen for any events.
-    permission org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission "true";
+    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.submit";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getJobResult";
@@ -127,7 +127,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 	//use the following line to allow a user to download full scheduler state and get events from any user
 	//"true" means that this user can get only its job in the state and listen for its events
 	//"false" means user can get full state and listen for any events.
-    permission org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission "false";
+    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "true";
     permission org.ow2.proactive.scheduler.permissions.ChangePriorityPermission "1,2,3";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.submit";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getJobResult";
@@ -157,6 +157,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getGlobalSpaceURIs";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getUserSpaceURIs";
 };
+
 
 // Resource providers have the same permissions as users + an ability to add remove node
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "providers" {
@@ -268,7 +269,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "watchers" {
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getState";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.addEventListener";
-    permission org.ow2.proactive.scheduler.permissions.GetOwnStateOnlyPermission "false";
+    permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "false";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getStatus";
 	permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
 	permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getTopology";

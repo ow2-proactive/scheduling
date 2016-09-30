@@ -170,7 +170,7 @@ chown $USER:$GROUP $PA_ROOT
 chown $USER:$GROUP $PA_ROOT/default
 chown -R $USER:$GROUP $PA_ROOT/$PA_FOLDER_NAME
 
-echo "ProActive use internal system accounts which should me modified in a production environment."
+echo "ProActive use internal system accounts which should be modified in a production environment."
 
 if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; then
 
@@ -215,6 +215,18 @@ if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; th
 
     ( cd /opt/proactive/default && zip -f dist/lib/rm-node-*.jar config/authentication/rm.cred )
     ( cd /opt/proactive/default/dist && zip -f war/rest/node.jar lib/rm-node-*.jar )
+fi
+
+echo "ProActive can integrate with Linux PAM (Pluggable Authentication Modules) to authenticate users."
+echo "Warning: this requires to add the $USER account to the \"shadow\" group"
+
+if confirm "Do you want to set PAM integration for ProActive scheduler? [y/N] " "n" ; then
+     sed "s/pa\.rm\.authentication\.loginMethod=.*/pa.rm.authentication.loginMethod=RMPAMLoginMethod/g"  -i "$PA_ROOT/default/config/rm/settings.ini"
+     sed "s/pa\.scheduler\.core\.authentication\.loginMethod=.*/pa.scheduler.core.authentication.loginMethod=SchedulerPAMLoginMethod/g"  -i "$PA_ROOT/default/config/scheduler/settings.ini"
+     cp $AUTH_ROOT/proactive-jpam /etc/pam.d/
+     usermod -a -G shadow $USER
+     echo "Users wil be able to authenticate to the ProActive server with their linux account credentials."
+     echo "Groups must still be configured for each user in the $AUTH_ROOT/group.cfg file."
 fi
 
 # removing test accounts
@@ -509,6 +521,7 @@ ls /opt/proactive/default/dist/lib/rm-node*.jar
 
 if  ! $CONFLICT ; then
     if confirm "Do you want to start the scheduler service now? [Y/n] " ; then
+        echo "If a problem occurs, check output in /var/log/proactive/scheduler"
         service proactive-scheduler start
     fi
 fi
