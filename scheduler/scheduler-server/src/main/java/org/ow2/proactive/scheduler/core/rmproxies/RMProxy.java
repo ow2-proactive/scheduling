@@ -78,7 +78,6 @@ public class RMProxy {
         RMAuthentication auth = RMConnection.join(rmURL.toString());
         proxyActiveObject = RMProxyActiveObject.createAOProxy(auth, creds);
         currentRMConnection = new RMProxiesManager.Connection(rmURL, auth);
-        proxyActiveObject = RMProxyActiveObject.createAOProxy(auth, creds);
     }
 
     public synchronized void terminate() {
