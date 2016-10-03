@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -81,26 +82,23 @@ public class TaskResultCreator {
 
         TaskResultImpl taskResult;
         JobDescriptor jobDescriptor = job.getJobDescriptor();
-        if (jobDescriptor.getRunningTasks().get(task.getId()) != null){
+        try{
             taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(), 
                     Collections.singletonList(task.getId())).get(task.getId());
-        }
-        else {
+        }catch(Exception e){
             taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception,output);
+        }
 
-            EligibleTaskDescriptor etd = null;
+        EligibleTaskDescriptor etd = null;
 
-            if (jobDescriptor.getPausedTasks().get(task.getId()) != null){
-                etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());            
-            }else if (jobDescriptor.getRunningTasks().get(task.getId()) != null){
-                etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());  
-            }
+        if (jobDescriptor.getPausedTasks().get(task.getId()) != null){
+            etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());            
+        }else if (jobDescriptor.getRunningTasks().get(task.getId()) != null){
+            etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());  
+        }
 
-            if (etd != null){
-                taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, etd, job, task));
-            }
-
-
+        if (etd != null){
+            taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, etd, job, task));
         }
 
         return taskResult;
