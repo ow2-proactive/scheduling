@@ -85,7 +85,7 @@ public class TaskResultCreator {
         try{
             taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(), 
                     Collections.singletonList(task.getId())).get(task.getId());
-        }catch(Exception e){
+        }catch(DatabaseManagerException e){
             taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception,output);
         }
 
