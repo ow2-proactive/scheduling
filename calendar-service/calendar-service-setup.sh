@@ -5,19 +5,21 @@
 ## Install required packages
 
 cd ..
-cwd=$(pwd)
+cwd="$(pwd)"
+radicale_version="1.1.1"
+
 ## Install radicale
 cd "$cwd/calendar-service/radicale/linux"
-tar xvzf Radicale-1.1.1.tar.gz
+tar xvzf "Radicale-$radicale_version.tar.gz"
 
 sudo apt-get update
 sudo apt-get -y install python3
 sudo apt-get -y install python3-setuptools
 sudo apt-get -y install apache2-utils
-cd Radicale-1.1.1
+cd "Radicale-$radicale_version"
 sudo python3 setup.py install
 cd "$cwd"
-sudo rm -rf "$cwd/calendar-service/radicale/linux/Radicale-1.1.1"
+sudo rm -rf "$cwd/calendar-service/radicale/linux/Radicale-$radicale_version"
 
 mkdir -p ~/.config/radicale/collections
 

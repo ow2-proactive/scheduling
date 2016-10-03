@@ -51,7 +51,7 @@ goto fail
 :execute
 
 @rem import proactive user accounts to radicale
-TYPE "%APP_HOME%\config\authentication\login.cfg" > "%RADICLAE_HOME%\Data\config\htpasswd.txt"
+TYPE "%APP_HOME%\config\authentication\login.cfg" > "%RADICALE_HOME%\Data\config\htpasswd.txt"
 
 @rem get calendar-service jar name and launch jar command 
 
