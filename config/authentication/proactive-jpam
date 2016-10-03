@@ -1,0 +1,46 @@
+#####################################################################
+# Pam Service Configuration for Unix Authentication 
+# Author: Greg Luck
+# Version: $Id: proactive-jpam,v 1.1 2016/09/28 11:49:40 fviale Exp $
+#
+# Requirements
+# ============
+# This configuration file is specific to Linux, although it should work on most Unixes.
+#
+# Instructions
+# ============
+# 1. Place this file in /etc/pam.d
+# 2. Uncomment one of the Module configurations below
+# 3. change /etc/shadow to be readable by the user.
+#
+# Format of pam.d files
+# =====================
+#
+# The first column is the facility. Possible values are:
+# account - account management
+# auth - authentication management
+# password - password  management
+# session - session session management.
+#
+# The second column is the control flag,  which is how the result of the operation is to
+# be interpreted. Possible values are:
+#
+# required - If the module succeeds, the rest of the chain is executed, and the request is granted unless some other module fails. If the module fails, the rest of the chain is also executed, but the request is ultimately denied.
+# requisite - If the module succeeds, the rest of the chain is executed, and the request is granted unless some other module fails. If the module fails, the chain is immediately terminated and the request is denied.
+# sufficient - If the module succeeds and no earlier module in the chain has failed, the chain is immediately terminated and the request is granted. If the module fails, the module is ignored and the rest of the chain is executed.
+#
+# The third column is the path to the module to be used for the chain.
+#
+# The fourth column is optional. It is for any options to be passed to the module.
+#
+######################################################################
+
+# Unix PAM Module
+# ===============
+#
+# Requirements: Requires /etc/shadow be made readable by the user executing java
+#
+auth       required   /lib64/security/pam_unix_auth.so
+account    required   /lib64/security/pam_unix_acct.so
+password   required   /lib64/security/pam_unix_passwd.so
+session    required   /lib64/security/pam_unix_session.so

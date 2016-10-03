@@ -1,5 +1,11 @@
 package org.ow2.proactive.scheduler.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -8,17 +14,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.Test;
 import org.objectweb.proactive.core.UniqueID;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.tests.ProActiveTest;
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.python.google.common.collect.Lists;
 
 
 public class SchedulerFrontendStateTest extends ProActiveTest {
@@ -58,5 +63,28 @@ public class SchedulerFrontendStateTest extends ProActiveTest {
         } catch (TimeoutException e) {
             // expected timeout exception after two seconds
         }
+    }
+
+    @Test
+    public void getIdentifiedJobTest() throws Exception {
+
+        SchedulerJMXHelper mockJMX = mock(SchedulerJMXHelper.class);
+        when(mockJMX.getSchedulerRuntimeMBean()).thenReturn(new RuntimeDataMBeanImpl(null));
+
+        SchedulerStateImpl schedulerStateImpl = new SchedulerStateImpl();
+
+        JobIdImpl jobId = new JobIdImpl(1234L, "job name");
+
+        JobState jobState = mock(JobState.class);
+
+        when(jobState.getId()).thenReturn(jobId);
+
+        schedulerStateImpl.setFinishedJobs(new Vector(Lists.newArrayList(jobState)));
+
+        final SchedulerFrontendState schedulerFrontendState = new SchedulerFrontendState(schedulerStateImpl,
+            mockJMX);
+
+        assertEquals(schedulerFrontendState.getIdentifiedJob(jobId).getJobId(), (jobId));
+
     }
 }
