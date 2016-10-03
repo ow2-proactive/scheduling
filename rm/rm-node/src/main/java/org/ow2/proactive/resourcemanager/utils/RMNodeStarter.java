@@ -1111,7 +1111,7 @@ public class RMNodeStarter {
                 }
             }
         }else {
-            logger.info("The monitoring is disabled!");
+            logger.info("JMX monitoring is disabled.");
         }
 
         for (final Node node : nodes) {
