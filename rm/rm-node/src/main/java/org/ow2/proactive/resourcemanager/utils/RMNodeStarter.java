@@ -1073,10 +1073,11 @@ public class RMNodeStarter {
 
         RMAuthentication auth = joinResourceManager(rmURL);
         final ResourceManager rm = loginToResourceManager(credentials, auth);
+        SigarExposer sigarExposer = null;
 
         if(!disabledMonitoring) {
             // initializing JMX server with Sigar beans
-            SigarExposer sigarExposer = new SigarExposer(nodeName);
+            sigarExposer = new SigarExposer(nodeName);
             final RMAuthentication rmAuth = auth;
             sigarExposer.boot(auth, false, new PermissionChecker() {
                 @Override
@@ -1102,26 +1103,29 @@ public class RMNodeStarter {
                     }
                 }
             });
-
-            for (final Node node : nodes) {
-                try {
-                    node.setProperty(JMX_URL + JMXTransportProtocol.RMI, sigarExposer.getAddress(
-                            JMXTransportProtocol.RMI).toString());
-                    node.setProperty(JMX_URL + JMXTransportProtocol.RO, sigarExposer.getAddress(
-                            JMXTransportProtocol.RO).toString());
-                } catch (Exception e) {
-                    logger.error("", e);
-                }
-            }
         }else {
             logger.info("JMX monitoring is disabled.");
         }
 
         for (final Node node : nodes) {
+            nodeSetJmxUrl(sigarExposer, node);
             addNodeToResourceManager(rmURL, node, rm);
         }
 
         return rm;
+    }
+
+    private void nodeSetJmxUrl(SigarExposer sigarExposer, Node node) {
+        try {
+            if(!disabledMonitoring) {
+                node.setProperty(JMX_URL + JMXTransportProtocol.RMI, sigarExposer.getAddress(
+                        JMXTransportProtocol.RMI).toString());
+                node.setProperty(JMX_URL + JMXTransportProtocol.RO, sigarExposer.getAddress(
+                        JMXTransportProtocol.RO).toString());
+            }
+        } catch (Exception e) {
+            logger.error("", e);
+        }
     }
 
     private void addNodeToResourceManager(String rmURL, Node node, ResourceManager rm) {
