@@ -650,7 +650,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkJobOwner("finishTaskInError", jobIdObject,
+        frontendState.checkJobOwner("finishTaskInError", frontendState.getIdentifiedJob(jobIdObject),
                 "You do not have permission to finish this task!");
         return schedulingService.finishInErrorTask(jobIdObject, taskName);
     }
