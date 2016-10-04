@@ -37,13 +37,10 @@
 package functionaltests;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
-import com.google.common.collect.Iterables;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -51,8 +48,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
@@ -60,7 +55,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -69,6 +63,8 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+
+import com.google.common.collect.Iterables;
 
 import functionaltests.utils.RestFuncTUtils;
 
@@ -132,7 +128,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpPost httpPost = new HttpPost(schedulerUrl);
         setSessionHeader(httpPost);
         File jobFile = RestFuncTHelper.getDefaultJobXmlfile();
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("",
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("file",
                 new FileBody(jobFile, ContentType.APPLICATION_XML));
         httpPost.setEntity(multipartEntityBuilder.build());
         HttpResponse response = executeUriRequest(httpPost);
@@ -150,7 +146,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpPost httpPost = new HttpPost(schedulerUrl);
         setSessionHeader(httpPost);
 
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("",
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("file",
                 new FileBody(jobFile, ContentType.APPLICATION_XML));
         httpPost.setEntity(multipartEntityBuilder.build());
 

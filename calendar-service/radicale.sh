@@ -7,16 +7,13 @@
 #
 # This function checks if the application is running
 
-cd ..
-cwd=$(pwd)
-
 check_status() {
 
   # Running ps with some arguments to check if the PID exists 
-  s=$(ps aux | grep '/bin/java.*calendar-service' | grep -v 'grep' | awk '{print $2}')
+  s=$(ps aux | grep 'radicale -d -S' | grep -v 'grep' | awk '{print $2}')
 
   # If somethig was returned by the ps command, this function returns the PID
-  if [ $s ] ; then
+  if [[ "$s" ]] ; then
     echo $s
     exit 1
   fi
@@ -31,27 +28,19 @@ start() {
 
   pid=$(check_status)
 
-  if [ $pid -ne 0 ] ; then
-    echo "Calendar service is already started"
+  if [ "$pid" -ne 0 ] ; then
+    echo "Radicale is already started"
     exit 1
   fi
 
   # If the application isn't running, starts it
-  echo " *** Starting Calendar Service *** "
+  echo " *** Starting Radicale server *** "
 
-  #copy scheduler users to radicale server
-  loginFile="$cwd/config/authentication/login.cfg"
-  rm -rf ~/.config/radicale/users
-  touch ~/.config/radicale/users
+  cd ~/.config/radicale/log
 
-  while IFS=':' read -r user password
-  do
-      htpasswd -bs ~/.config/radicale/users "$user" "$password"    
-  done < "$loginFile"
+  radicale -d -S
 
-  # Redirects default and error output to a log file
-  java -Dpa.scheduler.home=$cwd -Dspring.config.location=$cwd/config/calendar-service/application.properties -jar $cwd/tools/calendar-service*.jar > /dev/null 2>&1 &
-  echo " *** Calendar service gets started *** "
+  echo " *** OK *** "
 }
 
 # Stops the application
@@ -60,15 +49,15 @@ stop() {
   # Like as the start function, checks the application status
   pid=$(check_status)
 
-  if [ $pid -ne 0 ] ; then
+  if [ "$pid" -ne 0 ] ; then
     # Kills the application process
-    echo " *** Stopping Calendar service *** "
+    echo " *** Stopping Radicale server *** "
     kill -9 $pid
     echo "OK"    
     exit 1
   fi
 
-  echo "Calendar service is already stopped"
+  echo "Radicale server is already stopped"
 }
 
 # Show the application status
@@ -78,10 +67,10 @@ status() {
   pid=$(check_status)
 
   # If the PID was returned means the application is running
-  if [ $pid -ne 0 ] ; then
-    echo "Calendar service is started"
+  if [ "$pid" -ne 0 ] ; then
+    echo "Radicale is started"
   else
-    echo "Calendar service is stopped"
+    echo "Radicale is stopped"
   fi
 
 }
