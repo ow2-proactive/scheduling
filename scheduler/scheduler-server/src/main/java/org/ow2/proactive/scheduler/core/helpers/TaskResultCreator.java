@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
@@ -86,6 +87,10 @@ public class TaskResultCreator {
             taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(), 
                     Collections.singletonList(task.getId())).get(task.getId());
         }catch(DatabaseManagerException e){
+            taskResult = null;
+        }
+        
+        if (taskResult == null){
             taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception,output);
         }
 
