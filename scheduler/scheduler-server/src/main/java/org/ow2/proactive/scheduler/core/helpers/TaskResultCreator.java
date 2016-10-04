@@ -82,12 +82,12 @@ public class TaskResultCreator {
 
         TaskResultImpl taskResult;
         JobDescriptor jobDescriptor = job.getJobDescriptor();
-        try {
-            taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
-                    Collections.singletonList(task.getId())).get(task.getId());
-        } catch (DatabaseManagerException e) {
+//        try {
+//            taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
+//                    Collections.singletonList(task.getId())).get(task.getId());
+//        } catch (DatabaseManagerException e) {
             taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception, output);
-        }
+//        }
 
         EligibleTaskDescriptor etd = null;
 
