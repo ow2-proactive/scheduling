@@ -881,7 +881,8 @@ public abstract class InternalJob extends JobState {
 
     public ChangedTasksInfo finishInErrorTask(TaskId taskId, TaskResultImpl result, SchedulerStateUpdate frontend) {
 
-        ChangedTasksInfo changedTasksInfo = terminateTask(false, taskId, frontend, result.getAction(), result, true);
+        FlowAction action = result.getAction();
+        ChangedTasksInfo changedTasksInfo = terminateTask(false, taskId, frontend, action, result, true);
         setUnPause();
         return changedTasksInfo;
 
