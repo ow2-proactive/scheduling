@@ -760,9 +760,9 @@ class LiveJobs {
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
-            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task, 
-                    new TaskPreemptedException("Preempted by admin"), 
-                    new SimpleTaskLogs("", "Preempted by admin"));
+            TaskResultImpl taskResult = taskResultCreator.getEmptyTaskResultWithTaskIdAndExecutionTime
+                    (task, new TaskPreemptedException("Preempted by admin"),
+                            new SimpleTaskLogs("", "Preempted by admin"));
 
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
