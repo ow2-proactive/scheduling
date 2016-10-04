@@ -82,23 +82,23 @@ public class TaskResultCreator {
 
         TaskResultImpl taskResult;
         JobDescriptor jobDescriptor = job.getJobDescriptor();
-//        try {
-//            taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
-//                    Collections.singletonList(task.getId())).get(task.getId());
-//        } catch (DatabaseManagerException e) {
-            taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception, output);
-//        }
 
         EligibleTaskDescriptor etd = null;
-
         if (jobDescriptor.getPausedTasks().get(task.getId()) != null) {
             etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());
         } else if (jobDescriptor.getRunningTasks().get(task.getId()) != null) {
             etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());
         }
+        
+        if (jobDescriptor.getRunningTasks().get(task.getId()) != null) {
+            taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
+                    Collections.singletonList(task.getId())).get(task.getId());
+        } else {
+            taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception, output);
 
-        if (etd != null) {
-            taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, etd, job, task));
+            if (etd != null) {
+                taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, etd, job, task));
+            }
         }
 
         return taskResult;

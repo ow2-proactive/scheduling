@@ -715,8 +715,9 @@ class LiveJobs {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
 
-            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task, 
-                    new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"));
+            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+                                    new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
+                                    System.currentTimeMillis() - task.getStartTime());
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
 
@@ -760,9 +761,10 @@ class LiveJobs {
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
-            TaskResultImpl taskResult = taskResultCreator.getEmptyTaskResultWithTaskIdAndExecutionTime
-                    (task, new TaskPreemptedException("Preempted by admin"),
-                            new SimpleTaskLogs("", "Preempted by admin"));
+            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+                                    new TaskPreemptedException("Preempted by admin"),
+                                    new SimpleTaskLogs("", "Preempted by admin"),
+                                    System.currentTimeMillis() - task.getStartTime());
 
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
@@ -792,8 +794,9 @@ class LiveJobs {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
             
-            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task,
-                    new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user")); 
+            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+                                    new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
+                                    System.currentTimeMillis() - task.getStartTime());
 
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
