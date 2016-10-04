@@ -36,14 +36,9 @@
  */
 package org.ow2.proactive.authentication;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
+import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -52,10 +47,14 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
-
-import org.apache.log4j.Logger;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
 
 
 /**
@@ -160,7 +159,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                 throw new FailedLoginException("No username has been specified for authentication");
             }
 
-            succeeded = logUser(username, password);
+            succeeded = logUser(username, password, true);
             return succeeded;
 
         } catch (java.io.IOException ioe) {
@@ -178,13 +177,19 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * check group membership from group file.
      * @param username user's login
      * @param password user's password
+     * @param printErrorMessage if a message should be printed if the password is incorrect.
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication or group membership fails.
      */
-    protected boolean logUser(String username, String password) throws LoginException {
+    protected boolean logUser(String username, String password, boolean printErrorMessage) throws LoginException {
 
         if (!authenticateUserFromFile(username, password)) {
-            logger.info("Incorrect Username/Password");
+            String message = "[" + FileLoginModule.class.getSimpleName() + "] Incorrect Username/Password";
+            if (printErrorMessage) {
+                logger.info(message);
+            } else {
+                logger.debug(message);
+            }
             throw new FailedLoginException("Incorrect Username/Password");
         }
 

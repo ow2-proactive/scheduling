@@ -36,6 +36,32 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_LIST_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SHUTDOWN_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
+
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
@@ -362,7 +388,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         }
 
         UserIdentificationImpl ident = frontendState.checkPermission("submit",
-                "You do not have permission to submit a job !");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
 
         InternalJob job = frontendState.createJob(userJob, ident);
 
@@ -402,8 +428,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, PermissionException, UnknownJobException {
 
         // checking permissions
-        IdentifiedJob ij = frontendState.checkJobOwner("getJobResult", jobId,
-                "You do not have permission to get the result of this job !");
+        IdentifiedJob ij = frontendState.getIdentifiedJob(jobId);
+
+        frontendState.checkPermissions("getJobResult", ij,
+                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB);
 
         if (!ij.isFinished()) {
             jlogger.info(jobId, "is not finished");
@@ -463,7 +491,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
         frontendState.checkPermission("getTaskResultByTag",
-                "You do not have permission to get the task result of this job !");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         List<TaskState> taskStates = getJobState(jobId).getTasksByTag(taskTag);
         ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
         for (TaskState currentState : taskStates) {
@@ -505,9 +533,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
 
-        // checking permissions
-        frontendState.checkJobOwner("getTaskResultFromIncarnation", jobId,
-                "You do not have permission to get the task result of this job !");
+        // checking permissions      
+        frontendState.checkPermissions("getTaskResultFromIncarnation", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
 
         if (inc < 0) {
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
@@ -575,7 +603,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
-        frontendState.checkJobOwner("killTask", jobId, "You do not have permission to kill this task !");
+        frontendState.checkPermissions("killTask", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK);
         return schedulingService.killTask(jobId, taskName);
     }
 
@@ -597,7 +626,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public boolean restartTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
-        frontendState.checkJobOwner("restartTask", jobId, "You do not have permission to restart this task!");
+        frontendState.checkPermissions("restartTask", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
         return schedulingService.restartTask(jobId, taskName, restartDelay);
     }
 
@@ -620,8 +650,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkJobOwner("restartTaskOnError", jobIdObject,
-                "You do not have permission to restart this task!");
+        frontendState.checkPermissions("restartTaskOnError", frontendState.getIdentifiedJob(jobIdObject),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
         return schedulingService.restartInErrorTask(jobIdObject, taskName);
     }
 
@@ -632,9 +662,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public boolean preemptTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        // checking permissions
-        frontendState.checkJobOwner("preemptTask", jobId,
-                "You do not have permission to preempt this task !");
+        // checking permissions       
+        frontendState.checkPermissions("preemptTask", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK);
         return schedulingService.preemptTask(jobId, taskName, restartDelay);
     }
 
@@ -655,8 +685,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public boolean removeJob(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
 
-        // checking permissions
-        frontendState.checkJobOwner("removeJob", jobId, "You do not have permission to remove this job !");
+        // checking permissions       
+        frontendState.checkPermissions("removeJob", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
 
         // asking the scheduler for the result
         return schedulingService.removeJob(jobId);
@@ -668,14 +699,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
+        // checking permissions        
+        frontendState.checkPermissions("listenJobLogs", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB);
 
         if (!schedulingService.getListenJobLogsSupport().isEnabled()) {
             throw new PermissionException("Listening to job logs is disabled by administrator");
         }
-
-        // checking permissions
-        frontendState.checkJobOwner("listenJobLogs", jobId,
-                "You do not have permission to listen the log of this job !");
 
         schedulingService.listenJobLogs(jobId, appenderProvider);
     }
@@ -728,7 +758,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
             boolean getCurrentState, SchedulerEvent... events)
-            throws NotConnectedException, PermissionException {
+                    throws NotConnectedException, PermissionException {
         return frontendState.addEventListener(sel, myEventsOnly, getCurrentState, events);
     }
 
@@ -757,7 +787,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean start() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("start", "You do not have permission to start the scheduler !");
+        frontendState.checkPermission("start", YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER);
         return schedulingService.start();
     }
 
@@ -766,7 +796,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean stop() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("stop", "You do not have permission to stop the scheduler !");
+        frontendState.checkPermission("stop", YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER);
         return schedulingService.stop();
     }
 
@@ -775,7 +805,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean pause() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("pause", "You do not have permission to pause the scheduler !");
+        frontendState.checkPermission("pause", YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THE_SCHEDULER);
         return schedulingService.pause();
     }
 
@@ -784,7 +814,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean freeze() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("freeze", "You do not have permission to freeze the scheduler !");
+        frontendState.checkPermission("freeze", YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER);
         return schedulingService.freeze();
     }
 
@@ -793,7 +823,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean resume() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("resume", "You do not have permission to resume the scheduler !");
+        frontendState.checkPermission("resume", YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THE_SCHEDULER);
         return schedulingService.resume();
     }
 
@@ -802,7 +832,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean shutdown() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("shutdown", "You do not have permission to shutdown the scheduler !");
+        frontendState.checkPermission("shutdown", YOU_DO_NOT_HAVE_PERMISSION_TO_SHUTDOWN_THE_SCHEDULER);
         return schedulingService.shutdown();
     }
 
@@ -811,7 +841,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean kill() throws NotConnectedException, PermissionException {
-        frontendState.checkPermission("kill", "You do not have permission to kill the scheduler !");
+        frontendState.checkPermission("kill", YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER);
         return schedulingService.kill();
     }
 
@@ -847,7 +877,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public boolean pauseJob(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        frontendState.checkJobOwner("pauseJob", jobId, "You do not have permission to pause this job !");
+        frontendState.checkPermissions("pauseJob", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB);
         return schedulingService.pauseJob(jobId);
     }
 
@@ -857,7 +888,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public boolean resumeJob(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        frontendState.checkJobOwner("resumeJob", jobId, "You do not have permission to resume this job !");
+        frontendState.checkPermissions("resumeJob", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB);
         return schedulingService.resumeJob(jobId);
     }
 
@@ -867,7 +899,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public boolean killJob(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        frontendState.checkJobOwner("killJob", jobId, "You do not have permission to kill this job !");
+        frontendState.checkPermissions("killJob", frontendState.getIdentifiedJob(jobId),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
         return schedulingService.killJob(jobId);
     }
 
@@ -923,8 +956,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public boolean restartAllInErrorTasks(String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkJobOwner("restartAllInErrorTasks", jobIdObject,
-                "You do not have permission to restart in error tasks in this job!");
+        frontendState.checkPermissions("restartAllInErrorTasks", frontendState.getIdentifiedJob(jobIdObject),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB);
         return schedulingService.restartAllInErrorTasks(jobIdObject);
     }
 
@@ -980,7 +1013,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public boolean reloadPolicyConfiguration() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("reloadPolicyConfiguration",
-                "You do not have permission to reload policy configuration !");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION);
         return schedulingService.reloadPolicyConfiguration();
     }
 
@@ -1033,8 +1066,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public String getJobServerLogs(String jobId)
             throws UnknownJobException, NotConnectedException, PermissionException {
         JobId id = JobIdImpl.makeJobId(jobId);
-        frontendState.checkJobOwner("getJobServerLogs", id,
-                "You do not have permissions to get the logs of this job");
+        frontendState.checkPermissions("getJobServerLogs", frontendState.getIdentifiedJob(id),
+                YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB);
 
         return ServerJobAndTaskLogs.getJobLog(JobIdImpl.makeJobId(jobId), frontendState.getJobTasks(id));
     }
@@ -1045,8 +1078,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
 
         JobId id = JobIdImpl.makeJobId(jobId);
-        frontendState.checkJobOwner("getTaskServerLogs", id,
-                "You do not have permission to get the task logs of this job");
+        frontendState.checkPermissions("getTaskServerLogs", frontendState.getIdentifiedJob(id),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
 
         for (TaskId taskId : frontendState.getJobTasks(id)) {
             if (taskId.getReadableName().equals(taskName)) {
@@ -1062,8 +1095,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public String getTaskServerLogsByTag(String jobId, String taskTag)
             throws UnknownJobException, NotConnectedException, PermissionException {
         JobId id = JobIdImpl.makeJobId(jobId);
-        frontendState.checkJobOwner("getTaskServerLogsByTag", id,
-                "You do not have permission to get the task logs of this job");
+        frontendState.checkPermissions("getTaskServerLogsByTag", frontendState.getIdentifiedJob(id),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
         List<TaskState> lTaskState = frontendState.getJobState(id).getTasksByTag(taskTag);
         Set<TaskId> tasksIds = new HashSet<>(lTaskState.size());
         for (TaskState taskState : lTaskState) {
@@ -1080,23 +1113,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters)
-            throws NotConnectedException, PermissionException {
+                    throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getJobs",
                 "You don't have permissions to load jobs");
 
         boolean myJobsOnly = filterCriteria.isMyJobsOnly();
-        try {
-            frontendState.checkOwnStatePermission(myJobsOnly, ident);
-        } catch (PermissionException ex) {
-            // user does not have a right to retrieve all jobs
-            // limit it to its own jobs
-            if (!myJobsOnly) {
-                myJobsOnly = true;
-                frontendState.checkOwnStatePermission(true, ident);
-            } else {
-                throw ex;
-            }
-        }
 
         String user;
         if (myJobsOnly) {
@@ -1114,9 +1135,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     @ImmediateService
     public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getUsers",
-                "You don't have permissions to get users");
-        frontendState.checkOwnStatePermission(false, ident);
+        frontendState.checkPermission("getUsers", "You don't have permissions to get users");
         return frontendState.getUsers();
     }
 
@@ -1126,9 +1145,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     @ImmediateService
     public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getUsersWithJobs",
+        frontendState.checkPermission("getUsersWithJobs",
                 "You don't have permissions to get users with jobs");
-        frontendState.checkOwnStatePermission(false, ident);
         return dbManager.loadUsersWithJobs();
     }
 
@@ -1171,7 +1189,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public void putThirdPartyCredential(String key, String value)
             throws NotConnectedException, PermissionException, KeyException {
         UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
-                "You do not have permission to put third-party credentials in the scheduler!");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
 
         HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encryptString(value,
                 corePublicKey);
@@ -1181,21 +1199,21 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("thirdPartyCredentialsKeySet",
-                "You do not have permission to list third-party credentials in the scheduler!");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_LIST_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
         return dbManager.thirdPartyCredentialsKeySet(ident.getUsername());
     }
 
     @Override
     public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("removeThirdPartyCredential",
-                "You do not have permission to remove third-party credentials from the scheduler!");
+                YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER);
         dbManager.removeThirdPartyCredential(ident.getUsername(), key);
     }
 
     @Override
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
-            throws NotConnectedException, PermissionException {
+                    throws NotConnectedException, PermissionException {
         RestPageParameters params = new RestPageParameters(frontendState, "getTaskIds", from, to, mytasks,
             running, pending, finished, offset, limit, taskTag, SortSpecifierContainer.EMPTY_CONTAINER);
         Page<TaskInfo> pTaskInfo;
@@ -1212,7 +1230,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-            throws NotConnectedException, PermissionException {
+                    throws NotConnectedException, PermissionException {
         RestPageParameters params = new RestPageParameters(frontendState, "getTaskStates", from, to, mytasks,
             running, pending, finished, offset, limit, taskTag, sortParams);
         Page<TaskState> pTasks;
