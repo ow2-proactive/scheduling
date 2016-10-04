@@ -34,13 +34,6 @@
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -54,12 +47,19 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 
 public class TaskResultCreator {
 
     private static TaskResultCreator instance = null;
 
-    private TaskResultCreator() {
+    public TaskResultCreator() {
     }
 
     public static synchronized TaskResultCreator getInstance() {
@@ -69,35 +69,35 @@ public class TaskResultCreator {
         return instance;
     }
 
-    public TaskResultImpl getTaskResult(SchedulerDBManager dbManager, InternalJob job, InternalTask task) 
-            throws UnknownTaskException  {
+    public TaskResultImpl getTaskResult(SchedulerDBManager dbManager, InternalJob job, InternalTask task)
+            throws UnknownTaskException {
         return getTaskResult(dbManager, job, task, null, null);
     }
 
     public TaskResultImpl getTaskResult(SchedulerDBManager dbManager, InternalJob job, InternalTask task,
-            Throwable exception, TaskLogs output) throws UnknownTaskException {
-        if (task == null){
+                                        Throwable exception, TaskLogs output) throws UnknownTaskException {
+        if (task == null) {
             throw new UnknownTaskException();
         }
 
         TaskResultImpl taskResult;
         JobDescriptor jobDescriptor = job.getJobDescriptor();
-        try{
-            taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(), 
+        try {
+            taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
                     Collections.singletonList(task.getId())).get(task.getId());
-        }catch(DatabaseManagerException e){
-            taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception,output);
+        } catch (DatabaseManagerException e) {
+            taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception, output);
         }
 
         EligibleTaskDescriptor etd = null;
 
-        if (jobDescriptor.getPausedTasks().get(task.getId()) != null){
-            etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());            
-        }else if (jobDescriptor.getRunningTasks().get(task.getId()) != null){
-            etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());  
+        if (jobDescriptor.getPausedTasks().get(task.getId()) != null) {
+            etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());
+        } else if (jobDescriptor.getRunningTasks().get(task.getId()) != null) {
+            etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());
         }
 
-        if (etd != null){
+        if (etd != null) {
             taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, etd, job, task));
         }
 
@@ -106,38 +106,52 @@ public class TaskResultCreator {
     }
 
     public TaskResultImpl getEmptyTaskResultWithTaskIdAndExecutionTime(InternalTask task,
-            Throwable exception, TaskLogs output){
+                                                                       Throwable exception, TaskLogs output) {
         return new TaskResultImpl(task.getId(), exception,
                 output, System.currentTimeMillis() - task.getStartTime());
     }
 
-    private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager, 
-            EligibleTaskDescriptor etd, InternalJob job, InternalTask task) throws UnknownTaskException{
+    private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager,
+                                                       EligibleTaskDescriptor etd, InternalJob job, InternalTask task) throws UnknownTaskException {
         Map<String, byte[]> variables = new HashMap<>();
 
-        int resultSize = etd.getParents().size();
+        int numberOfParentTasks = etd.getParents().size();
         if (job.getType() == JobType.TASKSFLOW) {
             // retrieve from the database the previous task results if available
-            if ((resultSize > 0) && task.handleResultsArguments()) {
-                List<TaskId> parentIds = new ArrayList<>(resultSize);
-                for (int i = 0; i < resultSize; i++) {
-                    parentIds.add(etd.getParents().get(i).getTaskId());
-                }
-                Map<TaskId, TaskResult> taskResults = dbManager
-                        .loadTasksResults(
-                                job.getId(), parentIds);
-                for (TaskResult taskResult : taskResults.values()) {
-                    if (taskResult.getPropagatedVariables() != null) {
-                        variables.putAll(taskResult.getPropagatedVariables());
-                    }
-                }
+            if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {
+                variables = extractTaskResultsAndMergeIntoMap(dbManager, etd, job);
             } else {
-                // otherwise use the default job variables
-                for (Entry<String, String> entry : job.getVariables().entrySet()){
-                    variables.put(entry.getKey(), entry.getValue().getBytes());
-                }
+                variables = extractJobVariables(job);
             }
         }
         return variables;
+    }
+
+    private Map<String, byte[]> extractJobVariables(InternalJob job) {
+        Map<String, byte[]> jobVariables = new HashMap<>();
+        // otherwise use the default job variables
+        for (Entry<String, String> entry : job.getVariables().entrySet()) {
+            jobVariables.put(entry.getKey(), entry.getValue().getBytes());
+        }
+        return jobVariables;
+    }
+
+    private Map<String, byte[]> extractTaskResultsAndMergeIntoMap(SchedulerDBManager dbManager, EligibleTaskDescriptor etd, InternalJob job) {
+        Map<String, byte[]> mergedVariables = new HashMap<>();
+
+        int numberOfParentTasks = etd.getParents().size();
+        List<TaskId> parentIds = new ArrayList<>(numberOfParentTasks);
+        for (int i = 0; i < numberOfParentTasks; i++) {
+            parentIds.add(etd.getParents().get(i).getTaskId());
+        }
+        Map<TaskId, TaskResult> taskResults = dbManager
+                .loadTasksResults(
+                        job.getId(), parentIds);
+        for (TaskResult taskResult : taskResults.values()) {
+            if (taskResult.getPropagatedVariables() != null) {
+                mergedVariables.putAll(taskResult.getPropagatedVariables());
+            }
+        }
+        return mergedVariables;
     }
 }
