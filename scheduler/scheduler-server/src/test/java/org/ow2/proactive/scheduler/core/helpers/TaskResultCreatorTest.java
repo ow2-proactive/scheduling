@@ -125,16 +125,43 @@ public class TaskResultCreatorTest {
         when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
                 .thenThrow(new DatabaseManagerException());
 
-
         InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());
-
+        
         Map<String, String> fakeVariableMap = new HashMap<>();
-        fakeVariableMap.put("TestVar", "h234");
-        when(mockedInternalJob.getVariables()).thenReturn(fakeVariableMap);
+                fakeVariableMap.put("TestVar", "h234");
+                when(mockedInternalJob.getVariables()).thenReturn(fakeVariableMap);
 
         TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, mockedInternalJob, this.getMockedInternalTask());
 
         verify(mockedInternalJob, atLeastOnce()).getVariables();
+
+        assertThat(new String(taskResult
+                        .getPropagatedVariables()
+                        .get("TestVar")),
+                is("h234"));
+    }
+
+    @Test
+    public void testThatTaskVariablesAreUsedIfTaskisInDB() throws UnknownTaskException {
+        TaskResultCreator taskResultCreator = new TaskResultCreator();
+        TaskResultImpl mockedTaskResultImpl = mock(TaskResultImpl.class);
+        Map<String, byte[]> fakeVariableMap = new HashMap<>();
+        fakeVariableMap.put("TestVar", new String("h234").getBytes());
+        when(mockedTaskResultImpl.getPropagatedVariables()).thenReturn(fakeVariableMap);
+        
+        Map<TaskId, TaskResult> loadTaskResultsValue = new HashMap<>();
+        loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
+
+        SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
+                .thenReturn(loadTaskResultsValue);
+
+
+        InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());
+
+        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, mockedInternalJob, this.getMockedInternalTask());
+
+        verify(mockedTaskResultImpl, atLeastOnce()).getPropagatedVariables();
 
         assertThat(new String(taskResult
                         .getPropagatedVariables()
