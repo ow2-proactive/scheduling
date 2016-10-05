@@ -1703,6 +1703,13 @@ public interface SchedulerRestInterface {
 			UnknownTaskRestException, PermissionRestException;
 
 	@PUT
+	@Path("jobs/{jobid}/tasks/{taskname}/finishInErrorTask")
+	@Produces("application/json")
+	boolean finishInErrorTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,
+							   @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
+			UnknownTaskRestException, PermissionRestException;
+
+	@PUT
 	@Path("jobs/{jobid}/tasks/{taskname}/restartInErrorTask")
 	@Produces("application/json")
 	boolean restartInErrorTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobid,

@@ -93,7 +93,9 @@ public enum SchedulerEvent {
     JOB_IN_ERROR("Job In-Error"), /** A task has just been paused due to an error while executing */
     TASK_IN_ERROR("Task In-Error"), /** A job has just been restarted from error. */
     JOB_RESTARTED_FROM_ERROR("Job restarted from error"), /** A job has just been updated.*/
-    JOB_UPDATED("job updated");
+    JOB_UPDATED("job updated"),
+    TASK_IN_ERROR_TO_FINISHED(
+            "Task In-Error to finished"); /** A task has just had an error, was marked as finished. */
 
     /** Name of the method */
     private String methodName;

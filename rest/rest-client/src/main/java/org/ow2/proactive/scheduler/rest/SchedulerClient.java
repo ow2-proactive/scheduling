@@ -543,6 +543,18 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public boolean finishInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        boolean result = false;
+        try {
+            result = restApi().finishInErrorTask(sid, jobId, taskName);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPEOrUTE(e);
+        }
+        return result;
+    }
+
+    @Override
     public boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         boolean result = false;

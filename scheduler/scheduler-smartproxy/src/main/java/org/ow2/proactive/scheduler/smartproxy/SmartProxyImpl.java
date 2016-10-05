@@ -523,6 +523,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl>
     }
 
     @Override
+    public boolean finishInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return schedulerProxy.finishInErrorTask(jobId, taskName);
+    }
+
+    @Override
     public boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return schedulerProxy.restartInErrorTask(jobId, taskName);

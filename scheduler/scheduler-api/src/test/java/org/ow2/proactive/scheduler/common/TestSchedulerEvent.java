@@ -83,8 +83,9 @@ public class TestSchedulerEvent {
         Assert.assertEquals(SchedulerEvent.TASK_IN_ERROR.ordinal(), 28);
         Assert.assertEquals(SchedulerEvent.JOB_RESTARTED_FROM_ERROR.ordinal(), 29);
         Assert.assertEquals(SchedulerEvent.JOB_UPDATED.ordinal(), 30);
+        Assert.assertEquals(SchedulerEvent.TASK_IN_ERROR_TO_FINISHED.ordinal(), 31);
 
-        Assert.assertEquals(31, SchedulerEvent.values().length);
+        Assert.assertEquals(32, SchedulerEvent.values().length);
     }
 
 }
