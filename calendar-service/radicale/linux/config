@@ -34,7 +34,8 @@ htpasswd_encryption = sha1
 
 # Rights backend
 # Value: None | authenticated | owner_only | owner_write | from_file | custom
-type = owner_write
+type = from_file
+file = ~/.config/radicale/rights
 
 [logging]
 

@@ -34,6 +34,7 @@ fi
 
 cp -f "$cwd/calendar-service/radicale/linux/config" ~/.config/radicale/config
 cp -f "$cwd/calendar-service/radicale/linux/logging" ~/.config/radicale/logging
+cp -f "$cwd/calendar-service/radicale/linux/rights" ~/.config/radicale/rights
 rm -rf ~/.config/radicale/users
 touch ~/.config/radicale/users
 mkdir ~/.config/radicale/log

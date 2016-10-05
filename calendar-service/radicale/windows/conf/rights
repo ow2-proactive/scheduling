@@ -1,0 +1,19 @@
+# Allow authenticated user to read all collections
+[allow-everyone-read]
+user: .+
+collection: .*
+permission: r
+
+# Give write access to owners
+[owner-write]
+user: .+
+collection: ^%(login)s/.*$
+permission: w
+
+# This means all users may read and write any collection starting with private.
+# We do so by just not testing against the user string.
+# for google calendar and outlook user only. ,
+[private-url]
+user: .*
+collection: .*/private-.*
+permission: rw

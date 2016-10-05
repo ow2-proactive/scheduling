@@ -64,6 +64,7 @@ set RADICALE_HOME=%RADICALE_HOME:"=%
 @rem copy data folders and config files 
 xcopy "%RADICALE_HOME%\App\DefaultData" "%RADICALE_HOME%\Data" /s /e /y 
 xcopy radicale\windows\conf\config.ini "%RADICALE_HOME%\Data\config\" /y
+xcopy radicale\windows\conf\rights "%RADICALE_HOME%\Data\config\" /y
 
 @rem Execute radicale
 start "" "%RADICALE_HOME%\RadicalePortable.exe"
