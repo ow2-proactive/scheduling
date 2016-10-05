@@ -96,21 +96,26 @@ public class TaskResultCreatorTest {
 
     }
 
-//    @Test // NA for current application 
-//    public void testThatSetPropagatedVariablesIsCalledOnTheTaskResult() throws UnknownTaskException {
-//        TaskResultCreator taskResultCreator = new TaskResultCreator();
-//        TaskResultImpl mockedTaskResultImpl = mock(TaskResultImpl.class);
-//        Map<TaskId, TaskResult> loadTaskResultsValue = new HashMap<>();
-//        loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
-//
-//        SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-//        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-//                .thenReturn(loadTaskResultsValue);
-//
-//        taskResultCreator.getTaskResult(mockedschedulerDbManager, this.getMockedInternalJob(this.getMockedJobDescriptorWithPausedTask()), this.getMockedInternalTask());
-//
-//        verify(mockedTaskResultImpl).setPropagatedVariables(any(Map.class));
-//    }
+    @Test
+    public void testThatPropagatedVariablesAreExtractedFromParents() throws UnknownTaskException {
+        Map<String, byte[]> fakeVariableMap = new HashMap<>();
+        fakeVariableMap.put("ParentVar", "5623g".getBytes());
+        TaskResultCreator taskResultCreator = new TaskResultCreator();
+        TaskResultImpl mockedParentTaskResultImpl = mock(TaskResultImpl.class);
+        Map<TaskId, TaskResult> loadParentTaskResultsValue = new HashMap<>();
+        loadParentTaskResultsValue.put(this.createTaskID(), mockedParentTaskResultImpl);
+        when(mockedParentTaskResultImpl.getPropagatedVariables()).thenReturn(fakeVariableMap);
+
+        SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
+
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
+                .thenReturn(loadParentTaskResultsValue);
+
+        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTask()), this.getMockedInternalTask());
+
+        when(taskResult.getPropagatedVariables()).thenCallRealMethod();
+        assertThat(new String(taskResult.getPropagatedVariables().get("ParentVar")), is("5623g"));
+    }
 
     @Test
     public void testThatJobVariablesAreUsedIfTaskHasNoParents() throws UnknownTaskException {
@@ -230,11 +235,11 @@ public class TaskResultCreatorTest {
     }
 
     private EligibleTaskDescriptorImpl createParentTaskDescriptor() {
-        EligibleTaskDescriptorImpl spyEligibleTaskDescriptorImpl
+        EligibleTaskDescriptorImpl mockedEligibleTaskDescriptorImpl
                 = mock(EligibleTaskDescriptorImpl.class);
         TaskId parentId = this.createParentTaskID();
-        doReturn(parentId).when(spyEligibleTaskDescriptorImpl).getTaskId();
-        return spyEligibleTaskDescriptorImpl;
+        doReturn(parentId).when(mockedEligibleTaskDescriptorImpl).getTaskId();
+        return mockedEligibleTaskDescriptorImpl;
     }
 
     private Vector<TaskDescriptor> createParentVector() {

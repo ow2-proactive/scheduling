@@ -34,7 +34,6 @@
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
-import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -89,7 +88,7 @@ public class TaskResultCreator {
         } else if (jobDescriptor.getRunningTasks().get(task.getId()) != null) {
             etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());
         }
-        
+
         if (jobDescriptor.getRunningTasks().get(task.getId()) != null) {
             taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
                     Collections.singletonList(task.getId())).get(task.getId());
