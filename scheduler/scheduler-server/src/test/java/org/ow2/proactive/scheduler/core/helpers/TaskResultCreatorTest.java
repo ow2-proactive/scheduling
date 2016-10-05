@@ -120,16 +120,10 @@ public class TaskResultCreatorTest {
     @Test
     public void testThatJobVariablesAreUsedIfTaskHasNoParents() throws UnknownTaskException {
         TaskResultCreator taskResultCreator = new TaskResultCreator();
-        TaskResultImpl mockedTaskResultImpl = mock(TaskResultImpl.class);
-        doCallRealMethod().when(mockedTaskResultImpl).setPropagatedVariables(anyMap());
-        Map<TaskId, TaskResult> loadTaskResultsValue = new HashMap<>();
-        loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
-
-        doCallRealMethod().when(mockedTaskResultImpl).getPropagatedVariables();
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
         when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenReturn(loadTaskResultsValue);
+                .thenThrow(new DatabaseManagerException());
 
 
         InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());

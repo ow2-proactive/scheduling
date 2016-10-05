@@ -108,12 +108,12 @@ public class TaskResultCreator {
         Map<String, byte[]> variables = new HashMap<>();
 
         if (job.getType() == JobType.TASKSFLOW && eligibleTaskDescriptor != null) {
-            // retrieve from the database the previous task results if available
             try{
                 TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
                         Collections.singletonList(task.getId())).get(task.getId());
                 variables.putAll(taskResult.getPropagatedVariables());
             } catch (DatabaseManagerException exception) {
+                // retrieve from the database the previous task results if available
                 int numberOfParentTasks = eligibleTaskDescriptor.getParents().size();
                 if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {
                     variables = extractTaskResultsAndMergeIntoMap(dbManager, eligibleTaskDescriptor, job);
