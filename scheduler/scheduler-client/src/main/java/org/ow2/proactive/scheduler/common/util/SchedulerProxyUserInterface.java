@@ -350,6 +350,13 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public boolean finishInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.finishInErrorTask(jobId, taskName);
+    }
+
+    @Override
     public boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkSchedulerConnection();

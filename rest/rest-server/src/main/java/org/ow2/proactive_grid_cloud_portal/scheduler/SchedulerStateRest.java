@@ -802,6 +802,42 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new UnknownTaskRestException(e);
         }
     }
+    /**
+     * Finish a task, which is in InError state inside a job.
+     *
+     * @param sessionId
+     *            current session
+     * @param jobid
+     *            id of the job containing the task to finish (only when InError state)
+     * @param taskname
+     *            name of the task to finish (only when InError state)
+     * @throws NotConnectedRestException
+     * @throws UnknownJobRestException
+     * @throws UnknownTaskRestException
+     * @throws PermissionRestException
+     */
+    @Override
+    @PUT
+    @Path("jobs/{jobid}/tasks/{taskname}/finishInErrorTask")
+    @Produces("application/json")
+    public boolean finishInErrorTask(@HeaderParam("sessionid") String sessionId,
+                                      @PathParam("jobid") String jobid, @PathParam("taskname") String taskname)
+            throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+            PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId,
+                    "PUT jobs/" + jobid + "/tasks/" + taskname + "/finishInErrorTask");
+            return s.finishInErrorTask(jobid, taskname);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (UnknownTaskException e) {
+            throw new UnknownTaskRestException(e);
+        }
+    }
 
     /**
      * Restart a pause on error task within a job
