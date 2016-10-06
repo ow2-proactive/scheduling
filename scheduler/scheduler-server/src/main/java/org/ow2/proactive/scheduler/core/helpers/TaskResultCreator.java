@@ -89,30 +89,29 @@ public class TaskResultCreator {
             eligibleTaskDescriptor = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());
         }
 
-        TaskResultImpl taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception, output);
+        TaskResultImpl taskResult = getEmptyTaskResult(task, exception, output);
         taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, eligibleTaskDescriptor, job, task));
 
         return taskResult;
 
     }
 
-    public TaskResultImpl getEmptyTaskResultWithTaskIdAndExecutionTime(InternalTask task,
-                                                                       Throwable exception, TaskLogs output) {
+    public TaskResultImpl getEmptyTaskResult(InternalTask task, Throwable exception, TaskLogs output) {
         return new TaskResultImpl(task.getId(), exception,
                 output, System.currentTimeMillis() - task.getStartTime());
     }
 
     private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager,
             EligibleTaskDescriptor eligibleTaskDescriptor, InternalJob job, InternalTask task) throws UnknownTaskException {
-        
+
         Map<String, byte[]> variables = new HashMap<>();
 
         if (job.getType() == JobType.TASKSFLOW && eligibleTaskDescriptor != null) {
-            try{
-                TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
-                        Collections.singletonList(task.getId())).get(task.getId());
-                variables.putAll(taskResult.getPropagatedVariables());
-            } catch (DatabaseManagerException exception) {
+//            try{
+//                TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
+//                        Collections.singletonList(task.getId())).get(task.getId());
+//                variables.putAll(taskResult.getPropagatedVariables());
+//            } catch (DatabaseManagerException exception) {
                 // retrieve from the database the previous task results if available
                 int numberOfParentTasks = eligibleTaskDescriptor.getParents().size();
                 if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {
@@ -120,7 +119,7 @@ public class TaskResultCreator {
                 } else {
                     variables = extractJobVariables(job);
                 }
-            }
+//            }
         }
         return variables;
     }

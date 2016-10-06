@@ -717,6 +717,9 @@ class LiveJobs {
 
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task,
                     new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"));
+//            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+//                                                        new TaskRestartedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
+//                                                        System.currentTimeMillis() - task.getStartTime());
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
 
@@ -764,6 +767,11 @@ class LiveJobs {
                                     new TaskPreemptedException("Preempted by admin"),
                                     new SimpleTaskLogs("", "Preempted by admin"));
 
+//            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+//                    new TaskPreemptedException("Preempted by admin"), new SimpleTaskLogs("", "Preempted by admin"),
+//                                                        System.currentTimeMillis() - task.getStartTime());
+            System.out.println(taskResult.toString());
+
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
 
@@ -794,6 +802,9 @@ class LiveJobs {
             
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task,
                     new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"));
+//            TaskResultImpl taskResult = new TaskResultImpl(task.getId(),
+//                    new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"),
+//                                                        System.currentTimeMillis() - task.getStartTime());
 
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
