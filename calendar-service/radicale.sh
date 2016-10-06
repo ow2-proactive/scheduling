@@ -30,17 +30,16 @@ start() {
 
   if [ "$pid" -ne 0 ] ; then
     echo "Radicale is already started"
-    exit 1
+  else
+    # If the application isn't running, starts it
+    echo " *** Starting Radicale server *** "
+
+    cd ~/.config/radicale/log
+
+    radicale -d -S
+
+    echo " *** OK *** "
   fi
-
-  # If the application isn't running, starts it
-  echo " *** Starting Radicale server *** "
-
-  cd ~/.config/radicale/log
-
-  radicale -d -S
-
-  echo " *** OK *** "
 }
 
 # Stops the application
@@ -53,11 +52,10 @@ stop() {
     # Kills the application process
     echo " *** Stopping Radicale server *** "
     kill -9 $pid
-    echo "OK"    
-    exit 1
+    echo "OK"
+  else
+    echo "Radicale server is already stopped"
   fi
-
-  echo "Radicale server is already stopped"
 }
 
 # Show the application status
