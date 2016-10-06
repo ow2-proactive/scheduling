@@ -13,7 +13,7 @@ check_status() {
   s=$(ps aux | grep 'radicale -d -S' | grep -v 'grep' | awk '{print $2}')
 
   # If somethig was returned by the ps command, this function returns the PID
-  if [[ "$s" ]] ; then
+  if [ "$s" ] ; then
     echo $s
     exit 1
   fi
