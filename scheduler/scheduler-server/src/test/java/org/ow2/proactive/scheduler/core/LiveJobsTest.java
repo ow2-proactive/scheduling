@@ -14,6 +14,11 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeInformation;
+import org.objectweb.proactive.core.runtime.VMInformation;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -30,6 +35,7 @@ import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
@@ -122,6 +128,79 @@ public class LiveJobsTest {
         job.setId(id);
         liveJobs.jobSubmitted(job);
         Mockito.verify(listener, Mockito.times(1)).jobSubmitted(Matchers.any(ClientJobState.class));
+    }
+
+    @Test
+    public void testFinishInErrorTask() throws UnknownTaskException, UnknownJobException {
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
+                "description");
+        JobId id = new JobIdImpl(666L, "test-name");
+        job.setId(id);
+        
+        List<InternalTask> tasksList = new ArrayList<>();
+        InternalTask internalTask = new InternalScriptTask();
+        internalTask.setName("task-name");
+        internalTask.setStatus(TaskStatus.IN_ERROR);
+        
+        Node node = Mockito.mock(Node.class);
+        Mockito.when(node.getVMInformation()).thenAnswer(new Answer<VMInformation>() {
+                    @Override
+                    public VMInformation answer(InvocationOnMock invocation) throws Throwable {
+                        return Mockito.mock(VMInformation.class);
+                    }
+                });
+
+        Mockito.when(node.getNodeInformation()).thenAnswer(new Answer<NodeInformation>() {
+                    @Override
+                    public NodeInformation answer(InvocationOnMock invocation) throws Throwable {
+                        return Mockito.mock(NodeInformation.class);
+                    }
+                });
+        
+        
+        TaskLauncher taskLauncher =  Mockito.mock(TaskLauncher.class);
+        internalTask.setExecuterInformation(new ExecuterInformation(
+                taskLauncher, node));
+        ExecuterInformation ex;
+        tasksList.add(internalTask);
+        job.setTasks(tasksList);
+        liveJobs.jobSubmitted(job);
+        liveJobs.finishInErrorTask(job.getId(), "task-name");
+        assertThat(internalTask.getStatus(), is(TaskStatus.FINISHED));
+    }
+
+    @Test
+    public void testFinishInErrorTaskDoesNotFinishPausedTask() throws UnknownTaskException, UnknownJobException {
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
+                "description");
+        JobId id = new JobIdImpl(666L, "test-name");
+        job.setId(id);
+        List<InternalTask> tasksList = new ArrayList<>();
+        InternalTask internalTask = new InternalScriptTask();
+        internalTask.setName("task-name");
+        internalTask.setStatus(TaskStatus.PAUSED);
+        tasksList.add(internalTask);
+        job.setTasks(tasksList);
+        liveJobs.jobSubmitted(job);
+        liveJobs.finishInErrorTask(job.getId(), "task-name");
+        assertThat(internalTask.getStatus(), is(TaskStatus.PAUSED));
+    }
+
+    @Test
+    public void testFinishInErrorTaskDoesNotFinishPendingTask() throws UnknownTaskException, UnknownJobException {
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CONTINUE_JOB_EXECUTION,
+                "description");
+        JobId id = new JobIdImpl(666L, "test-name");
+        job.setId(id);
+        List<InternalTask> tasksList = new ArrayList<>();
+        InternalTask internalTask = new InternalScriptTask();
+        internalTask.setName("task-name");
+        internalTask.setStatus(TaskStatus.PENDING);
+        tasksList.add(internalTask);
+        job.setTasks(tasksList);
+        liveJobs.jobSubmitted(job);
+        liveJobs.finishInErrorTask(job.getId(), "task-name");
+        assertThat(internalTask.getStatus(), is(TaskStatus.PENDING));
     }
 
     @Test

@@ -186,6 +186,7 @@ public class RMNodeStarter {
     private int rank;
     // if true, previous nodes with different URLs are removed from the RM
     private boolean removePrevious;
+    private boolean disabledMonitoring = false;
 
     private int numberOfReconnectionAttemptsLeft;
 
@@ -205,6 +206,7 @@ public class RMNodeStarter {
     private static final String OPTION_DISCOVERY_PORT = "dp";
     private static final String OPTION_DISCOVERY_TIMEOUT = "dt";
     private static final char OPTION_HELP = 'h';
+    private static final String OPTION_DISABLE_MONITORING = "dm";
 
     public RMNodeStarter() {
 
@@ -311,6 +313,11 @@ public class RMNodeStarter {
         final Option help = new Option(Character.toString(OPTION_HELP), "help", false, "to display this help");
         help.setRequired(false);
         options.addOption(help);
+
+        // Disable monitoring
+        final Option monitorOption = new Option(OPTION_DISABLE_MONITORING, "disableMonitoring", false, "to disable node monitoring functionality");
+        monitorOption.setRequired(false);
+        options.addOption(monitorOption);
     }
 
     /**
@@ -792,6 +799,11 @@ public class RMNodeStarter {
                 printHelp = true;
             }
 
+            // Optional help option
+            if (cl.hasOption(OPTION_DISABLE_MONITORING)) {
+                disabledMonitoring = true;
+            }
+
             return nodeName;
         } catch (Throwable t) {
             printHelp = true;
@@ -1058,48 +1070,59 @@ public class RMNodeStarter {
 
         RMAuthentication auth = joinResourceManager(rmURL);
         final ResourceManager rm = loginToResourceManager(credentials, auth);
+        SigarExposer sigarExposer = null;
 
-        // initializing JMX server with Sigar beans
-        SigarExposer sigarExposer = new SigarExposer(nodeName);
-        final RMAuthentication rmAuth = auth;
-        sigarExposer.boot(auth, false, new PermissionChecker() {
-            @Override
-            public boolean checkPermission(Credentials cred) {
-                ResourceManager rm = null;
-                try {
-                    rm = rmAuth.login(cred);
-                    if (NB_OF_ADD_NODE_ATTEMPTS == 0)
+        if(!disabledMonitoring) {
+            // initializing JMX server with Sigar beans
+            sigarExposer = new SigarExposer(nodeName);
+            final RMAuthentication rmAuth = auth;
+            sigarExposer.boot(auth, false, new PermissionChecker() {
+                @Override
+                public boolean checkPermission(Credentials cred) {
+                    ResourceManager rm = null;
+                    try {
+                        rm = rmAuth.login(cred);
+                        if (NB_OF_ADD_NODE_ATTEMPTS == 0)
+                            return true;
+
+                        boolean isAdmin = rm.isNodeAdmin(nodes.get(0).getNodeInformation().getURL())
+                                .getBooleanValue();
+                        if (!isAdmin) {
+                            throw new SecurityException("Permission denied");
+                        }
                         return true;
-
-                    boolean isAdmin = rm.isNodeAdmin(nodes.get(0).getNodeInformation().getURL())
-                            .getBooleanValue();
-                    if (!isAdmin) {
-                        throw new SecurityException("Permission denied");
-                    }
-                    return true;
-                } catch (LoginException e) {
-                    throw new SecurityException(e);
-                } finally {
-                    if (rm != null) {
-                        rm.disconnect();
+                    } catch (LoginException e) {
+                        throw new SecurityException(e);
+                    } finally {
+                        if (rm != null) {
+                            rm.disconnect();
+                        }
                     }
                 }
-            }
-        });
+            });
+        }else {
+            logger.info("JMX monitoring is disabled.");
+        }
 
         for (final Node node : nodes) {
-            try {
-                node.setProperty(JMX_URL + JMXTransportProtocol.RMI, sigarExposer.getAddress(
-                        JMXTransportProtocol.RMI).toString());
-                node.setProperty(JMX_URL + JMXTransportProtocol.RO, sigarExposer.getAddress(
-                        JMXTransportProtocol.RO).toString());
-            } catch (Exception e) {
-                logger.error("", e);
-            }
+            nodeSetJmxUrl(sigarExposer, node);
             addNodeToResourceManager(rmURL, node, rm);
         }
 
         return rm;
+    }
+
+    private void nodeSetJmxUrl(SigarExposer sigarExposer, Node node) {
+        try {
+            if(!disabledMonitoring) {
+                node.setProperty(JMX_URL + JMXTransportProtocol.RMI, sigarExposer.getAddress(
+                        JMXTransportProtocol.RMI).toString());
+                node.setProperty(JMX_URL + JMXTransportProtocol.RO, sigarExposer.getAddress(
+                        JMXTransportProtocol.RO).toString());
+            }
+        } catch (Exception e) {
+            logger.error("", e);
+        }
     }
 
     private void addNodeToResourceManager(String rmURL, Node node, ResourceManager rm) {

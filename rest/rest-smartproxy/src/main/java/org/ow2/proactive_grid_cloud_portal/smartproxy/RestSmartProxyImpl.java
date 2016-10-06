@@ -234,6 +234,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public boolean finishInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return _getScheduler().finishInErrorTask(jobId, taskName);
+    }
+
+    @Override
     public boolean restartInErrorTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return _getScheduler().restartInErrorTask(jobId, taskName);

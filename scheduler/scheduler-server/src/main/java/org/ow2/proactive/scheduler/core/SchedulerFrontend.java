@@ -61,6 +61,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
 
 import java.net.URI;
 import java.security.KeyException;
@@ -639,6 +640,22 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public boolean restartTask(String jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return restartTask(JobIdImpl.makeJobId(jobId), taskName, restartDelay);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
+    public boolean finishInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        // checking permissions
+        final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        frontendState.checkJobOwner("finishTaskInError", frontendState.getIdentifiedJob(jobIdObject),
+                "You do not have permission to finish this task!");
+        frontendState.checkPermissions("finishTaskInError", frontendState.getIdentifiedJob(jobIdObject),
+                YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
+        return schedulingService.finishInErrorTask(jobIdObject, taskName);
     }
 
     /**

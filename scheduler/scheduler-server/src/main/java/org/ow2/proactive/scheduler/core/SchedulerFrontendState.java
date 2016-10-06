@@ -126,6 +126,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_LIST_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER = "You do not have permission to list third-party credentials in the scheduler !";
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION = "You do not have permission to reload policy configuration !";
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER = "You do not have permission to kill the scheduler !";
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK = "You do not have permission to finish this task!";
 
     private static final String USERS_UPDATED_EVENT_METHOD = "usersUpdatedEvent";
     private static final String TASK_STATE_UPDATED_EVENT_METHOD = "taskStateUpdatedEvent";
