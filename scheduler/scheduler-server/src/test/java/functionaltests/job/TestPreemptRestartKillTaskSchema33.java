@@ -51,6 +51,9 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.utils.SchedulerTHelper;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static functionaltests.utils.SchedulerTHelper.log;
@@ -84,6 +87,14 @@ public class TestPreemptRestartKillTaskSchema33 extends SchedulerFunctionalTestW
     private static URL jobDescriptor33 = TestPreemptRestartKillTaskSchema33.class
             .getResource("/functionaltests/descriptors/Job_preempt_restart_kill_Schema33.xml");
 
+    private static URL configFile = TestPreemptRestartKillTask.class
+            .getResource("/functionaltests/config/schedulerPropertiesNoRetry.ini");
+
+    @BeforeClass
+    public static void startSchedulerInAnyCase() throws Exception {
+        schedulerHelper.log("Starting a clean scheduler.");
+        schedulerHelper = new SchedulerTHelper(true, configFile.getPath());
+    }
 
     @Test
     public void testPreemptRestartKillTaskCompatibilitySchema33() throws Throwable {
