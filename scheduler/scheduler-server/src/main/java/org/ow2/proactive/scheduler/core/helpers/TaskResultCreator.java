@@ -107,11 +107,11 @@ public class TaskResultCreator {
         Map<String, byte[]> variables = new HashMap<>();
 
         if (job.getType() == JobType.TASKSFLOW && eligibleTaskDescriptor != null) {
-//            try{
-//                TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
-//                        Collections.singletonList(task.getId())).get(task.getId());
-//                variables.putAll(taskResult.getPropagatedVariables());
-//            } catch (DatabaseManagerException exception) {
+            try{
+                TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
+                        Collections.singletonList(task.getId())).get(task.getId());
+                variables.putAll(taskResult.getPropagatedVariables());
+            } catch (DatabaseManagerException exception) {
                 // retrieve from the database the previous task results if available
                 int numberOfParentTasks = eligibleTaskDescriptor.getParents().size();
                 if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {
@@ -119,7 +119,7 @@ public class TaskResultCreator {
                 } else {
                     variables = extractJobVariables(job);
                 }
-//            }
+            }
         }
         return variables;
     }

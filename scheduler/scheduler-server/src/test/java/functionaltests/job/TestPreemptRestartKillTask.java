@@ -36,7 +36,11 @@
  */
 package functionaltests.job;
 
+import functionaltests.dataspaces.TestSubmitJobWithUnaccessibleDataSpaces;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.utils.SchedulerTHelper;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
@@ -82,6 +86,16 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTestWithResta
     private static URL jobDescriptor = TestPreemptRestartKillTask.class
             .getResource("/functionaltests/descriptors/Job_preempt_restart_kill.xml");
 
+    private static URL configFile = TestPreemptRestartKillTask.class
+            .getResource("/functionaltests/config/schedulerPropertiesNoRetry.ini");
+
+
+    @BeforeClass
+    public static void startSchedulerInAnyCase() throws Exception {
+        schedulerHelper.log("Starting a clean scheduler.");
+        schedulerHelper = new SchedulerTHelper(true, configFile.getPath());
+    }
+
     @Test
     public void testPreemptRestartKillTask() throws Throwable {
         String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
@@ -90,6 +104,7 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTestWithResta
 
     private void TestPreemtRestartKillTask(String jobDescriptorPath) throws Exception {
         log("Submitting job");
+        log(schedulerHelper.getSchedulerInterface().getClass().toString());
 
         schedulerHelper.addExtraNodes(3);
 
