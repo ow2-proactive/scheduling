@@ -8,7 +8,7 @@
 # This function checks if the application is running
 
 cd ..
-cwd=$(pwd)
+cwd="$(pwd)"
 
 check_status() {
 
@@ -33,25 +33,24 @@ start() {
 
   if [ "$pid" -ne 0 ] ; then
     echo "Calendar service is already started"
-    exit 1
+  else
+    # If the application isn't running, starts it
+    echo " *** Starting Calendar Service *** "
+
+    #copy scheduler users to radicale server
+    loginFile="$cwd/config/authentication/login.cfg"
+    rm -rf ~/.config/radicale/users
+    touch ~/.config/radicale/users
+
+    while IFS=':' read -r user password
+    do
+        htpasswd -bs ~/.config/radicale/users "$user" "$password"    
+    done < "$loginFile"
+
+    # Redirects default and error output to a log file
+    java -Dpa.scheduler.home="$cwd" -Dspring.config.location="$cwd/config/calendar-service/application.properties" -jar "$cwd"/calendar-service/calendar-service*.jar > /dev/null 2>&1 &
+    echo " *** Calendar service gets started *** "
   fi
-
-  # If the application isn't running, starts it
-  echo " *** Starting Calendar Service *** "
-
-  #copy scheduler users to radicale server
-  loginFile="$cwd/config/authentication/login.cfg"
-  rm -rf ~/.config/radicale/users
-  touch ~/.config/radicale/users
-
-  while IFS=':' read -r user password
-  do
-      htpasswd -bs ~/.config/radicale/users "$user" "$password"    
-  done < "$loginFile"
-
-  # Redirects default and error output to a log file
-  java -Dpa.scheduler.home="$cwd" -Dspring.config.location="$cwd/config/calendar-service/application.properties" -jar "$cwd/calendar-service/calendar-service*.jar" > /dev/null 2>&1 &
-  echo " *** Calendar service gets started *** "
 }
 
 # Stops the application
@@ -64,11 +63,10 @@ stop() {
     # Kills the application process
     echo " *** Stopping Calendar service *** "
     kill -9 $pid
-    echo "OK"    
-    exit 1
+    echo "OK" 
+  else
+    echo "Calendar service is already stopped"
   fi
-
-  echo "Calendar service is already stopped"
 }
 
 # Show the application status
