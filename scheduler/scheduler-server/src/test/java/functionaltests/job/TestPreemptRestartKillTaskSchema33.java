@@ -36,9 +36,16 @@
  */
 package functionaltests.job;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.net.URL;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
 import org.ow2.proactive.scheduler.common.exception.TaskRestartedException;
@@ -50,16 +57,9 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -82,7 +82,7 @@ import static org.junit.Assert.assertTrue;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.0
  */
-public class TestPreemptRestartKillTaskSchema33 extends SchedulerFunctionalTestWithRestart {
+public class TestPreemptRestartKillTaskSchema33 extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     private static URL jobDescriptor33 = TestPreemptRestartKillTaskSchema33.class
             .getResource("/functionaltests/descriptors/Job_preempt_restart_kill_Schema33.xml");
