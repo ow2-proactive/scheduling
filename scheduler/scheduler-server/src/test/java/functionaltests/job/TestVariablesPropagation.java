@@ -57,6 +57,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
@@ -82,28 +83,34 @@ import functionaltests.utils.SchedulerTHelper;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.0
  */
-public class TestPreemptRestartKillTaskSchema33 extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class TestVariablesPropagation extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-    private static URL jobDescriptor33 = TestPreemptRestartKillTaskSchema33.class
-            .getResource("/functionaltests/descriptors/Job_preempt_restart_kill_Schema33.xml");
+    private static URL jobDescriptor = TestVariablesPropagation.class
+            .getResource("/functionaltests/descriptors/Job_variables_propagation.xml");
 
-    private static URL configFile = TestPreemptRestartKillTaskSchema33.class
+    private static URL configFile = TestVariablesPropagation.class
             .getResource("/functionaltests/config/schedulerPropertiesNoRetry.ini");
+    
+    private static String variableName = "variableName";
+    
+    private static String variableValue = "variableValue";
+
 
     @BeforeClass
     public static void startSchedulerInAnyCase() throws Exception {
-        schedulerHelper.log("Starting a clean scheduler.");
+        SchedulerTHelper.log("Starting a clean scheduler.");
         schedulerHelper = new SchedulerTHelper(true, configFile.getPath());
     }
 
     @Test
-    public void testPreemptRestartKillTaskCompatibilitySchema33() throws Throwable {
-        String jobDescriptorPath = new File(jobDescriptor33.toURI()).getAbsolutePath();
+    public void testPreemptRestartKillTask() throws Throwable {
+        String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
         TestPreemtRestartKillTask(jobDescriptorPath);
     }
 
     private void TestPreemtRestartKillTask(String jobDescriptorPath) throws Exception {
         log("Submitting job");
+        log(schedulerHelper.getSchedulerInterface().getClass().toString());
 
         schedulerHelper.addExtraNodes(3);
 
@@ -116,89 +123,36 @@ public class TestPreemptRestartKillTaskSchema33 extends SchedulerFunctionalTestW
         schedulerHelper.waitForEventTaskRunning(id, "t2");
         log("Wait for event t3 running");
         schedulerHelper.waitForEventTaskRunning(id, "t3");
-        log("Wait for event t4 running");
-        schedulerHelper.waitForEventTaskRunning(id, "t4");
 
         log("Preempt t1");
         schedulerHelper.getSchedulerInterface().preemptTask(id, "t1", 1);
-        log("Wait for event t1 waiting for restart");
-        //running jobs list must have only one job, task t1 must have number of execution to 0
-        TaskInfo ti1 = schedulerHelper.waitForEventTaskWaitingForRestart(id, "t1");
-        //task result for t1 must be available with TaskPreemptedException
-        TaskResult tr1 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t1");
 
         log("Restart t2");
         schedulerHelper.getSchedulerInterface().restartTask(id, "t2", 1);
-        log("Wait for event t2 waiting for restart");
-        //running jobs list must have only one job, task t2 must have number of execution to 1
-        TaskInfo ti2 = schedulerHelper.waitForEventTaskWaitingForRestart(id, "t2");
-        //task result for t2 must be available with TaskRestartedException
-        TaskResult tr2 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t2");
-        log("Wait for event t2 running");
-
-        schedulerHelper.waitForEventTaskRunning(id, "t2");
-
-        log("Restart t2 again");
-        schedulerHelper.getSchedulerInterface().restartTask(id, "t2", 1);
-        log("Wait for event t2 waiting for restart again");
-        //running jobs list must have only one job, task t2 must have number of execution to 2
-        TaskInfo ti3 = schedulerHelper.waitForEventTaskWaitingForRestart(id, "t2");
-        //task result for t2 must be available with TaskRestartedException
-        TaskResult tr3 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t2");
-
-        //ensure every tasks are running at this point
-        schedulerHelper.waitForEventTaskRunning(id, "t1");
-        schedulerHelper.waitForEventTaskRunning(id, "t2");
 
         log("Kill t3");
         schedulerHelper.getSchedulerInterface().killTask(id, "t3");
+        
+        //Wait for finish
+        log("Wait for event t1 finished");
+        schedulerHelper.waitForEventTaskFinished(id, "t1");
+        log("Wait for event t2 finished");
+        schedulerHelper.waitForEventTaskFinished(id, "t2");
         log("Wait for event t3 finished");
         schedulerHelper.waitForEventTaskFinished(id, "t3");
-        //task result for t3 must be available with TaskRestartedException
-        TaskResult tr4 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t3");
-
-        log("Kill t4");
-        schedulerHelper.getSchedulerInterface().killTask(id, "t4");
-        log("Wait for event job finished");
-        //finished jobs list must have only one job
-        JobInfo ji4 = schedulerHelper.waitForEventJobFinished(id);
-        //task result for t4 must be TaskRestartedException
-        JobState j4 = schedulerHelper.getSchedulerInterface().getJobState(id);
-        TaskResult tr5 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t4");
+        
+        //task result for t1
+        TaskResult tr1 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t1");
+        //task result for t2
+        TaskResult tr2 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t2");
+        //task result for t3
+        TaskResult tr3 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t3");
 
         //check result j1
-        assertEquals(2, ti1.getNumberOfExecutionLeft());
-        assertTrue(tr1.getException() instanceof TaskPreemptedException);
+        assertEquals(variableValue, SerializationUtil.deserializeVariableMap(tr1.getPropagatedVariables()).get(variableName));
         //check result j2
-        assertEquals(3, ti2.getNumberOfExecutionLeft());
-        assertTrue(tr2.getException() instanceof TaskRestartedException);
+        assertEquals(variableValue, SerializationUtil.deserializeVariableMap(tr2.getPropagatedVariables()).get(variableName));
         //check result j3
-        assertEquals(2, ti3.getNumberOfExecutionLeft());
-        assertTrue(tr3.getException() instanceof TaskRestartedException);
-        //check result tr4
-        assertTrue(tr4.getException() instanceof TaskAbortedException);
-        //check result j4
-        assertEquals(JobStatus.CANCELED, ji4.getStatus());
-
-        TaskStatus t1Status = getTask(j4, "t1").getStatus();
-        assertTrue(t1Status.equals(TaskStatus.ABORTED) || t1Status.equals(TaskStatus.NOT_RESTARTED));
-
-        TaskStatus t2Status = getTask(j4, "t2").getStatus();
-        assertTrue(t2Status.equals(TaskStatus.ABORTED) || t2Status.equals(TaskStatus.NOT_RESTARTED));
-
-        assertEquals(TaskStatus.FAULTY, getTask(j4, "t3").getStatus());
-        assertEquals(TaskStatus.FAULTY, getTask(j4, "t4").getStatus());
-        //check result tr5
-        assertTrue(tr5.getException() instanceof Exception);//
-    }
-
-    private TaskState getTask(JobState job, String taskName) {
-        for (TaskState ts : job.getTasks()) {
-            if (ts.getId().getReadableName().equals(taskName)) {
-                return ts;
-            }
-        }
-        assertFalse("taskName '" + taskName + "' was not found in job", true);
-        return null;
+        assertEquals(variableValue, SerializationUtil.deserializeVariableMap(tr3.getPropagatedVariables()).get(variableName));
     }
 }
