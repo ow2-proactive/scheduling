@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,6 +59,8 @@ import java.util.Map.Entry;
 public class TaskResultCreator {
 
     private static TaskResultCreator instance = null;
+
+    private static final TaskLogger tlogger = TaskLogger.getInstance();
 
     public TaskResultCreator() {
     }
@@ -112,6 +115,7 @@ public class TaskResultCreator {
                         Collections.singletonList(task.getId())).get(task.getId());
                 variables.putAll(taskResult.getPropagatedVariables());
             } catch (DatabaseManagerException exception) {
+                tlogger.info(task.getId(), exception.getMessage());
                 // retrieve from the database the previous task results if available
                 int numberOfParentTasks = eligibleTaskDescriptor.getParents().size();
                 if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {
