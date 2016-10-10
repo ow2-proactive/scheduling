@@ -38,25 +38,14 @@ package functionaltests.job;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
-import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
-import org.ow2.proactive.scheduler.common.exception.TaskRestartedException;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
@@ -103,12 +92,12 @@ public class TestVariablesPropagation extends SchedulerFunctionalTestWithCustomC
     }
 
     @Test
-    public void testPreemptRestartKillTask() throws Throwable {
+    public void testVariablesPropagation() throws Throwable {
         String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
-        TestPreemtRestartKillTask(jobDescriptorPath);
+        testVariablesPropagation(jobDescriptorPath);
     }
 
-    private void TestPreemtRestartKillTask(String jobDescriptorPath) throws Exception {
+    private void testVariablesPropagation(String jobDescriptorPath) throws Exception {
         log("Submitting job");
         log(schedulerHelper.getSchedulerInterface().getClass().toString());
 
