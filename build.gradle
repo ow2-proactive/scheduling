@@ -308,7 +308,7 @@ distributions {
         baseName project.archivesBaseName
         contents {
             from '.'
-            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*", 'tools/**'
+            include "dist/**", "config/**", "bin/**", "samples/**", "addons/**", "LICENSE*", "README*", 'tools/**', "calendar-service/**"
         }
     }
 }
