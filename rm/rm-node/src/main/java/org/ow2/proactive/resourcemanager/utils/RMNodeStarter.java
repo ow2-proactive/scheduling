@@ -315,7 +315,7 @@ public class RMNodeStarter {
         options.addOption(help);
 
         // Disable monitoring
-        final Option monitorOption = new Option(OPTION_DISABLE_MONITORING, "disableMonitoring", false, "to disable node monitoring functionality");
+        final Option monitorOption = new Option(OPTION_DISABLE_MONITORING, "disableMonitoring", false, "to disable JMX node monitoring functionality");
         monitorOption.setRequired(false);
         options.addOption(monitorOption);
     }
