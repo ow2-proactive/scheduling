@@ -242,7 +242,7 @@ public class ManageUsers {
             switch (action) {
                 case CREATE:
                     if (props.containsKey(userInfo.getLogin())) {
-                        exitWithErrorMessage("USER already exists in login file : " + loginFilePath, null, null);
+                        warnWithMessage("USER already exists in login file : " + loginFilePath + ", updating this user information.");
                     }
                     updateUserPassword(pubKey, userInfo.getLogin(), userInfo.getPassword(), props);
                     System.out.println("Created user " + userInfo.getLogin() + " in " + loginFilePath);
@@ -250,7 +250,11 @@ public class ManageUsers {
                     break;
                 case UPDATE:
                     if (!props.containsKey(userInfo.getLogin())) {
-                        exitWithErrorMessage("USER does not exist in login file : " + loginFilePath, null, null);
+                        if (userInfo.getPassword() != null && userInfo.getGroups() != null) {
+                            warnWithMessage("USER does not exist in login file : " + loginFilePath + ", create this user.");
+                        } else {
+                            exitWithErrorMessage("USER does not exist in login file : " + loginFilePath + " and not enough information were provided to create a new user.", null, null);
+                        }
                     }
                     if (userInfo.getPassword() != null) {
                         updateUserPassword(pubKey, userInfo.getLogin(), userInfo.getPassword(), props);
@@ -262,7 +266,7 @@ public class ManageUsers {
                     break;
                 case DELETE:
                     if (!props.containsKey(userInfo.getLogin())) {
-                        exitWithErrorMessage("USER does not exist in login file : " + loginFilePath, null, null);
+                        warnWithMessage("USER does not exist in login file : " + loginFilePath);
                     }
                     props.remove(userInfo.getLogin());
                     groupsMap.removeAll(userInfo.getLogin());
@@ -447,6 +451,10 @@ public class ManageUsers {
 
     private static void exitWithErrorMessage(String errorMessage, String infoMessage, Throwable e) throws ManageUsersException {
         throw new ManageUsersException(errorMessage, e, infoMessage);
+    }
+
+    private static void warnWithMessage(String warnMessage) throws ManageUsersException {
+        System.err.println("WARN : " + warnMessage);
     }
 
     private static String getLoginFilePath() {
