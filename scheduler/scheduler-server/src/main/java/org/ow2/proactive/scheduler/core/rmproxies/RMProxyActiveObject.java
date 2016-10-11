@@ -1,16 +1,6 @@
 package org.ow2.proactive.scheduler.core.rmproxies;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Future;
-
-import javax.security.auth.login.LoginException;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAEventProgramming;
@@ -31,7 +21,16 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-import org.apache.log4j.Logger;
+
+import javax.security.auth.login.LoginException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Future;
 
 
 @ActiveObject
@@ -156,6 +155,7 @@ public class RMProxyActiveObject {
     private void handleCleaningScript(Node node, Script<?> cleaningScript,
             Map<String, Serializable> variables, Map<String, String> genericInformation,TaskId taskId) {
         try {
+            this.nodesTaskId.put(node, taskId);
             ScriptHandler handler = ScriptLoader.createHandler(node);
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable)genericInformation);
@@ -171,8 +171,6 @@ public class RMProxyActiveObject {
                                 e);
             }
             this.nodeScriptResult.put(node, future);
-            this.nodesTaskId.put(node,taskId);
-
             logger.info("Cleaning Script started on node" + node.getNodeInformation().getURL());
 
         } catch (Exception e) {

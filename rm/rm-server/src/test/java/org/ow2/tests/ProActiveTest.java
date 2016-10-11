@@ -39,6 +39,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import java.security.Policy;
 
@@ -74,6 +75,9 @@ public class ProActiveTest {
 		String rmHome = System.getProperty(PAResourceManagerProperties.RM_HOME.getKey());
 		if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null && rmHome != null) {
 			System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(), rmHome);
+		}
+		if (System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) == null && rmHome != null) {
+			System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), rmHome);
 		}
 	}
 
