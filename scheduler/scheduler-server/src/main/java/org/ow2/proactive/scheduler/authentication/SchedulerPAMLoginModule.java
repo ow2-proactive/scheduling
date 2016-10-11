@@ -38,9 +38,12 @@ package org.ow2.proactive.scheduler.authentication;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.PAMLoginModule;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import java.io.File;
+import java.security.KeyException;
+import java.security.PrivateKey;
 
 
 /**
@@ -81,6 +84,12 @@ public class SchedulerPAMLoginModule extends PAMLoginModule {
         }
 
         return groupFile;
+    }
+
+    @Override
+    protected PrivateKey getPrivateKey() throws KeyException {
+        return Credentials.getPrivateKey(PASchedulerProperties
+                .getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()));
     }
 
     /**

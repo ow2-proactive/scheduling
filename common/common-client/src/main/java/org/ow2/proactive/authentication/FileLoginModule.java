@@ -37,6 +37,7 @@
 package org.ow2.proactive.authentication;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 
@@ -53,6 +54,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.KeyException;
+import java.security.PrivateKey;
 import java.util.Map;
 import java.util.Properties;
 
@@ -67,6 +70,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
 
     /** connection logger */
     private Logger logger = getLogger();
+
+    public static final String ENCRYPTED_DATA_SEP = " ";
 
     /**
      *  JAAS call back handler used to get authentication request parameters 
@@ -97,6 +102,13 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * @return the group file name
      */
     protected abstract String getGroupFileName();
+
+    /**
+     * Defines private key
+     *
+     * @return private key in use
+     */
+    protected abstract PrivateKey getPrivateKey() throws KeyException;
 
     /**
      * 
@@ -207,11 +219,17 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * @throws LoginException if login file is not found or unreadable.
      */
     private boolean authenticateUserFromFile(String username, String password) throws LoginException {
+
+
         Properties props = new Properties();
+        PrivateKey privateKey = null;
         try {
+            privateKey = getPrivateKey();
             FileInputStream stream = new FileInputStream(new File(loginFile));
             props.load(stream);
             stream.close();
+        } catch (KeyException e) {
+            throw new LoginException(e.toString());
         } catch (FileNotFoundException e) {
             throw new LoginException(e.toString());
         } catch (IOException e) {
@@ -219,10 +237,19 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         }
 
         // verify the username and password
-        if (!props.containsKey(username) || !props.get(username).equals(password)) {
+        if (!props.containsKey(username)) {
             return false;
-        } else
+        } else {
+            String encryptedPassword = (String) props.get(username);
+            try {
+                if (!HybridEncryptionUtil.decryptBase64String(encryptedPassword, privateKey, ENCRYPTED_DATA_SEP).equals(password)) {
+                    return false;
+                }
+            } catch (KeyException e) {
+                throw new LoginException(e.toString());
+            }
             return true;
+        }
     }
 
     /**

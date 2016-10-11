@@ -34,13 +34,14 @@
  */
 package org.ow2.proactive.authentication.crypto;
 
+import org.apache.commons.codec.binary.Base64;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 
 /**
@@ -123,6 +124,17 @@ public class HybridEncryptionUtil {
         } catch (UnsupportedEncodingException ignored) {
             return null; // never happens, we control charset value
         }
+    }
+
+    public static String decryptBase64String(String encryptedString, PrivateKey privateKey, String separator) throws KeyException {
+        String[] encryptedStrings = encryptedString.split(separator);
+        HybridEncryptedData encryptedData = new HybridEncryptedData(Base64.decodeBase64(encryptedStrings[1]), Base64.decodeBase64(encryptedStrings[0]));
+        return decryptString(encryptedData, privateKey);
+    }
+
+    public static String encryptStringToBase64(String value, PublicKey publicKey, String separator) throws KeyException {
+        HybridEncryptedData data = encryptString(value, publicKey);
+        return Base64.encodeBase64String(data.getEncryptedData()) + separator + Base64.encodeBase64String(data.getEncryptedSymmetricKey());
     }
 
     public static class HybridEncryptedData {
