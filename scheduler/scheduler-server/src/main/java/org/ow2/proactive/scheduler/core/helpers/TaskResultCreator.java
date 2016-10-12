@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
+import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -45,6 +46,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +59,8 @@ import java.util.Map.Entry;
 public class TaskResultCreator {
 
     private static TaskResultCreator instance = null;
+
+    private static final TaskLogger tlogger = TaskLogger.getInstance();
 
     public TaskResultCreator() {
     }
@@ -79,48 +83,46 @@ public class TaskResultCreator {
             throw new UnknownTaskException();
         }
 
-        TaskResultImpl taskResult;
         JobDescriptor jobDescriptor = job.getJobDescriptor();
 
-        EligibleTaskDescriptor etd = null;
+        EligibleTaskDescriptor eligibleTaskDescriptor = null;
         if (jobDescriptor.getPausedTasks().get(task.getId()) != null) {
-            etd = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());
+            eligibleTaskDescriptor = (EligibleTaskDescriptor) jobDescriptor.getPausedTasks().get(task.getId());
         } else if (jobDescriptor.getRunningTasks().get(task.getId()) != null) {
-            etd = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());
+            eligibleTaskDescriptor = (EligibleTaskDescriptor) jobDescriptor.getRunningTasks().get(task.getId());
         }
 
-        if (jobDescriptor.getRunningTasks().get(task.getId()) != null) {
-            taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
-                    Collections.singletonList(task.getId())).get(task.getId());
-        } else {
-            taskResult = getEmptyTaskResultWithTaskIdAndExecutionTime(task, exception, output);
-
-            if (etd != null) {
-                taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, etd, job, task));
-            }
-        }
+        TaskResultImpl taskResult = getEmptyTaskResult(task, exception, output);
+        taskResult.setPropagatedVariables(getPropagatedVariables(dbManager, eligibleTaskDescriptor, job, task));
 
         return taskResult;
 
     }
 
-    public TaskResultImpl getEmptyTaskResultWithTaskIdAndExecutionTime(InternalTask task,
-                                                                       Throwable exception, TaskLogs output) {
+    public TaskResultImpl getEmptyTaskResult(InternalTask task, Throwable exception, TaskLogs output) {
         return new TaskResultImpl(task.getId(), exception,
                 output, System.currentTimeMillis() - task.getStartTime());
     }
 
     private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager,
-                                                       EligibleTaskDescriptor etd, InternalJob job, InternalTask task) throws UnknownTaskException {
+            EligibleTaskDescriptor eligibleTaskDescriptor, InternalJob job, InternalTask task) throws UnknownTaskException {
+
         Map<String, byte[]> variables = new HashMap<>();
 
-        int numberOfParentTasks = etd.getParents().size();
-        if (job.getType() == JobType.TASKSFLOW) {
-            // retrieve from the database the previous task results if available
-            if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {
-                variables = extractTaskResultsAndMergeIntoMap(dbManager, etd, job);
-            } else {
-                variables = extractJobVariables(job);
+        if (job.getType() == JobType.TASKSFLOW && eligibleTaskDescriptor != null) {
+            try{
+                TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
+                        Collections.singletonList(task.getId())).get(task.getId());
+                variables.putAll(taskResult.getPropagatedVariables());
+            } catch (DatabaseManagerException exception) {
+                tlogger.info(task.getId(), exception.getMessage());
+                // retrieve from the database the previous task results if available
+                int numberOfParentTasks = eligibleTaskDescriptor.getParents().size();
+                if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {
+                    variables = extractTaskResultsAndMergeIntoMap(dbManager, eligibleTaskDescriptor, job);
+                } else {
+                    variables = extractJobVariables(job);
+                }
             }
         }
         return variables;
@@ -135,17 +137,17 @@ public class TaskResultCreator {
         return jobVariables;
     }
 
-    private Map<String, byte[]> extractTaskResultsAndMergeIntoMap(SchedulerDBManager dbManager, EligibleTaskDescriptor etd, InternalJob job) {
+    private Map<String, byte[]> extractTaskResultsAndMergeIntoMap(SchedulerDBManager dbManager, 
+            EligibleTaskDescriptor eligibleTaskDescriptor, InternalJob job) {
         Map<String, byte[]> mergedVariables = new HashMap<>();
 
-        int numberOfParentTasks = etd.getParents().size();
+        int numberOfParentTasks = eligibleTaskDescriptor.getParents().size();
         List<TaskId> parentIds = new ArrayList<>(numberOfParentTasks);
         for (int i = 0; i < numberOfParentTasks; i++) {
-            parentIds.add(etd.getParents().get(i).getTaskId());
+            parentIds.add(eligibleTaskDescriptor.getParents().get(i).getTaskId());
         }
         Map<TaskId, TaskResult> taskResults = dbManager
-                .loadTasksResults(
-                        job.getId(), parentIds);
+                .loadTasksResults(job.getId(), parentIds);
         for (TaskResult taskResult : taskResults.values()) {
             if (taskResult.getPropagatedVariables() != null) {
                 mergedVariables.putAll(taskResult.getPropagatedVariables());
