@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
+import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -45,6 +46,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.TaskLogger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +58,8 @@ import java.util.Map.Entry;
 public class TaskResultCreator {
 
     private static TaskResultCreator instance = null;
+
+    private static final TaskLogger tlogger = TaskLogger.getInstance();
 
     public TaskResultCreator() {
     }
@@ -105,7 +109,14 @@ public class TaskResultCreator {
         Map<String, byte[]> variables = new HashMap<>();
 
         if (job.getType() == JobType.TASKSFLOW && eligibleTaskDescriptor != null) {
-            TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadLastTaskResult(task.getId());
+            TaskResultImpl taskResult;
+            try{
+                taskResult = (TaskResultImpl) dbManager.loadLastTaskResult(task.getId());
+            }catch(DatabaseManagerException exception){
+                tlogger.error(task.getId(), exception.getMessage(), exception);
+                taskResult = null;
+            }
+            
             if (taskResult != null){
                 variables.putAll(taskResult.getPropagatedVariables());
             }else{
