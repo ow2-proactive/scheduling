@@ -34,7 +34,6 @@
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
-import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -46,10 +45,8 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.TaskLogger;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +56,6 @@ import java.util.Map.Entry;
 public class TaskResultCreator {
 
     private static TaskResultCreator instance = null;
-
-    private static final TaskLogger tlogger = TaskLogger.getInstance();
 
     public TaskResultCreator() {
     }
@@ -110,12 +105,10 @@ public class TaskResultCreator {
         Map<String, byte[]> variables = new HashMap<>();
 
         if (job.getType() == JobType.TASKSFLOW && eligibleTaskDescriptor != null) {
-            try{
-                TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadTasksResults(job.getId(),
-                        Collections.singletonList(task.getId())).get(task.getId());
+            TaskResultImpl taskResult = (TaskResultImpl) dbManager.loadLastTaskResult(task.getId());
+            if (taskResult != null){
                 variables.putAll(taskResult.getPropagatedVariables());
-            } catch (DatabaseManagerException exception) {
-                tlogger.info(task.getId(), exception.getMessage());
+            }else{
                 // retrieve from the database the previous task results if available
                 int numberOfParentTasks = eligibleTaskDescriptor.getParents().size();
                 if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {

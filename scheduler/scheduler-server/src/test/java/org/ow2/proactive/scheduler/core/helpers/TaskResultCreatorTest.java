@@ -30,9 +30,7 @@ import java.util.Vector;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -148,14 +146,10 @@ public class TaskResultCreatorTest {
         Map<String, byte[]> fakeVariableMap = new HashMap<>();
         fakeVariableMap.put("TestVar", new String("h234").getBytes());
         when(mockedTaskResultImpl.getPropagatedVariables()).thenReturn(fakeVariableMap);
-        
-        Map<TaskId, TaskResult> loadTaskResultsValue = new HashMap<>();
-        loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenReturn(loadTaskResultsValue);
-
+        when(mockedschedulerDbManager.loadLastTaskResult(any(TaskId.class)))
+                .thenReturn(mockedTaskResultImpl);
 
         InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());
 
