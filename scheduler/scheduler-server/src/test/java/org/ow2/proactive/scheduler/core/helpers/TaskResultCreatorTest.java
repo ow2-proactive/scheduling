@@ -30,9 +30,7 @@ import java.util.Vector;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -67,7 +65,7 @@ public class TaskResultCreatorTest {
         TaskResultCreator taskResultCreator = spy(TaskResultCreator.class);
         TaskResultImpl mockedTaskResultImpl = mock(TaskResultImpl.class);
         doReturn(mockedTaskResultImpl).when(taskResultCreator)
-                .getEmptyTaskResultWithTaskIdAndExecutionTime(any(InternalTask.class), any(Throwable.class), any(TaskLogs.class));
+                .getEmptyTaskResult(any(InternalTask.class), any(Throwable.class), any(TaskLogs.class));
         Map<TaskId, TaskResult> loadTaskResultsValue = new HashMap<>();
         loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
 
@@ -88,7 +86,7 @@ public class TaskResultCreatorTest {
         InternalTask mockedInternalTask = mock(InternalTask.class);
         when(mockedInternalTask.getStartTime()).thenReturn(System.currentTimeMillis() - 1);
 
-        TaskResultImpl taskResult = taskResultCreator.getEmptyTaskResultWithTaskIdAndExecutionTime(mockedInternalTask, null, null);
+        TaskResultImpl taskResult = taskResultCreator.getEmptyTaskResult(mockedInternalTask, null, null);
         // Between 1 millisecond and 1 second.
         assertThat(taskResult.getTaskDuration(), Matchers.greaterThan(0L));
         assertThat(taskResult.getTaskDuration(), Matchers.lessThan(1000L));
@@ -120,27 +118,44 @@ public class TaskResultCreatorTest {
     @Test
     public void testThatJobVariablesAreUsedIfTaskHasNoParents() throws UnknownTaskException {
         TaskResultCreator taskResultCreator = new TaskResultCreator();
-        TaskResultImpl mockedTaskResultImpl = mock(TaskResultImpl.class);
-        doCallRealMethod().when(mockedTaskResultImpl).setPropagatedVariables(anyMap());
-        Map<TaskId, TaskResult> loadTaskResultsValue = new HashMap<>();
-        loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
-
-        doCallRealMethod().when(mockedTaskResultImpl).getPropagatedVariables();
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
         when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenReturn(loadTaskResultsValue);
-
+                .thenThrow(new DatabaseManagerException());
 
         InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());
-
+        
         Map<String, String> fakeVariableMap = new HashMap<>();
-        fakeVariableMap.put("TestVar", "h234");
-        when(mockedInternalJob.getVariables()).thenReturn(fakeVariableMap);
+                fakeVariableMap.put("TestVar", "h234");
+                when(mockedInternalJob.getVariables()).thenReturn(fakeVariableMap);
 
         TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, mockedInternalJob, this.getMockedInternalTask());
 
         verify(mockedInternalJob, atLeastOnce()).getVariables();
+
+        assertThat(new String(taskResult
+                        .getPropagatedVariables()
+                        .get("TestVar")),
+                is("h234"));
+    }
+
+    @Test
+    public void testThatTaskVariablesAreUsedIfTaskisInDB() throws UnknownTaskException {
+        TaskResultCreator taskResultCreator = new TaskResultCreator();
+        TaskResultImpl mockedTaskResultImpl = mock(TaskResultImpl.class);
+        Map<String, byte[]> fakeVariableMap = new HashMap<>();
+        fakeVariableMap.put("TestVar", new String("h234").getBytes());
+        when(mockedTaskResultImpl.getPropagatedVariables()).thenReturn(fakeVariableMap);
+
+        SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
+        when(mockedschedulerDbManager.loadLastTaskResult(any(TaskId.class)))
+                .thenReturn(mockedTaskResultImpl);
+
+        InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());
+
+        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, mockedInternalJob, this.getMockedInternalTask());
+
+        verify(mockedTaskResultImpl, atLeastOnce()).getPropagatedVariables();
 
         assertThat(new String(taskResult
                         .getPropagatedVariables()

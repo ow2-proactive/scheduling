@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+	name="job_prt">
+	<taskFlow>
+		<task name="t1" maxNumberOfExecution="2">
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="120"/>
+					<parameter name="number" value="0"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="t2" maxNumberOfExecution="4">
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="120"/>
+					<parameter name="number" value="0"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+		<task name="t3">
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="120"/>
+					<parameter name="number" value="0"/>
+				</parameters>
+			</javaExecutable>
+		</task>
+        <task name="Groovy_Task">
+          <description>
+            <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+          </description>
+          <scriptExecutable>
+            <script>
+              <code language="groovy">
+                <![CDATA[variables.put("variableName", "variableValue")]]>
+              </code>
+            </script>
+          </scriptExecutable>
+        </task>
+
+	</taskFlow>
+</job>

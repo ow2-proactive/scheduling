@@ -36,7 +36,15 @@
  */
 package functionaltests.job;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.net.URL;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
@@ -50,11 +58,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import java.io.File;
-import java.net.URL;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
 
 
 /**
@@ -77,10 +82,20 @@ import static org.junit.Assert.*;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.0
  */
-public class TestPreemptRestartKillTask extends SchedulerFunctionalTestWithRestart {
+public class TestPreemptRestartKillTask extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     private static URL jobDescriptor = TestPreemptRestartKillTask.class
             .getResource("/functionaltests/descriptors/Job_preempt_restart_kill.xml");
+
+    private static URL configFile = TestPreemptRestartKillTask.class
+            .getResource("/functionaltests/config/schedulerPropertiesNoRetry.ini");
+
+
+    @BeforeClass
+    public static void startSchedulerInAnyCase() throws Exception {
+        schedulerHelper.log("Starting a clean scheduler.");
+        schedulerHelper = new SchedulerTHelper(true, configFile.getPath());
+    }
 
     @Test
     public void testPreemptRestartKillTask() throws Throwable {
@@ -90,6 +105,7 @@ public class TestPreemptRestartKillTask extends SchedulerFunctionalTestWithResta
 
     private void TestPreemtRestartKillTask(String jobDescriptorPath) throws Exception {
         log("Submitting job");
+        log(schedulerHelper.getSchedulerInterface().getClass().toString());
 
         schedulerHelper.addExtraNodes(3);
 
