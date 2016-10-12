@@ -215,6 +215,12 @@ if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; th
 
     ( cd /opt/proactive/default && zip -f dist/lib/rm-node-*.jar config/authentication/rm.cred )
     ( cd /opt/proactive/default/dist && zip -f war/rest/node.jar lib/rm-node-*.jar )
+
+    # configure watcher account
+    sed "s/scheduler\.cache\.password=.*/scheduler.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/scheduler\.cache\.credential=.*/scheduler.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/rm\.cache\.password=.*/rm.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/rm\.cache\.credential=.*/rm.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
 fi
 
 echo "ProActive can integrate with Linux PAM (Pluggable Authentication Modules) to authenticate users of the linux system."
@@ -240,13 +246,6 @@ $PA_ROOT/default/tools/proactive-users.sh -D -l nsadmin
 $PA_ROOT/default/tools/proactive-users.sh -D -l provider
 $PA_ROOT/default/tools/proactive-users.sh -D -l test_executor
 
-# configure watcher account
-sed "s/scheduler\.cache\.password=.*/scheduler.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-sed "s/scheduler\.cache\.credential=.*/scheduler.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-sed "s/rm\.cache\.password=.*/rm.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-sed "s/rm\.cache\.credential=.*/rm.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-
-
 # Configuration of the service script
 
 if [ -f /etc/init.d/proactive-scheduler ] && [[ "$OLD_PADIR" != "" ]]; then
@@ -266,7 +265,7 @@ if [[ "$PROTOCOL" == "https" ]]; then
         SELF_SIGNED=true
     else
         echo "In order to install a signed certificate, you need to follow the manual configuration steps described in the ProActive documentation :"
-        echo "http://doc.activeeon.com/dev/admin/ProActiveAdminGuide.html#_enable_https"
+        echo "http://doc.activeeon.com/latest/admin/ProActiveAdminGuide.html#_enable_https"
     fi
 
 fi
