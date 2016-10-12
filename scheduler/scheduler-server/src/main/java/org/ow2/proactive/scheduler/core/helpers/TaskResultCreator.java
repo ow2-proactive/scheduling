@@ -109,12 +109,11 @@ public class TaskResultCreator {
         Map<String, byte[]> variables = new HashMap<>();
 
         if (job.getType() == JobType.TASKSFLOW && eligibleTaskDescriptor != null) {
-            TaskResultImpl taskResult;
+            TaskResultImpl taskResult = null;
             try{
                 taskResult = (TaskResultImpl) dbManager.loadLastTaskResult(task.getId());
             }catch(DatabaseManagerException exception){
                 tlogger.error(task.getId(), exception.getMessage(), exception);
-                taskResult = null;
             }
             
             if (taskResult != null){
