@@ -70,6 +70,4 @@ public class ListFile {
     public List<String> getFullListing() {
         return fullListing;
     }
-
-
 }
