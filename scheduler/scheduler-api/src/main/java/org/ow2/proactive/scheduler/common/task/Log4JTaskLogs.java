@@ -44,6 +44,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.ObjectByteConverter;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -79,8 +80,16 @@ public class Log4JTaskLogs implements TaskLogs {
 
     /** Default layout for logs */
     public static Layout getTaskLogLayout() {
-        return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" + Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
-            "};%d{HH:mm:ss}]" + " %m %n");
+        PatternLayout patternLayout;
+        if (PASchedulerProperties.SCHEDULER_JOB_LOGS_PATTERN.isSet()) {
+            patternLayout = new PatternLayout(PASchedulerProperties.SCHEDULER_JOB_LOGS_PATTERN.getValueAsString());
+        }
+        else {
+            patternLayout = new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" +
+                    Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
+                    "};%d{HH:mm:ss}]" + " %m %n");
+        }
+        return patternLayout;
     }
 
     public static String getLoggerName(String jobId) {
