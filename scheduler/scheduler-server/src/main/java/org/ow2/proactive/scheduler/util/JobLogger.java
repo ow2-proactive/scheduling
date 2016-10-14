@@ -90,7 +90,7 @@ public class JobLogger {
     }
 
     public static String getJobLogFilename(JobId id) {
-        return id.value();
+        return id.value() + "/" + id.value();
     }
 
 }

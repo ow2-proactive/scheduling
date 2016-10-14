@@ -84,28 +84,26 @@ public class ServerJobAndTaskLogs {
 
     }
 
-    public static void remove(JobId jobId, Set<TaskId> taskIds) {
-        removeLog(JobLogger.getJobLogFilename(jobId));
-        for (TaskId taskId : taskIds) {
-            removeLog(TaskLogger.getTaskLogFilename(taskId));
-        }
+    public static void remove(JobId jobId) {
+        removeFolderLog(jobId.value());
     }
 
-    private static void removeLog(String filename) {
-        for (String suffix : new String[] { "", ".1" }) {
-            removeFile(filename + suffix);
-        }
+    private static void removeFolderLog(String folderName) {
+        removeFile(folderName);
+
     }
 
     private static void removeFile(String path) {
         if (logsLocationIsSet()) {
             String logsLocation = getLogsLocation();
-            File f = new File(logsLocation, path);
-            if (f.exists()) {
-                logger.info("Removing file " + f.getAbsolutePath());
-                f.delete();
+            File logFolder = new File(logsLocation, path);
+            try {
+                org.apache.commons.io.FileUtils.deleteDirectory(logFolder);
+            } catch (IOException e) {
+                throw new RuntimeException("Error removing logs for folder :" + logFolder.getAbsolutePath());
             }
         }
+
     }
 
     private static boolean logsLocationIsSet() {
@@ -114,8 +112,8 @@ public class ServerJobAndTaskLogs {
 
     // public for testing
     public static String getLogsLocation() {
-        return PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION
-                .getValueAsString());
+        return PASchedulerProperties
+                .getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
     }
 
     private static boolean isCleanStart() {

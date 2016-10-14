@@ -36,10 +36,6 @@
  */
 package org.ow2.proactive.scheduler.core.properties;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.utils.PAProperties;
-import org.ow2.proactive.utils.PAPropertiesLazyLoader;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,6 +43,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.PAProperties;
+import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
 /**
@@ -100,8 +100,8 @@ public enum PASchedulerProperties {
     SCHEDULER_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.scheduledpoolnbthreads", PropertyType.INTEGER),
 
     /** Number of threads used to handle scheduled operations related to housekeeping */
-    SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD(
-            "pa.scheduler.core.housekeeping.scheduledpoolnbthreads", PropertyType.INTEGER),
+    SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.housekeeping.scheduledpoolnbthreads",
+            PropertyType.INTEGER),
 
     /** Name of the JMX MBean for the scheduler */
     SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PropertyType.STRING),
@@ -218,20 +218,18 @@ public enum PASchedulerProperties {
 
     /** The same for the OUPUT */
     /** Several URLs can be specified, separated by space */
-    DATASPACE_DEFAULTOUTPUT_URL("pa.scheduler.dataspace.defaultoutput.url", PropertyType.LIST),
-    /** */
-    DATASPACE_DEFAULTOUTPUT_LOCALPATH("pa.scheduler.dataspace.defaultoutput.localpath", PropertyType.STRING),
-    /** */
+    DATASPACE_DEFAULTOUTPUT_URL("pa.scheduler.dataspace.defaultoutput.url", PropertyType.LIST), /** */
+    DATASPACE_DEFAULTOUTPUT_LOCALPATH("pa.scheduler.dataspace.defaultoutput.localpath",
+            PropertyType.STRING), /** */
     DATASPACE_DEFAULTOUTPUT_HOSTNAME("pa.scheduler.dataspace.defaultoutput.hostname", PropertyType.STRING),
 
     /** Default Global space URL for all user. This space is supposed public to all users.
      * Used to define a Global space of each job that does not define a Global space
      **/
     /** Several URLs can be specified, separated by space */
-    DATASPACE_DEFAULTGLOBAL_URL("pa.scheduler.dataspace.defaultglobal.url", PropertyType.STRING),
-    /** */
-    DATASPACE_DEFAULTGLOBAL_LOCALPATH("pa.scheduler.dataspace.defaultglobal.localpath", PropertyType.STRING),
-    /** */
+    DATASPACE_DEFAULTGLOBAL_URL("pa.scheduler.dataspace.defaultglobal.url", PropertyType.STRING), /** */
+    DATASPACE_DEFAULTGLOBAL_LOCALPATH("pa.scheduler.dataspace.defaultglobal.localpath",
+            PropertyType.STRING), /** */
     DATASPACE_DEFAULTGLOBAL_HOSTNAME("pa.scheduler.dataspace.defaultglobal.hostname", PropertyType.STRING),
 
     /** Default User Space URL
@@ -239,10 +237,9 @@ public enum PASchedulerProperties {
      * from this space by appending the username in the path */
 
     /** Several URLs can be specified, separated by space */
-    DATASPACE_DEFAULTUSER_URL("pa.scheduler.dataspace.defaultuser.url", PropertyType.STRING),
-    /** */
-    DATASPACE_DEFAULTUSER_LOCALPATH("pa.scheduler.dataspace.defaultuser.localpath", PropertyType.STRING),
-    /** */
+    DATASPACE_DEFAULTUSER_URL("pa.scheduler.dataspace.defaultuser.url", PropertyType.STRING), /** */
+    DATASPACE_DEFAULTUSER_LOCALPATH("pa.scheduler.dataspace.defaultuser.localpath",
+            PropertyType.STRING), /** */
     DATASPACE_DEFAULTUSER_HOSTNAME("pa.scheduler.dataspace.defaultuser.hostname", PropertyType.STRING),
 
     /* ***************************************************************** */
@@ -256,6 +253,9 @@ public enum PASchedulerProperties {
     SCHEDULER_JOB_LOGS_LOCATION("pa.scheduler.job.logs.location", PropertyType.STRING),
 
     SCHEDULER_JOB_LOGS_MAX_SIZE("pa.scheduler.job.logs.max.size", PropertyType.STRING),
+
+    SCHEDULER_TASK_OUTPUT_CONVERSION_PATTERN("pa.scheduler.task.output.conversion.pattern",
+            PropertyType.STRING),
 
     //    /** Log max size (in lines per tasks) */
     //    LOGS_MAX_SIZE("pa.scheduler.logs.maxsize", PropertyType.INTEGER),
@@ -314,13 +314,16 @@ public enum PASchedulerProperties {
      */
     SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING),
 
-    SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR("pa.scheduler.db.transactions.damping.factor", PropertyType.INTEGER),
+    SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR("pa.scheduler.db.transactions.damping.factor",
+            PropertyType.INTEGER),
 
-    SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES("pa.scheduler.db.transactions.maximum.retries", PropertyType.INTEGER),
+    SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES("pa.scheduler.db.transactions.maximum.retries",
+            PropertyType.INTEGER),
 
     SCHEDULER_DB_TRANSACTION_SLEEP_DELAY("pa.scheduler.db.transactions.sleep.delay", PropertyType.INTEGER),
 
-    SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE("pa.scheduler.db.recovery.load.jobs.batch_size", PropertyType.INTEGER),
+    SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE("pa.scheduler.db.recovery.load.jobs.batch_size",
+            PropertyType.INTEGER),
 
     EMAIL_NOTIFICATIONS_ENABLED("pa.scheduler.notifications.email.enabled", PropertyType.BOOLEAN),
 
@@ -442,8 +445,8 @@ public enum PASchedulerProperties {
             try {
                 return Integer.parseInt(valueS);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(key +
-                    " is not an integer property. getValueAsInt cannot be called on this property");
+                throw new IllegalArgumentException(
+                    key + " is not an integer property. getValueAsInt cannot be called on this property");
             }
         } else {
             return 0;
