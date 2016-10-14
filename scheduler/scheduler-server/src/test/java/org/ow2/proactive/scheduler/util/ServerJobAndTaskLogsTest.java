@@ -82,7 +82,7 @@ public class ServerJobAndTaskLogsTest {
                 new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogFilename(taskId) + ".1")
                         .exists());
 
-        assertEquals(4, new File(ServerJobAndTaskLogs.getLogsLocation()).list().length);
+        assertEquals(4, new File(ServerJobAndTaskLogs.getLogsLocation() + "/" + jobId).list().length);
 
         ServerJobAndTaskLogs.remove(jobId);
 

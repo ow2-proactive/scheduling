@@ -44,7 +44,6 @@ import java.util.LinkedList;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -52,7 +51,6 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.ObjectByteConverter;
 
 
@@ -81,14 +79,8 @@ public class Log4JTaskLogs implements TaskLogs {
 
     /** Default layout for logs */
     public static Layout getTaskLogLayout() {
-        if (StringUtils
-                .isEmpty(PASchedulerProperties.SCHEDULER_TASK_OUTPUT_CONVERSION_PATTERN.getValueAsString())) {
-            return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" + Log4JTaskLogs.MDC_TASK_ID +
-                "}@%X{" + Log4JTaskLogs.MDC_HOST + "};%d{HH:mm:ss}]" + " %m %n");
-        } else {
-            return new PatternLayout(
-                PASchedulerProperties.SCHEDULER_TASK_OUTPUT_CONVERSION_PATTERN.getValueAsString());
-        }
+        return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" + Log4JTaskLogs.MDC_TASK_ID +
+            "}@%X{" + Log4JTaskLogs.MDC_HOST + "};%d{HH:mm:ss}]" + " %m %n");
     }
 
     public static void main(String[] args) {
