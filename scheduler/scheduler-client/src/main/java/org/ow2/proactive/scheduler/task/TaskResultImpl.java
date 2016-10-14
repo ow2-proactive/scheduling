@@ -36,14 +36,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.Serializable;
-import java.util.Map;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
@@ -51,7 +44,13 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
-import org.apache.log4j.Logger;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -133,8 +132,13 @@ public class TaskResultImpl implements TaskResult {
         this.taskDuration = execDuration;
         this.value = value;
         try {
-            //try to serialize user result
-            this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
+            if (value instanceof byte[]) {
+                // object is already a byte array
+                this.serializedValue = (byte[]) value;
+            } else {
+                //try to serialize user result
+                this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
+            }
         } catch (IOException ioe1) {
             //error while serializing
             logger.error("", ioe1);
