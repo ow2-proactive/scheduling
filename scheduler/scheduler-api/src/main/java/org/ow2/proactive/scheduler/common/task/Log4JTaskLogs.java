@@ -36,22 +36,22 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import static com.google.common.base.Throwables.getStackTraceAsString;
-
 import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.utils.ObjectByteConverter;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.utils.ObjectByteConverter;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 /**
@@ -79,12 +79,8 @@ public class Log4JTaskLogs implements TaskLogs {
 
     /** Default layout for logs */
     public static Layout getTaskLogLayout() {
-        return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" + Log4JTaskLogs.MDC_TASK_ID +
-            "}@%X{" + Log4JTaskLogs.MDC_HOST + "};%d{HH:mm:ss}]" + " %m %n");
-    }
-
-    public static void main(String[] args) {
-        Log4JTaskLogs.getTaskLogLayout();
+        return new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" + Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
+            "};%d{HH:mm:ss}]" + " %m %n");
     }
 
     public static String getLoggerName(String jobId) {
@@ -160,13 +156,13 @@ public class Log4JTaskLogs implements TaskLogs {
         if (this.allEvents == null) {
             // restore log4j events
             try {
-                this.allEvents = (LinkedList<LoggingEvent>) ObjectByteConverter
-                        .byteArrayToObject(this.serializedAllEvents, true);
+                this.allEvents = (LinkedList<LoggingEvent>) ObjectByteConverter.byteArrayToObject(
+                        this.serializedAllEvents, true);
             } catch (Exception e) {
                 //store exception event in logs if we cannot convert
                 LoggingEvent logError = new LoggingEvent(loggerName, Logger.getLogger(loggerName),
-                    STDERR_LEVEL,
-                    "Cannot restore logging event from byte array : " + getStackTraceAsString(e), e);
+                    STDERR_LEVEL, "Cannot restore logging event from byte array : " +
+                        getStackTraceAsString(e), e);
                 this.allEvents = new LinkedList<LoggingEvent>();
                 this.allEvents.add(logError);
             }
@@ -184,8 +180,8 @@ public class Log4JTaskLogs implements TaskLogs {
             } catch (IOException e) {
                 //create a log4j event with e inside
                 LoggingEvent logError = new LoggingEvent(loggerName, Logger.getLogger(loggerName),
-                    STDERR_LEVEL,
-                    "Could not convert logging event to byte array : " + getStackTraceAsString(e), e);
+                    STDERR_LEVEL, "Could not convert logging event to byte array : " +
+                        getStackTraceAsString(e), e);
                 LinkedList<LoggingEvent> errorEvent = new LinkedList<LoggingEvent>();
                 errorEvent.add(logError);
                 try {
