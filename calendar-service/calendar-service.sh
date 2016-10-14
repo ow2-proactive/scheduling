@@ -40,7 +40,7 @@ start() {
     #copy scheduler users to radicale server
     loginFile="$cwd/config/authentication/login.cfg"
 
-    cat "$loginFile" > "~/.config/radicale/users"
+    cat "$loginFile" > ~/.config/radicale/users
 
     # Redirects default and error output to a log file
     java -Dpa.scheduler.home="$cwd" -Dspring.config.location="$cwd/config/calendar-service/application.properties" -jar "$cwd"/calendar-service/calendar-service*.jar > /dev/null 2>&1 &
