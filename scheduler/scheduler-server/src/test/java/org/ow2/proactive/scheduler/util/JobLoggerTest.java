@@ -13,6 +13,6 @@ public class JobLoggerTest {
     @Test
     public void testGetJobLogFilename() {
         JobId id = new JobIdImpl(1123, "readableName");
-        assertThat(JobLogger.getJobLogFilename(id), is("1123/1123"));
+        assertThat(JobLogger.getJobLogRelativePath(id), is("1123/1123"));
     }
 }

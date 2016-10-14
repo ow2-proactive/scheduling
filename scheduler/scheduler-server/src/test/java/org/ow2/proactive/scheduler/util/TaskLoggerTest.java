@@ -16,6 +16,6 @@ public class TaskLoggerTest {
     public void testGetJobLogFilename() {
         JobId jobId = new JobIdImpl(1123, "readableName");
         TaskId taskId = TaskIdImpl.createTaskId(jobId, "taskreadableName", 123123);
-        assertThat(TaskLogger.getTaskLogFilename(taskId), is("1123/1123t123123"));
+        assertThat(TaskLogger.getTaskLogRelativePath(taskId), is("1123/1123t123123"));
     }
 }

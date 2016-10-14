@@ -63,12 +63,12 @@ public class ServerJobAndTaskLogs {
     }
 
     public static String getTaskLog(TaskId id) {
-        String result = readLog(TaskLogger.getTaskLogFilename(id));
+        String result = readLog(TaskLogger.getTaskLogRelativePath(id));
         return result != null ? result : "Cannot retrieve logs for task " + id;
     }
 
     public static String getJobLog(JobId jobId, Set<TaskId> tasks) {
-        String jobLog = readLog(JobLogger.getJobLogFilename(jobId));
+        String jobLog = readLog(JobLogger.getJobLogRelativePath(jobId));
         if (jobLog == null) {
             return "Cannot retrieve logs for job " + jobId;
         }
@@ -88,20 +88,11 @@ public class ServerJobAndTaskLogs {
         removeFolderLog(jobId.value());
     }
 
-    private static void removeFolderLog(String folderName) {
-        removeFile(folderName);
-
-    }
-
-    private static void removeFile(String path) {
+    private static void removeFolderLog(String path) {
         if (logsLocationIsSet()) {
             String logsLocation = getLogsLocation();
             File logFolder = new File(logsLocation, path);
-            try {
-                org.apache.commons.io.FileUtils.deleteDirectory(logFolder);
-            } catch (IOException e) {
-                throw new RuntimeException("Error removing logs for folder :" + logFolder.getAbsolutePath());
-            }
+            org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
         }
 
     }

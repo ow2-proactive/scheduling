@@ -115,10 +115,10 @@ public class TaskLogger {
     }
 
     private void updateMdcWithTaskLogFilename(TaskId id) {
-        MDC.put(FileAppender.FILE_NAME, getTaskLogFilename(id));
+        MDC.put(FileAppender.FILE_NAME, getTaskLogRelativePath(id));
     }
 
-    public static String getTaskLogFilename(TaskId id) {
+    public static String getTaskLogRelativePath(TaskId id) {
         return id.getJobId().value() + "/" + id.toString();
     }
 

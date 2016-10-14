@@ -72,14 +72,14 @@ public class ServerJobAndTaskLogsTest {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogFilename(jobId))
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogRelativePath(jobId))
                 .exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogFilename(jobId) + ".1")
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogRelativePath(jobId) + ".1")
                 .exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogFilename(taskId))
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogRelativePath(taskId))
                 .exists());
         assertTrue(
-                new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogFilename(taskId) + ".1")
+                new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogRelativePath(taskId) + ".1")
                         .exists());
 
         assertEquals(4, new File(ServerJobAndTaskLogs.getLogsLocation() + "/" + jobId).list().length);
