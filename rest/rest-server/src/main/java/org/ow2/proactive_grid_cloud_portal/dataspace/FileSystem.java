@@ -52,6 +52,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,7 +101,7 @@ public class FileSystem {
 
     public static ListFile list(FileObject fo, List<String> includes, List<String> excludes) throws FileSystemException {
         fo.refresh();
-        ListFile list = new ListFile();
+        ListFile answer = new ListFile();
         List<String> dirList = Lists.newArrayList();
         List<String> fileList = Lists.newArrayList();
         List<String> fullList = Lists.newArrayList();
@@ -133,10 +134,13 @@ public class FileSystem {
                     throw new RuntimeException("Unknown : " + type);
             }
         }
-        list.setDirectoryListing(dirList);
-        list.setFileListing(fileList);
-        list.setFullListing(fullList);
-        return list;
+        Collections.sort(dirList);
+        Collections.sort(fileList);
+        Collections.sort(fullList);
+        answer.setDirectoryListing(dirList);
+        answer.setFileListing(fileList);
+        answer.setFullListing(fullList);
+        return answer;
     }
 
     public static Map<String, Object> metadata(FileObject fo) throws FileSystemException {
