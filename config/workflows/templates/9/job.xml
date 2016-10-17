@@ -1,50 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="urn:proactive:jobdescriptor:3.5"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-    name="Docker Exec. Env." projectName="4. Cloud Automation Workflows"
-    priority="normal"
-    onTaskError="continueJobExecution"
-     maxNumberOfExecution="2">
-  <description>
-    <![CDATA[ This workflow demonstrates the usage of a Docker Fork Execution Environment. Including the usage of variables passing and Dataspaces ]]>
-  </description>
-  <taskFlow>
-    <task name="CheckoutProactiveScheduling">
-      <description>
-        <![CDATA[ The simplest task, ran by a bash engine. ]]>
-      </description>
-      <forkEnvironment javaHome="/usr" >
-        <envScript>
-          <script>
-            <code language="python">
-              <![CDATA[
-# Prepare Docker parameters 
-containerName = 'java' 
-dockerRunCommand =  'docker run ' 
-dockerParameters = '--rm ' 
-# Prepare ProActive home volume 
-paHomeHost = variables.get("PA_SCHEDULER_HOME") 
-paHomeContainer = variables.get("PA_SCHEDULER_HOME") 
-proActiveHomeVolume = '-v '+paHomeHost +':'+paHomeContainer+' ' 
-# Prepare working directory (For Dataspaces and serialized task file) 
-workspaceHost = localspace 
-workspaceContainer = localspace 
-workspaceVolume = '-v '+localspace +':'+localspace+' ' 
-# Prepare container working directory 
-containerWorkingDirectory = '-w '+workspaceContainer+' ' 
-# Save pre execution command into magic variable 'preJavaHomeCmd', which is picked up by the node 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.5"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+        name="Docker Exec. Env." projectName="4. Cloud Automation Workflows"
+        priority="normal"
+        onTaskError="continueJobExecution"
+>
+    <description>
+        <![CDATA[ This workflow demonstrates the usage of a Docker Fork Execution Environment. Including the usage of variables passing and Dataspaces ]]>
+    </description>
+    <taskFlow>
+        <task name="CheckoutProactiveScheduling"
+        >
+            <description>
+                <![CDATA[ The simplest task, ran by a bash engine. ]]>
+            </description>
+            <forkEnvironment javaHome="/usr" >
+                <envScript>
+                    <script>
+                        <code language="python">
+                            <![CDATA[
+# Prepare Docker parameters
+containerName = 'java'
+dockerRunCommand =  'docker run '
+dockerParameters = '--rm '
+# Prepare ProActive home volume
+paHomeHost = variables.get("PA_SCHEDULER_HOME")
+paHomeContainer = variables.get("PA_SCHEDULER_HOME")
+proActiveHomeVolume = '-v '+paHomeHost +':'+paHomeContainer+' '
+# Prepare working directory (For Dataspaces and serialized task file)
+workspaceHost = localspace
+workspaceContainer = localspace
+workspaceVolume = '-v '+localspace +':'+localspace+' '
+# Prepare container working directory
+containerWorkingDirectory = '-w '+workspaceContainer+' '
+# Save pre execution command into magic variable 'preJavaHomeCmd', which is picked up by the node
 preJavaHomeCmd = dockerRunCommand + dockerParameters + proActiveHomeVolume + workspaceVolume + containerWorkingDirectory + containerName
 ]]>
-            </code>
-          </script>
-        </envScript>
-      </forkEnvironment>
-      <scriptExecutable>
-        <script>
-          <code language="bash">
-            <![CDATA[
+                        </code>
+                    </script>
+                </envScript>
+            </forkEnvironment>
+            <scriptExecutable>
+                <script>
+                    <code language="bash">
+                        <![CDATA[
 echo '---------------------- Execute a task inside a Docker Container Example -----------------------------'
 echo '---------------------- Start Task No. 1 ---------------------------------------------------------'
 echo 'This task runs inside a Docker container. It can install new software or change software versions without impacting other software or tasks.'
@@ -54,58 +55,60 @@ echo 'Lets pretend we created some statistics about this git repo, we save it in
 echo "In the 'Data Management' tab, the stats.log file is setup to be transferred between tasks."
 echo "This is a statistic, 1,2,3,4,5,6,7,8. Saved in stats.log." > stats.log
 ]]>
-          </code>
-        </script>
-      </scriptExecutable>
-      <controlFlow block="none"></controlFlow>
-      <outputFiles>
-        <files  includes="stats.log" accessMode="transferToUserSpace"/>
-      </outputFiles>
-    </task>
-    <task name="Print_settings.properties">
-      <description>
-        <![CDATA[ The simplest task, ran by a bash engine. ]]>
-      </description>
-      <depends>
-        <task ref="CheckoutProactiveScheduling"/>
-      </depends>
-      <inputFiles>
-        <files  includes="stats.log" accessMode="transferFromUserSpace"/>
-      </inputFiles>
-      <scriptExecutable>
-        <script>
-          <code language="python">
-            <![CDATA[
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+            <outputFiles>
+                <files  includes="stats.log" accessMode="transferToUserSpace"/>
+            </outputFiles>
+        </task>
+        <task name="Print_settings.properties"
+        >
+            <description>
+                <![CDATA[ The simplest task, ran by a bash engine. ]]>
+            </description>
+            <depends>
+                <task ref="CheckoutProactiveScheduling"/>
+            </depends>
+            <inputFiles>
+                <files  includes="stats.log" accessMode="transferFromUserSpace"/>
+            </inputFiles>
+            <scriptExecutable>
+                <script>
+                    <code language="python">
+                        <![CDATA[
 print '---------------------- Start Task No. 2 ---------------------------------------------------------'
 print "This task receives a file from its preceding task, statsfile.log. It was configured in the 'Data Management' tab to do so."
 with open('stats.log', 'r') as statsfile:
     variables.put('statsfile',statsfile.read())
 print 'The file was read and put into the variables map. Variables which are placed inside the variables map are transferred along tasks. Those are accessible and changeable inside preceding tasks.
 ]]>
-          </code>
-        </script>
-      </scriptExecutable>
-      <controlFlow block="none"></controlFlow>
-    </task>
-    <task name="Linux_Bash_Task">
-      <description>
-        <![CDATA[ The simplest task, ran by a bash engine. ]]>
-      </description>
-      <depends>
-        <task ref="Print_settings.properties"/>
-      </depends>
-      <scriptExecutable>
-        <script>
-          <code language="bash">
-            <![CDATA[
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+        <task name="Linux_Bash_Task"
+        >
+            <description>
+                <![CDATA[ The simplest task, ran by a bash engine. ]]>
+            </description>
+            <depends>
+                <task ref="Print_settings.properties"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="bash">
+                        <![CDATA[
 echo '---------------------- Start Task No. 3 ---------------------------------------------------------'
 echo "Print the content of the file from a variable. The variable was created in one of the succeeding tasks in a python script. Variables which are saved in the variables map are passed along tasks. So now we can access the output of the python script in this bash script. Which is: "
 echo $variables_statsfile
 ]]>
-          </code>
-        </script>
-      </scriptExecutable>
-      <controlFlow block="none"></controlFlow>
-    </task>
-  </taskFlow>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow block="none"></controlFlow>
+        </task>
+    </taskFlow>
 </job>

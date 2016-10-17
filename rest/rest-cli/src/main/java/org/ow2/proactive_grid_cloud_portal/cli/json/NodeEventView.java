@@ -49,7 +49,6 @@ public class NodeEventView {
     private String nodeOwner;
     private String defaultJMXUrl;
     private String proactiveJMXUrl;
-    private boolean disabledMonitoring;
 
     public String getHostName() {
         return hostName;
@@ -137,13 +136,5 @@ public class NodeEventView {
 
     public void setProactiveJMXUrl(String proactiveJMXUrl) {
         this.proactiveJMXUrl = proactiveJMXUrl;
-    }
-
-    public boolean isDisabledMonitoring() {
-        return disabledMonitoring;
-    }
-
-    public void setDisabledMonitoring(boolean disabledMonitoring) {
-        this.disabledMonitoring = disabledMonitoring;
     }
 }

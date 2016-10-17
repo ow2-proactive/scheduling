@@ -160,7 +160,6 @@ public class StringUtility {
                 line.add(nodeEvent.getNodeUrl());
                 line.add(nodeEvent.getNodeProvider() == null ? "" : nodeEvent.getNodeProvider());
                 line.add(nodeEvent.getNodeOwner() == null ? "" : nodeEvent.getNodeOwner());
-                line.add(String.valueOf(nodeEvent.isDisabledMonitoring()));
                 formatter.addLine(line);
             }
         }
@@ -216,7 +215,7 @@ public class StringUtility {
         for (String taskName : allResults.keySet()) {
             buffer.append(
                     String.format(taskName + " : " +
-                        ObjectUtility.object(allResults.get(taskName).getSerializedValue()))).append('\n');
+                            ObjectUtility.object(allResults.get(taskName).getSerializedValue()))).append('\n');
         }
         return buffer.toString();
     }
