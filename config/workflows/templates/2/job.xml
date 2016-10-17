@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:proactive:jobdescriptor:3.5"
         xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-        name="Selection Scripts" projectName="Basic Workflows"
+        name="Selection Scripts" projectName="1. Basic Workflows"
         priority="normal"
         onTaskError="continueJobExecution">
   <description>

@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="urn:proactive:jobdescriptor:3.5"
-        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-        name="Docker Exec. Env." projectName="Cloud Automation"
-        priority="normal"
-        onTaskError="continueJobExecution"
->
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.5"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+    name="Docker Exec. Env." projectName="4. Cloud Automation Workflows"
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2">
   <description>
     <![CDATA[ This workflow demonstrates the usage of a Docker Fork Execution Environment. Including the usage of variables passing and Dataspaces ]]>
   </description>
   <taskFlow>
-    <task name="CheckoutProactiveScheduling"
->
+    <task name="CheckoutProactiveScheduling">
       <description>
         <![CDATA[ The simplest task, ran by a bash engine. ]]>
       </description>
       <forkEnvironment javaHome="/usr" >
         <envScript>
-          <script>
+          <script>
             <code language="python">
               <![CDATA[
 # Prepare Docker parameters 
@@ -36,14 +35,14 @@ workspaceVolume = '-v '+localspace +':'+localspace+' '
 # Prepare container working directory 
 containerWorkingDirectory = '-w '+workspaceContainer+' ' 
 # Save pre execution command into magic variable 'preJavaHomeCmd', which is picked up by the node 
-preJavaHomeCmd = dockerRunCommand + dockerParameters + proActiveHomeVolume + workspaceVolume + containerWorkingDirectory + containerName 
+preJavaHomeCmd = dockerRunCommand + dockerParameters + proActiveHomeVolume + workspaceVolume + containerWorkingDirectory + containerName
 ]]>
             </code>
           </script>
         </envScript>
       </forkEnvironment>
       <scriptExecutable>
-        <script>
+        <script>
           <code language="bash">
             <![CDATA[
 echo '---------------------- Execute a task inside a Docker Container Example -----------------------------'
@@ -63,8 +62,7 @@ echo "This is a statistic, 1,2,3,4,5,6,7,8. Saved in stats.log." > stats.log
         <files  includes="stats.log" accessMode="transferToUserSpace"/>
       </outputFiles>
     </task>
-    <task name="Print_settings.properties"
->
+    <task name="Print_settings.properties">
       <description>
         <![CDATA[ The simplest task, ran by a bash engine. ]]>
       </description>
@@ -75,7 +73,7 @@ echo "This is a statistic, 1,2,3,4,5,6,7,8. Saved in stats.log." > stats.log
         <files  includes="stats.log" accessMode="transferFromUserSpace"/>
       </inputFiles>
       <scriptExecutable>
-        <script>
+        <script>
           <code language="python">
             <![CDATA[
 print '---------------------- Start Task No. 2 ---------------------------------------------------------'
@@ -89,8 +87,7 @@ print 'The file was read and put into the variables map. Variables which are pla
       </scriptExecutable>
       <controlFlow block="none"></controlFlow>
     </task>
-    <task name="Linux_Bash_Task"
->
+    <task name="Linux_Bash_Task">
       <description>
         <![CDATA[ The simplest task, ran by a bash engine. ]]>
       </description>
@@ -98,7 +95,7 @@ print 'The file was read and put into the variables map. Variables which are pla
         <task ref="Print_settings.properties"/>
       </depends>
       <scriptExecutable>
-        <script>
+        <script>
           <code language="bash">
             <![CDATA[
 echo '---------------------- Start Task No. 3 ---------------------------------------------------------'

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.5"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+    name="Spark" projectName="3. Big Data Workflows"
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2">
+  <variables>
+    <variable name="spark_master_url" value="spark://sparkContainerMaster:7077"/>
+    <variable name="network" value="my-net"/>
+  </variables>
+  <description>
+    <![CDATA[ A workflow to submit a Spark job from a docker container, to estimate PI ]]>
+  </description>
+  <taskFlow>
+    <task name="submit_spark_PI">
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
+container_id="$(docker run --net=$variables_network -di activeeon/hdfs-spark:latest /bin/sh -c 'bash')"
+docker exec $container_id /bin/sh -c 'spark-submit --deploy-mode client --class org.apache.spark.examples.SparkPi --num-executors 1 --driver-memory 50m --executor-cores 2 --queue default --master '$variables_spark_master_url' $SPARK_HOME/lib/spark-examples*.jar 10'
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>
