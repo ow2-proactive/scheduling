@@ -802,6 +802,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new UnknownTaskRestException(e);
         }
     }
+
     /**
      * Finish a task, which is in InError state inside a job.
      *
@@ -821,9 +822,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/{taskname}/finishInErrorTask")
     @Produces("application/json")
     public boolean finishInErrorTask(@HeaderParam("sessionid") String sessionId,
-                                      @PathParam("jobid") String jobid, @PathParam("taskname") String taskname)
-            throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
-            PermissionRestException {
+            @PathParam("jobid") String jobid, @PathParam("taskname") String taskname)
+                    throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+                    PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId,
                     "PUT jobs/" + jobid + "/tasks/" + taskname + "/finishInErrorTask");
@@ -1299,7 +1300,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     public InputStream retrieveTaskLogsUsingDataspaces(String sessionId, String jobId, TaskId taskId)
             throws PermissionRestException, IOException, NotConnectedRestException {
-        String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + taskId.value() + ".log";
+        String fullTaskLogsFile = jobId + "/TaskLogs-" + jobId + "-" + taskId.value() + ".log";
         return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME, fullTaskLogsFile);
     }
 
