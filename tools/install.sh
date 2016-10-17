@@ -320,12 +320,20 @@ fi
 read -e -p "Number of ProActive nodes to start on the server machine: " -i "4" NB_NODES
 NB_NODES=$(trim "$NB_NODES")
 
-if confirm "Setup cron task for cleaning old logs? [Y/n] " ; then
-     read -e -p "Cleaning logs older than (in days) [50]: " -i "50" LOGS_CLEANUP_DAYS
+echo "The ProActive server can automatically remove from its database old jobs. This feature also remove the associated job logs from the file system."
 
-     LOGS_CLEANUP_DAYS=$(trim "$LOGS_CLEANUP_DAYS")
+if confirm "Do you want to enable automatic job removal? [Y/n] " ; then
+     read -e -p "Remove jobs older than (in days) [30]: " -i "30" JOB_CLEANUP_DAYS
+     JOB_CLEANUP_DAYS=$(trim "$JOB_CLEANUP_DAYS")
+     JOB_CLEANUP_SECONDS=$((JOB_CLEANUP_DAYS*24*3600))
+
+     # Configure the scheduler to remove jobs
+     sed "s/pa\.scheduler\.core\.automaticremovejobdelay=.*/pa.scheduler.core.automaticremovejobdelay=$JOB_CLEANUP_SECONDS/g"  -i "$PA_ROOT/default/config/scheduler/settings.ini"
+     sed "s/pa\.scheduler\.job\.removeFromDataBase=.*/pa.scheduler.job.removeFromDataBase=true/g"  -i "$PA_ROOT/default/config/scheduler/settings.ini"
+
+     # Cleanup extra log files older than the given period
      if [[ $(grep -c "$PA_ROOT/default/logs" /etc/crontab) == 0 ]]; then
-        echo "1 0   * * *   root   find $PA_ROOT/default/logs -mtime +$LOGS_CLEANUP_DAYS -name '*.log' -exec rm {} \;" >> /etc/crontab
+        echo "1 0   * * *   root   find $PA_ROOT/default/logs -mtime +$JOB_CLEANUP_DAYS -name '*.log' -exec rm {} \;" >> /etc/crontab
      fi
 fi
 

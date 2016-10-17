@@ -36,17 +36,16 @@
  */
 package functionaltests.nodesource;
 
-import java.io.File;
-
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.junit.Test;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import java.io.File;
 
 import static functionaltests.utils.RMTHelper.log;
 
@@ -63,9 +62,11 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
 
     protected int descriptorNodeNumber = 1;
 
+    protected final static long TIME_SLOT_PERIOD = 45000;
+
     protected Object[] getPolicyParams() {
         return new Object[] { "ME", "ALL", TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
-                TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + 15000), "0", "true" };
+                TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + TIME_SLOT_PERIOD), "0", "true"};
     }
 
     protected void createEmptyNodeSource(String sourceName) throws Exception {
@@ -116,7 +117,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
         log("Test 2 - creation/removal of the node source with nodes");
         createDefaultNodeSource(source1);
 
-        log("Test 2 - nodes will be removed in 15 secs");
+        log("Test 2 - nodes will be removed in " + TIME_SLOT_PERIOD + " ms");
         // wait for the nodes release
         for (int i = 0; i < descriptorNodeNumber; i++) {
             rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
