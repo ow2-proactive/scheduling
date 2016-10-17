@@ -211,10 +211,10 @@
         <ref name="taskDescription"/>
       </optional>
       <optional>
-        <ref name="genericInformation"/>
+        <ref name="variables"/>
       </optional>
       <optional>
-        <ref name="variables"/>
+        <ref name="genericInformation"/>
       </optional>
       <optional>
         <ref name="depends"/>

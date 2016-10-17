@@ -214,8 +214,8 @@
         <xs:complexType>
           <xs:sequence>
             <xs:group minOccurs="0" ref="jd:taskDescription"/>
-            <xs:element minOccurs="0" ref="jd:genericInformation"/>
             <xs:element minOccurs="0" ref="jd:variables"/>
+            <xs:element minOccurs="0" ref="jd:genericInformation"/>
             <xs:element minOccurs="0" ref="jd:depends"/>
             <xs:element minOccurs="0" ref="jd:inputFiles"/>
             <xs:element minOccurs="0" ref="jd:parallel"/>
