@@ -260,8 +260,8 @@ public enum PASchedulerProperties {
     //    /** Log max size (in lines per tasks) */
     //    LOGS_MAX_SIZE("pa.scheduler.logs.maxsize", PropertyType.INTEGER),
 
-    // Define the logging format pattern on the scheduler
-    SCHEDULER_JOB_LOGS_PATTERN("pa.scheduler.job.logs.pattern", PropertyType.STRING),
+    // Define the logging format pattern of tasks on the scheduler
+    SCHEDULER_JOB_LOGS_PATTERN("pa.scheduler.job.task.output.logs.pattern", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */
