@@ -134,20 +134,14 @@ public class TaskLogger {
         }
         String logFileName = LOG_FILE_PREFIX + "-" + taskId.getJobId() + "-" + taskId.value() + ".log";
 
-        logger.info("PPPPPAAAAARRRRR:: logFileName = " + logFileName);
-
         File logFolder = new File(pathToFolder, taskId.getJobId().toString());
 
-        logger.info("PPPPPAAAAARRRRR:: logFolder = " + logFolder.getAbsolutePath());
-        logger.info("PPPPPAAAAARRRRR:: logFolder exists before mkdir= " + logFolder.exists());
         if (!logFolder.exists()) {
             logFolder.mkdir();
         }
-        logger.info("PPPPPAAAAARRRRR:: logFolder exists after mkdir= " + logFolder.exists());
 
         File logFile = new File(logFolder, logFileName);
         FileUtils.touch(logFile);
-        logger.info("PPPPPAAAAARRRRR:: logFile touched= " + logFile.getAbsolutePath());
 
         logFile.setWritable(true, false);
 
