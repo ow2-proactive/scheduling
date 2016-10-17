@@ -3,12 +3,14 @@ package org.ow2.proactive.scheduler.common.job.factories;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -21,6 +23,7 @@ import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 public class Job2XMLTransformerTest {
@@ -135,6 +138,27 @@ public class Job2XMLTransformerTest {
                 org.hamcrest.Matchers.matchesPattern(
                         matchEvery + matchTaskTagOpening + notMatchSmallerSign + matchOnTaskErrorEquals(
                                 taskOnTaskErrorSetting) + matchEvery + matchSmallerSign + matchEvery));
+    }
+
+    @Test
+    public void checkTaskVariables() throws Exception {
+        File xmlFile = tmpFolder.newFile();
+        HashMap<String, String> variablesMap = new HashMap<>();
+        variablesMap.put("name1", "value1");
+        variablesMap.put("name2", "value2");
+
+        TaskFlowJob job = new TaskFlowJob();
+        JavaTask task = new JavaTask();
+        task.setName("task");
+        task.setExecutableClassName("oo.Bar");
+        task.setVariables(variablesMap);
+        job.addTask(task);
+
+        new Job2XMLTransformer().job2xmlFile(job, xmlFile);
+        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(
+                xmlFile.getAbsolutePath()));
+
+        assertEquals(variablesMap, recreatedJob.getTask("task").getVariables());
     }
 
     @Test

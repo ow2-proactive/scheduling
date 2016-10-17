@@ -62,7 +62,6 @@ taskFlow = ## A job composed of a flow of tasks with or without dependencies
 # +++++++++++++ task
 task = ## A task is the smallest computation unit for the scheduler 
     element task {
-        taskVariables?, 
         taskName,
         nodesNumber_t?,
         onTaskError_t?,
@@ -75,6 +74,7 @@ task = ## A task is the smallest computation unit for the scheduler
         resultPreviewClass?,
         taskDescription?,
         genericInformation?,
+        variables?,
         depends?,
         inputFiles?,
         parallel?,
@@ -90,14 +90,6 @@ task = ## A task is the smallest computation unit for the scheduler
 
 taskName = ## Identification of this task (identifier) 
     attribute name { xsd:ID }
-taskVariables = ## Definition of variables which can be reused throughout this descriptor
-    element variables { taskVariable+ }
-taskVariable = ## Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}
-    element variable { taskVariableName, taskVariableValue}
-taskVariableName = ## Name of a variable
-    attribute name  { xsd:string }
-taskVariableValue = ## The patterns ${variable_name} will be replaced by this value
-    attribute value { xsd:string }
 nodesNumber_t = ## number of cores needed for the task (identifier)
     attribute numberOfNodes { xsd:positiveInteger | variableRefType }
 taskDescription = ## Textual description of this task

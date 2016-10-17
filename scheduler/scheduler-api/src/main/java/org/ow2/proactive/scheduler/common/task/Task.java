@@ -38,6 +38,8 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -152,6 +154,9 @@ public abstract class Task extends CommonAttribute {
     protected long wallTime = 0;
 
     protected ForkEnvironment forkEnvironment;
+
+    /** A map to hold task variables */
+    protected ConcurrentHashMap<String, String> variables = new ConcurrentHashMap<>();
 
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
@@ -685,6 +690,24 @@ public abstract class Task extends CommonAttribute {
      */
     public List<OutputSelector> getOutputFilesList() {
         return outputFiles;
+    }
+
+    /**
+     * Sets the variable map for this task.
+     * 
+     * @param variables the variables map
+     */
+    public void setVariables(Map<String, String> variables) {
+        this.variables = new ConcurrentHashMap<>(variables);
+    }
+
+    /**
+     * Returns the variable map of this task.
+     * 
+     * @return a variable map
+     */
+    public Map<String, String> getVariables() {
+        return this.variables;
     }
 
     @Override
