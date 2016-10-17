@@ -215,7 +215,7 @@ public class StringUtility {
         for (String taskName : allResults.keySet()) {
             buffer.append(
                     String.format(taskName + " : " +
-                            ObjectUtility.object(allResults.get(taskName).getSerializedValue()))).append('\n');
+                        ObjectUtility.object(allResults.get(taskName).getSerializedValue()))).append('\n');
         }
         return buffer.toString();
     }
