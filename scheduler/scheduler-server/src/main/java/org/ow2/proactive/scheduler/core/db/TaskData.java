@@ -591,7 +591,7 @@ public class TaskData {
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
         internalTask.setMatchingBlock(getMatchingBlock());
-        internalTask.setVariables(new HashMap<>());
+        internalTask.setVariables(new HashMap<String, String>());
         internalTask.getVariables().putAll(getVariables());
 
         ForkEnvironment forkEnv = new ForkEnvironment();
