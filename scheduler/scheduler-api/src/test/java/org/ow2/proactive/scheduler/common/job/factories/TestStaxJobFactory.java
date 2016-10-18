@@ -167,6 +167,13 @@ public class TestStaxJobFactory {
         assertExpectedKeyValueEntriesMatch(variables);
     }
 
+    @Test
+    public void testTaskVariables() throws URISyntaxException, JobCreationException {
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("task_variables.xml"));
+        Map<String, String> variables = job.getTask("task").getVariables();
+        assertExpectedKeyValueEntriesMatch(variables);
+    }
+
     private static <K,V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
         // map variable is assumed to contain attributes name/value parsed from XML
 
