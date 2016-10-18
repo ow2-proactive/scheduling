@@ -83,8 +83,7 @@ public class Log4JTaskLogs implements TaskLogs {
         PatternLayout patternLayout;
         if (PASchedulerProperties.SCHEDULER_JOB_LOGS_PATTERN.isSet()) {
             patternLayout = new PatternLayout(PASchedulerProperties.SCHEDULER_JOB_LOGS_PATTERN.getValueAsString());
-        }
-        else {
+        } else {
             patternLayout = new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" +
                     Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
                     "};%d{HH:mm:ss}]" + " %m %n");
