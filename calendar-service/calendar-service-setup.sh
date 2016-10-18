@@ -15,7 +15,6 @@ tar xvzf "Radicale-$radicale_version.tar.gz"
 sudo apt-get update
 sudo apt-get -y install python3
 sudo apt-get -y install python3-setuptools
-sudo apt-get -y install apache2-utils
 cd "Radicale-$radicale_version"
 sudo python3 setup.py install
 cd "$cwd"
@@ -35,8 +34,6 @@ fi
 cp -f "$cwd/calendar-service/radicale/linux/config" ~/.config/radicale/config
 cp -f "$cwd/calendar-service/radicale/linux/logging" ~/.config/radicale/logging
 cp -f "$cwd/calendar-service/radicale/linux/rights" ~/.config/radicale/rights
-rm -rf ~/.config/radicale/users
-touch ~/.config/radicale/users
 mkdir ~/.config/radicale/log
 
 echo "Radicale server is installed, starting the server..."

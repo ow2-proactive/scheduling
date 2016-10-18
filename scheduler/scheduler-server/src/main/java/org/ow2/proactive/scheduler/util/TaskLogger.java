@@ -36,10 +36,10 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.utils.appenders.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.utils.appenders.FileAppender;
 
 
 public class TaskLogger {
@@ -115,11 +115,11 @@ public class TaskLogger {
     }
 
     private void updateMdcWithTaskLogFilename(TaskId id) {
-        MDC.put(FileAppender.FILE_NAME, getTaskLogFilename(id));
+        MDC.put(FileAppender.FILE_NAME, getTaskLogRelativePath(id));
     }
 
-    public static String getTaskLogFilename(TaskId id) {
-        return id.toString();
+    public static String getTaskLogRelativePath(TaskId id) {
+        return id.getJobId().value() + "/" + id.toString();
     }
 
     public boolean isDebugEnabled() {
