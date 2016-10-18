@@ -60,7 +60,7 @@ public class TaskLogger {
     private static final Logger logger = Logger.getLogger(TaskLogger.class);
 
     // the prefix for log file produced in localspace
-    private static final String LOG_FILE_PREFIX = "TaskLogs";
+    public static final String LOG_FILE_PREFIX = "TaskLogs";
 
     private static final String MAX_LOG_SIZE_PROPERTY = "pas.launcher.logs.maxsize";
 
