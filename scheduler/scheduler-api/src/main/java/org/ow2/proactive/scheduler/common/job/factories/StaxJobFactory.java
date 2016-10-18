@@ -1585,6 +1585,7 @@ public class StaxJobFactory extends JobFactory {
                 }
 
                 logger.debug("genericInformation: " + t.getGenericInformation());
+                logger.debug("variables: " + t.getVariables());
 
                 if (t instanceof JavaTask) {
                     logger.debug("class: " + ((JavaTask) t).getExecutableClassName());

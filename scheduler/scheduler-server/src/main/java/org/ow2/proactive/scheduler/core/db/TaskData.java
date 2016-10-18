@@ -142,6 +142,8 @@ public class TaskData {
 
     private Map<String, String> genericInformation;
 
+    private Map<String, String> variables;
+
     private List<SelectionScriptData> selectionScripts;
 
     private List<SelectorData> dataspaceSelectors;
@@ -468,6 +470,7 @@ public class TaskData {
                 PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
         taskData.setGenericInformation(task.getGenericInformation(false));
+        taskData.setVariables(task.getVariables());
 
         // set the scheduledTime if the START_AT property exists
         Map<String, String> genericInfos = taskData.getGenericInformation();
@@ -588,6 +591,8 @@ public class TaskData {
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
         internalTask.setMatchingBlock(getMatchingBlock());
+        internalTask.setVariables(new HashMap<>());
+        internalTask.getVariables().putAll(getVariables());
 
         ForkEnvironment forkEnv = new ForkEnvironment();
         forkEnv.setJavaHome(javaHome);
@@ -640,6 +645,16 @@ public class TaskData {
 
     public void setGenericInformation(Map<String, String> genericInformation) {
         this.genericInformation = genericInformation;
+    }
+
+    @Column(name = "VARIABLES", length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -1112,6 +1127,7 @@ public class TaskData {
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
         taskState.setParallelEnvironment(getParallelEnvironment());
         taskState.setGenericInformation(getGenericInformation());
+        taskState.setVariables(getVariables());
         return taskState;
     }
 

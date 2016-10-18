@@ -1051,7 +1051,7 @@ public abstract class InternalTask extends TaskState {
             tli.setWalltime(wallTime);
         }
         tli.setPreciousLogs(isPreciousLogs());
-        tli.setVariables(job.getVariables());
+        tli.setVariables(getVariablesOverridden(job));
 
         tli.setPingPeriod(PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt());
         tli.setPingAttempts(PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt());
@@ -1067,6 +1067,16 @@ public abstract class InternalTask extends TaskState {
         gInfo.putAll(job.getGenericInformation());
         gInfo.putAll(getGenericInformation());
         return gInfo;
+    }
+
+    /**
+     * @return the generic information of the job overridden eventually by the task's generic info
+     */
+    public Map<String, String> getVariablesOverridden(InternalJob job) {
+        HashMap<String, String> variables = new HashMap<>();
+        variables.putAll(job.getVariables());
+        variables.putAll(getVariables());
+        return variables;
     }
 
     /**
