@@ -63,12 +63,12 @@ public class ServerJobAndTaskLogs {
     }
 
     public static String getTaskLog(TaskId id) {
-        String result = readLog(TaskLogger.getTaskLogFilename(id));
+        String result = readLog(TaskLogger.getTaskLogRelativePath(id));
         return result != null ? result : "Cannot retrieve logs for task " + id;
     }
 
     public static String getJobLog(JobId jobId, Set<TaskId> tasks) {
-        String jobLog = readLog(JobLogger.getJobLogFilename(jobId));
+        String jobLog = readLog(JobLogger.getJobLogRelativePath(jobId));
         if (jobLog == null) {
             return "Cannot retrieve logs for job " + jobId;
         }
@@ -84,28 +84,17 @@ public class ServerJobAndTaskLogs {
 
     }
 
-    public static void remove(JobId jobId, Set<TaskId> taskIds) {
-        removeLog(JobLogger.getJobLogFilename(jobId));
-        for (TaskId taskId : taskIds) {
-            removeLog(TaskLogger.getTaskLogFilename(taskId));
-        }
+    public static void remove(JobId jobId) {
+        removeFolderLog(jobId.value());
     }
 
-    private static void removeLog(String filename) {
-        for (String suffix : new String[] { "", ".1" }) {
-            removeFile(filename + suffix);
-        }
-    }
-
-    private static void removeFile(String path) {
+    private static void removeFolderLog(String path) {
         if (logsLocationIsSet()) {
             String logsLocation = getLogsLocation();
-            File f = new File(logsLocation, path);
-            if (f.exists()) {
-                logger.info("Removing file " + f.getAbsolutePath());
-                f.delete();
-            }
+            File logFolder = new File(logsLocation, path);
+            org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
         }
+
     }
 
     private static boolean logsLocationIsSet() {
@@ -114,8 +103,8 @@ public class ServerJobAndTaskLogs {
 
     // public for testing
     public static String getLogsLocation() {
-        return PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION
-                .getValueAsString());
+        return PASchedulerProperties
+                .getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
     }
 
     private static boolean isCleanStart() {

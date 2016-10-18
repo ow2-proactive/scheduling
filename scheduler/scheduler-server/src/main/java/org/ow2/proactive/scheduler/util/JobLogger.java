@@ -86,11 +86,11 @@ public class JobLogger {
     }
 
     private void updateMdcWithTaskLogFilename(JobId id) {
-        MDC.put(FileAppender.FILE_NAME, getJobLogFilename(id));
+        MDC.put(FileAppender.FILE_NAME, getJobLogRelativePath(id));
     }
 
-    public static String getJobLogFilename(JobId id) {
-        return id.value();
+    public static String getJobLogRelativePath(JobId id) {
+        return id.value() + "/" + id.value();
     }
 
 }
