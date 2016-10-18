@@ -36,6 +36,19 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.dataspace;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+
 import java.io.File;
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -43,18 +56,6 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
-import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
-import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
 
 /**
@@ -149,12 +150,15 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
 
     public boolean configureNode() {
         try {
+            Node node = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis());
+            logger.info("Start of dataspace configuration for node " + node);
             // configure node for Data Spaces
             String baseScratchDir = getBaseScratchDir();
             final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(
                     (String) null, baseScratchDir);
-            DataSpacesNodes.configureNode(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()),
+            DataSpacesNodes.configureNode(node,
                     scratchConf);
+            logger.info("Dataspace configuration for node " + node + " successful.");
         } catch (Throwable t) {
             logger.error("Cannot configure dataSpace", t);
             return false;

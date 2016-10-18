@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="${job_name}" onTaskError="continueJobExecution" priority="normal">
+    <description>TaskVariablesLoad</description>
+    <taskFlow>
+		<task name="task" preciousResult="true">
+		    <variables>
+		        <variable name="name1" value="value1" />
+		        <variable name="name2" value="value2" />
+		    </variables>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						print('Hello World!')
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+    </taskFlow>
+</job>
