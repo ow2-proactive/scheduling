@@ -34,6 +34,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Collections;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -49,15 +59,6 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class SchedulerStateRestJobLogsTest {
@@ -122,16 +123,17 @@ public class SchedulerStateRestJobLogsTest {
         task.setPreciousLogs(true);
         jobState.addTask(task);
 
-        File logFile = tempFolder.newFile("TaskLogs-123-0.log");
-        FileUtils.write(logFile, "logs");
+        File logFolder = tempFolder.newFolder("0");
+        File logFile = new File(logFolder, "TaskLogs-0-0.log");
+        FileUtils.write(logFile, "logs", Charset.defaultCharset());
 
-        when(mockScheduler.getJobState("123")).thenReturn(jobState);
-        when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
-        when(mockScheduler.getGlobalSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
+        when(mockScheduler.getJobState("0")).thenReturn(jobState);
+        when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFolder.getParent()));
+        when(mockScheduler.getGlobalSpaceURIs()).thenReturn(Collections.singletonList(logFolder.getParent()));
 
-        InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
+        InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "0", validSessionId);
 
-        assertEquals("logs", IOUtils.toString(fullLogs));
+        assertEquals("logs", IOUtils.toString(fullLogs, Charset.defaultCharset()));
     }
 
     @Test
@@ -140,17 +142,18 @@ public class SchedulerStateRestJobLogsTest {
         addTask(jobState, 1, 10);
         addTask(jobState, 10, 2);
         addTask(jobState, 3, 3);
+        File logFolder = tempFolder.newFolder("123");
 
-        File logFile = tempFolder.newFile("TaskLogs-123-10.log");
+        File logFile = new File(logFolder, "TaskLogs-123-10.log");
         FileUtils.write(logFile, "10");
-        logFile = tempFolder.newFile("TaskLogs-123-2.log");
+        logFile = new File(logFolder, "TaskLogs-123-2.log");
         FileUtils.write(logFile, "2");
-        logFile = tempFolder.newFile("TaskLogs-123-3.log");
+        logFile = new File(logFolder, "TaskLogs-123-3.log");
         FileUtils.write(logFile, "3");
 
         when(mockScheduler.getJobState("123")).thenReturn(jobState);
-        when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
-        when(mockScheduler.getGlobalSpaceURIs()).thenReturn(Collections.singletonList(logFile.getParent()));
+        when(mockScheduler.getUserSpaceURIs()).thenReturn(Collections.singletonList(logFolder.getParent()));
+        when(mockScheduler.getGlobalSpaceURIs()).thenReturn(Collections.singletonList(logFolder.getParent()));
 
         InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
 
@@ -167,9 +170,10 @@ public class SchedulerStateRestJobLogsTest {
 
     private JobResultImpl createJobResult(String taskOutput, String taskErrput) {
         JobResultImpl jobResult = new JobResultImpl();
-        jobResult.addTaskResult("OneTask", new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl
-                .makeJobId("123"), "OneTask", 1), "result",
-            new SimpleTaskLogs(taskOutput, taskErrput), 100), false);
+        jobResult.addTaskResult("OneTask",
+                new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("123"), "OneTask", 1),
+                    "result", new SimpleTaskLogs(taskOutput, taskErrput), 100),
+                false);
         return jobResult;
     }
 }
