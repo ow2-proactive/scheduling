@@ -146,6 +146,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -1300,8 +1301,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     public InputStream retrieveTaskLogsUsingDataspaces(String sessionId, String jobId, TaskId taskId)
             throws PermissionRestException, IOException, NotConnectedRestException {
-        String fullTaskLogsFile = jobId + "/TaskLogs-" + jobId + "-" + taskId.value() + ".log";
-        return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME, fullTaskLogsFile);
+        return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME,
+                TaskLoggerRelativePathGenerator.generateRelativePath(taskId));
     }
 
     /**

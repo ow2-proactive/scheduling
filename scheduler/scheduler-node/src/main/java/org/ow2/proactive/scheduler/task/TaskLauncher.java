@@ -64,6 +64,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
@@ -292,7 +293,7 @@ public class TaskLauncher implements InitActive {
         if (initializer.isPreciousLogs()) {
             try {
                 FileSelector taskLogFileSelector = new FileSelector(taskLogFile.getName());
-                taskLogFileSelector.setIncludes(taskLogFile.getParentFile().getName() + "/**");
+                taskLogFileSelector.setIncludes(TaskLoggerRelativePathGenerator.generateRelativePath(taskId));
                 dataspaces.copyScratchDataToOutput(Collections.singletonList(
                         new OutputSelector(taskLogFileSelector, OutputAccessMode.TransferToUserSpace)));
             } catch (FileSystemException e) {

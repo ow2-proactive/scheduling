@@ -49,6 +49,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
+import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
@@ -58,9 +59,6 @@ import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputSt
 public class TaskLogger {
 
     private static final Logger logger = Logger.getLogger(TaskLogger.class);
-
-    // the prefix for log file produced in localspace
-    public static final String LOG_FILE_PREFIX = "TaskLogs";
 
     private static final String MAX_LOG_SIZE_PROPERTY = "pas.launcher.logs.maxsize";
 
@@ -132,15 +130,10 @@ public class TaskLogger {
         if (taskLogAppender.getAppender(FILE_APPENDER_NAME) != null) {
             throw new IllegalStateException("Only one file appender can be created");
         }
-        String logFileName = LOG_FILE_PREFIX + "-" + taskId.getJobId() + "-" + taskId.value() + ".log";
 
-        File logFolder = new File(pathToFolder, taskId.getJobId().toString());
+        File logFile = new File(pathToFolder, TaskLoggerRelativePathGenerator.generateRelativePath(taskId));
 
-        if (!logFolder.exists()) {
-            logFolder.mkdir();
-        }
-
-        File logFile = new File(logFolder, logFileName);
+        FileUtils.forceMkdirParent(logFile);
         FileUtils.touch(logFile);
 
         logFile.setWritable(true, false);
