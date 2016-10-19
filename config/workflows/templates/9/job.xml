@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:proactive:jobdescriptor:3.5"
         xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-        name="Docker Exec. Env." projectName="Cloud Automation"
+        name="Docker Exec. Env." projectName="4. Cloud Automation Workflows"
         priority="normal"
         onTaskError="continueJobExecution"
 >
@@ -21,22 +21,22 @@
           <script>
             <code language="python">
               <![CDATA[
-# Prepare Docker parameters 
-containerName = 'java' 
-dockerRunCommand =  'docker run ' 
-dockerParameters = '--rm ' 
-# Prepare ProActive home volume 
-paHomeHost = variables.get("PA_SCHEDULER_HOME") 
-paHomeContainer = variables.get("PA_SCHEDULER_HOME") 
-proActiveHomeVolume = '-v '+paHomeHost +':'+paHomeContainer+' ' 
-# Prepare working directory (For Dataspaces and serialized task file) 
-workspaceHost = localspace 
-workspaceContainer = localspace 
-workspaceVolume = '-v '+localspace +':'+localspace+' ' 
-# Prepare container working directory 
-containerWorkingDirectory = '-w '+workspaceContainer+' ' 
-# Save pre execution command into magic variable 'preJavaHomeCmd', which is picked up by the node 
-preJavaHomeCmd = dockerRunCommand + dockerParameters + proActiveHomeVolume + workspaceVolume + containerWorkingDirectory + containerName 
+# Prepare Docker parameters
+containerName = 'java'
+dockerRunCommand =  'docker run '
+dockerParameters = '--rm '
+# Prepare ProActive home volume
+paHomeHost = variables.get("PA_SCHEDULER_HOME")
+paHomeContainer = variables.get("PA_SCHEDULER_HOME")
+proActiveHomeVolume = '-v '+paHomeHost +':'+paHomeContainer+' '
+# Prepare working directory (For Dataspaces and serialized task file)
+workspaceHost = localspace
+workspaceContainer = localspace
+workspaceVolume = '-v '+localspace +':'+localspace+' '
+# Prepare container working directory
+containerWorkingDirectory = '-w '+workspaceContainer+' '
+# Save pre execution command into magic variable 'preJavaHomeCmd', which is picked up by the node
+preJavaHomeCmd = dockerRunCommand + dockerParameters + proActiveHomeVolume + workspaceVolume + containerWorkingDirectory + containerName
 ]]>
             </code>
           </script>
