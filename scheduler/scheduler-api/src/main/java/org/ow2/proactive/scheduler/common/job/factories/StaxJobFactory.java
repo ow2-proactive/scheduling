@@ -357,7 +357,7 @@ public class StaxJobFactory extends JobFactory {
                             if (!(updatedVariableMap == null || updatedVariableMap.isEmpty())) {
                                 updateVariables(updatedVariableMap);
                             }
-                            createVariables(cursorJob);
+                            createJobVariables(cursorJob);
                             if (!(updatedVariableMap == null || updatedVariableMap.isEmpty())) {
                                 updateVariables(updatedVariableMap);
                             }
@@ -421,14 +421,29 @@ public class StaxJobFactory extends JobFactory {
             commonPropertiesHolder.setOnTaskError(OnTaskError.CANCEL_JOB);
         }
     }
+    
+    /**
+     * Fill the job variables map with XML variables.
+     * 
+     * @param cursorVariables the streamReader with the cursor on the 'ELEMENT_VARIABLES' tag.
+     * @throws JobCreationException
+     */
+    private void createJobVariables(XMLStreamReader cursorVariables) 
+            throws JobCreationException {
+        updateVariables(createVariables(cursorVariables));
+    }
 
     /**
-     * Create the map of variables found in this document.
+     * Create a map of variables from XML variables.
      * Leave the method with the cursor at the end of 'ELEMENT_VARIABLES' tag
      *
      * @param cursorVariables the streamReader with the cursor on the 'ELEMENT_VARIABLES' tag.
+     * @return the map in which the variables were added.
+     * @throws JobCreationException
      */
-    private void createVariables(XMLStreamReader cursorVariables) throws JobCreationException {
+     private Map<String, String> createVariables(XMLStreamReader cursorVariables) 
+             throws JobCreationException {
+        Map<String, String> variablesMap = new HashMap<>();
         try {
             int eventType;
             while (cursorVariables.hasNext()) {
@@ -441,12 +456,12 @@ public class StaxJobFactory extends JobFactory {
                             String name = attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
                             String value = attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName());
 
-                            variables.put(name, value);
+                            variablesMap.put(name, value);
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (XMLTags.VARIABLES.matches(cursorVariables.getLocalName())) {
-                            return;
+                            return variablesMap;
                         }
                         break;
                 }
@@ -461,6 +476,7 @@ public class StaxJobFactory extends JobFactory {
             }
             throw new JobCreationException(cursorVariables.getLocalName(), attrtmp, e);
         }
+        return variablesMap;
     }
 
     private Map<String, String> getAttributesAsMap(XMLStreamReader cursorVariables)
@@ -675,6 +691,9 @@ public class StaxJobFactory extends JobFactory {
                         currentTag = null;
                         if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                             tmpTask.setGenericInformation(getGenericInformation(cursorTask));
+                        } else if (XMLTags.VARIABLES.matches(current)) {
+                            Map<String, String> taskVariablesMap = createVariables(cursorTask);
+                            tmpTask.setVariables(taskVariablesMap);
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
                             tmpTask.setDescription(getDescription(cursorTask));
                         } else if (XMLTags.DS_INPUT_FILES.matches(current)) {

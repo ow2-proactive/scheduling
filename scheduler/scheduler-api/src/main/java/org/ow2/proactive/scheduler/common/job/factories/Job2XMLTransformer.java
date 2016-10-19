@@ -388,6 +388,12 @@ public class Job2XMLTransformer {
 
         // *** elements ****
 
+        // <ref name="variables"/>
+        if (task.getVariables() != null && !task.getVariables().isEmpty()) {
+            Element variablesE = createVariablesElement(doc, task.getVariables());
+            taskE.appendChild(variablesE);
+        }
+
         // <ref name="taskDescription"/>
         if (task.getDescription() != null) {
             Element descrNode = createElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), task

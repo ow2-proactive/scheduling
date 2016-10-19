@@ -182,9 +182,9 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
     private void checkJobAndTaskLogFiles(JobId jobId, List<TaskState> tasks, boolean shouldExist)
             throws Exception {
-        checkFile(shouldExist, new File(logsLocation, JobLogger.getJobLogFilename(jobId)));
+        checkFile(shouldExist, new File(logsLocation, JobLogger.getJobLogRelativePath(jobId)));
         for (TaskState taskState : tasks) {
-            checkFile(shouldExist, new File(logsLocation, TaskLogger.getTaskLogFilename(taskState.getId())));
+            checkFile(shouldExist, new File(logsLocation, TaskLogger.getTaskLogRelativePath(taskState.getId())));
         }
     }
 

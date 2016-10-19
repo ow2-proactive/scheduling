@@ -42,6 +42,25 @@ start() {
   fi
 }
 
+# Starts the application
+startDebug() {
+
+  pid=$(check_status)
+
+  if [ "$pid" -ne 0 ] ; then
+    echo "Radicale is already started"
+  else
+    # If the application isn't running, starts it
+    echo " *** Starting Radicale server *** "
+
+    cd ~/.config/radicale/log
+
+    radicale -d -S -D
+
+    echo " *** OK *** "
+  fi
+}
+
 # Stops the application
 stop() {
 
@@ -56,6 +75,31 @@ stop() {
   else
     echo "Radicale server is already stopped"
   fi
+}
+
+# Stops the application
+restart() {
+
+  # Like as the start function, checks the application status
+  pid=$(check_status)
+
+  if [ "$pid" -ne 0 ] ; then
+    # Kills the application process
+    echo " *** Stopping Radicale server *** "
+    kill -9 $pid
+    echo "OK"
+  else
+    echo "Radicale server is already stopped"
+  fi
+
+  # If the application isn't running, starts it
+  echo " *** Starting Radicale server *** "
+
+  cd ~/.config/radicale/log
+
+  radicale -d -S
+
+  echo " *** OK *** "
 }
 
 # Show the application status
@@ -78,6 +122,9 @@ case "$1" in
   start)
     start
     ;;
+  startDebug)
+    startDebug
+    ;;
   stop)
     stop
     ;;
@@ -85,11 +132,10 @@ case "$1" in
     status
     ;;
   restart)
-    stop
-    start
+    restart
     ;;
   *)
-    echo "Usage: $0 {start|stop|restart|status}"
+    echo "Usage: $0 {start|stop|restart|status|startDebug}"
     exit 1
 esac
 
