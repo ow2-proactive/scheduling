@@ -12,10 +12,16 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 public class TaskLoggerRelativePathGeneratorTest {
 
     @Test
-    public void testGenerationOfRelativePath() {
+    public void testGetRelativePath() {
         TaskId taskId = TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L);
-        assertThat(TaskLoggerRelativePathGenerator.generateRelativePath(taskId),
+        assertThat(new TaskLoggerRelativePathGenerator(taskId).getRelativePath(),
                 is("1000/TaskLogs-1000-42.log"));
+    }
+
+    @Test
+    public void testGetFileName() {
+        TaskId taskId = TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L);
+        assertThat(new TaskLoggerRelativePathGenerator(taskId).getFileName(), is("TaskLogs-1000-42.log"));
     }
 
 }

@@ -1302,7 +1302,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public InputStream retrieveTaskLogsUsingDataspaces(String sessionId, String jobId, TaskId taskId)
             throws PermissionRestException, IOException, NotConnectedRestException {
         return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME,
-                TaskLoggerRelativePathGenerator.generateRelativePath(taskId));
+                new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
     }
 
     /**

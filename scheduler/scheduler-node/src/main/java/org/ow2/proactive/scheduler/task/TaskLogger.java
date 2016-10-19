@@ -131,7 +131,7 @@ public class TaskLogger {
             throw new IllegalStateException("Only one file appender can be created");
         }
 
-        File logFile = new File(pathToFolder, TaskLoggerRelativePathGenerator.generateRelativePath(taskId));
+        File logFile = new File(pathToFolder, new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
 
         FileUtils.forceMkdirParent(logFile);
         FileUtils.touch(logFile);

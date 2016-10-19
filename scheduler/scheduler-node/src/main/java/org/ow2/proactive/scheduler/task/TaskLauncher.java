@@ -293,7 +293,8 @@ public class TaskLauncher implements InitActive {
         if (initializer.isPreciousLogs()) {
             try {
                 FileSelector taskLogFileSelector = new FileSelector(taskLogFile.getName());
-                taskLogFileSelector.setIncludes(TaskLoggerRelativePathGenerator.generateRelativePath(taskId));
+                taskLogFileSelector
+                        .setIncludes(new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
                 dataspaces.copyScratchDataToOutput(Collections.singletonList(
                         new OutputSelector(taskLogFileSelector, OutputAccessMode.TransferToUserSpace)));
             } catch (FileSystemException e) {

@@ -8,12 +8,20 @@ public class TaskLoggerRelativePathGenerator {
     // the prefix for log file produced in localspace
     private static final String LOG_FILE_PREFIX = "TaskLogs";
 
-    private TaskLoggerRelativePathGenerator() {
+    private final String relativePath;
+    private final String fileName;
+
+    public TaskLoggerRelativePathGenerator(TaskId taskId) {
+        this.fileName = LOG_FILE_PREFIX + "-" + taskId.getJobId() + "-" + taskId.value() + ".log";
+        this.relativePath = taskId.getJobId().toString() + "/" + fileName;
     }
 
-    public static String generateRelativePath(TaskId taskId) {
-        return taskId.getJobId().toString() + "/" + LOG_FILE_PREFIX + "-" + taskId.getJobId() + "-" +
-            taskId.value() + ".log";
+    public String getRelativePath() {
+        return this.relativePath;
+    }
+
+    public String getFileName() {
+        return this.fileName;
     }
 
 }

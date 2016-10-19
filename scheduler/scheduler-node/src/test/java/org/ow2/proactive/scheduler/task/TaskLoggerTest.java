@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -127,8 +128,7 @@ public class TaskLoggerTest {
 
         assertEquals(logAppender.getParentFile().getName(), jobid.value());
 
-        assertEquals(logAppender.getName(),
-                TaskLogger.LOG_FILE_PREFIX + "-" + taskId.getJobId() + "-" + taskId.value() + ".log");
+        assertEquals(logAppender.getName(), new TaskLoggerRelativePathGenerator(taskId).getFileName());
 
     }
 }
