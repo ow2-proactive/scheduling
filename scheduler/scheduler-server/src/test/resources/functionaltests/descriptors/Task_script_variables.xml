@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="Job_variables" priority="normal">
+    <variables>
+        <variable name="TESTVAR0" value="testvarjob0"/>
+        <variable name="TESTVAR1" value="testvarjob1"/>
+        <variable name="TESTVAR2" value="testvarjob2"/>
+        <variable name="TESTVAR3" value="testvarjob3"/>
+        <variable name="TESTVAR4" value="testvarjob4"/>
+        <variable name="TESTVAR5" value="testvarjob5"/>
+    </variables>
+    <description>Job using variables in selection scripts, check the scheduler logs if the test fails to see the
+        selection scripts output
+    </description>
+    <taskFlow>
+        <task name="taskVariables">
+            <description>Task with multiple scripts which uses variables</description>
+		    <variables>
+		        <variable name="TESTVAR0" value="testvartask0"/>
+		        <variable name="TESTVAR1" value="testvartask1"/>
+		        <variable name="TESTVAR2" value="testvartask2"/>
+		        <variable name="TESTVAR3" value="testvartask3"/>
+		        <variable name="TESTVAR4" value="testvartask4"/>
+		        <variable name="TESTVAR5" value="testvartask5"/>
+		    </variables>
+			<selection>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+						println variables["TESTVAR0"]
+						selected=true
+						]]>
+					</code>
+				</script>
+			</selection>
+            <forkEnvironment>
+                <envScript>
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[println variables["TESTVAR1"]]]>
+                        </code>
+                    </script>
+                </envScript>
+            </forkEnvironment>
+            <pre>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[println variables["TESTVAR2"]]]>
+                    </code>
+                </script>
+            </pre>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[println variables["TESTVAR3"]]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <post>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[println variables["TESTVAR4"]]]>
+                    </code>
+                </script>
+            </post>
+            <cleaning>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[println variables["TESTVAR5"]]]>
+                    </code>
+                </script>
+            </cleaning>
+        </task>
+        <task name="taskNoVariables">
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[println variables["TESTVAR1"]]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
