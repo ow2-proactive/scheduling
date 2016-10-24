@@ -34,6 +34,8 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -51,12 +53,12 @@ import org.ow2.proactive.authentication.crypto.KeyGen;
 import org.ow2.tests.ProActiveTest;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.security.KeyException;
 import java.security.PrivateKey;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -79,23 +81,24 @@ public class ManageUsersTest extends ProActiveTest {
 
     PrivateKey privateKey;
 
-    final List<String> sourceUsers1 = Arrays.asList(new String[]{
-            "user1:pwd1", "user2:pwd2", "admin1:pwd3", "admin2:pwd4", "usernopwd:", ":nologin", "usernogroup:toobad"
-    });
-    final List<String> sourceUsers2 = Arrays.asList(new String[]{
-            "user1:pwda", "user2:pwdb", "admin1:pwdc", "admin2:pwdd", "usernopwd:", ":nologin", "usernogroup:toobad"
-    });
+    final List<String> sourceUsers1 = ImmutableList.of(
+            "user1:pwd1", "user2:pwd2", "userà:pwdà", "admin1:pwd3", "admin2:pwd4", "usernopwd:", ":nologin", "usernogroup:toobad"
+    );
+    final List<String> sourceUsers2 = ImmutableList.of(
+            "user1:pwda", "user2:pwdb", "userà:pwdé", "admin1:pwdc", "admin2:pwdd", "usernopwd:", ":nologin", "usernogroup:toobad"
+    );
 
-    final List<String> sourceGroups1 = Arrays.asList(new String[]{
-            "user1:user", "user2:user", "user2:other", "admin1:admin", "admin2:admin", "admin2:other", "useremptygroup:", ":nologin", "userwithoutcredentials:admin"
-    });
-    final List<String> sourceGroups2 = Arrays.asList(new String[]{
-            "user1:user", "user1:other", "user2:user", "admin1:admin", "admin1:other", "admin2:admin", "useremptygroup:", ":nologin", "userwithoutcredentials:admin"
-    });
+    final List<String> sourceGroups1 = ImmutableList.of(
+            "user1:user", "user2:user", "user2:other", "userà:groupà", "admin1:admin", "admin2:admin", "admin2:other", "useremptygroup:", ":nologin", "userwithoutcredentials:admin"
+    );
+    final List<String> sourceGroups2 = ImmutableList.of(
+            "user1:user", "user1:other", "user2:user", "userà:groupé", "admin1:admin", "admin1:other", "admin2:admin", "useremptygroup:", ":nologin", "userwithoutcredentials:admin"
+    );
 
     final Map<String, String> users = ImmutableMap.<String, String>builder().
             put("user1", "pwd1").
             put("user2", "pwd2").
+            put("userà", "pwdà").
             put("admin1", "pwd3").
             put("admin2", "pwd4").
             build();
@@ -103,6 +106,7 @@ public class ManageUsersTest extends ProActiveTest {
     final Map<String, String> users2 = ImmutableMap.<String, String>builder().
             put("user1", "pwda").
             put("user2", "pwdb").
+            put("userà", "pwdé").
             put("admin1", "pwdc").
             put("admin2", "pwdd").
             build();
@@ -110,6 +114,7 @@ public class ManageUsersTest extends ProActiveTest {
     final Multimap<String, String> groups = ImmutableMultimap.<String, String>builder().
             putAll("user1", "user").
             putAll("user2", "user", "other").
+            putAll("userà", "groupà").
             putAll("admin1", "admin").
             putAll("admin2", "admin", "other").
             build();
@@ -117,6 +122,7 @@ public class ManageUsersTest extends ProActiveTest {
     final Multimap<String, String> groups2 = ImmutableMultimap.<String, String>builder().
             putAll("user1", "user", "other").
             putAll("user2", "user").
+            putAll("userà", "groupé").
             putAll("admin1", "admin", "other").
             putAll("admin2", "admin").
             build();
@@ -169,14 +175,14 @@ public class ManageUsersTest extends ProActiveTest {
 
     private void createUsers() throws Exception {
         for (Map.Entry<String, String> user : users.entrySet()) {
-            ManageUsers.manageUsers(new String[]{"-" + ManageUsers.CREATE_OPTION,
+            ManageUsers.manageUsers("-" + ManageUsers.CREATE_OPTION,
                     "-" + ManageUsers.LOGIN_OPTION, user.getKey(),
                     "-" + ManageUsers.PWD_OPTION, user.getValue(),
                     "-" + ManageUsers.GROUPS_OPTION, getGroupString(user.getKey(), groups),
                     "-" + ManageUsers.LOGINFILE_OPTION, loginFile.getAbsolutePath(),
                     "-" + ManageUsers.GROUPFILE_OPTION, groupFile.getAbsolutePath(),
                     "-" + ManageUsers.KEYFILE_OPTION, publicKeyFile.getAbsolutePath()
-            });
+            );
         }
         validateContents(users, groups);
     }
@@ -184,27 +190,27 @@ public class ManageUsersTest extends ProActiveTest {
     private void createBulkUsers() throws Exception {
         FileUtils.writeLines(sourceLoginFile, sourceUsers1);
         FileUtils.writeLines(sourceGroupFile, sourceGroups1);
-        ManageUsers.manageUsers(new String[]{"-" + ManageUsers.CREATE_OPTION,
+        ManageUsers.manageUsers("-" + ManageUsers.CREATE_OPTION,
                 "-" + ManageUsers.SOURCE_LOGINFILE_OPTION, sourceLoginFile.getAbsolutePath(),
                 "-" + ManageUsers.SOURCE_GROUPFILE_OPTION, sourceGroupFile.getAbsolutePath(),
                 "-" + ManageUsers.LOGINFILE_OPTION, loginFile.getAbsolutePath(),
                 "-" + ManageUsers.GROUPFILE_OPTION, groupFile.getAbsolutePath(),
                 "-" + ManageUsers.KEYFILE_OPTION, publicKeyFile.getAbsolutePath()
-        });
+        );
 
         validateContents(users, groups);
     }
 
     private void updateUsers() throws Exception {
         for (Map.Entry<String, String> user : users2.entrySet()) {
-            ManageUsers.manageUsers(new String[]{"-" + ManageUsers.UPDATE_OPTION,
+            ManageUsers.manageUsers("-" + ManageUsers.UPDATE_OPTION,
                     "-" + ManageUsers.LOGIN_OPTION, user.getKey(),
                     "-" + ManageUsers.PWD_OPTION, user.getValue(),
                     "-" + ManageUsers.GROUPS_OPTION, getGroupString(user.getKey(), groups2),
                     "-" + ManageUsers.LOGINFILE_OPTION, loginFile.getAbsolutePath(),
                     "-" + ManageUsers.GROUPFILE_OPTION, groupFile.getAbsolutePath(),
                     "-" + ManageUsers.KEYFILE_OPTION, publicKeyFile.getAbsolutePath()
-            });
+            );
         }
         validateContents(users2, groups2);
     }
@@ -212,51 +218,51 @@ public class ManageUsersTest extends ProActiveTest {
     private void updateBulkUsers() throws Exception {
         FileUtils.writeLines(sourceLoginFile, sourceUsers2);
         FileUtils.writeLines(sourceGroupFile, sourceGroups2);
-        ManageUsers.manageUsers(new String[]{"-" + ManageUsers.UPDATE_OPTION,
+        ManageUsers.manageUsers("-" + ManageUsers.UPDATE_OPTION,
                 "-" + ManageUsers.SOURCE_LOGINFILE_OPTION, sourceLoginFile.getAbsolutePath(),
                 "-" + ManageUsers.SOURCE_GROUPFILE_OPTION, sourceGroupFile.getAbsolutePath(),
                 "-" + ManageUsers.LOGINFILE_OPTION, loginFile.getAbsolutePath(),
                 "-" + ManageUsers.GROUPFILE_OPTION, groupFile.getAbsolutePath(),
                 "-" + ManageUsers.KEYFILE_OPTION, publicKeyFile.getAbsolutePath()
-        });
+        );
 
         validateContents(users2, groups2);
     }
 
     private void updateBulkUsersLoginFile() throws Exception {
         FileUtils.writeLines(sourceLoginFile, sourceUsers2);
-        ManageUsers.manageUsers(new String[]{"-" + ManageUsers.UPDATE_OPTION,
+        ManageUsers.manageUsers("-" + ManageUsers.UPDATE_OPTION,
                 "-" + ManageUsers.SOURCE_LOGINFILE_OPTION, sourceLoginFile.getAbsolutePath(),
                 "-" + ManageUsers.LOGINFILE_OPTION, loginFile.getAbsolutePath(),
                 "-" + ManageUsers.GROUPFILE_OPTION, groupFile.getAbsolutePath(),
                 "-" + ManageUsers.KEYFILE_OPTION, publicKeyFile.getAbsolutePath()
-        });
+        );
     }
 
     private void updateBulkUsersGroupFile() throws Exception {
         FileUtils.writeLines(sourceGroupFile, sourceGroups2);
-        ManageUsers.manageUsers(new String[]{"-" + ManageUsers.UPDATE_OPTION,
+        ManageUsers.manageUsers("-" + ManageUsers.UPDATE_OPTION,
                 "-" + ManageUsers.SOURCE_GROUPFILE_OPTION, sourceGroupFile.getAbsolutePath(),
                 "-" + ManageUsers.LOGINFILE_OPTION, loginFile.getAbsolutePath(),
                 "-" + ManageUsers.GROUPFILE_OPTION, groupFile.getAbsolutePath(),
                 "-" + ManageUsers.KEYFILE_OPTION, publicKeyFile.getAbsolutePath()
-        });
+        );
     }
 
     private void deleteUsers() throws Exception {
         for (Map.Entry<String, String> user : users.entrySet()) {
-            ManageUsers.manageUsers(new String[]{"-" + ManageUsers.DELETE_OPTION,
+            ManageUsers.manageUsers("-" + ManageUsers.DELETE_OPTION,
                     "-" + ManageUsers.LOGIN_OPTION, user.getKey(),
                     "-" + ManageUsers.LOGINFILE_OPTION, loginFile.getAbsolutePath(),
                     "-" + ManageUsers.GROUPFILE_OPTION, groupFile.getAbsolutePath(),
                     "-" + ManageUsers.KEYFILE_OPTION, publicKeyFile.getAbsolutePath()
-            });
+            );
         }
-        String loginContent = IOUtils.toString(loginFile.toURI());
+        String loginContent = IOUtils.toString(loginFile.toURI(), Charsets.UTF_8);
         System.out.println("Login file content after deletion:");
         System.out.println(loginContent);
         Assert.assertTrue("login file should be empty", loginContent.trim().isEmpty());
-        String groupContent = IOUtils.toString(groupFile.toURI());
+        String groupContent = IOUtils.toString(groupFile.toURI(), Charsets.UTF_8);
         System.out.println("Group file content after deletion:");
         System.out.println(groupContent);
         Assert.assertTrue("group file should be empty", groupContent.trim().isEmpty());
@@ -264,9 +270,9 @@ public class ManageUsersTest extends ProActiveTest {
 
     private void validateContents(Map<String, String> usersToCheck, Multimap<String, String> groupsToCheck) throws IOException, KeyException {
         Properties props = new Properties();
-        try (Reader reader = new FileReader(loginFile)) {
+        try (Reader reader = new InputStreamReader(new FileInputStream(loginFile), Charsets.UTF_8)) {
             props.load(reader);
-            String groupContent = IOUtils.toString(groupFile.toURI());
+            String groupContent = IOUtils.toString(groupFile.toURI(), Charsets.UTF_8);
             for (Map.Entry<String, String> user : usersToCheck.entrySet()) {
                 Assert.assertTrue("login file should contain " + user.getKey(), props.containsKey(user.getKey()));
                 String encryptedPassword = (String) props.get(user.getKey());

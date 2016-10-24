@@ -95,6 +95,16 @@ public class ManageUsers {
     public static final String SOURCE_GROUPFILE_OPTION_NAME = "sourcegroupfile";
 
 
+    public static final String USER_HEADER = "USER ";
+    public static final String ALREADY_EXISTS_IN_LOGIN_FILE = " already exists in login file : ";
+    public static final String ALREADY_EXISTS_IN_GROUP_FILE = " already exists in group file : ";
+    public static final String IS_EMPTY_SKIPPING = " is empty, skipping.";
+    public static final String DOES_NOT_EXIST_IN_LOGIN_FILE = " does not exist in login file : ";
+    public static final String UPDATING_THIS_USER_INFORMATION = ", updating this user information.";
+    public static final String DOES_NOT_EXIST_IN_GROUP_FILE = " does not exist in group file : ";
+    public static final String PROVIDED_USERNAME = "Provided username ";
+
+
     /**
      * Entry point
      *
@@ -123,7 +133,7 @@ public class ManageUsers {
         System.exit(0);
     }
 
-    public static void manageUsers(String[] args) throws ManageUsersException {
+    public static void manageUsers(String... args) throws ManageUsersException {
         SecurityManagerConfigurator.configureSecurityManager(CreateCredentials.class.getResource(
                 "/all-permissions.security.policy").toString());
 
@@ -131,7 +141,6 @@ public class ManageUsers {
         /**
          * default values
          */
-        boolean nonInteractive = true;
         String pubKeyPath = null;
         PublicKey pubKey = null;
         UserInfo userInfo = new UserInfo();
@@ -203,21 +212,7 @@ public class ManageUsers {
         } catch (KeyException e) {
             exitWithErrorMessage("Could not retrieve public key from '" + pubKeyPath, null, e);
         }
-        if (sourceLoginFilePath != null || sourceGroupFilePath != null) {
-            nonInteractive = true;
-        } else {
-            switch (action) {
-                case CREATE:
-                    nonInteractive = (userInfo.getLogin() != null && userInfo.getPassword() != null && userInfo.getGroups() != null);
-                    break;
-                case UPDATE:
-                    nonInteractive = (userInfo.getLogin() != null && userInfo.getPassword() != null) || (userInfo.getLogin() != null && userInfo.getGroups() != null);
-                    break;
-                case DELETE:
-                    nonInteractive = userInfo.getLogin() != null;
-                    break;
-            }
-        }
+        boolean nonInteractive = checkInteractivity(userInfo, sourceLoginFilePath, sourceGroupFilePath, action);
 
         if (!nonInteractive) {
             askInteractively(console, userInfo, action);
@@ -226,25 +221,48 @@ public class ManageUsers {
         updateAccounts(pubKey, userInfo, loginFilePath, groupFilePath, action, sourceLoginFilePath, sourceGroupFilePath);
     }
 
+    private static boolean checkInteractivity(UserInfo userInfo, String sourceLoginFilePath, String sourceGroupFilePath, Action action) {
+        boolean nonInteractive = true;
+        if (sourceLoginFilePath != null || sourceGroupFilePath != null) {
+            nonInteractive = true;
+        } else {
+            boolean l = !Strings.isNullOrEmpty(userInfo.getLogin());
+            boolean p = !Strings.isNullOrEmpty(userInfo.getPassword());
+            boolean g = !userInfo.getGroups().isEmpty();
+            switch (action) {
+                case CREATE:
+                    nonInteractive = l && p && g;
+                    break;
+                case UPDATE:
+                    nonInteractive = (l && p) || (l && g);
+                    break;
+                case DELETE:
+                    nonInteractive = l;
+                    break;
+            }
+        }
+        return nonInteractive;
+    }
+
     /**
      * Ask the user for parameters missing on the command line
      */
     private static void askInteractively(Console console, UserInfo userInfo, Action action) {
         System.out.println(action);
         System.out.print("login: ");
-        if (userInfo.getLogin() == null) {
+        if (Strings.isNullOrEmpty(userInfo.getLogin())) {
             userInfo.setLogin(console.readLine());
         } else {
             System.out.println(userInfo.getLogin());
         }
         System.out.print("password: ");
-        if ((action.isCreate() && userInfo.getPassword() == null) || (action.isUpdate() && userInfo.getPassword() == null && userInfo.getGroups() == null)) {
+        if ((action.isCreate() && Strings.isNullOrEmpty(userInfo.getPassword())) || (action.isUpdate() && Strings.isNullOrEmpty(userInfo.getPassword()) && userInfo.getGroups().isEmpty())) {
             userInfo.setPassword(new String(console.readPassword()));
         } else {
             System.out.println("*******");
         }
 
-        if (action.isCreate() && userInfo.getGroups() == null) {
+        if (action.isCreate() && userInfo.getGroups().isEmpty()) {
             System.out.print("groups for user " + userInfo.getLogin() + ":");
             String groupString = console.readLine();
             userInfo.setGroups(Arrays.asList(groupString.split(",")));
@@ -259,7 +277,7 @@ public class ManageUsers {
     private static void updateAccounts(final PublicKey pubKey, final UserInfo userInfo, final String loginFilePath, final String groupFilePath, final Action action, final String sourceLoginFile, final String sourceGroupFile) throws ManageUsersException {
         try {
             Properties destinationLoginProps = new Properties();
-            try (FileInputStream stream = new FileInputStream(new File(loginFilePath))) {
+            try (InputStreamReader stream = new InputStreamReader(new FileInputStream(loginFilePath), Charsets.UTF_8)) {
                 destinationLoginProps.load(stream);
             } catch (Exception e) {
                 exitWithErrorMessage("could not read login file : " + loginFilePath, null, e);
@@ -269,7 +287,7 @@ public class ManageUsers {
 
             Properties sourceLoginProps = new Properties();
             if (sourceLoginFile != null) {
-                try (FileInputStream stream = new FileInputStream(new File(sourceLoginFile))) {
+                try (InputStreamReader stream = new InputStreamReader(new FileInputStream(sourceLoginFile), Charsets.UTF_8)) {
                     sourceLoginProps.load(stream);
                 } catch (Exception e) {
                     exitWithErrorMessage("could not read source login file : " + sourceLoginFile, null, e);
@@ -289,7 +307,7 @@ public class ManageUsers {
                 sourceGroupsMap = loadGroups(sourceGroupFile);
             } else {
                 sourceGroupsMap = TreeMultimap.create();
-                if (userInfo != null && userInfo.getGroups() != null) {
+                if (userInfo != null && !userInfo.getGroups().isEmpty()) {
                     for (String group : userInfo.getGroups()) {
                         sourceGroupsMap.put(userInfo.getLogin(), group);
                     }
@@ -312,10 +330,10 @@ public class ManageUsers {
 
                 switch (action) {
                     case CREATE:
-                        createAccount(pubKey, sourceUserInfo, loginFilePath, groupFilePath, destinationLoginProps, destinationGroupsMap, bulkMode);
+                        createAccount(pubKey, sourceUserInfo, loginFilePath, groupFilePath, destinationLoginProps, destinationGroupsMap);
                         break;
                     case UPDATE:
-                        updateAccount(pubKey, sourceUserInfo, loginFilePath, groupFilePath, destinationLoginProps, destinationGroupsMap, bulkMode);
+                        updateAccount(pubKey, sourceUserInfo, loginFilePath, destinationLoginProps, destinationGroupsMap, bulkMode);
                         break;
                     case DELETE:
                         deleteAccount(sourceUserInfo, loginFilePath, groupFilePath, destinationLoginProps, destinationGroupsMap);
@@ -333,35 +351,36 @@ public class ManageUsers {
     }
 
     private static void deleteAccount(UserInfo userInfo, String loginFilePath, String groupFilePath, Properties props, Multimap<String, String> groupsMap) throws ManageUsersException {
-        if (userInfo.getLogin().isEmpty()) {
-            warnWithMessage("Provided username is empty, skipping.");
+        if (Strings.isNullOrEmpty(userInfo.getLogin())) {
+            warnWithMessage(PROVIDED_USERNAME + IS_EMPTY_SKIPPING);
             return;
         }
         if (!props.containsKey(userInfo.getLogin())) {
-            warnWithMessage("USER " + userInfo.getLogin() + " does not exist in login file : " + loginFilePath);
+            warnWithMessage(USER_HEADER + userInfo.getLogin() + DOES_NOT_EXIST_IN_LOGIN_FILE + loginFilePath);
         }
         if (!groupsMap.containsKey(userInfo.getLogin())) {
-            warnWithMessage("USER " + userInfo.getLogin() + " does not exist in group file : " + groupFilePath);
+            warnWithMessage(USER_HEADER + userInfo.getLogin() + DOES_NOT_EXIST_IN_GROUP_FILE + groupFilePath);
         }
         props.remove(userInfo.getLogin());
         groupsMap.removeAll(userInfo.getLogin());
         System.out.println("Deleted user " + userInfo.getLogin());
     }
 
-    private static void updateAccount(PublicKey pubKey, UserInfo userInfo, String loginFilePath, String groupFilePath, Properties props, Multimap<String, String> groupsMap, boolean bulkMode) throws ManageUsersException, KeyException {
-        if (userInfo.getLogin().isEmpty()) {
-            warnWithMessage("Provided username is empty, skipping.");
+    private static void updateAccount(PublicKey pubKey, UserInfo userInfo, String loginFilePath, Properties props, Multimap<String, String> groupsMap, boolean bulkMode) throws ManageUsersException, KeyException {
+        if (Strings.isNullOrEmpty(userInfo.getLogin())) {
+            warnWithMessage(PROVIDED_USERNAME + IS_EMPTY_SKIPPING);
             return;
         }
         if (!props.containsKey(userInfo.getLogin())) {
-            if (userInfo.getPassword() != null && userInfo.getGroups() != null) {
-                warnWithMessage("USER " + userInfo.getLogin() + " does not exist in login file : " + loginFilePath + ", create this user.");
+            String userDoesNotExistInLoginFileMessage = USER_HEADER + userInfo.getLogin() + DOES_NOT_EXIST_IN_LOGIN_FILE + loginFilePath;
+            if (!Strings.isNullOrEmpty(userInfo.getPassword()) && !userInfo.getGroups().isEmpty()) {
+                warnWithMessage(userDoesNotExistInLoginFileMessage + ", create this user.");
             } else {
                 if (bulkMode) {
-                    warnWithMessage("USER " + userInfo.getLogin() + " does not exist in login file : " + loginFilePath + " and not enough information were provided to create a new user, skipping.");
+                    warnWithMessage(userDoesNotExistInLoginFileMessage + " and not enough information were provided to create a new user, skipping.");
                     return;
                 } else {
-                    exitWithErrorMessage("USER " + userInfo.getLogin() + " does not exist in login file : " + loginFilePath + " and not enough information were provided to create a new user.", null, null);
+                    exitWithErrorMessage(userDoesNotExistInLoginFileMessage + " and not enough information were provided to create a new user.", null, null);
                 }
             }
         }
@@ -369,31 +388,31 @@ public class ManageUsers {
             updateUserPassword(pubKey, userInfo.getLogin(), userInfo.getPassword(), props);
             System.out.println("Changed password for user " + userInfo.getLogin());
         }
-        if (userInfo.getGroups() != null) {
+        if (!userInfo.getGroups().isEmpty()) {
             updateUserGroups(userInfo.getLogin(), userInfo.getGroups(), groupsMap);
         }
 
         System.out.println("Updated user " + userInfo.getLogin());
     }
 
-    private static void createAccount(PublicKey pubKey, UserInfo userInfo, String loginFilePath, String groupFilePath, Properties props, Multimap<String, String> groupsMap, boolean bulkMode) throws ManageUsersException, KeyException {
+    private static void createAccount(PublicKey pubKey, UserInfo userInfo, String loginFilePath, String groupFilePath, Properties props, Multimap<String, String> groupsMap) throws ManageUsersException, KeyException {
         if (Strings.isNullOrEmpty(userInfo.getLogin())) {
-            warnWithMessage("Provided username is empty, skipping.");
+            warnWithMessage(PROVIDED_USERNAME + IS_EMPTY_SKIPPING);
             return;
         }
         if (Strings.isNullOrEmpty(userInfo.getPassword())) {
-            warnWithMessage("Provided password for user " + userInfo.getLogin() + " is empty, skipping.");
+            warnWithMessage("Provided password for user " + userInfo.getLogin() + IS_EMPTY_SKIPPING);
             return;
         }
-        if (userInfo.getGroups() == null) {
-            warnWithMessage("Provided groups for user " + userInfo.getLogin() + " is empty, skipping.");
+        if (userInfo.getGroups().isEmpty()) {
+            warnWithMessage("Provided groups for user " + userInfo.getLogin() + IS_EMPTY_SKIPPING);
             return;
         }
         if (props.containsKey(userInfo.getLogin())) {
-            warnWithMessage("USER " + userInfo.getLogin() + " already exists in login file : " + loginFilePath + ", updating this user information.");
+            warnWithMessage(USER_HEADER + userInfo.getLogin() + ALREADY_EXISTS_IN_LOGIN_FILE + loginFilePath + UPDATING_THIS_USER_INFORMATION);
         }
         if (groupsMap.containsKey(userInfo.getLogin())) {
-            warnWithMessage("USER " + userInfo.getLogin() + " already exists in group file : " + groupFilePath + ", updating this user information.");
+            warnWithMessage(USER_HEADER + userInfo.getLogin() + ALREADY_EXISTS_IN_GROUP_FILE + groupFilePath + UPDATING_THIS_USER_INFORMATION);
         }
         updateUserPassword(pubKey, userInfo.getLogin(), userInfo.getPassword(), props);
         updateUserGroups(userInfo.getLogin(), userInfo.getGroups(), groupsMap);
@@ -502,11 +521,13 @@ public class ManageUsers {
     }
 
     private static void updateUserGroups(String login, Collection<String> groups, Multimap<String, String> groupsMap) {
-        groupsMap.removeAll(login);
-        for (String group : groups) {
-            if (!group.isEmpty()) {
-                groupsMap.put(login, group);
-                System.out.println("Adding group " + group + " to user " + login);
+        if (!groups.isEmpty()) {
+            groupsMap.removeAll(login);
+            for (String group : groups) {
+                if (!group.isEmpty()) {
+                    groupsMap.put(login, group);
+                    System.out.println("Adding group " + group + " to user " + login);
+                }
             }
         }
     }
@@ -519,39 +540,35 @@ public class ManageUsers {
     }
 
     private static Multimap<String, String> loadGroups(String groupFilePath) throws ManageUsersException {
-        try {
-            Multimap<String, String> groupsMap = TreeMultimap.create();
-            String line = null;
+        Multimap<String, String> groupsMap = TreeMultimap.create();
+        String line = null;
 
-            try (BufferedReader reader = new BufferedReader(new FileReader(groupFilePath))) {
-                while ((line = reader.readLine()) != null) {
-                    if (!line.trim().isEmpty()) {
-                        String[] u2g = line.split(":");
-                        if (u2g.length == 2) {
-                            groupsMap.put(u2g[0].trim(), u2g[1].trim());
-                        }
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(groupFilePath), Charsets.UTF_8))) {
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    String[] u2g = line.split(":");
+                    if (u2g.length == 2) {
+                        groupsMap.put(u2g[0].trim(), u2g[1].trim());
                     }
                 }
             }
-
-            return groupsMap;
         } catch (IOException e) {
             exitWithErrorMessage("could not read group file : " + groupFilePath, null, e);
         }
-        return null;
+        return groupsMap;
     }
 
     /**
      * Stores the logins into login.cfg
      */
     private static void storeLoginFile(String loginFilePath, Properties props) throws IOException {
-        try (FileOutputStream stream = new FileOutputStream(new File(loginFilePath))) {
-            props.store(stream, null);
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(loginFilePath), Charsets.UTF_8))) {
+            props.store(writer, null);
         }
         List<String> lines = null;
 
-        try (FileInputStream reader = new FileInputStream(loginFilePath)) {
-            lines = IOUtils.readLines(reader, Charsets.UTF_8);
+        try (FileInputStream stream = new FileInputStream(loginFilePath)) {
+            lines = IOUtils.readLines(stream, Charsets.UTF_8);
         }
 
         TreeMap<String, String> sortedUsers = new TreeMap<>();
@@ -565,8 +582,8 @@ public class ManageUsers {
         for (Map.Entry entry : sortedUsers.entrySet()) {
             modifiedLines.add(entry.getKey() + ":" + entry.getValue());
         }
-        try (FileOutputStream writer = new FileOutputStream(loginFilePath)) {
-            IOUtils.writeLines(modifiedLines, System.getProperty("line.separator"), writer, Charsets.UTF_8);
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(loginFilePath), Charsets.UTF_8))) {
+            IOUtils.writeLines(modifiedLines, System.getProperty("line.separator"), writer);
         }
         System.out.println("Stored login file in " + loginFilePath);
     }
@@ -576,7 +593,7 @@ public class ManageUsers {
      */
     private static void storeGroups(String groupFilePath, Multimap<String, String> groups) throws ManageUsersException {
         try {
-            try (PrintWriter writer = new PrintWriter(new FileWriter(groupFilePath))) {
+            try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(groupFilePath), Charsets.UTF_8))) {
                 for (Map.Entry<String, String> userEntry : groups.entries()) {
                     writer.println(userEntry.getKey() + ":" + userEntry.getValue());
                 }
@@ -666,15 +683,9 @@ public class ManageUsers {
     static class UserInfo {
         private String login;
         private String password;
-        private Collection<String> groups;
+        private Collection<String> groups = Collections.EMPTY_LIST;
 
         public UserInfo() {
-        }
-
-        public UserInfo(String login, String password, Collection<String> groups) {
-            this.login = login;
-            this.password = password;
-            this.groups = groups;
         }
 
         public String getLogin() {
