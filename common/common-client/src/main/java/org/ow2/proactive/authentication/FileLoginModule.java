@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.authentication;
 
+import com.google.common.base.Charsets;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
@@ -48,12 +49,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.Map;
@@ -225,11 +221,13 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         PrivateKey privateKey = null;
         try {
             privateKey = getPrivateKey();
-            FileInputStream stream = new FileInputStream(new File(loginFile));
-            props.load(stream);
-            stream.close();
         } catch (KeyException e) {
             throw new LoginException(e.toString());
+        }
+
+        try (FileInputStream stream = new FileInputStream(loginFile)) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
+            props.load(reader);
         } catch (FileNotFoundException e) {
             throw new LoginException(e.toString());
         } catch (IOException e) {
@@ -258,10 +256,10 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * @throws LoginException if group file is not found or unreadable.
      */
     protected void groupMembershipFromFile(String username) throws LoginException {
-        Properties groups = new Properties();
-        try {
+
+        try (FileInputStream stream = new FileInputStream(groupFile)) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
             String line = null;
-            BufferedReader reader = new BufferedReader(new FileReader(groupFile));
             while ((line = reader.readLine()) != null) {
                 String[] u2g = line.split(":");
                 if (u2g[0].trim().equals(username)) {
@@ -269,10 +267,6 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
                     logger.debug("adding group principal '" + u2g[1] + "' for user '" + username + "'");
                 }
             }
-            reader.close();
-            FileInputStream stream = new FileInputStream(new File(groupFile));
-            groups.load(stream);
-            stream.close();
         } catch (FileNotFoundException e) {
             throw new LoginException(e.toString());
         } catch (IOException e) {
