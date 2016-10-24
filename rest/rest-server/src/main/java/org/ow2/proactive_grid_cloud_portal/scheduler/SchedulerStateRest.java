@@ -3257,6 +3257,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 @Override
                 public void onDisconnect(@SuppressWarnings("rawtypes") WebSocketEvent event) {
                     try {
+                        logger.info("#### websocket disconnected，remove listener ####");
                         scheduler.removeEventListener();
                     } catch (Exception e) {
                         logger.error(e);
