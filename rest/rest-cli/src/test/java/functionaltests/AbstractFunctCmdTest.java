@@ -44,7 +44,7 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase{
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
         WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler);
         JobId id = submitter.submit(jobFile, new HashMap<String, String>());
-        waitJobState(id, waitForStatus, 100000);
+        waitJobState(id, waitForStatus, 500000);
         return id;
     }
 

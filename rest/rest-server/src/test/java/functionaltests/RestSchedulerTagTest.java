@@ -70,12 +70,18 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
+        System.out.println(Thread.currentThread().getStackTrace());
+        System.out.println("Initialize Test Class: "+RestSchedulerTagTest.class.toString());
         init();
+        System.out.println("Finished Initialize Test Class: "+RestSchedulerTagTest.class.toString());
+
     }
 
     @Before
     public void setUp() throws Exception {
+        System.out.println("Setup test case." + Thread.currentThread().getStackTrace());
         if (jobId == null) {
+            System.out.println("Setup - no jobId found: Remove all jobs from scheduler");
             scheduler = RestFuncTHelper.getScheduler();
             SchedulerState state = scheduler.getState();
             List<JobState> jobStates = new ArrayList<>();
@@ -87,18 +93,20 @@ public class RestSchedulerTagTest extends AbstractRestFuncTestCase {
                 scheduler.killJob(jobId);
                 scheduler.removeJob(jobId);
             }
-
+            System.out.println("Scheduler was cleaned.");
+            System.out.println("Submit job for test cases.");
             //submit a job with a loop and out and err outputs
             System.out.println("submit a job with loop, out and err outputs");
             jobId = submitJob("flow_loop_out.xml");
         }
+        System.out.println("Finished setup test case.");
     }
 
     private JobId submitJob(String filename) throws Exception {
         File jobFile = new File(this.getClass().getResource("config/" + filename).toURI());
         WorkflowSubmitter submitter = new WorkflowSubmitter(scheduler);
         JobId id = submitter.submit(jobFile, new HashMap<String, String>());
-        waitJobState(id, JobStatus.FINISHED, 100000);
+        waitJobState(id, JobStatus.FINISHED, 500000);
         return id;
     }
 
