@@ -5,18 +5,17 @@ import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 
 
 /**
- * extended scheduler event listener to have a dedicated method trying to recover the socket
- * connection
+ * extended scheduler event listener to notify the disconnection event
  * 
  * @author ActiveEon team
  *
  */
-public interface ConnectionRecoveredSchedulerEventListener extends SchedulerEventListener {
+public interface DisconnectionAwareSchedulerEventListener extends SchedulerEventListener {
 
     /**
-     * recover the socket connection
+     * notify the socket disconnection
      * 
      * @throws ConnectionException throw an exception if the connection cannot be done
      */
-    void recoverConnection() throws ConnectionException;
+    void notifyDisconnection();
 }
