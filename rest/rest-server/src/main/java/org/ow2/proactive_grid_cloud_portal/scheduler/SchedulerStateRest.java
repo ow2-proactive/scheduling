@@ -146,6 +146,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -802,6 +803,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new UnknownTaskRestException(e);
         }
     }
+
     /**
      * Finish a task, which is in InError state inside a job.
      *
@@ -821,9 +823,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/{taskname}/finishInErrorTask")
     @Produces("application/json")
     public boolean finishInErrorTask(@HeaderParam("sessionid") String sessionId,
-                                      @PathParam("jobid") String jobid, @PathParam("taskname") String taskname)
-            throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
-            PermissionRestException {
+            @PathParam("jobid") String jobid, @PathParam("taskname") String taskname)
+                    throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
+                    PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId,
                     "PUT jobs/" + jobid + "/tasks/" + taskname + "/finishInErrorTask");
@@ -1299,8 +1301,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     public InputStream retrieveTaskLogsUsingDataspaces(String sessionId, String jobId, TaskId taskId)
             throws PermissionRestException, IOException, NotConnectedRestException {
-        String fullTaskLogsFile = "TaskLogs-" + jobId + "-" + taskId.value() + ".log";
-        return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME, fullTaskLogsFile);
+        return pullFile(sessionId, SchedulerConstants.USERSPACE_NAME,
+                new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
     }
 
     /**
@@ -3255,6 +3257,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 @Override
                 public void onDisconnect(@SuppressWarnings("rawtypes") WebSocketEvent event) {
                     try {
+                        logger.info("#### websocket disconnected，remove listener ####");
                         scheduler.removeEventListener();
                     } catch (Exception e) {
                         logger.error(e);
