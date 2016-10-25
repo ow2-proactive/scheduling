@@ -7,8 +7,8 @@
 #
 # This function checks if the application is running
 
-cd ..
-cwd="$(pwd)"
+script_dir=$(dirname "$0")
+cwd="$script_dir/.."
 
 check_status() {
 

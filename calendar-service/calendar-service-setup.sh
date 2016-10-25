@@ -4,8 +4,8 @@
 
 ## Install required packages
 
-cd ..
-cwd="$(pwd)"
+script_dir=$(dirname "$0")
+cwd="$script_dir/.."
 radicale_version="1.1.1"
 
 ## Install radicale
