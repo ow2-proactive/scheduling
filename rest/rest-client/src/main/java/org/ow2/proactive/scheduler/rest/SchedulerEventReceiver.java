@@ -59,6 +59,7 @@ import org.atmosphere.wasync.Socket;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
 import org.ow2.proactive.scheduler.rest.utils.EventCodecUtil;
@@ -104,7 +105,15 @@ public class SchedulerEventReceiver {
         socket.on(Event.MESSAGE, notificationHandler);
         socket.on(Event.CLOSE, new Function() {
             public void on(Object t) {
-                SchedulerEventReceiver.logger.info("#### websocket connection is closed ####");
+                SchedulerEventReceiver.logger.info("#### Websocket connection is closed ####");
+                if (eventListener instanceof ConnectionRecoveredSchedulerEventListener) {
+                    try {
+                        ((ConnectionRecoveredSchedulerEventListener) eventListener).recoverConnection();
+                    } catch (ConnectionException e) {
+                        SchedulerEventReceiver.logger
+                                .error("#### Cannot recover the websocket connection ####", e);
+                    }
+                }
             }
         });
         // initialize the connection
