@@ -474,7 +474,7 @@ public class TaskData {
                 PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
         taskData.setGenericInformation(task.getGenericInformation(false));
-        taskData.setVariables(new HashMap<>());
+        taskData.setVariables(new HashMap<String, TaskDataVariable>());
         for (Map.Entry<String, TaskVariable> entry: task.getVariables().entrySet())
             taskData.getVariables().put(entry.getKey(), getTaskDataVariable(entry.getValue()));
 

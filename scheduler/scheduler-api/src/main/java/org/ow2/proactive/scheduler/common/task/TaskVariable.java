@@ -36,8 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
