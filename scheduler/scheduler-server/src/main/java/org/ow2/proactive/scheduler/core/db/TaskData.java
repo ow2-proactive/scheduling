@@ -19,6 +19,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -34,6 +35,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
+import org.jruby.ir.operands.Hash;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
@@ -44,6 +46,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
@@ -123,7 +126,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
         @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
         @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
         @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
-        @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME") })
+        @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME"),
+        @Index(name = "TASK_DATA_VARIABLE", columnList = "TASK_NAME") })
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
@@ -142,7 +146,7 @@ public class TaskData {
 
     private Map<String, String> genericInformation;
 
-    private Map<String, String> variables;
+    private Map<String, TaskDataVariable> variables;
 
     private List<SelectionScriptData> selectionScripts;
 
@@ -470,7 +474,9 @@ public class TaskData {
                 PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
         taskData.setGenericInformation(task.getGenericInformation(false));
-        taskData.setVariables(task.getVariables());
+        taskData.setVariables(new HashMap<>());
+        for (Map.Entry<String, TaskVariable> entry: task.getVariables().entrySet())
+            taskData.getVariables().put(entry.getKey(), getTaskDataVariable(entry.getValue()));
 
         // set the scheduledTime if the START_AT property exists
         Map<String, String> genericInfos = taskData.getGenericInformation();
@@ -549,6 +555,42 @@ public class TaskData {
         return taskData;
     }
 
+    private static TaskDataVariable getTaskDataVariable(TaskVariable taskVariable) {
+        if (taskVariable == null){
+            return null;
+        }
+        
+        TaskDataVariable taskDataVariable = new TaskDataVariable();
+        taskDataVariable.setJobInherited(taskVariable.isJobInherited());
+        taskDataVariable.setModel(taskVariable.getModel());
+        taskDataVariable.setValue(taskVariable.getValue());
+        taskDataVariable.setName(taskVariable.getName());
+        
+        return taskDataVariable;
+    }
+    
+    private Map<String, TaskVariable> getVariablesAsTaskVariables(){
+        Map<String, TaskVariable> variables = new HashMap<String, TaskVariable>();
+        for (Map.Entry<String, TaskDataVariable> entry: getVariables().entrySet()){
+            variables.put(entry.getKey(), getTaskVariable(entry.getValue()));
+        }
+        return variables;
+    }
+
+    private static TaskVariable getTaskVariable(TaskDataVariable taskDataVariable) {
+        if (taskDataVariable == null){
+            return null;
+        }
+        
+        TaskVariable taskVariable = new TaskVariable();
+        taskVariable.setJobInherited(taskDataVariable.isJobInherited());
+        taskVariable.setModel(taskDataVariable.getModel());
+        taskVariable.setValue(taskDataVariable.getValue());
+        taskVariable.setName(taskDataVariable.getName());
+        
+        return taskVariable;
+    }
+
     TaskId createTaskId(InternalJob internalJob) {
         return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId());
     }
@@ -591,8 +633,7 @@ public class TaskData {
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
         internalTask.setMatchingBlock(getMatchingBlock());
-        internalTask.setVariables(new HashMap<String, String>());
-        internalTask.getVariables().putAll(getVariables());
+        internalTask.setVariables(getVariablesAsTaskVariables());
 
         ForkEnvironment forkEnv = new ForkEnvironment();
         forkEnv.setJavaHome(javaHome);
@@ -647,13 +688,14 @@ public class TaskData {
         this.genericInformation = genericInformation;
     }
 
-    @Column(name = "VARIABLES", length = Integer.MAX_VALUE)
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Map<String, String> getVariables() {
+    @OneToMany(mappedBy = "taskData", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @MapKey(name="name")
+    public Map<String,TaskDataVariable> getVariables() {
         return variables;
     }
 
-    public void setVariables(Map<String, String> variables) {
+    public void setVariables(Map<String, TaskDataVariable> variables) {
         this.variables = variables;
     }
 
@@ -1127,7 +1169,7 @@ public class TaskData {
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
         taskState.setParallelEnvironment(getParallelEnvironment());
         taskState.setGenericInformation(getGenericInformation());
-        taskState.setVariables(getVariables());
+        taskState.setVariables(getVariablesAsTaskVariables());
         return taskState;
     }
 

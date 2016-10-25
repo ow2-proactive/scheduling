@@ -421,7 +421,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 // resolve script variables (if any) in the list of selection
                 // scripts and then set it as the selection criteria.
                 criteria.setScripts(resolveScriptVariables(internalTask.getSelectionScripts(), 
-                        internalTask.getVariablesOverridden(currentJob)));
+                        currentJob.getVariables()));
                 criteria.setBlackList(internalTask.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
                 criteria.setAcceptableNodesUrls(freeResources);
@@ -494,7 +494,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             } else {
                 // otherwise use the default job variables
-                variables.putAll(task.getVariablesOverridden(job));
+                variables.putAll(job.getVariables());
             }
         }
 

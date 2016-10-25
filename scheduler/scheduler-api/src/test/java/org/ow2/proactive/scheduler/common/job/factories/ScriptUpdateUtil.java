@@ -62,15 +62,11 @@ public class ScriptUpdateUtil {
      * Filters the scripts in the specified job.
      */
     public static TaskFlowJob resolveScripts(TaskFlowJob job) {
-        Map<String, String> jobVariables = job.getVariables();
+        Map<String, String> variables = job.getVariables();
         ArrayList<Task> tasks = job.getTasks();
-        for (Task task : tasks) {
-            Map<String, String> taskVariables = task.getVariables();
-            Map<String, String> variables = new HashMap<>();
-            variables.putAll(jobVariables);
-            variables.putAll(taskVariables);
-            
+        for (Task task : tasks) {            
             List<SelectionScript> selectionScripts = task.getSelectionScripts();
+            
             if (selectionScripts != null) {
                 for (SelectionScript sscript : selectionScripts) {
                     resolveScript(sscript, variables);

@@ -156,7 +156,7 @@ public abstract class Task extends CommonAttribute {
     protected ForkEnvironment forkEnvironment;
 
     /** A map to hold task variables */
-    protected ConcurrentHashMap<String, String> variables = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<String, TaskVariable> variables = new ConcurrentHashMap<>();
 
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
@@ -697,7 +697,7 @@ public abstract class Task extends CommonAttribute {
      * 
      * @param variables the variables map
      */
-    public void setVariables(Map<String, String> variables) {
+    public void setVariables(Map<String, TaskVariable> variables) {
         this.variables = new ConcurrentHashMap<>(variables);
     }
 
@@ -706,7 +706,7 @@ public abstract class Task extends CommonAttribute {
      * 
      * @return a variable map
      */
-    public Map<String, String> getVariables() {
+    public Map<String, TaskVariable> getVariables() {
         return this.variables;
     }
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,6 +17,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -143,9 +145,19 @@ public class Job2XMLTransformerTest {
     @Test
     public void checkTaskVariables() throws Exception {
         File xmlFile = tmpFolder.newFile();
-        HashMap<String, String> variablesMap = new HashMap<>();
-        variablesMap.put("name1", "value1");
-        variablesMap.put("name2", "value2");
+        Map<String, TaskVariable> variablesMap = new HashMap<>();
+        TaskVariable taskVariable1 = new TaskVariable();
+        taskVariable1.setName("name1");
+        taskVariable1.setValue("value1");
+        taskVariable1.setJobInherited(false);
+        taskVariable1.setModel("model1");
+        TaskVariable taskVariable2 = new TaskVariable();
+        taskVariable2.setName("name2");
+        taskVariable2.setValue("value2");
+        taskVariable2.setJobInherited(true);
+        taskVariable2.setModel("model2");
+        variablesMap.put(taskVariable1.getName(), taskVariable1);
+        variablesMap.put(taskVariable2.getName(), taskVariable2);
 
         TaskFlowJob job = new TaskFlowJob();
         JavaTask task = new JavaTask();
@@ -158,7 +170,10 @@ public class Job2XMLTransformerTest {
         TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(
                 xmlFile.getAbsolutePath()));
 
-        assertEquals(variablesMap, recreatedJob.getTask("task").getVariables());
+        Map<String, TaskVariable> resVariables = recreatedJob.getTask("task").getVariables();
+        assertEquals(2, resVariables.size());
+        assertEquals(taskVariable1, resVariables.get("name1"));
+        assertEquals(taskVariable2, resVariables.get("name2"));
     }
 
     @Test

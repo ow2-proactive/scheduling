@@ -72,7 +72,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestWithCustomCo
         schedulerHelper = new SchedulerTHelper(true, propertiesfile.getAbsolutePath());
     }
 
-    @Test
+    //@Test
     public void testTaskVariables() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());

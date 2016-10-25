@@ -40,16 +40,20 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.map.HashedMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -170,7 +174,11 @@ public class TestStaxJobFactory {
     @Test
     public void testTaskVariables() throws URISyntaxException, JobCreationException {
         TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("task_variables.xml"));
-        Map<String, String> variables = job.getTask("task").getVariables();
+        Map<String, TaskVariable> taskVariables = job.getTask("task").getVariables();
+        Map<String, String> variables = new HashMap<>();
+        for (TaskVariable variable: taskVariables.values()){
+            variables.put(variable.getName(), variable.getValue());
+        }
         assertExpectedKeyValueEntriesMatch(variables);
     }
 

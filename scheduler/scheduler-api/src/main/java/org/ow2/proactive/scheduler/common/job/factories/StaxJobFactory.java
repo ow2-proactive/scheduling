@@ -76,6 +76,7 @@ import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
 import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
@@ -479,6 +480,56 @@ public class StaxJobFactory extends JobFactory {
         return variablesMap;
     }
 
+     /**
+      * Create a map of variables from XML variables.
+      * Leave the method with the cursor at the end of 'ELEMENT_VARIABLES' tag
+      *
+      * @param cursorVariables the streamReader with the cursor on the 'ELEMENT_VARIABLES' tag.
+      * @return the map in which the variables were added.
+      * @throws JobCreationException
+      */
+      private Map<String, TaskVariable> createTaskVariables(XMLStreamReader cursorVariables) 
+              throws JobCreationException {
+         Map<String, TaskVariable> variablesMap = new HashMap<>();
+         try {
+             int eventType;
+             while (cursorVariables.hasNext()) {
+                 eventType = cursorVariables.next();
+                 switch (eventType) {
+                     case XMLEvent.START_ELEMENT:
+                         if (XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
+                             Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables);
+
+                             //TODO checks for data consistency
+                             TaskVariable taskVariable = new TaskVariable();
+                             taskVariable.setName(attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName()));
+                             taskVariable.setValue(attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
+                             taskVariable.setModel(attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
+                             taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
+
+                             variablesMap.put(taskVariable.getName(), taskVariable);
+                         }
+                         break;
+                     case XMLEvent.END_ELEMENT:
+                         if (XMLTags.VARIABLES.matches(cursorVariables.getLocalName())) {
+                             return variablesMap;
+                         }
+                         break;
+                 }
+             }
+         } catch (JobCreationException jce) {
+             jce.pushTag(cursorVariables.getLocalName());
+             throw jce;
+         } catch (Exception e) {
+             String attrtmp = null;
+             if (cursorVariables.isStartElement() && cursorVariables.getAttributeCount() == 1) {
+                 attrtmp = cursorVariables.getAttributeLocalName(0);
+             }
+             throw new JobCreationException(cursorVariables.getLocalName(), attrtmp, e);
+         }
+         return variablesMap;
+     }
+
     private Map<String, String> getAttributesAsMap(XMLStreamReader cursorVariables)
             throws JobCreationException {
         final ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
@@ -692,7 +743,7 @@ public class StaxJobFactory extends JobFactory {
                         if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                             tmpTask.setGenericInformation(getGenericInformation(cursorTask));
                         } else if (XMLTags.VARIABLES.matches(current)) {
-                            Map<String, String> taskVariablesMap = createVariables(cursorTask);
+                            Map<String, TaskVariable> taskVariablesMap = createTaskVariables(cursorTask);
                             tmpTask.setVariables(taskVariablesMap);
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
                             tmpTask.setDescription(getDescription(cursorTask));
