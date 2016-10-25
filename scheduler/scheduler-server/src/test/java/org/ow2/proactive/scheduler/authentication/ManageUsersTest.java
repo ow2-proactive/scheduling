@@ -34,7 +34,6 @@
  */
 package org.ow2.proactive.scheduler.authentication;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
@@ -258,11 +257,11 @@ public class ManageUsersTest extends ProActiveTest {
                     "-" + ManageUsers.KEYFILE_OPTION, publicKeyFile.getAbsolutePath()
             );
         }
-        String loginContent = IOUtils.toString(loginFile.toURI(), Charsets.UTF_8);
+        String loginContent = IOUtils.toString(loginFile.toURI());
         System.out.println("Login file content after deletion:");
         System.out.println(loginContent);
         Assert.assertTrue("login file should be empty", loginContent.trim().isEmpty());
-        String groupContent = IOUtils.toString(groupFile.toURI(), Charsets.UTF_8);
+        String groupContent = IOUtils.toString(groupFile.toURI());
         System.out.println("Group file content after deletion:");
         System.out.println(groupContent);
         Assert.assertTrue("group file should be empty", groupContent.trim().isEmpty());
@@ -270,9 +269,9 @@ public class ManageUsersTest extends ProActiveTest {
 
     private void validateContents(Map<String, String> usersToCheck, Multimap<String, String> groupsToCheck) throws IOException, KeyException {
         Properties props = new Properties();
-        try (Reader reader = new InputStreamReader(new FileInputStream(loginFile), Charsets.UTF_8)) {
+        try (Reader reader = new InputStreamReader(new FileInputStream(loginFile))) {
             props.load(reader);
-            String groupContent = IOUtils.toString(groupFile.toURI(), Charsets.UTF_8);
+            String groupContent = IOUtils.toString(groupFile.toURI());
             for (Map.Entry<String, String> user : usersToCheck.entrySet()) {
                 Assert.assertTrue("login file should contain " + user.getKey(), props.containsKey(user.getKey()));
                 String encryptedPassword = (String) props.get(user.getKey());

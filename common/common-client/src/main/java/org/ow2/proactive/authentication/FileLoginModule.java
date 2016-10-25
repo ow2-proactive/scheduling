@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.authentication;
 
-import com.google.common.base.Charsets;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
@@ -49,7 +48,12 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.Map;
@@ -226,7 +230,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         }
 
         try (FileInputStream stream = new FileInputStream(loginFile)) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             props.load(reader);
         } catch (FileNotFoundException e) {
             throw new LoginException(e.toString());
@@ -258,7 +262,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     protected void groupMembershipFromFile(String username) throws LoginException {
 
         try (FileInputStream stream = new FileInputStream(groupFile)) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             String line = null;
             while ((line = reader.readLine()) != null) {
                 String[] u2g = line.split(":");
