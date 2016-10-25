@@ -35,7 +35,6 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
-import org.jruby.ir.operands.Hash;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
