@@ -43,13 +43,3 @@ radicale -d -S
 
 echo "Radicale server started"
 
-#delete radicale folder
-cd "$cwd/calendar-service/"
-
-read -e -p "Would you like to start Calendar Service right now? (Y/N) :" input
-
-if [ "$input" == "y" ] || [ "$input" == "Y" ]; then
-	source "$cwd"/calendar-service/calendar-service.sh start
-elif [ "$input" == "n" ] || [ "$input" == "N" ]; then
-	exit 1
-fi
