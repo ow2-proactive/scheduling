@@ -34,21 +34,8 @@
  */
 package org.ow2.proactive.scheduler.task.java;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import javax.script.AbstractScriptEngine;
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -57,9 +44,20 @@ import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandalon
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
 import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.TaskScript;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.WriterOutputStream;
+
+import javax.script.AbstractScriptEngine;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 
@@ -95,9 +93,9 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
                 execInitializer.setSerializedArguments(Collections.<String, byte[]> emptyMap());
             }
 
-            if (context.getAttribute(TaskScript.CREDENTIALS_VARIABLE) != null) {
+            if (context.getAttribute(SchedulerConstants.CREDENTIALS_VARIABLE) != null) {
                 execInitializer.setThirdPartyCredentials((Map<String, String>) context
-                        .getAttribute(TaskScript.CREDENTIALS_VARIABLE));
+                        .getAttribute(SchedulerConstants.CREDENTIALS_VARIABLE));
             } else {
                 execInitializer.setThirdPartyCredentials(Collections.<String, String> emptyMap());
             }
@@ -113,7 +111,7 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             javaExecutable.internalInit(execInitializer, context);
 
             Serializable execute = javaExecutable.execute((TaskResult[]) context
-                    .getAttribute(TaskScript.RESULTS_VARIABLE));
+                    .getAttribute(SchedulerConstants.RESULTS_VARIABLE));
 
             if (propagatedVariables != null) {
                 ((Map<String, Serializable>) context.getAttribute(
