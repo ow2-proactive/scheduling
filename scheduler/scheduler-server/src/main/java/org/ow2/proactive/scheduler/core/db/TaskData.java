@@ -125,8 +125,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
         @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
         @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
         @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
-        @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME"),
-        @Index(name = "TASK_DATA_VARIABLE", columnList = "TASK_NAME") })
+        @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME") })
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
@@ -568,15 +567,15 @@ public class TaskData {
         return taskDataVariable;
     }
     
-    private Map<String, TaskVariable> getVariablesAsTaskVariables(){
+    private Map<String, TaskVariable> variablesToTaskVariables(){
         Map<String, TaskVariable> variables = new HashMap<String, TaskVariable>();
         for (Map.Entry<String, TaskDataVariable> entry: getVariables().entrySet()){
-            variables.put(entry.getKey(), getTaskVariable(entry.getValue()));
+            variables.put(entry.getKey(), variableToTaskVariable(entry.getValue()));
         }
         return variables;
     }
 
-    private static TaskVariable getTaskVariable(TaskDataVariable taskDataVariable) {
+    private static TaskVariable variableToTaskVariable(TaskDataVariable taskDataVariable) {
         if (taskDataVariable == null){
             return null;
         }
@@ -632,7 +631,7 @@ public class TaskData {
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
         internalTask.setMatchingBlock(getMatchingBlock());
-        internalTask.setVariables(getVariablesAsTaskVariables());
+        internalTask.setVariables(variablesToTaskVariables());
 
         ForkEnvironment forkEnv = new ForkEnvironment();
         forkEnv.setJavaHome(javaHome);
@@ -687,7 +686,8 @@ public class TaskData {
         this.genericInformation = genericInformation;
     }
 
-    @OneToMany(mappedBy = "taskData", fetch = FetchType.LAZY)
+    @Cascade(CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @MapKey(name="name")
     public Map<String,TaskDataVariable> getVariables() {
@@ -1168,7 +1168,7 @@ public class TaskData {
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
         taskState.setParallelEnvironment(getParallelEnvironment());
         taskState.setGenericInformation(getGenericInformation());
-        taskState.setVariables(getVariablesAsTaskVariables());
+        taskState.setVariables(variablesToTaskVariables());
         return taskState;
     }
 

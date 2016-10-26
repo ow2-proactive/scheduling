@@ -146,6 +146,7 @@ public class SchedulerDBManager {
 			configuration.addAnnotatedClass(JobData.class);
 			configuration.addAnnotatedClass(JobContent.class);
 			configuration.addAnnotatedClass(TaskData.class);
+            configuration.addAnnotatedClass(TaskDataVariable.class);
 			configuration.addAnnotatedClass(TaskResultData.class);
 			configuration.addAnnotatedClass(ScriptData.class);
 			configuration.addAnnotatedClass(SelectionScriptData.class);
