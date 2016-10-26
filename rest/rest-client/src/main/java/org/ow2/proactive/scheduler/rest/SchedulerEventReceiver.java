@@ -104,7 +104,10 @@ public class SchedulerEventReceiver {
         socket.on(Event.MESSAGE, notificationHandler);
         socket.on(Event.CLOSE, new Function() {
             public void on(Object t) {
-                SchedulerEventReceiver.logger.info("#### websocket connection is closed ####");
+                SchedulerEventReceiver.logger.info("#### Websocket connection is closed ####");
+                if (eventListener instanceof DisconnectionAwareSchedulerEventListener) {
+                    ((DisconnectionAwareSchedulerEventListener) eventListener).notifyDisconnection();
+                }
             }
         });
         // initialize the connection

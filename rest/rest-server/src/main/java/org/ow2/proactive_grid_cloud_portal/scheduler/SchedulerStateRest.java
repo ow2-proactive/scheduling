@@ -1124,7 +1124,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates")
     @Produces("application/json")
-    public RestPage getJobTaskStates(@HeaderParam("sessionid") String sessionId,
+    public RestPage<TaskStateData> getJobTaskStates(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         return getJobTaskStatesPaginated(sessionId, jobId, 0, TASKS_PAGE_SIZE);
@@ -1148,7 +1148,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/paginated")
     @Produces("application/json")
-    public RestPage getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
+    public RestPage<TaskStateData> getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
@@ -1159,7 +1159,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTasksPaginated(offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage(tasks, page.getSize());
+            return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1186,7 +1186,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}")
     @Produces("application/json")
-    public RestPage getJobTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
+    public RestPage<TaskStateData> getJobTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
@@ -1194,7 +1194,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, 0, TASKS_PAGE_SIZE);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage(tasks, page.getSize());
+            return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1212,7 +1212,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
     @Produces("application/json")
-    public RestPage getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
+    public RestPage<TaskStateData> getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit)
@@ -1224,7 +1224,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage(tasks, page.getSize());
+            return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -3311,11 +3311,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
         }
         return variables;
-    }
-
-    private boolean isXmlWorkflow(InputPart fileInputPart) {
-        return fileInputPart.getMediaType().toString().toLowerCase()
-                .contains(MediaType.APPLICATION_XML.toLowerCase());
     }
 
     protected static Map<String, String> createSortableTaskAttrMap() {
