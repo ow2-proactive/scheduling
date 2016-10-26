@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="urn:proactive:jobdescriptor:3.6" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:jd="urn:proactive:jobdescriptor:3.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="urn:proactive:jobdescriptor:3.7" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:jd="urn:proactive:jobdescriptor:3.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <ref name="job"/>
   </start>
@@ -211,7 +211,7 @@
         <ref name="taskDescription"/>
       </optional>
       <optional>
-        <ref name="variables"/>
+        <ref name="taskVariables"/>
       </optional>
       <optional>
         <ref name="genericInformation"/>
@@ -253,6 +253,47 @@
     <attribute name="name">
       <doc:documentation>Identification of this task (identifier) </doc:documentation>
       <data type="ID"/>
+    </attribute>
+  </define>
+  <define name="taskVariables">
+    <element name="variables">
+      <doc:documentation>Definition of variables which can be used throughout the task</doc:documentation>
+      <oneOrMore>
+        <ref name="taskVariable"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="taskVariable">
+    <element name="variable">
+      <doc:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</doc:documentation>
+      <ref name="taskVariableName"/>
+      <ref name="taskVariableValue"/>
+      <ref name="taskVariableInheritance"/>
+      <ref name="taskVariableModel"/>
+    </element>
+  </define>
+  <define name="taskVariableName">
+    <attribute name="name">
+      <doc:documentation>Name of a variable</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="taskVariableValue">
+    <attribute name="value">
+      <doc:documentation>The patterns ${variable_name} will be replaced by this value</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="taskVariableInheritance">
+    <attribute name="inherited">
+      <doc:documentation>States whether variable value is inherited from parents</doc:documentation>
+      <data type="boolean"/>
+    </attribute>
+  </define>
+  <define name="taskVariableModel">
+    <attribute name="model">
+      <doc:documentation>Variable type</doc:documentation>
+      <data type="string"/>
     </attribute>
   </define>
   <define name="nodesNumber_t">

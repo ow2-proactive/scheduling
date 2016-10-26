@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.6" xmlns:jd="urn:proactive:jobdescriptor:3.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.7" xmlns:jd="urn:proactive:jobdescriptor:3.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <xs:import namespace="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="xsi.xsd"/>
   <xs:element name="job">
     <xs:annotation>
@@ -7,7 +7,7 @@
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" ref="jd:variables"/>
+        <xs:group minOccurs="0" ref="jd:variables"/>
         <xs:group minOccurs="0" ref="jd:jobDescription"/>
         <xs:element minOccurs="0" ref="jd:genericInformation"/>
         <xs:element minOccurs="0" ref="jd:inputSpace"/>
@@ -64,14 +64,18 @@
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
-  <xs:element name="variables">
-    <xs:annotation>
-      <xs:documentation>Definition of variables which can be reused throughout this descriptor</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:group maxOccurs="unbounded" ref="jd:variable"/>
-    </xs:complexType>
-  </xs:element>
+  <xs:group name="variables">
+    <xs:sequence>
+      <xs:element name="variables">
+        <xs:annotation>
+          <xs:documentation>Definition of variables which can be reused throughout this descriptor</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:group maxOccurs="unbounded" ref="jd:variable"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
   <xs:group name="variable">
     <xs:sequence>
       <xs:element name="variable">
@@ -214,7 +218,7 @@
         <xs:complexType>
           <xs:sequence>
             <xs:group minOccurs="0" ref="jd:taskDescription"/>
-            <xs:element minOccurs="0" ref="jd:variables"/>
+            <xs:group minOccurs="0" ref="jd:taskVariables"/>
             <xs:element minOccurs="0" ref="jd:genericInformation"/>
             <xs:element minOccurs="0" ref="jd:depends"/>
             <xs:element minOccurs="0" ref="jd:inputFiles"/>
@@ -306,6 +310,61 @@
     <xs:attribute name="name" use="required" type="xs:ID">
       <xs:annotation>
         <xs:documentation>Identification of this task (identifier) </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="taskVariables">
+    <xs:sequence>
+      <xs:element name="variables">
+        <xs:annotation>
+          <xs:documentation>Definition of variables which can be used throughout the task</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:group maxOccurs="unbounded" ref="jd:taskVariable"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="taskVariable">
+    <xs:sequence>
+      <xs:element name="variable">
+        <xs:annotation>
+          <xs:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attributeGroup ref="jd:taskVariableName"/>
+          <xs:attributeGroup ref="jd:taskVariableValue"/>
+          <xs:attributeGroup ref="jd:taskVariableInheritance"/>
+          <xs:attributeGroup ref="jd:taskVariableModel"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="taskVariableName">
+    <xs:attribute name="name" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of a variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="taskVariableValue">
+    <xs:attribute name="value" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The patterns ${variable_name} will be replaced by this value</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="taskVariableInheritance">
+    <xs:attribute name="inherited" use="required" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>States whether variable value is inherited from parents</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="taskVariableModel">
+    <xs:attribute name="model" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Variable type</xs:documentation>
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
