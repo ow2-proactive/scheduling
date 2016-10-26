@@ -214,7 +214,7 @@ dependencies {
     nativeBundle 'net.sf.jpam:libjpam:1.1-proactive:native'
 
     compile 'org.codehaus.groovy:groovy-all:2.4.6'
-    compile 'commons-io:commons-io:2.4'
+    compile 'commons-io:commons-io:2.5'
 }
 
 task dist(type: Sync) {

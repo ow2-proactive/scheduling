@@ -146,7 +146,7 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
         Map<String, TaskResult> results = jobResult.getAllResults();
         for (String taskName : expectedOutput.keySet()) {
 
-            File taskLog = new File(userPath, String.format("TaskLogs-%s-%s.log", jobId.value(), results.get(
+            File taskLog = new File(userPath + "/" +jobId.value(), String.format("TaskLogs-%s-%s.log", jobId.value(), results.get(
                     taskName).getTaskId().value()));
             if (!taskLog.exists()) {
                 Assert.fail("Task log file " + taskLog.getAbsolutePath() + " doesn't exist");

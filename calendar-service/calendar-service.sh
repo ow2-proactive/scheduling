@@ -7,8 +7,8 @@
 #
 # This function checks if the application is running
 
-cd ..
-cwd="$(pwd)"
+script_dir=$(dirname "$0")
+cwd="$script_dir/.."
 
 check_status() {
 
@@ -39,13 +39,8 @@ start() {
 
     #copy scheduler users to radicale server
     loginFile="$cwd/config/authentication/login.cfg"
-    rm -rf ~/.config/radicale/users
-    touch ~/.config/radicale/users
 
-    while IFS=':' read -r user password
-    do
-        htpasswd -bs ~/.config/radicale/users "$user" "$password"    
-    done < "$loginFile"
+    cat "$loginFile" > ~/.config/radicale/users
 
     # Redirects default and error output to a log file
     java -Dpa.scheduler.home="$cwd" -Dspring.config.location="$cwd/config/calendar-service/application.properties" -jar "$cwd"/calendar-service/calendar-service*.jar > /dev/null 2>&1 &

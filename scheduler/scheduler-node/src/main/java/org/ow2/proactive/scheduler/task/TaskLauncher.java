@@ -36,7 +36,17 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import com.google.common.base.Stopwatch;
+import java.io.File;
+import java.io.Serializable;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -54,6 +64,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
@@ -66,16 +77,7 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
 
-import java.io.File;
-import java.io.Serializable;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.google.common.base.Stopwatch;
 
 
 /**
@@ -89,8 +91,7 @@ import java.util.concurrent.TimeUnit;
 public class TaskLauncher implements InitActive {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
-    final private TaskContextVariableExtractor taskContextVariableExtractor
-            = new TaskContextVariableExtractor();
+    final private TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
     private TaskLauncherFactory factory;
 
     private TaskId taskId;
@@ -157,15 +158,18 @@ public class TaskLauncher implements InitActive {
             addShutdownHook();
             // lock the cache space cleaning mechanism
             DataSpaceNodeConfigurationAgent.lockCacheSpaceCleaning();
-            dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService(), executableContainer.isRunAsUser());
+            dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService(),
+                    executableContainer.isRunAsUser());
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
             TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-                    new NodeDataSpacesURIs(dataspaces.getScratchURI(), dataspaces.getCacheURI(), dataspaces.getInputURI(), dataspaces.getOutputURI(), dataspaces.getUserURI(), dataspaces.getGlobalURI()), progressFileReader.getProgressFile()
-                    .toString(), getHostname(), decrypter);
+                new NodeDataSpacesURIs(dataspaces.getScratchURI(), dataspaces.getCacheURI(),
+                    dataspaces.getInputURI(), dataspaces.getOutputURI(), dataspaces.getUserURI(),
+                    dataspaces.getGlobalURI()),
+                progressFileReader.getProgressFile().toString(), getHostname(), decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
@@ -179,8 +183,8 @@ public class TaskLauncher implements InitActive {
 
             wallTimer.start();
 
-            dataspaces.copyInputDataToScratch(initializer
-                    .getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
+            dataspaces
+                    .copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
 
             if (decrypter != null) {
                 decrypter.setCredentials(executableContainer.getCredentials());
@@ -202,8 +206,8 @@ public class TaskLauncher implements InitActive {
                     return;
             }
 
-            dataspaces.copyScratchDataToOutput(initializer.getFilteredOutputFiles(fileSelectorsFilters(
-                    context, taskResult)));
+            dataspaces.copyScratchDataToOutput(
+                    initializer.getFilteredOutputFiles(fileSelectorsFilters(context, taskResult)));
 
             wallTimer.stop();
 
@@ -226,7 +230,7 @@ public class TaskLauncher implements InitActive {
                     logger.info("Failed to execute task", taskFailure);
                     taskFailure.printStackTrace(taskLogger.getErrorSink());
                     taskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(),
-                            taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+                        taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
                     sendResultToScheduler(terminateNotification, taskResult);
             }
         } finally {
@@ -264,7 +268,7 @@ public class TaskLauncher implements InitActive {
 
     private TaskResultImpl getWalltimedTaskResult(Stopwatch taskStopwatchForFailures) {
         String message = "Walltime of " + initializer.getWalltime() + " ms reached on task " +
-                taskId.getReadableName();
+            taskId.getReadableName();
 
         return getTaskResult(taskStopwatchForFailures, new WalltimeExceededException(message));
     }
@@ -273,7 +277,7 @@ public class TaskLauncher implements InitActive {
         taskLogger.getErrorSink().println(exception.getMessage());
 
         return new TaskResultImpl(taskId, exception, taskLogger.getLogs(),
-                taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+            taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)
@@ -288,8 +292,11 @@ public class TaskLauncher implements InitActive {
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
         if (initializer.isPreciousLogs()) {
             try {
-                dataspaces.copyScratchDataToOutput(Collections.singletonList(new OutputSelector(
-                        new FileSelector(taskLogFile.getName()), OutputAccessMode.TransferToUserSpace)));
+                FileSelector taskLogFileSelector = new FileSelector(taskLogFile.getName());
+                taskLogFileSelector
+                        .setIncludes(new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
+                dataspaces.copyScratchDataToOutput(Collections.singletonList(
+                        new OutputSelector(taskLogFileSelector, OutputAccessMode.TransferToUserSpace)));
             } catch (FileSystemException e) {
                 logger.warn("Cannot copy logs of task to user data spaces", e);
             }
@@ -323,9 +330,8 @@ public class TaskLauncher implements InitActive {
                 logger.debug("Successfully notified task termination " + taskId);
                 return;
             } catch (Throwable t) {
-                logger.warn(
-                        "Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms",
-                        t);
+                logger.warn("Cannot notify task termination " + taskId + ", will try again in " +
+                    pingPeriodMs + " ms", t);
 
                 if (i != pingAttempts - 1) {
                     try {
@@ -338,7 +344,7 @@ public class TaskLauncher implements InitActive {
         }
 
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
-                " attempts, terminating task launcher now");
+            " attempts, terminating task launcher now");
     }
 
     private boolean isNodeShuttingDown() {
