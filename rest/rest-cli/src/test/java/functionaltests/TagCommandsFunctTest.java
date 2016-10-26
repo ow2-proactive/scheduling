@@ -7,26 +7,32 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
-/**
- * Created by Sandrine on 18/09/2015.
- */
 public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
 
     private static JobId jobId = null;
 
+    /**
+     * Very large jobId, very probably not existent, in this test env.
+     */
+    private static long NOT_EXISTENT_JOBID = 234454567;
 
 
     @BeforeClass
     public static void beforeClass() throws Exception {
+        System.out.println("Init class: " + TagCommandsFunctTest.class);
         init();
+        System.out.println("Finished init class: " + TagCommandsFunctTest.class);
     }
 
     @Before
     public void setUp() throws Exception {
+        System.out.println("Setup test case for class: " + TagCommandsFunctTest.class);
         synchronized (TagCommandsFunctTest.class) {
+            System.out.println("Synchronized");
             super.setUp();
             if (jobId == null) {
+                System.out.println("JobId was null");
                 cleanScheduler();
 
                 //submit a job with a loop and out and err outputs
@@ -35,12 +41,13 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
                 System.out.println("Job " + jobId + " finished");
             }
         }
+        System.out.println("Finished setup test case");
     }
 
 
     @Test
     public void testListJobTaskIds() throws Exception {
-        typeLine("listtasks(1)");
+        typeLine("listtasks(+" + jobId.longValue() + ")");
 
         runCli();
 
@@ -61,7 +68,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListJobTaskIdsWithTag() throws Exception {
-        typeLine("listtasks(1, 'LOOP-T2-1')");
+        typeLine("listtasks(" + jobId.longValue() + ", 'LOOP-T2-1')");
 
         runCli();
 
@@ -82,7 +89,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListJobTaskIdsWithUnknownTag() throws Exception {
-        typeLine("listtasks(1, 'unknownTag')");
+        typeLine("listtasks(" + jobId.longValue() + ", 'unknownTag')");
 
         runCli();
 
@@ -103,7 +110,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListJobTaskIdsUnknownJob() throws Exception {
-        typeLine("listtasks(2, 'unknownTag')");
+        typeLine("listtasks(" + NOT_EXISTENT_JOBID + ", 'unknownTag')");
 
         runCli();
 
@@ -124,7 +131,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListTaskStates() throws Exception {
-        typeLine("taskstates(1)");
+        typeLine("taskstates(" + jobId.longValue() + ")");
 
         runCli();
 
@@ -145,7 +152,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListTaskStateWithTag() throws Exception {
-        typeLine("taskstates(1, 'LOOP-T2-1')");
+        typeLine("taskstates(" + jobId.longValue() + ", 'LOOP-T2-1')");
 
         runCli();
 
@@ -166,7 +173,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListTaskStatesWithUnknownTag() throws Exception {
-        typeLine("taskstates(1, 'unknownTag')");
+        typeLine("taskstates(" + jobId.longValue() + ", 'unknownTag')");
 
         runCli();
 
@@ -187,7 +194,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListTaskStatesUnknownJob() throws Exception {
-        typeLine("taskstates(2, 'unknownTag')");
+        typeLine("taskstates(" + NOT_EXISTENT_JOBID + ", 'unknownTag')");
 
         runCli();
 
@@ -207,10 +214,9 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
     }
 
 
-
     @Test
     public void testJobOutput() throws Exception {
-        typeLine("joboutput(1)");
+        typeLine("joboutput(" + jobId.longValue() + ")");
 
         runCli();
 
@@ -229,7 +235,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testJobOutputWithTag() throws Exception {
-        typeLine("joboutput(1, 'LOOP-T2-1')");
+        typeLine("joboutput(" + jobId.longValue() + ", 'LOOP-T2-1')");
 
         runCli();
 
@@ -248,7 +254,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testJobOutputWithUnknownTag() throws Exception {
-        typeLine("joboutput(1, 'unknownTag')");
+        typeLine("joboutput(" + jobId.longValue() + ", 'unknownTag')");
 
         runCli();
 
@@ -264,7 +270,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListJobOutputUnknownJob() throws Exception {
-        typeLine("joboutput(2, 'unknownTag')");
+        typeLine("joboutput(" + NOT_EXISTENT_JOBID + ", 'unknownTag')");
 
         runCli();
 
@@ -278,7 +284,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testJobResult() throws Exception {
-        typeLine("jobresult(1)");
+        typeLine("jobresult(" + jobId.longValue() + ")");
 
         runCli();
 
@@ -299,7 +305,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testJobResultWithTag() throws Exception {
-        typeLine("jobresult(1, 'LOOP-T2-1')");
+        typeLine("jobresult(" + jobId.longValue() + ", 'LOOP-T2-1')");
 
         runCli();
 
@@ -320,7 +326,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testJobResultWithUnknownTag() throws Exception {
-        typeLine("jobresult(1, 'unknownTag')");
+        typeLine("jobresult(" + jobId.longValue() + ", 'unknownTag')");
 
         runCli();
 
@@ -341,7 +347,7 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testListJobResultUnknownJob() throws Exception {
-        typeLine("jobresult(2, 'unknownTag')");
+        typeLine("jobresult(" + NOT_EXISTENT_JOBID + ", 'unknownTag')");
 
         runCli();
 

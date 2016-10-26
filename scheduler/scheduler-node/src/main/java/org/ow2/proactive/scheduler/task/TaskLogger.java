@@ -133,7 +133,8 @@ public class TaskLogger {
 
         File logFile = new File(pathToFolder, new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
 
-        FileUtils.forceMkdirParent(logFile);
+        logFile.getParentFile().mkdirs();
+        
         FileUtils.touch(logFile);
 
         logFile.setWritable(true, false);
