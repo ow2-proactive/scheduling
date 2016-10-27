@@ -1,10 +1,6 @@
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -24,6 +20,11 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 
 @Ignore
@@ -199,10 +200,12 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
 
     @Test
     public void testResult() throws Throwable {
+        Map<String, String> metadata = ImmutableMap.of("key1", "value1", "key2", "value2");
         InternalJob job = saveSingleTask(createDefaultTask("task"));
         TaskResultImpl result = new TaskResultImpl(null, new TestResult(10, "12345"), null, 0);
         String previewer = "org.ow2.proactive.scheduler.common.org.ow2.proactive.scheduler.common.ClassName";
         result.setPreviewerClassName(previewer);
+        result.setMetadata(metadata);
         InternalTask task = (InternalTask) job.getTasks().get(0);
         System.out.println("Add task result");
         dbManager.updateAfterTaskFinished(job, task, result);
@@ -218,6 +221,7 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
         Assert.assertEquals("12345", value.getB());
         Assert.assertEquals(previewer, restoredResult.getPreviewerClassName());
         Assert.assertNull(restoredResult.getAction());
+        Assert.assertEquals(metadata, restoredResult.getMetadata());
     }
 
     @Test

@@ -47,7 +47,6 @@ import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.TaskScript;
 
 import java.io.PrintStream;
 import java.io.Serializable;
@@ -74,14 +73,16 @@ public class ForkedTaskVariablesManager implements Serializable {
 
 
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext,
-                                           Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client, RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient) {
+                                           Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client, RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
         scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, taskContext.getInitializer().getGenericInformation());
 
-        scriptHandler.addBinding(TaskScript.RESULTS_VARIABLE, tasksResults(taskContext));
+        scriptHandler.addBinding(SchedulerConstants.RESULTS_VARIABLE, tasksResults(taskContext));
 
-        scriptHandler.addBinding(TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
+        scriptHandler.addBinding(SchedulerConstants.RESULT_METADATA_VARIABLE, resultMetadata);
+
+        scriptHandler.addBinding(SchedulerConstants.CREDENTIALS_VARIABLE, thirdPartyCredentials);
         if (client != null) {
             scriptHandler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, client);
             scriptHandler.addBinding(SchedulerConstants.DS_USER_API_BINDING_NAME, userSpaceClient);

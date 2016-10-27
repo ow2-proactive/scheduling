@@ -36,14 +36,12 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import javax.swing.JPanel;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -87,6 +85,19 @@ public interface TaskResult extends Serializable {
      * @return the value of the task, null if an exception occurred.
      */
     byte[] getSerializedValue();
+
+    /**
+     * Get metadata associated with this result.
+     *
+     * Metadata let the task add additional information bound to the result.
+     * It is the responsibility of the business-code to define the metadata semantics.
+     *
+     * For example, if the result contains binary data, the metadata map could contain the binary content type,
+     * or the name of the file if the result needs to be written on disk.
+     *
+     * @return a map of metadata
+     */
+    Map<String, String> getMetadata();
 
     /**
      * If a FlowScript was executed on this task, its result

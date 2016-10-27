@@ -57,14 +57,6 @@ public class TaskScript extends Script<Serializable> {
      * of a script task.
      */
     public static final String RESULT_VARIABLE = "result";
-    /**
-     * The variable name to access results from dependent tasks (an array).
-     */
-    public static final String RESULTS_VARIABLE = "results";
-    /**
-     * The variable name to access the user's third party credentials.
-     */
-    public static final String CREDENTIALS_VARIABLE = "credentials";
 
     public TaskScript(Script script) throws InvalidScriptException {
         super(script);
