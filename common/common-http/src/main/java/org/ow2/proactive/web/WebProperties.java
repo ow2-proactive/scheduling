@@ -67,6 +67,13 @@ public final class WebProperties {
 
     public static final String WEB_REDIRECT_HTTP_TO_HTTPS = "web.redirect_http_to_https";
 
+    public static final String METADATA_CONTENT_TYPE = "content.type";
+
+    public static final String METADATA_FILE_NAME = "file.name";
+
+    public static final String METADATA_FILE_EXTENSION = "file.extension";
+
+
     private WebProperties() {
 
     }
