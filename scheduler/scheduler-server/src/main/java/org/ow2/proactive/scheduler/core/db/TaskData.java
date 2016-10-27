@@ -568,11 +568,11 @@ public class TaskData {
     }
     
     private Map<String, TaskVariable> variablesToTaskVariables(){
-        Map<String, TaskVariable> variables = new HashMap<String, TaskVariable>();
+        Map<String, TaskVariable> taskVariables = new HashMap<String, TaskVariable>();
         for (Map.Entry<String, TaskDataVariable> entry: getVariables().entrySet()){
-            variables.put(entry.getKey(), variableToTaskVariable(entry.getValue()));
+            taskVariables.put(entry.getKey(), variableToTaskVariable(entry.getValue()));
         }
-        return variables;
+        return taskVariables;
     }
 
     private static TaskVariable variableToTaskVariable(TaskDataVariable taskDataVariable) {

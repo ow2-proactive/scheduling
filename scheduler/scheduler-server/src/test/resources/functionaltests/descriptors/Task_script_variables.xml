@@ -15,14 +15,13 @@
     </description>
     <taskFlow>
         <task name="taskVariables">
-            <description>Task with multiple scripts which uses variables</description>
 		    <variables>
-		        <variable name="TESTVAR0" value="testvartask0"/>
-		        <variable name="TESTVAR1" value="testvartask1"/>
-		        <variable name="TESTVAR2" value="testvartask2"/>
-		        <variable name="TESTVAR3" value="testvartask3"/>
-		        <variable name="TESTVAR4" value="testvartask4"/>
-		        <variable name="TESTVAR5" value="testvartask5"/>
+		        <variable name="TESTVAR0" value="testvartask0" inherited="false" model=""/>
+		        <variable name="TESTVAR1" value="testvartask1" inherited="false" model=""/>
+		        <variable name="TESTVAR2" value="testvartask2" inherited="false" model=""/>
+		        <variable name="TESTVAR3" value="testvartask3" inherited="false" model=""/>
+		        <variable name="TESTVAR4" value="testvartask4" inherited="false" model=""/>
+		        <variable name="TESTVAR5" value="testvartask5" inherited="false" model=""/>
 		    </variables>
 			<selection>
 				<script>

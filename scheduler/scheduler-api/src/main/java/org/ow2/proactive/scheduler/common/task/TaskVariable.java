@@ -62,6 +62,7 @@ public class TaskVariable  {
 
     /** ProActive default constructor */
     public TaskVariable() {
+        super();
     }
 
     public String getName() {

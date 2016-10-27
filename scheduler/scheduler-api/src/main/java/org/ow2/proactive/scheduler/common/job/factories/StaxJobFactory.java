@@ -495,26 +495,18 @@ public class StaxJobFactory extends JobFactory {
              int eventType;
              while (cursorVariables.hasNext()) {
                  eventType = cursorVariables.next();
-                 switch (eventType) {
-                     case XMLEvent.START_ELEMENT:
-                         if (XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
-                             Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables);
+                 if (eventType == XMLEvent.START_ELEMENT && XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
+                     Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables);
 
-                             //TODO checks for data consistency
-                             TaskVariable taskVariable = new TaskVariable();
-                             taskVariable.setName(attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName()));
-                             taskVariable.setValue(attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
-                             taskVariable.setModel(attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
-                             taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
+                     TaskVariable taskVariable = new TaskVariable();
+                     taskVariable.setName(attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName()));
+                     taskVariable.setValue(attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
+                     taskVariable.setModel(attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
+                     taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
 
-                             variablesMap.put(taskVariable.getName(), taskVariable);
-                         }
-                         break;
-                     case XMLEvent.END_ELEMENT:
-                         if (XMLTags.VARIABLES.matches(cursorVariables.getLocalName())) {
-                             return variablesMap;
-                         }
-                         break;
+                     variablesMap.put(taskVariable.getName(), taskVariable);
+                 }else if (eventType == XMLEvent.END_ELEMENT && XMLTags.VARIABLES.matches(cursorVariables.getLocalName())){
+                     return variablesMap;
                  }
              }
          } catch (JobCreationException jce) {
