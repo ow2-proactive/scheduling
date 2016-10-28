@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
@@ -50,7 +52,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TaskVariable  {
+public class TaskVariable implements Serializable {
 
     private String name;
 
@@ -62,7 +64,7 @@ public class TaskVariable  {
 
     /** ProActive default constructor */
     public TaskVariable() {
-        super();
+        //Empty constructor
     }
 
     public String getName() {

@@ -41,6 +41,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -48,8 +49,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
-
-import com.sun.source.tree.AssertTree;
 
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
@@ -72,14 +71,14 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestWithCustomCo
         schedulerHelper = new SchedulerTHelper(true, propertiesfile.getAbsolutePath());
     }
 
-    //@Test
+    @Test
     public void testTaskVariables() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
                 new File(jobDescriptor.toURI()).getAbsolutePath());
-
+        
         JobId id = schedulerHelper.submitJob(job);
         schedulerHelper.waitForEventJobFinished(id);  
-        
+
         //Wait for cleaning scripts to be executed
         Thread.sleep(2000);
 

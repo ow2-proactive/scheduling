@@ -189,7 +189,7 @@ final class TerminationData {
                 getResultsFromListOfTaskResults(variables, taskResults);
             } else {
                 if (internalJob != null)
-                    variables.putAll(internalJob.getVariables());
+                    variables.putAll(taskData.getTask().getVariablesOverriden(internalJob));
             }
             variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(false));
         } else if (taskResult.hadException()) {

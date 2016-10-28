@@ -1051,7 +1051,7 @@ public abstract class InternalTask extends TaskState {
             tli.setWalltime(wallTime);
         }
         tli.setPreciousLogs(isPreciousLogs());
-        tli.setVariables(job.getVariables());
+        tli.setVariables(getVariablesOverriden(job));
 
         tli.setPingPeriod(PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt());
         tli.setPingAttempts(PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt());

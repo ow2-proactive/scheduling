@@ -38,7 +38,6 @@ package org.ow2.proactive.scheduler.common.job.factories;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,9 +61,9 @@ public class ScriptUpdateUtil {
      * Filters the scripts in the specified job.
      */
     public static TaskFlowJob resolveScripts(TaskFlowJob job) {
-        Map<String, String> variables = job.getVariables();
         ArrayList<Task> tasks = job.getTasks();
         for (Task task : tasks) {            
+            Map<String, String> variables = task.getVariablesOverriden(job);
             List<SelectionScript> selectionScripts = task.getSelectionScripts();
             
             if (selectionScripts != null) {
