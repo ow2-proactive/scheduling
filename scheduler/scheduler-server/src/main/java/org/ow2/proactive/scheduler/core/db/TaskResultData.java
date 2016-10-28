@@ -61,10 +61,12 @@ public class TaskResultData {
 
     private TaskLogs logs;
 
+    private Map<String, String> metadata;
+
     TaskResultImpl toTaskResult(TaskId taskId) {
 
         TaskResultImpl result = new TaskResultImpl(taskId, getSerializedValue(), getSerializedException(),
-                getLogs(), getPropagatedVariables());
+                getLogs(), getMetadata(), getPropagatedVariables());
 
         result.setPreviewerClassName(getPreviewerClassName());
         FlowActionData actionData = getFlowAction();
@@ -85,6 +87,7 @@ public class TaskResultData {
         resultData.setTaskRuntimeData(taskRuntimeData);
         resultData.setLogs(result.getOutput());
         resultData.setPreviewerClassName(result.getPreviewerClassName());
+        resultData.setMetadata(result.getMetadata());
         resultData.setPropagatedVariables(result.getPropagatedVariables());
         resultData.setSerializedException(result.getSerializedException());
         resultData.setSerializedValue(result.getSerializedValue());
@@ -188,6 +191,16 @@ public class TaskResultData {
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, byte[]> getPropagatedVariables() {
         return propagatedVariables;
+    }
+
+    @Column(name = "METADATA", length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
     }
 
     public void setPropagatedVariables(Map<String, byte[]> executionVariables) {

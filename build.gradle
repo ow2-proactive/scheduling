@@ -69,8 +69,6 @@ allprojects {
         repositories.add(it)
     }
 
-
-
     uploadArchives {
         repositories {
             mavenDeployer {
@@ -125,6 +123,7 @@ configure(javaSubprojects) {
         if(Boolean.valueOf(System.getProperty("java.awt.headless"))){
             exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
         }
+        systemProperty 'file.encoding', 'UTF-8'
     }
 
     task serialver(type: serialver.InsertSerialVersionUIDTask) {

@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.task;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -8,6 +9,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -139,6 +141,26 @@ public class InProcessTaskExecutorTest {
     }
 
     @Test
+    public void resultMetadata() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        Map<String, String> metadata = ImmutableMap.of("pre", "pre", "post", "post", "task", "task");
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setPreScript(new SimpleScript(SchedulerConstants.RESULT_METADATA_VARIABLE + ".put('pre','pre')", "groovy"));
+        initializer.setPostScript(new SimpleScript(SchedulerConstants.RESULT_METADATA_VARIABLE + ".put('post','post')", "groovy"));
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
+
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
+                new ScriptExecutableContainer(new TaskScript(
+                        new SimpleScript(SchedulerConstants.RESULT_METADATA_VARIABLE + ".put('task','task')",
+                                "groovy"))),
+                initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream, taskOutput.error);
+
+        assertEquals(metadata, result.getMetadata());
+    }
+
+    @Test
     public void variablesPropagation() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
@@ -172,7 +194,7 @@ public class InProcessTaskExecutorTest {
         variablesFromParent.put("var", "parent");
         variablesFromParent.put(SchedulerVars.PA_TASK_ID.toString(), "1234");
 
-        TaskResult[] previousTasksResults = { new TaskResultImpl(null, null, null, null,
+        TaskResult[] previousTasksResults = {new TaskResultImpl(null, null, null, null, null,
                 SerializationUtil.serializeVariableMap(variablesFromParent)) };
 
         new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(

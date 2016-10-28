@@ -998,6 +998,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return a list of task' states of the job <code>jobId</code> filtered by
      *         a given tag, for a given pagination.
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/paginated")
@@ -1124,7 +1125,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates")
     @Produces("application/json")
-    public RestPage getJobTaskStates(@HeaderParam("sessionid") String sessionId,
+    public RestPage<TaskStateData> getJobTaskStates(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         return getJobTaskStatesPaginated(sessionId, jobId, 0, TASKS_PAGE_SIZE);
@@ -1148,7 +1149,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/paginated")
     @Produces("application/json")
-    public RestPage getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
+    public RestPage<TaskStateData> getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
@@ -1159,7 +1160,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTasksPaginated(offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage(tasks, page.getSize());
+            return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1186,7 +1187,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}")
     @Produces("application/json")
-    public RestPage getJobTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
+    public RestPage<TaskStateData> getJobTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
                     throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
@@ -1194,7 +1195,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, 0, TASKS_PAGE_SIZE);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage(tasks, page.getSize());
+            return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1212,7 +1213,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
     @Produces("application/json")
-    public RestPage getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
+    public RestPage<TaskStateData> getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("-1") int limit)
@@ -1224,7 +1225,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage(tasks, page.getSize());
+            return new RestPage<TaskStateData>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1390,7 +1391,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the tag used to filter the tasks.
      * @return the value of the task result
      */
-
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/value")
@@ -1429,6 +1430,62 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
         }
         return value;
+    }
+
+    /**
+     * Returns the metadata of the task result of task <code>taskName</code> of the
+     * job <code>jobId</code>.
+     *
+     * Metadata is a map containing additional information associated with a result. For example a file name if the result represents a file.
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            the id of the job
+     * @param taskname
+     *            the name of the task
+     * @return the metadata of the task result
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/{taskname}/result/metadata")
+    @Produces("*/*")
+    public Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+                                                    @PathParam("taskname") String taskname) throws Throwable {
+        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/value");
+        TaskResult taskResult = s.getTaskResult(jobId, taskname);
+        taskResult = PAFuture.getFutureValue(taskResult);
+        return taskResult.getMetadata();
+    }
+
+    /**
+     * Returns the metadata of the task result of task <code>taskName</code> of the
+     * job <code>jobId</code>filtered by a given tag.
+     * <p>
+     * Metadata is a map containing additional information associated with a result. For example a file name if the result represents a file.
+     *
+     * @param sessionId a valid session id
+     * @param jobId     the id of the job
+     * @param taskTag   the tag used to filter the tasks.
+     * @return a map containing for each task entry, the metadata of the task result
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/metadata")
+    @Produces("application/json")
+    public Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
+                                                                      @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
+        Scheduler s = checkAccess(sessionId,
+                "jobs/" + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
+        List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
+        Map<String, Map<String, String>> result = new HashMap<>(trs.size());
+        for (TaskResult currentResult : trs) {
+            TaskResult r = PAFuture.getFutureValue(currentResult);
+            result.put(r.getTaskId().getReadableName(), r.getMetadata());
+        }
+        return result;
     }
 
     /**
@@ -1472,6 +1529,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return the values of the set of tasks result as a byte array, indexed by
      *         the readable name of the task.
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue")
@@ -1544,6 +1602,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the tag used to filter the tasks.
      * @return the task results of the set of tasks filtered by the given tag.
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result")
@@ -1631,6 +1690,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return the list of logs generated by each filtered task (either stdout
      *         and stderr) or an empty string if the result is not yet available
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/all")
@@ -1831,6 +1891,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @return the stdout generated by the task or an empty string if the result
      *         is not yet available
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/out")
@@ -1966,6 +2027,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the tag used to filter the tasks in the job.
      * @return task traces from the scheduler and resource manager
      */
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/log/server")
@@ -3257,6 +3319,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 @Override
                 public void onDisconnect(@SuppressWarnings("rawtypes") WebSocketEvent event) {
                     try {
+                        logger.info("#### websocket disconnected，remove listener ####");
                         scheduler.removeEventListener();
                     } catch (Exception e) {
                         logger.error(e);
@@ -3310,11 +3373,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
         }
         return variables;
-    }
-
-    private boolean isXmlWorkflow(InputPart fileInputPart) {
-        return fileInputPart.getMediaType().toString().toLowerCase()
-                .contains(MediaType.APPLICATION_XML.toLowerCase());
     }
 
     protected static Map<String, String> createSortableTaskAttrMap() {
@@ -3432,7 +3490,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * 
      * @param sessionId
      *            current session
-     * @param jobid
+     * @param jobId
      *            id of the job that needs to be updated
      * @param startAt
      *            its value should be ISO 8601 compliant

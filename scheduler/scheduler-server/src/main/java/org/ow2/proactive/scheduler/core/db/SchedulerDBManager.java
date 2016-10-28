@@ -240,7 +240,7 @@ public class SchedulerDBManager {
 
 		});
 
-		return new Page(lJobs, totalNbJobs);
+        return new Page<JobInfo>(lJobs, totalNbJobs);
 	}
 
 	public Page<TaskState> getTaskStates(final long from, final long to, final String tag, final int offset,

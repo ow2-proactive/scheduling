@@ -34,16 +34,15 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import javax.swing.JPanel;
-
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility.object;
 
@@ -57,9 +56,12 @@ public class TaskResultImpl implements TaskResult {
     private boolean hadException;
     private TaskLogs taskLogs;
 
+    private Map<String, String> metadata = new HashMap<>();
+
     public TaskResultImpl(TaskId id, TaskResultData d) {
         this.id = id;
         this.serializedValue = d.getSerializedValue();
+        this.metadata = d.getMetadata();
     }
 
     @Override
@@ -89,6 +91,15 @@ public class TaskResultImpl implements TaskResult {
     @Override
     public byte[] getSerializedValue() {
         return serializedValue;
+    }
+
+    @Override
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
     }
 
     @Override
