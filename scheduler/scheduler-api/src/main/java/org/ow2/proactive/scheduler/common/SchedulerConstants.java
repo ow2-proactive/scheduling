@@ -122,6 +122,18 @@ public class SchedulerConstants {
 
     /** Attribute name in task the generic information indicating that the task requires a node protedcted by token */
     public static final String NODE_ACCESS_TOKEN = "NODE_ACCESS_TOKEN";
+    /**
+     * The variable name to access results from dependent tasks (an array).
+     */
+    public static final String RESULTS_VARIABLE = "results";
+    /**
+     * The variable name to access result metadata from dependent tasks (a map).
+     */
+    public static final String RESULT_METADATA_VARIABLE = "resultMetadata";
+    /**
+     * The variable name to access the user's third party credentials.
+     */
+    public static final String CREDENTIALS_VARIABLE = "credentials";
 
     /**
      * The Application ID used by the scheduler for local Dataspaces

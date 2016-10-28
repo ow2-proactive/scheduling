@@ -37,9 +37,9 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import java.util.Arrays;
-
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Arrays;
+import java.util.Map;
 
 
 @XmlRootElement
@@ -47,6 +47,8 @@ public class TaskResultData {
 
     private TaskIdData id;
     private byte[] serializedValue;
+
+    private Map<String, String> metadata;
 
     public TaskIdData getId() {
         return id;
@@ -64,8 +66,16 @@ public class TaskResultData {
         this.serializedValue = serializedValue;
     }
 
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+    }
+
     @Override
     public String toString() {
-        return "TaskResultData{" + "id=" + id + ", serializedValue=" + Arrays.toString(serializedValue) + '}';
+        return "TaskResultData{" + "id=" + id + ", serializedValue=" + Arrays.toString(serializedValue) + ", metadata=" + metadata + '}';
     }
 }

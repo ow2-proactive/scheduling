@@ -816,6 +816,45 @@ public interface SchedulerRestInterface {
 			@PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable;
 
 	/**
+	 * Returns the metadata of the task result of task <code>taskName</code> of the
+	 * job <code>jobId</code>.
+	 *
+	 * Metadata is a map containing additional information associated with a result. For example a file name if the result represents a file.
+	 *
+	 * @param sessionId
+	 *            a valid session id
+	 * @param jobId
+	 *            the id of the job
+	 * @param taskname
+	 *            the name of the task
+	 * @return the metadata of the task result
+	 */
+	@GET
+	@GZIP
+	@Path("jobs/{jobid}/tasks/{taskname}/result/metadata")
+	@Produces("*/*")
+	Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+											 @PathParam("taskname") String taskname) throws Throwable;
+
+	/**
+	 * Returns the metadata of the task result of task <code>taskName</code> of the
+	 * job <code>jobId</code>filtered by a given tag.
+	 * <p>
+	 * Metadata is a map containing additional information associated with a result. For example a file name if the result represents a file.
+	 *
+	 * @param sessionId a valid session id
+	 * @param jobId     the id of the job
+	 * @param taskTag   the tag used to filter the tasks.
+	 * @return a map containing for each task entry, the metadata of the task result
+	 */
+	@GET
+	@GZIP
+	@Path("jobs/{jobid}/tasks/tag/{tasktag}/result/metadata")
+	@Produces("application/json")
+	Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
+															   @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable;
+
+	/**
 	 * Returns the value of the task result of the task <code>taskName</code> of
 	 * the job <code>jobId</code> This method returns the result as a byte array
 	 * whatever the result is.

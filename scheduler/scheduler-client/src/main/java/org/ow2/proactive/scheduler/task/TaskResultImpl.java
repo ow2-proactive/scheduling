@@ -50,6 +50,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -74,6 +75,8 @@ public class TaskResultImpl implements TaskResult {
     /** The value of the result if no exception occurred */
     private transient Serializable value = null;
 
+    private Map<String, String> metadata = new HashMap<>();
+
     /** The exception thrown by the task as a byte array */
     private byte[] serializedException = null;
     /** The exception thrown by the task */
@@ -97,10 +100,11 @@ public class TaskResultImpl implements TaskResult {
      */
     private Map<String, byte[]> propagatedVariables;
 
-    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
-            Map<String, byte[]> propagatedVariables) {
+    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output, Map<String, String> metadata,
+                          Map<String, byte[]> propagatedVariables) {
         this(id, serializedValue, serializedException, output);
         this.propagatedVariables = propagatedVariables;
+        this.metadata = metadata;
     }
 
     public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output) {
@@ -364,6 +368,15 @@ public class TaskResultImpl implements TaskResult {
      */
     public byte[] getSerializedValue() {
         return serializedValue;
+    }
+
+    @Override
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
     }
 
     /**

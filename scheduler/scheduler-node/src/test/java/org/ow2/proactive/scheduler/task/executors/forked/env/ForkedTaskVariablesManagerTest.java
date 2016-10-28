@@ -64,7 +64,18 @@ public class ForkedTaskVariablesManagerTest {
         variables.put(testVariable1Key, testVariable1Value);
 
         validateThatScriptHandlerBindingsContain(scriptHandler, createTaskContext(null), variables,
-                new HashMap<String, String>(), SchedulerConstants.VARIABLES_BINDING_NAME, variables);
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.VARIABLES_BINDING_NAME, variables);
+
+    }
+
+    @Test
+    public void testAddBindingsToScriptHandlerContainsResultMetadata() throws InvalidScriptException, NodeException, NoSuchFieldException, IllegalAccessException {
+        ScriptHandler scriptHandler = new ScriptHandler();
+
+        Map<String, String> resultMetadata = new HashMap<>();
+
+        validateThatScriptHandlerBindingsContain(scriptHandler, createTaskContext(null), new HashMap<String, Serializable>(),
+                new HashMap<String, String>(), resultMetadata, SchedulerConstants.RESULT_METADATA_VARIABLE, resultMetadata);
 
     }
 
@@ -82,7 +93,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), TaskScript.RESULTS_VARIABLE, taskResultArray);
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.RESULTS_VARIABLE, taskResultArray);
 
     }
 
@@ -94,7 +105,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), createTaskContext(null),
                 new HashMap<String, Serializable>(),
-                thirdPartyCredentials, TaskScript.CREDENTIALS_VARIABLE, thirdPartyCredentials);
+                thirdPartyCredentials, new HashMap<String, String>(), SchedulerConstants.CREDENTIALS_VARIABLE, thirdPartyCredentials);
 
     }
 
@@ -104,7 +115,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), createTaskContext(null),
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), "", null);
+                new HashMap<String, String>(), new HashMap<String, String>(), "", null);
 
     }
 
@@ -117,7 +128,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
                 forkEnvironment);
 
     }
@@ -137,7 +148,7 @@ public class ForkedTaskVariablesManagerTest {
         // variable should belong to the expected class
         validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME,
                 SchedulerNodeClient.class);
 
     }
@@ -157,13 +168,13 @@ public class ForkedTaskVariablesManagerTest {
         // variable should belong to the expected class
         validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.DS_USER_API_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.DS_USER_API_BINDING_NAME,
                 DataSpaceNodeClient.class);
 
         // variable should belong to the expected class
         validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.DS_GLOBAL_API_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.DS_GLOBAL_API_BINDING_NAME,
                 DataSpaceNodeClient.class);
     }
 
@@ -180,7 +191,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.DS_SCRATCH_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.DS_SCRATCH_BINDING_NAME,
                 testSetString);
     }
 
@@ -196,7 +207,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.DS_CACHE_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.DS_CACHE_BINDING_NAME,
                 testSetString);
     }
 
@@ -212,7 +223,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.DS_INPUT_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.DS_INPUT_BINDING_NAME,
                 testSetString);
     }
 
@@ -228,7 +239,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.DS_OUTPUT_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.DS_OUTPUT_BINDING_NAME,
                 testSetString);
     }
 
@@ -244,7 +255,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.DS_USER_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.DS_USER_BINDING_NAME,
                 testSetString);
     }
 
@@ -260,7 +271,7 @@ public class ForkedTaskVariablesManagerTest {
         // Expect taskResultArray to be inside the map
         validateThatScriptHandlerBindingsContain(new ScriptHandler(), taskContext,
                 new HashMap<String, Serializable>(),
-                new HashMap<String, String>(), SchedulerConstants.DS_GLOBAL_BINDING_NAME,
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.DS_GLOBAL_BINDING_NAME,
                 testSetString);
     }
 
@@ -333,10 +344,10 @@ public class ForkedTaskVariablesManagerTest {
     }
 
     private <T> void validateThatScriptHandlerBindingsContain(ScriptHandler scriptHandler,
-            TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials,
-            String key,
-            T entry) throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
-        Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler, taskContext, variables, credentials);
+                                                              TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials, Map<String, String> resultMetadata,
+                                                              String key,
+                                                              T entry) throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
+        Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler, taskContext, variables, credentials, resultMetadata);
 
 
         // Check if element exists
@@ -346,17 +357,17 @@ public class ForkedTaskVariablesManagerTest {
 
 
     private <T> void validateThatScriptHandlerBindingsInstanceOf(ScriptHandler scriptHandler,
-                                                                 TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials,
+                                                                 TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials, Map<String, String> resultMetadata,
                                                                  String key,
                                                                  Class clazz) throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
-        Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler, taskContext, variables, credentials);
+        Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler, taskContext, variables, credentials, resultMetadata);
 
         // Check if element exists
         assertThat((T) scriptHandlerBindings.get(key),
                 isA(clazz));
     }
 
-    private Map<String, Object> initializeForkedTaskVariableManager(ScriptHandler scriptHandler, TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials) throws IllegalAccessException, NoSuchFieldException {
+    private Map<String, Object> initializeForkedTaskVariableManager(ScriptHandler scriptHandler, TaskContext taskContext, Map<String, Serializable> variables, Map<String, String> credentials, Map<String, String> resultMetadata) throws IllegalAccessException, NoSuchFieldException {
         // Create class
         ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
 
@@ -369,7 +380,7 @@ public class ForkedTaskVariablesManagerTest {
 
         // Execute method which adds bindings
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext,
-                variables, credentials, schedulerNodeClient, forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.USER), forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.GLOBAL));
+                variables, credentials, schedulerNodeClient, forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.USER), forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.GLOBAL), resultMetadata);
         return scriptHandlerBindings;
     }
 

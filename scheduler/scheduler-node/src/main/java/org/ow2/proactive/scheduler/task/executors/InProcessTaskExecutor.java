@@ -55,6 +55,7 @@ import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.PAProperties;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -128,6 +129,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(
                     taskContext,
                     nodesFile);
+            Map<String, String> resultMetadata = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
                     taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
@@ -135,7 +137,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             globalSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.GLOBAL);
 
             forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext, variables,
-                    thirdPartyCredentials, schedulerNodeClient, userSpaceClient, globalSpaceClient);
+                    thirdPartyCredentials, schedulerNodeClient, userSpaceClient, globalSpaceClient, resultMetadata);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
@@ -157,6 +159,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             executeFlowScript(taskContext.getControlFlowScript(), scriptHandler, output, error, taskResult);
 
             taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
+            taskResult.setMetadata(resultMetadata);
 
             return taskResult;
         } catch (Throwable e) {
