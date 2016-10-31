@@ -105,6 +105,12 @@ import com.google.common.collect.ImmutableMap;
 public class StaxJobFactory extends JobFactory {
 
     public static final Logger logger = Logger.getLogger(StaxJobFactory.class);
+    
+    private enum ScriptType{
+        SELECTION,
+        FLOW,
+        OTHER
+    }
 
     /**
      * XML input factory
@@ -317,15 +323,15 @@ public class StaxJobFactory extends JobFactory {
             if (XMLAttributes.COMMON_NAME.matches(attributeName)) {
                 commonPropertiesHolder.setName(attributeValue);
             } else if (XMLAttributes.JOB_PRIORITY.matches(attributeName)) {
-                commonPropertiesHolder.setPriority(JobPriority.findPriority(replace(attributeValue, null)));
+                commonPropertiesHolder.setPriority(JobPriority.findPriority(replace(attributeValue, commonPropertiesHolder.getVariables())));
             } else if (XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.matches(attributeName)) {
                 handleCancelJobOnErrorAttribute(commonPropertiesHolder, attributeValue);
             } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
-                commonPropertiesHolder.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue, null)));
+                commonPropertiesHolder.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue, commonPropertiesHolder.getVariables())));
             } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
-                commonPropertiesHolder.setOnTaskError(OnTaskError.getInstance(replace(attributeValue, null)));
+                commonPropertiesHolder.setOnTaskError(OnTaskError.getInstance(replace(attributeValue, commonPropertiesHolder.getVariables())));
             } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
-                commonPropertiesHolder.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue, null)));
+                commonPropertiesHolder.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue, commonPropertiesHolder.getVariables())));
             } else if (XMLAttributes.JOB_PROJECT_NAME.matches(attributeName)) {
                 //don't replace() here it is done at the end of the job
                 commonPropertiesHolder.setProjectName(attributeValue);
@@ -970,7 +976,7 @@ public class StaxJobFactory extends JobFactory {
         FlowScript sc = null;
         Script<?> internalScript;
         try {
-            internalScript = createScript(cursorTask, 2, variables);
+            internalScript = createScript(cursorTask, ScriptType.FLOW, variables);
             switch (FlowActionType.parse(type)) {
                 case IF:
                     sc = FlowScript.createIfFlowScript(internalScript, target, targetElse, targetJoin);
@@ -1097,12 +1103,10 @@ public class StaxJobFactory extends JobFactory {
      * Leave the method with cursor at the end of the corresponding script.
      *
      * @param cursorScript the streamReader with the cursor on the corresponding script tag (pre, post, cleaning, selection, generation).
-     * @param type         nature of the script : 1 : selection
-     *                     2 : flow
-     *                     3 : else
-     * @return the script defined at the specified cursor.
+     * @param type         nature of the script
+     * @return the script  defined at the specified cursor.
      */
-    private Script<?> createScript(XMLStreamReader cursorScript, int type, Map<String, String> variables) throws JobCreationException {
+    private Script<?> createScript(XMLStreamReader cursorScript, ScriptType type, Map<String, String> variables) throws JobCreationException {
         String attrtmp = null;
         String currentScriptTag = cursorScript.getLocalName();
         String current = null;
@@ -1111,7 +1115,7 @@ public class StaxJobFactory extends JobFactory {
             Script<?> toReturn = null;
             int eventType = -1;
             while (cursorScript.hasNext()) {
-                if (type == 1 && eventType == -1) {
+                if (type == ScriptType.SELECTION && eventType == -1) {
                     eventType = cursorScript.getEventType();
                 } else {
                     eventType = cursorScript.next();
@@ -1164,7 +1168,7 @@ public class StaxJobFactory extends JobFactory {
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (cursorScript.getLocalName().equals(currentScriptTag)) {
-                            if (type == 1) {
+                            if (type == ScriptType.SELECTION) {
                                 return new SelectionScript(toReturn, isDynamic);
                             } else {
                                 return toReturn;
@@ -1203,7 +1207,7 @@ public class StaxJobFactory extends JobFactory {
                     case XMLEvent.START_ELEMENT:
                         current = cursorScript.getLocalName();
                         if (XMLTags.SCRIPT_SCRIPT.matches(current)) {
-                            newOne = (SelectionScript) createScript(cursorScript, 1, variables);
+                            newOne = (SelectionScript) createScript(cursorScript, ScriptType.SELECTION, variables);
                             scripts.add(newOne);
                         }
                         break;
@@ -1237,7 +1241,7 @@ public class StaxJobFactory extends JobFactory {
      */
     private Script<?> createScript(XMLStreamReader cursorScript, Map<String, String> variables) throws JobCreationException {
         try {
-            return createScript(cursorScript, 0, variables);
+            return createScript(cursorScript, ScriptType.OTHER, variables);
         } catch (JobCreationException jce) {
             jce.pushTag(XMLTags.SCRIPT_SCRIPT.getXMLName());
             throw jce;
