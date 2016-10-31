@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -89,19 +89,19 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestWithCustomCo
         String[] outputVariablesLines = outputVariables.getStdoutLogs(false).split(System.lineSeparator());
         TaskLogs outputNoVariables = schedulerHelper.getTaskResult(id, "taskNoVariables").getOutput();
         String[] outputNoVariablesLines = outputNoVariables.getStdoutLogs(false).split(System.lineSeparator());
-        System.err.println(outputVariables.getStdoutLogs(false));
-        System.err.println(outputNoVariables.getStdoutLogs(false));
 
         //Tests variable access
         //Selection files access
         assertTrue(logsMatch(logsLines, "testvartask0"));
 
         //Fork environment, pre, scriptExecutable, post scripts 
-        assertEquals(4, outputVariablesLines.length);
+        assertEquals(5, outputVariablesLines.length);
         assertEquals("testvartask1", outputVariablesLines[0]);
         assertEquals("testvartask2", outputVariablesLines[1]);
         assertEquals("testvartask3", outputVariablesLines[2]);
         assertEquals("testvartask4", outputVariablesLines[3]);
+        //Inherited value
+        assertEquals("testvarjob6", outputVariablesLines[4]);
         
         //Test that other tasks don't have access to task variables
         assertEquals(1, outputNoVariablesLines.length);
@@ -109,6 +109,23 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestWithCustomCo
 
         //Cleaning script
         assertTrue(logsMatch(logsLines, ".*\\(taskVariables\\) testvartask5"));
+        
+        //Variables use into generic information
+        Map<String, String> genericInformations = job.getGenericInformation();
+        assertEquals(1, genericInformations.size());
+        assertEquals("testvarjob0", genericInformations.get("jobGI"));
+
+        genericInformations = job.getTask("taskVariables").getGenericInformation();
+        assertEquals(1, genericInformations.size());
+        assertEquals("testvartask1", genericInformations.get("taskVariablesGI"));
+
+        genericInformations = job.getTask("taskNoVariables").getGenericInformation();
+        assertEquals(1, genericInformations.size());
+        assertEquals("testvarjob2", genericInformations.get("taskNoVariablesGI"));
+        
+        //Variables use into node configuration
+        assertEquals(2, job.getTask("taskVariables").getParallelEnvironment().getNodesNumber());
+        assertEquals(1, job.getTask("taskNoVariables").getParallelEnvironment().getNodesNumber());
     }
     
     private boolean logsMatch(String[] logsLines, String pattern){

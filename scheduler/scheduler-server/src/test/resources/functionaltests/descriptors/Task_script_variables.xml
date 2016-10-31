@@ -9,10 +9,15 @@
         <variable name="TESTVAR3" value="testvarjob3"/>
         <variable name="TESTVAR4" value="testvarjob4"/>
         <variable name="TESTVAR5" value="testvarjob5"/>
+        <variable name="TESTVAR6" value="testvarjob6"/>
+        <variable name="NUMBER_OF_NODES" value="1"/>
     </variables>
     <description>Job using variables in selection scripts, check the scheduler logs if the test fails to see the
         selection scripts output
     </description>
+    <genericInformation>
+        <info name="jobGI" value="${TESTVAR0}" />
+    </genericInformation>
     <taskFlow>
         <task name="taskVariables">
 		    <variables>
@@ -22,7 +27,13 @@
 		        <variable name="TESTVAR3" value="testvartask3" inherited="false" model=""/>
 		        <variable name="TESTVAR4" value="testvartask4" inherited="false" model=""/>
 		        <variable name="TESTVAR5" value="testvartask5" inherited="false" model=""/>
+		        <variable name="TESTVAR6" value="testvartask6" inherited="true" model=""/>
+        		<variable name="NUMBER_OF_NODES" value="2" inherited="false" model=""/>
 		    </variables>
+            <genericInformation>
+                <info name="taskVariablesGI" value="${TESTVAR1}" />
+            </genericInformation>
+      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
 			<selection>
 				<script>
 					<code language="groovy">
@@ -59,7 +70,7 @@
             <post>
                 <script>
                     <code language="groovy">
-                        <![CDATA[println variables["TESTVAR4"]]]>
+                        <![CDATA[println variables["TESTVAR4"];println variables["TESTVAR6"]]]>
                     </code>
                 </script>
             </post>
@@ -72,6 +83,10 @@
             </cleaning>
         </task>
         <task name="taskNoVariables">
+            <genericInformation>
+                <info name="taskNoVariablesGI" value="${TESTVAR2}" />
+            </genericInformation>
+      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
             <scriptExecutable>
                 <script>
                     <code language="groovy">

@@ -675,7 +675,6 @@ public class StaxJobFactory extends JobFactory {
         XMLTags currentTag = null;
         String current = null;
         String taskName = null;
-        Map<String, String> variables = job.getVariables();
         try {
             Task toReturn = null;
             Task tmpTask = new Task() {
@@ -690,26 +689,27 @@ public class StaxJobFactory extends JobFactory {
                     tmpTask.setName(attributeValue);
                     taskName = attributeValue;
                 } else if (XMLAttributes.TASK_NB_NODES.matches(attributeName)) {
-                    int numberOfNodesNeeded = Integer.parseInt(replace(attributeValue, variables));
+                    int numberOfNodesNeeded = Integer.parseInt(replace(attributeValue, tmpTask.getVariablesOverriden(job)));
                     tmpTask.setParallelEnvironment(new ParallelEnvironment(numberOfNodesNeeded));
                 } else if (XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.matches(attributeName)) {
                     handleCancelJobOnErrorAttribute(tmpTask, attributeValue);
                 } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
-                    tmpTask.setOnTaskError(OnTaskError.getInstance(replace(attributeValue, variables)));
+                    tmpTask.setOnTaskError(OnTaskError.getInstance(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
-                    tmpTask.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue, variables)));
+                    tmpTask.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
-                    tmpTask.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue, variables)));
+                    tmpTask.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 } else if (XMLAttributes.TASK_PRECIOUS_RESULT.matches(attributeName)) {
-                    tmpTask.setPreciousResult(Boolean.parseBoolean(replace(attributeValue, variables)));
+                    tmpTask.setPreciousResult(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 } else if (XMLAttributes.TASK_PRECIOUS_LOGS.matches(attributeName)) {
-                    tmpTask.setPreciousLogs(Boolean.parseBoolean(replace(attributeValue, variables)));
+                    tmpTask.setPreciousLogs(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 } else if (XMLAttributes.TASK_WALLTIME.matches(attributeName)) {
-                    tmpTask.setWallTime(Tools.formatDate(replace(attributeValue, variables)));
+                    tmpTask.setWallTime(Tools.formatDate(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attributeName)) {
-                    tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue, variables)));
+                    tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 }
             }
+            
             int eventType;
             boolean shouldContinue = true;
             while (shouldContinue && cursorTask.hasNext()) {
@@ -719,42 +719,42 @@ public class StaxJobFactory extends JobFactory {
                         current = cursorTask.getLocalName();
                         currentTag = null;
                         if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
-                            tmpTask.setGenericInformation(getGenericInformation(cursorTask, variables));
+                            tmpTask.setGenericInformation(getGenericInformation(cursorTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.VARIABLES.matches(current)) {
-                            Map<String, TaskVariable> taskVariablesMap = createTaskVariables(cursorTask, variables);
+                            Map<String, TaskVariable> taskVariablesMap = createTaskVariables(cursorTask, tmpTask.getVariablesOverriden(job));
                             tmpTask.setVariables(taskVariablesMap);
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
-                            tmpTask.setDescription(getDescription(cursorTask, variables));
+                            tmpTask.setDescription(getDescription(cursorTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.DS_INPUT_FILES.matches(current)) {
-                            setIOFIles(cursorTask, XMLTags.DS_INPUT_FILES.getXMLName(), tmpTask, variables);
+                            setIOFIles(cursorTask, XMLTags.DS_INPUT_FILES.getXMLName(), tmpTask, tmpTask.getVariablesOverriden(job));
                         } else if (XMLTags.DS_OUTPUT_FILES.matches(current)) {
-                            setIOFIles(cursorTask, XMLTags.DS_OUTPUT_FILES.getXMLName(), tmpTask, variables);
+                            setIOFIles(cursorTask, XMLTags.DS_OUTPUT_FILES.getXMLName(), tmpTask, tmpTask.getVariablesOverriden(job));
                         } else if (XMLTags.PARALLEL_ENV.matches(current)) {
-                            tmpTask.setParallelEnvironment(createParallelEnvironment(cursorTask, variables));
+                            tmpTask.setParallelEnvironment(createParallelEnvironment(cursorTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.SCRIPT_SELECTION.matches(current)) {
-                            tmpTask.setSelectionScripts(createSelectionScript(cursorTask, variables));
+                            tmpTask.setSelectionScripts(createSelectionScript(cursorTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.FORK_ENVIRONMENT.matches(current)) {
-                            tmpTask.setForkEnvironment(createForkEnvironment(cursorTask, variables));
+                            tmpTask.setForkEnvironment(createForkEnvironment(cursorTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.SCRIPT_PRE.matches(current)) {
-                            tmpTask.setPreScript(createScript(cursorTask, variables));
+                            tmpTask.setPreScript(createScript(cursorTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.SCRIPT_POST.matches(current)) {
-                            tmpTask.setPostScript(createScript(cursorTask, variables));
+                            tmpTask.setPostScript(createScript(cursorTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.SCRIPT_CLEANING.matches(current)) {
-                            tmpTask.setCleaningScript(createScript(cursorTask, variables));
+                            tmpTask.setCleaningScript(createScript(cursorTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.FLOW.matches(current)) {
-                            tmpTask.setFlowScript(createControlFlowScript(cursorTask, tmpTask, variables));
+                            tmpTask.setFlowScript(createControlFlowScript(cursorTask, tmpTask, tmpTask.getVariablesOverriden(job)));
                         } else if (XMLTags.TASK_DEPENDENCES.matches(current)) {
                             currentTag = XMLTags.TASK_DEPENDENCES;
                             dependencies.putAll(createDependences(cursorTask, tmpTask));
                         } else if (XMLTags.JAVA_EXECUTABLE.matches(current)) {
                             toReturn = new JavaTask();
-                            setJavaExecutable((JavaTask) toReturn, cursorTask, variables);
+                            setJavaExecutable((JavaTask) toReturn, cursorTask, tmpTask.getVariablesOverriden(job));
                         } else if (XMLTags.NATIVE_EXECUTABLE.matches(current)) {
                             toReturn = new NativeTask();
                             setNativeExecutable((NativeTask) toReturn, cursorTask);
                         } else if (XMLTags.SCRIPT_EXECUTABLE.matches(current)) {
                             toReturn = new ScriptTask();
-                            ((ScriptTask) toReturn).setScript(new TaskScript(createScript(cursorTask, variables)));
+                            ((ScriptTask) toReturn).setScript(new TaskScript(createScript(cursorTask, tmpTask.getVariablesOverriden(job))));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
