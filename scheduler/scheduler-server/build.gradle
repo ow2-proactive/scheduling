@@ -20,6 +20,7 @@ dependencies {
     compile project(':rm:rm-server')
     compile project(':rm:rm-client')
 
+    testCompile "com.google.jimfs:jimfs:1.1"
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     testCompile "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -35,7 +36,15 @@ dependencies {
     testCompile project(':rm:rm-policy:rm-policy-scheduler')
     testCompile project(':scheduler:scheduler-examples')
 
-    runtime 'org.hsqldb:hsqldb:2.3.4'
+    // The version used is a custom one that includes a fix for the silent option:
+    // https://sourceforge.net/p/hsqldb/bugs/1456/
+    //
+    // The source code used to generate this version is available at:
+    //   https://github.com/activeeon/hsqldb/commits/master
+    //
+    // This version can be replaced by an official one once the fix about the
+    // previous issue is released
+    runtime 'org.hsqldb:hsqldb:r5658-f2e27a7'
 
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"

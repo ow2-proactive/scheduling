@@ -36,7 +36,29 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import org.apache.commons.cli.*;
+import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
+import java.security.KeyException;
+import java.util.List;
+
+import javax.security.auth.login.LoginException;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
@@ -67,21 +89,6 @@ import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.PAMRRouterStarter;
 import org.ow2.proactive.utils.Tools;
 
-import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
-import java.rmi.AlreadyBoundException;
-import java.security.KeyException;
-import java.util.List;
-
-import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
-
 
 /**
  * SchedulerStarter will start a new Scheduler on the local host connected to the given Resource Manager.<br>
@@ -102,6 +109,8 @@ public class SchedulerStarter {
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
 
     private static BroadcastDiscovery discoveryService;
+
+    private static SchedulerHsqldbStarter hsqldbServer;
 
     /**
      * Start the scheduler creation process.
@@ -142,6 +151,9 @@ public class SchedulerStarter {
             startRouter();
         }
 
+        hsqldbServer = new SchedulerHsqldbStarter();
+        hsqldbServer.startIfNeeded();
+
         String rmUrl = getRmUrl(commandLine);
         setCleanDatabaseProperties(commandLine);
         setCleanNodesourcesProperty(commandLine);
@@ -155,7 +167,8 @@ public class SchedulerStarter {
         SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
 
         if (!commandLine.hasOption("no-rest")) {
-            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL()));
+            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl,
+                    sai.getHostURL()));
             if (applicationUrls != null) {
                 for (String applicationUrl : applicationUrls) {
                     if (applicationUrl.endsWith("/rest")) {
@@ -176,11 +189,12 @@ public class SchedulerStarter {
             int routerPort = PAMRConfig.PA_NET_ROUTER_PORT.getValue();
             config.setPort(routerPort);
             config.setNbWorkerThreads(Runtime.getRuntime().availableProcessors());
-            config.setReservedAgentConfigFile(new File(
-              System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) + PAMRRouterStarter.PATH_TO_ROUTER_CONFIG_FILE));
+            config.setReservedAgentConfigFile(
+                    new File(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+                        PAMRRouterStarter.PATH_TO_ROUTER_CONFIG_FILE));
             Router.createAndStart(config);
-            logger.info("The router created on " + ProActiveInet.getInstance().getHostname() + ":" +
-                routerPort);
+            logger.info(
+                    "The router created on " + ProActiveInet.getInstance().getHostname() + ":" + routerPort);
         }
     }
 
@@ -226,8 +240,8 @@ public class SchedulerStarter {
         return sai;
     }
 
-    private static void startDiscovery(CommandLine commandLine, String urlToDiscover) throws ParseException,
-            SocketException, UnknownHostException {
+    private static void startDiscovery(CommandLine commandLine, String urlToDiscover)
+            throws ParseException, SocketException, UnknownHostException {
         if (!commandLine.hasOption("no-discovery")) {
             int discoveryPort = readIntOption(commandLine, "discovery-port", DISCOVERY_DEFAULT_PORT);
             discoveryService = new BroadcastDiscovery(discoveryPort, urlToDiscover);
@@ -309,9 +323,12 @@ public class SchedulerStarter {
             @Override
             public void run() {
                 logger.info("Shutting down...");
+
                 if (discoveryService != null) {
                     discoveryService.stop();
                 }
+
+                hsqldbServer.stop();
             }
         }));
     }
@@ -335,10 +352,7 @@ public class SchedulerStarter {
         rmURL.setRequired(false);
         options.addOption(rmURL);
 
-        Option policy = new Option(
-            "p",
-            "policy",
-            true,
+        Option policy = new Option("p", "policy", true,
             "the complete name of the scheduling policy to use (default: org.ow2.proactive.scheduler.policy.DefaultPolicy)");
         policy.setArgName("policy");
         policy.setRequired(false);
@@ -360,24 +374,24 @@ public class SchedulerStarter {
         options.addOption(new Option("c", "clean", false,
             "clean scheduler and resource manager databases (default: false)"));
 
-        options.addOption(Option.builder().longOpt("clean-nodesources").desc(
-                "drop all previously created nodesources from resource manager database (default: false)")
+        options.addOption(Option.builder().longOpt("clean-nodesources")
+                .desc("drop all previously created nodesources from resource manager database (default: false)")
                 .build());
 
-        options.addOption(Option.builder().longOpt("rm-only").desc(
-                "start only resource manager (implies --no-rest; default: false)").build());
+        options.addOption(Option.builder().longOpt("rm-only")
+                .desc("start only resource manager (implies --no-rest; default: false)").build());
 
-        options.addOption(Option.builder().longOpt("no-rest").desc(
-                "do not deploy REST server and wars from dist/war (default: false)").build());
+        options.addOption(Option.builder().longOpt("no-rest")
+                .desc("do not deploy REST server and wars from dist/war (default: false)").build());
 
-        options.addOption(Option.builder().longOpt("no-router").desc(
-          "do not deploy PAMR Router (default: false)").build());
+        options.addOption(Option.builder().longOpt("no-router")
+                .desc("do not deploy PAMR Router (default: false)").build());
 
         options.addOption(Option.builder().longOpt("no-discovery")
                 .desc("do not run discovery service for nodes (default: false)").build());
         options.addOption(Option.builder("dp").longOpt("discovery-port")
-                .desc("discovery service port for nodes (default: " + DISCOVERY_DEFAULT_PORT + ")")
-                .hasArg().argName("port").build());
+                .desc("discovery service port for nodes (default: " + DISCOVERY_DEFAULT_PORT + ")").hasArg()
+                .argName("port").build());
 
         return options;
     }
@@ -389,8 +403,8 @@ public class SchedulerStarter {
             try {
                 value = Integer.parseInt(cmd.getOptionValue(optionName));
             } catch (Exception nfe) {
-                throw new ParseException("Wrong value for " + optionName + " option: " +
-                    cmd.getOptionValue("t"));
+                throw new ParseException(
+                    "Wrong value for " + optionName + " option: " + cmd.getOptionValue("t"));
             }
         }
         return value;
@@ -432,8 +446,9 @@ public class SchedulerStarter {
         //first im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
                 .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME, LocalInfrastructure.class
-                .getName(), new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
+        rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME,
+                LocalInfrastructure.class.getName(),
+                new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
                 RestartDownNodesPolicy.class.getName(), new Object[] { "ALL", "ALL", "10000" });
     }
 
@@ -447,14 +462,14 @@ public class SchedulerStarter {
         String schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
         setPropIfNotAlreadySet(PAResourceManagerProperties.RM_HOME.getKey(), schedHome);
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
-        setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(), schedHome +
-            "/config/network/server.ini");
+        setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
+                schedHome + "/config/network/server.ini");
     }
 
     private static void configureSecurityManager() {
-        SecurityManagerConfigurator.configureSecurityManager(System
-                .getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-            "/config/security.java.policy-server");
+        SecurityManagerConfigurator
+                .configureSecurityManager(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+                    "/config/security.java.policy-server");
     }
 
     private static void configureLogging() {
