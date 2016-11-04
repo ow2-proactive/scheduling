@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+import org.ow2.proactive.scheduler.util.SchedulerHsqldbStarter;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -105,6 +106,8 @@ public class SchedulerStartForFunctionalTest implements Serializable {
         PASchedulerProperties.updateProperties(schedPropPath);
 
         RMFactory.setOsJavaProperty();
+
+        new SchedulerHsqldbStarter().startIfNeeded();
 
         new Thread() {
             public void run() {
