@@ -33,7 +33,7 @@
             <genericInformation>
                 <info name="taskVariablesGI" value="${TESTVAR1}" />
             </genericInformation>
-      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
+      		<!-- <parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel> -->
 			<selection>
 				<script>
 					<code language="groovy">
@@ -86,7 +86,7 @@
             <genericInformation>
                 <info name="taskNoVariablesGI" value="${TESTVAR2}" />
             </genericInformation>
-      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
+      		<!-- <parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel> -->
             <scriptExecutable>
                 <script>
                     <code language="groovy">
