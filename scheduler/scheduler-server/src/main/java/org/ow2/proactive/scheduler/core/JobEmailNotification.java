@@ -44,8 +44,12 @@ public class JobEmailNotification {
 
     public boolean doCheckAndSend() throws JobEmailNotificationException {
         switch (eventType) {
+            case JOB_PAUSED:
+            case JOB_RESUMED:
+            case JOB_IN_ERROR:
             case JOB_PENDING_TO_FINISHED:
             case JOB_RUNNING_TO_FINISHED:
+            case JOB_RESTARTED_FROM_ERROR:
                 break;
             default:
                 logger.trace("Event unrelated to job finish, doing nothing");
