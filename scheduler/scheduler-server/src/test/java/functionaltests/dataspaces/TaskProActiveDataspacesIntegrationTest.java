@@ -57,7 +57,7 @@ public class TaskProActiveDataspacesIntegrationTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(120);
+    public Timeout globalTimeout = Timeout.seconds(600);
 
     private Process schedulerDataspaceProcess;
 

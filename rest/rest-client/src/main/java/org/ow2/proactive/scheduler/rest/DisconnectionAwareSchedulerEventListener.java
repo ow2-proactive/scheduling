@@ -1,7 +1,6 @@
 package org.ow2.proactive.scheduler.rest;
 
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 
 
 /**
@@ -14,8 +13,6 @@ public interface DisconnectionAwareSchedulerEventListener extends SchedulerEvent
 
     /**
      * notify the socket disconnection
-     * 
-     * @throws ConnectionException throw an exception if the connection cannot be done
      */
     void notifyDisconnection();
 }
