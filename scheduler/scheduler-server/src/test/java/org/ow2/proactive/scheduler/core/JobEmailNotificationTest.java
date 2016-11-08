@@ -257,7 +257,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("job 123890 finished"),
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job running to finished"),
                 contains("Status: Killed"));
         verifyNoMoreInteractions(stubbedSender);
     }
