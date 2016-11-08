@@ -40,9 +40,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.utils.PAProperties;
 import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -201,6 +203,17 @@ public enum PASchedulerProperties {
 
     /** Number of tasks to fetch per page when pagination is used */
     TASKS_PAGE_SIZE("pa.scheduler.tasks.page.size", PropertyType.INTEGER),
+
+    /**
+     * If set to non-null value the scheduler can executes only forkenvironment and clean scripts from
+     * this directory. All other scripts will be rejected.
+     */
+    EXECUTE_SCRIPT_AUTHORIZED_DIR("pa.scheduler.script.authorized.dir", PropertyType.STRING),
+
+    /**
+     * The pa.scheduler.script.authorized.dir is browsed every refreshperiod time to load authorized scripts.
+     */
+    EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD("pa.scheduler.script.authorized.dir.refreshperiod", PropertyType.INTEGER),
 
     /* ***************************************************************** */
     /* ********************** DATASPACES PROPERTIES ******************** */
@@ -392,10 +405,8 @@ public enum PASchedulerProperties {
     public static void updateProperties(String filename) {
         Properties prop = propertiesLoader.getProperties();
         Properties ptmp = new Properties();
-        try {
-            FileInputStream stream = new FileInputStream(filename);
-            ptmp.load(stream);
-            stream.close();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename)))) {
+            ptmp.load(reader);
             for (Object o : ptmp.keySet()) {
                 prop.setProperty((String) o, (String) ptmp.get(o));
             }

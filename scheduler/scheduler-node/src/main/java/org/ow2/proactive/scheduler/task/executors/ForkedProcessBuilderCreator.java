@@ -96,6 +96,10 @@ public class ForkedProcessBuilderCreator implements Serializable {
 
             if (forkEnvironment.getEnvScript() != null) {
 
+                if (!context.getInitializer().isAuthorizedForkEnvironmentScript()) {
+                    throw new SecurityException("Unauthorized fork environment script: " + System.getProperty("line.separator") + forkEnvironment.getEnvScript().getScript());
+                }
+
                 forkEnvironmentScriptResult = forkEnvironmentScriptExecutor
                         .executeForkEnvironmentScript(context, outputSink, errorSink);
             }
