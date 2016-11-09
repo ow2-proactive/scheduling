@@ -36,6 +36,9 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +46,16 @@ import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.log4j.Logger;
+import org.atmosphere.wasync.Client;
+import org.atmosphere.wasync.ClientFactory;
+import org.atmosphere.wasync.Decoder;
+import org.atmosphere.wasync.Encoder;
+import org.atmosphere.wasync.Event;
+import org.atmosphere.wasync.Function;
+import org.atmosphere.wasync.Request;
+import org.atmosphere.wasync.RequestBuilder;
+import org.atmosphere.wasync.Socket;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -55,20 +68,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification.Action;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
-import com.google.common.collect.Lists;
-import org.apache.log4j.Logger;
-import org.atmosphere.wasync.Client;
-import org.atmosphere.wasync.ClientFactory;
-import org.atmosphere.wasync.Decoder;
-import org.atmosphere.wasync.Encoder;
-import org.atmosphere.wasync.Event;
-import org.atmosphere.wasync.Function;
-import org.atmosphere.wasync.Request;
-import org.atmosphere.wasync.RequestBuilder;
-import org.atmosphere.wasync.Socket;
 
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Strings.isNullOrEmpty;
+import com.google.common.collect.Lists;
 
 
 /**
@@ -96,11 +97,19 @@ public class SchedulerEventReceiver {
 
     @SuppressWarnings("rawtypes")
     private void openAndReceive(final SchedulerEventListener eventListener, boolean myEventsOnly,
-            SchedulerEvent... events) throws IOException {
+                                SchedulerEvent... events) throws IOException {
         Client client = ClientFactory.getDefault().newClient();
         socket = client.create();
         EventNotificationHandler notificationHandler = new EventNotificationHandler(eventListener);
         socket.on(Event.MESSAGE, notificationHandler);
+        socket.on(Event.CLOSE, new Function() {
+            public void on(Object t) {
+                SchedulerEventReceiver.logger.info("#### Websocket connection is closed ####");
+                if (eventListener instanceof DisconnectionAwareSchedulerEventListener) {
+                    ((DisconnectionAwareSchedulerEventListener) eventListener).notifyDisconnection();
+                }
+            }
+        });
         // initialize the connection
         RequestBuilder requestBuilder = client.newRequestBuilder();
         requestBuilder.method(Request.METHOD.GET);
@@ -231,7 +240,7 @@ public class SchedulerEventReceiver {
                 case JOB_STATE_UPDATED:
                     eventListener.jobStateUpdatedEvent(
                             new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
-                                DataUtility.toJobInfo((JobInfoData) eventData.getData())));
+                                    DataUtility.toJobInfo((JobInfoData) eventData.getData())));
                     break;
                 case JOB_FULL_DATA_UPDATED:
                     eventListener.jobUpdatedFullDataEvent(
@@ -240,7 +249,7 @@ public class SchedulerEventReceiver {
                 case TASK_STATE_UPDATED:
                     eventListener.taskStateUpdatedEvent(
                             new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
-                                DataUtility.taskInfo((TaskInfoData) eventData.getData())));
+                                    DataUtility.taskInfo((TaskInfoData) eventData.getData())));
                     break;
                 case USERS_UPDATED:
                     eventListener

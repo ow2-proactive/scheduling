@@ -4,8 +4,8 @@
 
 ## Install required packages
 
-cd ..
-cwd="$(pwd)"
+script_dir=$(dirname "$0")
+cwd="$script_dir/.."
 radicale_version="1.1.1"
 
 ## Install radicale
@@ -25,7 +25,7 @@ mkdir -p ~/.config/radicale/collections
 #check if path is not empty string
 loginFile="$cwd/config/authentication/login.cfg"
 #check if file exist
-if [ ! -e "$loginFile" ] 
+if [ ! -e "$loginFile" ]
     then
     echo "authentication file doesnt exists"
     exit
@@ -42,14 +42,3 @@ cd ~/.config/radicale/log
 radicale -d -S
 
 echo "Radicale server started"
-
-#delete radicale folder
-cd "$cwd/calendar-service/"
-
-read -e -p "Would you like to start Calendar Service right now? (Y/N) :" input
-
-if [ "$input" == "y" ] || [ "$input" == "Y" ]; then
-	source "$cwd"/calendar-service/calendar-service.sh start
-elif [ "$input" == "n" ] || [ "$input" == "N" ]; then
-	exit 1
-fi
