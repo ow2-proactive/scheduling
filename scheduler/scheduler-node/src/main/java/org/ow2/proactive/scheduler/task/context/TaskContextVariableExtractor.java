@@ -41,6 +41,7 @@ import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
@@ -107,6 +108,20 @@ public class TaskContextVariableExtractor implements Serializable {
         variables.putAll(retrieveContextVariables(taskContext.getInitializer()));
 
         variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), taskContext.getSchedulerHome());
+        return variables;
+    }
+
+    public Map<String, Serializable> extractScopeVariables(TaskContext taskContext) {
+        Map<String, Serializable> variables = new HashMap<>();
+
+        // variables from task definition
+        if (taskContext.getInitializer().getTaskVariables() != null){
+            for (TaskVariable taskVariable: taskContext.getInitializer().getTaskVariables().values()){
+                if (!taskVariable.isJobInherited()){
+                    variables.put(taskVariable.getName(), taskVariable.getValue());
+                }
+            }
+        }
         return variables;
     }
 

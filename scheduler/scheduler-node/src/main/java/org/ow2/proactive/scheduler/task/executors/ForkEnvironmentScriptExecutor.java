@@ -40,6 +40,7 @@ import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -48,6 +49,7 @@ import org.ow2.proactive.scripting.ScriptResult;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ForkEnvironmentScriptExecutor implements Serializable {
@@ -67,7 +69,9 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
     public ScriptResult executeForkEnvironmentScript(TaskContext context, PrintStream outputSink,
             PrintStream errorSink) throws Exception {
 
-        Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(context);
+        VariablesMap variables = new VariablesMap();
+        variables.setInheritedMap(taskContextVariableExtractor.extractTaskVariables(context));
+        variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(context));
         Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
                 context);
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();

@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
@@ -126,9 +127,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
         RemoteSpace globalSpaceClient = null;
         try {
             nodesFile = writeNodesFile(taskContext);
-            Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(
-                    taskContext,
-                    nodesFile);
+            VariablesMap variables = new VariablesMap();
+            variables.setInheritedMap(taskContextVariableExtractor.extractTaskVariables(
+                    taskContext, nodesFile));
+            variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(
+                    taskContext));
             Map<String, String> resultMetadata = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
                     taskContext);
@@ -157,8 +160,8 @@ public class InProcessTaskExecutor implements TaskExecutor {
             }
 
             executeFlowScript(taskContext.getControlFlowScript(), scriptHandler, output, error, taskResult);
-
-            taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
+            
+            taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables.getPropagatedVariables()));
             taskResult.setMetadata(resultMetadata);
 
             return taskResult;
@@ -186,10 +189,10 @@ public class InProcessTaskExecutor implements TaskExecutor {
      */
     private Serializable execute(TaskContext taskContext, PrintStream output, PrintStream error,
             ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
-            Map<String, Serializable> variables) throws Throwable {
+            VariablesMap variables) throws Throwable {
         if (taskContext.getPreScript() != null) {
             Script<?> script = taskContext.getPreScript();
-            forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables,
+            forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, 
                     error);
             ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
             if (preScriptResult.errorOccured()) {

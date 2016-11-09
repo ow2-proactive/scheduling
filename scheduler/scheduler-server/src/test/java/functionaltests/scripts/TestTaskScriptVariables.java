@@ -87,10 +87,13 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestWithCustomCo
         String[] logsLines = logs.split(System.lineSeparator());
         TaskLogs outputVariables = schedulerHelper.getTaskResult(id, "taskVariables").getOutput();
         String[] outputVariablesLines = outputVariables.getStdoutLogs(false).split(System.lineSeparator());
+        TaskLogs outputChild = schedulerHelper.getTaskResult(id, "childTask").getOutput();
+        String[] outputChildLines = outputChild.getStdoutLogs(false).split(System.lineSeparator());
         TaskLogs outputNoVariables = schedulerHelper.getTaskResult(id, "taskNoVariables").getOutput();
-        String[] outputNoVariablesLines = outputNoVariables.getStdoutLogs(false).split(System.lineSeparator());
+        String[] outputNoVariablesLines = outputNoVariables.getStdoutLogs(false).split(System.lineSeparator());        
 
         //Tests variable access
+        assertEquals("testvarjob3", job.getVariables().get("TESTVAR3"));
         //Selection files access
         assertTrue(logsMatch(logsLines, "testvartask0"));
 
@@ -103,9 +106,27 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestWithCustomCo
         //Inherited value
         assertEquals("testvarjob6", outputVariablesLines[4]);
         
+        //Test that child tasks don't have access to task variables
+        assertEquals(8, outputChildLines.length);
+        assertEquals("testvarjob0", outputChildLines[0]);
+        assertEquals("testvarjob1", outputChildLines[1]);
+        assertEquals("testvarjob2", outputChildLines[2]);
+        assertEquals("testvarjob3", outputChildLines[3]);
+        assertEquals("testvarjob4", outputChildLines[4]);
+        assertEquals("testvarjob5", outputChildLines[5]);
+        assertEquals("testvarjob6", outputChildLines[6]);
+        assertEquals("testvar7modified", outputChildLines[7]);
+        
         //Test that other tasks don't have access to task variables
-        assertEquals(1, outputNoVariablesLines.length);
-        assertEquals("testvarjob1", outputNoVariablesLines[0]);
+        assertEquals(8, outputNoVariablesLines.length);
+        assertEquals("testvarjob0", outputNoVariablesLines[0]);
+        assertEquals("testvarjob1", outputNoVariablesLines[1]);
+        assertEquals("testvarjob2", outputNoVariablesLines[2]);
+        assertEquals("testvarjob3", outputNoVariablesLines[3]);
+        assertEquals("testvarjob4", outputNoVariablesLines[4]);
+        assertEquals("testvarjob5", outputNoVariablesLines[5]);
+        assertEquals("testvarjob6", outputNoVariablesLines[6]);
+        assertEquals("testvarjob7", outputNoVariablesLines[7]);
 
         //Cleaning script
         assertTrue(logsMatch(logsLines, ".*\\(taskVariables\\) testvartask5"));
@@ -119,13 +140,18 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestWithCustomCo
         assertEquals(1, genericInformations.size());
         assertEquals("testvartask1", genericInformations.get("taskVariablesGI"));
 
+        genericInformations = job.getTask("childTask").getGenericInformation();
+        assertEquals(1, genericInformations.size());
+        assertEquals("testvarjob4", genericInformations.get("childTaskGI"));
+
         genericInformations = job.getTask("taskNoVariables").getGenericInformation();
         assertEquals(1, genericInformations.size());
         assertEquals("testvarjob2", genericInformations.get("taskNoVariablesGI"));
         
         //Variables use into node configuration
-        //assertEquals(2, job.getTask("taskVariables").getParallelEnvironment().getNodesNumber());
-        //assertEquals(1, job.getTask("taskNoVariables").getParallelEnvironment().getNodesNumber());
+        assertEquals(2, job.getTask("taskVariables").getParallelEnvironment().getNodesNumber());
+        assertEquals(1, job.getTask("childTask").getParallelEnvironment().getNodesNumber());
+        assertEquals(1, job.getTask("taskNoVariables").getParallelEnvironment().getNodesNumber());
     }
     
     private boolean logsMatch(String[] logsLines, String pattern){

@@ -36,6 +36,18 @@
  */
 package org.ow2.proactive.scheduler.task.internal;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -48,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
@@ -60,17 +73,6 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.utils.NodeSet;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -1051,7 +1053,8 @@ public abstract class InternalTask extends TaskState {
             tli.setWalltime(wallTime);
         }
         tli.setPreciousLogs(isPreciousLogs());
-        tli.setVariables(getVariablesOverriden(job));
+        tli.setVariables(job.getVariables());
+        tli.setTaskVariables(getVariables());
 
         tli.setPingPeriod(PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt());
         tli.setPingAttempts(PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt());

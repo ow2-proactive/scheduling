@@ -10,6 +10,7 @@
         <variable name="TESTVAR4" value="testvarjob4"/>
         <variable name="TESTVAR5" value="testvarjob5"/>
         <variable name="TESTVAR6" value="testvarjob6"/>
+        <variable name="TESTVAR7" value="testvarjob7"/>
         <variable name="NUMBER_OF_NODES" value="1"/>
     </variables>
     <description>Job using variables in selection scripts, check the scheduler logs if the test fails to see the
@@ -27,13 +28,14 @@
 		        <variable name="TESTVAR3" value="testvartask3" inherited="false" model=""/>
 		        <variable name="TESTVAR4" value="testvartask4" inherited="false" model=""/>
 		        <variable name="TESTVAR5" value="testvartask5" inherited="false" model=""/>
-		        <variable name="TESTVAR6" value="testvartask6" inherited="true" model=""/>
+		        <variable name="TESTVAR6" value="" inherited="true" model=""/>
+        		<variable name="TESTVAR7" value="testvartask7" inherited="false" model=""/>
         		<variable name="NUMBER_OF_NODES" value="2" inherited="false" model=""/>
 		    </variables>
             <genericInformation>
                 <info name="taskVariablesGI" value="${TESTVAR1}" />
             </genericInformation>
-      		<!-- <parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel> -->
+      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
 			<selection>
 				<script>
 					<code language="groovy">
@@ -63,7 +65,10 @@
             <scriptExecutable>
                 <script>
                     <code language="groovy">
-                        <![CDATA[println variables["TESTVAR3"]]]>
+                        <![CDATA[
+                        	println variables["TESTVAR3"]
+                        	variables["TESTVAR7"]="testvar7modified"
+                        ]]>
                     </code>
                 </script>
             </scriptExecutable>
@@ -82,15 +87,47 @@
                 </script>
             </cleaning>
         </task>
+        <task name="childTask">
+            <genericInformation>
+                <info name="childTaskGI" value="${TESTVAR4}" />
+            </genericInformation>
+			<depends>
+			  <task ref="taskVariables"/>
+			</depends>
+      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+                        	println variables["TESTVAR0"]
+                        	println variables["TESTVAR1"]
+                        	println variables["TESTVAR2"]
+                        	println variables["TESTVAR3"]
+                        	println variables["TESTVAR4"]
+                        	println variables["TESTVAR5"]
+                        	println variables["TESTVAR6"]
+                        	println variables["TESTVAR7"]
+                       	]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
         <task name="taskNoVariables">
             <genericInformation>
                 <info name="taskNoVariablesGI" value="${TESTVAR2}" />
             </genericInformation>
-      		<!-- <parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel> -->
+      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
             <scriptExecutable>
                 <script>
                     <code language="groovy">
-                        <![CDATA[println variables["TESTVAR1"]]]>
+                        	println variables["TESTVAR0"]
+                        	println variables["TESTVAR1"]
+                        	println variables["TESTVAR2"]
+                        	println variables["TESTVAR3"]
+                        	println variables["TESTVAR4"]
+                        	println variables["TESTVAR5"]
+                        	println variables["TESTVAR6"]
+                        	println variables["TESTVAR7"]
                     </code>
                 </script>
             </scriptExecutable>

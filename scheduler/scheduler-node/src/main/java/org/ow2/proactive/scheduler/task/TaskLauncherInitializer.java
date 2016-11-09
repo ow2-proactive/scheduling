@@ -40,6 +40,7 @@ import com.google.common.collect.ImmutableMap;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -48,6 +49,7 @@ import org.ow2.proactive.scripting.Script;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +95,8 @@ public class TaskLauncherInitializer implements Serializable {
     private boolean preciousLogs;
 
     private ImmutableMap<String, String> variables;
+
+    private ImmutableMap<String, TaskVariable> taskVariables = ImmutableMap.of();
     private int pingPeriod;
     private int pingAttempts = 1;
 
@@ -323,6 +327,14 @@ public class TaskLauncherInitializer implements Serializable {
 
     public ImmutableMap<String, String> getVariables() {
         return this.variables;
+    }
+
+    public void setTaskVariables(Map<String, TaskVariable> taskVariables) {
+        this.taskVariables = ImmutableMap.copyOf(taskVariables);
+    }
+
+    public ImmutableMap<String, TaskVariable> getTaskVariables() {
+        return this.taskVariables;
     }
 
     public void setPingPeriod(int pingPeriod) {
