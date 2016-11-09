@@ -36,10 +36,7 @@
  */
 package org.ow2.proactive.utils.appenders;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Enumeration;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -47,7 +44,10 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Enumeration;
 
 
 /**
@@ -93,6 +93,15 @@ public class FileAppender extends WriterAppender {
         if (filesLocation != null) {
             fileName = filesLocation + File.separator + fileName;
         }
+        File file = new File(fileName);
+        if (!file.exists()) {
+            try {
+                FileUtils.forceMkdirParent(file);
+                FileUtils.touch(file);
+            } catch (IOException e) {
+                Logger.getRootLogger().error(e.getMessage(), e);
+            }
+        }
 
         try {
             RollingFileAppender appender = new RollingFileAppender(getLayout(), fileName, true);
@@ -104,7 +113,6 @@ public class FileAppender extends WriterAppender {
             appender.close();
         } catch (IOException e) {
             Logger.getRootLogger().error(e.getMessage(), e);
-            e.printStackTrace();
         }
     }
 
