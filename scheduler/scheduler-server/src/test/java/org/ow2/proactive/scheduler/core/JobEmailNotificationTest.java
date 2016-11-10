@@ -201,15 +201,10 @@ public class JobEmailNotificationTest extends ProActiveTest {
         assertFalse(sendNotification(job, SchedulerEvent.STARTED, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.STOPPED, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.KILLED, stubbedSender));
-        assertFalse(sendNotification(job, SchedulerEvent.JOB_PAUSED, stubbedSender));
-        assertFalse(sendNotification(job, SchedulerEvent.JOB_PENDING_TO_RUNNING, stubbedSender));
-        assertFalse(sendNotification(job, SchedulerEvent.JOB_RESUMED, stubbedSender));
-        assertFalse(sendNotification(job, SchedulerEvent.JOB_SUBMITTED, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.JOB_REMOVE_FINISHED, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.TASK_PENDING_TO_RUNNING, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.TASK_RUNNING_TO_FINISHED, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.TASK_WAITING_FOR_RESTART, stubbedSender));
-        assertFalse(sendNotification(job, SchedulerEvent.JOB_CHANGE_PRIORITY, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.PAUSED, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.RM_DOWN, stubbedSender));
         assertFalse(sendNotification(job, SchedulerEvent.RM_UP, stubbedSender));
@@ -243,7 +238,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("job 123890 finished"),
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job running to finished"),
                 contains("Status: Finished"));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -257,7 +252,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("job 123890 finished"),
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job running to finished"),
                 contains("Status: Killed"));
         verifyNoMoreInteractions(stubbedSender);
     }
@@ -271,9 +266,106 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_PENDING_TO_FINISHED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("job 123890 finished"),
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job pending to finished"),
                 contains("Status: Finished"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
+    @Test
+    public void testPaused() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.PAUSED);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_PAUSED, stubbedSender);
+
+        assertTrue(sent);
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job paused"),
+                contains("Status: Paused"));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testResumed() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.PENDING);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_RESUMED, stubbedSender);
+
+        assertTrue(sent);
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job resumed"),
+                contains("Status: Pending"));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testJobInError() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.IN_ERROR);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_IN_ERROR, stubbedSender);
+
+        assertTrue(sent);
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job In-Error"),
+                contains("Status: In-Error"));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testJobSubmitted() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.PENDING);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_SUBMITTED, stubbedSender);
+
+        assertTrue(sent);
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job submitted"),
+                contains("Status: Pending"));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testJobPendingToRun() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.PENDING);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_PENDING_TO_RUNNING, stubbedSender);
+
+        assertTrue(sent);
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job pending to running"),
+                contains("Status: Pending"));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testJobChangePriority() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.STALLED);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_CHANGE_PRIORITY, stubbedSender);
+
+        assertTrue(sent);
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job change piority"),
+                contains("Status: Stalled"));
+        verifyNoMoreInteractions(stubbedSender);
+    }
+
+    @Test
+    public void testJobRestartedFromError() throws Exception {
+        InternalJob job = createJob(USER_EMAIL);
+        job.setId(new JobIdImpl(123890, job.getName()));
+        job.setStatus(JobStatus.RUNNING);
+
+        boolean sent = sendNotification(job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR, stubbedSender);
+
+        assertTrue(sent);
+        verify(stubbedSender).send(eq(ADMIN_EMAIL), eq(USER_EMAIL), contains("ProActive Job 123890 : Job restarted from error"),
+                contains("Status: Running"));
+        verifyNoMoreInteractions(stubbedSender);
+    }
 }
