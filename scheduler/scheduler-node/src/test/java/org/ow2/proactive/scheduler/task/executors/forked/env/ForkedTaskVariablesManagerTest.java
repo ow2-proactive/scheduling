@@ -68,7 +68,7 @@ public class ForkedTaskVariablesManagerTest {
         variablesMap.setInheritedMap(variables);
 
         validateThatScriptHandlerBindingsContain(scriptHandler, createTaskContext(null), variablesMap,
-                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.VARIABLES_BINDING_NAME, variables);
+                new HashMap<String, String>(), new HashMap<String, String>(), SchedulerConstants.VARIABLES_BINDING_NAME, variablesMap);
 
     }
 
