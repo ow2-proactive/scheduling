@@ -73,7 +73,6 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
 
         //Get logs and task output
         String logs = schedulerHelper.getJobServerLogs(id);
-        String[] logsLines = logs.split(System.lineSeparator());
         TaskLogs outputVariables = schedulerHelper.getTaskResult(id, "taskVariables").getOutput();
         String[] outputVariablesLines = outputVariables.getStdoutLogs(false).split(System.lineSeparator());
         TaskLogs outputChild = schedulerHelper.getTaskResult(id, "childTask").getOutput();
@@ -84,7 +83,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         //Tests variable access
         assertEquals("testvarjob3", job.getVariables().get("TESTVAR3"));
         //Selection files access
-        assertTrue(logsMatch(logsLines, "testvartask0"));
+        assertTrue(logs.contains("testvartask0"));
 
         //Fork environment, pre, scriptExecutable, post scripts 
         assertEquals(5, outputVariablesLines.length);
@@ -118,7 +117,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         assertEquals("testvarjob7", outputNoVariablesLines[7]);
 
         //Cleaning script
-        assertTrue(logsMatch(logsLines, ".*\\(taskVariables\\) testvartask5"));
+        assertTrue(logs.contains("(taskVariables) testvartask5"));
         
         //Variables use into generic information
         Map<String, String> genericInformations = job.getGenericInformation();
@@ -141,15 +140,6 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         assertEquals(2, job.getTask("taskVariables").getParallelEnvironment().getNodesNumber());
         assertEquals(1, job.getTask("childTask").getParallelEnvironment().getNodesNumber());
         assertEquals(1, job.getTask("taskNoVariables").getParallelEnvironment().getNodesNumber());
-    }
-    
-    private boolean logsMatch(String[] logsLines, String pattern){
-        for (String line: logsLines){
-            if (line.matches(pattern)){
-                return true;
-            }
-        }
-        return false;
     }
 
 }
