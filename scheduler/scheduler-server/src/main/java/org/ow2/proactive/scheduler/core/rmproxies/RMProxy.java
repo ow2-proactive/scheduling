@@ -49,7 +49,6 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.Map;
 
