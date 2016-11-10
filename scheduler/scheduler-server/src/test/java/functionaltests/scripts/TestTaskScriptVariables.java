@@ -43,33 +43,22 @@ import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
-import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 
 
 /**
- * This test checks that variable bindings are available and correctly set in various scripts (pre/post/fork/task)
+ * This test checks that task variables are available from task scope but not propagated
  */
-public class TestTaskScriptVariables extends SchedulerFunctionalTestWithCustomConfigAndRestart {
-
-    static URL configFile = TestTaskScriptVariables.class
-            .getResource("/functionaltests/scripts/schedulerPropertiesCustomSchedulerRestUrl.ini");
+public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestTaskScriptVariables.class
             .getResource("/functionaltests/descriptors/Task_script_variables.xml");
-
-    @BeforeClass
-    public static void before() throws Throwable {
-        File propertiesfile = new File(configFile.toURI());
-        schedulerHelper = new SchedulerTHelper(true, propertiesfile.getAbsolutePath());
-    }
 
     @Test
     public void testTaskVariables() throws Throwable {
