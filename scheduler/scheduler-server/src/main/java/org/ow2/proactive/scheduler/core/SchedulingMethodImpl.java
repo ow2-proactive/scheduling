@@ -550,15 +550,16 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     .getDataSpaceServiceStarter();
             job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
 
-            // create launcher
-            launcher = task.createLauncher(job, node);
-
-            activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-
-            nodeSet.remove(0);
-
             NodeSet nodes = new NodeSet();
             try {
+
+                // create launcher
+                launcher = task.createLauncher(job, node);
+
+                activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
+
+                nodeSet.remove(0);
+
                 //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
                 // we will need to update this code once topology will be allowed for single-node task
                 if (task.isParallel()) {

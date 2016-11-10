@@ -36,6 +36,10 @@
  */
 package org.ow2.proactive.scripting;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
+
+import javax.script.Bindings;
 import java.io.File;
 import java.io.Reader;
 import java.io.Serializable;
@@ -44,11 +48,6 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
-import javax.script.Bindings;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -303,17 +302,6 @@ public class SelectionScript extends Script<Boolean> {
      */
     public byte[] digest() throws NoSuchAlgorithmException {
         return MessageDigest.getInstance("MD5").digest(id_);
-    }
-
-    /**
-     * Get MD5 hash value of the script without parameters
-     */
-    public static String digest(String script) {
-        try {
-            return new String(MessageDigest.getInstance("MD5").digest(script.getBytes()));
-        } catch (NoSuchAlgorithmException e) {
-            return script;
-        }
     }
 
     /** Compare two arrays of bytes

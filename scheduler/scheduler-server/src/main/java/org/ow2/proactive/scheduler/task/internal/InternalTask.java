@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -59,13 +60,17 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -84,6 +89,18 @@ import java.util.regex.Pattern;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class InternalTask extends TaskState {
+
+    @XmlTransient
+    public static final transient TaskLogger logger = TaskLogger.getInstance();
+
+    @XmlTransient
+    private static transient HashSet<String> authorizedSelectionScripts = null;
+
+    @XmlTransient
+    private static final transient long DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD = (long) 60 * 1000;
+
+    @XmlTransient
+    private static transient long lastAuthorizedFolderLoadingTime = 0;
 
     /** Parents list: null if no dependency */
     @XmlTransient
@@ -539,6 +556,59 @@ public abstract class InternalTask extends TaskState {
         }
         this.taskInfo = (TaskInfoImpl) taskInfo;
     }
+
+    /**
+     * Loads authorized selection scripts.
+     */
+    private static void updateAuthorizedScriptsSignatures(TaskId id) {
+        String dirName = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString();
+        if (dirName != null && dirName.length() > 0) {
+            dirName = PASchedulerProperties.getAbsolutePath(dirName);
+            File folder = new File(dirName);
+
+            if (folder.exists() && folder.isDirectory()) {
+                logger.info(id, "The resource manager will accept only fork environment or cleaning scripts from " + dirName);
+                long currentTime = System.currentTimeMillis();
+                long configuredAuthorizedScriptLoadPeriod = getConfiguredAuthorizedScriptLoadPeriod();
+                if (currentTime - lastAuthorizedFolderLoadingTime > configuredAuthorizedScriptLoadPeriod) {
+                    lastAuthorizedFolderLoadingTime = currentTime;
+                    loadAuthorizedScriptsSignatures(id, folder);
+                }
+            } else {
+                logger.error(id, "Invalid dir name for authorized scripts " + dirName);
+            }
+
+        }
+    }
+
+    private static void loadAuthorizedScriptsSignatures(TaskId id, File folder) {
+        authorizedSelectionScripts = new HashSet<>();
+        for (File file : folder.listFiles()) {
+            if (file.isFile()) {
+                try {
+                    String script = Script.readFile(file);
+                    logger.debug(id, "Adding authorized script " + file.getAbsolutePath());
+                    authorizedSelectionScripts.add(Script.digest(script.trim()));
+                } catch (Exception e) {
+                    logger.error(id, e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    private static long getConfiguredAuthorizedScriptLoadPeriod() {
+        long configuredAuthorizedScriptLoadPeriod = DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD;
+        if (PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.isSet()) {
+            configuredAuthorizedScriptLoadPeriod = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsInt();
+        }
+        return configuredAuthorizedScriptLoadPeriod;
+    }
+
+    public static synchronized boolean isScriptAuthorized(TaskId id, Script script) {
+        updateAuthorizedScriptsSignatures(id);
+        return authorizedSelectionScripts == null || authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()));
+    }
+
 
     @Override
     public void setMaxNumberOfExecution(int numberOfExecution) {
@@ -1046,6 +1116,13 @@ public abstract class InternalTask extends TaskState {
         Map<String, String> gInfo = getGenericInformationOverridden(job);
         tli.setGenericInformation(gInfo);
 
+        ForkEnvironment environment = getForkEnvironment();
+        if (environment != null) {
+            Script environmentScript = environment.getEnvScript();
+            if ((environmentScript != null) && !isScriptAuthorized(getId(), environmentScript)) {
+                tli.setAuthorizedForkEnvironmentScript(false);
+            }
+        }
         tli.setForkEnvironment(getForkEnvironment());
         if (isWallTimeSet()) {
             tli.setWalltime(wallTime);

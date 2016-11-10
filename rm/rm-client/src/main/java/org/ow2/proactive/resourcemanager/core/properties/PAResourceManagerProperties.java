@@ -90,11 +90,16 @@ public enum PAResourceManagerProperties {
      */
     RM_EXECUTE_SCRIPT_TIMEOUT("pa.rm.execute.script.timeout", PropertyType.INTEGER),
 
-    /** 
-     * If set to non-null value the resource manager executes only scripts from
+    /**
+     * If set to non-null value the resource manager executes only selection scripts from
      * this directory. All other selection scripts will be rejected.
      */
     RM_EXECUTE_SCRIPT_AUTHORIZED_DIR("pa.rm.select.script.authorized.dir", PropertyType.STRING),
+
+    /**
+     * The pa.rm.select.script.authorized.dir is browsed every refreshperiod time to load authorized scripts.
+     */
+    RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD("pa.rm.select.script.authorized.dir.refreshperiod", PropertyType.INTEGER),
 
     /** Timeout in ms for node lookup */
     RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER),

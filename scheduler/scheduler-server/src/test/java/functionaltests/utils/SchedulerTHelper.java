@@ -36,17 +36,8 @@
  */
 package functionaltests.utils;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.monitor.SchedulerMonitorsHandler;
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -62,21 +53,23 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import functionaltests.monitor.RMMonitorsHandler;
-import functionaltests.monitor.SchedulerMonitorsHandler;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -481,6 +474,31 @@ public class SchedulerTHelper {
      * verification of events sequence.
      */
     public JobId testJobSubmission(Job jobToSubmit, boolean acceptSkipped) throws Exception {
+        return testJobSubmission(jobToSubmit, acceptSkipped, true);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check, with assertions,
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ job passing from running to finished (with state set to finished).
+     * 4/ every task finished with or without error (configurable)
+     * <p>
+     * Then returns.
+     * <p>
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific events or task states (failures, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param jobToSubmit     job object to schedule.
+     * @param acceptSkipped   if true then skipped task will not fail the test
+     * @param failIfTaskError if true then the test will fail if a task was in error
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job submission, or during
+     *                   verification of events sequence.
+     */
+    public JobId testJobSubmission(Job jobToSubmit, boolean acceptSkipped, boolean failIfTaskError) throws Exception {
         Scheduler userInt = getSchedulerInterface();
 
         JobId id = userInt.submit(jobToSubmit);
@@ -543,7 +561,7 @@ public class SchedulerTHelper {
             }
         }
 
-        if (taskError) {
+        if (taskError && failIfTaskError) {
             fail(message);
         }
 
