@@ -55,6 +55,7 @@ import java.util.HashSet;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.CoreMatchers.is;
 
 
 public class SessionSharingTest {
@@ -108,6 +109,15 @@ public class SessionSharingTest {
         } catch (NotConnectedRestException expected) {
             // expected
         }
+    }
+    
+    @Test
+    public void sessions_by_scheduler_login() throws Exception {
+        String sessionId = schedulerRest.login("login", "pw");
+
+        String login = schedulerRest.getLoginFromSessionId(sessionId);
+        
+        assertThat(login, is("login"));
     }
 
     @Test

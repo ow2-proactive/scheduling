@@ -1554,6 +1554,21 @@ public interface SchedulerRestInterface {
 	String loginOrRenewSession(@HeaderParam("sessionid") String sessionId, @MultipartForm LoginForm multipart)
 			throws KeyException, SchedulerRestException, LoginException, NotConnectedRestException;
 
+    /**
+     * Get the login string from the {@code sessionId} if it exists
+     * 
+     * @param sessionId given sessionId
+     * @return login string
+     * @throws SchedulerRestException
+     * @throws LoginException
+     * @throws NotConnectedRestException
+     */
+    @GET
+    @Path("logins/sessionid/{sessionId}")
+    @Produces("application/json")
+    public String getLoginFromSessionId(@PathParam("sessionId") String sessionId)
+            throws SchedulerRestException, LoginException, NotConnectedRestException;
+
 	/**
 	 * login to the scheduler using a multipart form can be used either by
 	 * submitting - 2 fields: username and password - a credential file with
