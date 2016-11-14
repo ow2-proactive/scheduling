@@ -52,6 +52,7 @@ import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.Random;
 
@@ -68,7 +69,15 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     public static final String TEMP_DIR_NAME = "tempDir";
     public static final String TEMP_DIR2_NAME = "tempDir2";
     public static final String TEMP_FILE_TMP_NAME = "tempFile.tmp";
+    public static final String TEMP_FILE_ZIP_NAME = "test1.zip";
+    public static final String TEMP_FILE_TGZ_NAME = "test1.tgz";
     public static final String TEMP_FILE_TMP_PATH = TEMP_DIR_NAME + "/" + TEMP_FILE_TMP_NAME;
+
+    static URL zipFileUrl = DataTransferTest.class
+            .getResource("/functionaltests/files/test1.zip");
+
+    static URL tgzFileUrl = DataTransferTest.class
+            .getResource("/functionaltests/files/test2.tgz");
 
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
@@ -98,6 +107,37 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         FileUtils.deleteQuietly(destFile);
         client.getUserSpace().pushFile(tmpFile, "testUploadSingleFile/" + TEMP_FILE_TMP_NAME);
         assertTrue(Files.equal(tmpFile, destFile));
+    }
+
+    @Test
+    public void testUploadTgzFile() throws Exception {
+        testUploadArchiveFile(TEMP_FILE_ZIP_NAME, zipFileUrl, "testUploadZipFile");
+    }
+
+
+    @Test
+    public void testUploadZipFile() throws Exception {
+        testUploadArchiveFile(TEMP_FILE_TGZ_NAME, tgzFileUrl, "testUploadTgzFile");
+    }
+
+    private void testUploadArchiveFile(String archiveFileName, URL archiveFileSource, String testFolderName) throws Exception {
+        File tmpZipFile = tmpDir.newFile(archiveFileName);
+        FileUtils.copyInputStreamToFile(archiveFileSource.openStream(),tmpZipFile);
+
+        // use standard client
+        IDataSpaceClient client = clientInstance();
+        LocalFileSource source = new LocalFileSource(tmpZipFile);
+        RemoteDestination dest = new RemoteDestination(USER, testFolderName + "/" + archiveFileName);
+
+        assertTrue(client.upload(source, dest));
+        String destDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
+        File destFile = new File(destDirPath, testFolderName + "/" + archiveFileName);
+        assertTrue(Files.equal(tmpZipFile, destFile));
+
+        // use RemoteSpace API
+        FileUtils.deleteQuietly(destFile);
+        client.getUserSpace().pushFile(tmpZipFile, testFolderName + "/" + archiveFileName);
+        assertTrue(Files.equal(tmpZipFile, destFile));
     }
 
     @Test
@@ -215,6 +255,45 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         File downloadedFile = client.getUserSpace().pullFile(TEMP_FILE_TMP_NAME, tmpFile);
         assertTrue(Files.equal(srcFile, downloadedFile));
 
+    }
+
+
+    @Test
+    public void testDownloadZipFile() throws Exception {
+        testDownloadArchiveFile(TEMP_FILE_ZIP_NAME, zipFileUrl);
+
+    }
+
+    @Test
+    public void testDownloadTgzFile() throws Exception {
+        testDownloadArchiveFile(TEMP_FILE_TGZ_NAME, tgzFileUrl);
+
+    }
+
+    private void testDownloadArchiveFile(String archiveFileName, URL archiveSource) throws Exception {
+        String srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
+        File srcFile = new File(srcDirPath, archiveFileName);
+        if (srcFile.exists()) {
+            assertTrue(srcFile.delete());
+        }
+        FileUtils.copyInputStreamToFile(archiveSource.openStream(),srcFile);
+
+        File tmpFile = tmpDir.newFile(archiveFileName);
+        if (tmpFile.exists()) {
+            assertTrue(tmpFile.delete());
+        }
+
+        // use standard client
+        IDataSpaceClient client = clientInstance();
+        RemoteSource source = new RemoteSource(USER, archiveFileName);
+        LocalDestination dest = new LocalDestination(tmpFile);
+        assertTrue(client.download(source, dest));
+        assertTrue(Files.equal(srcFile, tmpFile));
+
+        // use RemoteSpace API
+        FileUtils.deleteQuietly(tmpFile);
+        File downloadedFile = client.getUserSpace().pullFile(archiveFileName, tmpFile);
+        assertTrue(Files.equal(srcFile, downloadedFile));
     }
 
     @Test

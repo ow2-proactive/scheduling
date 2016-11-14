@@ -381,7 +381,7 @@ public class RestDataspaceImpl {
                     throw new WebApplicationException(ioe, Response.Status.INTERNAL_SERVER_ERROR);
                 }
             }
-        }).header(HttpHeaders.CONTENT_TYPE, mediaType(fo)).header(HttpHeaders.CONTENT_ENCODING, "zip")
+        }).header(HttpHeaders.CONTENT_TYPE, mediaType(fo)).header(HttpHeaders.CONTENT_ENCODING, "identity")
                 .build();
     }
 
