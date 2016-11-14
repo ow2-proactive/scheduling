@@ -1,116 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="urn:proactive:jobdescriptor:3.5"
-        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-        name="Distributed Computing" projectName="2. Advanced Workflows"
-        priority="normal"
-        onTaskError="continueJobExecution">
-  <description>
-    <![CDATA[ Computing PI according to MonteCarlo method. This job will launch 6 MonteCarlo tasks, then 2 tasks will average 3 results each. So a last task will average the 2 last        result. Finally this last task will be the final result. ]]>
-  </description>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.5"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+    name="2 Minutes Cron" projectName="1. Basic Workflows"
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2">
   <taskFlow>
-    <task name="Computation1">
+    <task name="cron_task">
       <description>
-        <![CDATA[ Compute Pi and return it ]]>
+        <![CDATA[ Will run every minutes ]]>
       </description>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
-        <parameters>
-          <parameter name="steps" value="20"/>
-          <parameter name="iterations" value="100000000"/>
-        </parameters>
-      </javaExecutable>
-    </task>
-    <task name="Computation2">
-      <description>
-        <![CDATA[ Compute Pi and return it ]]>
-      </description>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
-        <parameters>
-          <parameter name="steps" value="20"/>
-          <parameter name="iterations" value="100000000"/>
-        </parameters>
-      </javaExecutable>
-    </task>
-    <task name="Computation3">
-      <description>
-        <![CDATA[ Compute Pi and return it ]]>
-      </description>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
-        <parameters>
-          <parameter name="steps" value="20"/>
-          <parameter name="iterations" value="100000000"/>
-        </parameters>
-      </javaExecutable>
-    </task>
-    <task name="Computation4">
-      <description>
-        <![CDATA[ Compute Pi and return it ]]>
-      </description>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
-        <parameters>
-          <parameter name="steps" value="20"/>
-          <parameter name="iterations" value="100000000"/>
-        </parameters>
-      </javaExecutable>
-    </task>
-    <task name="Computation5">
-      <description>
-        <![CDATA[ Compute Pi and return it ]]>
-      </description>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
-        <parameters>
-          <parameter name="steps" value="20"/>
-          <parameter name="iterations" value="100000000"/>
-        </parameters>
-      </javaExecutable>
-    </task>
-    <task name="Computation6">
-      <description>
-        <![CDATA[ Compute Pi and return it ]]>
-      </description>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarlo">
-        <parameters>
-          <parameter name="steps" value="20"/>
-          <parameter name="iterations" value="100000000"/>
-        </parameters>
-      </javaExecutable>
-    </task>
-    <task name="Average1">
-      <description>
-        <![CDATA[ Do the average of 1 2 3 and return it. ]]>
-      </description>
-      <depends>
-        <task ref="Computation1"/>
-        <task ref="Computation2"/>
-        <task ref="Computation3"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarloAverage"></javaExecutable>
-    </task>
-    <task name="Average2">
-      <description>
-        <![CDATA[ Do the average of 4 5 6 and return it. ]]>
-      </description>
-      <depends>
-        <task ref="Computation4"/>
-        <task ref="Computation5"/>
-        <task ref="Computation6"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarloAverage"></javaExecutable>
-    </task>
-    <task name="LastAverage"
-
-
-
-    preciousResult="true" >
-      <description>
-        <![CDATA[ Do the average of average 1 2 and return it. ]]>
-      </description>
-      <depends>
-        <task ref="Average1"/>
-        <task ref="Average2"/>
-      </depends>
-      <javaExecutable class="org.ow2.proactive.scheduler.examples.MonteCarloAverage"></javaExecutable>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+print(new Date());
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow >
+        <loop target="cron_task">
+          <script>
+            <code language="javascript">
+              <![CDATA[
+// You can use a Cron Expression here
+              // examples http://www.sauronsoftware.it/projects/cron4j/manual.php#p02
+              loop = '*/2 * * * *';
+]]>
+            </code>
+          </script>
+        </loop>
+      </controlFlow>
     </task>
   </taskFlow>
 </job>
