@@ -114,6 +114,13 @@ public class TaskLogger {
         MDC.remove(FileAppender.FILE_NAME);
     }
 
+    public void error(TaskId id, String message) {
+        updateMdcWithTaskLogFilename(id);
+        logger.error(format(id, message));
+        MDC.remove(FileAppender.FILE_NAME);
+    }
+
+
     private void updateMdcWithTaskLogFilename(TaskId id) {
         MDC.put(FileAppender.FILE_NAME, getTaskLogRelativePath(id));
     }

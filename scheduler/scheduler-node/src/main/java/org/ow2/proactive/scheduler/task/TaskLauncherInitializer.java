@@ -87,6 +87,8 @@ public class TaskLauncherInitializer implements Serializable {
 
     private ImmutableMap<String, String> genericInformation;
 
+    private boolean authorizedForkEnvironmentScript = true;
+
     /** DataSpaces needed parameter */
     private List<InputSelector> taskInputFiles = null;
     private List<OutputSelector> taskOutputFiles = null;
@@ -409,5 +411,14 @@ public class TaskLauncherInitializer implements Serializable {
     public void setForkEnvironment(ForkEnvironment forkEnvironment) {
         this.forkEnvironment = forkEnvironment;
     }
+
+    public boolean isAuthorizedForkEnvironmentScript() {
+        return authorizedForkEnvironmentScript;
+    }
+
+    public void setAuthorizedForkEnvironmentScript(boolean authorizedForkEnvironmentScript) {
+        this.authorizedForkEnvironmentScript = authorizedForkEnvironmentScript;
+    }
+
 
 }

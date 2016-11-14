@@ -15,6 +15,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -137,10 +138,13 @@ public class RMProxyActiveObject {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes);
-            } else {
+            } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript)) {
                 for (Node node : nodes) {
-                    handleCleaningScript(node, cleaningScript, variables,genericInformation,taskId);
+                    handleCleaningScript(node, cleaningScript, variables, genericInformation, taskId);
                 }
+            } else {
+                TaskLogger.getInstance().error(taskId, "Unauthorized clean script: " + System.getProperty("line.separator") + cleaningScript.getScript());
+                releaseNodes(nodes);
             }
         }
     }

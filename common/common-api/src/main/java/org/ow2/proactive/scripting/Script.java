@@ -36,32 +36,24 @@
  */
 package org.ow2.proactive.scripting;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.base.Throwables;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.BoundedStringWriter;
+import org.ow2.proactive.utils.FileUtils;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.utils.BoundedStringWriter;
-import org.ow2.proactive.utils.FileUtils;
-import com.google.common.base.Throwables;
-import org.apache.log4j.Logger;
+import java.io.*;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -84,6 +76,7 @@ public abstract class Script<E> implements Serializable {
 
     /** Variable name for script arguments */
     public static final String ARGUMENTS_NAME = "args";
+    public static final String MD5 = "MD5";
 
     /** Name of the script engine or file path to script file (extension will be used to lookup) */
     protected String scriptEngineLookup;
@@ -392,28 +385,30 @@ public abstract class Script<E> implements Serializable {
 
     /** Create string script from url */
     protected void storeScript(URL url) throws IOException {
-        BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()));
-        StringBuilder builder = new StringBuilder();
-        String tmp;
+        try (BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()))) {
+            StringBuilder builder = new StringBuilder();
+            String tmp;
 
-        while ((tmp = buf.readLine()) != null) {
-            builder.append(tmp).append("\n");
+            while ((tmp = buf.readLine()) != null) {
+                builder.append(tmp).append("\n");
+            }
+
+            script = builder.toString();
         }
-
-        script = builder.toString();
     }
 
     /** Create string script from file */
     public static String readFile(File file) throws IOException {
-        BufferedReader buf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-        StringBuilder builder = new StringBuilder();
-        String tmp;
+        try (BufferedReader buf = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+            StringBuilder builder = new StringBuilder();
+            String tmp;
 
-        while ((tmp = buf.readLine()) != null) {
-            builder.append(tmp).append("\n");
+            while ((tmp = buf.readLine()) != null) {
+                builder.append(tmp).append("\n");
+            }
+
+            return builder.toString();
         }
-
-        return builder.toString();
     }
 
     public String getEngineName() {
@@ -433,6 +428,18 @@ public abstract class Script<E> implements Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * Get MD5 hash value of the script without parameters
+     */
+    public static String digest(String script) {
+        try {
+            return new String(MessageDigest.getInstance(MD5).digest(script.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("No algorithm found, digest will use the script content", e);
+            return script;
+        }
     }
 
     @Override
