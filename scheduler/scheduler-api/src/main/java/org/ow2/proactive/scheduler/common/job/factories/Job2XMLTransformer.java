@@ -274,6 +274,25 @@ public class Job2XMLTransformer {
     }
 
     /**
+     * Creates the task variables element
+     */
+    private Element createTaskVariablesElement(Document doc, Map<String, TaskVariable> variables) {
+        if (variables == null) {
+            return null;
+        }
+        Element variablesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.VARIABLES.getXMLName());
+        for (TaskVariable variable : variables.values()) {
+            Element variableE = createElement(doc, XMLTags.VARIABLE.getXMLName(), null, 
+                    new Attribute( XMLAttributes.VARIABLE_NAME.getXMLName(), variable.getName()), 
+                    new Attribute(XMLAttributes.VARIABLE_VALUE.getXMLName(), variable.getValue()), 
+                    new Attribute(XMLAttributes.VARIABLE_MODEL.getXMLName(), variable.getModel()), 
+                    new Attribute(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName(), String.valueOf(variable.isJobInherited())));
+            variablesE.appendChild(variableE);
+        }
+        return variablesE;
+    }
+
+    /**
      * Creates the generic information element corresponding to <define
      * name="genericInformation">
      *
@@ -390,7 +409,7 @@ public class Job2XMLTransformer {
 
         // <ref name="variables"/>
         if (task.getVariables() != null && !task.getVariables().isEmpty()) {
-            Element variablesE = createVariablesElement(doc, task.getVariables());
+            Element variablesE = createTaskVariablesElement(doc, task.getVariables());
             taskE.appendChild(variablesE);
         }
 

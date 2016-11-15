@@ -13,6 +13,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.utils.TaskIdWrapper;
 import org.apache.log4j.Logger;
 
@@ -118,7 +119,7 @@ final class TerminationData {
         for (TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
             RunningTaskData taskData = taskToTerminate.taskData;
             Map<String, String> genericInformation = new HashMap<>();
-            Map<String, Serializable> variables = null;
+            VariablesMap variables = null;
             if (taskToTerminate.internalJob != null) {
                 genericInformation = taskData.getTask().getGenericInformationOverridden(
                         taskToTerminate.internalJob);
@@ -168,14 +169,16 @@ final class TerminationData {
         }
     }
 
-    public Map<String, Serializable> getStringSerializableMap(SchedulingService service,
+    public VariablesMap getStringSerializableMap(SchedulingService service,
             TaskTerminationData taskToTerminate) throws Exception {
-        Map<String, Serializable> variables = new HashMap<>();
+        VariablesMap variablesMap = new VariablesMap();
 
         RunningTaskData taskData = taskToTerminate.taskData;
         TaskResultImpl taskResult = taskToTerminate.taskResult;
         InternalJob internalJob = taskToTerminate.internalJob;
 
+        variablesMap.setScopeMap(taskData.getTask().getSerializableVariables());
+        
         if (!taskToTerminate.normalTermination || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();
             if (iDependences != null) {
@@ -186,19 +189,19 @@ final class TerminationData {
                 Map<TaskId, TaskResult> taskResults = service.getInfrastructure().getDBManager()
                         .loadTasksResults(
                                 taskData.getTask().getJobId(), parentIds);
-                getResultsFromListOfTaskResults(variables, taskResults);
+                getResultsFromListOfTaskResults(variablesMap.getInheritedMap(), taskResults);
             } else {
                 if (internalJob != null)
-                    variables.putAll(internalJob.getVariables());
+                    variablesMap.getInheritedMap().putAll(internalJob.getVariables());
             }
-            variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(false));
+            variablesMap.getInheritedMap().put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(false));
         } else if (taskResult.hadException()) {
-            variables = fillMapWithTaskResult(taskResult, false);
+            variablesMap.setInheritedMap(fillMapWithTaskResult(taskResult, false));
 
         } else {
-            variables = fillMapWithTaskResult(taskResult, true);
+            variablesMap.setInheritedMap(fillMapWithTaskResult(taskResult, true));
         }
-        return variables;
+        return variablesMap;
     }
 
     private Map<String, Serializable> fillMapWithTaskResult(TaskResultImpl taskResult,

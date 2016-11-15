@@ -21,6 +21,7 @@ import org.ow2.proactive.scheduler.core.SchedulingInfrastructure;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
@@ -111,7 +112,7 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
                 return null;
             }
 
-        }).when(userProxy).releaseNodes((NodeSet) anyObject(), (Script<?>) anyObject(), (Map<String,Serializable>)anyObject(),
+        }).when(userProxy).releaseNodes((NodeSet) anyObject(), (Script<?>) anyObject(), (VariablesMap)anyObject(),
                 (Map<String,String>)anyObject(), (TaskId) anyObject());
 
         rmProxiesManager = mock(RMProxiesManager.class);

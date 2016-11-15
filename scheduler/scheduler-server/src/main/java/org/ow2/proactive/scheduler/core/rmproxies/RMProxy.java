@@ -44,11 +44,11 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.Map;
 
@@ -137,7 +137,7 @@ public class RMProxy {
         releaseNodes(nodeSet, cleaningScript,  null, null, null);
     }
 
-    public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, Map<String, Serializable> variables,Map<String, String> genericInformation,
+    public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, VariablesMap variables,Map<String, String> genericInformation,
     TaskId taskId) {
 
         if (nodeSet.size() == 0) {

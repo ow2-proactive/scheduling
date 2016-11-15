@@ -36,7 +36,9 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,6 +51,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
@@ -156,7 +159,7 @@ public abstract class Task extends CommonAttribute {
     protected ForkEnvironment forkEnvironment;
 
     /** A map to hold task variables */
-    protected ConcurrentHashMap<String, String> variables = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<String, TaskVariable> variables = new ConcurrentHashMap<>();
 
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
@@ -697,8 +700,8 @@ public abstract class Task extends CommonAttribute {
      * 
      * @param variables the variables map
      */
-    public void setVariables(Map<String, String> variables) {
-        this.variables = new ConcurrentHashMap<>(variables);
+    public void setVariables(Map<String, TaskVariable> variables) {
+        this.variables = new ConcurrentHashMap<String, TaskVariable>(variables);
     }
 
     /**
@@ -706,8 +709,36 @@ public abstract class Task extends CommonAttribute {
      * 
      * @return a variable map
      */
-    public Map<String, String> getVariables() {
+    public Map<String, TaskVariable> getVariables() {
         return this.variables;
+    }
+
+    /**
+     * Returns the variable map of this task.
+     * 
+     * @return a variable map
+     */
+    public Map<String, String> getVariablesOverriden(Job job) {
+        Map<String, String> taskVariables = new HashMap<>();
+        if (job != null){
+            taskVariables.putAll(job.getVariables());
+        }
+        for (TaskVariable variable: getVariables().values()){
+            if (!variable.isJobInherited()){
+                taskVariables.put(variable.getName(), variable.getValue());
+            }
+        }
+        return taskVariables;
+    }
+    
+    public Map<String, Serializable> getSerializableVariables(){
+        Map<String, Serializable> taskVariables = new HashMap<>();
+        for (TaskVariable variable: getVariables().values()){
+            if (!variable.isJobInherited()){
+                taskVariables.put(variable.getName(), variable.getValue());
+            }
+        }
+        return taskVariables;
     }
 
     @Override

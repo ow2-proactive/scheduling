@@ -19,6 +19,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -44,6 +45,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
@@ -141,6 +143,8 @@ public class TaskData {
     private TaskData ifBranch;
 
     private Map<String, String> genericInformation;
+
+    private Map<String, TaskDataVariable> variables;
 
     private List<SelectionScriptData> selectionScripts;
 
@@ -468,6 +472,9 @@ public class TaskData {
                 PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
         taskData.setGenericInformation(task.getGenericInformation(false));
+        taskData.setVariables(new HashMap<String, TaskDataVariable>());
+        for (Map.Entry<String, TaskVariable> entry: task.getVariables().entrySet())
+            taskData.getVariables().put(entry.getKey(), getTaskDataVariable(entry.getValue()));
 
         // set the scheduledTime if the START_AT property exists
         Map<String, String> genericInfos = taskData.getGenericInformation();
@@ -546,6 +553,42 @@ public class TaskData {
         return taskData;
     }
 
+    private static TaskDataVariable getTaskDataVariable(TaskVariable taskVariable) {
+        if (taskVariable == null){
+            return null;
+        }
+        
+        TaskDataVariable taskDataVariable = new TaskDataVariable();
+        taskDataVariable.setJobInherited(taskVariable.isJobInherited());
+        taskDataVariable.setModel(taskVariable.getModel());
+        taskDataVariable.setValue(taskVariable.getValue());
+        taskDataVariable.setName(taskVariable.getName());
+        
+        return taskDataVariable;
+    }
+    
+    private Map<String, TaskVariable> variablesToTaskVariables(){
+        Map<String, TaskVariable> taskVariables = new HashMap<String, TaskVariable>();
+        for (Map.Entry<String, TaskDataVariable> entry: getVariables().entrySet()){
+            taskVariables.put(entry.getKey(), variableToTaskVariable(entry.getValue()));
+        }
+        return taskVariables;
+    }
+
+    private static TaskVariable variableToTaskVariable(TaskDataVariable taskDataVariable) {
+        if (taskDataVariable == null){
+            return null;
+        }
+        
+        TaskVariable taskVariable = new TaskVariable();
+        taskVariable.setJobInherited(taskDataVariable.isJobInherited());
+        taskVariable.setModel(taskDataVariable.getModel());
+        taskVariable.setValue(taskDataVariable.getValue());
+        taskVariable.setName(taskDataVariable.getName());
+        
+        return taskVariable;
+    }
+
     TaskId createTaskId(InternalJob internalJob) {
         return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId());
     }
@@ -588,6 +631,7 @@ public class TaskData {
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
         internalTask.setMatchingBlock(getMatchingBlock());
+        internalTask.setVariables(variablesToTaskVariables());
 
         ForkEnvironment forkEnv = new ForkEnvironment();
         forkEnv.setJavaHome(javaHome);
@@ -640,6 +684,18 @@ public class TaskData {
 
     public void setGenericInformation(Map<String, String> genericInformation) {
         this.genericInformation = genericInformation;
+    }
+
+    @Cascade(CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @MapKey(name="name")
+    public Map<String,TaskDataVariable> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, TaskDataVariable> variables) {
+        this.variables = variables;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -1112,6 +1168,7 @@ public class TaskData {
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
         taskState.setParallelEnvironment(getParallelEnvironment());
         taskState.setGenericInformation(getGenericInformation());
+        taskState.setVariables(variablesToTaskVariables());
         return taskState;
     }
 

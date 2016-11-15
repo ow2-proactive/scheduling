@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+     name="Job_variables" priority="normal">
+    <variables>
+        <variable name="TESTVAR0" value="testvarjob0"/>
+        <variable name="TESTVAR1" value="testvarjob1"/>
+        <variable name="TESTVAR2" value="testvarjob2"/>
+        <variable name="TESTVAR3" value="testvarjob3"/>
+        <variable name="TESTVAR4" value="testvarjob4"/>
+        <variable name="TESTVAR5" value="testvarjob5"/>
+        <variable name="TESTVAR6" value="testvarjob6"/>
+        <variable name="TESTVAR7" value="testvarjob7"/>
+        <variable name="NUMBER_OF_NODES" value="1"/>
+    </variables>
+    <description>Job using variables in selection scripts, check the scheduler logs if the test fails to see the
+        selection scripts output
+    </description>
+    <genericInformation>
+        <info name="jobGI" value="${TESTVAR0}" />
+    </genericInformation>
+    <taskFlow>
+        <task name="taskVariables">
+		    <variables>
+		        <variable name="TESTVAR0" value="testvartask0" inherited="false" model=""/>
+		        <variable name="TESTVAR1" value="testvartask1" inherited="false" model=""/>
+		        <variable name="TESTVAR2" value="testvartask2" inherited="false" model=""/>
+		        <variable name="TESTVAR3" value="testvartask3" inherited="false" model=""/>
+		        <variable name="TESTVAR4" value="testvartask4" inherited="false" model=""/>
+		        <variable name="TESTVAR5" value="testvartask5" inherited="false" model=""/>
+		        <variable name="TESTVAR6" value="" inherited="true" model=""/>
+        		<variable name="TESTVAR7" value="testvartask7" inherited="false" model=""/>
+        		<variable name="NUMBER_OF_NODES" value="2" inherited="false" model=""/>
+		    </variables>
+            <genericInformation>
+                <info name="taskVariablesGI" value="${TESTVAR1}" />
+            </genericInformation>
+      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
+			<selection>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+						println variables["TESTVAR0"]
+						selected=true
+						]]>
+					</code>
+				</script>
+			</selection>
+            <forkEnvironment>
+                <envScript>
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[println variables["TESTVAR1"]]]>
+                        </code>
+                    </script>
+                </envScript>
+            </forkEnvironment>
+            <pre>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[println variables["TESTVAR2"]]]>
+                    </code>
+                </script>
+            </pre>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+                        	println variables["TESTVAR3"]
+                        	variables["TESTVAR7"]="testvar7modified"
+                        ]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <post>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[println variables["TESTVAR4"];println variables["TESTVAR6"]]]>
+                    </code>
+                </script>
+            </post>
+            <cleaning>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[println variables["TESTVAR5"]]]>
+                    </code>
+                </script>
+            </cleaning>
+        </task>
+        <task name="childTask">
+            <genericInformation>
+                <info name="childTaskGI" value="${TESTVAR4}" />
+            </genericInformation>
+			<depends>
+			  <task ref="taskVariables"/>
+			</depends>
+      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+                        	println variables["TESTVAR0"]
+                        	println variables["TESTVAR1"]
+                        	println variables["TESTVAR2"]
+                        	println variables["TESTVAR3"]
+                        	println variables["TESTVAR4"]
+                        	println variables["TESTVAR5"]
+                        	println variables["TESTVAR6"]
+                        	println variables["TESTVAR7"]
+                       	]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="taskNoVariables">
+            <genericInformation>
+                <info name="taskNoVariablesGI" value="${TESTVAR2}" />
+            </genericInformation>
+      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        	println variables["TESTVAR0"]
+                        	println variables["TESTVAR1"]
+                        	println variables["TESTVAR2"]
+                        	println variables["TESTVAR3"]
+                        	println variables["TESTVAR4"]
+                        	println variables["TESTVAR5"]
+                        	println variables["TESTVAR6"]
+                        	println variables["TESTVAR7"]
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

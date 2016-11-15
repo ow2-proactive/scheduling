@@ -14,6 +14,7 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
@@ -132,7 +133,7 @@ public class RMProxyActiveObject {
      * @see #releaseNodes(NodeSet)
      */
     @ImmediateService
-    public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, Map<String, Serializable> variables, Map<String,
+    public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables, Map<String,
             String> genericInformation, TaskId taskId) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
@@ -157,7 +158,7 @@ public class RMProxyActiveObject {
      * @param genericInformation
      */
     private void handleCleaningScript(Node node, Script<?> cleaningScript,
-            Map<String, Serializable> variables, Map<String, String> genericInformation,TaskId taskId) {
+            VariablesMap variables, Map<String, String> genericInformation,TaskId taskId) {
         try {
             this.nodesTaskId.put(node, taskId);
             ScriptHandler handler = ScriptLoader.createHandler(node);
