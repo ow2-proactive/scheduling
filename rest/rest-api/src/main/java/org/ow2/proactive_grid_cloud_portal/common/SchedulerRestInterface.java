@@ -1558,7 +1558,7 @@ public interface SchedulerRestInterface {
     /**
      * Get the login string associated to the {@code sessionId} if it exists
      * 
-     * In case that the give sessionId doesn't have an associated login (session id expired, or invalid), 
+     * In case that the given sessionId doesn't have an associated login (session id expired, or invalid), 
      * this endpoint will throw a {@link javax.ws.rs.NotFoundException}
      * 
      * @param sessionId with which the endpoint is going to look for the login value
