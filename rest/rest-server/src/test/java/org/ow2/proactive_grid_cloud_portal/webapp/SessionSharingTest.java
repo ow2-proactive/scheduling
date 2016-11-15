@@ -34,6 +34,18 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.HashSet;
+
+import javax.ws.rs.NotFoundException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -49,13 +61,6 @@ import org.ow2.proactive_grid_cloud_portal.rm.RMRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.studio.StudioRest;
-
-import java.util.HashSet;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.hamcrest.CoreMatchers.is;
 
 
 public class SessionSharingTest {
@@ -112,12 +117,19 @@ public class SessionSharingTest {
     }
     
     @Test
-    public void sessions_by_scheduler_login() throws Exception {
+    public void sessions_scheduler_login_by_sessionid() throws Exception {
         String sessionId = schedulerRest.login("login", "pw");
 
         String login = schedulerRest.getLoginFromSessionId(sessionId);
         
         assertThat(login, is("login"));
+    }
+    
+    @Test(expected = NotFoundException.class)
+    public void sessions_scheduler_login_by_wrong_sessionid() throws Exception {
+        schedulerRest.login("login", "pw");
+
+        schedulerRest.getLoginFromSessionId("whatever");
     }
 
     @Test
