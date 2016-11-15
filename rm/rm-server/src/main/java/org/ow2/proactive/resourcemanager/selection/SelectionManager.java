@@ -77,7 +77,9 @@ public abstract class SelectionManager {
 
     private RMCore rmcore;
 
-    private static final int SELECTION_THEADS_NUMBER = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt();
+    private static final long DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD = (long) 60 * 1000;
+
+    private static long lastAuthorizedFolderLoadingTime = 0;
 
     private ExecutorService scriptExecutorThreadPool;
 
@@ -107,36 +109,55 @@ public abstract class SelectionManager {
             selectionPolicy = new ShufflePolicy();
         }
 
-        loadAuthorizedScriptsSignatures();
+        updateAuthorizedScriptsSignatures();
     }
 
     /**
      * Loads authorized selection scripts.
      */
-    public void loadAuthorizedScriptsSignatures() {
+    public void updateAuthorizedScriptsSignatures() {
         String dirName = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString();
         if (dirName != null && dirName.length() > 0) {
             dirName = PAResourceManagerProperties.getAbsolutePath(dirName);
-
-            logger.info("The resource manager will accept only selection scripts from " + dirName);
             File folder = new File(dirName);
+
             if (folder.exists() && folder.isDirectory()) {
-                authorizedSelectionScripts = new HashSet<>();
-                for (File file : folder.listFiles()) {
-                    if (file.isFile()) {
-                        try {
-                            String script = SelectionScript.readFile(file);
-                            logger.debug("Adding authorized selection script " + file.getAbsolutePath());
-                            authorizedSelectionScripts.add(SelectionScript.digest(script));
-                        } catch (Exception e) {
-                            logger.error(e.getMessage(), e);
-                        }
-                    }
+                logger.info("The resource manager will accept only selection scripts from " + dirName);
+                long currentTime = System.currentTimeMillis();
+                long configuredAuthorizedScriptLoadPeriod = getConfiguredAuthorizedScriptLoadPeriod();
+                if (currentTime - lastAuthorizedFolderLoadingTime > configuredAuthorizedScriptLoadPeriod) {
+                    lastAuthorizedFolderLoadingTime = currentTime;
+                    loadAuthorizedScriptsSignatures(folder);
                 }
             } else {
                 logger.error("Invalid dir name for authorized scripts " + dirName);
+                throw new SecurityException("Invalid dir name for authorized scripts " + dirName);
             }
         }
+    }
+
+    private void loadAuthorizedScriptsSignatures(File folder) {
+        authorizedSelectionScripts = new HashSet<>();
+        for (File file : folder.listFiles()) {
+            if (file.isFile()) {
+                try {
+                    String script = SelectionScript.readFile(file);
+                    logger.debug("Adding authorized selection script " + file.getAbsolutePath());
+                    authorizedSelectionScripts.add(Script.digest(script.trim()));
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                    throw new SecurityException("Error while reading authorized script file", e);
+                }
+            }
+        }
+    }
+
+    private long getConfiguredAuthorizedScriptLoadPeriod() {
+        long configuredAuthorizedScriptLoadPeriod = DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD;
+        if (PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.isSet()) {
+            configuredAuthorizedScriptLoadPeriod = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsInt();
+        }
+        return configuredAuthorizedScriptLoadPeriod;
     }
 
     /**
@@ -347,13 +368,14 @@ public abstract class SelectionManager {
      * Checks is all scripts are authorized. If not throws an exception.
      */
     private void checkAuthorizedScripts(List<SelectionScript> scripts) {
+        updateAuthorizedScriptsSignatures();
         if (authorizedSelectionScripts == null || scripts == null)
             return;
 
         for (SelectionScript script : scripts) {
-            if (!authorizedSelectionScripts.contains(SelectionScript.digest(script.getScript()))) {
+            if (!authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()))) {
                 // unauthorized selection script
-                throw new SecurityException("Cannot execute unauthorized script " + script.getScript());
+                throw new SecurityException("Cannot execute unauthorized script: " + System.getProperty("line.separator") + script.getScript());
             }
         }
     }

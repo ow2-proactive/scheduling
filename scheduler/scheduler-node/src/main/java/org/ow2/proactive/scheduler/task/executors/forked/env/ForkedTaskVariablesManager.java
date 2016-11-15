@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 
@@ -73,7 +74,7 @@ public class ForkedTaskVariablesManager implements Serializable {
 
 
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext,
-                                           Map<String, Serializable> variables, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client, RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
+                                           VariablesMap variables, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client, RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
         scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, taskContext.getInitializer().getGenericInformation());
@@ -128,11 +129,12 @@ public class ForkedTaskVariablesManager implements Serializable {
         return null;
     }
 
-    public void replaceScriptParameters(Script script, Map<String, String> thirdPartyCredentials,
-            Map<String, Serializable> variables, PrintStream errorStream) {
+    public void replaceScriptParameters(Script<?> script, Map<String, String> thirdPartyCredentials,
+            VariablesMap variables, PrintStream errorStream) {
 
-        Map<String, Serializable> variablesAndCredentials = new HashMap<>(variables);
+        Map<String, Serializable> variablesAndCredentials = new HashMap<>(variables.getInheritedMap());
 
+        variablesAndCredentials.putAll(variables.getScopeMap());
         for (Map.Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
             variablesAndCredentials.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(),
                     credentialEntry.getValue());
@@ -142,6 +144,7 @@ public class ForkedTaskVariablesManager implements Serializable {
     }
 
     private void replace(Script script, Map<String, Serializable> substitutes, PrintStream errorStream) {
+        
         if (script != null) {
             if ("java".equals(script.getEngineName())) {
                 try {

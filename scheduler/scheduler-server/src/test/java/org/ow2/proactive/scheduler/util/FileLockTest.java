@@ -34,6 +34,8 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import org.junit.Test;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +45,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-
 /**
  * FileLockTest aims to check that {@link FileLock} implementation
  * can be used from several threads at the same time to perform a
@@ -52,7 +52,7 @@ import org.junit.Test;
  */
 public class FileLockTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 5000)
     public void testWaitUntilUnlocked() throws Exception {
         int nbTasks = 3;
         final FileLock fileLock = new FileLock();

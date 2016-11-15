@@ -61,10 +61,11 @@ public class ScriptUpdateUtil {
      * Filters the scripts in the specified job.
      */
     public static TaskFlowJob resolveScripts(TaskFlowJob job) {
-        Map<String, String> variables = job.getVariables();
         ArrayList<Task> tasks = job.getTasks();
-        for (Task task : tasks) {
+        for (Task task : tasks) {            
+            Map<String, String> variables = task.getVariablesOverriden(job);
             List<SelectionScript> selectionScripts = task.getSelectionScripts();
+            
             if (selectionScripts != null) {
                 for (SelectionScript sscript : selectionScripts) {
                     resolveScript(sscript, variables);
@@ -78,7 +79,7 @@ public class ScriptUpdateUtil {
         return job;
     }
 
-    private static void resolveScript(Script script, Map variables) {
+    private static void resolveScript(Script<?> script, Map<String, String> variables) {
         if (script != null) {
             script.setScript(filterAndUpdate(script.getScript(), variables));
             Serializable[] parameters = script.getParameters();

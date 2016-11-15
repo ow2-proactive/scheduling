@@ -3,98 +3,25 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:proactive:jobdescriptor:3.5"
         xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-        name="Cloud Automation" projectName="4. Cloud Automation Workflows"
+        name="Multi-Node Task" projectName="2. Advanced Workflows"
         priority="normal"
         onTaskError="continueJobExecution">
   <description>
-    <![CDATA[ A workflow that simulates cloud automation. ]]>
+    <![CDATA[ A multinode task will reserve several nodes and expose them to the task.        It is often used to run MPI jobs or task that use the ProActive Java API. ]]>
   </description>
   <taskFlow>
-    <task name="CreateDataBaseVM">
-      <description>
-        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
-      </description>
+    <task name="MultiNodeTask">
+      <parallel numberOfNodes="4"></parallel>
       <scriptExecutable>
         <script>
-          <code language="javascript">
+          <code language="groovy">
             <![CDATA[
-print("Creating database VM")
+println (nodesurl.size() + 1) + " nodes have been reserved"
+                        println "The other reserved nodes are accessible there " + nodesurl
 ]]>
           </code>
         </script>
       </scriptExecutable>
-      <controlFlow block="none"></controlFlow>
-    </task>
-    <task name="CreateApplicationVM">
-      <description>
-        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
-      </description>
-      <scriptExecutable>
-        <script>
-          <code language="javascript">
-            <![CDATA[
-print("Creating application VM")
-]]>
-          </code>
-        </script>
-      </scriptExecutable>
-      <controlFlow block="none"></controlFlow>
-    </task>
-    <task name="ConfigureApplication">
-      <description>
-        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
-      </description>
-      <depends>
-        <task ref="CreateApplicationVM"/>
-      </depends>
-      <scriptExecutable>
-        <script>
-          <code language="javascript">
-            <![CDATA[
-print("Configuring application")
-]]>
-          </code>
-        </script>
-      </scriptExecutable>
-      <controlFlow block="none"></controlFlow>
-    </task>
-    <task name="RunApplication">
-      <description>
-        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
-      </description>
-      <depends>
-        <task ref="ConfigDatabase"/>
-        <task ref="ConfigureApplication"/>
-      </depends>
-      <scriptExecutable>
-        <script>
-          <code language="javascript">
-            <![CDATA[
-print("Running application")
-java.lang.Thread.sleep(60000)
-]]>
-          </code>
-        </script>
-      </scriptExecutable>
-      <controlFlow block="none"></controlFlow>
-    </task>
-    <task name="ConfigDatabase">
-      <description>
-        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
-      </description>
-      <depends>
-        <task ref="CreateDataBaseVM"/>
-      </depends>
-      <scriptExecutable>
-        <script>
-          <code language="javascript">
-            <![CDATA[
-print("Configuring database VM")
-]]>
-          </code>
-        </script>
-      </scriptExecutable>
-      <controlFlow block="none"></controlFlow>
     </task>
   </taskFlow>
 </job>

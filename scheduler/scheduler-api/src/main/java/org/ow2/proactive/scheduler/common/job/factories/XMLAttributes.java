@@ -63,6 +63,8 @@ public enum XMLAttributes {
     // VARIABLE
     VARIABLE_NAME("name"),
     VARIABLE_VALUE("value"),
+    VARIABLE_MODEL("model"),
+    VARIABLE_JOB_INHERITED("inherited"),
 
     // TASKS
     TASK_CLASS_NAME("class"),

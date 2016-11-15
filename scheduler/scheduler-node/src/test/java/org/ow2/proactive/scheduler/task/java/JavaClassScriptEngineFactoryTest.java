@@ -6,6 +6,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -80,8 +81,8 @@ public class JavaClassScriptEngineFactoryTest {
         engine.getContext().setWriter(output);
         engine.getContext().setErrorWriter(new PrintWriter(error));
 
-        Map<String, Integer> variables = new HashMap<>();
-        variables.put(SchedulerVars.PA_TASK_REPLICATION.toString(), 42);
+        VariablesMap variables = new VariablesMap();
+        variables.getInheritedMap().put(SchedulerVars.PA_TASK_REPLICATION.toString(), 42);
         engine.getContext().setAttribute("variables",
           variables,
                 ScriptContext.ENGINE_SCOPE);
