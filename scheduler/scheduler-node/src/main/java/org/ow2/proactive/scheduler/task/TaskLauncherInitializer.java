@@ -40,6 +40,7 @@ import com.google.common.collect.ImmutableMap;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -86,6 +87,8 @@ public class TaskLauncherInitializer implements Serializable {
 
     private ImmutableMap<String, String> genericInformation;
 
+    private boolean authorizedForkEnvironmentScript = true;
+
     /** DataSpaces needed parameter */
     private List<InputSelector> taskInputFiles = null;
     private List<OutputSelector> taskOutputFiles = null;
@@ -93,6 +96,8 @@ public class TaskLauncherInitializer implements Serializable {
     private boolean preciousLogs;
 
     private ImmutableMap<String, String> variables;
+
+    private ImmutableMap<String, TaskVariable> taskVariables = ImmutableMap.of();
     private int pingPeriod;
     private int pingAttempts = 1;
 
@@ -325,6 +330,14 @@ public class TaskLauncherInitializer implements Serializable {
         return this.variables;
     }
 
+    public void setTaskVariables(Map<String, TaskVariable> taskVariables) {
+        this.taskVariables = ImmutableMap.copyOf(taskVariables);
+    }
+
+    public ImmutableMap<String, TaskVariable> getTaskVariables() {
+        return this.taskVariables;
+    }
+
     public void setPingPeriod(int pingPeriod) {
         this.pingPeriod = pingPeriod;
     }
@@ -398,5 +411,14 @@ public class TaskLauncherInitializer implements Serializable {
     public void setForkEnvironment(ForkEnvironment forkEnvironment) {
         this.forkEnvironment = forkEnvironment;
     }
+
+    public boolean isAuthorizedForkEnvironmentScript() {
+        return authorizedForkEnvironmentScript;
+    }
+
+    public void setAuthorizedForkEnvironmentScript(boolean authorizedForkEnvironmentScript) {
+        this.authorizedForkEnvironmentScript = authorizedForkEnvironmentScript;
+    }
+
 
 }
