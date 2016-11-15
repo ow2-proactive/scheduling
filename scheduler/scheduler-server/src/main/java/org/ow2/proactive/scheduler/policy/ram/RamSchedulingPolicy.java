@@ -37,14 +37,14 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
         String allocRam = task.getInternal().getGenericInformation().get(RAM_VARIABLE_NAME);
 
         if (allocRam != null) {
-            return canRunTaskOnNode(selectedNodes, task, Integer.parseInt(allocRam));
+            return canRunTaskOnNode(selectedNodes, task, Double.parseDouble(allocRam));
         } else {
             return true;
         }
 
     }
 
-    private boolean canRunTaskOnNode(NodeSet selectedNodes, EligibleTaskDescriptor task, int neededRam) {
+    private boolean canRunTaskOnNode(NodeSet selectedNodes, EligibleTaskDescriptor task, double neededRam) {
         Node n = selectedNodes.get(0);
         try {
             long freeRam = getFreeRamFromNode(n);
