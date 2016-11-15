@@ -1555,7 +1555,11 @@ public interface SchedulerRestInterface {
 			throws KeyException, SchedulerRestException, LoginException, NotConnectedRestException;
 
     /**
-     * Get the login string from the {@code sessionId} if it exists
+     * Get the login string associated to the {@code sessionId} if it exists
+     * 
+     * In case that the give sessionId has no login associated (session id expired, or invalid), 
+     * this endpoint simply returns an empty string, meaning that there isn't an associated login
+     * found with the given session id
      * 
      * @param sessionId given sessionId
      * @return login string
