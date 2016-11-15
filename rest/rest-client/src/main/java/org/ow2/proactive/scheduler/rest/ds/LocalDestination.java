@@ -56,7 +56,7 @@ public class LocalDestination implements ILocalDestination {
 
     @Override
     public void readFrom(InputStream is, String encoding) throws IOException {
-        if (Strings.isNullOrEmpty(encoding)) {
+        if (Strings.isNullOrEmpty(encoding) || "identity".equals(encoding)) {
             Files.asByteSink(dest).writeFrom(is);
         } else if ("gzip".equals(encoding)) {
             Zipper.GZIP.unzip(is, dest);

@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
 
 import javax.script.AbstractScriptEngine;
@@ -79,8 +80,8 @@ public class JavaClassScriptEngine extends AbstractScriptEngine {
             Map<String, byte[]> propagatedVariables = null;
             if (context.getAttribute(SchedulerConstants.VARIABLES_BINDING_NAME) != null) {
                 propagatedVariables = SerializationUtil
-                        .serializeVariableMap((Map<String, Serializable>) context.getAttribute(
-                                SchedulerConstants.VARIABLES_BINDING_NAME));
+                        .serializeVariableMap(((VariablesMap) context.getAttribute(
+                                SchedulerConstants.VARIABLES_BINDING_NAME)).getPropagatedVariables());
                 execInitializer.setPropagatedVariables(propagatedVariables);
             } else {
                 execInitializer.setPropagatedVariables(Collections.<String, byte[]> emptyMap());

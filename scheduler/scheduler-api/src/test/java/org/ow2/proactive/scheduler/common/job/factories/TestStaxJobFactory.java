@@ -36,26 +36,31 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 
-import static org.junit.Assert.assertEquals;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class TestStaxJobFactory {
 
@@ -170,8 +175,20 @@ public class TestStaxJobFactory {
     @Test
     public void testTaskVariables() throws URISyntaxException, JobCreationException {
         TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("task_variables.xml"));
-        Map<String, String> variables = job.getTask("task").getVariables();
-        assertExpectedKeyValueEntriesMatch(variables);
+        Map<String, TaskVariable> taskVariables = job.getTask("task").getVariables();
+        assertEquals(2, taskVariables.size());
+        TaskVariable taskVariable = taskVariables.get("name1");
+        assertNotNull(taskVariable);
+        assertEquals("name1", taskVariable.getName());
+        assertEquals("value1", taskVariable.getValue());
+        assertEquals("model1", taskVariable.getModel());
+        assertFalse(taskVariable.isJobInherited());
+        taskVariable = taskVariables.get("name2");
+        assertNotNull(taskVariable);
+        assertEquals("name2", taskVariable.getName());
+        assertEquals("value2", taskVariable.getValue());
+        assertEquals("model2", taskVariable.getModel());
+        assertTrue(taskVariable.isJobInherited());
     }
 
     private static <K,V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
