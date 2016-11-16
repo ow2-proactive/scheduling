@@ -1086,24 +1086,11 @@ public class TaskData {
 
     @Transient
     RestartMode getRestartMode() {
-        switch (restartModeId) {
-            case 1:
-                return RestartMode.ANYWHERE;
-            case 2:
-                return RestartMode.ELSEWHERE;
-            default:
-                throw new IllegalStateException("Invalid restartModeId: " + restartModeId);
-        }
+        return RestartMode.getMode(restartModeId);
     }
 
     void setRestartMode(RestartMode restartMode) {
-        if (restartMode.equals(RestartMode.ANYWHERE)) {
-            restartModeId = 1;
-        } else if (restartMode.equals(RestartMode.ELSEWHERE)) {
-            restartModeId = 2;
-        } else {
-            throw new IllegalArgumentException("Invalid restart mode: " + restartMode);
-        }
+        restartModeId = restartMode.getIndex();
     }
 
     @Transient
