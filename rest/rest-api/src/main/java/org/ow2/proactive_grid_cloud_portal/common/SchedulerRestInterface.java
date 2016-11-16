@@ -1572,7 +1572,7 @@ public interface SchedulerRestInterface {
     @Path("logins/sessionid/{sessionId}")
     @Produces("application/json")
     String getLoginFromSessionId(@PathParam("sessionId") String sessionId)
-            throws SchedulerRestException, LoginException, NotConnectedRestException, NotFoundException ;
+            throws SchedulerRestException, LoginException, NotConnectedRestException;
 
 	/**
 	 * login to the scheduler using a multipart form can be used either by

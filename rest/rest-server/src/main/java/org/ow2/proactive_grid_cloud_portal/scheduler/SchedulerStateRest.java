@@ -2950,7 +2950,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("logins/sessionid/{sessionId}")
     @Produces("application/json")
     public String getLoginFromSessionId(@PathParam("sessionId") String sessionId)
-            throws SchedulerRestException, LoginException, NotConnectedRestException, NotFoundException {
+            throws SchedulerRestException, LoginException, NotConnectedRestException {
         if (sessionId != null && sessionStore.exists(sessionId)) {
             return sessionStore.get(sessionId).getUserName();
         }
