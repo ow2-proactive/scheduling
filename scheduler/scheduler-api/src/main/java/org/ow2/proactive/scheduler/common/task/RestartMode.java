@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import com.google.common.annotations.VisibleForTesting;
 
 
 /**
@@ -60,6 +61,7 @@ public class RestartMode implements java.io.Serializable {
      * The task will be restarted according to its possible resources.
      */
     public static final RestartMode ANYWHERE = new RestartMode(1, "Anywhere");
+
     /**
      * The task will be restarted on an other node.
      */
@@ -70,23 +72,25 @@ public class RestartMode implements java.io.Serializable {
 
     @XmlAttribute
     private String description;
-    
-    public RestartMode(){}
+
+    public RestartMode() {}
 
     /**
      * Implicit constructor of a restart mode.
      *
      * @param description the name of the restart mode.
      */
-    private RestartMode(int index, String description) {
+    @VisibleForTesting
+    protected RestartMode(int index, String description) {
         this.index = index;
         this.description = description;
     }
 
     /**
-     * Return the RestartMode  corresponding to the given sMode String.
+     * Return the RestartMode corresponding to the given {@code description}.
      *
      * @param description a string representing the restart mode.
+     *
      * @return the RestartMode.
      */
     public static RestartMode getMode(String description) {
@@ -97,26 +101,48 @@ public class RestartMode implements java.io.Serializable {
         }
     }
 
-    /**
-     * @see java.lang.Enum#toString()
-     */
-    @Override
-    public String toString() {
+    public static RestartMode getMode(int restartModeId) {
+        switch (restartModeId) {
+            case 1:
+                return RestartMode.ANYWHERE;
+            case 2:
+                return RestartMode.ELSEWHERE;
+            default:
+                throw new IllegalArgumentException("Unknown restart mode: " + restartModeId);
+        }
+    }
+
+    public String getDescription() {
         return description;
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+    public int getIndex() {
+        return index;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        try {
-            return index == ((RestartMode) obj).index;
-        } catch (ClassCastException e) {
-            return false;
-        } catch (NullPointerException e) {
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+
+        RestartMode that = (RestartMode) o;
+
+        return index == that.index;
+    }
+
+    @Override
+    public int hashCode() {
+        return index;
+    }
+
+    @Override
+    public String toString() {
+        return description;
     }
 
 }
