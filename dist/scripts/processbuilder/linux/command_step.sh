@@ -7,8 +7,9 @@
 # parameters:
 #	$1 - the token
 #	$2 - temp file to save exit value
-# 	$3 - absolute path to the working dir of user command
-#	$4... - command to execute
+#	$3 - temp file containing the environment
+# 	$4 - absolute path to the working dir of user command
+#	$5... - command to execute
 
 # IMPORTANT: On error messages refer to the JavaDoc of OSProcessBuilder
 
@@ -30,6 +31,16 @@ if [ ! -e $tmp ]; then
   exit 1;
 fi;
 
+# temp env file
+tmpenv=$3
+
+if [ ! -e $tmpenv ]; then
+  # if the temp file is not OK
+  error="$OSPL_E_PREFIX ${OSLP_PACKAGE}FatalProcessBuilderException $OSPL_E_CAUSE Could not access temp environment file for loading system variables!";
+  echo $error 1>&2;
+  exit 1;
+fi;
+
 # if we have data in the file, then it is the dump of the environment
 # PROACTIVE-970 : default env is used
 #if [ -s $tmp ]; then
@@ -37,10 +48,10 @@ fi;
 #fi;
 
 # working directory for the user command 
-workdir="$3"
+workdir="$4"
 
-# losing the first two arguments, all that remains is the user command
-shift;shift;shift;
+# losing the first four arguments, all that remains is the user command
+shift;shift;shift;shift;
 
 # change umask settings to prevent file permission issues in RunAsMe mode
 umask 0000
@@ -66,6 +77,11 @@ fi;
 
 if [ -e "$cmd_path" ]; then
   if [ -x "$cmd_path" ]; then
+
+    # load the environment variables
+    set -a
+    source $tmpenv
+    rm $tmpenv 2> /dev/null
     
     # let's tell the launcher that everything is OK 
     confirm="_OS_PROCESS_LAUNCH_INIT_FINISHED_"
