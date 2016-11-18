@@ -73,6 +73,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -2939,6 +2940,21 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @GET
+    @Path("logins/sessionid/{sessionId}")
+    @Produces("application/json")
+    public String getLoginFromSessionId(@PathParam("sessionId") String sessionId)
+            throws SchedulerRestException, LoginException, NotConnectedRestException {
+        if (sessionId != null && sessionStore.exists(sessionId)) {
+            return sessionStore.get(sessionId).getUserName();
+        }
+        throw new NotFoundException("login cannot be found with the session id " + sessionId);
     }
 
     /**

@@ -53,6 +53,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -1553,6 +1554,25 @@ public interface SchedulerRestInterface {
 	@Produces("application/json")
 	String loginOrRenewSession(@HeaderParam("sessionid") String sessionId, @MultipartForm LoginForm multipart)
 			throws KeyException, SchedulerRestException, LoginException, NotConnectedRestException;
+
+    /**
+     * Get the login string associated to the {@code sessionId} if it exists
+     * 
+     * In case that the given sessionId doesn't have an associated login (session id expired, or invalid), 
+     * this endpoint will throw a {@link javax.ws.rs.NotFoundException}
+     * 
+     * @param sessionId with which the endpoint is going to look for the login value
+     * @return the associated login value
+     * @throws SchedulerRestException
+     * @throws LoginException
+     * @throws NotConnectedRestException
+     * @throws NotFoundException if the given session id doesn't have an associated login value found
+     */
+    @GET
+    @Path("logins/sessionid/{sessionId}")
+    @Produces("application/json")
+    String getLoginFromSessionId(@PathParam("sessionId") String sessionId)
+            throws SchedulerRestException, LoginException, NotConnectedRestException;
 
 	/**
 	 * login to the scheduler using a multipart form can be used either by

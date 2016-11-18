@@ -169,5 +169,10 @@ public class VariablesMap implements Map<String, Serializable>, Serializable{
     public Set<java.util.Map.Entry<String, Serializable>> entrySet() {
         return getMergedMap().entrySet();
     }
+
+    @Override
+    public String toString() {
+        return getMergedMap().toString();
+    }
     
 }

@@ -36,19 +36,11 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.text.WordUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.MockitoAnnotations;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.RestTestServer;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -56,10 +48,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import org.apache.commons.lang3.text.WordUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.RestTestServer;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The purpose of the test is to check that each method from {@link
@@ -91,7 +91,8 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() throws NoSuchMethodException, IllegalAccessException {
         Set<String> methodsToIgnore =
-                ImmutableSet.of("getCreateCredential", "login", "loginOrRenewSession", "loginWithCredential", "validate");
+                ImmutableSet.of("getCreateCredential", "getLoginFromSessionId", "login",
+                        "loginOrRenewSession", "loginWithCredential", "validate");
 
         Method[] methodsToTest = SchedulerRestInterface.class.getMethods();
         Object[][] data = new Object[methodsToTest.length][2];
