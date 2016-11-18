@@ -117,9 +117,9 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
      * defined job level.
      */
     private String getStartAtValue(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) {
-        String startAt = taskDesc.getInternal().getGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
+        String startAt = taskDesc.getInternal().getRuntimeGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
         if (startAt == null) {
-            startAt = jobDesc.getInternal().getGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
+            startAt = jobDesc.getInternal().getRuntimeGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
         }
         return startAt;
     }

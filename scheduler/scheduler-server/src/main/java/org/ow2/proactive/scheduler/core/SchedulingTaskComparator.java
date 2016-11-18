@@ -102,16 +102,17 @@ public class SchedulingTaskComparator {
 
         boolean selectionScriptUseVariables = (doesSelectionScriptsUseVariables(task) || doesSelectionScriptsUseVariables(tcomp.task));
 
-        boolean requireNodeWithTokern = task.getGenericInformation().containsKey(
+        boolean requireNodeWithTokern = task.getRuntimeGenericInformation().containsKey(
                 SchedulerConstants.NODE_ACCESS_TOKEN) ||
-            tcomp.task.getGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN);
+                tcomp.task.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN);
 
         // if topology is specified for any of task => not equal
         // for now topology is allowed only for parallel tasks which is
         // checked before
 
         //add the 6 tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && samePriority && !isParallel && !selectionScriptUseVariables && !requireNodeWithTokern;
+        return false;
+        //return sameSsHash && sameNodeEx && sameOwner && samePriority && !isParallel && !selectionScriptUseVariables && !requireNodeWithTokern;
     }
 
     private boolean doesSelectionScriptsUseVariables(InternalTask task) {

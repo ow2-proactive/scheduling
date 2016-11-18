@@ -730,16 +730,6 @@ public abstract class Task extends CommonAttribute {
         }
         return taskVariables;
     }
-    
-    public Map<String, Serializable> getSerializableVariables(){
-        Map<String, Serializable> taskVariables = new HashMap<>();
-        for (TaskVariable variable: getVariables().values()){
-            if (!variable.isJobInherited()){
-                taskVariables.put(variable.getName(), variable.getValue());
-            }
-        }
-        return taskVariables;
-    }
 
     @Override
     public String toString() {

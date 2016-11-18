@@ -471,7 +471,7 @@ public class TaskData {
         taskData.setNumberOfExecutionOnFailureLeft(
                 PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
-        taskData.setGenericInformation(task.getGenericInformation(false));
+        taskData.setGenericInformation(task.getGenericInformation());
         taskData.setVariables(new HashMap<String, TaskDataVariable>());
         for (Map.Entry<String, TaskVariable> entry: task.getVariables().entrySet())
             taskData.getVariables().put(entry.getKey(), getTaskDataVariable(entry.getValue()));
@@ -599,9 +599,9 @@ public class TaskData {
         InternalTask internalTask;
 
         if (taskType.equals(SCRIPT_TASK)) {
-            internalTask = new InternalScriptTask();
+            internalTask = new InternalScriptTask(internalJob);
         } else if (taskType.equals(FORKED_SCRIPT_TASK)) {
-            internalTask = new InternalForkedScriptTask();
+            internalTask = new InternalForkedScriptTask(internalJob);
         } else {
             throw new IllegalStateException("Unexpected stored task type: " + taskType);
         }

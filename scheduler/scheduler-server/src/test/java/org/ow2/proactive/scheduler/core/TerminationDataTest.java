@@ -9,11 +9,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
+import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -68,9 +72,11 @@ public class TerminationDataTest {
 	@Test
 	public void testAddTaskData(){
 		assertThat(terminationData.isEmpty(), is(true));
-		JobId jobId = new JobIdImpl(666, "readableName");
-		InternalTask internalTask = new InternalScriptTask();
-		TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+                "description");
+        JobId jobId = new JobIdImpl(666, "readableName");
+        InternalTask internalTask = new InternalScriptTask(job);
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
 		internalTask.setId(taskId);
 		internalTask.setName("task-name");
 		internalTask.setStatus(TaskStatus.RUNNING);
@@ -101,9 +107,11 @@ public class TerminationDataTest {
 	
 	@Test
 	public void testHandleTerminationForTaskNotNormalTermination() throws IOException, ClassNotFoundException {
-		JobId jobId = new JobIdImpl(666, "readableName");
-		InternalTask internalTask = new InternalScriptTask();
-		TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+                "description");
+        JobId jobId = new JobIdImpl(666, "readableName");
+        InternalTask internalTask = new InternalScriptTask(job);
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
 		internalTask.setId(taskId);
 		internalTask.setName("task-name");
 		internalTask.setStatus(TaskStatus.RUNNING);
@@ -117,9 +125,11 @@ public class TerminationDataTest {
 	
 	@Test
 	public void testHandleTerminationForTaskNormalTermination() throws RMProxyCreationException, IOException, ClassNotFoundException {
-		JobId jobId = new JobIdImpl(666, "readableName");
-		InternalTask internalTask = new InternalScriptTask();
-		TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+                "description");
+        JobId jobId = new JobIdImpl(666, "readableName");
+        InternalTask internalTask = new InternalScriptTask(job);
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
 		internalTask.setId(taskId);
 		internalTask.setName("task-name");
 		internalTask.setStatus(TaskStatus.RUNNING);

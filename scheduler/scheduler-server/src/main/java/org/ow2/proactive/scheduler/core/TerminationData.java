@@ -121,8 +121,7 @@ final class TerminationData {
             Map<String, String> genericInformation = new HashMap<>();
             VariablesMap variables = null;
             if (taskToTerminate.internalJob != null) {
-                genericInformation = taskData.getTask().getGenericInformationOverridden(
-                        taskToTerminate.internalJob);
+                genericInformation = taskData.getTask().getRuntimeGenericInformation();
             }
             try {
                 variables = getStringSerializableMap(service, taskToTerminate);
@@ -177,7 +176,7 @@ final class TerminationData {
         TaskResultImpl taskResult = taskToTerminate.taskResult;
         InternalJob internalJob = taskToTerminate.internalJob;
 
-        variablesMap.setScopeMap(taskData.getTask().getSerializableVariables());
+        variablesMap.setScopeMap(taskData.getTask().getRuntimeVariables());
         
         if (!taskToTerminate.normalTermination || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();

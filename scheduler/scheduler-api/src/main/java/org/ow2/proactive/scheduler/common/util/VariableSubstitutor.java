@@ -36,11 +36,11 @@
  */
 package org.ow2.proactive.scheduler.common.util;
 
+import org.ow2.proactive.scripting.Script;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.ow2.proactive.scripting.Script;
 
 
 /**
@@ -89,11 +89,20 @@ public class VariableSubstitutor {
         }
 
         String output = input;
-        for (Map.Entry<String, String> replacement : buildSubstitutes(variables).entrySet()) {
-            if (replacement.getValue() != null) {
-                output = output.replace(replacement.getKey(), replacement.getValue());
+        Map<String, String> substitutes = buildSubstitutes(variables);
+        boolean anyReplacement;
+        int depthCount = 0;
+        do {
+            anyReplacement = false;
+            depthCount++;
+            for (Map.Entry<String, String> replacement : substitutes.entrySet()) {
+                if (replacement.getValue() != null) {
+                    String newOutput = output.replace(replacement.getKey(), replacement.getValue());
+                    anyReplacement = anyReplacement || !newOutput.equals(output);
+                    output = newOutput;
+                }
             }
-        }
+        } while (anyReplacement && depthCount < 5);
 
         return output;
     }
@@ -130,6 +139,7 @@ public class VariableSubstitutor {
                     String value = variable.getValue().toString();
 
                     replacements.put("$" + key, value);
+                    replacements.put("$" + key.toUpperCase().replace(".", "_"), value);
                     replacements.put("${" + key + "}", value);
                 }
             }
