@@ -37,7 +37,6 @@
 package org.ow2.proactive.scheduler.task.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +58,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
@@ -68,7 +66,6 @@ import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -107,7 +104,7 @@ public abstract class InternalTask extends TaskState {
 
     /** Parents list: null if no dependency */
     @XmlTransient
-    private transient List<InternalTask> ideps = null;
+    private transient List<InternalTask> internalTasksDependencies = null;
 
     /** Information about the launcher and node, mutable can change overtime, in case of restart for instance */
     // These information are not required during task process
@@ -206,9 +203,9 @@ public abstract class InternalTask extends TaskState {
 
         replicatedTask.internalJob = internalJob;
 
-        // ideps contain references to other InternalTasks, it needs to be removed.
+        // internalTasksDependencies contain references to other InternalTasks, it needs to be removed.
         // anyway, dependencies for the new task will not be the same as the original
-        replicatedTask.ideps = null;
+        replicatedTask.internalTasksDependencies = null;
 
         // the taskinfo needs to be cleaned so that we don't tag this task as finished
         TaskId repId = replicatedTask.taskInfo.getTaskId();
@@ -365,7 +362,7 @@ public abstract class InternalTask extends TaskState {
             // hard dependency check has to be exclusive and AFTER if branch checks :
             // if an FlowAction#IF was executed, we should have both weak and hard dependencies,
             // although only the weak one should be copied on the replicated task
-            // ideps.addAll(this.getIDependences());
+            // internalTasksDependencies.addAll(this.getIDependences());
             for (InternalTask parent : this.getIDependences()) {
                 // filter out replicated tasks
                 if (ideps.containsKey(parent.getAmbiguousName())) {
@@ -524,15 +521,15 @@ public abstract class InternalTask extends TaskState {
      * @param task a super task of this task.
      */
     public void addDependence(InternalTask task) {
-        if (ideps == null) {
-            ideps = new ArrayList<>();
+        if (internalTasksDependencies == null) {
+            internalTasksDependencies = new ArrayList<>();
         }
-        ideps.add(task);
+        internalTasksDependencies.add(task);
     }
 
     public boolean removeDependence(InternalTask task) {
-        if (ideps != null) {
-            return ideps.remove(task);
+        if (internalTasksDependencies != null) {
+            return internalTasksDependencies.remove(task);
         }
         return false;
     }
@@ -544,7 +541,7 @@ public abstract class InternalTask extends TaskState {
      * @return true if this task has dependencies, false otherwise.
      */
     public boolean hasDependences() {
-        return (ideps != null && ideps.size() > 0);
+        return (internalTasksDependencies != null && internalTasksDependencies.size() > 0);
     }
 
     /**
@@ -716,10 +713,10 @@ public abstract class InternalTask extends TaskState {
      */
     public List<InternalTask> getIDependences() {
         //set to null if needed
-        if (ideps != null && ideps.size() == 0) {
-            ideps = null;
+        if (internalTasksDependencies != null && internalTasksDependencies.size() == 0) {
+            internalTasksDependencies = null;
         }
-        return ideps;
+        return internalTasksDependencies;
     }
 
     /**
@@ -729,12 +726,12 @@ public abstract class InternalTask extends TaskState {
     @XmlTransient
     public List<TaskState> getDependences() {
         //set to null if needed
-        if (ideps == null || ideps.size() == 0) {
-            ideps = null;
+        if (internalTasksDependencies == null || internalTasksDependencies.size() == 0) {
+            internalTasksDependencies = null;
             return null;
         }
-        List<TaskState> tmp = new ArrayList<>(ideps.size());
-        for (TaskState ts : ideps) {
+        List<TaskState> tmp = new ArrayList<>(internalTasksDependencies.size());
+        for (TaskState ts : internalTasksDependencies) {
             tmp.add(ts);
         }
         return tmp;
@@ -1155,49 +1152,56 @@ public abstract class InternalTask extends TaskState {
         return false;
     }
 
-    public synchronized void updateVariables(SchedulingService schedulingService) throws IOException, ClassNotFoundException {
+    /**
+     * Updates the runtime variables for this task. Variables are updated using the following order:
+     * 1) job variables
+     * 2) task variables
+     * 3) propagated variables
+     * 4) system variables
+     *
+     * @param schedulingService
+     */
+    public synchronized void updateVariables(SchedulingService schedulingService) {
         if (updatedVariables == null) {
             updatedVariables = new LinkedHashMap<>();
             updatedVariables.putAll(internalJob.getVariables());
-            for (TaskVariable variable : variables.values()) {
-                if (!variable.isJobInherited()) {
-                    updatedVariables.put(variable.getName(), variable.getValue());
-                }
-            }
+            updatedVariables.putAll(getScopeVariables());
 
-            if (ideps != null) {
-                List<TaskId> parentIds = new ArrayList<>(ideps.size());
-                for (InternalTask parentTask : ideps) {
+            if (internalTasksDependencies != null) {
+                List<TaskId> parentIds = new ArrayList<>(internalTasksDependencies.size());
+                for (InternalTask parentTask : internalTasksDependencies) {
                     parentIds.add(parentTask.getId());
                 }
-                if (parentIds.size() > 0) {
+                if (!parentIds.isEmpty()) {
                     Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
                             .loadTasksResults(
                                     internalJob.getId(), parentIds);
-                    for (TaskResult taskResult : taskResults.values()) {
-                        if (taskResult.getPropagatedVariables() != null) {
-                            updatedVariables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
-                        }
-                    }
+                    updateVariablesWithTaskResults(taskResults);
                 }
             }
 
-            updatedVariables.put(SchedulerVars.PA_JOB_ID.toString(), internalJob.getId().value());
-            updatedVariables.put(SchedulerVars.PA_JOB_NAME.toString(), internalJob.getName());
-            if (getId() != null) {
-                updatedVariables.put(SchedulerVars.PA_TASK_ID.toString(), getId().value());
-                updatedVariables.put(SchedulerVars.PA_TASK_NAME.toString(), getName());
-            }
-            updatedVariables.put(SchedulerVars.PA_USER.toString(), internalJob.getOwner());
+            updatedVariables.putAll(getSystemVariables());
+        }
+    }
 
-            if (internalJob.getType() == JobType.TASKSFLOW) {
-                updatedVariables.put(SchedulerVars.PA_TASK_ITERATION.toString(), getIterationIndex());
-                updatedVariables.put(SchedulerVars.PA_TASK_REPLICATION.toString(), getReplicationIndex());
+    private void updateVariablesWithTaskResults(Map<TaskId, TaskResult> taskResults) {
+        for (TaskResult taskResult : taskResults.values()) {
+            if (taskResult.getPropagatedVariables() != null) {
+                try {
+                    updatedVariables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
+                } catch (Exception e) {
+                    throw new IllegalStateException("Could not deserialize variable map", e);
+                }
             }
         }
     }
 
 
+    /**
+     * Returns the up-to-date variables, following a call to updateVariable
+     * @return up-to-date variables mzp
+     */
+    @Override
     public synchronized Map<String, Serializable> getRuntimeVariables() {
         if (updatedVariables == null) {
             return new HashMap<>();
@@ -1207,14 +1211,12 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     *
-     * Return generic info replacing $PA_JOB_NAME, $PA_JOB_ID, $PA_TASK_NAME, $PA_TASK_ID, $PA_TASK_ITERATION
-     * $PA_TASK_REPLICATION by it's actual value
-     *
+     * returns a generic replacement map, where up-to-date runtime variables were replaced
      */
-    public synchronized Map<String, String> getRuntimeGenericInformation() {
+    @Override
+    public Map<String, String> getRuntimeGenericInformation() {
 
-        if (taskInfo == null) {
+        if (getTaskInfo() == null) {
             // task is not yet properly initialized
             return new HashMap<>();
         }

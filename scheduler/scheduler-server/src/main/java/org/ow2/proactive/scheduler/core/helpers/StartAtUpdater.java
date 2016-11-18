@@ -51,7 +51,7 @@ public class StartAtUpdater {
 
     private boolean resetJobGenericInformation(InternalJob job, String startAt) {
 
-        Map<String, String> genericInformation = job.getRuntimeGenericInformation(true);
+        Map<String, String> genericInformation = job.getRuntimeGenericInformation();
 
         if (isValidStartAt(genericInformation, startAt)) {
             genericInformation.put(ExtendedSchedulerPolicy.GENERIC_INFORMATION_KEY_START_AT, startAt);

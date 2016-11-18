@@ -51,6 +51,10 @@ import java.util.Map;
  */
 public class VariableSubstitutor {
 
+    // Maximum depth allowed in recursive variable replacements to avoid infinite loops.
+    // This is not configurable as it should cover all use cases.
+    public static final int MAXIMUM_DEPTH = 5;
+
     // non-instantiable
     private VariableSubstitutor() {
     }
@@ -90,7 +94,21 @@ public class VariableSubstitutor {
 
         String output = input;
         Map<String, String> substitutes = buildSubstitutes(variables);
+        output = replaceRecursively(output, substitutes);
+
+        return output;
+    }
+
+    /**
+     * Replace the given string with a list of substitutions recursively. Recursion will be limited to MAXIMUM_DEPTH.
+     *
+     * @param value       string used to apply replacement
+     * @param substitutes map of substitutions
+     * @return a new string where all replacements were performed
+     */
+    private static String replaceRecursively(final String value, Map<String, String> substitutes) {
         boolean anyReplacement;
+        String output = value;
         int depthCount = 0;
         do {
             anyReplacement = false;
@@ -102,8 +120,7 @@ public class VariableSubstitutor {
                     output = newOutput;
                 }
             }
-        } while (anyReplacement && depthCount < 5);
-
+        } while (anyReplacement && depthCount < MAXIMUM_DEPTH);
         return output;
     }
 

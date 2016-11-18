@@ -233,7 +233,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setOutputSpace(job.getOutputSpace());
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
         jobRuntimeData.setUserSpace(job.getUserSpace());
-        jobRuntimeData.setGenericInformation(job.getRuntimeGenericInformation(false));
+        jobRuntimeData.setGenericInformation(job.getGenericInformation());
         jobRuntimeData.setVariables(job.getVariables());
         jobRuntimeData.setStatus(job.getStatus());
         jobRuntimeData.setOwner(job.getOwner());

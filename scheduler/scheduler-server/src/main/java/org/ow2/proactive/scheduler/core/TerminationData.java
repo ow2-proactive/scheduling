@@ -176,7 +176,7 @@ final class TerminationData {
         TaskResultImpl taskResult = taskToTerminate.taskResult;
         InternalJob internalJob = taskToTerminate.internalJob;
 
-        variablesMap.setScopeMap(taskData.getTask().getRuntimeVariables());
+        variablesMap.setScopeMap(taskData.getTask().getScopeVariables());
         
         if (!taskToTerminate.normalTermination || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();

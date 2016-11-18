@@ -65,14 +65,12 @@ import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateIfTaskHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateLoopHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateReplicateTaskHandler;
-import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 import javax.xml.bind.annotation.XmlTransient;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
@@ -1229,44 +1227,6 @@ public abstract class InternalJob extends JobState {
             return task;
         } else {
             throw new UnknownTaskException("'" + taskId + "' does not exist in this job.");
-        }
-    }
-
-    /**
-     *
-     * Return generic info replacing $PA_JOB_NAME, $PA_JOB_ID, $PA_TASK_NAME,
-     * $PA_TASK_ID, $PA_TASK_ITERATION $PA_TASK_REPLICATION by it's actual value
-     *
-     */
-    public Map<String, String> getRuntimeGenericInformation() {
-        if (genericInformation == null) {
-            // task is not yet properly initialized
-            return new HashMap<>(0);
-        }
-
-        Map<String, Serializable> replacements = new HashMap<>();
-        JobId jobId = jobInfo.getJobId();
-        if (jobId != null) {
-            replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());
-            replacements.put(SchedulerVars.PA_JOB_NAME.toString(), jobId.getReadableName());
-        }
-        return applyReplacementsOnGenericInformation(genericInformation, replacements);
-    }
-
-    /**
-     *
-     * Gets the task generic information.
-     * 
-     * @param replaceVariables
-     *            - if set to true method replaces variables in the generic
-     *            information
-     *
-     */
-    public Map<String, String> getRuntimeGenericInformation(boolean replaceVariables) {
-        if (replaceVariables) {
-            return this.getRuntimeGenericInformation();
-        } else {
-            return super.getGenericInformation();
         }
     }
 

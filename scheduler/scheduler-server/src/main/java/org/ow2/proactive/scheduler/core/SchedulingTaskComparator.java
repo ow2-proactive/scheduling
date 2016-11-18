@@ -111,8 +111,7 @@ public class SchedulingTaskComparator {
         // checked before
 
         //add the 6 tests to the returned value
-        return false;
-        //return sameSsHash && sameNodeEx && sameOwner && samePriority && !isParallel && !selectionScriptUseVariables && !requireNodeWithTokern;
+        return sameSsHash && sameNodeEx && sameOwner && samePriority && !isParallel && !selectionScriptUseVariables && !requireNodeWithTokern;
     }
 
     private boolean doesSelectionScriptsUseVariables(InternalTask task) {

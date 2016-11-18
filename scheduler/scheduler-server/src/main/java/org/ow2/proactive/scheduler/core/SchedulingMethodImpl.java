@@ -424,7 +424,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setBlackList(internalTask0.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
                 criteria.setAcceptableNodesUrls(freeResources);
-                criteria.setBindings(createBindingsForSelectionScripts(currentJob, etd, internalTask0));
+                criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0));
 
                 if (internalTask0.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask0.getRuntimeGenericInformation().get(
@@ -466,7 +466,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
     }
 
-    private void updateVariablesForTasksToSchedule(Map<JobId, JobDescriptor> jobMap, LinkedList<EligibleTaskDescriptor> tasksToSchedule) throws IOException, ClassNotFoundException {
+    /**
+     * Update all variables for the given scheduled tasks
+     */
+    private void updateVariablesForTasksToSchedule(Map<JobId, JobDescriptor> jobMap, LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
         for (EligibleTaskDescriptor taskDescriptor : tasksToSchedule) {
             InternalJob associatedJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
             InternalTask internalTask = associatedJob.getIHMTasks().get(taskDescriptor.getTaskId());
@@ -477,7 +480,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /**
      * Create bindings which will be used by selection scripts for the given tasks
      */
-    private Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, EligibleTaskDescriptor etd, InternalTask task) throws IOException, ClassNotFoundException {
+    private Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task) throws IOException, ClassNotFoundException {
         Map<String, Serializable> bindings = new HashMap<>();
         Map<String, Serializable> variables = new HashMap<>();
         Map<String, Serializable> genericInfo = new HashMap<>();

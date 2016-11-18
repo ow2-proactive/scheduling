@@ -86,8 +86,6 @@ public class TagTest extends ProActiveTest{
 
     private InternalScriptTask createTask(String name, InternalTask[] dependences, FlowBlock block, String matchingBlock) {
 
-        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
-                "description");
         InternalScriptTask result = new InternalScriptTask(job);
         result.setName(name);
 

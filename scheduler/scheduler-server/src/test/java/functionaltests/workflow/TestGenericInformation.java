@@ -126,7 +126,7 @@ public class TestGenericInformation extends SchedulerFunctionalTestNoRestart {
 
         for (String key : expected.keySet()) {
             Assert.assertEquals("Wrong value for " + key, expected.get(key), jobState
-                    .getGenericInformation().get(key));
+                    .getRuntimeGenericInformation().get(key));
             System.out.println(key + " is " + expected.get(key) + " - good");
         }
     }
@@ -143,7 +143,7 @@ public class TestGenericInformation extends SchedulerFunctionalTestNoRestart {
 
         for (String key : expected.keySet()) {
             Assert.assertEquals("Wrong value for " + key, expected.get(key), taskState
-                    .getGenericInformation().get(key));
+                    .getRuntimeGenericInformation().get(key));
             System.out.println(key + " is " + expected.get(key) + " - good");
         }
     }
