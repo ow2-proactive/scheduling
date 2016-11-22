@@ -108,7 +108,7 @@ public class SchedulerStateRestJobLogsTest {
     @Test
     public void job_full_logs_not_finished() throws Exception {
         InternalTaskFlowJob jobState = new InternalTaskFlowJob();
-        jobState.addTask(new InternalScriptTask());
+        jobState.addTask(new InternalScriptTask(jobState));
         when(mockScheduler.getJobState("123")).thenReturn(jobState);
 
         InputStream fullLogs = restScheduler.jobFullLogs(validSessionId, "123", validSessionId);
@@ -119,7 +119,7 @@ public class SchedulerStateRestJobLogsTest {
     @Test
     public void job_full_logs_finished() throws Exception {
         InternalTaskFlowJob jobState = new InternalTaskFlowJob();
-        InternalScriptTask task = new InternalScriptTask();
+        InternalScriptTask task = new InternalScriptTask(jobState);
         task.setPreciousLogs(true);
         jobState.addTask(task);
 
@@ -161,7 +161,7 @@ public class SchedulerStateRestJobLogsTest {
     }
 
     private static void addTask(InternalTaskFlowJob jobState, long finishedTime, long id) {
-        InternalScriptTask task = new InternalScriptTask();
+        InternalScriptTask task = new InternalScriptTask(jobState);
         task.setPreciousLogs(true);
         task.setFinishedTime(finishedTime);
         jobState.addTask(task);

@@ -34,7 +34,7 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
 
         logger.debug("Analysing task: " + task.getInternal().getName());
 
-        String allocRam = task.getInternal().getGenericInformation().get(RAM_VARIABLE_NAME);
+        String allocRam = task.getInternal().getRuntimeGenericInformation().get(RAM_VARIABLE_NAME);
 
         if (allocRam != null) {
             return canRunTaskOnNode(selectedNodes, task, Double.parseDouble(allocRam));

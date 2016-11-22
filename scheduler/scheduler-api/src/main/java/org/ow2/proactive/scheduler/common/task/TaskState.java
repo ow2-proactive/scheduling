@@ -36,8 +36,11 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -47,6 +50,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 
 
 /**
@@ -418,4 +422,70 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      */
     public abstract int getReplicationIndex();
 
+    /**
+     * Returns a map containing all scope variables defined in this Task (i.e. all task variables not inherited)
+     *
+     * @return map of variables
+     */
+    public Map<String, Serializable> getScopeVariables() {
+        Map<String, Serializable> scopeVariables = new HashMap<>();
+        for (TaskVariable variable : variables.values()) {
+            if (!variable.isJobInherited()) {
+                scopeVariables.put(variable.getName(), variable.getValue());
+            }
+        }
+        return scopeVariables;
+    }
+
+    /**
+     * Returns a map containing all variables defined by the system for this task, such as PA_JOB_ID, PA_USER, etc.
+     * @return map of variables
+     */
+    public Map<String, Serializable> getSystemVariables() {
+        Map<String, Serializable> systemVariables = new HashMap<>();
+        if (getTaskInfo() != null) {
+            systemVariables.put(SchedulerVars.PA_JOB_ID.toString(), getTaskInfo().getJobId().value());
+            systemVariables.put(SchedulerVars.PA_JOB_NAME.toString(), getTaskInfo().getJobId().getReadableName());
+            if (getId() != null) {
+                systemVariables.put(SchedulerVars.PA_TASK_ID.toString(), getId().toString());
+                systemVariables.put(SchedulerVars.PA_TASK_NAME.toString(), getName());
+            }
+            systemVariables.put(SchedulerVars.PA_USER.toString(), getTaskInfo().getJobInfo().getJobOwner());
+
+            systemVariables.put(SchedulerVars.PA_TASK_ITERATION.toString(), getIterationIndex());
+            systemVariables.put(SchedulerVars.PA_TASK_REPLICATION.toString(), getReplicationIndex());
+        }
+        return systemVariables;
+    }
+
+    /**
+     * Returns a map containing both scope variables and system variables
+     * @return map of variables
+     */
+    public Map<String, Serializable> getRuntimeVariables() {
+        Map<String, Serializable> runtimeVariables = new HashMap<>();
+        runtimeVariables.putAll(getScopeVariables());
+        runtimeVariables.putAll(getSystemVariables());
+        return runtimeVariables;
+    }
+
+    /**
+     * Returns a map of generic information, with replacement done from the runtime variables map
+     */
+    public Map<String, String> getRuntimeGenericInformation() {
+
+        if (getTaskInfo() == null) {
+            // task is not yet properly initialized
+            return new HashMap<>();
+        }
+
+        HashMap<String, String> gInfo = new HashMap<>();
+
+        if (genericInformation != null) {
+            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(genericInformation, getRuntimeVariables());
+            gInfo.putAll(updatedTaskGenericInfo);
+        }
+
+        return gInfo;
+    }
 }

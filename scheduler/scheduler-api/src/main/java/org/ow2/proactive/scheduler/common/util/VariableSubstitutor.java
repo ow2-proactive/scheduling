@@ -36,11 +36,11 @@
  */
 package org.ow2.proactive.scheduler.common.util;
 
+import org.ow2.proactive.scripting.Script;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.ow2.proactive.scripting.Script;
 
 
 /**
@@ -50,6 +50,10 @@ import org.ow2.proactive.scripting.Script;
  * variable map.
  */
 public class VariableSubstitutor {
+
+    // Maximum depth allowed in recursive variable replacements to avoid infinite loops.
+    // This is not configurable as it should cover all use cases.
+    public static final int MAXIMUM_DEPTH = 5;
 
     // non-instantiable
     private VariableSubstitutor() {
@@ -89,12 +93,34 @@ public class VariableSubstitutor {
         }
 
         String output = input;
-        for (Map.Entry<String, String> replacement : buildSubstitutes(variables).entrySet()) {
-            if (replacement.getValue() != null) {
-                output = output.replace(replacement.getKey(), replacement.getValue());
-            }
-        }
+        Map<String, String> substitutes = buildSubstitutes(variables);
+        output = replaceRecursively(output, substitutes);
 
+        return output;
+    }
+
+    /**
+     * Replace the given string with a list of substitutions recursively. Recursion will be limited to MAXIMUM_DEPTH.
+     *
+     * @param value       string used to apply replacement
+     * @param substitutes map of substitutions
+     * @return a new string where all replacements were performed
+     */
+    private static String replaceRecursively(final String value, Map<String, String> substitutes) {
+        boolean anyReplacement;
+        String output = value;
+        int depthCount = 0;
+        do {
+            anyReplacement = false;
+            depthCount++;
+            for (Map.Entry<String, String> replacement : substitutes.entrySet()) {
+                if (replacement.getValue() != null) {
+                    String newOutput = output.replace(replacement.getKey(), replacement.getValue());
+                    anyReplacement = anyReplacement || !newOutput.equals(output);
+                    output = newOutput;
+                }
+            }
+        } while (anyReplacement && depthCount < MAXIMUM_DEPTH);
         return output;
     }
 
@@ -130,6 +156,7 @@ public class VariableSubstitutor {
                     String value = variable.getValue().toString();
 
                     replacements.put("$" + key, value);
+                    replacements.put("$" + key.toUpperCase().replace(".", "_"), value);
                     replacements.put("${" + key + "}", value);
                 }
             }

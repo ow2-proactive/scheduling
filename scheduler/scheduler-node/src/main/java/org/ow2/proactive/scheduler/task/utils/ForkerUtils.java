@@ -168,10 +168,13 @@ public final class ForkerUtils {
     }
 
     public static void setSharedPermissions(File file, boolean setExecutable) {
-        file.setReadable(true, false);
-        file.setWritable(true, false);
+        if (!file.setReadable(true, false))
+            logger.warn("Failed to set read permission on : " + file);
+        if (!file.setWritable(true, false))
+            logger.warn("Failed to set write permission on : " + file);
         if (setExecutable) {
-            file.setExecutable(true, false);
+            if (!file.setExecutable(true, false))
+                logger.warn("Failed to set executable permission on : " + file);
         }
     }
 

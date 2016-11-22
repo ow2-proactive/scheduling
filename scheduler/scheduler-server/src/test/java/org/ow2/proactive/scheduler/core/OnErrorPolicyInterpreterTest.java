@@ -4,12 +4,15 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.mockito.Mock;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
@@ -223,7 +226,9 @@ public class OnErrorPolicyInterpreterTest {
     }
 
     private InternalTask createTask() {
-        InternalTask task = new InternalTask() {
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+                "description");
+        InternalTask task = new InternalTask(job) {
 
             @Override
             public boolean handleResultsArguments() {
@@ -232,7 +237,7 @@ public class OnErrorPolicyInterpreterTest {
             }
 
             @Override
-            public TaskLauncher createLauncher(InternalJob job, Node node)
+            public TaskLauncher createLauncher(Node node)
                     throws ActiveObjectCreationException, NodeException {
                 // TODO Auto-generated method stub
                 return null;

@@ -34,6 +34,7 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
+import org.apache.commons.io.FileUtils;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -61,7 +62,7 @@ public class ForkedProcessBuilderCreator implements Serializable {
      * @param outputSink        Standard output sink.
      * @param errorSink         Error sink.
      * @param workingDir        The working directory to execute the process in.
-     * @return Returns a process builder, ready to excute.
+     * @return Returns a process builder, ready to execute.
      * @throws Exception
      */
     public OSProcessBuilder createForkedProcessBuilder(TaskContext context, File serializedContext,
@@ -122,6 +123,9 @@ public class ForkedProcessBuilderCreator implements Serializable {
     private OSProcessBuilder getOsProcessBuilder(TaskContext context, File workingDir,
             String nativeScriptPath) throws IOException, IllegalAccessException, KeyException {
         OSProcessBuilder processBuilder;
+        if (!workingDir.exists()) {
+            FileUtils.forceMkdir(workingDir);
+        }
         if (context.isRunAsUser()) {
             ForkerUtils.setSharedPermissions(workingDir, true);
             processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(

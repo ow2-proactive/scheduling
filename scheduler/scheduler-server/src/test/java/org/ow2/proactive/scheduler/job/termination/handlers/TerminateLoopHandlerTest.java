@@ -12,13 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
-import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
-import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.scheduler.job.JobInfoImpl;
+import org.ow2.proactive.scheduler.job.*;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -81,9 +80,9 @@ public class TerminateLoopHandlerTest {
 				.thenReturn(true);
 		boolean result = terminateLoopHandler.terminateLoopTask(action, initiator, changesInfo, frontend);
 		assertThat(result, is(true));
-		Map<String, String> genericInformation = newTasks.values().iterator().next().getGenericInformation();
-		assertThat(genericInformation.containsKey(InternalJob.GENERIC_INFO_START_AT_KEY), is(true));
-		assertThat(newTasks.values().iterator().next().getScheduledTime(),
+        Map<String, String> genericInformation = newTasks.values().iterator().next().getRuntimeGenericInformation();
+        assertThat(genericInformation.containsKey(InternalJob.GENERIC_INFO_START_AT_KEY), is(true));
+        assertThat(newTasks.values().iterator().next().getScheduledTime(),
 				is(ISO8601DateUtil.toDate(genericInformation.get(InternalJob.GENERIC_INFO_START_AT_KEY)).getTime()));
 	}
 
@@ -95,9 +94,11 @@ public class TerminateLoopHandlerTest {
 	}
 
 	private InternalTask generateInternalTask() {
-		InternalTask internalTask = new InternalScriptTask();
-		internalTask.setId(TaskIdImpl.createTaskId(new JobIdImpl(666L, "JobName"), "readableName", 555L));
-		return internalTask;
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+                "description");
+        InternalTask internalTask = new InternalScriptTask(job);
+        internalTask.setId(TaskIdImpl.createTaskId(new JobIdImpl(666L, "JobName"), "readableName", 555L));
+        return internalTask;
 
 	}
 

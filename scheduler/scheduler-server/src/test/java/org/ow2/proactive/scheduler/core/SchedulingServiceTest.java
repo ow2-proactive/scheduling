@@ -5,10 +5,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
@@ -248,15 +252,19 @@ public class SchedulingServiceTest {
 
     @Test
     public void testCannotRestartTaskOnNodeFailure() {
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+                "description");
         schedulingService.status = schedulingService.status.KILLED;
-        InternalTask task = new InternalScriptTask();
+        InternalTask task = new InternalScriptTask(job);
         schedulingService.restartTaskOnNodeFailure(task);
         Mockito.verify(infrastructure, Mockito.times(0)).getInternalOperationsThreadPool();
     }
 
     @Test
     public void testRestartTaskOnNodeFailure() {
-        InternalTask task = new InternalScriptTask();
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+                "description");
+        InternalTask task = new InternalScriptTask(job);
         ExecutorService executorService = Mockito.mock(ExecutorService.class);
         Mockito.when(infrastructure.getInternalOperationsThreadPool()).thenReturn(executorService);
         schedulingService.restartTaskOnNodeFailure(task);
