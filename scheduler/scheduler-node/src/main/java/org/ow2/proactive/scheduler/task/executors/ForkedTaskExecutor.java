@@ -78,6 +78,9 @@ public class ForkedTaskExecutor implements TaskExecutor {
         File serializedContext = null;
 
         try {
+            if (!workingDir.exists()) {
+                FileUtils.forceMkdir(workingDir);
+            }
             serializedContext = taskContextSerializer.serializeContext(context, workingDir);
 
             OSProcessBuilder processBuilder = forkedJvmProcessBuilderCreator.createForkedProcessBuilder(
