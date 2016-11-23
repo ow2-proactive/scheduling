@@ -36,7 +36,7 @@ public class RamCompute implements Serializable {
 
         OperatingSystemMXBean bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
-        double totRAMAvailable = bean.getTotalPhysicalMemorySize() / GIGABYTE;
+        double totRAMAvailable = ((double) bean.getTotalPhysicalMemorySize()) / GIGABYTE;
 
         double totalRAMUsed = 0;
         for (LocalNode localNode : ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes()) {
