@@ -84,28 +84,11 @@ public class ForkedTaskExecutorTest {
     }
 
     @Test
-    public void failToSerialize() throws Throwable {
-        TestTaskOutput taskOutput = new TestTaskOutput();
-
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"));
-
-        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
-        initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
-
-        TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))),
-                        initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
-                taskOutput.outputStream, taskOutput.error);
-
-        assertNotNull(result.getException());
-    }
-
-    @Test
     public void failToFindJava() throws Throwable {
         System.setProperty("java.home", "does not exist");
         TestTaskOutput taskOutput = new TestTaskOutput();
 
-        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(new File("non_existing_folder"));
+        ForkedTaskExecutor taskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder());
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
