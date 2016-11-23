@@ -32,21 +32,21 @@ public class RamCompute implements Serializable {
      * 
      * @return the total GIGA of RAM available in a machine minus the RAM preallocated by a task.
      */
-    public long getAvailableRAMInGB() {
+    public double getAvailableRAMInGB() {
 
         OperatingSystemMXBean bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
-        long totRAMAvailable = bean.getTotalPhysicalMemorySize() / GIGABYTE;
+        double totRAMAvailable = ((double) bean.getTotalPhysicalMemorySize()) / GIGABYTE;
 
-        int totalRAMUsed = 0;
+        double totalRAMUsed = 0;
         for (LocalNode localNode : ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes()) {
             if (localNode.getProperty(RamSchedulingPolicy.RAM_VARIABLE_NAME) != null) {
-                totalRAMUsed += Integer
-                        .parseInt(localNode.getProperty(RamSchedulingPolicy.RAM_VARIABLE_NAME));
+                totalRAMUsed += Double
+                        .parseDouble(localNode.getProperty(RamSchedulingPolicy.RAM_VARIABLE_NAME));
             }
         }
 
-        long ramInBytes = totRAMAvailable - totalRAMUsed;
+        double ramInBytes = totRAMAvailable - totalRAMUsed;
 
         return ramInBytes;
 
