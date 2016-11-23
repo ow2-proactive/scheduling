@@ -65,7 +65,7 @@ public class JobEmailNotification {
             logger.debug("Notification emails disabled, doing nothing");
             return false;
         }
-        if (!JobStatus.equals(eventType.toString())) {
+        if (JobStatus != null && !JobStatus.equals(eventType.toString())) {
             logger.debug("Event type is not mentioned to be noticed, doing nothing");
             return false;
         }
