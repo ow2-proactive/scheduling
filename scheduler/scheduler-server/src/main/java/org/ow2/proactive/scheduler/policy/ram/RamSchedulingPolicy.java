@@ -47,7 +47,7 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
     private boolean canRunTaskOnNode(NodeSet selectedNodes, EligibleTaskDescriptor task, double neededRam) {
         Node n = selectedNodes.get(0);
         try {
-            long freeRam = getFreeRamFromNode(n);
+            double freeRam = getFreeRamFromNode(n);
             logger.debug("Free Ram for node (" + n.getNodeInformation().getName() + ") : " + freeRam +
                 " , neededRam : " + neededRam);
             if (freeRam >= neededRam) {
@@ -61,9 +61,9 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
         return false;
     }
 
-    private long getFreeRamFromNode(Node n) throws ActiveObjectCreationException, NodeException {
+    private double getFreeRamFromNode(Node n) throws ActiveObjectCreationException, NodeException {
         RamCompute ramCompute = PAActiveObject.newActive(RamCompute.class, new Object[] {}, n);
-        long freeRam = ramCompute.getAvailableRAMInGB();
+        double freeRam = ramCompute.getAvailableRAMInGB();
         try {
             PAActiveObject.terminateActiveObject(ramCompute, true);
         } catch (Exception e) {
