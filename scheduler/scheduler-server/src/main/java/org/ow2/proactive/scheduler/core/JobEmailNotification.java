@@ -1,5 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -20,6 +21,7 @@ import org.apache.log4j.Logger;
 public class JobEmailNotification {
 
     public static final String GENERIC_INFORMATION_KEY_EMAIL = "EMAIL";
+    public static final String GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT = "NOTIFICATION_EVENT";
 
     private JobState jobState;
     private SchedulerEvent eventType;
@@ -63,7 +65,7 @@ public class JobEmailNotification {
             return false;
         }
         try {
-            sender.send(getFrom(), getTo(), getSubject(), getBody());
+            sender.sender(getTo(), getSubject(), getBody());
             return true;
         } catch (AddressException e) {
             throw new JobEmailNotificationException("Malformed email address", e);
