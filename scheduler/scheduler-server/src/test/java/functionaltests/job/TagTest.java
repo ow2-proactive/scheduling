@@ -45,10 +45,13 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.SchedulerStateUpdate;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
@@ -81,10 +84,9 @@ public class TagTest extends ProActiveTest{
     }
 
 
+    private InternalScriptTask createTask(String name, InternalTask[] dependences, FlowBlock block, String matchingBlock) {
 
-    private InternalScriptTask createTask(String name, InternalTask[] dependences, FlowBlock block, String matchingBlock)
-             {
-        InternalScriptTask result = new InternalScriptTask();
+        InternalScriptTask result = new InternalScriptTask(job);
         result.setName(name);
 
         if(dependences != null && dependences.length > 0){

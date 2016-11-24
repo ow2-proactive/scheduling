@@ -36,20 +36,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.xml.bind.annotation.XmlTransient;
-
+import it.sauronsoftware.cron4j.Predictor;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -78,13 +65,15 @@ import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateIfTaskHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateLoopHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateReplicateTaskHandler;
-import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
-import it.sauronsoftware.cron4j.Predictor;
+import javax.xml.bind.annotation.XmlTransient;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
@@ -239,7 +228,6 @@ public abstract class InternalJob extends JobState {
      *         not.
      */
     public boolean addTask(InternalTask task) {
-        task.setJobId(getId());
 
         int taskId = tasks.size();
         task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId));
@@ -1239,44 +1227,6 @@ public abstract class InternalJob extends JobState {
             return task;
         } else {
             throw new UnknownTaskException("'" + taskId + "' does not exist in this job.");
-        }
-    }
-
-    /**
-     *
-     * Return generic info replacing $PA_JOB_NAME, $PA_JOB_ID, $PA_TASK_NAME,
-     * $PA_TASK_ID, $PA_TASK_ITERATION $PA_TASK_REPLICATION by it's actual value
-     *
-     */
-    public Map<String, String> getGenericInformation() {
-        if (genericInformation == null) {
-            // task is not yet properly initialized
-            return new HashMap<>(0);
-        }
-
-        Map<String, String> replacements = new HashMap<>();
-        JobId jobId = jobInfo.getJobId();
-        if (jobId != null) {
-            replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());
-            replacements.put(SchedulerVars.PA_JOB_NAME.toString(), jobId.getReadableName());
-        }
-        return applyReplacementsOnGenericInformation(replacements);
-    }
-
-    /**
-     *
-     * Gets the task generic information.
-     * 
-     * @param replaceVariables
-     *            - if set to true method replaces variables in the generic
-     *            information
-     *
-     */
-    public Map<String, String> getGenericInformation(boolean replaceVariables) {
-        if (replaceVariables) {
-            return this.getGenericInformation();
-        } else {
-            return super.getGenericInformation();
         }
     }
 

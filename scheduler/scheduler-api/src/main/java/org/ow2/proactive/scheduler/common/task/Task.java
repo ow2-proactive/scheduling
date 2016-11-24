@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -723,16 +722,6 @@ public abstract class Task extends CommonAttribute {
         if (job != null){
             taskVariables.putAll(job.getVariables());
         }
-        for (TaskVariable variable: getVariables().values()){
-            if (!variable.isJobInherited()){
-                taskVariables.put(variable.getName(), variable.getValue());
-            }
-        }
-        return taskVariables;
-    }
-    
-    public Map<String, Serializable> getSerializableVariables(){
-        Map<String, Serializable> taskVariables = new HashMap<>();
         for (TaskVariable variable: getVariables().values()){
             if (!variable.isJobInherited()){
                 taskVariables.put(variable.getName(), variable.getValue());

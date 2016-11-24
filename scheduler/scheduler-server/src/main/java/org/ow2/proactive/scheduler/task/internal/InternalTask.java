@@ -37,9 +37,11 @@
 package org.ow2.proactive.scheduler.task.internal;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,20 +57,15 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -102,9 +99,12 @@ public abstract class InternalTask extends TaskState {
     @XmlTransient
     private static transient long lastAuthorizedFolderLoadingTime = 0;
 
+    @XmlTransient
+    protected transient InternalJob internalJob;
+
     /** Parents list: null if no dependency */
     @XmlTransient
-    private transient List<InternalTask> ideps = null;
+    private transient List<InternalTask> internalTasksDependencies = null;
 
     /** Information about the launcher and node, mutable can change overtime, in case of restart for instance */
     // These information are not required during task process
@@ -147,6 +147,13 @@ public abstract class InternalTask extends TaskState {
     private transient InternalTask ifBranch = null;
 
     private transient InternalTask replicatedFrom;
+
+    @XmlTransient
+    private transient Map<String, Serializable> updatedVariables;
+
+    protected InternalTask(InternalJob internalJob) {
+        this.internalJob = internalJob;
+    }
 
     void setReplicatedFrom(InternalTask replicatedFrom) {
         this.replicatedFrom = replicatedFrom;
@@ -194,9 +201,11 @@ public abstract class InternalTask extends TaskState {
             throw new ExecutableCreationException("Failed to serialize task", t);
         }
 
-        // ideps contain references to other InternalTasks, it needs to be removed.
+        replicatedTask.internalJob = internalJob;
+
+        // internalTasksDependencies contain references to other InternalTasks, it needs to be removed.
         // anyway, dependencies for the new task will not be the same as the original
-        replicatedTask.ideps = null;
+        replicatedTask.internalTasksDependencies = null;
 
         // the taskinfo needs to be cleaned so that we don't tag this task as finished
         TaskId repId = replicatedTask.taskInfo.getTaskId();
@@ -353,7 +362,7 @@ public abstract class InternalTask extends TaskState {
             // hard dependency check has to be exclusive and AFTER if branch checks :
             // if an FlowAction#IF was executed, we should have both weak and hard dependencies,
             // although only the weak one should be copied on the replicated task
-            // ideps.addAll(this.getIDependences());
+            // internalTasksDependencies.addAll(this.getIDependences());
             for (InternalTask parent : this.getIDependences()) {
                 // filter out replicated tasks
                 if (ideps.containsKey(parent.getAmbiguousName())) {
@@ -484,10 +493,9 @@ public abstract class InternalTask extends TaskState {
      * Create the launcher for this taskDescriptor.
      *
      * @param node the node on which to create the launcher.
-     * @param job the job on which to create the launcher.
      * @return the created launcher as an activeObject.
      */
-    public abstract TaskLauncher createLauncher(InternalJob job, Node node)
+    public abstract TaskLauncher createLauncher(Node node)
             throws ActiveObjectCreationException, NodeException;
 
     /**
@@ -513,15 +521,15 @@ public abstract class InternalTask extends TaskState {
      * @param task a super task of this task.
      */
     public void addDependence(InternalTask task) {
-        if (ideps == null) {
-            ideps = new ArrayList<>();
+        if (internalTasksDependencies == null) {
+            internalTasksDependencies = new ArrayList<>();
         }
-        ideps.add(task);
+        internalTasksDependencies.add(task);
     }
 
     public boolean removeDependence(InternalTask task) {
-        if (ideps != null) {
-            return ideps.remove(task);
+        if (internalTasksDependencies != null) {
+            return internalTasksDependencies.remove(task);
         }
         return false;
     }
@@ -533,7 +541,7 @@ public abstract class InternalTask extends TaskState {
      * @return true if this task has dependencies, false otherwise.
      */
     public boolean hasDependences() {
-        return (ideps != null && ideps.size() > 0);
+        return (internalTasksDependencies != null && internalTasksDependencies.size() > 0);
     }
 
     /**
@@ -555,6 +563,7 @@ public abstract class InternalTask extends TaskState {
                     "' but was '" + taskInfo.getTaskId() + "'");
         }
         this.taskInfo = (TaskInfoImpl) taskInfo;
+        this.taskInfo.setJobId(internalJob.getId());
     }
 
     /**
@@ -639,15 +648,6 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
-     * To set the jobId
-     *
-     * @param id the jobId to set
-     */
-    public void setJobId(JobId id) {
-        taskInfo.setJobId(id);
-    }
-
-    /**
      * To set the startTime
      *
      * @param startTime the startTime to set
@@ -713,10 +713,10 @@ public abstract class InternalTask extends TaskState {
      */
     public List<InternalTask> getIDependences() {
         //set to null if needed
-        if (ideps != null && ideps.size() == 0) {
-            ideps = null;
+        if (internalTasksDependencies != null && internalTasksDependencies.size() == 0) {
+            internalTasksDependencies = null;
         }
-        return ideps;
+        return internalTasksDependencies;
     }
 
     /**
@@ -726,12 +726,12 @@ public abstract class InternalTask extends TaskState {
     @XmlTransient
     public List<TaskState> getDependences() {
         //set to null if needed
-        if (ideps == null || ideps.size() == 0) {
-            ideps = null;
+        if (internalTasksDependencies == null || internalTasksDependencies.size() == 0) {
+            internalTasksDependencies = null;
             return null;
         }
-        List<TaskState> tmp = new ArrayList<>(ideps.size());
-        for (TaskState ts : ideps) {
+        List<TaskState> tmp = new ArrayList<>(internalTasksDependencies.size());
+        for (TaskState ts : internalTasksDependencies) {
             tmp.add(ts);
         }
         return tmp;
@@ -1098,10 +1098,10 @@ public abstract class InternalTask extends TaskState {
      *
      * @return the default created task launcher initializer
      */
-    protected TaskLauncherInitializer getDefaultTaskLauncherInitializer(InternalJob job) {
+    protected TaskLauncherInitializer getDefaultTaskLauncherInitializer() {
         TaskLauncherInitializer tli = new TaskLauncherInitializer();
         tli.setTaskId(getId());
-        tli.setJobOwner(job.getJobInfo().getJobOwner());
+        tli.setJobOwner(internalJob.getJobInfo().getJobOwner());
         tli.setSchedulerRestUrl(PASchedulerProperties.SCHEDULER_REST_URL.getValueAsStringOrNull());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
@@ -1109,11 +1109,11 @@ public abstract class InternalTask extends TaskState {
         tli.setTaskInputFiles(getInputFilesList());
         tli.setTaskOutputFiles(getOutputFilesList());
         tli.setNamingService(
-                job.getTaskDataSpaceApplications().get(getId().longValue()).getNamingServiceStub());
+                internalJob.getTaskDataSpaceApplications().get(getId().longValue()).getNamingServiceStub());
         tli.setIterationIndex(getIterationIndex());
         tli.setReplicationIndex(getReplicationIndex());
 
-        Map<String, String> gInfo = getGenericInformationOverridden(job);
+        Map<String, String> gInfo = getRuntimeGenericInformation();
         tli.setGenericInformation(gInfo);
 
         ForkEnvironment environment = getForkEnvironment();
@@ -1128,23 +1128,13 @@ public abstract class InternalTask extends TaskState {
             tli.setWalltime(wallTime);
         }
         tli.setPreciousLogs(isPreciousLogs());
-        tli.setVariables(job.getVariables());
+        tli.setVariables(internalJob.getVariables());
         tli.setTaskVariables(getVariables());
 
         tli.setPingPeriod(PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt());
         tli.setPingAttempts(PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt());
 
         return tli;
-    }
-
-    /**
-     * @return the generic information of the job overridden eventually by the task's generic info
-     */
-    public Map<String, String> getGenericInformationOverridden(InternalJob job) {
-        HashMap<String, String> gInfo = new HashMap<>();
-        gInfo.putAll(job.getGenericInformation());
-        gInfo.putAll(getGenericInformation());
-        return gInfo;
     }
 
     /**
@@ -1163,46 +1153,85 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
+     * Updates the runtime variables for this task. Variables are updated using the following order:
+     * 1) job variables
+     * 2) task variables
+     * 3) propagated variables
+     * 4) system variables
      *
-     * Return generic info replacing $PA_JOB_NAME, $PA_JOB_ID, $PA_TASK_NAME, $PA_TASK_ID, $PA_TASK_ITERATION
-     * $PA_TASK_REPLICATION by it's actual value
-     *
+     * @param schedulingService
      */
-    public Map<String, String> getGenericInformation() {
+    public synchronized void updateVariables(SchedulingService schedulingService) {
+        if (updatedVariables == null) {
+            updatedVariables = new LinkedHashMap<>();
+            updatedVariables.putAll(internalJob.getVariables());
+            updatedVariables.putAll(getScopeVariables());
 
-        if (taskInfo == null || genericInformation == null) {
+            if (internalTasksDependencies != null) {
+                List<TaskId> parentIds = new ArrayList<>(internalTasksDependencies.size());
+                for (InternalTask parentTask : internalTasksDependencies) {
+                    parentIds.add(parentTask.getId());
+                }
+                if (!parentIds.isEmpty()) {
+                    Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
+                            .loadTasksResults(
+                                    internalJob.getId(), parentIds);
+                    updateVariablesWithTaskResults(taskResults);
+                }
+            }
+
+            updatedVariables.putAll(getSystemVariables());
+        }
+    }
+
+    private void updateVariablesWithTaskResults(Map<TaskId, TaskResult> taskResults) {
+        for (TaskResult taskResult : taskResults.values()) {
+            if (taskResult.getPropagatedVariables() != null) {
+                try {
+                    updatedVariables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
+                } catch (Exception e) {
+                    throw new IllegalStateException("Could not deserialize variable map", e);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Returns the up-to-date variables, following a call to updateVariable
+     * @return up-to-date variables mzp
+     */
+    @Override
+    public synchronized Map<String, Serializable> getRuntimeVariables() {
+        if (updatedVariables == null) {
+            return new HashMap<>();
+        } else {
+            return updatedVariables;
+        }
+    }
+
+    /**
+     * returns a generic replacement map, where up-to-date runtime variables were replaced
+     */
+    @Override
+    public Map<String, String> getRuntimeGenericInformation() {
+
+        if (getTaskInfo() == null) {
             // task is not yet properly initialized
             return new HashMap<>();
         }
 
-        Map<String, String> replacements = new HashMap<>();
-        JobId jobId = taskInfo.getJobId();
-        if (jobId != null) {
-            replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());
-            replacements.put(SchedulerVars.PA_JOB_NAME.toString(), jobId.getReadableName());
+        HashMap<String, String> gInfo = new HashMap<>();
+        Map<String, String> jobGenericInfo = internalJob.getRuntimeGenericInformation();
+        if (jobGenericInfo != null) {
+            gInfo.putAll(jobGenericInfo);
         }
-        TaskId taskId = taskInfo.getTaskId();
-        if (taskId != null) {
-            replacements.put(SchedulerVars.PA_TASK_ID.toString(), taskId.toString());
-            replacements.put(SchedulerVars.PA_TASK_NAME.toString(), taskId.getReadableName());
-        }
-        replacements.put(SchedulerVars.PA_TASK_ITERATION.toString(), String.valueOf(iteration));
-        replacements.put(SchedulerVars.PA_TASK_REPLICATION.toString(), String.valueOf(replication));
 
-        return applyReplacementsOnGenericInformation(replacements);
-    }
-
-    /**
-     *
-     * Gets the task generic information.
-     * @param replaceVariables - if set to true method replaces variables in the generic information
-     *
-     */
-    public Map<String, String> getGenericInformation(boolean replaceVariables) {
-        if (replaceVariables) {
-            return this.getGenericInformation();
-        } else {
-            return super.getGenericInformation();
+        if (genericInformation != null) {
+            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(genericInformation, getRuntimeVariables());
+            gInfo.putAll(updatedTaskGenericInfo);
         }
+
+        return gInfo;
     }
 }
