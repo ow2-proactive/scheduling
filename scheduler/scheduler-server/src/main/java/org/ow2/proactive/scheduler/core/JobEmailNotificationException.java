@@ -1,6 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
-public class JobEmailNotificationException extends RuntimeException {
+public class JobEmailNotificationException extends Exception {
 
     public JobEmailNotificationException(String message) {
         super(message);

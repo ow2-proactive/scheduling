@@ -25,6 +25,7 @@ public class SendMail {
         final Properties properties = EmailConfiguration.getConfiguration().getProperties();
 
         Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(properties.getProperty("mail.smtp.username"),
                         properties.getProperty("mail.smtp.password"));

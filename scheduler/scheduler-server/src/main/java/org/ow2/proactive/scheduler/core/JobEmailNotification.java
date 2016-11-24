@@ -1,6 +1,5 @@
 package org.ow2.proactive.scheduler.core;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -45,7 +44,7 @@ public class JobEmailNotification {
     }
 
     public boolean doCheckAndSend() throws JobEmailNotificationException {
-        String JobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
+        String jobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
         switch (eventType) {
             case JOB_PAUSED:
             case JOB_RESUMED:
@@ -65,7 +64,7 @@ public class JobEmailNotification {
             logger.debug("Notification emails disabled, doing nothing");
             return false;
         }
-        if (JobStatus != null && !JobStatus.equals(eventType.toString())) {
+        if (jobStatus != null && !jobStatus.equals(eventType.toString())) {
             logger.debug("Event type is not mentioned to be noticed, doing nothing");
             return false;
         }
