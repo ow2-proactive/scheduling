@@ -65,7 +65,7 @@ public class JobEmailNotification {
             case JOB_SUBMITTED:
                 break;
             default:
-                logger.trace("Event unrelated to job finish, doing nothing");
+                logger.trace("Event not in the list of email notification, doing nothing");
                 return false;
         }
         if (!PASchedulerProperties.EMAIL_NOTIFICATIONS_ENABLED.getValueAsBoolean()) {

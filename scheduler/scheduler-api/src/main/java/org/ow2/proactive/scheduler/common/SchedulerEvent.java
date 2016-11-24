@@ -111,6 +111,7 @@ public enum SchedulerEvent {
 
     /**
      * @see java.lang.Enum#toString()
+     * Override the toString() method, to make sure each time it returns the value (eg: "Job paused") not the key (eg: JOB_PAUSED)
      */
     @Override
     public String toString() {
