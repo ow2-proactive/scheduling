@@ -74,7 +74,7 @@ public enum SchedulerEvent {
             "Task running to finished"), /** A task has just had an error, it will wait for restart. */
     TASK_WAITING_FOR_RESTART("Task waiting for restart"), /** The priority of a job has just been change. */
     JOB_CHANGE_PRIORITY(
-            "Job change piority"), /** The scheduler has just been paused. Every running job will be finished. */
+            "Job change priority"), /** The scheduler has just been paused. Every running job will be finished. */
     PAUSED("Paused"), /** The Resource Manager is no more available. */
     RM_DOWN("RM down"), /** The Resource Manager is re-available . */
     RM_UP("RM up"), /** A user has just connect the scheduler or submit a job. */

@@ -351,7 +351,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_CHANGE_PRIORITY, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job change piority"),
+        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job change priority"),
                 contains("Status: Stalled"));
         verifyNoMoreInteractions(stubbedSender);
     }

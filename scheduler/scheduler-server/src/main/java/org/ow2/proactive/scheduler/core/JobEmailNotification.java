@@ -1,5 +1,8 @@
 package org.ow2.proactive.scheduler.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -20,7 +23,7 @@ import org.apache.log4j.Logger;
 public class JobEmailNotification {
 
     public static final String GENERIC_INFORMATION_KEY_EMAIL = "EMAIL";
-    public static final String GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT = "NOTIFICATION_EVENT";
+    public static final String GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT = "NOTIFICATION_EVENTS";
 
     private JobState jobState;
     private SchedulerEvent eventType;
@@ -45,6 +48,11 @@ public class JobEmailNotification {
 
     public boolean doCheckAndSend() throws JobEmailNotificationException {
         String jobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
+        List<String> jobStatusList = new ArrayList<>();
+        if(jobStatus != null){
+            jobStatusList = Arrays.asList(jobStatus.split("\\s*,\\s*"));
+        }
+
         switch (eventType) {
             case JOB_CHANGE_PRIORITY:
             case JOB_IN_ERROR:
@@ -64,9 +72,9 @@ public class JobEmailNotification {
             logger.debug("Notification emails disabled, doing nothing");
             return false;
         }
-        if (jobStatus != null && !jobStatus.equals(eventType.toString())) {
+        if (jobStatusList != null && jobStatusList.contains(eventType.toString().toLowerCase())) {
             logger.debug("Event type is not mentioned to be noticed, doing nothing");
-            return false;
+            return true;
         }
         try {
             sender.sender(getTo(), getSubject(), getBody());
