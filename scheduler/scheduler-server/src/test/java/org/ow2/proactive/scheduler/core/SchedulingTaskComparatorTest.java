@@ -91,10 +91,10 @@ public class SchedulingTaskComparatorTest {
 
     @Test
     public void testAnyRequiresNodeWithToken() throws Exception {
-        Mockito.when(task1.getGenericInformation()).thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token"));
+        Mockito.when(task1.getRuntimeGenericInformation()).thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token"));
         Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2, job2)));
-        Mockito.when(task2.getGenericInformation()).thenReturn(null);
-        Mockito.when(task2.getGenericInformation()).thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token"));
+        Mockito.when(task2.getRuntimeGenericInformation()).thenReturn(null);
+        Mockito.when(task2.getRuntimeGenericInformation()).thenReturn(ImmutableMap.of(SchedulerConstants.NODE_ACCESS_TOKEN, "token"));
         Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2, job2)));
     }
 

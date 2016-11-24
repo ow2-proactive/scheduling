@@ -76,7 +76,7 @@ public class DefaultPolicyTest {
         InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", jobPriority, OnTaskError.CANCEL_JOB, "");
         taskFlowJob.setId(JobIdImpl.makeJobId(Integer.toString(jobId++)));
         ArrayList<InternalTask> tasks = new ArrayList<>();
-        tasks.add(new InternalScriptTask());
+        tasks.add(new InternalScriptTask(taskFlowJob));
         taskFlowJob.addTasks(tasks);
         return new JobDescriptorImpl(taskFlowJob);
     }

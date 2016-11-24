@@ -55,7 +55,8 @@ public class InternalForkedScriptTask extends InternalScriptTask {
     /**
      * ProActive empty constructor.
      */
-    public InternalForkedScriptTask() {
+    public InternalForkedScriptTask(InternalJob internalJob) {
+        super(internalJob);
     }
 
     /**
@@ -63,7 +64,8 @@ public class InternalForkedScriptTask extends InternalScriptTask {
      *
      * @param execContainer the Native Executable Container
      */
-    public InternalForkedScriptTask(ExecutableContainer execContainer) {
+    public InternalForkedScriptTask(ExecutableContainer execContainer, InternalJob internalJob) {
+        super(internalJob);
         this.executableContainer = execContainer;
     }
 
@@ -71,11 +73,11 @@ public class InternalForkedScriptTask extends InternalScriptTask {
      * {@inheritDoc}
      */
     @Override
-    public TaskLauncher createLauncher(InternalJob job, Node node) throws ActiveObjectCreationException,
+    public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException,
             NodeException {
         logger.info(getTaskInfo().getTaskId(), "creating forked task launcher");
         TaskLauncher launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
-                new Object[] { getDefaultTaskLauncherInitializer(job),
+                new Object[]{getDefaultTaskLauncherInitializer(),
                         new ProActiveForkedTaskLauncherFactory() }, node);
         // wait until the task launcher is active
         launcher.isActivated();

@@ -50,9 +50,6 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -64,11 +61,9 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
-import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -399,16 +394,19 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
         InternalJob currentJob = jobMap.get(etd.getJobId()).getInternal();
-        InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
+        InternalTask internalTask0 = currentJob.getIHMTasks().get(etd.getTaskId());
 
         try {
+            updateVariablesForTasksToSchedule(jobMap, tasksToSchedule);
+
             TopologyDescriptor descriptor = null;
             boolean bestEffort = true;
-            if (internalTask.isParallel()) {
-                descriptor = internalTask.getParallelEnvironment().getTopologyDescriptor();
+
+            if (internalTask0.isParallel()) {
+                descriptor = internalTask0.getParallelEnvironment().getTopologyDescriptor();
                 bestEffort = false;
                 if (descriptor == null) {
-                    logger.debug("Topology is not defined for the task " + internalTask.getName());
+                    logger.debug("Topology is not defined for the task " + internalTask0.getName());
                 }
             }
             if (descriptor == null) {
@@ -421,15 +419,15 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setTopology(descriptor);
                 // resolve script variables (if any) in the list of selection
                 // scripts and then set it as the selection criteria.
-                criteria.setScripts(resolveScriptVariables(internalTask.getSelectionScripts(), 
-                        internalTask.getVariablesOverriden(currentJob)));
-                criteria.setBlackList(internalTask.getNodeExclusion());
+                criteria.setScripts(resolveScriptVariables(internalTask0.getSelectionScripts(),
+                        internalTask0.getRuntimeVariables()));
+                criteria.setBlackList(internalTask0.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
                 criteria.setAcceptableNodesUrls(freeResources);
-                criteria.setBindings(createBindingsForSelectionScripts(currentJob, etd, internalTask));
+                criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0));
 
-                if (internalTask.getGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
-                    criteria.setNodeAccessToken(internalTask.getGenericInformation().get(
+                if (internalTask0.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
+                    criteria.setNodeAccessToken(internalTask0.getRuntimeGenericInformation().get(
                             SchedulerConstants.NODE_ACCESS_TOKEN));
                 }
 
@@ -454,8 +452,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             return nodeSet;
 
         } catch (IOException | ClassNotFoundException e) {
-            logger.warn("Failed to deserialize previous task variables before selection for task " + internalTask.getId().toString(), e);
-            schedulingService.simulateJobStartAndCancelIt(tasksToSchedule, "Failed to deserialize previous task variables before selection for task " + internalTask.getId().toString());
+            logger.warn("Failed to deserialize previous task variables before selection for task " + internalTask0.getId().toString(), e);
+            schedulingService.simulateJobStartAndCancelIt(tasksToSchedule, "Failed to deserialize previous task variables before selection for task " + internalTask0.getId().toString());
             return null;
         } catch (RMProxyCreationException e) {
             logger.warn("Failed to create User RM Proxy", e);
@@ -469,50 +467,30 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     /**
+     * Update all variables for the given scheduled tasks
+     */
+    private void updateVariablesForTasksToSchedule(Map<JobId, JobDescriptor> jobMap, LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
+        for (EligibleTaskDescriptor taskDescriptor : tasksToSchedule) {
+            InternalJob associatedJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
+            InternalTask internalTask = associatedJob.getIHMTasks().get(taskDescriptor.getTaskId());
+            internalTask.updateVariables(schedulingService);
+        }
+    }
+
+    /**
      * Create bindings which will be used by selection scripts for the given tasks
      */
-    private Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, EligibleTaskDescriptor etd, InternalTask task) throws IOException, ClassNotFoundException {
+    private Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task) throws IOException, ClassNotFoundException {
         Map<String, Serializable> bindings = new HashMap<>();
-        VariablesMap variables = new VariablesMap();
-        variables.setScopeMap(task.getSerializableVariables());
+        Map<String, Serializable> variables = new HashMap<>();
         Map<String, Serializable> genericInfo = new HashMap<>();
 
+        variables.putAll(task.getRuntimeVariables());
 
-        int resultSize = etd.getParents().size();
-        if (job.getType() == JobType.TASKSFLOW) {
-            // retrieve from the database the previous task results if available
-            if ((resultSize > 0) && task.handleResultsArguments()) {
-                List<TaskId> parentIds = new ArrayList<>(resultSize);
-                for (int i = 0; i < resultSize; i++) {
-                    parentIds.add(etd.getParents().get(i).getTaskId());
-                }
-                Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
-                        .loadTasksResults(
-                                job.getId(), parentIds);
-                for (TaskResult taskResult : taskResults.values()) {
-                    if (taskResult.getPropagatedVariables() != null) {
-                        variables.getInheritedMap().putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
-                    }
-                }
-            } else {
-                // otherwise use the default job variables
-                variables.getInheritedMap().putAll(job.getVariables());
-            }
-        }
-
-        // update the variable bindings values for this task
-        variables.getInheritedMap().put(SchedulerVars.PA_JOB_ID.toString(), job.getId().value());
-        variables.getInheritedMap().put(SchedulerVars.PA_JOB_NAME.toString(), job.getName());
-        variables.getInheritedMap().put(SchedulerVars.PA_TASK_ID.toString(), task.getId().value());
-        variables.getInheritedMap().put(SchedulerVars.PA_TASK_NAME.toString(), task.getName());
-        variables.getInheritedMap().put(SchedulerVars.PA_USER.toString(), job.getOwner());
-
-        genericInfo.putAll(job.getGenericInformation());
+        genericInfo.putAll(job.getRuntimeGenericInformation());
 
         if (job.getType() == JobType.TASKSFLOW) {
-            variables.getInheritedMap().put(SchedulerVars.PA_TASK_ITERATION.toString(), task.getIterationIndex());
-            variables.getInheritedMap().put(SchedulerVars.PA_TASK_REPLICATION.toString(), task.getReplicationIndex());
-            genericInfo.putAll(task.getGenericInformation());
+            genericInfo.putAll(task.getRuntimeGenericInformation());
         }
 
         bindings.put(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
@@ -556,7 +534,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             try {
 
                 // create launcher
-                launcher = task.createLauncher(job, node);
+                launcher = task.createLauncher(node);
 
                 activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
@@ -619,7 +597,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * Replace selection script variables with values specified in the map.
      */
     private List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
-            Map<String, String> variables) {
+                                                         Map<String, Serializable> variables) {
         if (selectionScripts == null) {
             return null;
         }

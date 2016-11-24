@@ -156,7 +156,7 @@ public class InternalJobFactory {
         boolean hasPreciousResult = false;
 
         for (Task t : userJob.getTasks()) {
-            tasksList.put(t, createTask(userJob, t));
+            tasksList.put(t, createTask(userJob, job, t));
 
             if (!hasPreciousResult) {
                 hasPreciousResult = t.isPreciousResult();
@@ -250,14 +250,14 @@ public class InternalJobFactory {
         return job;
     }
 
-    private static InternalTask createTask(Job userJob, Task task) throws JobCreationException {
+    private static InternalTask createTask(Job userJob, InternalJob internalJob, Task task) throws JobCreationException {
         // TODO: avoid branching with double dispatch
         if (task instanceof NativeTask) {
-            return createTask(userJob, (NativeTask) task);
+            return createTask(userJob, internalJob, (NativeTask) task);
         } else if (task instanceof JavaTask) {
-            return createTask(userJob, (JavaTask) task);
+            return createTask(userJob, internalJob, (JavaTask) task);
         } else if (task instanceof ScriptTask) {
-            return createTask(userJob, (ScriptTask) task);
+            return createTask(userJob, internalJob, (ScriptTask) task);
         }
 
         String msg = "Unknown task type: " + task.getClass().getName();
@@ -273,7 +273,7 @@ public class InternalJobFactory {
      * @throws JobCreationException an exception if the factory cannot create the given task.
      */
     @SuppressWarnings("unchecked")
-    private static InternalTask createTask(Job userJob, JavaTask task) throws JobCreationException {
+    private static InternalTask createTask(Job userJob, InternalJob internalJob, JavaTask task) throws JobCreationException {
         InternalTask javaTask;
 
         if (task.getExecutableClassName() != null) {
@@ -284,14 +284,14 @@ public class InternalJobFactory {
                     javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript(task.getExecutableClassName(),
                             JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
-                            new Serializable[] { args }))));
+                                new Serializable[]{args}))), internalJob);
                     javaTask.setForkEnvironment(task.getForkEnvironment());
                     configureRunAsMe(task);
                 } else {
                     javaTask = new InternalScriptTask(new ScriptExecutableContainer(
                         new TaskScript(new SimpleScript(task.getExecutableClassName(),
                             JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
-                            new Serializable[] { args }))));
+                                new Serializable[]{args}))), internalJob);
                 }
             } catch (InvalidScriptException e) {
                 throw new JobCreationException(e);
@@ -324,7 +324,7 @@ public class InternalJobFactory {
      * @return the created internal task.
      * @throws JobCreationException an exception if the factory cannot create the given task.
      */
-    private static InternalTask createTask(Job userJob, NativeTask task) throws JobCreationException {
+    private static InternalTask createTask(Job userJob, InternalJob internalJob, NativeTask task) throws JobCreationException {
         if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0))) {
             String msg = "The command line is null or empty and not generated !";
             logger.info(msg);
@@ -336,11 +336,11 @@ public class InternalJobFactory {
             InternalTask scriptTask;
             if (isForkingTask()) {
                 scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
-                    new TaskScript(new SimpleScript(commandAndArguments, "native"))));
+                        new TaskScript(new SimpleScript(commandAndArguments, "native"))), internalJob);
                 configureRunAsMe(task);
             } else {
                 scriptTask = new InternalScriptTask(new ScriptExecutableContainer(
-                    new TaskScript(new SimpleScript(commandAndArguments, "native"))));
+                        new TaskScript(new SimpleScript(commandAndArguments, "native"))), internalJob);
             }
             ForkEnvironment forkEnvironment = new ForkEnvironment();
             scriptTask.setForkEnvironment(forkEnvironment);
@@ -353,13 +353,13 @@ public class InternalJobFactory {
         }
     }
 
-    private static InternalTask createTask(Job userJob, ScriptTask task) throws JobCreationException {
+    private static InternalTask createTask(Job userJob, InternalJob internalJob, ScriptTask task) throws JobCreationException {
         InternalTask scriptTask;
         if (isForkingTask()) {
-            scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()));
+            scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()), internalJob);
             configureRunAsMe(task);
         } else {
-            scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()));
+            scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()), internalJob);
         }
         //set task common properties
         try {
