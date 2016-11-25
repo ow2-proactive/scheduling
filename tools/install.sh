@@ -202,7 +202,7 @@ if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; th
         cp "$OLD_PADIR/config/authentication/keys/*.key" $AUTH_ROOT/keys/
     else
         echo "Generating New Private/Public key pair for the scheduler"
-        ./proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
+        $PA_ROOT/default/tools/proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
     fi
 
 

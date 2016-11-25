@@ -37,7 +37,12 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
         String allocRam = task.getInternal().getRuntimeGenericInformation().get(RAM_VARIABLE_NAME);
 
         if (allocRam != null) {
-            return canRunTaskOnNode(selectedNodes, task, Double.parseDouble(allocRam));
+            try {
+                return canRunTaskOnNode(selectedNodes, task, Double.parseDouble(allocRam));
+            } catch (NumberFormatException nfe) {
+                logger.warn("allocRam : " + allocRam + " is not a number");
+                return true;
+            }
         } else {
             return true;
         }
