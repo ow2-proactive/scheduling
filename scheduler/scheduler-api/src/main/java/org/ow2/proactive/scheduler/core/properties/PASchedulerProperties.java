@@ -338,6 +338,12 @@ public enum PASchedulerProperties {
 
     SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE("pa.scheduler.db.recovery.load.jobs.batch_size", PropertyType.INTEGER),
 
+    /* ***************************************************************** */
+    /* ***************** EMAIL NOTIFICATION PROPERTIES ***************** */
+    /* ***************************************************************** */
+
+    EMAIL_NOTIFICATIONS_CONFIGURATION("pa.scheduler.notification.email.configuration", PropertyType.STRING),
+
     EMAIL_NOTIFICATIONS_ENABLED("pa.scheduler.notifications.email.enabled", PropertyType.BOOLEAN),
 
     EMAIL_NOTIFICATIONS_SENDER_ADDRESS("pa.scheduler.notifications.email.from", PropertyType.STRING);
