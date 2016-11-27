@@ -36,14 +36,6 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -52,6 +44,13 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -147,6 +146,9 @@ public class JobInfoImpl implements JobInfo {
         this.numberOfPendingTasks = jobInfo.getNumberOfPendingTasks();
         this.numberOfRunningTasks = jobInfo.getNumberOfRunningTasks();
         this.numberOfFinishedTasks = jobInfo.getNumberOfFinishedTasks();
+        this.numberOfFailedTasks = jobInfo.getNumberOfFailedTasks();
+        this.numberOfFaultyTasks = jobInfo.getNumberOfFaultyTasks();
+        this.numberOfInErrorTasks = jobInfo.getNumberOfInErrorTasks();
         this.priority = jobInfo.getPriority();
         this.status = jobInfo.getStatus();
         this.toBeRemoved = jobInfo.toBeRemoved;

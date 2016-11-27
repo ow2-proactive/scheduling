@@ -34,12 +34,6 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
-import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfo;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -48,7 +42,15 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfo;
 
 
 public class JobStateImpl extends JobState {
@@ -68,7 +70,13 @@ public class JobStateImpl extends JobState {
 
     @Override
     public Map<TaskId, TaskState> getHMTasks() {
-        throw new UnsupportedOperationException();
+        Map<String, TaskStateData> taskStateMap = jobStateData.getTasks();
+        Map<TaskId, TaskState> hmTasks = new HashMap<>();
+        for (TaskStateData ts : taskStateMap.values()) {
+            TaskIdData taskIdData = ts.getTaskInfo().getTaskId();
+            hmTasks.put(DataUtility.taskId(DataUtility.jobId(jobStateData.getJobInfo().getJobId()), taskIdData), DataUtility.taskState(ts));
+        }
+        return hmTasks;
     }
 
     @Override
