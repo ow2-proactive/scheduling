@@ -36,15 +36,6 @@
  */
 package org.ow2.proactive.scheduler.common.task.executable;
 
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.script.ScriptContext;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -52,6 +43,14 @@ import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandalon
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scripting.helper.progress.ProgressFile;
+
+import javax.script.ScriptContext;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -68,6 +67,8 @@ public abstract class JavaExecutable {
     protected JavaStandaloneExecutableInitializer execInitializer;
 
     private Map<String, Serializable> propagatedVariables;
+
+    private Map<String, String> metadata;
 
     private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
 
@@ -91,6 +92,7 @@ public abstract class JavaExecutable {
         updateVariables(arguments, getVariables());
         init(arguments);
         initDataSpaces(sc);
+        initMetadata(sc);
     }
 
     /**
@@ -169,6 +171,15 @@ public abstract class JavaExecutable {
         this.globalSpace = (String) sc.getAttribute(SchedulerConstants.DS_GLOBAL_BINDING_NAME);
         this.userSpace = (String) sc.getAttribute(SchedulerConstants.DS_USER_BINDING_NAME);
         this.localSpace = (String) sc.getAttribute(SchedulerConstants.DS_SCRATCH_BINDING_NAME);
+    }
+
+    /**
+     * Initialization of the metadata.<br>
+     *
+     * @param sc the ScriptContext including as bindings the metadata map.
+     */
+    public void initMetadata(ScriptContext sc) {
+        this.metadata = (Map<String, String>) sc.getAttribute(SchedulerConstants.RESULT_METADATA_VARIABLE);
     }
 
     /**
@@ -287,6 +298,15 @@ public abstract class JavaExecutable {
 
     public Map<String, Serializable> getVariables() {
         return this.propagatedVariables;
+    }
+
+    /**
+     * Return the result metadata map
+     *
+     * @return metadata map
+     */
+    public Map<String, String> getMetadata() {
+        return this.metadata;
     }
 
     public void setVariables(Map<String, Serializable> propagatedVariables) {
