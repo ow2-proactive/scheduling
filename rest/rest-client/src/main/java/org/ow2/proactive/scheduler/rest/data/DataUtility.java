@@ -82,6 +82,9 @@ public class DataUtility {
         impl.setNumberOfFinishedTasks(d.getNumberOfFinishedTasks());
         impl.setNumberOfPendingTasks(d.getNumberOfPendingTasks());
         impl.setNumberOfRunningTasks(d.getNumberOfRunningTasks());
+        impl.setNumberOfFailedTasks(d.getNumberOfFailedTasks());
+        impl.setNumberOfFaultyTasks(d.getNumberOfFaultyTasks());
+        impl.setNumberOfInErrorTasks(d.getNumberOfInErrorTasks());
         impl.setJobPriority(jobPriority(d.getPriority()));
         impl.setRemovedTime(d.getRemovedTime());
         impl.setStartTime(d.getStartTime());
