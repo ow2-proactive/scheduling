@@ -50,7 +50,7 @@ public class JobEmailNotification {
         String jobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
         List<String> jobStatusList = new ArrayList<>();
         if(jobStatus != null){
-            jobStatusList = Arrays.asList(jobStatus.split("\\s*,\\s*"));
+            jobStatusList = Arrays.asList(jobStatus.toLowerCase().split("\\s*,\\s*"));
         }
 
         switch (eventType) {
@@ -72,9 +72,8 @@ public class JobEmailNotification {
             logger.debug("Notification emails disabled, doing nothing");
             return false;
         }
-        if (jobStatusList != null && jobStatusList.contains(eventType.toString().toLowerCase())) {
-            logger.debug("Event type is not mentioned to be noticed, doing nothing");
-            return true;
+        if(jobStatusList!=null && !jobStatusList.contains(eventType.toString().toLowerCase())){
+            return false;
         }
         try {
             sender.sender(getTo(), getSubject(), getBody());
