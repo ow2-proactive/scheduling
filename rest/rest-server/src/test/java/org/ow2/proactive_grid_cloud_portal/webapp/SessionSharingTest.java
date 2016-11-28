@@ -124,12 +124,13 @@ public class SessionSharingTest {
         
         assertThat(login, is("login"));
     }
-    
-    @Test(expected = NotFoundException.class)
+
+    @Test
     public void sessions_scheduler_login_by_wrong_sessionid() throws Exception {
         schedulerRest.login("login", "pw");
 
-        schedulerRest.getLoginFromSessionId("whatever");
+        String login = schedulerRest.getLoginFromSessionId("whatever");
+        assertThat(login, is(""));
     }
 
     @Test
