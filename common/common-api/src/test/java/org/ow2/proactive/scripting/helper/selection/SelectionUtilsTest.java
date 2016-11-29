@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -66,6 +67,7 @@ public class SelectionUtilsTest {
         assertTrue(SelectionUtils.checkOSArch("6"));
     }
 
+    @Ignore
     @Test
     public void checkOSName() {
         assertFalse(SelectionUtils.checkOSName(null));
