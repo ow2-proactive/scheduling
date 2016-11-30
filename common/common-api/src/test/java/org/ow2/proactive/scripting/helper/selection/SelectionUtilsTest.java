@@ -3,6 +3,7 @@ package org.ow2.proactive.scripting.helper.selection;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -67,13 +68,13 @@ public class SelectionUtilsTest {
         assertTrue(SelectionUtils.checkOSArch("6"));
     }
 
-    @Ignore
     @Test
     public void checkOSName() {
+        String osNameRegexPattern = Pattern.quote(System.getProperty("os.name"));
         assertFalse(SelectionUtils.checkOSName(null));
         assertFalse(SelectionUtils.checkOSName("123"));
-        assertTrue(SelectionUtils.checkOSName(System.getProperty("os.name")));
-        assertTrue(SelectionUtils.checkOSName(System.getProperty("os.name").toUpperCase()));
+        assertTrue(SelectionUtils.checkOSName(osNameRegexPattern));
+        assertTrue(SelectionUtils.checkOSName(osNameRegexPattern.toUpperCase()));
     }
 
     @Test
