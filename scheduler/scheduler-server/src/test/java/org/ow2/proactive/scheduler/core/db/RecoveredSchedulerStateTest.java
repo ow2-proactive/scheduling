@@ -61,7 +61,7 @@ public class RecoveredSchedulerStateTest {
         InternalTaskFlowJob job =
                 new InternalTaskFlowJob("MyJob", JobPriority.HIGH, OnTaskError.CANCEL_JOB, "Description");
 
-        InternalScriptTask internalScriptTask = new InternalScriptTask();
+        InternalScriptTask internalScriptTask = new InternalScriptTask(job);
 
         job.addTasks(ImmutableList.<InternalTask>of(internalScriptTask));
 

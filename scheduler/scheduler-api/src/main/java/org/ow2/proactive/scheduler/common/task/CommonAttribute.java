@@ -36,17 +36,17 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
 
 
 /**
@@ -206,21 +206,8 @@ public abstract class CommonAttribute implements Serializable {
 
     }
 
-    protected Map<String, String> applyReplacementsOnGenericInformation(Map<String, String> replacements) {
-        Map<String, String> replacedGenericInformation = new HashMap<String, String>();
-        for (Entry<String, String> e : this.genericInformation.entrySet()) {
-            String key = e.getKey();
-            String value = e.getValue();
-
-            for (Entry<String, String> replacement : replacements.entrySet()) {
-                String javaStyleProperty = replacement.getKey();
-                String envStyleProperty = "$" + javaStyleProperty.toUpperCase().replace('.', '_');
-                value = value.replace(envStyleProperty, replacement.getValue());
-            }
-
-            replacedGenericInformation.put(key, value);
-        }
-        return replacedGenericInformation;
+    protected static Map<String, String> applyReplacementsOnGenericInformation(Map<String, String> genericInformation, Map<String, Serializable> variables) {
+        return VariableSubstitutor.filterAndUpdate(genericInformation, variables);
     }
 
 }

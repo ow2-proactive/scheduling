@@ -1066,6 +1066,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setNumberOfFinishedTasks(jobInfoData.getNumberOfFinishedTasks());
         jobInfoImpl.setNumberOfPendingTasks(jobInfoData.getNumberOfPendingTasks());
         jobInfoImpl.setNumberOfRunningTasks(jobInfoData.getNumberOfRunningTasks());
+        jobInfoImpl.setNumberOfInErrorTasks(jobInfoData.getNumberOfInErrorTasks());
+        jobInfoImpl.setNumberOfFaultyTasks(jobInfoData.getNumberOfFaultyTasks());
+        jobInfoImpl.setTotalNumberOfTasks(jobInfoData.getTotalNumberOfTasks());
         jobInfoImpl.setJobPriority(JobPriority.findPriority(jobInfoData.getPriority().toString()));
         jobInfoImpl.setJobStatus(JobStatus.findPriority(jobInfoData.getStatus().toString()));
         if (jobInfoData.isToBeRemoved())

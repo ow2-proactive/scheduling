@@ -197,9 +197,15 @@ if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; th
 
     # generate new private/public key pair
 
-    echo "Generating New Private/Public key pair for the scheduler"
+    if [[ "$OLD_PADIR" != "" ]]; then
+        echo "Retrieving private key from previous scheduler installation"
+        cp "$OLD_PADIR/config/authentication/keys/*.key" $AUTH_ROOT/keys/
+    else
+        echo "Generating New Private/Public key pair for the scheduler"
+        $PA_ROOT/default/tools/proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
+    fi
 
-    ./proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
+
 
     $PA_ROOT/default/tools/proactive-users.sh -U -l admin -p "$ADMIN_PWD"
     $PA_ROOT/default/tools/proactive-users.sh -U -l rm -p "$RM_PWD"
@@ -213,8 +219,8 @@ if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; th
     $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l rm -p "$RM_PWD" -o $AUTH_ROOT/rm.cred
     $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l watcher -p "$WATCHER_PWD" -o $AUTH_ROOT/watcher.cred
 
-    ( cd /opt/proactive/default && zip -f dist/lib/rm-node-*.jar config/authentication/rm.cred )
-    ( cd /opt/proactive/default/dist && zip -f war/rest/node.jar lib/rm-node-*.jar )
+    ( cd $PA_ROOT/default && zip -f dist/lib/rm-node-*.jar config/authentication/rm.cred )
+    ( cd $PA_ROOT/default/dist && zip -f war/rest/node.jar lib/rm-node-*.jar )
 
     # configure watcher account
     sed "s/scheduler\.cache\.password=.*/scheduler.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
@@ -518,8 +524,8 @@ fi
 
 echo "Resource Manager credentials are used by remote ProActive Agents to register to the scheduler."
 echo "If you plan to use ProActive Agents, please replace in their respective \"schedworker\" folder the following files taken from the server installation:"
-ls /opt/proactive/default/config/authentication/rm.cred
-ls /opt/proactive/default/dist/lib/rm-node*.jar
+ls $PA_ROOT/default/config/authentication/rm.cred
+ls $PA_ROOT/default/dist/lib/rm-node*.jar
 
 if  ! $CONFLICT ; then
     if confirm "Do you want to start the scheduler service now? [Y/n] " ; then

@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
+import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
@@ -188,7 +189,7 @@ public class ExtendedSchedulerPolicyTest {
     }
 
     private String startAtValue(EligibleTaskDescriptor taskDesc) {
-        return taskDesc.getInternal().getGenericInformation().get(GENERIC_INFO_START_AT_KEY);
+        return taskDesc.getInternal().getRuntimeGenericInformation().get(GENERIC_INFO_START_AT_KEY);
     }
 
     private EligibleTaskDescriptor first(List<EligibleTaskDescriptor> taskDescList) {
@@ -214,7 +215,9 @@ public class ExtendedSchedulerPolicyTest {
     }
 
     private InternalScriptTask createTask(String taskStartAt) {
-        InternalScriptTask task1 = new InternalScriptTask();
+        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
+                "description");
+        InternalScriptTask task1 = new InternalScriptTask(job);
         if (taskStartAt != null) {
             task1.addGenericInformation("START_AT", taskStartAt);
         }

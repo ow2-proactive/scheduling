@@ -138,7 +138,7 @@ public class LiveJobsTest {
         job.setId(id);
         
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.IN_ERROR);
         
@@ -176,7 +176,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.PAUSED);
         tasksList.add(internalTask);
@@ -193,7 +193,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.PENDING);
         tasksList.add(internalTask);
@@ -210,7 +210,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
@@ -225,7 +225,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
@@ -239,7 +239,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
@@ -253,7 +253,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         internalTask.setName("task-name");
         tasksList.add(internalTask);
         job.setTasks(tasksList);
@@ -269,7 +269,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         internalTask.setName("task-name");
         tasksList.add(internalTask);
         job.setTasks(tasksList);
@@ -286,7 +286,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         tasksList.add(internalTask);
@@ -305,7 +305,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalScriptTask internalTask = new InternalScriptTask();
+        InternalScriptTask internalTask = new InternalScriptTask(job);
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setMaxNumberOfExecution(5);
@@ -338,7 +338,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalScriptTask internalTask = new InternalScriptTask();
+        InternalScriptTask internalTask = new InternalScriptTask(job);
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setMaxNumberOfExecution(5);
@@ -365,7 +365,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         TaskId taskId = TaskIdImpl.createTaskId(id, "task-name", 777L);
         internalTask.setId(taskId);
         internalTask.setName("task-name");
@@ -386,7 +386,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         TaskId taskId = TaskIdImpl.createTaskId(id, "task-name", 0L);
         internalTask.setId(taskId);
         internalTask.setName("task-name");
@@ -424,7 +424,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         TaskId taskId = TaskIdImpl.createTaskId(id, "task-name", 0L);
         internalTask.setId(taskId);
         internalTask.setName("task-name");
@@ -460,7 +460,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         TaskId taskId = TaskIdImpl.createTaskId(id, "task-name", 0L);
         internalTask.setId(taskId);
         internalTask.setName("task-name");
@@ -471,7 +471,7 @@ public class LiveJobsTest {
 
         internalTask.setOnTaskError(OnTaskError.PAUSE_JOB);
 
-        InternalTask internalTask2 = new InternalScriptTask();
+        InternalTask internalTask2 = new InternalScriptTask(job);
         TaskId taskId2 = TaskIdImpl.createTaskId(id, "task-name2", 1L);
         internalTask2.setId(taskId2);
         internalTask2.setName("task-name2");
@@ -511,7 +511,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         TaskId taskId = TaskIdImpl.createTaskId(id, "task-name", 0L);
         internalTask.setId(taskId);
         internalTask.setName("task-name");
@@ -546,7 +546,7 @@ public class LiveJobsTest {
         JobId id = new JobIdImpl(666L, "test-name");
         job.setId(id);
         List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask();
+        InternalTask internalTask = new InternalScriptTask(job);
         TaskId taskId = TaskIdImpl.createTaskId(id, "task-name", 0L);
         internalTask.setId(taskId);
         internalTask.setName("task-name");

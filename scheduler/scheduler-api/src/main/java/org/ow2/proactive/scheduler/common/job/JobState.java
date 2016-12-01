@@ -36,11 +36,8 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -53,6 +50,7 @@ import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 
 
 /**
@@ -476,5 +474,26 @@ public abstract class JobState extends Job implements Comparable<JobState> {
     public String toString() {
         return getClass().getSimpleName() + "[" + getId() + "]";
     }
-    
+
+    /**
+     * Returns job generic information, where job variables, PA_JOB_ID, PA_JOB_NAME and PA_USER were replaced
+     */
+    public Map<String, String> getRuntimeGenericInformation() {
+        if (genericInformation == null) {
+            // task is not yet properly initialized
+            return new HashMap<>(0);
+        }
+
+        Map<String, Serializable> replacements = new HashMap<>();
+        JobId jobId = getJobInfo().getJobId();
+        if (jobId != null) {
+            replacements.put(SchedulerVars.PA_JOB_ID.toString(), jobId.toString());
+            replacements.put(SchedulerVars.PA_JOB_NAME.toString(), jobId.getReadableName());
+            replacements.put(SchedulerVars.PA_USER.toString(), getOwner());
+        }
+        if (variables != null) {
+            replacements.putAll(variables);
+        }
+        return applyReplacementsOnGenericInformation(genericInformation, replacements);
+    }
 }

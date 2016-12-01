@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.7"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.7 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.7/schedulerjob.xsd"
+        name="Job_DynamicGenericInfo"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+    <taskFlow>
+        <task name="Split">
+            <description>
+                <![CDATA[ This task defines some input, here strings to be processed. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+for (int i = 0; i < 4 ; i++) {
+  variables.put("VAR_" + i, "VALUE_" + i)
+}
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow>
+                <replicate>
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[
+runs=4
+]]>
+                        </code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="Process">
+            <description>
+                <![CDATA[ This task will be replicated according to the 'runs' value specified in the replication script.                The replication index is used in each task's instance to select the input. ]]>
+            </description>
+            <genericInformation>
+                <info name="GINFO" value="${VAR_${PA_TASK_REPLICATION}}"/>
+            </genericInformation>
+            <depends>
+                <task ref="Split"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+index = variables.get("PA_TASK_REPLICATION");
+if (!genericInformation.get("GINFO").equals("VALUE_" + index)) {
+  throw new RuntimeException("Expected GINFO=" + "VALUE_" + index + " but received GINFO=" + genericInformation.get("GINFO"))
+}
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Merge">
+            <description>
+                <![CDATA[ As a merge operation, we simply print the results from previous tasks. ]]>
+            </description>
+            <depends>
+                <task ref="Process"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println results
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
