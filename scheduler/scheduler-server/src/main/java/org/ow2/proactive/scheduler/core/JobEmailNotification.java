@@ -9,7 +9,6 @@ import java.net.UnknownHostException;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
-import org.ow2.proactive.scheduler.common.Main;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
