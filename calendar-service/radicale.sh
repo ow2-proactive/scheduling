@@ -138,5 +138,3 @@ case "$1" in
     echo "Usage: $0 {start|stop|restart|status|startDebug}"
     exit 1
 esac
-
-exit 0

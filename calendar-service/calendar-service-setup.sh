@@ -3,6 +3,7 @@
 # Updated to use python 3.4
 
 script_dir=$(dirname "$0")
+localRadicale="$(cd ~/.config/radicale | pwd)"
 radicale_version="1.1.1"
 
 which python3
@@ -19,7 +20,7 @@ fi
 
 which radicale
 radicaleInstalled=$?
-
+ 
 if [ "$radicaleInstalled" -ne 0 ] ; then
   ## Install radicale
   cd "$script_dir/radicale/linux"
@@ -31,15 +32,15 @@ if [ "$radicaleInstalled" -ne 0 ] ; then
 else
   echo "Radicale is already installed"  
   source "$script_dir/radicale.sh" stop
-  rm -rf ~/.config/radicale/*
+  rm -rf "$localRadicale/*"
 fi
 
-mkdir -p ~/.config/radicale/collections
-mkdir -p ~/.config/radicale/log
+mkdir -p "$localRadicale/collections"
+mkdir -p "$localRadicale/log"
 
-cp -f "$script_dir/radicale/linux/config" ~/.config/radicale/config
-cp -f "$script_dir/radicale/linux/logging" ~/.config/radicale/logging
-cp -f "$script_dir/radicale/linux/rights" ~/.config/radicale/rights
+cp -f "$script_dir/radicale/linux/config" "$localRadicale/config"
+cp -f "$script_dir/radicale/linux/logging" "$localRadicale/logging"
+cp -f "$script_dir/radicale/linux/rights" "$localRadicale/rights"
 
 source "$script_dir/radicale.sh" start
 
