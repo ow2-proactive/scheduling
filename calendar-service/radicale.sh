@@ -38,7 +38,7 @@ start() {
 
     radicale -d -S
 
-    echo " *** OK *** "
+    echo " *** Radicale server started *** "
   fi
 }
 
