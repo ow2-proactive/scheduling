@@ -328,7 +328,21 @@ public class SchedulerStarter {
                     discoveryService.stop();
                 }
 
-                hsqldbServer.stop();
+                // WARNING: do not close embedded HSQLDB server in a shutdown hook.
+                //
+                // Multiple shutdown hooks are defined. Some are used for instance
+                // by the Resource Manager to remove node sources before termination.
+                // If the database is closed before completing the last operation, then
+                // some errors will occur (see logs).
+                //
+                // Besides, checking the state of the Scheduler and RM by registering
+                // an event listener or even by polling with periodic method calls will
+                // not work since Scheduler and RM are Active Objects and these are
+                // terminated by other shutdown hooks executed before the current one.
+                //
+                // The database connection should be closed by Hibernate when
+                // the datasource is closed. If not, the HSQLDB server will handle
+                // in the worst case the JVM shutdown as an accidental machine failure.
             }
         }));
     }
