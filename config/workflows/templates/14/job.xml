@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.5"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.7 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+    name="resultMetadata" projectName="2. Advanced Workflows"
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2"
+>
+  <taskFlow>
+    <task name="Download_Image_Task">
+      <description>
+        <![CDATA[ Download an image and retrieve its content. ]]>
+      </description>
+      <pre>
+        <script>
+          <code language="bash">
+            <![CDATA[
+wget "http://www.activeeon.com/img/ae-title.png"
+]]>
+          </code>
+        </script>
+      </pre>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+// The image will be available through the 'Preview' tab in the scheduler.
+// You can download it or save it.
+import com.google.common.net.MediaType
+
+file = new File("balloon13.png")
+result = file.getBytes()
+resultMetadata.put("file.extension", ".png")
+resultMetadata.put("content.type", MediaType.PNG.toString())
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="Download_Pdf_Task">
+      <description>
+        <![CDATA[ Download a document and retrieve its content. ]]>
+      </description>
+      <pre>
+        <script>
+          <code language="bash">
+            <![CDATA[
+wget "http://www.activeeon.com/resources/activeeon-datasheet-proactive-workflows-scheduling-en.pdf"
+]]>
+          </code>
+        </script>
+      </pre>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+// The pdf will be available through the 'Preview' tab in the scheduler.
+// You can download it or save it.
+import com.google.common.net.MediaType
+
+file = new File("pdfurl-guide.pdf")
+result = file.getBytes()
+resultMetadata.put("file.name", "pdfurl-guide.pdf")
+resultMetadata.put("content.type", MediaType.PDF.toString())
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>
