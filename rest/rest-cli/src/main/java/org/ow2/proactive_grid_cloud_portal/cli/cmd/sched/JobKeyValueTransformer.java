@@ -50,7 +50,7 @@ import com.google.common.collect.Maps;
 
 
 public class JobKeyValueTransformer {
-    private final static String USAGE = " The correct format is [ submit('workflow.xml','{\"var1\":\"value1\",\"var2\":\"value2\"}') ]";
+    private final static String USAGE = " 222The correct format is [ submit('workflow.xml','{\"var1\":\"value1\",\"var2\":\"value2\"}') ]";
 
     public Map<String, String> transformVariablesToMap(String jsonVariables) {
         Map<String, String> jobVariables = Maps.newHashMap();

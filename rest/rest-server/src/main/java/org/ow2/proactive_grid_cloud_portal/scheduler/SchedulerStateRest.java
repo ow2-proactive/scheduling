@@ -83,7 +83,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
@@ -183,10 +182,9 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedR
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
+import org.ow2.proactive_grid_cloud_portal.scheduler.util.WorkflowVariablesTransformer;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-
-import com.google.common.collect.Maps;
 
 
 /**
@@ -228,6 +226,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Context
     private HttpServletRequest httpServletRequest;
+
+    private final WorkflowVariablesTransformer workflowVariablesTransformer = new WorkflowVariablesTransformer();
 
     /**
      * Returns the ids of the current jobs under a list of string.
@@ -1452,8 +1452,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/metadata")
     @Produces("*/*")
-    public Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-                                                    @PathParam("taskname") String taskname) throws Throwable {
+    public Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/value");
         TaskResult taskResult = s.getTaskResult(jobId, taskname);
         taskResult = PAFuture.getFutureValue(taskResult);
@@ -1476,8 +1476,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/metadata")
     @Produces("application/json")
-    public Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
-                                                                      @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
+    public Map<String, Map<String, String>> metadataOfTaskResultByTag(
+            @HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @PathParam("tasktag") String taskTag) throws Throwable {
         Scheduler s = checkAccess(sessionId,
                 "jobs/" + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
         List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
@@ -2277,7 +2278,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
             JobId jobId = workflowSubmitter.submit(tmpWorkflowFile,
-                    getWorkflowVariablesFromPathSegment(pathSegment));
+                    workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment));
 
             return mapper.map(jobId, JobIdData.class);
         } catch (IOException e) {
@@ -2329,7 +2330,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
                 IOUtils.copy(is, new FileOutputStream(tmpJobFile));
 
-                Map<String, String> jobVariables = getWorkflowVariablesFromPathSegment(pathSegment);
+                Map<String, String> jobVariables = workflowVariablesTransformer
+                        .getWorkflowVariablesFromPathSegment(pathSegment);
 
                 WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
 
@@ -3377,18 +3379,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new JobCreationRestException("Cannot create workflow without url");
         HttpResourceDownloader httpResourceDownloader = new HttpResourceDownloader();
         return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
-    }
-
-    private Map<String, String> getWorkflowVariablesFromPathSegment(PathSegment pathSegment) {
-        Map<String, String> variables = null;
-        MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
-        if (matrixParams != null && !matrixParams.isEmpty()) {
-            variables = Maps.newHashMap();
-            for (String key : matrixParams.keySet()) {
-                variables.put(key, matrixParams.getFirst(key));
-            }
-        }
-        return variables;
     }
 
     protected static Map<String, String> createSortableTaskAttrMap() {
