@@ -93,6 +93,9 @@ public class JobInfoImpl implements JobInfo {
     //DEFAULT MUST BE -1
     private long removedTime = -1;
 
+    /** last updated time on the job*/
+    private long lastUpdatedTime = -1;
+
     /** total number of tasks */
     private int totalNumberOfTasks = 0;
 
@@ -241,6 +244,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setSubmittedTime(long submittedTime) {
         this.submittedTime = submittedTime;
+    }
+
+    @Override
+    public long getLastUpdatedTime() {
+        return lastUpdatedTime;
+    }
+
+    public void setLastUpdatedTime(long lastUpdatedTime) {
+        this.lastUpdatedTime = lastUpdatedTime;
     }
 
     /**
