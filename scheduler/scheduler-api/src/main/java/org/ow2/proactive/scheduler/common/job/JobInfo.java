@@ -107,6 +107,13 @@ public interface JobInfo extends Serializable {
     long getSubmittedTime();
 
     /**
+     * Returns the time at which the last updated happened on the Job.
+     *
+     * @return the time in long format.
+     */
+    long getLastUpdatedTime();
+
+    /**
      * Returns the number of tasks managed by the Job.
      *
      * @return the number of tasks managed by the Job.
