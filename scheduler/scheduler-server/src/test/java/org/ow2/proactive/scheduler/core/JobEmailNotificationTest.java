@@ -1,6 +1,6 @@
 package org.ow2.proactive.scheduler.core;
 
-import java.io.IOException;
+import java.util.Map;
 import java.io.Serializable;
 import java.security.KeyException;
 
@@ -107,6 +107,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
     public void testIncompleteFrom() throws Exception {
         setSenderAddress(INCOMPLETE_EMAIL);
         InternalJob job = createJob(USER_EMAIL);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished");
+        job.setGenericInformation(genericInfo);
 
         try {
 
@@ -122,6 +125,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
     @Test(expected = JobEmailNotificationException.class)
     public void testIncompleteTo() throws Exception {
         InternalJob job = createJob(INCOMPLETE_EMAIL);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished");
+        job.setGenericInformation(genericInfo);
 
         try {
 
@@ -138,6 +144,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
     public void testMalformedFrom() throws Exception {
         setSenderAddress(MALFORMED_EMAIL);
         InternalJob job = createJob(USER_EMAIL);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished");
+        job.setGenericInformation(genericInfo);
 
         try {
 
@@ -153,6 +162,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
     @Test(expected = JobEmailNotificationException.class)
     public void testMalformedTo() throws Exception {
         InternalJob job = createJob(MALFORMED_EMAIL);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished");
+        job.setGenericInformation(genericInfo);
 
         try {
 
@@ -168,6 +180,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
     @Test(expected = JobEmailNotificationException.class)
     public void testNoTo() throws Exception {
         InternalJob job = createJob(null);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished");
+        job.setGenericInformation(genericInfo);
 
         try {
 
@@ -222,6 +237,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
     @Test
     public void testSimple() throws Exception {
         InternalJob job = createJob(USER_EMAIL);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
@@ -235,6 +253,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.FINISHED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
@@ -249,6 +270,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.KILLED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job running to finished");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
@@ -263,6 +287,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.FINISHED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job pending to finished");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_PENDING_TO_FINISHED, stubbedSender);
 
@@ -277,6 +304,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.PAUSED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job paused");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_PAUSED, stubbedSender);
 
@@ -291,6 +321,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.PENDING);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job resumed");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RESUMED, stubbedSender);
 
@@ -305,6 +338,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.IN_ERROR);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job In-Error");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_IN_ERROR, stubbedSender);
 
@@ -319,6 +355,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.PENDING);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job submitted");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_SUBMITTED, stubbedSender);
 
@@ -333,6 +372,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.PENDING);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job pending to running");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_PENDING_TO_RUNNING, stubbedSender);
 
@@ -347,6 +389,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.STALLED);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job change priority");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_CHANGE_PRIORITY, stubbedSender);
 
@@ -361,6 +406,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         InternalJob job = createJob(USER_EMAIL);
         job.setId(new JobIdImpl(123890, job.getName()));
         job.setStatus(JobStatus.RUNNING);
+        Map<String, String> genericInfo = job.getGenericInformation();
+        genericInfo.put("NOTIFICATION_EVENTS", "Job restarted from error");
+        job.setGenericInformation(genericInfo);
 
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR, stubbedSender);
 
