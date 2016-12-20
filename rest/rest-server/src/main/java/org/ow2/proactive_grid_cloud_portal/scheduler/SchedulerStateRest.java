@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -66,18 +65,9 @@ import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
-import org.ow2.proactive.scheduler.common.task.Task;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
@@ -96,6 +86,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotificat
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
+import org.ow2.proactive_grid_cloud_portal.scheduler.util.WorkflowVariablesTransformer;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
@@ -103,12 +94,7 @@ import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -162,6 +148,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @Context
     private HttpServletRequest httpServletRequest;
+
+    private final WorkflowVariablesTransformer workflowVariablesTransformer = new WorkflowVariablesTransformer();
 
     /**
      * Returns the ids of the current jobs under a list of string.
@@ -1386,8 +1374,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/{taskname}/result/metadata")
     @Produces("*/*")
-    public Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-                                                    @PathParam("taskname") String taskname) throws Throwable {
+    public Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/value");
         TaskResult taskResult = s.getTaskResult(jobId, taskname);
         taskResult = PAFuture.getFutureValue(taskResult);
@@ -1410,8 +1398,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/metadata")
     @Produces("application/json")
-    public Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
-                                                                      @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
+    public Map<String, Map<String, String>> metadataOfTaskResultByTag(
+            @HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @PathParam("tasktag") String taskTag) throws Throwable {
         Scheduler s = checkAccess(sessionId,
                 "jobs/" + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
         List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
@@ -2215,7 +2204,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
             JobId jobId = workflowSubmitter.submit(tmpWorkflowFile,
-                    getWorkflowVariablesFromPathSegment(pathSegment));
+                    workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment));
 
             return mapper.map(jobId, JobIdData.class);
         } catch (IOException e) {
@@ -2267,7 +2256,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
                 IOUtils.copy(is, new FileOutputStream(tmpJobFile));
 
-                Map<String, String> jobVariables = getWorkflowVariablesFromPathSegment(pathSegment);
+                Map<String, String> jobVariables = workflowVariablesTransformer
+                        .getWorkflowVariablesFromPathSegment(pathSegment);
 
                 WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
 
@@ -3331,18 +3321,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new JobCreationRestException("Cannot create workflow without url");
         HttpResourceDownloader httpResourceDownloader = new HttpResourceDownloader();
         return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
-    }
-
-    private Map<String, String> getWorkflowVariablesFromPathSegment(PathSegment pathSegment) {
-        Map<String, String> variables = null;
-        MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
-        if (matrixParams != null && !matrixParams.isEmpty()) {
-            variables = Maps.newHashMap();
-            for (String key : matrixParams.keySet()) {
-                variables.put(key, matrixParams.getFirst(key));
-            }
-        }
-        return variables;
     }
 
     protected static Map<String, String> createSortableTaskAttrMap() {
