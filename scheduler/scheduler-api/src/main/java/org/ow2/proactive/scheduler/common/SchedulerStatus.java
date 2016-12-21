@@ -69,7 +69,7 @@ public enum SchedulerStatus implements java.io.Serializable {
     /**
      * The scheduler is in freeze mode.
      * It means that every running tasks will be terminated,
-     * but the running jobs will wait for the scheduler to resume.
+     * but the pending jobs will wait for the scheduler to resume.
      * It can be resumed, stopped, paused or shutdown.
      */
     FROZEN("Frozen"),
