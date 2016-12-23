@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.7"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.7 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.7/schedulerjob.xsd"
+    name="Twitter Language R Analysis" projectName="3. Big Data Workflows"
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="1"
+>
+  <variables>
+    <variable name="KeyWord" value="HybridCloud"/>
+    <variable name="Number_of_search" value="3"/>
+    <variable name="Number_of_tweets" value="2000"/>
+  </variables>
+  <description>
+    <![CDATA[ A workflow to run a simple Twitter analysis using R ]]>
+  </description>
+  <taskFlow>
+    <task name="Analysis">
+      <description>
+        <![CDATA[ Create a wordcloud using the tweets from one town. ]]>
+      </description>
+      <depends>
+        <task ref="Split"/>
+      </depends>
+      <forkEnvironment javaHome="$JAVA_HOME" >
+        <envScript>
+          <script>
+            <code language="python">
+              <![CDATA[
+#Be aware, that the prefix command is internally split by spaces. So paths with spaces won't work.
+# Prepare Docker parameters 
+containerName = 'activeeon/demor' 
+dockerRunCommand =  'docker run ' 
+dockerParameters = '--rm ' 
+# Prepare ProActive home volume 
+paHomeHost = variables.get("PA_SCHEDULER_HOME") 
+paHomeContainer = variables.get("PA_SCHEDULER_HOME") 
+proActiveHomeVolume = '-v '+paHomeHost +':'+paHomeContainer+' ' 
+# Prepare working directory (For Dataspaces and serialized task file) 
+workspaceHost = localspace 
+workspaceContainer = localspace 
+workspaceVolume = '-v '+localspace +':'+localspace+' ' 
+# Prepare container working directory 
+containerWorkingDirectory = '-w '+workspaceContainer+' ' 
+# Save pre execution command into magic variable 'preJavaHomeCmd', which is picked up by the node 
+preJavaHomeCmd = dockerRunCommand + dockerParameters + proActiveHomeVolume + workspaceVolume + containerWorkingDirectory + containerName
+]]>
+            </code>
+          </script>
+        </envScript>
+      </forkEnvironment>
+      <pre>
+        <script>
+          <code language="bash">
+            <![CDATA[
+
+]]>
+          </code>
+        </script>
+      </pre>
+      <scriptExecutable>
+        <script>
+          <code language="Language R">
+            <![CDATA[
+#Change to your own or the limits will be shared
+consumer_key_api <- "K5sM7uI8QPwK1iiTsvWayIl9q"
+consumer_secret_api <- "4Lc9V9bjzNTI2B6Eq7wvf3TZJQMnv3sFqiDCBCgqWQL1kjFmM6"
+token <- "804452393895088129-JmyRNVoDLaDBOyjlUrh4my3Yl8M2Q9U"
+token_secret <- "yedHoQyQEardwoQNbFraWIz1n552BgfADDk5XOSwcc7PT"
+#15 calls every 15 minutes. 
+
+
+
+Locations <- data.frame( lats=unlist(results[[1]][1]), lons=unlist(results[[1]][2]), cities=unlist(results[[1]][3]))
+
+
+Sys.setlocale("LC_NUMERIC", "C") 
+library(twitteR)
+library(stringr)
+library(tm)
+library(wordcloud)
+library(textreg)
+library(mailR)
+
+
+tryCatch({
+options(httr_oauth_cache=F)
+setup_twitter_oauth(consumer_key_api, consumer_secret_api, token , token_secret)
+} ,error=function(cond) {
+print("The credentials seem to be wrong or you made too many calls. In the latter case, wait 15 minutes and try again")
+stop("Could not connect")
+return(NA)
+})
+
+Tweets <- searchTwitter(toString(variables[["KeyWord"]]) , n=variables[["Number_of_tweets"]], lang='en', geocode=paste(Locations$lats[variables[["PA_TASK_REPLICATION"]]+1],Locations$lons[variables[["PA_TASK_REPLICATION"]]+1],paste0(300,"km"),sep=",") )
+
+
+Tweetstext <-sapply(Tweets, function(x) x$getText())
+Tweetstext <-unlist(Tweetstext)
+
+
+corpus <- Corpus(VectorSource(Tweetstext))
+corpus <- tm_map(corpus, str_replace_all,"[^[:alnum:]]", " ")
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
+corpus <- tm_map(corpus, removeWords, c("http", "https", "amp", variables[["KeyWord"]]))
+corpus <- tm_map(corpus, PlainTextDocument)
+
+
+
+#plot and save
+col <- brewer.pal(6,"Dark2")
+png(paste(Locations$cities[variables[["PA_TASK_REPLICATION"]]+1], "_", variables[["KeyWord"]], ".png", sep = ""))
+plot.new()
+wordcloud(corpus, scale=c(3,.2),rot.per = 0.25,  random.color=T, max.word=700, random.order=F, colors=col)
+dev.off()
+
+
+
+corpus <- convert.tm.to.character(corpus)
+result <- corpus
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="start"></controlFlow>
+      <outputFiles>
+        <files  includes="*.png" accessMode="transferToUserSpace"/>
+      </outputFiles>
+    </task>
+    <task name="Split">
+      <forkEnvironment javaHome="$JAVA_HOME" >
+        <envScript>
+          <script>
+            <code language="python">
+              <![CDATA[
+#Be aware, that the prefix command is internally split by spaces. So paths with spaces won't work.
+# Prepare Docker parameters 
+containerName = 'activeeon/demor' 
+dockerRunCommand =  'docker run ' 
+dockerParameters = '--rm ' 
+# Prepare ProActive home volume 
+paHomeHost = variables.get("PA_SCHEDULER_HOME") 
+paHomeContainer = variables.get("PA_SCHEDULER_HOME") 
+proActiveHomeVolume = '-v '+paHomeHost +':'+paHomeContainer+' ' 
+# Prepare working directory (For Dataspaces and serialized task file) 
+workspaceHost = localspace 
+workspaceContainer = localspace 
+workspaceVolume = '-v '+localspace +':'+localspace+' ' 
+# Prepare container working directory 
+containerWorkingDirectory = '-w '+workspaceContainer+' ' 
+# Save pre execution command into magic variable 'preJavaHomeCmd', which is picked up by the node 
+preJavaHomeCmd = dockerRunCommand + dockerParameters + proActiveHomeVolume + workspaceVolume + containerWorkingDirectory + containerName
+]]>
+            </code>
+          </script>
+        </envScript>
+      </forkEnvironment>
+      <scriptExecutable>
+        <script>
+          <code language="Language R">
+            <![CDATA[
+lats <- c(38.9, 40.7, 37.8, 39, 37.4, 28, 30, 42.4, 48, 36, 32.3, 33.5, 34.7, 33.8, 37.2)
+lons <- c(-77, -74, -122, -105.5, -122, -82.5, -98, -71, -122, -115, -86.3, -112, -92.3, -84.4, -93.3)
+cities <- c("DC", "New-York", "San-Francisco", "Colorado", "Mountain-View", "Tampa", "Austin", "Boston", "Seattle", "Vegas", "Montgomery", "Phoenix", "Little-Rock", "Atlanta", "Springfield")
+variables[['names']] <- cities
+
+result <- list(lats, lons, cities)
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow >
+        <replicate>
+          <script>
+            <code language="javascript">
+              <![CDATA[
+runs=variables.get("Number_of_search")
+]]>
+            </code>
+          </script>
+        </replicate>
+      </controlFlow>
+    </task>
+    <task name="Merge">
+      <depends>
+        <task ref="Additional"/>
+      </depends>
+      <forkEnvironment javaHome="$JAVA_HOME" >
+        <envScript>
+          <script>
+            <code language="python">
+              <![CDATA[
+#Be aware, that the prefix command is internally split by spaces. So paths with spaces won't work.
+# Prepare Docker parameters 
+containerName = 'activeeon/demor' 
+dockerRunCommand =  'docker run ' 
+dockerParameters = '--rm ' 
+# Prepare ProActive home volume 
+paHomeHost = variables.get("PA_SCHEDULER_HOME") 
+paHomeContainer = variables.get("PA_SCHEDULER_HOME") 
+proActiveHomeVolume = '-v '+paHomeHost +':'+paHomeContainer+' ' 
+# Prepare working directory (For Dataspaces and serialized task file) 
+workspaceHost = localspace 
+workspaceContainer = localspace 
+workspaceVolume = '-v '+localspace +':'+localspace+' ' 
+# Prepare container working directory 
+containerWorkingDirectory = '-w '+workspaceContainer+' ' 
+# Save pre execution command into magic variable 'preJavaHomeCmd', which is picked up by the node 
+preJavaHomeCmd = dockerRunCommand + dockerParameters + proActiveHomeVolume + workspaceVolume + containerWorkingDirectory + containerName
+]]>
+            </code>
+          </script>
+        </envScript>
+      </forkEnvironment>
+      <scriptExecutable>
+        <script>
+          <code language="Language R">
+            <![CDATA[
+library(wordcloud)
+library(tm)
+library(stringr)
+library(mailR)
+
+
+corpus <- c()
+for (i in 1:variables[["Number_of_search"]])
+    corpus <- c(corpus, results[[i]])
+
+corpus <- Corpus(VectorSource(corpus))
+
+
+
+#plot and save
+col <- brewer.pal(6,"Dark2")
+png(paste("Main_", variables[['KeyWord']], ".png", sep =""))
+plot.new()
+wordcloud(corpus, scale=c(3,.2),rot.per = 0.25,  random.color=T, max.word=700, random.order=F, colors=col)
+dev.off()
+
+print ("Done.")
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <outputFiles>
+        <files  includes="*.png" accessMode="transferToUserSpace"/>
+      </outputFiles>
+    </task>
+    <task name="Images">
+      <description>
+        <![CDATA[ Retrieve the wordclouds in an accessible way. ]]>
+      </description>
+      <depends>
+        <task ref="Analysis"/>
+      </depends>
+      <inputFiles>
+        <files  includes="**" accessMode="transferFromUserSpace"/>
+      </inputFiles>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+import com.google.common.net.MediaType
+
+replication = variables.get('PA_TASK_REPLICATION')
+fileName = variables.get("names")[replication] + "_" + variables.get('KeyWord') + ".png"
+
+file = new File(fileName)
+
+result = file.getBytes()
+resultMetadata.put("file.name", fileName)
+resultMetadata.put("content.type", MediaType.PNG.toString())
+
+// The result of the analysis will be available through the 'Preview' tab in the scheduler.
+// You can also access them in the dataspace.
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="Additional">
+      <description>
+        <![CDATA[ Only used as end of the block. ]]>
+      </description>
+      <depends>
+        <task ref="Analysis"/>
+        <task ref="Images"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="Language R">
+            <![CDATA[
+result <- results[[1]]
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="end"></controlFlow>
+    </task>
+    <task name="Image">
+      <description>
+        <![CDATA[ Retrieve the last wordcloud in an accessible way. ]]>
+      </description>
+      <depends>
+        <task ref="Merge"/>
+      </depends>
+      <inputFiles>
+        <files  includes="**" accessMode="transferFromUserSpace"/>
+      </inputFiles>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+import com.google.common.net.MediaType
+
+fileName = "Main_" + variables.get('KeyWord') + ".png"
+
+file = new File(fileName)
+
+result = file.getBytes()
+resultMetadata.put("file.name", fileName)
+resultMetadata.put("content.type", MediaType.PNG.toString())
+
+// The result of the analysis will be available through the 'Preview' tab in the scheduler.
+// You can also access them in the dataspace.
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>
