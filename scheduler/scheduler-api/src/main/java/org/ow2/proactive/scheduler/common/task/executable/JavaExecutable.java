@@ -89,8 +89,9 @@ public abstract class JavaExecutable {
         setVariables(propagatedVariables);
         // update arguments
         updateVariables(arguments, getVariables());
-        init(arguments);
+
         initDataSpaces(sc);
+        init(arguments);
     }
 
     /**

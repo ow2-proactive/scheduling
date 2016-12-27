@@ -684,6 +684,7 @@ public class SchedulerDBManager {
 					session.getNamedQuery("deleteJobData").setParameter("jobId", id).executeUpdate();
 				} else {
 					session.getNamedQuery("updateJobDataRemovedTime").setParameter("removedTime", removedTime)
+							.setParameter("lastUpdatedTime", new Date().getTime())
 							.setParameter("jobId", id).executeUpdate();
 				}
 
@@ -895,6 +896,7 @@ public class SchedulerDBManager {
 			public Void doInTransaction(Session session) {
 				long id = jobId(jobId);
 				session.getNamedQuery("updateJobDataPriority").setParameter("priority", priority)
+						.setParameter("lastUpdatedTime", new Date().getTime())
 						.setParameter("jobId", id).executeUpdate();
 				return null;
 			}
@@ -913,6 +915,7 @@ public class SchedulerDBManager {
 						.setParameter("startTime", jobInfo.getStartTime())
 						.setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
 						.setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+						.setParameter("lastUpdatedTime", new Date().getTime())
 						.setParameter("jobId", jobId).executeUpdate();
 
 				if (taskStatusToPending) {
@@ -951,6 +954,7 @@ public class SchedulerDBManager {
 						.setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
 						.setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
 						.setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+						.setParameter("lastUpdatedTime", new Date().getTime())
 						.setParameter("jobId", jobId).executeUpdate();
 
 				TaskData.DBTaskId taskId = taskId(task);
@@ -992,6 +996,7 @@ public class SchedulerDBManager {
 						.setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
 						.setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
 						.setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
+						.setParameter("lastUpdatedTime", new Date().getTime())
 						.setParameter("jobId", jobId).executeUpdate();
 
 				JobData jobRuntimeData = session.load(JobData.class, jobId);
@@ -1080,7 +1085,9 @@ public class SchedulerDBManager {
 						.setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
 						.setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
 						.setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
-						.setParameter("inErrorTime", jobInfo.getInErrorTime()).setParameter("jobId", jobId(job))
+						.setParameter("inErrorTime", jobInfo.getInErrorTime())
+						.setParameter("lastUpdatedTime", new Date().getTime())
+						.setParameter("jobId", jobId(job))
 						.executeUpdate();
 
 				return null;
@@ -1180,6 +1187,7 @@ public class SchedulerDBManager {
 						.setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
 						.setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
 						.setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+						.setParameter("lastUpdatedTime", new Date().getTime())
 						.setParameter("jobId", jobId).executeUpdate();
 
 				Query taskUpdateQuery = session.getNamedQuery("updateTaskDataAfterJobFinished");
@@ -1237,6 +1245,7 @@ public class SchedulerDBManager {
 				long id = jobId(jobId);
 
 				session.getNamedQuery("updateJobDataSetJobToBeRemoved").setParameter("toBeRemoved", true)
+						.setParameter("lastUpdatedTime", new Date().getTime())
 						.setParameter("jobId", id).executeUpdate();
 
 				return null;

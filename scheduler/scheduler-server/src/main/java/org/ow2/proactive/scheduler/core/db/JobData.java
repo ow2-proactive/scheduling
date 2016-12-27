@@ -63,32 +63,32 @@ import com.google.common.collect.Lists;
         @NamedQuery(name = "readAccountJobs", query = "select count(*), sum(finishedTime) - sum(startTime) from JobData" +
             " where owner = :username and finishedTime > 0"),
         @NamedQuery(name = "updateJobAndTasksState", query = "update JobData set status = :status, " +
-            "numberOfFailedTasks = :numberOfFailedTasks, " + "numberOfFaultyTasks = :numberOfFaultyTasks, " +
-            "numberOfInErrorTasks = :numberOfInErrorTasks, " + "inErrorTime = :inErrorTime " +
+            "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
+            "numberOfInErrorTasks = :numberOfInErrorTasks, inErrorTime = :inErrorTime, lastUpdatedTime = :lastUpdatedTime " +
             "where id = :jobId"),
-        @NamedQuery(name = "updateJobDataRemovedTime", query = "update JobData set removedTime = :removedTime where id = :jobId"),
-        @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved where id = :jobId"),
-        @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority where id = :jobId"),
+        @NamedQuery(name = "updateJobDataRemovedTime", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+        @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+        @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
         @NamedQuery(name = "updateJobDataAfterTaskFinished", query = "update JobData set status = :status, " +
             "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
             "numberOfFinishedTasks = :numberOfFinishedTasks, " +
             "numberOfRunningTasks = :numberOfRunningTasks, " +
-            "numberOfFailedTasks = :numberOfFailedTasks, " + "numberOfFaultyTasks = :numberOfFaultyTasks, " +
-            "numberOfInErrorTasks = :numberOfInErrorTasks " + " where id = :jobId"),
+            "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
+            "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
         @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, " +
             "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
             "numberOfFinishedTasks = :numberOfFinishedTasks, " +
-            "numberOfRunningTasks = :numberOfRunningTasks, " + "totalNumberOfTasks =:totalNumberOfTasks, " +
-            "numberOfFailedTasks = :numberOfFailedTasks, " + "numberOfFaultyTasks = :numberOfFaultyTasks, " +
-            "numberOfInErrorTasks = :numberOfInErrorTasks " + "where id = :jobId"),
+            "numberOfRunningTasks = :numberOfRunningTasks, totalNumberOfTasks =:totalNumberOfTasks, " +
+            "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
+            "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
         @NamedQuery(name = "updateJobDataTaskRestarted", query = "update JobData set status = :status, " +
             "numberOfPendingTasks = :numberOfPendingTasks, " +
             "numberOfRunningTasks = :numberOfRunningTasks, " +
-            "numberOfFailedTasks = :numberOfFailedTasks, " + "numberOfFaultyTasks = :numberOfFaultyTasks, " +
-            "numberOfInErrorTasks = :numberOfInErrorTasks " + "where id = :jobId"),
+            "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
+            "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
         @NamedQuery(name = "updateJobDataTaskStarted", query = "update JobData set status = :status, " +
             "startTime = :startTime, numberOfPendingTasks = :numberOfPendingTasks, " +
-            "numberOfRunningTasks = :numberOfRunningTasks where id = :jobId") })
+            "numberOfRunningTasks = :numberOfRunningTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId") })
 @Table(name = "JOB_DATA", indexes = { @Index(name = "JOB_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
         @Index(name = "JOB_DATA_OWNER", columnList = "OWNER"),
         @Index(name = "JOB_DATA_REMOVE_TIME", columnList = "REMOVE_TIME"),
@@ -162,6 +162,8 @@ public class JobData implements Serializable {
 
     private List<JobContent> jobContent = Lists.newArrayList();
 
+    private long lastUpdatedTime;
+
     JobInfoImpl createJobInfo(JobId jobId) {
         JobInfoImpl jobInfo = new JobInfoImpl();
         jobInfo.setJobId(jobId);
@@ -181,6 +183,7 @@ public class JobData implements Serializable {
         jobInfo.setFinishedTime(getFinishedTime());
         jobInfo.setSubmittedTime(getSubmittedTime());
         jobInfo.setRemovedTime(getRemovedTime());
+        jobInfo.setLastUpdatedTime(getLastUpdatedTime());
         if (isToBeRemoved()) {
             jobInfo.setToBeRemoved();
         }
@@ -247,6 +250,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setNumberOfInErrorTasks(job.getNumberOfInErrorTasks());
         jobRuntimeData.setTotalNumberOfTasks(job.getTotalNumberOfTasks());
         jobRuntimeData.addJobContent(job.getTaskFlowJob());
+        jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
 
         return jobRuntimeData;
     }
@@ -548,6 +552,15 @@ public class JobData implements Serializable {
 
     public void setJobContent(List<JobContent> jobContent) {
         this.jobContent = jobContent;
+    }
+
+    @Column(name = "LAST_UPDATED_TIME")
+    public long getLastUpdatedTime() {
+        return lastUpdatedTime;
+    }
+
+    public void setLastUpdatedTime(long lastUpdatedTime) {
+        this.lastUpdatedTime = lastUpdatedTime;
     }
 
     public void addJobContent(Job job) {
