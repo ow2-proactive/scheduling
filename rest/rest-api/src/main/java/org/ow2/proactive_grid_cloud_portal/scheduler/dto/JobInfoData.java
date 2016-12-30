@@ -37,7 +37,7 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-public class JobInfoData {
+public class JobInfoData implements java.io.Serializable {
 
     private long startTime;
     private long inErrorTime;

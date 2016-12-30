@@ -46,9 +46,18 @@ import java.util.Map;
 public class TaskResultData {
 
     private TaskIdData id;
+
     private byte[] serializedValue;
 
+    private byte[] serializedException;
+
+    private String exceptionMessage;
+
     private Map<String, String> metadata;
+
+    private Map<String, byte[]> propagatedVariables;
+
+    private TaskLogsData output;
 
     public TaskIdData getId() {
         return id;
@@ -66,6 +75,14 @@ public class TaskResultData {
         this.serializedValue = serializedValue;
     }
 
+    public byte[] getSerializedException() {
+        return serializedException;
+    }
+
+    public void setSerializedException(byte[] serializedException) {
+        this.serializedException = serializedException;
+    }
+
     public Map<String, String> getMetadata() {
         return metadata;
     }
@@ -74,8 +91,32 @@ public class TaskResultData {
         this.metadata = metadata;
     }
 
+    public String getExceptionMessage() {
+        return exceptionMessage;
+    }
+
+    public void setExceptionMessage(String exceptionMessage) {
+        this.exceptionMessage = exceptionMessage;
+    }
+
+    public Map<String, byte[]> getPropagatedVariables() {
+        return propagatedVariables;
+    }
+
+    public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {
+        this.propagatedVariables = propagatedVariables;
+    }
+
+    public TaskLogsData getOutput() {
+        return output;
+    }
+
+    public void setOutput(TaskLogsData output) {
+        this.output = output;
+    }
+
     @Override
     public String toString() {
-        return "TaskResultData{" + "id=" + id + ", serializedValue=" + Arrays.toString(serializedValue) + ", metadata=" + metadata + '}';
+        return "TaskResultData{" + "id=" + id + ", serializedValue=" + Arrays.toString(serializedValue) + ", serializedException=" + Arrays.toString(serializedException) + ", exception=" + exceptionMessage + ", metadata=" + metadata + ", output=" + output + '}';
     }
 }

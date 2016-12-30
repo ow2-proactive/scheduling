@@ -1,5 +1,5 @@
 /*
- *  
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -30,54 +30,22 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *  * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.rest.data;
+package functionaltests.jobs;
 
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+import java.io.Serializable;
 
-public class TaskLogsImpl implements TaskLogs {
-    private static final long serialVersionUID = 1L;
+public class VariableTask extends JavaExecutable {
 
-    private String stdOutLogs;
-    private String stdErrLogs;
-    private String allLogs;
-
-    public TaskLogsImpl(String stdOutLogs, String stdErrLogs, String allLogs) {
-        this.stdOutLogs = stdOutLogs;
-        this.allLogs = allLogs;
-        this.stdErrLogs = stdErrLogs;
-    }
+    public static final String MYVAR = "myvar";
 
     @Override
-    public String getAllLogs(boolean timestamp) {
-        return allLogs;
+    public Serializable execute(TaskResult... results) throws Throwable {
+        getVariables().put(MYVAR, "myvalue");
+        return true;
     }
-
-    @Override
-    public String getStderrLogs(boolean timestamp) {
-        return stdErrLogs;
-    }
-
-    @Override
-    public String getStdoutLogs(boolean timestamp) {
-        return stdOutLogs;
-    }
-
-    @Override
-    public String getStdoutLogs() {
-        return getAllLogs(false);
-    }
-
-    @Override
-    public String getStderrLogs() {
-        return getStderrLogs(false);
-    }
-
-    @Override
-    public String getAllLogs() {
-        return getAllLogs(false);
-    }
-
 }

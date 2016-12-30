@@ -34,8 +34,6 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
-import java.util.List;
-
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -64,11 +62,6 @@ public abstract class ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
-        throw newUnsupportedOperationException();
-    }
-
-    @Override
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         throw newUnsupportedOperationException();
     }
@@ -88,18 +81,6 @@ public abstract class ClientBase implements ISchedulerClient {
     public TaskResult getTaskResultFromIncarnation(String arg0, String arg1, int arg2)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         throw newUnsupportedOperationException();
-    }
-
-    @Override
-    public boolean killTask(JobId arg0, String arg1) throws NotConnectedException, UnknownJobException,
-            UnknownTaskException, PermissionException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean killTask(String arg0, String arg1) throws NotConnectedException, UnknownJobException,
-            UnknownTaskException, PermissionException {
-        throw new UnsupportedOperationException();
     }
 
     @Override

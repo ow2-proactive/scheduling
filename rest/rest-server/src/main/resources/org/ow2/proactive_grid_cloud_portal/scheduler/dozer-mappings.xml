@@ -21,6 +21,10 @@
 			<a>id</a>
 			<b get-method="value" >value</b>
 		</field>
+		<field>
+			<a>readableName</a>
+			<b>readableName</b>
+		</field>
 	</mapping>
 
 	<mapping>
@@ -38,17 +42,33 @@
 		<field>
 			<a>id</a>
 			<b>jobId</b>
+			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData</a-hint>
+		</field>
+		<field>
+			<a>jobInfo</a>
+			<b>jobInfo</b>
+			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData</a-hint>
 		</field>
 		<field>
 			<a>allResults</a>
 			<b>allResults</b>
 			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>
 		</field>
+		<field>
+			<a>preciousResults</a>
+			<b>preciousResults</b>
+			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>
+		</field>
+		<field>
+			<a>exceptionResults</a>
+			<b>exceptionResults</b>
+			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>
+		</field>
 	</mapping>
 
 	<mapping>
 		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</class-a>
-		<class-b>org.ow2.proactive.scheduler.common.task.TaskResult</class-b>
+		<class-b>org.ow2.proactive.scheduler.task.TaskResultImpl</class-b>
 		<field>
 			<a>id</a>
 			<b>taskId</b>
@@ -56,6 +76,27 @@
 		<field>
 			<a>serializedValue</a>
 			<b>serializedValue</b>
+		</field>
+		<field>
+			<a>serializedException</a>
+			<b>serializedException</b>
+		</field>
+		<field>
+			<a>exceptionMessage</a>
+			<b>exceptionMessage</b>
+		</field>
+		<field>
+			<a>metadata</a>
+			<b>metadata</b>
+		</field>
+		<field>
+			<a>propagatedVariables</a>
+			<b>propagatedVariables</b>
+		</field>
+		<field>
+			<a>output</a>
+			<b>output</b>
+			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskLogsData</a-hint>
 		</field>
 	</mapping>
 
@@ -65,6 +106,19 @@
 		<field>
 			<a>taskStatus</a>
 			<b>status</b>
+		</field>
+	</mapping>
+
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskLogsData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.task.TaskLogs</class-b>
+		<field>
+			<a>stdoutLogs</a>
+			<b>stdoutLogs</b>
+		</field>
+		<field>
+			<a>stderrLogs</a>
+			<b>stderrLogs</b>
 		</field>
 	</mapping>
 

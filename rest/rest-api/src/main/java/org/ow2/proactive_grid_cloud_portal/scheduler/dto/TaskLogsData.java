@@ -1,5 +1,5 @@
 /*
- *  
+ *  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
@@ -30,54 +30,37 @@
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *  * $$PROACTIVE_INITIAL_DEV$$
+ *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.rest.data;
+package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
+public class TaskLogsData {
 
-public class TaskLogsImpl implements TaskLogs {
-    private static final long serialVersionUID = 1L;
+    private String stdoutLogs;
+    private String stderrLogs;
 
-    private String stdOutLogs;
-    private String stdErrLogs;
-    private String allLogs;
-
-    public TaskLogsImpl(String stdOutLogs, String stdErrLogs, String allLogs) {
-        this.stdOutLogs = stdOutLogs;
-        this.allLogs = allLogs;
-        this.stdErrLogs = stdErrLogs;
-    }
-
-    @Override
-    public String getAllLogs(boolean timestamp) {
-        return allLogs;
-    }
-
-    @Override
-    public String getStderrLogs(boolean timestamp) {
-        return stdErrLogs;
-    }
-
-    @Override
-    public String getStdoutLogs(boolean timestamp) {
-        return stdOutLogs;
-    }
-
-    @Override
     public String getStdoutLogs() {
-        return getAllLogs(false);
+        return stdoutLogs;
     }
 
-    @Override
+    public void setStdoutLogs(String stdoutLogs) {
+        this.stdoutLogs = stdoutLogs;
+    }
+
     public String getStderrLogs() {
-        return getStderrLogs(false);
+        return stderrLogs;
     }
+
+    public void setStderrLogs(String stderrLogs) {
+        this.stderrLogs = stderrLogs;
+    }
+
 
     @Override
-    public String getAllLogs() {
-        return getAllLogs(false);
+    public String toString() {
+        return "TaskLogsData{" + "stdoutLogs=" + stdoutLogs + ", stdoutLogs=" + stderrLogs + '}';
     }
-
 }

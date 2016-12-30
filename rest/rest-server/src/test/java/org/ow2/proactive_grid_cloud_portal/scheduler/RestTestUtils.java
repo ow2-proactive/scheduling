@@ -50,6 +50,12 @@ public class RestTestUtils {
         return new Page<JobInfo>(lJobInfo, nbTotalJobs);
     }
 
+    protected static JobInfo newMockedJobInfo(String jobStr, String taskTag,
+                                              int nbTasks) {
+        JobInfo jobInfo = RestTestUtils.newMockedJob(jobStr, taskTag, nbTasks).getJobInfo();
+        return jobInfo;
+    }
+
     protected static JobState newMockedJob(final String jobIdStr, final String tag, final int nbTasks) {
         JobState mockedJob = mock(JobState.class);
         JobId mockedJobId = mock(JobId.class);
