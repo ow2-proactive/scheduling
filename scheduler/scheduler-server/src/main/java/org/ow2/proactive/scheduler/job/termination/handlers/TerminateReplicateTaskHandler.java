@@ -48,8 +48,12 @@ public class TerminateReplicateTaskHandler {
                 for (InternalTask ts : tl) {
                     if (ts.getId().equals(initiator.getId()) && !toReplicate.contains(ti)) {
                         if (runs < 1) {
-                            skipTask(changesInfo, initiator, ti);
-
+                            long finishedTime = initiator.getFinishedTime() + 1;
+                            if (ti.getFlowBlock().equals(FlowBlock.START)) {
+                                skipAllblock(changesInfo, ti, finishedTime);
+                            } else {
+                                skipTask(changesInfo, ti, finishedTime);
+                            }
                         } else {
                             // ti needs to be replicated
                             toReplicate.add(ti);
@@ -184,13 +188,32 @@ public class TerminateReplicateTaskHandler {
         return true;
     }
 
+    private void skipAllblock(ChangedTasksInfo changesInfo, InternalTask ti, long finishedTime) {
+        InternalTask endBlock = null;
+        for (InternalTask t : internalJob.getIHMTasks().values()) {
+            if (t.getFlowBlock().equals(FlowBlock.END)) {
+                endBlock = t;
+                skipTask(changesInfo, endBlock, finishedTime);
+                break;
+            }
+        }
+        InternalTask previousTaskInTheBlock = endBlock;
+        while (previousTaskInTheBlock.getId() != ti.getId()) {
+            for (InternalTask previousBlock : previousTaskInTheBlock.getIDependences()) {
+                skipTask(changesInfo, previousBlock, finishedTime);
+                previousTaskInTheBlock = previousBlock;
+            }
+        }
+
+    }
+
     /**
      * @param changesInfo 
      * @param ti
      * @param initiator 
      */
-    private void skipTask(ChangedTasksInfo changesInfo, InternalTask ti, InternalTask initiator) {
-        ti.setFinishedTime(initiator.getFinishedTime() + 1);
+    private void skipTask(ChangedTasksInfo changesInfo, InternalTask ti, long finishedTime) {
+        ti.setFinishedTime(finishedTime);
         ti.setStatus(TaskStatus.SKIPPED);
         ti.setExecutionDuration(0);
         changesInfo.taskSkipped(ti);
