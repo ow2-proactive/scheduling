@@ -37,9 +37,6 @@ public class TerminateReplicateTaskHandler {
     public boolean terminateReplicateTask(FlowAction action, InternalTask initiator,
             ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, TaskId taskId) {
         int runs = action.getDupNumber();
-        if (runs < 1) {
-            runs = 1;
-        }
 
         logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
         List<InternalTask> toReplicate = new ArrayList<>();
@@ -50,8 +47,13 @@ public class TerminateReplicateTaskHandler {
             if (tl != null) {
                 for (InternalTask ts : tl) {
                     if (ts.getId().equals(initiator.getId()) && !toReplicate.contains(ti)) {
-                        // ti needs to be replicated
-                        toReplicate.add(ti);
+                        if (runs < 1) {
+                            skipTask(changesInfo, initiator, ti);
+
+                        } else {
+                            // ti needs to be replicated
+                            toReplicate.add(ti);
+                        }
                     }
                 }
             }
@@ -169,7 +171,8 @@ public class TerminateReplicateTaskHandler {
         if (frontend != null) {
             frontend.jobStateUpdated(internalJob.getOwner(),
                     new NotificationData<>(SchedulerEvent.TASK_REPLICATED, internalJob.getJobInfo()));
-
+            frontend.jobStateUpdated(internalJob.getOwner(),
+                    new NotificationData<>(SchedulerEvent.TASK_SKIPPED, internalJob.getJobInfo()));
             frontend.jobUpdatedFullData(internalJob);
         }
         ((JobInfoImpl) internalJob.getJobInfo()).clearTasksChanges();
@@ -179,6 +182,22 @@ public class TerminateReplicateTaskHandler {
         internalJob.getJobDescriptor().terminate(taskId);
 
         return true;
+    }
+
+    /**
+     * @param changesInfo 
+     * @param ti
+     * @param initiator 
+     */
+    private void skipTask(ChangedTasksInfo changesInfo, InternalTask ti, InternalTask initiator) {
+        ti.setFinishedTime(initiator.getFinishedTime() + 1);
+        ti.setStatus(TaskStatus.SKIPPED);
+        ti.setExecutionDuration(0);
+        changesInfo.taskSkipped(ti);
+        internalJob.setNumberOfPendingTasks(internalJob.getNumberOfPendingTasks() - 1);
+        internalJob.setNumberOfFinishedTasks(internalJob.getNumberOfFinishedTasks() + 1);
+        logger.info("Task " + ti.getId() + " will not be executed");
+
     }
 
     /**

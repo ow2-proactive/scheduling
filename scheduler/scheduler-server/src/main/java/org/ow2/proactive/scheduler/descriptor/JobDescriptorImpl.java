@@ -550,10 +550,11 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param taskId the task to remove from running task.
      */
     public void terminate(TaskId taskId, boolean inErrorTask) {
-        
-        Map<TaskId, ? extends TaskDescriptor> currentTasks = 
-                inErrorTask ? pausedTasks : runningTasks;
-        
+
+        Map<TaskId, ? extends TaskDescriptor> currentTasks = inErrorTask ? pausedTasks : runningTasks;
+
+        List<TaskId> taskIdsToSkip = new ArrayList<>();
+
         if (getInternal().getType() == JobType.TASKSFLOW) {
             TaskDescriptor lt = currentTasks.get(taskId);
 
@@ -568,6 +569,9 @@ public class JobDescriptorImpl implements JobDescriptor {
                         } else if (internalJob.getStatus() == JobStatus.IN_ERROR &&
                             task.getInternal().getStatus() == TaskStatus.PAUSED) {
                             pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                        } else if (task.getInternal().getStatus() == TaskStatus.SKIPPED) {
+                            runningTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                            taskIdsToSkip.add(task.getTaskId());
                         } else {
                             eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
                         }
@@ -581,6 +585,11 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
 
         currentTasks.remove(taskId);
+
+        for (TaskId taskIdToSkip : taskIdsToSkip) {
+            terminate(taskIdToSkip);
+        }
+
     }
 
     public void recoverTask(TaskId taskId) {
@@ -621,6 +630,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             }
         }
     }
+
     public void unpause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
             EligibleTaskDescriptor eligibleTaskDescriptor = pausedTasks.remove(taskId);
@@ -637,8 +647,6 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
         return null;
     }
-
-
 
     public void updateTaskScheduledTime(TaskId taskId, long scheduledTime) {
         if (getInternal().getType() == JobType.TASKSFLOW) {

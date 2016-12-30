@@ -41,24 +41,26 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.internal.InternalTaskParentFinder;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
-import org.apache.log4j.Logger;
-
-import static org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 
 
 /**
@@ -115,17 +117,24 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             //if job is TASKSFLOW, preparing the list of parameters for this task.
             int resultSize = taskDescriptor.getParents().size();
             if ((job.getType() == JobType.TASKSFLOW) && (resultSize > 0) && task.handleResultsArguments()) {
-                params = new TaskResult[resultSize];
-                List<TaskId> parentIds = new ArrayList<>(resultSize);
+
+                Set<TaskId> parentIds = new HashSet<>(resultSize);
                 for (int i = 0; i < resultSize; i++) {
-                    parentIds.add(taskDescriptor.getParents().get(i).getTaskId());
+                    parentIds.addAll(InternalTaskParentFinder.getInstance().getFirstNotSkippedParentTaskIds(
+                            taskDescriptor.getParents().get(i).getInternal()));
                 }
+
+                params = new TaskResult[parentIds.size()];
+
                 Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
-                        .loadTasksResults(
-                                job.getId(), parentIds);
-                for (int i = 0; i < resultSize; i++) {
-                    params[i] = taskResults.get(taskDescriptor.getParents().get(i).getTaskId());
+                        .loadTasksResults(job.getId(), new ArrayList<>(parentIds));
+
+                int i = 0;
+                for (TaskId taskId : parentIds) {
+                    params[i] = taskResults.get(taskId);
+                    i++;
                 }
+
             }
 
             // activate loggers for this task if needed
@@ -139,6 +148,23 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             restartTask();
         }
         return null;
+    }
+
+    /**
+     * @param parentIds
+     * @param parentTask
+     */
+    private void addFirstNotSkippedParentTasks(Set<TaskId> parentIds, InternalTask parentTask) {
+        if (parentTask.getStatus() == TaskStatus.SKIPPED) {
+            if (parentTask.getIDependences() != null) {
+                for (InternalTask parentInternalTask : parentTask.getIDependences()) {
+                    addFirstNotSkippedParentTasks(parentIds, parentInternalTask);
+                }
+            }
+        } else {
+            parentIds.add(parentTask.getId());
+        }
+
     }
 
     protected void fillContainer() throws KeyException, NoSuchAlgorithmException {
@@ -155,15 +181,15 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         enrichWithThirdPartyCredentials(decryptedUserCredentials);
 
         PublicKey nodePublicKey = launcher.generatePublicKey();
-        Credentials nodeEncryptedUserCredentials =
-                Credentials.createCredentials(decryptedUserCredentials, nodePublicKey);
+        Credentials nodeEncryptedUserCredentials = Credentials.createCredentials(decryptedUserCredentials,
+                nodePublicKey);
 
         task.getExecutableContainer().setCredentials(nodeEncryptedUserCredentials);
     }
 
     protected boolean areThirdPartyCredentialsDefined() {
-        return schedulingService.getInfrastructure().getDBManager().hasThirdPartyCredentials(
-                job.getJobInfo().getJobOwner());
+        return schedulingService.getInfrastructure().getDBManager()
+                .hasThirdPartyCredentials(job.getJobInfo().getJobOwner());
     }
 
     private void enrichWithThirdPartyCredentials(CredData decryptedUserCredentials) throws KeyException {
