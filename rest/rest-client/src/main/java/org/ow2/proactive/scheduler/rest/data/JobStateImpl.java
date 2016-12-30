@@ -70,13 +70,13 @@ public class JobStateImpl extends JobState {
 
     @Override
     public Map<TaskId, TaskState> getHMTasks() {
-        Map<String, TaskStateData> taskStateMap = jobStateData.getTasks();
-        Map<TaskId, TaskState> hmTasks = new HashMap<>();
-        for (TaskStateData ts : taskStateMap.values()) {
-            TaskIdData taskIdData = ts.getTaskInfo().getTaskId();
-            hmTasks.put(DataUtility.taskId(DataUtility.jobId(jobStateData.getJobInfo().getJobId()), taskIdData), DataUtility.taskState(ts));
+        Map<String, TaskStateData> taskStateDataMap = jobStateData.getTasks();
+        Map<TaskId, TaskState> taskStateMap = new HashMap<>();
+        for (TaskStateData taskStateData : taskStateDataMap.values()) {
+            TaskIdData taskIdData = taskStateData.getTaskInfo().getTaskId();
+            taskStateMap.put(DataUtility.taskId(DataUtility.jobId(jobStateData.getJobInfo().getJobId()), taskIdData), DataUtility.taskState(taskStateData));
         }
-        return hmTasks;
+        return taskStateMap;
     }
 
     @Override
