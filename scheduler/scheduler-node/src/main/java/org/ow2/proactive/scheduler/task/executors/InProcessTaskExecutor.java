@@ -96,7 +96,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             } else {
                 directory = new File(taskContext.getNodeDataSpaceURIs().getScratchURI());
             }
-            File nodesFile = File.createTempFile(NODES_FILE_DIRECTORY_NAME, null, directory);
+            File nodesFile = new File(directory, NODES_FILE_DIRECTORY_NAME + "_" + taskContext.getTaskId());
 
             Writer outputWriter = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(nodesFile),

@@ -63,6 +63,16 @@ import javax.crypto.Cipher;
  */
 public class KeyPairUtil {
 
+    private static SecureRandom secureRandom;
+
+    private static synchronized void initSecureRandom() {
+        if (secureRandom == null) {
+            secureRandom = new SecureRandom();
+            final byte[] dummy = new byte[512];
+            secureRandom.nextBytes(dummy);
+        }
+    }
+
     /**
      * Generates a pair of public and private keys
      * 
@@ -128,7 +138,8 @@ public class KeyPairUtil {
         Cipher ciph = null;
         try {
             ciph = Cipher.getInstance(cipherParams);
-            ciph.init(Cipher.ENCRYPT_MODE, pubKey);
+            initSecureRandom();
+            ciph.init(Cipher.ENCRYPT_MODE, pubKey, secureRandom);
         } catch (Exception e) {
             throw new KeyException("Could not initialize cipher", e);
         }
@@ -157,7 +168,8 @@ public class KeyPairUtil {
         Cipher ciph = null;
         try {
             ciph = Cipher.getInstance(cipherParams);
-            ciph.init(Cipher.DECRYPT_MODE, privKey);
+            initSecureRandom();
+            ciph.init(Cipher.DECRYPT_MODE, privKey, secureRandom);
         } catch (Exception e) {
             throw new KeyException("Could not initialize cipher", e);
         }

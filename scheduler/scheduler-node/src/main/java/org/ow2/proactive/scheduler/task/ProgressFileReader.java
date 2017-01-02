@@ -82,10 +82,10 @@ public class ProgressFileReader {
 
         try {
             Files.createDirectories(progressFileDir);
-            ForkerUtils.setSharedPermissions(progressFileDir.toFile(), true);
+            ForkerUtils.setSharedExecutablePermissions(progressFileDir.toFile());
             progressFile = progressFileDir.resolve(progressFileName);
             Files.createFile(progressFile);
-            ForkerUtils.setSharedPermissions(progressFile.toFile(), false);
+            ForkerUtils.setSharedPermissions(progressFile.toFile());
         } catch (FileAlreadyExistsException e) {
             // ignore file already exists exception
         }

@@ -35,6 +35,7 @@
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +89,11 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         jvmArguments.add(PASchedulerProperties.TASK_FORK.getCmdLine() + "true");
 
         StringBuilder classpath = new StringBuilder("." + File.pathSeparatorChar);
-        classpath.append(System.getProperty("java.class.path", ""));
+        if (!System.getProperty("java.class.path", "").contains("node.jar")) {
+            // in case the class path of the node is not built with the node.jar, we
+            // build the classpath with wildcards to avoid command too long errors on windows
+            classpath.append(getStandardClassPathEntries(variables));
+        }
 
         for (String classpathEntry : OneJar.getClasspath()) {
             classpath.append(File.pathSeparatorChar).append(classpathEntry);
@@ -122,5 +127,37 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         javaCommand.add(serializedContextAbsolutePath);
 
         return javaCommand;
+    }
+
+    private StringBuilder getStandardClassPathEntries(Map<String, Serializable> variables) throws IOException {
+        StringBuilder classpathEntries = new StringBuilder();
+        Serializable schedulerHomeSerializable = variables.get("PA_SCHEDULER_HOME");
+        if (schedulerHomeSerializable != null) {
+            File paHome = new File((String) schedulerHomeSerializable).getCanonicalFile();
+            File distLib = new File(paHome, "dist/lib").getCanonicalFile();
+            if (distLib.exists()) {
+                File addons = new File(paHome, "addons").getCanonicalFile();
+                classpathEntries.append(distLib);
+                classpathEntries.append(File.pathSeparatorChar);
+                classpathEntries.append(new File(distLib, "*"));
+                classpathEntries.append(File.pathSeparatorChar);
+                classpathEntries.append(addons);
+                classpathEntries.append(File.pathSeparatorChar);
+                classpathEntries.append(new File(addons, "*"));
+            } else {
+                return getClassPathEntriesUsingJavaClassPath();
+            }
+        } else {
+            return getClassPathEntriesUsingJavaClassPath();
+        }
+
+        return classpathEntries;
+
+    }
+
+    private StringBuilder getClassPathEntriesUsingJavaClassPath() {
+        StringBuilder classpathEntries = new StringBuilder();
+        classpathEntries.append(System.getProperty("java.class.path", ""));
+        return classpathEntries;
     }
 }
