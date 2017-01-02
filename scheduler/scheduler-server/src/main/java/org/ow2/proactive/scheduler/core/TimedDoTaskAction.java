@@ -54,7 +54,6 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -151,23 +150,6 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             restartTask();
         }
         return null;
-    }
-
-    /**
-     * @param parentIds
-     * @param parentTask
-     */
-    private void addFirstNotSkippedParentTasks(Set<TaskId> parentIds, InternalTask parentTask) {
-        if (parentTask.getStatus() == TaskStatus.SKIPPED) {
-            if (parentTask.getIDependences() != null) {
-                for (InternalTask parentInternalTask : parentTask.getIDependences()) {
-                    addFirstNotSkippedParentTasks(parentIds, parentInternalTask);
-                }
-            }
-        } else {
-            parentIds.add(parentTask.getId());
-        }
-
     }
 
     protected void fillContainer() throws KeyException, NoSuchAlgorithmException {
