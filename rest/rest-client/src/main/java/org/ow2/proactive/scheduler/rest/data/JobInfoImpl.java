@@ -47,6 +47,7 @@ public class JobInfoImpl implements JobInfo {
     private long inErrorTime = -1;
     private long finishedTime = -1;
     private long removedTime = -1;
+    private long lastUpdatedTime = -1;
 
     private JobId jobId;
     private String jobOwner;
@@ -197,6 +198,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setSubmittedTime(long submittedTime) {
         this.submittedTime = submittedTime;
+    }
+
+    @Override
+    public long getLastUpdatedTime() {
+        return lastUpdatedTime;
+    }
+
+    public void setLastUpdatedTime(long lastUpdatedTime) {
+        this.lastUpdatedTime = lastUpdatedTime;
     }
 
     @Override
