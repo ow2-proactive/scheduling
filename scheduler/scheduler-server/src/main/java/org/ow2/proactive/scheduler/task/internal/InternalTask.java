@@ -160,7 +160,7 @@ public abstract class InternalTask extends TaskState {
     private transient Map<String, Serializable> updatedVariables;
 
     @XmlTransient
-    private final InternalTaskParentFinder internalTaskParentFinder;
+    private transient InternalTaskParentFinder internalTaskParentFinder;
 
     protected InternalTask(InternalJob internalJob) {
         this.internalJob = internalJob;

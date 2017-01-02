@@ -597,8 +597,10 @@ public class JobDescriptorImpl implements JobDescriptor {
         if (taskToRun == null) {
             taskToRun = pausedTasks.remove(taskId);
         }
-        runningTasks.put(taskId, taskToRun);
-        terminate(taskId);
+        if (taskToRun != null) {
+            runningTasks.put(taskId, taskToRun);
+            terminate(taskId);
+        }
     }
 
     /**
