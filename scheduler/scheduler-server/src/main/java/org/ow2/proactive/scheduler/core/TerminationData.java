@@ -72,6 +72,8 @@ final class TerminationData {
 
     private final Map<TaskIdWrapper, TaskRestartData> tasksToRestart;
 
+    private final InternalTaskParentFinder internalTaskParentFinder;
+
     static final TerminationData EMPTY = new TerminationData(Collections.<JobId> emptySet(),
         Collections.<TaskIdWrapper, TaskTerminationData> emptyMap(),
         Collections.<TaskIdWrapper, TaskRestartData> emptyMap());
@@ -87,6 +89,7 @@ final class TerminationData {
         this.jobsToTerminate = jobsToTerminate;
         this.tasksToTerminate = tasksToTerminate;
         this.tasksToRestart = tasksToRestart;
+        this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
     }
 
     void addJobToTerminate(JobId jobId) {
@@ -186,7 +189,7 @@ final class TerminationData {
         if (!taskToTerminate.normalTermination || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();
             if (iDependences != null) {
-                Set<TaskId> parentIds = InternalTaskParentFinder.getInstance()
+                Set<TaskId> parentIds = internalTaskParentFinder
                         .getFirstNotSkippedParentTaskIds(taskData.getTask());
 
                 Map<TaskId, TaskResult> taskResults = service.getInfrastructure().getDBManager()

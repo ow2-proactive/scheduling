@@ -89,6 +89,8 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private boolean taskWasRestarted;
 
+    private final InternalTaskParentFinder internalTaskParentFinder;
+
     /**
      * Create a new instance of TimedDoTaskAction
      *
@@ -104,6 +106,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         this.schedulingService = schedulingService;
         this.terminateNotification = terminateNotification;
         this.corePrivateKey = corePrivateKey;
+        this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
     }
 
     /**
@@ -120,7 +123,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
                 Set<TaskId> parentIds = new HashSet<>(resultSize);
                 for (int i = 0; i < resultSize; i++) {
-                    parentIds.addAll(InternalTaskParentFinder.getInstance().getFirstNotSkippedParentTaskIds(
+                    parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(
                             taskDescriptor.getParents().get(i).getInternal()));
                 }
 

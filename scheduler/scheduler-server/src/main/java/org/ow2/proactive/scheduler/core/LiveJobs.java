@@ -17,7 +17,6 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.exception.TaskPreemptedException;
 import org.ow2.proactive.scheduler.common.exception.TaskRestartedException;
-import org.ow2.proactive.scheduler.common.exception.TaskSkippedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -807,33 +806,6 @@ class LiveJobs {
             } else {
                 terminateTask(jobData, task, true, taskResult, terminationData);
             }
-
-            return terminationData;
-        } finally {
-            jobData.unlock();
-        }
-    }
-
-    TerminationData skipTask(JobId jobId, String taskName) throws UnknownJobException, UnknownTaskException {
-        JobData jobData = lockJob(jobId);
-        if (jobData == null) {
-            throw new UnknownJobException(jobId);
-        }
-        try {
-            InternalTask task = jobData.job.getTask(taskName);
-
-            RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(task.getId()));
-            if (taskData == null) {
-                throw new IllegalStateException("No information for: " + task.getId());
-            }
-
-            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task,
-                    new TaskSkippedException("Skipped by xxx"), new SimpleTaskLogs("", "Skipped by xxx"));
-
-            TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
-                    false);
-
-            terminateTask(jobData, task, true, taskResult, terminationData);
 
             return terminationData;
         } finally {

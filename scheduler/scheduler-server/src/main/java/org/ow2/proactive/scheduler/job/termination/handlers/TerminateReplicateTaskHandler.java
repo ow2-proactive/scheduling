@@ -54,10 +54,12 @@ public class TerminateReplicateTaskHandler {
                             } else {
                                 skipTask(changesInfo, ti, finishedTime);
                             }
+                            break;
                         } else {
                             // ti needs to be replicated
                             toReplicate.add(ti);
                         }
+                        break;
                     }
                 }
             }
@@ -197,11 +199,11 @@ public class TerminateReplicateTaskHandler {
                 break;
             }
         }
-        InternalTask previousTaskInTheBlock = endBlock;
-        while (previousTaskInTheBlock.getId() != ti.getId()) {
-            for (InternalTask previousBlock : previousTaskInTheBlock.getIDependences()) {
+        InternalTask lastBlockTaskThatHasBeenSkipped = endBlock;
+        while (lastBlockTaskThatHasBeenSkipped.getId() != ti.getId()) {
+            for (InternalTask previousBlock : lastBlockTaskThatHasBeenSkipped.getIDependences()) {
                 skipTask(changesInfo, previousBlock, finishedTime);
-                previousTaskInTheBlock = previousBlock;
+                lastBlockTaskThatHasBeenSkipped = previousBlock;
             }
         }
 
