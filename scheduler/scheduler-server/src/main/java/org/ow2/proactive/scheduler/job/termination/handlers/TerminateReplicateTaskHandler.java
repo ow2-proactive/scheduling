@@ -50,7 +50,7 @@ public class TerminateReplicateTaskHandler {
                         if (runs < 1) {
                             long finishedTime = initiator.getFinishedTime() + 1;
                             if (ti.getFlowBlock().equals(FlowBlock.START)) {
-                                skipAllblock(changesInfo, ti, finishedTime);
+                                skipTasksUntilEndBlock(changesInfo, ti, finishedTime);
                             } else {
                                 skipTask(changesInfo, ti, finishedTime);
                             }
@@ -59,7 +59,6 @@ public class TerminateReplicateTaskHandler {
                             // ti needs to be replicated
                             toReplicate.add(ti);
                         }
-                        break;
                     }
                 }
             }
@@ -190,39 +189,30 @@ public class TerminateReplicateTaskHandler {
         return true;
     }
 
-    private void skipAllblock(ChangedTasksInfo changesInfo, InternalTask ti, long finishedTime) {
-        InternalTask endBlock = null;
-        for (InternalTask t : internalJob.getIHMTasks().values()) {
-            if (t.getFlowBlock().equals(FlowBlock.END)) {
-                endBlock = t;
-                skipTask(changesInfo, endBlock, finishedTime);
-                break;
+    private void skipTasksUntilEndBlock(ChangedTasksInfo changesInfo, InternalTask ti, long finishedTime) {
+        skipTask(changesInfo, ti, finishedTime);
+        if (!ti.getFlowBlock().equals(FlowBlock.END)) {
+            for (InternalTask blockTask : getTaskChildren(ti)) {
+                skipTasksUntilEndBlock(changesInfo, blockTask, finishedTime);
             }
         }
-        InternalTask lastBlockTaskThatHasBeenSkipped = endBlock;
-        while (lastBlockTaskThatHasBeenSkipped.getId() != ti.getId()) {
-            for (InternalTask previousBlock : lastBlockTaskThatHasBeenSkipped.getIDependences()) {
-                skipTask(changesInfo, previousBlock, finishedTime);
-                lastBlockTaskThatHasBeenSkipped = previousBlock;
-            }
-        }
+    }
+
+    private List<InternalTask> getTaskChildren(InternalTask internalTask) {
+        return internalJob.getJobDescriptor().getTaskChildren(internalTask);
 
     }
 
-    /**
-     * @param changesInfo 
-     * @param ti
-     * @param initiator 
-     */
     private void skipTask(ChangedTasksInfo changesInfo, InternalTask ti, long finishedTime) {
-        ti.setFinishedTime(finishedTime);
-        ti.setStatus(TaskStatus.SKIPPED);
-        ti.setExecutionDuration(0);
-        changesInfo.taskSkipped(ti);
-        internalJob.setNumberOfPendingTasks(internalJob.getNumberOfPendingTasks() - 1);
-        internalJob.setNumberOfFinishedTasks(internalJob.getNumberOfFinishedTasks() + 1);
-        logger.info("Task " + ti.getId() + " will not be executed");
-
+        if (ti.getStatus() != TaskStatus.SKIPPED) {
+            ti.setFinishedTime(finishedTime);
+            ti.setStatus(TaskStatus.SKIPPED);
+            ti.setExecutionDuration(0);
+            changesInfo.taskSkipped(ti);
+            internalJob.setNumberOfPendingTasks(internalJob.getNumberOfPendingTasks() - 1);
+            internalJob.setNumberOfFinishedTasks(internalJob.getNumberOfFinishedTasks() + 1);
+            logger.info("Task " + ti.getId() + " will not be executed");
+        }
     }
 
     /**
