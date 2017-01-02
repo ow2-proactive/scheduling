@@ -85,13 +85,13 @@ public class SchedulerStateRestJobTest extends RestTestServer {
     @Test
     public void testJobInfo() throws Throwable {
         String JobId = "3";
-        JobState jobState = RestTestUtils.newMockedJob(JobId, null, 50);
+        JobInfo jobInfo = RestTestUtils.newMockedJobInfo(JobId, null, 50);
 
-        when(mockOfScheduler.getJobState("3")).thenReturn(jobState);
+        when(mockOfScheduler.getJobInfo("3")).thenReturn(jobInfo);
 
         JobInfoData jobInfoData = restInterface.jobInfo(sessionId, JobId);
 
-        RestTestUtils.assertJobInfo(jobState.getJobInfo(), jobInfoData);
+        RestTestUtils.assertJobInfo(jobInfo, jobInfoData);
 
     }
 

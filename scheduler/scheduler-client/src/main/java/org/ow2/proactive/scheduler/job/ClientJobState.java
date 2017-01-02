@@ -1,12 +1,5 @@
 package org.ow2.proactive.scheduler.job;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -18,6 +11,13 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.task.ClientTaskState;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -87,6 +87,10 @@ public final class ClientJobState extends JobState {
         jobInfo.setNumberOfFinishedTasks(taskInfo.getJobInfo().getNumberOfFinishedTasks());
         jobInfo.setNumberOfPendingTasks(taskInfo.getJobInfo().getNumberOfPendingTasks());
         jobInfo.setNumberOfRunningTasks(taskInfo.getJobInfo().getNumberOfRunningTasks());
+        jobInfo.setNumberOfFaultyTasks(taskInfo.getJobInfo().getNumberOfFaultyTasks());
+        jobInfo.setNumberOfInErrorTasks(taskInfo.getJobInfo().getNumberOfInErrorTasks());
+        jobInfo.setNumberOfFailedTasks(taskInfo.getJobInfo().getNumberOfFailedTasks());
+        jobInfo.setTotalNumberOfTasks(taskInfo.getJobInfo().getTotalNumberOfTasks());
         try {
             tasks.get(taskInfo.getTaskId()).update(taskInfo);
         } catch (NullPointerException e) {

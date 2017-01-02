@@ -36,21 +36,20 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.io.IOException;
-import java.util.LinkedList;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.utils.ObjectByteConverter;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.utils.ObjectByteConverter;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import java.io.IOException;
+import java.util.LinkedList;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 
@@ -217,6 +216,21 @@ public class Log4JTaskLogs implements TaskLogs {
         }
 
         return logs.toString();
+    }
+
+    @Override
+    public String getStdoutLogs() {
+        return getStdoutLogs(false);
+    }
+
+    @Override
+    public String getStderrLogs() {
+        return getStderrLogs(false);
+    }
+
+    @Override
+    public String getAllLogs() {
+        return getAllLogs(false);
     }
 
     /**

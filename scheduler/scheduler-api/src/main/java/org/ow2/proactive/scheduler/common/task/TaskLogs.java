@@ -48,6 +48,28 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public interface TaskLogs extends java.io.Serializable {
 
     /**
+     * Return the logs generated on standard output. No timestamp
+     *
+     * @return a String containing the logs generated on standard output.
+     */
+    String getStdoutLogs();
+
+    /**
+     * Return the logs generated on error output. No timestamp
+     *
+     * @return a String containing the logs generated on error output.
+     */
+    String getStderrLogs();
+
+    /**
+     * Return all the logs generated on standard and error output. No timestamp
+     *
+     * @return a String containing stored logs, or null if any.
+     */
+    String getAllLogs();
+
+
+    /**
      * Return the logs generated on standard output.
      * @param timeStamp get the logs with or without time tags.
      * 
