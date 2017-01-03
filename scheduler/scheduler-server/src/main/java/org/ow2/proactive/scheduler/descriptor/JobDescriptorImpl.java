@@ -559,31 +559,28 @@ public class JobDescriptorImpl implements JobDescriptor {
         List<TaskId> taskIdsToSkip = new ArrayList<>();
 
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            TaskDescriptor lt = currentTasks.get(taskId);
+            TaskDescriptor taskToTerminate = currentTasks.get(taskId);
 
-            if (lt != null) {
-                for (TaskDescriptor task : lt.getChildren()) {
-                    ((EligibleTaskDescriptorImpl) task)
-                            .setCount(((EligibleTaskDescriptorImpl) task).getCount() - 1);
+            if (taskToTerminate != null) {
+                for (TaskDescriptor childTask : taskToTerminate.getChildren()) {
+                    decreaseParentCount(childTask);
 
-                    if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
+                    if (((EligibleTaskDescriptorImpl) childTask).getCount() == 0) {
                         if (internalJob.getStatus() == JobStatus.PAUSED) {
-                            pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                            pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
                         } else if (internalJob.getStatus() == JobStatus.IN_ERROR &&
-                            task.getInternal().getStatus() == TaskStatus.PAUSED) {
-                            pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
-                        } else if (task.getInternal().getStatus() == TaskStatus.SKIPPED) {
-                            runningTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
-                            taskIdsToSkip.add(task.getTaskId());
+                            childTask.getInternal().getStatus() == TaskStatus.PAUSED) {
+                            pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
+                        } else if (childTask.getInternal().getStatus() == TaskStatus.SKIPPED) {
+                            runningTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
+                            taskIdsToSkip.add(childTask.getTaskId());
                         } else {
-                            eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                            eligibleTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
                         }
                     }
                 }
 
-                for (TaskDescriptor task : lt.getParents()) {
-                    ((EligibleTaskDescriptorImpl) task).setChildrenCount(task.getChildrenCount() - 1);
-                }
+                decreaseChildrenCountForAllParents(taskToTerminate);
             }
         }
 
@@ -593,6 +590,17 @@ public class JobDescriptorImpl implements JobDescriptor {
             terminate(taskIdToSkip);
         }
 
+    }
+
+    private void decreaseParentCount(TaskDescriptor childTask) {
+        ((EligibleTaskDescriptorImpl) childTask)
+                .setCount(((EligibleTaskDescriptorImpl) childTask).getCount() - 1);
+    }
+
+    private void decreaseChildrenCountForAllParents(TaskDescriptor taskToTerminate) {
+        for (TaskDescriptor parentTask : taskToTerminate.getParents()) {
+            ((EligibleTaskDescriptorImpl) parentTask).setChildrenCount(parentTask.getChildrenCount() - 1);
+        }
     }
 
     public void recoverTask(TaskId taskId) {
