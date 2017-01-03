@@ -159,12 +159,8 @@ public abstract class InternalTask extends TaskState {
     @XmlTransient
     private transient Map<String, Serializable> updatedVariables;
 
-    @XmlTransient
-    private transient InternalTaskParentFinder internalTaskParentFinder;
-
     protected InternalTask(InternalJob internalJob) {
         this.internalJob = internalJob;
-        this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
     }
 
     void setReplicatedFrom(InternalTask replicatedFrom) {
@@ -1185,7 +1181,8 @@ public abstract class InternalTask extends TaskState {
             if (internalTasksDependencies != null) {
                 Set<TaskId> parentIds = new HashSet<>(internalTasksDependencies.size());
                 for (InternalTask parentTask : internalTasksDependencies) {
-                    parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(parentTask));
+                    parentIds.addAll(InternalTaskParentFinder.getInstance()
+                            .getFirstNotSkippedParentTaskIds(parentTask));
                 }
                 if (!parentIds.isEmpty()) {
                     Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
