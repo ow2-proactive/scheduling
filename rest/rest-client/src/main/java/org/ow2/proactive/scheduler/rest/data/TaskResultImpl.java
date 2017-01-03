@@ -34,11 +34,13 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
+import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.TaskRestException;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -52,9 +54,11 @@ public class TaskResultImpl implements TaskResult {
 
     private TaskId id;
     private byte[] serializedValue;
+    private byte[] serializedException;
     private Serializable value;
-    private boolean hadException;
     private TaskLogs taskLogs;
+    private String exceptionMessage;
+    private Map<String, byte[]> propagatedVariables;
 
     private Map<String, String> metadata = new HashMap<>();
 
@@ -62,6 +66,13 @@ public class TaskResultImpl implements TaskResult {
         this.id = id;
         this.serializedValue = d.getSerializedValue();
         this.metadata = d.getMetadata();
+        this.exceptionMessage = d.getExceptionMessage();
+        this.serializedException = d.getSerializedException();
+        this.propagatedVariables = d.getPropagatedVariables();
+        if (d.getOutput() != null) {
+            this.taskLogs = new SimpleTaskLogs(d.getOutput().getStdoutLogs(), d.getOutput().getStderrLogs());
+        }
+
     }
 
     @Override
@@ -71,7 +82,17 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public Throwable getException() {
-        throw new UnsupportedOperationException();
+        if (serializedException == null || exceptionMessage == null) {
+            return null;
+        }
+        try {
+            Throwable unserializedException = (Throwable) object(serializedException);
+            return unserializedException;
+        } catch (ClassCastException e) {
+            // If an error occurs during deserialization, a string is returned
+            // in that case return the custom made server-side exception
+            return new TaskRestException(exceptionMessage);
+        }
     }
 
     public void setOutput(TaskLogs taskLogs) {
@@ -85,7 +106,7 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public Map<String, byte[]> getPropagatedVariables() {
-        throw new UnsupportedOperationException();
+        return propagatedVariables;
     }
 
     @Override
@@ -107,13 +128,9 @@ public class TaskResultImpl implements TaskResult {
         return id;
     }
 
-    public void setHadException(boolean hadException) {
-        this.hadException = hadException;
-    }
-
     @Override
     public boolean hadException() {
-        return hadException;
+        return serializedException != null;
     }
 
     public void setValue(Serializable value) {

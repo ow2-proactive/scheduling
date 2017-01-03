@@ -271,6 +271,27 @@ public abstract class AbstractRestFuncTestCase {
         return job;
     }
 
+    protected Job createJobManyTasks(String jobName, Class<?>... clazzes) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName(jobName);
+        job.setPriority(JobPriority.NORMAL);
+        job.setDescription("Test " + jobName);
+        job.setMaxNumberOfExecution(1);
+
+        for (Class<?> clazz : clazzes) {
+            JavaTask task = new JavaTask();
+            task.setName(clazz.getSimpleName() + "Task");
+            task.setExecutableClassName(clazz.getName());
+            task.setMaxNumberOfExecution(1);
+            String classpath = RestFuncTUtils.getClassPath(clazz);
+            ForkEnvironment forkEnvironment = new ForkEnvironment();
+            forkEnvironment.addAdditionalClasspath(classpath);
+            task.setForkEnvironment(forkEnvironment);
+            job.addTask(task);
+        }
+        return job;
+    }
+
     protected String getTaskName(Class<?> clazz) {
         return clazz.getSimpleName() + "Task";
     }

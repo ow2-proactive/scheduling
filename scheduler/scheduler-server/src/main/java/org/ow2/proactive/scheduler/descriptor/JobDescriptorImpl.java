@@ -96,6 +96,9 @@ public class JobDescriptorImpl implements JobDescriptor {
     /** Job paused tasks */
     private Map<TaskId, EligibleTaskDescriptor> pausedTasks = new HashMap<>();
 
+    /** All tasks with their children */
+    private final Map<InternalTask, TaskDescriptor> allTasksWithTheirChildren = new HashMap<>();
+
     /**
      * Create a new instance of job descriptor using an internal job.
      * Just make a mapping between some fields of the two type of job in order to
@@ -126,7 +129,6 @@ public class JobDescriptorImpl implements JobDescriptor {
      * This list represents the ordered TaskDescriptor list of its parent tasks.
      */
     private void makeTree(InternalJob job) {
-        Map<InternalTask, TaskDescriptor> mem = new HashMap<>();
 
         //create task descriptor list
         for (InternalTask td : job.getITasks()) {
@@ -141,16 +143,17 @@ public class JobDescriptorImpl implements JobDescriptor {
                 branchTasks.put(td.getId(), lt);
             }
 
-            mem.put(td, lt);
+            allTasksWithTheirChildren.put(td, lt);
         }
 
         //now for each taskDescriptor, set the parents and children list
         for (InternalTask td : job.getITasks()) {
             if (td.getDependences() != null) {
-                TaskDescriptor taskDescriptor = mem.get(td);
+                TaskDescriptor taskDescriptor = allTasksWithTheirChildren.get(td);
 
                 for (InternalTask depends : td.getIDependences()) {
-                    ((EligibleTaskDescriptorImpl) taskDescriptor).addParent(mem.get(depends));
+                    ((EligibleTaskDescriptorImpl) taskDescriptor)
+                            .addParent(allTasksWithTheirChildren.get(depends));
                 }
 
                 for (TaskDescriptor lt : taskDescriptor.getParents()) {
@@ -550,37 +553,54 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param taskId the task to remove from running task.
      */
     public void terminate(TaskId taskId, boolean inErrorTask) {
-        
-        Map<TaskId, ? extends TaskDescriptor> currentTasks = 
-                inErrorTask ? pausedTasks : runningTasks;
-        
+
+        Map<TaskId, ? extends TaskDescriptor> currentTasks = inErrorTask ? pausedTasks : runningTasks;
+
+        List<TaskId> taskIdsToSkip = new ArrayList<>();
+
         if (getInternal().getType() == JobType.TASKSFLOW) {
-            TaskDescriptor lt = currentTasks.get(taskId);
+            TaskDescriptor taskToTerminate = currentTasks.get(taskId);
 
-            if (lt != null) {
-                for (TaskDescriptor task : lt.getChildren()) {
-                    ((EligibleTaskDescriptorImpl) task)
-                            .setCount(((EligibleTaskDescriptorImpl) task).getCount() - 1);
+            if (taskToTerminate != null) {
+                for (TaskDescriptor childTask : taskToTerminate.getChildren()) {
+                    decreaseParentCount(childTask);
 
-                    if (((EligibleTaskDescriptorImpl) task).getCount() == 0) {
+                    if (((EligibleTaskDescriptorImpl) childTask).getCount() == 0) {
                         if (internalJob.getStatus() == JobStatus.PAUSED) {
-                            pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                            pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
                         } else if (internalJob.getStatus() == JobStatus.IN_ERROR &&
-                            task.getInternal().getStatus() == TaskStatus.PAUSED) {
-                            pausedTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                            childTask.getInternal().getStatus() == TaskStatus.PAUSED) {
+                            pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
+                        } else if (childTask.getInternal().getStatus() == TaskStatus.SKIPPED) {
+                            runningTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
+                            taskIdsToSkip.add(childTask.getTaskId());
                         } else {
-                            eligibleTasks.put(task.getTaskId(), (EligibleTaskDescriptor) task);
+                            eligibleTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
                         }
                     }
                 }
 
-                for (TaskDescriptor task : lt.getParents()) {
-                    ((EligibleTaskDescriptorImpl) task).setChildrenCount(task.getChildrenCount() - 1);
-                }
+                decreaseChildrenCountForAllParents(taskToTerminate);
             }
         }
 
         currentTasks.remove(taskId);
+
+        for (TaskId taskIdToSkip : taskIdsToSkip) {
+            terminate(taskIdToSkip);
+        }
+
+    }
+
+    private void decreaseParentCount(TaskDescriptor childTask) {
+        ((EligibleTaskDescriptorImpl) childTask)
+                .setCount(((EligibleTaskDescriptorImpl) childTask).getCount() - 1);
+    }
+
+    private void decreaseChildrenCountForAllParents(TaskDescriptor taskToTerminate) {
+        for (TaskDescriptor parentTask : taskToTerminate.getParents()) {
+            ((EligibleTaskDescriptorImpl) parentTask).setChildrenCount(parentTask.getChildrenCount() - 1);
+        }
     }
 
     public void recoverTask(TaskId taskId) {
@@ -588,8 +608,10 @@ public class JobDescriptorImpl implements JobDescriptor {
         if (taskToRun == null) {
             taskToRun = pausedTasks.remove(taskId);
         }
-        runningTasks.put(taskId, taskToRun);
-        terminate(taskId);
+        if (taskToRun != null) {
+            runningTasks.put(taskId, taskToRun);
+            terminate(taskId);
+        }
     }
 
     /**
@@ -621,6 +643,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             }
         }
     }
+
     public void unpause(TaskId taskId) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
             EligibleTaskDescriptor eligibleTaskDescriptor = pausedTasks.remove(taskId);
@@ -637,8 +660,6 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
         return null;
     }
-
-
 
     public void updateTaskScheduledTime(TaskId taskId, long scheduledTime) {
         if (getInternal().getType() == JobType.TASKSFLOW) {
@@ -712,6 +733,16 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     public Map<TaskId, ? extends TaskDescriptor> getPausedTasks() {
         return pausedTasks;
+    }
+
+    public List<InternalTask> getTaskChildren(InternalTask internalTask) {
+        List<InternalTask> children = new ArrayList<>();
+        if (allTasksWithTheirChildren.containsKey(internalTask)) {
+            for (TaskDescriptor taskDescriptor : allTasksWithTheirChildren.get(internalTask).getChildren()) {
+                children.add(taskDescriptor.getInternal());
+            }
+        }
+        return children;
     }
 
     /**

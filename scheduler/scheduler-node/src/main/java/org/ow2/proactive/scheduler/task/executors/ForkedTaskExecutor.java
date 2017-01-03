@@ -41,7 +41,6 @@ import java.io.ObjectInputStream;
 import java.io.PrintStream;
 
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
-import org.objectweb.proactive.extensions.processbuilder.exception.NotImplementedException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -78,26 +77,27 @@ public class ForkedTaskExecutor implements TaskExecutor {
         File serializedContext = null;
 
         try {
+            if (!workingDir.exists()) {
+                FileUtils.forceMkdir(workingDir);
+            }
             serializedContext = taskContextSerializer.serializeContext(context, workingDir);
 
             OSProcessBuilder processBuilder = forkedJvmProcessBuilderCreator.createForkedProcessBuilder(
                     context, serializedContext, outputSink,
                     errorSink, workingDir);
 
-            try {
-                TaskId taskId = context.getTaskId();
 
-                String cookieNameSuffix = "Job" + taskId.getJobId().value() + "Task" + taskId.value();
+            TaskId taskId = context.getTaskId();
 
-                taskProcessTreeKiller =
-                        CookieBasedProcessTreeKiller.createProcessChildrenKiller(
-                                cookieNameSuffix, processBuilder.environment());
-            } catch (NotImplementedException e) {
-                // SCHEDULING-986 : remove catch block when environment can be modified with runAsMe
-            }
+            String cookieNameSuffix = "Job" + taskId.getJobId().value() + "Task" + taskId.value();
+
+            taskProcessTreeKiller =
+                    CookieBasedProcessTreeKiller.createProcessChildrenKiller(
+                            cookieNameSuffix, processBuilder.environment());
+
 
             process = processBuilder.start();
-            processStreamsReader = new ProcessStreamsReader(process, outputSink, errorSink);
+            processStreamsReader = new ProcessStreamsReader(taskId.toString(), process, outputSink, errorSink);
 
             int exitCode = process.waitFor();
 
@@ -106,8 +106,8 @@ public class ForkedTaskExecutor implements TaskExecutor {
                     Object error = deserializeTaskResult(serializedContext);
                     if (error instanceof TaskContext) {
                         return createTaskResult(context, new IOException(
-                                "Forked task failed to remove serialized task context, " +
-                                        "probably a permission issue on folder " + workingDir));
+                                "Forked JVM process returned with exit code " + exitCode + ", see task logs for more information"
+                        ));
                     } else {
                         Throwable exception = (Throwable) error;
                         return createTaskResult(context, exception);

@@ -73,15 +73,6 @@ start "" "%RADICALE_HOME%\RadicalePortable.exe"
 @rem End local scope for the variables with windows NT shell
 echo *** OK ***
 
-set /p input="Would you like to start Calendar Service right now? (Y/N) :"
-if "%input%"=="y" goto runCs
-if "%input%"=="Y" goto runCs
-if "%input%"=="n" goto mainEnd
-if "%input%"=="N" goto mainEnd
-if "%ERRORLEVEL%"=="0" goto mainEnd
-
-:runCs
-call "%APP_HOME%\calendar-service\calendar-service.bat"
 goto mainEnd
 
 :fail

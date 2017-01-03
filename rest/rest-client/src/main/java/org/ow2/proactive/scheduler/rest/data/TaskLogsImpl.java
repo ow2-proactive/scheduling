@@ -65,4 +65,19 @@ public class TaskLogsImpl implements TaskLogs {
         return stdOutLogs;
     }
 
+    @Override
+    public String getStdoutLogs() {
+        return getAllLogs(false);
+    }
+
+    @Override
+    public String getStderrLogs() {
+        return getStderrLogs(false);
+    }
+
+    @Override
+    public String getAllLogs() {
+        return getAllLogs(false);
+    }
+
 }

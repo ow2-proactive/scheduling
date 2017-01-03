@@ -298,16 +298,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             if (taskResult.value() == null) {
                 Serializable value = restApi().valueOfTaskResult(sid, jobId, taskName);
                 if (value != null) {
-                    taskResult.setHadException(true);
                     taskResult.setValue(value);
                 }
             }
-
-            String all = restApi().taskLog(sid, jobId, taskName);
-            String out = restApi().taskLogout(sid, jobId, taskName);
-            String err = restApi().taskLogErr(sid, jobId, taskName);
-
-            taskResult.setOutput(DataUtility.toTaskLogs(all, out, err));
 
         } catch (Throwable t) {
             throwUJEOrNCEOrPEOrUTE(exception(t));
@@ -434,6 +427,24 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throwNCEOrPE(e);
         }
         return isJobKilled;
+    }
+
+    @Override
+    public boolean killTask(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return killTask(jobId.value(), taskName);
+    }
+
+    @Override
+    public boolean killTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        boolean isTaskKilled = false;
+        try {
+            isTaskKilled = restApi().killTask(sid, jobId, taskName);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+        return isTaskKilled;
     }
 
     @Override
@@ -878,6 +889,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
+        try {
+            return restApi().globalspaceURIs(sid);
+        } catch (Exception error) {
+            throw throwNCEOrPE(error);
+        }
+    }
+
+    @Override
     public void renewSession() throws NotConnectedException {
         try {
             LoginForm loginForm = new LoginForm();
@@ -1066,6 +1086,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         jobInfoImpl.setNumberOfFinishedTasks(jobInfoData.getNumberOfFinishedTasks());
         jobInfoImpl.setNumberOfPendingTasks(jobInfoData.getNumberOfPendingTasks());
         jobInfoImpl.setNumberOfRunningTasks(jobInfoData.getNumberOfRunningTasks());
+        jobInfoImpl.setNumberOfInErrorTasks(jobInfoData.getNumberOfInErrorTasks());
+        jobInfoImpl.setNumberOfFaultyTasks(jobInfoData.getNumberOfFaultyTasks());
+        jobInfoImpl.setTotalNumberOfTasks(jobInfoData.getTotalNumberOfTasks());
         jobInfoImpl.setJobPriority(JobPriority.findPriority(jobInfoData.getPriority().toString()));
         jobInfoImpl.setJobStatus(JobStatus.findPriority(jobInfoData.getStatus().toString()));
         if (jobInfoData.isToBeRemoved())

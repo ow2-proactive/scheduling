@@ -123,11 +123,8 @@ public class ForkedProcessBuilderCreator implements Serializable {
     private OSProcessBuilder getOsProcessBuilder(TaskContext context, File workingDir,
             String nativeScriptPath) throws IOException, IllegalAccessException, KeyException {
         OSProcessBuilder processBuilder;
-        if (!workingDir.exists()) {
-            FileUtils.forceMkdir(workingDir);
-        }
         if (context.isRunAsUser()) {
-            ForkerUtils.setSharedPermissions(workingDir, true);
+            ForkerUtils.setSharedExecutablePermissions(workingDir);
             processBuilder = ForkerUtils.getOSProcessBuilderFactory(nativeScriptPath).getBuilder(
                     ForkerUtils.checkConfigAndGetUser(context.getDecrypter()));
         } else {

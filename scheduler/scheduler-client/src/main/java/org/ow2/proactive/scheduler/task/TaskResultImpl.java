@@ -39,6 +39,7 @@ package org.ow2.proactive.scheduler.task;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -294,6 +295,19 @@ public class TaskResultImpl implements TaskResult {
                 return new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
                     this.id + " : " + e.getMessage(), e);
             }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Return the exception message, if any, used by dozer mappings.
+     *
+     * @return
+     */
+    public String getExceptionMessage() {
+        if (hadException()) {
+            return StackTraceUtil.getStackTrace(getException());
         } else {
             return null;
         }
