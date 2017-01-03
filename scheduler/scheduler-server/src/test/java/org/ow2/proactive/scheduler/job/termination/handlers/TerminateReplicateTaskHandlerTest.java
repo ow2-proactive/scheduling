@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.python.google.common.collect.Lists;
 
 import com.google.common.collect.Maps;
 
@@ -118,6 +119,7 @@ public class TerminateReplicateTaskHandlerTest {
     public void testTerminateReplicateTaskSkipBlockOfTasks() {
         tasks = genearteTaksWithBlock();
         when(internalJob.getIHMTasks()).thenReturn(tasks);
+
         initiator = generateInitiatorTask();
         boolean result = terminateReplicateTaskHandler.terminateReplicateTask(action, initiator, changesInfo,
                 frontend, initiator.getId());
@@ -160,10 +162,14 @@ public class TerminateReplicateTaskHandlerTest {
         InternalTask internalTask3 = generateInternalTask(888L);
         tempTasks.put(internalTask3.getId(), internalTask3);
         internalTask3.addDependence(startTask);
+        when(jobDescriptorImpl.getTaskChildren(startTask))
+                .thenReturn(Lists.newArrayList(internalTask2, internalTask3));
 
         InternalTask endTask = generateInternalTask(999L);
         tempTasks.put(endTask.getId(), endTask);
         endTask.setFlowBlock(FlowBlock.END);
+        when(jobDescriptorImpl.getTaskChildren(internalTask2)).thenReturn(Lists.newArrayList(endTask));
+        when(jobDescriptorImpl.getTaskChildren(internalTask3)).thenReturn(Lists.newArrayList(endTask));
 
         endTask.addDependence(internalTask2);
         endTask.addDependence(internalTask3);
