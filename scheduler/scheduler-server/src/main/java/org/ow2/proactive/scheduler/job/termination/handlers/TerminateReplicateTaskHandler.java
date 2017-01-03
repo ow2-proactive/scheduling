@@ -20,7 +20,6 @@ import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.python.google.common.collect.Lists;
 
 import it.sauronsoftware.cron4j.Predictor;
 
@@ -45,7 +44,7 @@ public class TerminateReplicateTaskHandler {
         // find the tasks that need to be replicated
         for (InternalTask internalTask : internalJob.getIHMTasks().values()) {
             List<InternalTask> internalTaskDependencies = internalTask.getIDependences() == null
-                    ? Lists.newArrayList() : internalTask.getIDependences();
+                    ? new ArrayList<InternalTask>() : internalTask.getIDependences();
             for (InternalTask internalTaskDependency : internalTaskDependencies) {
                 if (isTheInitiatorTask(initiator, toReplicate, internalTask, internalTaskDependency)) {
                     if (runs < 1) {
