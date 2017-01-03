@@ -302,18 +302,19 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
                 long invalidationPeriod = getCacheInvalidationPeriod();
                 long currentTime = System.currentTimeMillis();
                 // lock the timer in write mode, this will prevent any Task to start during the cleaning process
-                cacheCleaningRWLock.writeLock().lockInterruptibly();
-                try {
-                    FileObject rootFO = fileSystemManager.resolveFile(rootCacheUri);
-                    FileObject[] files = rootFO.findFiles(Selectors.EXCLUDE_SELF);
-                    for (FileObject file : files) {
-                        if (currentTime - file.getContent().getLastModifiedTime() > invalidationPeriod) {
-                            logger.info("[Cache Space cleaner] deleting " + file);
-                            file.delete();
+                if (cacheCleaningRWLock.writeLock().tryLock()) {
+                    try {
+                        FileObject rootFO = fileSystemManager.resolveFile(rootCacheUri);
+                        FileObject[] files = rootFO.findFiles(Selectors.EXCLUDE_SELF);
+                        for (FileObject file : files) {
+                            if (currentTime - file.getContent().getLastModifiedTime() > invalidationPeriod) {
+                                logger.info("[Cache Space cleaner] deleting " + file);
+                                file.delete();
+                            }
                         }
+                    } finally {
+                        cacheCleaningRWLock.writeLock().unlock();
                     }
-                } finally {
-                    cacheCleaningRWLock.writeLock().unlock();
                 }
             } catch (Exception e) {
                 logger.error("Error when cleaning files in cache", e);
