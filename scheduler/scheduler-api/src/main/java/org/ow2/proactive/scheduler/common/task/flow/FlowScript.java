@@ -49,6 +49,7 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
+
 import it.sauronsoftware.cron4j.InvalidPatternException;
 import it.sauronsoftware.cron4j.Predictor;
 
@@ -180,7 +181,8 @@ public class FlowScript extends Script<FlowAction> {
      * @return a newly allocated and configured Control Flow Script
      * @throws InvalidScriptException
      */
-    public static FlowScript createLoopFlowScript(String script, String target) throws InvalidScriptException {
+    public static FlowScript createLoopFlowScript(String script, String target)
+            throws InvalidScriptException {
         return createLoopFlowScript(script, "javascript", target);
     }
 
@@ -543,7 +545,7 @@ public class FlowScript extends Script<FlowAction> {
                             return new ScriptResult<FlowAction>(new Exception(msg, e2));
                         }
                     }
-                    if (args < 1) {
+                    if (args < 0) {
                         String msg = "REPLICATE action: value of variable " + replicateRunsVariable +
                             " cannot be negative";
                         logger.error(msg);

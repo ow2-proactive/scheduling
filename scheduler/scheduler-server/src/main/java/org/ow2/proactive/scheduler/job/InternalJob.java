@@ -36,7 +36,20 @@
  */
 package org.ow2.proactive.scheduler.job;
 
-import it.sauronsoftware.cron4j.Predictor;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -70,10 +83,7 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
-import javax.xml.bind.annotation.XmlTransient;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
+import it.sauronsoftware.cron4j.Predictor;
 
 
 /**
@@ -174,15 +184,15 @@ public abstract class InternalJob extends JobState {
         // Implementation
         if (!getId().equals(info.getJobId())) {
             throw new IllegalArgumentException(
-                    "This job info is not applicable for this job. (expected id is '" + getId() + "' but was '" +
-                            info.getJobId() + "'");
+                "This job info is not applicable for this job. (expected id is '" + getId() + "' but was '" +
+                    info.getJobId() + "'");
         }
         jobInfo = (JobInfoImpl) info.getJobInfo();
         try {
             tasks.get(info.getTaskId()).update(info);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("This task info is not applicable in this job. (task id '" +
-                    info.getTaskId() + "' not found)");
+                info.getTaskId() + "' not found)");
         }
     }
 
@@ -190,8 +200,8 @@ public abstract class InternalJob extends JobState {
     public synchronized void update(JobInfo info) {
         if (!getId().equals(info.getJobId())) {
             throw new IllegalArgumentException(
-                    "This job info is not applicable for this job. (expected id is '" + getId() + "' but was '" +
-                            info.getJobId() + "'");
+                "This job info is not applicable for this job. (expected id is '" + getId() + "' but was '" +
+                    info.getJobId() + "'");
         }
         // update job info
         this.jobInfo = (JobInfoImpl) info;
@@ -261,7 +271,7 @@ public abstract class InternalJob extends JobState {
         td.setStartTime(System.currentTimeMillis());
         td.setFinishedTime(-1);
         td.setExecutionHostName(td.getExecuterInformation().getHostName() + " (" +
-                td.getExecuterInformation().getNodeName() + ")");
+            td.getExecuterInformation().getNodeName() + ")");
     }
 
     /**
@@ -280,7 +290,7 @@ public abstract class InternalJob extends JobState {
             if (!taskDataSpaceApplications.containsKey(taskId)) {
                 String appId = internalTask.getId().toString();
                 TaskDataSpaceApplication taskDataSpaceApplication = new TaskDataSpaceApplication(appId,
-                        namingService);
+                    namingService);
 
                 taskDataSpaceApplications.put(taskId, taskDataSpaceApplication);
 
@@ -297,7 +307,7 @@ public abstract class InternalJob extends JobState {
         setNumberOfPendingTasks(getNumberOfPendingTasks() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         if (getNumberOfRunningTasks() == 0 &&
-                !(getStatus() == JobStatus.PAUSED || getStatus() == JobStatus.IN_ERROR)) {
+            !(getStatus() == JobStatus.PAUSED || getStatus() == JobStatus.IN_ERROR)) {
             setStatus(JobStatus.STALLED);
         }
     }
@@ -373,10 +383,9 @@ public abstract class InternalJob extends JobState {
         descriptor.setStatus(errorOccurred ? TaskStatus.FAULTY : TaskStatus.FINISHED);
         descriptor.setExecutionDuration(result.getTaskDuration());
 
-        if (taskIsPaused){
+        if (taskIsPaused) {
             setNumberOfInErrorTasks(getNumberOfInErrorTasks() - 1);
-        }
-        else{
+        } else {
             setNumberOfRunningTasks(getNumberOfRunningTasks() - 1);
         }
         setNumberOfFinishedTasks(getNumberOfFinishedTasks() + 1);
@@ -402,18 +411,18 @@ public abstract class InternalJob extends JobState {
                     break;
                 }
 
-                /*
-                 * IF action
-                 */
+                    /*
+                     * IF action
+                     */
                 case IF: {
                     didAction = terminateIfTaskHandler.terminateIfTask(action, initiator, changesInfo,
                             frontend, descriptor, taskId);
                     break;
                 }
 
-                /*
-                 * REPLICATE action
-                 */
+                    /*
+                     * REPLICATE action
+                     */
                 case REPLICATE: {
                     didAction = terminateReplicateTaskHandler.terminateReplicateTask(action, initiator,
                             changesInfo, frontend, taskId);
@@ -421,9 +430,9 @@ public abstract class InternalJob extends JobState {
 
                 }
 
-                /*
-                 * CONTINUE action : - continue taskflow as if no action was provided
-                 */
+                    /*
+                     * CONTINUE action : - continue taskflow as if no action was provided
+                     */
                 case CONTINUE:
 
                     LOGGER.debug("Task flow Action CONTINUE on task " + initiator.getId().getReadableName());
@@ -529,7 +538,7 @@ public abstract class InternalJob extends JobState {
         }
 
         ((JobInfoImpl) this.getJobInfo())
-        .setNumberOfPendingTasks(this.getJobInfo().getNumberOfPendingTasks() + dup.size());
+                .setNumberOfPendingTasks(this.getJobInfo().getNumberOfPendingTasks() + dup.size());
 
         // ensure naming unicity
         // time-consuming but safe
@@ -688,11 +697,11 @@ public abstract class InternalJob extends JobState {
                     }
                     updatedTasks.add(td.getId());
                 } else if (td.getStatus() == TaskStatus.WAITING_ON_ERROR ||
-                        td.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
+                    td.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
                     td.setStatus(TaskStatus.NOT_RESTARTED);
                     updatedTasks.add(td.getId());
                 } else if (td.getStatus() != TaskStatus.FINISHED && td.getStatus() != TaskStatus.FAILED &&
-                        td.getStatus() != TaskStatus.FAULTY && td.getStatus() != TaskStatus.SKIPPED) {
+                    td.getStatus() != TaskStatus.FAULTY && td.getStatus() != TaskStatus.SKIPPED) {
                     td.setStatus(TaskStatus.NOT_STARTED);
                     updatedTasks.add(td.getId());
                 }
@@ -801,8 +810,8 @@ public abstract class InternalJob extends JobState {
 
         for (InternalTask td : values) {
             if ((td.getStatus() != TaskStatus.FINISHED) && (td.getStatus() != TaskStatus.RUNNING) &&
-                    (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY) &&
-                    (td.getStatus() != TaskStatus.IN_ERROR)) {
+                (td.getStatus() != TaskStatus.SKIPPED) && (td.getStatus() != TaskStatus.FAULTY) &&
+                (td.getStatus() != TaskStatus.IN_ERROR)) {
                 td.setStatus(TaskStatus.PAUSED);
                 getJobDescriptor().pause(td.getId());
                 updatedTasks.add(td.getId());
@@ -844,10 +853,10 @@ public abstract class InternalJob extends JobState {
                 task.setStatus(TaskStatus.SUBMITTED);
                 updatedTasks.add(task.getId());
             } else if ((jobInfo.getStatus() == JobStatus.RUNNING) ||
-                    (jobInfo.getStatus() == JobStatus.STALLED)) {
+                (jobInfo.getStatus() == JobStatus.STALLED)) {
                 if ((task.getStatus() != TaskStatus.FINISHED) && (task.getStatus() != TaskStatus.RUNNING) &&
-                        (task.getStatus() != TaskStatus.SKIPPED) && (task.getStatus() != TaskStatus.FAULTY) &&
-                        (task.getStatus() != TaskStatus.IN_ERROR)) {
+                    (task.getStatus() != TaskStatus.SKIPPED) && (task.getStatus() != TaskStatus.FAULTY) &&
+                    (task.getStatus() != TaskStatus.IN_ERROR)) {
                     task.setStatus(TaskStatus.PENDING);
                     updatedTasks.add(task.getId());
                 }
@@ -867,7 +876,8 @@ public abstract class InternalJob extends JobState {
         return updatedTasks;
     }
 
-    public ChangedTasksInfo finishInErrorTask(TaskId taskId, TaskResultImpl result, SchedulerStateUpdate frontend) {
+    public ChangedTasksInfo finishInErrorTask(TaskId taskId, TaskResultImpl result,
+            SchedulerStateUpdate frontend) {
 
         FlowAction action = result.getAction();
         ChangedTasksInfo changedTasksInfo = terminateTask(false, taskId, frontend, action, result, true);

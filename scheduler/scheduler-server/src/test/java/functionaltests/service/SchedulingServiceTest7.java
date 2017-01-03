@@ -80,8 +80,8 @@ public class SchedulingServiceTest7 extends BaseServiceTest {
         result.setAction(action);
         service.taskTerminatedWithResult(taskId, result);
 
-        listener.assertEvents(SchedulerEvent.TASK_REPLICATED, SchedulerEvent.JOB_UPDATED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED);
+        listener.assertEvents(SchedulerEvent.TASK_REPLICATED, SchedulerEvent.TASK_SKIPPED,
+                SchedulerEvent.JOB_UPDATED, SchedulerEvent.TASK_RUNNING_TO_FINISHED);
 
         jobsMap = service.lockJobsToSchedule();
         assertEquals(1, jobsMap.size());
