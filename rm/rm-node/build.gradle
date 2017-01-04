@@ -1,6 +1,6 @@
 dependencies {
     compile 'org.ow2.proactive:process-tree-killer:1.0.0'
-    compile 'org.jvnet.winp:winp:1.23-proactive'
+    compile 'org.jvnet.winp:winp:1.24'
     compile 'net.java.dev.jna:jna:4.1.0'
     compile 'commons-io:commons-io:2.5'
 
