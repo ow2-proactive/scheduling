@@ -75,7 +75,7 @@ public class SelectionScriptTimeOutTest extends RMFunctionalTest {
         ResourceManager resourceManager = rmHelper.getResourceManager();
         rmHelper.createNodeSource();
         int nodesNumber = resourceManager.getState().getTotalNodesNumber();
-        int scriptSleepingTime = 10 * 1000;
+        int scriptSleepingTime = 40 * 1000;
 
         log("Test 1 - selecting nodes with timeout script");
 
