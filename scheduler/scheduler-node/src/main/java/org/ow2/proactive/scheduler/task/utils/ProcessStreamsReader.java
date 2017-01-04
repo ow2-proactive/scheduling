@@ -44,11 +44,11 @@ public class ProcessStreamsReader {
     private final Thread threadReadingOutput;
     private final Thread threadReadingError;
 
-    public ProcessStreamsReader(Process process, PrintStream outputSink, PrintStream errorSink) {
+    public ProcessStreamsReader(String name, Process process, PrintStream outputSink, PrintStream errorSink) {
         BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader processError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        threadReadingOutput = new Thread(new ThreadReader(processOutput, outputSink));
-        threadReadingError = new Thread(new ThreadReader(processError, errorSink));
+        threadReadingOutput = new Thread(new ThreadReader(processOutput, outputSink), name + "_OUT");
+        threadReadingError = new Thread(new ThreadReader(processError, errorSink), name + "_ERR");
         threadReadingOutput.start();
         threadReadingError.start();
     }

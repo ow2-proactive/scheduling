@@ -36,6 +36,7 @@
  */
 package functionaltests.nodesource;
 
+import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 import org.apache.sshd.SshServer;
@@ -96,13 +97,15 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
     @Test
     public void testSSHInfrastructureV2() throws Exception {
 
+        nsname = "testSSHInfra";
+
         resourceManager = this.rmHelper.getResourceManager();
 
         RMTHelper.log("Test - Create SSH infrastructure on ssh://localhost on port " + this.port);
 
         resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
                 StaticPolicy.class.getName(), policyParameters);
-        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES);
+        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
 
         RMState s = resourceManager.getState();
         assertEquals(NB_NODES, s.getTotalNodesNumber());
@@ -112,13 +115,17 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
     @Test
     public void testSSHInfrastructureV2WithRestartDownNodes() throws Exception {
 
+        nsname = "testSSHInfraRestart";
+
         resourceManager = this.rmHelper.getResourceManager();
 
         RMTHelper.log("Test - Create SSH infrastructure with RestartDownNodes policy on ssh://localhost on port " + this.port);
 
         resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
                 RestartDownNodesPolicy.class.getName(), policyParameters);
-        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES);
+        RMMonitorsHandler monitorsHandler = this.rmHelper.getMonitorsHandler();
+
+        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, monitorsHandler);
 
         RMState s = resourceManager.getState();
         assertEquals(NB_NODES, s.getTotalNodesNumber());
@@ -126,8 +133,10 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         NodeSet ns = resourceManager.getNodes(new Criteria(NB_NODES));
 
+        assertEquals(NB_NODES, ns.size());
+
         for (Node n : ns) {
-            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 60000, monitorsHandler);
         }
 
         String nodeUrl = ns.get(0).getNodeInformation().getURL();
@@ -135,12 +144,12 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         rmHelper.killRuntime(nodeUrl);
 
         for (Node n : ns) {
-            RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL());
+            RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 120000, monitorsHandler);
             assertEquals(NodeState.DOWN, ev.getNodeState());
         }
 
         for (Node n : ns) {
-            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL());
+            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL(), 120000, monitorsHandler);
         }
 
         rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES);

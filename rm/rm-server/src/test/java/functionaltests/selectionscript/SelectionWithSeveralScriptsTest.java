@@ -38,6 +38,7 @@ package functionaltests.selectionscript;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.TestNode;
+import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -120,6 +121,8 @@ public class SelectionWithSeveralScriptsTest extends RMFunctionalTest {
         //wait for the nodes to be in free state
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
+        Assert.assertEquals(1, resourceManager.listAliveNodeUrls().size());
+
         //--------------------------------------------------
         //create a second node with only the first VM property
         //---------------------------------------------------
@@ -137,6 +140,8 @@ public class SelectionWithSeveralScriptsTest extends RMFunctionalTest {
         //wait for the nodes to be in free state
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
+        Assert.assertEquals(2, resourceManager.listAliveNodeUrls().size());
+
         //--------------------------------------------------
         //create a third node with only the second VM property
         //---------------------------------------------------
@@ -153,6 +158,8 @@ public class SelectionWithSeveralScriptsTest extends RMFunctionalTest {
         rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node3URL);
         //wait for the nodes to be in free state
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        Assert.assertEquals(3, resourceManager.listAliveNodeUrls().size());
 
         //create the static selection script object that check vm prop1
         SelectionScript sScript1 = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
