@@ -120,8 +120,13 @@ public class SetInfrastructureCommand extends AbstractCommand implements Command
                 ConfigurableFieldView cf = configurableFields[index];
                 Type ft = cf.getMeta().type();
                 if (FILEBROWSER.equals(ft) || CREDENTIAL.equals(ft)) {
-                    String contents = FileUtility.readFileToString(new File(infrastructureArgs[index]));
-                    queryStringBuilder.add("infrastructureFileParameters", contents);
+                    if(infrastructureArgs[index].equals("")){
+                        String contents = "";
+                        queryStringBuilder.add("infrastructureFileParameters", contents);
+                    }else{
+                        String contents = FileUtility.readFileToString(new File(infrastructureArgs[index]));
+                        queryStringBuilder.add("infrastructureFileParameters", contents);
+                    }
                 } else {
                     queryStringBuilder.add("infrastructureParameters", infrastructureArgs[index]);
                 }
