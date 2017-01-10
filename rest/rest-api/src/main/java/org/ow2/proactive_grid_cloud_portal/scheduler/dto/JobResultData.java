@@ -37,16 +37,22 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import java.util.Map;
-
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Map;
 
 
 @XmlRootElement
 public class JobResultData {
 
     private JobIdData id;
+
+    private JobInfoData jobInfo;
+
     private Map<String, TaskResultData> allResults;
+
+    private Map<String, TaskResultData> preciousResults;
+
+    private Map<String, TaskResultData> exceptionResults;
 
     public JobIdData getId() {
         return id;
@@ -64,8 +70,32 @@ public class JobResultData {
         this.allResults = allResults;
     }
 
+    public JobInfoData getJobInfo() {
+        return jobInfo;
+    }
+
+    public void setJobInfo(JobInfoData jobInfo) {
+        this.jobInfo = jobInfo;
+    }
+
+    public Map<String, TaskResultData> getPreciousResults() {
+        return preciousResults;
+    }
+
+    public void setPreciousResults(Map<String, TaskResultData> preciousResults) {
+        this.preciousResults = preciousResults;
+    }
+
+    public Map<String, TaskResultData> getExceptionResults() {
+        return exceptionResults;
+    }
+
+    public void setExceptionResults(Map<String, TaskResultData> exceptionResults) {
+        this.exceptionResults = exceptionResults;
+    }
+
     @Override
     public String toString() {
-        return "JobResultData{" + "id=" + id + ", allResults=" + allResults + '}';
+        return "JobResultData{" + "id=" + id + ", allResults=" + allResults + ", preciousResults=" + preciousResults + ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
     }
 }

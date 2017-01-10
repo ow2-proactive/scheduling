@@ -41,6 +41,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import com.google.common.base.Strings;
+import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
 public class TaskContextSerializer implements Serializable {
 
@@ -58,6 +59,9 @@ public class TaskContextSerializer implements Serializable {
         File file = File.createTempFile(tmpFilePrefix, null, directory);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             objectOutputStream.writeObject(context);
+        }
+        if (context.isRunAsUser()) {
+            ForkerUtils.setSharedPermissions(file);
         }
         return file;
     }

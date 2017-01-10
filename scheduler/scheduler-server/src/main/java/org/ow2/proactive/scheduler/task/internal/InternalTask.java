@@ -45,6 +45,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +59,13 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
 import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
@@ -74,6 +81,7 @@ import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
+
 
 /**
  * Internal and global description of a task.
@@ -576,7 +584,9 @@ public abstract class InternalTask extends TaskState {
             File folder = new File(dirName);
 
             if (folder.exists() && folder.isDirectory()) {
-                logger.info(id, "The resource manager will accept only fork environment or cleaning scripts from " + dirName);
+                logger.info(id,
+                        "The resource manager will accept only fork environment or cleaning scripts from " +
+                            dirName);
                 long currentTime = System.currentTimeMillis();
                 long configuredAuthorizedScriptLoadPeriod = getConfiguredAuthorizedScriptLoadPeriod();
                 if (currentTime - lastAuthorizedFolderLoadingTime > configuredAuthorizedScriptLoadPeriod) {
@@ -608,16 +618,17 @@ public abstract class InternalTask extends TaskState {
     private static long getConfiguredAuthorizedScriptLoadPeriod() {
         long configuredAuthorizedScriptLoadPeriod = DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD;
         if (PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.isSet()) {
-            configuredAuthorizedScriptLoadPeriod = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsInt();
+            configuredAuthorizedScriptLoadPeriod = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD
+                    .getValueAsInt();
         }
         return configuredAuthorizedScriptLoadPeriod;
     }
 
     public static synchronized boolean isScriptAuthorized(TaskId id, Script script) {
         updateAuthorizedScriptsSignatures(id);
-        return authorizedSelectionScripts == null || authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()));
+        return authorizedSelectionScripts == null ||
+            authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()));
     }
-
 
     @Override
     public void setMaxNumberOfExecution(int numberOfExecution) {
@@ -1168,14 +1179,14 @@ public abstract class InternalTask extends TaskState {
             updatedVariables.putAll(getScopeVariables());
 
             if (internalTasksDependencies != null) {
-                List<TaskId> parentIds = new ArrayList<>(internalTasksDependencies.size());
+                Set<TaskId> parentIds = new HashSet<>(internalTasksDependencies.size());
                 for (InternalTask parentTask : internalTasksDependencies) {
-                    parentIds.add(parentTask.getId());
+                    parentIds.addAll(InternalTaskParentFinder.getInstance()
+                            .getFirstNotSkippedParentTaskIds(parentTask));
                 }
                 if (!parentIds.isEmpty()) {
                     Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
-                            .loadTasksResults(
-                                    internalJob.getId(), parentIds);
+                            .loadTasksResults(internalJob.getId(), new ArrayList(parentIds));
                     updateVariablesWithTaskResults(taskResults);
                 }
             }
@@ -1188,14 +1199,14 @@ public abstract class InternalTask extends TaskState {
         for (TaskResult taskResult : taskResults.values()) {
             if (taskResult.getPropagatedVariables() != null) {
                 try {
-                    updatedVariables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
+                    updatedVariables.putAll(
+                            SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
                 } catch (Exception e) {
                     throw new IllegalStateException("Could not deserialize variable map", e);
                 }
             }
         }
     }
-
 
     /**
      * Returns the up-to-date variables, following a call to updateVariable
@@ -1228,7 +1239,8 @@ public abstract class InternalTask extends TaskState {
         }
 
         if (genericInformation != null) {
-            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(genericInformation, getRuntimeVariables());
+            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(
+                    genericInformation, getRuntimeVariables());
             gInfo.putAll(updatedTaskGenericInfo);
         }
 

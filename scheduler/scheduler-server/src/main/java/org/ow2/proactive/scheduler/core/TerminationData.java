@@ -2,8 +2,15 @@ package org.ow2.proactive.scheduler.core;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -13,9 +20,9 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.internal.InternalTaskParentFinder;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.utils.TaskIdWrapper;
-import org.apache.log4j.Logger;
 
 
 /*
@@ -65,14 +72,15 @@ final class TerminationData {
 
     private final Map<TaskIdWrapper, TaskRestartData> tasksToRestart;
 
-    static final TerminationData EMPTY = new TerminationData(Collections.<JobId>emptySet(), Collections
-            .<TaskIdWrapper, TaskTerminationData>emptyMap(),
-            Collections.<TaskIdWrapper, TaskRestartData>emptyMap());
+    private final InternalTaskParentFinder internalTaskParentFinder;
+
+    static final TerminationData EMPTY = new TerminationData(Collections.<JobId> emptySet(),
+        Collections.<TaskIdWrapper, TaskTerminationData> emptyMap(),
+        Collections.<TaskIdWrapper, TaskRestartData> emptyMap());
 
     static TerminationData newTerminationData() {
-        return new TerminationData(new HashSet<JobId>(),
-                new HashMap<TaskIdWrapper, TaskTerminationData>(),
-                new HashMap<TaskIdWrapper, TaskRestartData>());
+        return new TerminationData(new HashSet<JobId>(), new HashMap<TaskIdWrapper, TaskTerminationData>(),
+            new HashMap<TaskIdWrapper, TaskRestartData>());
     }
 
     private TerminationData(Set<JobId> jobsToTerminate,
@@ -81,6 +89,7 @@ final class TerminationData {
         this.jobsToTerminate = jobsToTerminate;
         this.tasksToTerminate = tasksToTerminate;
         this.tasksToRestart = tasksToRestart;
+        this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
     }
 
     void addJobToTerminate(JobId jobId) {
@@ -89,9 +98,8 @@ final class TerminationData {
 
     void addTaskData(InternalJob jobData, RunningTaskData taskData, boolean normalTermination,
             TaskResultImpl taskResult) {
-        tasksToTerminate
-                .put(TaskIdWrapper.wrap(taskData.getTask().getId()),
-                        new TaskTerminationData(jobData, taskData, normalTermination, taskResult));
+        tasksToTerminate.put(TaskIdWrapper.wrap(taskData.getTask().getId()),
+                new TaskTerminationData(jobData, taskData, normalTermination, taskResult));
     }
 
     void addRestartData(TaskId taskId, long waitTime) {
@@ -133,14 +141,14 @@ final class TerminationData {
                     taskData.getLauncher().kill();
                 }
             } catch (Throwable t) {
-                logger
-                        .info("Cannot terminate task launcher for task '" + taskData.getTask().getId() + "'",
-                                t);
+                logger.info("Cannot terminate task launcher for task '" + taskData.getTask().getId() + "'",
+                        t);
                 try {
                     logger.info("Task launcher that cannot be terminated is identified by " +
-                            taskData.getLauncher().toString());
+                        taskData.getLauncher().toString());
                 } catch (Throwable ignore) {
-                    logger.info("Getting information about Task launcher failed (remote object not accessible?)");
+                    logger.info(
+                            "Getting information about Task launcher failed (remote object not accessible?)");
                 }
             }
 
@@ -177,23 +185,22 @@ final class TerminationData {
         InternalJob internalJob = taskToTerminate.internalJob;
 
         variablesMap.setScopeMap(taskData.getTask().getScopeVariables());
-        
+
         if (!taskToTerminate.normalTermination || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();
             if (iDependences != null) {
-                List<TaskId> parentIds = new ArrayList<>(iDependences.size());
-                for (int i = 0; i < iDependences.size(); i++) {
-                    parentIds.add(iDependences.get(i).getId());
-                }
+                Set<TaskId> parentIds = internalTaskParentFinder
+                        .getFirstNotSkippedParentTaskIds(taskData.getTask());
+
                 Map<TaskId, TaskResult> taskResults = service.getInfrastructure().getDBManager()
-                        .loadTasksResults(
-                                taskData.getTask().getJobId(), parentIds);
+                        .loadTasksResults(taskData.getTask().getJobId(), new ArrayList(parentIds));
                 getResultsFromListOfTaskResults(variablesMap.getInheritedMap(), taskResults);
             } else {
                 if (internalJob != null)
                     variablesMap.getInheritedMap().putAll(internalJob.getVariables());
             }
-            variablesMap.getInheritedMap().put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(false));
+            variablesMap.getInheritedMap().put(SchedulerVars.PA_TASK_SUCCESS.toString(),
+                    Boolean.toString(false));
         } else if (taskResult.hadException()) {
             variablesMap.setInheritedMap(fillMapWithTaskResult(taskResult, false));
 

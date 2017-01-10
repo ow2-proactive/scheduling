@@ -43,23 +43,56 @@ import java.io.*;
 
 public class ExecuteForkedTaskInsideNewJvm {
 
+    public static final int MAX_CONTEXT_WAIT = 6000;
+
+    public static final String CONTEXT_FILE = "Context file ";
+
+    private ExecuteForkedTaskInsideNewJvm() {
+
+    }
+
+    public static ExecuteForkedTaskInsideNewJvm getInstance() {
+        return new ExecuteForkedTaskInsideNewJvm();
+    }
+
     // 2 called by forked
-    private static TaskContext deserializeContext(String pathToFile) throws IOException,
-            ClassNotFoundException {
+    private TaskContext deserializeContext(String pathToFile) throws IOException,
+            ClassNotFoundException, InterruptedException {
         File f = new File(pathToFile);
+        if (!f.exists()) {
+            throw new IllegalStateException(CONTEXT_FILE + f + " does not exist");
+        }
+        if (!f.canRead()) {
+            throw new IllegalStateException(CONTEXT_FILE + f + " exists but cannot be read");
+        }
+        if (!f.canWrite()) {
+            throw new IllegalStateException(CONTEXT_FILE + f + " exists but cannot be written");
+        }
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(f))) {
             return (TaskContext) inputStream.readObject();
         } finally {
+            deleteContextFile(f);
+        }
+    }
+
+    private void deleteContextFile(File contextFile) throws InterruptedException {
+        int waitCounter = 0;
+        while (contextFile.exists() && waitCounter < MAX_CONTEXT_WAIT) {
             try {
-                FileUtils.forceDelete(f);
+                waitCounter++;
+                FileUtils.forceDelete(contextFile);
             } catch (Exception e) {
-                e.printStackTrace(System.err);
+                if (waitCounter == MAX_CONTEXT_WAIT) {
+                    throw new IllegalStateException("Cannot remove " + CONTEXT_FILE + contextFile, e);
+                } else {
+                    Thread.sleep(100);
+                }
             }
         }
     }
 
     // 3 called by forked
-    private static void serializeTaskResult(Object result, String contextPath) throws IOException {
+    private void serializeTaskResult(Object result, String contextPath) throws IOException {
         File file = new File(contextPath);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             objectOutputStream.writeObject(result);
@@ -75,13 +108,15 @@ public class ExecuteForkedTaskInsideNewJvm {
             System.exit(-1);
         }
 
-        fromForkedJVM(args[0]);
+        ExecuteForkedTaskInsideNewJvm instance = ExecuteForkedTaskInsideNewJvm.getInstance();
+
+        instance.fromForkedJVM(args[0]);
 
         // Call to System.exit is necessary at this point (when the task is finished normally) as the forked JVM can keep alive non-daemon threads
         System.exit(0);
     }
 
-    private static void fromForkedJVM(String contextPath) {
+    private void fromForkedJVM(String contextPath) {
         try {
             TaskContext container = deserializeContext(contextPath);
 

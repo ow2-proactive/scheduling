@@ -54,7 +54,7 @@ class LiveJobs {
     private static final JobLogger jlogger = JobLogger.getInstance();
 
     private static final TaskLogger tlogger = TaskLogger.getInstance();
-    
+
     private static final TaskResultCreator taskResultCreator = TaskResultCreator.getInstance();
 
     private static class JobData {
@@ -617,7 +617,8 @@ class LiveJobs {
         }
     }
 
-    TerminationData finishInErrorTask(JobId jobId, String taskName) throws UnknownTaskException, UnknownJobException {
+    TerminationData finishInErrorTask(JobId jobId, String taskName)
+            throws UnknownTaskException, UnknownJobException {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
             throw new UnknownJobException(jobId);
@@ -628,18 +629,18 @@ class LiveJobs {
             if (task == null) {
                 throw new UnknownTaskException(taskName);
             }
-            
+
             TaskId taskId = task.getId();
             if (task.getStatus() != TaskStatus.IN_ERROR) {
                 tlogger.info(task.getId(), "Task must be in state IN_ERROR: " + task.getStatus());
                 return emptyResult(task.getId());
             }
-            
-            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, job, task);            
-            
-            RunningTaskData data = new RunningTaskData(task, job.getOwner(), 
-                    job.getCredentials(), task.getExecuterInformation().getLauncher());
-            
+
+            TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, job, task);
+
+            RunningTaskData data = new RunningTaskData(task, job.getOwner(), job.getCredentials(),
+                task.getExecuterInformation().getLauncher());
+
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(job, data, false, taskResult);
 
@@ -666,8 +667,9 @@ class LiveJobs {
             }
 
             //send event
-            listener.taskStateUpdated(job.getOwner(), new NotificationData<TaskInfo>(
-                SchedulerEvent.TASK_IN_ERROR_TO_FINISHED, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+            listener.taskStateUpdated(job.getOwner(),
+                    new NotificationData<TaskInfo>(SchedulerEvent.TASK_IN_ERROR_TO_FINISHED,
+                        new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             //if this job is finished (every task have finished)
             jlogger.info(job.getId(), "finished tasks " + job.getNumberOfFinishedTasks() + ", total tasks " +
                 job.getTotalNumberOfTasks() + ", finished " + jobFinished);
@@ -761,8 +763,8 @@ class LiveJobs {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task,
-                                    new TaskPreemptedException("Preempted by admin"),
-                                    new SimpleTaskLogs("", "Preempted by admin"));
+                    new TaskPreemptedException("Preempted by admin"),
+                    new SimpleTaskLogs("", "Preempted by admin"));
 
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job,
                     false);
@@ -791,7 +793,7 @@ class LiveJobs {
             if (taskData == null) {
                 throw new IllegalStateException("No information for: " + task.getId());
             }
-            
+
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, jobData.job, task,
                     new TaskAbortedException("Aborted by user"), new SimpleTaskLogs("", "Aborted by user"));
 

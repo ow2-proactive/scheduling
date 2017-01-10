@@ -70,10 +70,26 @@ public class SimpleTaskLogs implements TaskLogs {
         this.errorlogs = errLogs;
     }
 
+    @Override
+    public String getAllLogs() {
+        return getAllLogs(false);
+    }
+
+    @Override
+    public String getStderrLogs() {
+        return getStderrLogs(false);
+    }
+
+    @Override
+    public String getStdoutLogs() {
+        return getStdoutLogs(false);
+    }
+
     /**
      * Timestamp parameter is not relevant for this TaskLogs implementation.
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getAllLogs(boolean)
      */
+    @Override
     public String getAllLogs(boolean timeStamp) {
         return this.standardLogs + this.errorlogs;
     }
@@ -82,6 +98,7 @@ public class SimpleTaskLogs implements TaskLogs {
      * Timestamp parameter is not relevant for this TaskLogs implementation.
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getStderrLogs(boolean)
      */
+    @Override
     public String getStderrLogs(boolean timeStamp) {
         return this.errorlogs;
     }
@@ -90,6 +107,7 @@ public class SimpleTaskLogs implements TaskLogs {
      * Timestamp parameter is not relevant for this TaskLogs implementation.
      * @see org.ow2.proactive.scheduler.common.task.TaskLogs#getStdoutLogs(boolean)
      */
+    @Override
     public String getStdoutLogs(boolean timeStamp) {
         return this.standardLogs;
     }
