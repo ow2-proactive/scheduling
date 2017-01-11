@@ -1,17 +1,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 
@@ -76,7 +65,8 @@ public class EnvironmentModifierData {
         this.name = name;
     }
 
-    @Column(name = "VALUE", nullable = false)
+    @Column(name = "VALUE", nullable = false, length = Integer.MAX_VALUE)
+    @Lob
     public String getValue() {
         return value;
     }
