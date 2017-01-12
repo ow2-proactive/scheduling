@@ -1,19 +1,12 @@
 package org.ow2.proactive.scheduler.core.db;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
+
+import javax.persistence.*;
 
 
 @Entity
+@NamedQueries({ @NamedQuery(name = "deleteTaskDataVariable", query = "delete from TaskDataVariable where taskData.id.jobId = :jobId"), })
 @Table(name = "TASK_DATA_VARIABLE", indexes = {
         @Index(name = "TASK_DATA_VARIABLE_JOB_ID", columnList = "JOB_ID"),
         @Index(name = "TASK_DATA_VARIABLE_TASK_ID", columnList = "TASK_ID")
@@ -32,8 +25,18 @@ public class TaskDataVariable {
 
     private TaskData taskData;
 
+    static TaskDataVariable create(String variableName, TaskVariable taskVariable, TaskData taskData) {
+        TaskDataVariable taskDataVariable = new TaskDataVariable();
+        taskDataVariable.setName(variableName);
+        taskDataVariable.setValue(taskVariable.getValue());
+        taskDataVariable.setModel(taskVariable.getModel());
+        taskDataVariable.setJobInherited(taskVariable.isJobInherited());
+        taskDataVariable.setTaskData(taskData);
+        return taskDataVariable;
+    }
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     @Column(name = "ID")
     public long getId() {
         return id;
@@ -64,7 +67,8 @@ public class TaskDataVariable {
         this.name = name;
     }
 
-    @Column(name = "VARIABLE_VALUE")
+    @Column(name = "VARIABLE_VALUE", length = Integer.MAX_VALUE)
+    @Lob
     public String getValue() {
         return value;
     }
@@ -82,7 +86,8 @@ public class TaskDataVariable {
         this.jobInherited = jobInherited;
     }
 
-    @Column(name = "VARIABLE_MODEL")
+    @Column(name = "VARIABLE_MODEL", length = Integer.MAX_VALUE)
+    @Lob
     public String getModel() {
         return model;
     }

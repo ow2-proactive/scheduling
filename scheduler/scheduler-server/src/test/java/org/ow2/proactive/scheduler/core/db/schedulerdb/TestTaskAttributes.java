@@ -1,19 +1,10 @@
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
-import org.ow2.proactive.scheduler.common.task.NativeTask;
-import org.ow2.proactive.scheduler.common.task.OnTaskError;
-import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
-import org.ow2.proactive.scheduler.common.task.RestartMode;
-import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -22,8 +13,12 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.junit.Assert;
-import org.junit.Test;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 public class TestTaskAttributes extends BaseSchedulerDBTest {
@@ -154,6 +149,44 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
     }
 
     @Test
+    public void testForkEnv() throws Exception {
+        JavaTask task = createDefaultTask("task");
+        ForkEnvironment env = new ForkEnvironment();
+        task.setForkEnvironment(env);
+        InternalTask taskData = saveSingleTask(task).getTask(task.getName());
+        Assert.assertNotNull(taskData.getForkEnvironment());
+
+        env = new ForkEnvironment();
+        env.setEnvScript(new SimpleScript("forkenvscript", "js", new String[] { "p1", "p2" }));
+        task.setForkEnvironment(env);
+        taskData = saveSingleTask(task).getTask(task.getName());
+        Assert.assertNotNull(taskData.getForkEnvironment().getEnvScript());
+        Assert.assertArrayEquals(new String[] { "p1", "p2" }, task.getForkEnvironment().getEnvScript().getParameters());
+
+        env = new ForkEnvironment();
+        env.setJavaHome("javahome");
+        env.setWorkingDir("workingdir");
+        env.addAdditionalClasspath("classpath");
+        env.addJVMArgument("jvmargument");
+        env.addSystemEnvironmentVariable("var1", "value1");
+        StringBuilder longString = buildLongString();
+        env.addSystemEnvironmentVariable("longvar", longString.toString());
+
+        task.setForkEnvironment(env);
+        taskData = saveSingleTask(task).getTask(task.getName());
+        Assert.assertEquals("javahome", taskData.getForkEnvironment().getJavaHome());
+        Assert.assertEquals("workingdir", taskData.getForkEnvironment().getWorkingDir());
+        Assert.assertEquals(1, taskData.getForkEnvironment().getAdditionalClasspath().size());
+        Assert.assertEquals("classpath", taskData.getForkEnvironment().getAdditionalClasspath().get(0));
+        Assert.assertEquals(1, taskData.getForkEnvironment().getJVMArguments().size());
+        Assert.assertEquals("jvmargument", taskData.getForkEnvironment().getJVMArguments().get(0));
+        Assert.assertEquals(2, taskData.getForkEnvironment().getSystemEnvironment().size());
+        Assert.assertEquals("value1", taskData.getForkEnvironment().getSystemEnvironment().get("var1"));
+        Assert.assertEquals(longString.toString(), taskData.getForkEnvironment().getSystemEnvironment().get("longvar"));
+
+    }
+
+    @Test
     public void testParallelEnv() throws Exception {
         JavaTask task = createDefaultTask("task");
         ParallelEnvironment env = new ParallelEnvironment(5);
@@ -205,16 +238,68 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         Assert.assertEquals("v1", taskData.getGenericInformation().get("p1"));
         Assert.assertEquals("v2", taskData.getGenericInformation().get("p2"));
 
-        StringBuilder longString = new StringBuilder();
-        for (int i = 0; i < 100; i++) {
-            longString.append("0123456789abcdefghijklmnopqrstuvwxyz");
-        }
+        StringBuilder longString = buildLongString();
         genericInfo = new HashMap<>();
         genericInfo.put("longProperty", longString.toString());
         task.setGenericInformation(genericInfo);
         taskData = saveSingleTask(task).getTask(task.getName());
         Assert.assertEquals(1, taskData.getGenericInformation().size());
         Assert.assertEquals(longString.toString(), taskData.getGenericInformation().get("longProperty"));
+    }
+
+    private StringBuilder buildLongString() {
+        StringBuilder longString = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            longString.append("0123456789abcdefghijklmnopqrstuvwxyz");
+        }
+        return longString;
+    }
+
+    @Test
+    public void testTaskVariables() throws Exception {
+        JavaTask task = createDefaultTask("task");
+        Map<String, TaskVariable> variables;
+        InternalTask taskData;
+
+        variables = new HashMap<>();
+        task.setVariables(variables);
+        taskData = saveSingleTask(task).getTask(task.getName());
+
+        Assert.assertNotNull(taskData.getVariables());
+        Assert.assertTrue(taskData.getVariables().isEmpty());
+
+        variables = new HashMap<>();
+        TaskVariable v1 = new TaskVariable();
+        v1.setName("p1");
+        v1.setValue("v1");
+        TaskVariable v2 = new TaskVariable();
+        v2.setName("p2");
+        v2.setValue("v2");
+        variables.put("p1", v1);
+        variables.put("p2", v2);
+        TaskVariable v3 = new TaskVariable();
+        v3.setName("emptyvar");
+        variables.put("emptyvar", v3);
+        task.setVariables(variables);
+        taskData = saveSingleTask(task).getTask(task.getName());
+        Assert.assertEquals(3, taskData.getVariables().size());
+        Assert.assertEquals("p1", taskData.getVariables().get("p1").getName());
+        Assert.assertEquals("p2", taskData.getVariables().get("p2").getName());
+        Assert.assertEquals("v1", taskData.getVariables().get("p1").getValue());
+        Assert.assertEquals("v2", taskData.getVariables().get("p2").getValue());
+        Assert.assertEquals("emptyvar", taskData.getVariables().get("emptyvar").getName());
+        Assert.assertNull(taskData.getVariables().get("emptyvar").getValue());
+
+        StringBuilder longString = buildLongString();
+        variables = new HashMap<>();
+        TaskVariable longVariable = new TaskVariable();
+        longVariable.setName("longProperty");
+        longVariable.setValue(longString.toString());
+        variables.put("longProperty", longVariable);
+        task.setVariables(variables);
+        taskData = saveSingleTask(task).getTask(task.getName());
+        Assert.assertEquals(1, taskData.getVariables().size());
+        Assert.assertEquals(longString.toString(), taskData.getVariables().get("longProperty").getValue());
     }
 
 }
