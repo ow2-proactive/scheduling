@@ -280,7 +280,7 @@ public class TaskData {
         this.script = script;
     }
 
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
     public List<EnvironmentModifierData> getEnvModifiers() {
@@ -291,7 +291,8 @@ public class TaskData {
         this.envModifiers = envModifiers;
     }
 
-    @Column(name = "WORKING_DIR")
+    @Column(name = "WORKING_DIR", length = Integer.MAX_VALUE)
+    @Lob
     public String getWorkingDir() {
         return workingDir;
     }
@@ -472,9 +473,11 @@ public class TaskData {
                 PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
         taskData.setNumberOfExecutionLeft(task.getMaxNumberOfExecution());
         taskData.setGenericInformation(task.getGenericInformation());
-        taskData.setVariables(new HashMap<String, TaskDataVariable>());
-        for (Map.Entry<String, TaskVariable> entry: task.getVariables().entrySet())
-            taskData.getVariables().put(entry.getKey(), getTaskDataVariable(entry.getValue()));
+        HashMap<String, TaskDataVariable> variables = new HashMap<>();
+        for (Map.Entry<String, TaskVariable> entry : task.getVariables().entrySet()) {
+            variables.put(entry.getKey(), TaskDataVariable.create(entry.getKey(), entry.getValue(), taskData));
+        }
+        taskData.setVariables(variables);
 
         // set the scheduledTime if the START_AT property exists
         Map<String, String> genericInfos = taskData.getGenericInformation();
@@ -552,30 +555,16 @@ public class TaskData {
 
         return taskData;
     }
-
-    private static TaskDataVariable getTaskDataVariable(TaskVariable taskVariable) {
-        if (taskVariable == null){
-            return null;
-        }
-        
-        TaskDataVariable taskDataVariable = new TaskDataVariable();
-        taskDataVariable.setJobInherited(taskVariable.isJobInherited());
-        taskDataVariable.setModel(taskVariable.getModel());
-        taskDataVariable.setValue(taskVariable.getValue());
-        taskDataVariable.setName(taskVariable.getName());
-        
-        return taskDataVariable;
-    }
     
     private Map<String, TaskVariable> variablesToTaskVariables(){
-        Map<String, TaskVariable> taskVariables = new HashMap<String, TaskVariable>();
+        Map<String, TaskVariable> taskVariables = new HashMap<>();
         for (Map.Entry<String, TaskDataVariable> entry: getVariables().entrySet()){
-            taskVariables.put(entry.getKey(), variableToTaskVariable(entry.getValue()));
+            taskVariables.put(entry.getKey(), taskDataVariableToTaskVariable(entry.getValue()));
         }
         return taskVariables;
     }
 
-    private static TaskVariable variableToTaskVariable(TaskDataVariable taskDataVariable) {
+    private static TaskVariable taskDataVariableToTaskVariable(TaskDataVariable taskDataVariable) {
         if (taskDataVariable == null){
             return null;
         }
@@ -633,34 +622,7 @@ public class TaskData {
         internalTask.setMatchingBlock(getMatchingBlock());
         internalTask.setVariables(variablesToTaskVariables());
 
-        ForkEnvironment forkEnv = new ForkEnvironment();
-        forkEnv.setJavaHome(javaHome);
-
-        List<String> additionalClasspath = getAdditionalClasspath();
-        if (additionalClasspath != null) {
-            for (String classpath : additionalClasspath) {
-                forkEnv.addAdditionalClasspath(classpath);
-            }
-        }
-
-        List<String> jvmArguments = getJvmArguments();
-        if (jvmArguments != null) {
-            for (String jvmArg : jvmArguments) {
-                forkEnv.addJVMArgument(jvmArg);
-            }
-        }
-
-        List<EnvironmentModifierData> envModifiers = getEnvModifiers();
-
-        if (envModifiers != null) {
-            for (EnvironmentModifierData envModifier : envModifiers) {
-                forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue());
-            }
-        }
-
-        if (envScript != null) {
-            forkEnv.setEnvScript(envScript.createSimpleScript());
-        }
+        ForkEnvironment forkEnv = createForkEnvironment();
 
         internalTask.setForkEnvironment(forkEnv);
 
@@ -689,7 +651,6 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @MapKey(name="name")
     public Map<String,TaskDataVariable> getVariables() {
         return variables;
     }

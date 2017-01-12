@@ -36,17 +36,7 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-
+import com.google.common.base.Joiner;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -61,7 +51,15 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import com.google.common.base.Joiner;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -700,7 +698,18 @@ public abstract class Task extends CommonAttribute {
      * @param variables the variables map
      */
     public void setVariables(Map<String, TaskVariable> variables) {
-        this.variables = new ConcurrentHashMap<String, TaskVariable>(variables);
+        verifyVariableMap(variables);
+        this.variables = new ConcurrentHashMap<>(variables);
+    }
+
+    private void verifyVariableMap(Map<String, TaskVariable> variables) {
+        for (Map.Entry<String, TaskVariable> entry : variables.entrySet()) {
+            if (!entry.getKey().equals(entry.getValue().getName())) {
+                throw new IllegalArgumentException("Variables map entry key (" + entry.getKey() +
+                                                   ") is different from task variable name (" +
+                                                   entry.getValue().getName() + ")");
+            }
+        }
     }
 
     /**
