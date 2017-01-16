@@ -56,6 +56,8 @@ public class SchedulerTestUser {
     private String connectedUserName = null;
     private String connectedUserPassword = null;
 
+    private byte[] connectedUserKey = null;
+
     private static SchedulerTestUser instance = null;
 
     private SchedulerMonitorsHandler monitorsHandler;
@@ -78,13 +80,19 @@ public class SchedulerTestUser {
         return user.username.equals(connectedUserName);
     }
 
+    public boolean is(String username, String password) {
+        return username.equals(connectedUserName) && password.equals(connectedUserPassword);
+    }
+
     /**
      * Connects the singleton using the given user
      */
-    public boolean connect(TestUsers user, String schedulerUrl) throws LoginException,
+    public boolean connect(String username, String password, byte[] key, String schedulerUrl)
+            throws LoginException,
             KeyException, ActiveObjectCreationException, NodeException, SchedulerException {
-        this.connectedUserName = user.username;
-        this.connectedUserPassword = user.password;
+        this.connectedUserName = username;
+        this.connectedUserPassword = password;
+        this.connectedUserKey = key;
 
         disconnectFromScheduler();
 
@@ -95,7 +103,8 @@ public class SchedulerTestUser {
         SchedulerTHelper.log("Connecting user " + connectedUserName + " to the Scheduler at url " + schedulerUrl);
         CredData connectedUserCreds =
                 new CredData(CredData.parseLogin(connectedUserName), CredData.parseDomain(connectedUserName),
-                        connectedUserPassword);
+                                                 connectedUserPassword,
+                                                 connectedUserKey);
 
         schedulerProxy.init(schedulerUrl, connectedUserCreds);
 
@@ -114,6 +123,14 @@ public class SchedulerTestUser {
         SchedulerState state = schedulerProxy.addEventListener(eventReceiver, true, true);
         monitorsHandler.init(state);
         return true;
+    }
+
+    /**
+     * Connects the singleton using the given user
+     */
+    public boolean connect(TestUsers user, String schedulerUrl)
+            throws LoginException, KeyException, ActiveObjectCreationException, NodeException, SchedulerException {
+        return connect(user.username, user.password, null, schedulerUrl);
     }
 
     public void schedulerIsRestarted() {

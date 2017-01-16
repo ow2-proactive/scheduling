@@ -79,7 +79,7 @@ public final class ForkerUtils {
         }
     }
 
-    private enum ForkMethod {
+    public enum ForkMethod {
         NONE("none"), PWD("pwd"), KEY("key");
         private String value;
 
