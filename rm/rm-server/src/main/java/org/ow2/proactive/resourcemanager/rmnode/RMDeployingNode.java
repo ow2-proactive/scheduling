@@ -62,6 +62,7 @@ import org.ow2.proactive.scripting.SelectionScript;
  *
  */
 public final class RMDeployingNode extends AbstractRMNode {
+
     static {
         InfrastructureManager.RMDeployingNodeAccessor.setDefault(new RMDeployingNodeAccessorImpl());
     }
@@ -153,6 +154,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clean() throws NodeException {
         //implementation does nothing
     }
@@ -160,6 +162,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
         throw new UnsupportedOperationException();
     }
@@ -167,6 +170,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RMNodeEvent getAddEvent() {
         return this.addEvent;
     }
@@ -174,6 +178,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public Permission getAdminPermission() {
         throw new UnsupportedOperationException();
     }
@@ -181,6 +186,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @return empty string
      */
+    @Override
     public String getDescriptorVMName() {
         return "";
     }
@@ -188,6 +194,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @return empty string
      */
+    @Override
     public String getHostName() {
         return "";
     }
@@ -195,6 +202,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RMNodeEvent getLastEvent() {
         return this.lastEvent;
     }
@@ -202,6 +210,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public Node getNode() {
         throw new UnsupportedOperationException();
     }
@@ -216,6 +225,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNodeName() {
         return this.nodeName;
     }
@@ -223,6 +233,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public NodeSource getNodeSource() {
         return this.nodeSource;
     }
@@ -230,6 +241,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNodeURL() {
         return this.nodeURL;
     }
@@ -237,6 +249,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * Always return null (a deploying node cannot be owned)
      */
+    @Override
     public Client getOwner() {
         return null;
     }
@@ -244,6 +257,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Client getProvider() {
         return this.provider;
     }
@@ -251,6 +265,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public HashMap<SelectionScript, Integer> getScriptStatus() {
         throw new UnsupportedOperationException();
     }
@@ -258,6 +273,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public NodeState getState() {
         return this.state;
     }
@@ -265,6 +281,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getStateChangeTime() {
         return this.stateChangeTime;
     }
@@ -272,6 +289,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public Permission getUserPermission() {
         throw new UnsupportedOperationException();
     }
@@ -279,6 +297,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @return an empty string
      */
+    @Override
     public String getVNodeName() {
         return "";
     }
@@ -286,6 +305,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @return false;
      */
+    @Override
     public boolean isBusy() {
         return false;
     }
@@ -293,6 +313,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @return false;
      */
+    @Override
     public boolean isDown() {
         return false;
     }
@@ -300,6 +321,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @return false;
      */
+    @Override
     public boolean isFree() {
         return false;
     }
@@ -307,6 +329,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @return false;
      */
+    @Override
     public boolean isToRemove() {
         return false;
     }
@@ -329,6 +352,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setAddEvent(final RMNodeEvent addEvent) {
         this.addEvent = addEvent;
     }
@@ -336,6 +360,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setBusy(Client owner) {
         throw new UnsupportedOperationException();
     }
@@ -343,6 +368,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setDown() {
         throw new UnsupportedOperationException();
     }
@@ -350,6 +376,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setFree() {
         throw new UnsupportedOperationException();
     }
@@ -357,6 +384,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLastEvent(final RMNodeEvent lastEvent) {
         this.lastEvent = lastEvent;
     }
@@ -364,6 +392,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setNodeSource(NodeSource nodeSource) {
         this.nodeSource = nodeSource;
     }
@@ -371,10 +400,12 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setToRemove() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public int compareTo(RMNode o) {
         return this.getNodeURL().compareTo(o.getNodeURL());
     }
@@ -382,6 +413,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNodeSourceName() {
         return this.nodeSourceName;
     }
@@ -396,6 +428,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @return false
      */
+    @Override
     public boolean isConfiguring() {
         return false;
     }
@@ -403,6 +436,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setConfiguring(Client owner) {
         throw new UnsupportedOperationException();
     }
@@ -516,4 +550,5 @@ class RMDeployingNodeAccessorImpl extends InfrastructureManager.RMDeployingNodeA
     protected void setLost(RMDeployingNode pn) {
         pn.setLost();
     }
+
 }

@@ -189,6 +189,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Returns the name of the node.
      * @return the name of the node.
      */
+    @Override
     public String getNodeName() {
         return this.nodeName;
     }
@@ -196,6 +197,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getNode()
      */
+    @Override
     public Node getNode() {
         return this.node;
     }
@@ -204,6 +206,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Returns the Virtual node name of the RMNode.
      * @return the Virtual node name  of the RMNode.
      */
+    @Override
     public String getVNodeName() {
         return this.vnodeName;
     }
@@ -212,6 +215,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Returns the host name of the RMNode.
      * @return the host name of the RMNode.
      */
+    @Override
     public String getHostName() {
         return this.hostName;
     }
@@ -220,6 +224,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Returns the java virtual machine name of the RMNode.
      * @return the java virtual machine name of the RMNode.
      */
+    @Override
     public String getDescriptorVMName() {
         return this.jvmName;
     }
@@ -228,6 +233,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Returns the NodeSource name of the RMNode.
      * @return {@link NodeSource} name of the RMNode.
      */
+    @Override
     public String getNodeSourceName() {
         return this.nodeSourceName;
     }
@@ -236,6 +242,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Returns the unique id of the RMNode.
      * @return the unique id of the RMNode represented by its URL.
      */
+    @Override
     public String getNodeURL() {
         return nodeURL;
     }
@@ -243,6 +250,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * Changes the state of this node to {@link NodeState#BUSY}.
      */
+    @Override
     public void setBusy(Client owner) {
         this.state = NodeState.BUSY;
         this.stateChangeTime = System.currentTimeMillis();
@@ -252,6 +260,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * Changes the state of this node to {@link NodeState#FREE}.
      */
+    @Override
     public void setFree() {
         this.state = NodeState.FREE;
         this.stateChangeTime = System.currentTimeMillis();
@@ -261,6 +270,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * Changes the state of this node to {@link NodeState#CONFIGURING}
      */
+    @Override
     public void setConfiguring(Client owner) {
         if (!this.isDown()) {
             this.state = NodeState.CONFIGURING;
@@ -271,6 +281,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * Changes the state of this node to {@link NodeState#DOWN}.
      */
+    @Override
     public void setDown() {
         this.state = NodeState.DOWN;
         this.stateChangeTime = System.currentTimeMillis();
@@ -279,6 +290,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * Changes the state of this node to {@link NodeState#TO_BE_REMOVED}.
      */
+    @Override
     public void setToRemove() {
         this.state = NodeState.TO_BE_REMOVED;
         this.stateChangeTime = System.currentTimeMillis();
@@ -287,6 +299,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @return true if the node is free, false otherwise.
      */
+    @Override
     public boolean isFree() {
         return this.state == NodeState.FREE;
     }
@@ -294,6 +307,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @return true if the node is busy, false otherwise.
      */
+    @Override
     public boolean isBusy() {
         return this.state == NodeState.BUSY;
     }
@@ -301,6 +315,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @return true if the node is down, false otherwise.
      */
+    @Override
     public boolean isDown() {
         return this.state == NodeState.DOWN;
     }
@@ -308,6 +323,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @return true if the node is 'to be released', false otherwise.
      */
+    @Override
     public boolean isToRemove() {
         return this.state == NodeState.TO_BE_REMOVED;
     }
@@ -315,6 +331,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @return true if the node is 'configuring', false otherwise.
      */
+    @Override
     public boolean isConfiguring() {
         return this.state == NodeState.CONFIGURING;
     }
@@ -337,6 +354,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void lock(Client client) {
         this.isLocked = true;
         this.lockTime = System.currentTimeMillis();
@@ -353,6 +371,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @return a String showing information about the node.
      */
+    @Override
     public String getNodeInfo() {
         String newLine = System.lineSeparator();
         String nodeInfo = "Node " + nodeName + newLine;
@@ -411,8 +430,8 @@ public class RMNodeImpl extends AbstractRMNode {
      * @param script Selection script to execute
      * @param bindings bindings to use to execute the selection scripts
      * @return Result of the test.
-     *
      */
+    @Override
     public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
         try {
             this.initHandler();
@@ -432,6 +451,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * kill all active objects on the node.
      * @throws NodeException
      */
+    @Override
     public synchronized void clean() throws NodeException {
         handler = null;
         try {
@@ -468,6 +488,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Gives the HashMap of all scripts tested with corresponding results.
      * @return the HashMap of all scripts tested with corresponding results.
      */
+    @Override
     public HashMap<SelectionScript, Integer> getScriptStatus() {
         return this.scriptStatus;
     }
@@ -477,6 +498,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * @param rmnode the RMNode object to compare
      * @return an integer
      */
+    @Override
     public int compareTo(RMNode rmnode) {
         if (this.getVNodeName().equals(rmnode.getVNodeName())) {
             if (this.getHostName().equals(rmnode.getHostName())) {
@@ -496,6 +518,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @return the stub of the {@link NodeSource} that handle the RMNode.
      */
+    @Override
     public NodeSource getNodeSource() {
         return this.nodeSource;
     }
@@ -504,6 +527,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Set the NodeSource stub to the RMNode.
      * @param ns Stub of the NodeSource that handle the IMNode.
      */
+    @Override
     public void setNodeSource(NodeSource ns) {
         this.nodeSource = ns;
     }
@@ -511,6 +535,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getState()
      */
+    @Override
     public NodeState getState() {
         return this.state;
     }
@@ -518,6 +543,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Client getOwner() {
         return owner;
     }
@@ -525,6 +551,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Client getProvider() {
         return provider;
     }
@@ -532,6 +559,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Permission getUserPermission() {
         return nodeAccessPermission;
     }
@@ -539,6 +567,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Permission getAdminPermission() {
         return new PrincipalPermission(provider.getName(), provider.getSubject().getPrincipals(
                 UserNamePrincipal.class));
@@ -547,6 +576,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RMNodeEvent getAddEvent() {
         return this.addEvent;
     }
@@ -554,6 +584,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RMNodeEvent getLastEvent() {
         return this.lastEvent;
     }
@@ -561,6 +592,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLastEvent(final RMNodeEvent lastEvent) {
         this.lastEvent = lastEvent;
     }
@@ -568,6 +600,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setAddEvent(final RMNodeEvent addEvent) {
         this.addEvent = addEvent;
     }
@@ -575,6 +608,7 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getStateChangeTime() {
         return stateChangeTime;
     }
@@ -582,14 +616,19 @@ public class RMNodeImpl extends AbstractRMNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setJMXUrl(JMXTransportProtocol protocol, String address) {
         jmxUrls[protocol.ordinal()] = address;
     }
 
+
+    @Override
     public String getJMXUrl(JMXTransportProtocol protocol) {
         return jmxUrls[protocol.ordinal()];
     }
 
+
+    @Override
     public boolean isProtectedByToken() {
         return protectedByToken;
     }
@@ -617,4 +656,5 @@ public class RMNodeImpl extends AbstractRMNode {
     public void setProtectedByToken(boolean protectedByToken) {
         this.protectedByToken = protectedByToken;
     }
+
 }
