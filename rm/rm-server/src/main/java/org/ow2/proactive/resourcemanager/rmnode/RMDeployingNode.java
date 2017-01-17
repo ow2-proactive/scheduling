@@ -36,6 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
@@ -43,7 +48,6 @@ import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
@@ -51,18 +55,13 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * This class stands for a node whose deployment has already been launched whereas the RMNode
  * has not been acquired by the RMCore yet. This purely informative.
  *
  */
-public final class RMDeployingNode implements RMNode, Serializable {
+public final class RMDeployingNode extends AbstractRMNode {
     static {
         InfrastructureManager.RMDeployingNodeAccessor.setDefault(new RMDeployingNodeAccessorImpl());
     }
@@ -411,14 +410,37 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return false
      */
+    @Override
     public boolean isLocked() {
         return false;
     }
 
     /**
+     * @return {@code -1}
+     */
+    @Override
+    public long getLockTime() {
+        return -1;
+    }
+
+    /**
+     * @return {@code null}
+     */
+    @Override
+    public Client getLockedBy() {
+        return null;
+    }
+
+    /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void lock(Client owner) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void unlock(Client owner) {
         throw new UnsupportedOperationException();
     }
 
@@ -462,23 +484,6 @@ public final class RMDeployingNode implements RMNode, Serializable {
             this.setLastEvent(rmNodeEvent);
         }
         return rmNodeEvent;
-    }
-
-    private RMNodeDescriptor toNodeDescriptor() {
-        RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
-        rmNodeDescriptor.setNodeURL(this.getNodeURL());
-        rmNodeDescriptor.setNodeSourceName(this.getNodeSourceName());
-        rmNodeDescriptor.setVNodeName(this.getVNodeName());
-        rmNodeDescriptor.setHostName(this.getHostName());
-        rmNodeDescriptor.setState(this.getState());
-        rmNodeDescriptor.setDefaultJMXUrl(getJMXUrl(JMXTransportProtocol.RMI));
-        rmNodeDescriptor.setProactiveJMXUrl(getJMXUrl(JMXTransportProtocol.RO));
-        rmNodeDescriptor.setDescriptorVMName(this.getDescriptorVMName());
-        rmNodeDescriptor.setStateChangeTime(this.getStateChangeTime());
-        rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
-        rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
-        rmNodeDescriptor.setNodeInfo(getNodeInfo());
-        return rmNodeDescriptor;
     }
 
     @Override

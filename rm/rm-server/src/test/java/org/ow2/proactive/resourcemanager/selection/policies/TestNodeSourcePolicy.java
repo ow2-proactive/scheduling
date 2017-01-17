@@ -190,6 +190,16 @@ public class TestNodeSourcePolicy {
             return false;
         }
 
+        @Override
+        public long getLockTime() {
+            return -1;
+        }
+
+        @Override
+        public Client getLockedBy() {
+            return null;
+        }
+
         public void setFree() {
         }
 
@@ -206,6 +216,11 @@ public class TestNodeSourcePolicy {
         }
 
         public void lock(Client owner) {
+        }
+
+        @Override
+        public void unlock(Client owner) {
+
         }
 
         public void setNodeSource(NodeSource nodeSource) {

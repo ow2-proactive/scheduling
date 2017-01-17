@@ -36,6 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -46,7 +53,6 @@ import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.Script;
@@ -54,12 +60,6 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -81,9 +81,8 @@ import java.util.Map;
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- *
  */
-public class RMNodeImpl implements RMNode, Serializable {
+public class RMNodeImpl extends AbstractRMNode {
 
     private final static Logger logger = Logger.getLogger(RMNodeImpl.class);
 
@@ -119,6 +118,25 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     /** State of the node */
     private NodeState state;
+
+    /**
+     * Status associated to a ProActive Node.
+     * When a Node is locked, it is no longer eligible for Tasks execution.
+     * A ProActive node can be locked whatever its state is.
+     */
+    private boolean isLocked;
+
+    /**
+     * Defines the time at which the node has been locked.
+     * This field has a meaning when {@code isLocked} is {@code true} only.
+     */
+    private long lockTime = -1;
+
+    /**
+     * Defines who has locked the node.
+     * This field has a meaning when {@code isLocked} is {@code true} only.
+     */
+    private Client lockedBy;
 
     /** Time stamp of the latest state change */
     private long stateChangeTime;
@@ -301,33 +319,71 @@ public class RMNodeImpl implements RMNode, Serializable {
         return this.state == NodeState.CONFIGURING;
     }
 
+    @Override
     public boolean isLocked() {
-        return this.state == NodeState.LOCKED;
+        return isLocked;
+    }
+
+    @Override
+    public long getLockTime() {
+        return lockTime;
+    }
+
+    @Override
+    public Client getLockedBy() {
+        return lockedBy;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void lock(Client owner) {
-        this.state = NodeState.LOCKED;
-        this.stateChangeTime = System.currentTimeMillis();
-        this.owner = owner;
+    public void lock(Client client) {
+        this.isLocked = true;
+        this.lockTime = System.currentTimeMillis();
+        this.lockedBy = client;
+    }
+
+    @Override
+    public void unlock(Client client) {
+        this.isLocked = false;
+        this.lockTime = -1;
+        this.lockedBy = null;
     }
 
     /**
-     * @return a String showing informations about the node.
+     * @return a String showing information about the node.
      */
     public String getNodeInfo() {
         String newLine = System.lineSeparator();
         String nodeInfo = "Node " + nodeName + newLine;
-        nodeInfo += "URL : " + nodeURL + newLine;
-        nodeInfo += "Node source : " + nodeSourceName + newLine;
-        nodeInfo += "Provider : " + provider.getName() + newLine;
-        nodeInfo += "Used by : " + (owner == null ? "nobody" : owner.getName()) + newLine;
-        nodeInfo += "State : " + state + newLine;
+        nodeInfo += "URL: " + nodeURL + newLine;
+        nodeInfo += "Node source: " + nodeSourceName + newLine;
+        nodeInfo += "Provider: " + provider.getName() + newLine;
+        nodeInfo += "Used by: " + (owner == null ? "nobody" : owner.getName()) + newLine;
+        nodeInfo += "State: " + state + newLine;
+        nodeInfo += getLockStatus();
         nodeInfo += "JMX RMI: " + getJMXUrl(JMXTransportProtocol.RMI) + newLine;
         nodeInfo += "JMX RO: " + getJMXUrl(JMXTransportProtocol.RO) + newLine;
         return nodeInfo;
+    }
+
+    private String getLockStatus() {
+        String result = "Locked: " + Boolean.toString(isLocked);
+
+        if (isLocked) {
+            result += " (";
+
+            if (lockedBy != null) {
+                result += "by " + lockedBy.getName() + " ";
+            }
+
+            result += "since " + new Date(lockTime);
+            result += ")";
+        }
+
+        result += System.lineSeparator();
+
+        return result;
     }
 
     private void initHandler() throws NodeException {
@@ -551,24 +607,6 @@ public class RMNodeImpl implements RMNode, Serializable {
             this.setLastEvent(rmNodeEvent);
         }
         return rmNodeEvent;
-    }
-
-    private RMNodeDescriptor toNodeDescriptor() {
-        RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
-        rmNodeDescriptor.setNodeURL(this.getNodeURL());
-        rmNodeDescriptor.setNodeSourceName(this.getNodeSourceName());
-        rmNodeDescriptor.setVNodeName(this.getVNodeName());
-        rmNodeDescriptor.setHostName(this.getHostName());
-        rmNodeDescriptor.setState(this.getState());
-        rmNodeDescriptor.setDefaultJMXUrl(getJMXUrl(JMXTransportProtocol.RMI));
-        rmNodeDescriptor.setProactiveJMXUrl(getJMXUrl(JMXTransportProtocol.RO));
-        rmNodeDescriptor.setDescriptorVMName(this.getDescriptorVMName());
-        rmNodeDescriptor.setStateChangeTime(this.getStateChangeTime());
-        rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
-        rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
-        rmNodeDescriptor.setNodeInfo(getNodeInfo());
-
-        return rmNodeDescriptor;
     }
 
     @Override

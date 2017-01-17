@@ -36,8 +36,28 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.*;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -62,7 +82,11 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.RMStateNodeUrls;
-import org.ow2.proactive.resourcemanager.common.event.*;
+import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
@@ -92,18 +116,15 @@ import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelect
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
-import org.ow2.proactive.scripting.*;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptException;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.Permission;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -182,7 +203,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /** HashMaps of nodes known by the RMCore */
     private HashMap<String, RMNode> allNodes;
 
-    /** list of all free nodes */
+    /**
+     * List of nodes that are eligible for Scheduling.
+     * It corresponds to nodes that are in the `FREE` state and not locked.
+     * Nodes which are locked are not part of this list.
+     **/
     private ArrayList<RMNode> freeNodes;
 
     private SelectionManager selectionManager;
@@ -441,33 +466,47 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * Set a node's state to free, after a completed task by it. Set the to free
-     * and move the node to the internal free nodes list. An event informing the
-     * node state's change is thrown to RMMonitoring.
+     * Change the state of the node to free, after a Task has been completed by the specified node.
+     * The node passed as parameter is moved to the list of nodes which are eligible for scheduling if it is not locked.
+     * In all cases, an event informing the node state's change is propagated to RMMonitoring.
      * 
      * @param rmNode node to set free.
      * @return true if the node successfully set as free, false if it was down before.
      */
     private BooleanWrapper internalSetFree(final RMNode rmNode) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Current node state " + rmNode.getState() + " " + rmNode.getNodeURL());
+            logger.debug("Setting node state to free " + rmNode.getNodeURL());
+        }
+
         // If the node is already free no need to go further
-        logger.debug("Current node state " + rmNode.getState() + " " + rmNode.getNodeURL());
-        logger.debug("Setting node state to free " + rmNode.getNodeURL());
         if (rmNode.isFree()) {
             return new BooleanWrapper(true);
         }
+
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
+
+
         Client client = rmNode.getOwner();
         if (client == null) {
             // node has been just configured, so the user initiated this action is the node provider
             client = rmNode.getProvider();
         }
-        // reseting owner here
+
+        // resetting owner here
         rmNode.setFree();
-        this.freeNodes.add(rmNode);
-        // create the event
-        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                previousNodeState, client.getName()));
+
+        if (!rmNode.isLocked()) {
+            this.freeNodes.add(rmNode);
+        }
+
+        this.registerAndEmitNodeEvent(
+                rmNode.createNodeEvent(
+                        RMEventType.NODE_STATE_CHANGED,
+                        previousNodeState,
+                        client.getName()));
+
         return new BooleanWrapper(true);
     }
 
@@ -1661,22 +1700,32 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private boolean internalLockNode(RMNode rmnode) {
-        if (!rmnode.isFree()) {
-            logger.warn("Cannot lock the node " + rmnode.getNodeURL() + " which is not free [ state is " +
-                rmnode.getState() + " ]");
+        if (rmnode.isLocked()) {
+            logger.warn("Cannot lock a node that is already locked: " + rmnode.getNodeURL());
+            // locking a node that is already locked must not update
+            // the lock time neither change who has locked the node
             return false;
         }
+
         try {
-            // can throws a security exception if caller is not an admin
+            // can throw a security exception if the caller is not an admin
             this.checkNodeAdminPermission(rmnode, this.caller);
+
             rmnode.lock(this.caller);
             this.freeNodes.remove(rmnode);
         } catch (SecurityException ex) {
             logger.warn("", ex);
             return false;
         }
-        this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_STATE_CHANGED, NodeState.FREE,
-                this.caller.getName()));
+
+        // sending the following event is required in order to have monitoring information
+        // updated in the intermediate RM cache (see RMListenerProxy#nodeEvent)
+        this.registerAndEmitNodeEvent(
+                rmnode.createNodeEvent(
+                        RMEventType.NODE_STATE_CHANGED,
+                        rmnode.getState(),
+                        this.caller.getName()));
+
         return true;
     }
 
@@ -1689,7 +1738,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             RMNode rmnode = getNodebyUrl(url);
 
             if (rmnode == null) {
-                logger.warn("Cannot lock unknown node with the following url " + url);
+                logger.warn("Unknown node to unlock: " + url);
                 result = false;
                 continue;
             }
@@ -1701,21 +1750,25 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private boolean internalUnlockNode(RMNode rmnode) {
         if (!rmnode.isLocked()) {
-            logger.warn("Cannot unlock the node " + rmnode.getNodeURL() + " which is not locked [ state is " +
-                rmnode.getState() + " ]");
+            logger.warn("Cannot unlock a node that is not locked: " + rmnode.getNodeURL());
             return false;
         }
         try {
-            // can throws a security exception if caller is not an admin
+            // can throw a security exception if the caller is not an admin
             this.checkNodeAdminPermission(rmnode, this.caller);
-            rmnode.setFree();
-            freeNodes.add(rmnode);
+            rmnode.unlock(this.caller);
+
+            if (rmnode.isFree()) {
+                freeNodes.add(rmnode);
+            }
         } catch (Exception ex) {
             logger.warn("", ex);
             return false;
         }
+
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                NodeState.LOCKED, caller.getName()));
+                rmnode.getState(), caller.getName()));
+
         return true;
     }
 
@@ -1834,8 +1887,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         } else {
             // Unlock all previously locked nodes
             this.unselectNodes(selectedRMNodes);
-            throw new IllegalStateException("Unable to execute script atomically, the " +
-                candidateNode.getNodeURL() + " is not free.");
+
+            throw new IllegalStateException(
+                    "Script cannot be executed atomically since the node is already locked: "
+                            + candidateNode.getNodeURL());
         }
     }
 

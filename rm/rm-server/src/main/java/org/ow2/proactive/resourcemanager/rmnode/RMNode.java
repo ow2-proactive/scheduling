@@ -232,9 +232,29 @@ public interface RMNode extends Comparable<RMNode> {
     boolean isConfiguring();
 
     /**
-     * @return true if the node is locked, false otherwise.
+     * Returns a boolean saying whether the node is locked or not.
+     *
+     * @return {@code true} if the node is locked, {@code false} otherwise.
      */
     boolean isLocked();
+
+    /**
+     * Returns the timestamp at which the node has been locked.
+     * <p>
+     * The value returned by this method is meaningful when the node is locked only.
+     *
+     * @see #isLocked()
+     *
+     * @return the timestamp at which the node has been locked or {@code -1} if the node is not locked.
+     */
+    long getLockTime();
+
+    /**
+     * Returns the client who has locked the node.
+     *
+     * @return the client who has locked the node, or {@code null} if the node is not locked.
+     */
+    Client getLockedBy();
 
     // ---------------------------------------------------------------------//
     // SET
@@ -267,10 +287,18 @@ public interface RMNode extends Comparable<RMNode> {
     void setConfiguring(Client owner);
 
     /**
-     * Changes the node status to locked
-     * @param owner
+     * Set the node locked.
+     *
+     * @param client the client that locks the node.
      */
-    void lock(Client owner);
+    void lock(Client client);
+
+    /**
+     * Unlock the node.
+     *
+     * @param client the client that unlocks the node.
+     */
+    void unlock(Client client);
 
     /**
      * Change the {@link NodeSource} from where the node is.
