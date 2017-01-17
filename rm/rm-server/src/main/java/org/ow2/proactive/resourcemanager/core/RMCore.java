@@ -1664,20 +1664,21 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private boolean checkNodeAdminPermission(RMNode rmnode, Client client) {
         NodeSource nodeSource = rmnode.getNodeSource();
+
+        String errorMessage = caller +
+                " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
+                rmnode.getNodeSourceName();
+
         // in order to be the node administrator a client has to be either
         // an administrator of the RM (with AllPermissions) or
         // an administrator of the node source (creator) or
         // a node provider
         try {
             // checking if the caller is an administrator
-            caller.checkPermission(nodeSource.getAdminPermission(), caller +
-                " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
-                rmnode.getNodeSourceName());
+            caller.checkPermission(nodeSource.getAdminPermission(), errorMessage);
         } catch (SecurityException ex) {
             // the caller is not an administrator, so checking if it is a node provider
-            caller.checkPermission(rmnode.getAdminPermission(), caller +
-                " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
-                rmnode.getNodeSourceName());
+            caller.checkPermission(rmnode.getAdminPermission(), errorMessage);
         }
 
         return true;
@@ -1775,8 +1776,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return false;
         }
 
-        this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                rmnode.getState(), caller.getName()));
+        this.registerAndEmitNodeEvent(
+                rmnode.createNodeEvent(
+                        RMEventType.NODE_STATE_CHANGED,
+                        rmnode.getState(),
+                        caller.getName()));
 
         return true;
     }
