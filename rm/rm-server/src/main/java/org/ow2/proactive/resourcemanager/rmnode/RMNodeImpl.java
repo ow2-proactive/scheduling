@@ -540,6 +540,10 @@ public class RMNodeImpl extends AbstractRMNode {
         return this.state;
     }
 
+    public void setState(NodeState nodeState) {
+        this.state = nodeState;
+    }
+
     /**
      * {@inheritDoc}
      */
