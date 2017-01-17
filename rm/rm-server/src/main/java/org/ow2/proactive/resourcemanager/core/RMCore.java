@@ -126,6 +126,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import com.google.common.base.Predicate;
+
 
 /**
  * The main active object of the Resource Manager (RM), the RMCore has to
@@ -1684,19 +1686,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanWrapper lockNodes(Set<String> urls) {
-        boolean result = true;
-        for (String url : urls) {
-            RMNode rmnode = getNodebyUrl(url);
-
-            if (rmnode == null) {
-                logger.warn("Cannot lock unknown node with the following url " + url);
-                result &= false;
-                continue;
+        return mapOnNodeUrlSet(urls, new Predicate<RMNode>() {
+            @Override
+            public boolean apply(RMNode node) {
+                return internalLockNode(node);
             }
-            result &= this.internalLockNode(rmnode);
-        }
-        return new BooleanWrapper(result);
+        }, "lock");
     }
 
     private boolean internalLockNode(RMNode rmnode) {
@@ -1732,19 +1729,31 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanWrapper unlockNodes(Set<String> urls) {
+        return mapOnNodeUrlSet(urls, new Predicate<RMNode>() {
+            @Override
+            public boolean apply(RMNode node) {
+                return internalUnlockNode(node);
+            }
+        }, "unlock");
+    }
+
+    public BooleanWrapper mapOnNodeUrlSet(Set<String> nodeUrls, Predicate<RMNode> operation, String operationName) {
         boolean result = true;
-        for (String url : urls) {
+
+        for (String url : nodeUrls) {
             RMNode rmnode = getNodebyUrl(url);
 
             if (rmnode == null) {
-                logger.warn("Unknown node to unlock: " + url);
+                logger.warn("Cannot " + operationName + ", unknown node: " + url);
                 result &= false;
                 continue;
             }
 
-            result &= this.internalUnlockNode(rmnode);
+            result &= operation.apply(rmnode);
         }
+
         return new BooleanWrapper(result);
     }
 
