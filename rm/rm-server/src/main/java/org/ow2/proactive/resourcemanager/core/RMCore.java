@@ -1691,10 +1691,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             if (rmnode == null) {
                 logger.warn("Cannot lock unknown node with the following url " + url);
-                result = false;
+                result &= false;
                 continue;
             }
-            result = this.internalLockNode(rmnode);
+            result &= this.internalLockNode(rmnode);
         }
         return new BooleanWrapper(result);
     }
@@ -1739,11 +1739,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             if (rmnode == null) {
                 logger.warn("Unknown node to unlock: " + url);
-                result = false;
+                result &= false;
                 continue;
             }
 
-            result = this.internalUnlockNode(rmnode);
+            result &= this.internalUnlockNode(rmnode);
         }
         return new BooleanWrapper(result);
     }
