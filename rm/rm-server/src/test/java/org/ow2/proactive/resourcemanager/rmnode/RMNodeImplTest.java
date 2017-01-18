@@ -60,7 +60,7 @@ public class RMNodeImplTest {
 
         assertThat(rmNode.getNodeInfo()).contains("Locked: true ");
     }
-
+    
     public static RMNodeImpl createRmNode() {
         Node node = Mockito.mock(Node.class);
         NodeSource nodeSource = Mockito.mock(NodeSource.class);
