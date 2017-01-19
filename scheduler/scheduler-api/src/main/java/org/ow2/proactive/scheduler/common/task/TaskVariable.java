@@ -36,12 +36,11 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import java.io.Serializable;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-
-import org.objectweb.proactive.annotation.PublicAPI;
+import java.io.Serializable;
 
 
 /**
@@ -65,6 +64,13 @@ public class TaskVariable implements Serializable {
     /** ProActive default constructor */
     public TaskVariable() {
         //Empty constructor
+    }
+
+    public TaskVariable(String name, String value, String model, boolean isJobInherited) {
+        this.name = name;
+        this.value = value;
+        this.jobInherited = isJobInherited;
+        this.model = model;
     }
 
     public String getName() {

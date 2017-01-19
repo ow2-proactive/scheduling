@@ -1,0 +1,2 @@
+org.ow2.proactive.scheduler.common.job.factories.spi.stax.StaxJobValidatorServiceProvider
+org.ow2.proactive.scheduler.common.job.factories.spi.model.DefaultModelJobValidatorServiceProvider
