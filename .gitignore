@@ -18,6 +18,7 @@ dist/war/*.war
 /lib
 /bin
 **/bin
+/out
 
 /tools
 !/tools/startup.groovy

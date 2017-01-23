@@ -36,6 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
@@ -43,7 +48,6 @@ import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
@@ -51,18 +55,14 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * This class stands for a node whose deployment has already been launched whereas the RMNode
  * has not been acquired by the RMCore yet. This purely informative.
  *
  */
-public final class RMDeployingNode implements RMNode, Serializable {
+public final class RMDeployingNode extends AbstractRMNode {
+
     static {
         InfrastructureManager.RMDeployingNodeAccessor.setDefault(new RMDeployingNodeAccessorImpl());
     }
@@ -154,6 +154,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clean() throws NodeException {
         //implementation does nothing
     }
@@ -161,6 +162,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
         throw new UnsupportedOperationException();
     }
@@ -168,6 +170,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RMNodeEvent getAddEvent() {
         return this.addEvent;
     }
@@ -175,6 +178,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public Permission getAdminPermission() {
         throw new UnsupportedOperationException();
     }
@@ -182,6 +186,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return empty string
      */
+    @Override
     public String getDescriptorVMName() {
         return "";
     }
@@ -189,6 +194,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return empty string
      */
+    @Override
     public String getHostName() {
         return "";
     }
@@ -196,6 +202,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RMNodeEvent getLastEvent() {
         return this.lastEvent;
     }
@@ -203,6 +210,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public Node getNode() {
         throw new UnsupportedOperationException();
     }
@@ -217,6 +225,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNodeName() {
         return this.nodeName;
     }
@@ -224,6 +233,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public NodeSource getNodeSource() {
         return this.nodeSource;
     }
@@ -231,6 +241,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNodeURL() {
         return this.nodeURL;
     }
@@ -238,6 +249,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * Always return null (a deploying node cannot be owned)
      */
+    @Override
     public Client getOwner() {
         return null;
     }
@@ -245,6 +257,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Client getProvider() {
         return this.provider;
     }
@@ -252,6 +265,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public HashMap<SelectionScript, Integer> getScriptStatus() {
         throw new UnsupportedOperationException();
     }
@@ -259,6 +273,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public NodeState getState() {
         return this.state;
     }
@@ -266,6 +281,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getStateChangeTime() {
         return this.stateChangeTime;
     }
@@ -273,6 +289,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public Permission getUserPermission() {
         throw new UnsupportedOperationException();
     }
@@ -280,6 +297,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return an empty string
      */
+    @Override
     public String getVNodeName() {
         return "";
     }
@@ -287,6 +305,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return false;
      */
+    @Override
     public boolean isBusy() {
         return false;
     }
@@ -294,6 +313,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return false;
      */
+    @Override
     public boolean isDown() {
         return false;
     }
@@ -301,6 +321,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return false;
      */
+    @Override
     public boolean isFree() {
         return false;
     }
@@ -308,6 +329,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return false;
      */
+    @Override
     public boolean isToRemove() {
         return false;
     }
@@ -330,6 +352,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setAddEvent(final RMNodeEvent addEvent) {
         this.addEvent = addEvent;
     }
@@ -337,6 +360,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setBusy(Client owner) {
         throw new UnsupportedOperationException();
     }
@@ -344,6 +368,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setDown() {
         throw new UnsupportedOperationException();
     }
@@ -351,6 +376,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setFree() {
         throw new UnsupportedOperationException();
     }
@@ -358,6 +384,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLastEvent(final RMNodeEvent lastEvent) {
         this.lastEvent = lastEvent;
     }
@@ -365,6 +392,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setNodeSource(NodeSource nodeSource) {
         this.nodeSource = nodeSource;
     }
@@ -372,10 +400,12 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setToRemove() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public int compareTo(RMNode o) {
         return this.getNodeURL().compareTo(o.getNodeURL());
     }
@@ -383,6 +413,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getNodeSourceName() {
         return this.nodeSourceName;
     }
@@ -397,6 +428,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return false
      */
+    @Override
     public boolean isConfiguring() {
         return false;
     }
@@ -404,6 +436,7 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void setConfiguring(Client owner) {
         throw new UnsupportedOperationException();
     }
@@ -411,14 +444,37 @@ public final class RMDeployingNode implements RMNode, Serializable {
     /**
      * @return false
      */
+    @Override
     public boolean isLocked() {
         return false;
     }
 
     /**
+     * @return {@code -1}
+     */
+    @Override
+    public long getLockTime() {
+        return -1;
+    }
+
+    /**
+     * @return {@code null}
+     */
+    @Override
+    public Client getLockedBy() {
+        return null;
+    }
+
+    /**
      * @throws UnsupportedOperationException
      */
+    @Override
     public void lock(Client owner) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void unlock(Client owner) {
         throw new UnsupportedOperationException();
     }
 
@@ -464,23 +520,6 @@ public final class RMDeployingNode implements RMNode, Serializable {
         return rmNodeEvent;
     }
 
-    private RMNodeDescriptor toNodeDescriptor() {
-        RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
-        rmNodeDescriptor.setNodeURL(this.getNodeURL());
-        rmNodeDescriptor.setNodeSourceName(this.getNodeSourceName());
-        rmNodeDescriptor.setVNodeName(this.getVNodeName());
-        rmNodeDescriptor.setHostName(this.getHostName());
-        rmNodeDescriptor.setState(this.getState());
-        rmNodeDescriptor.setDefaultJMXUrl(getJMXUrl(JMXTransportProtocol.RMI));
-        rmNodeDescriptor.setProactiveJMXUrl(getJMXUrl(JMXTransportProtocol.RO));
-        rmNodeDescriptor.setDescriptorVMName(this.getDescriptorVMName());
-        rmNodeDescriptor.setStateChangeTime(this.getStateChangeTime());
-        rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
-        rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
-        rmNodeDescriptor.setNodeInfo(getNodeInfo());
-        return rmNodeDescriptor;
-    }
-
     @Override
     public RMNodeEvent createNodeEvent() {
         return createNodeEvent(null, null, null);
@@ -511,4 +550,5 @@ class RMDeployingNodeAccessorImpl extends InfrastructureManager.RMDeployingNodeA
     protected void setLost(RMDeployingNode pn) {
         pn.setLost();
     }
+
 }

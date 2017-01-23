@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
@@ -59,10 +60,12 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility;
-import org.apache.commons.codec.binary.StringUtils;
 
 
-public class StringUtility {
+public final class StringUtility {
+
+    private StringUtility() {
+    }
 
     public static boolean isEmpty(String string) {
         return string == null || string.length() == 0;
@@ -138,6 +141,9 @@ public class StringUtility {
         titles.add("HOST_NAME");
         titles.add("STATE");
         titles.add("SINCE");
+        titles.add("LOCKED");
+        titles.add("LOCKED_BY");
+        titles.add("LOCK_TIME");
         titles.add("URL");
         titles.add("PROVIDER");
         titles.add("USED_BY");
@@ -147,23 +153,52 @@ public class StringUtility {
 
         if (nodeEvents != null) {
             for (NodeEventView nodeEvent : nodeEvents) {
-                List<String> line = new ArrayList<>(7);
+                List<String> line = new ArrayList<>(10);
                 line.add(nodeEvent.getNodeSource());
                 line.add(nodeEvent.getHostName());
                 line.add(nodeEvent.getNodeState());
-                long timestamp = Long.parseLong(nodeEvent.getTimeStamp());
-                String date = Tools.getFormattedDate(timestamp);
-                if (timestamp != -1) {
-                    date += " (" + Tools.getElapsedTime(timestamp) + ")";
-                }
-                line.add(date);
+                line.add(getStateChangeTime(nodeEvent));
+                line.add(nodeEvent.isLocked());
+                line.add(toStringNullable(nodeEvent.getNodeLocker()));
+                line.add(getLockTime(nodeEvent));
                 line.add(nodeEvent.getNodeUrl());
-                line.add(nodeEvent.getNodeProvider() == null ? "" : nodeEvent.getNodeProvider());
-                line.add(nodeEvent.getNodeOwner() == null ? "" : nodeEvent.getNodeOwner());
+                line.add(toStringNullable(nodeEvent.getNodeProvider()));
+                line.add(toStringNullable(nodeEvent.getNodeOwner()));
                 formatter.addLine(line);
             }
         }
         return Tools.getStringAsArray(formatter);
+    }
+
+    private static String getStateChangeTime(NodeEventView nodeEvent) {
+        long timestamp = Long.parseLong(nodeEvent.getTimeStamp());
+        String stateChangeTime = Tools.getFormattedDate(timestamp);
+        if (timestamp != -1) {
+            stateChangeTime += " (" + Tools.getElapsedTime(timestamp) + ")";
+        }
+        return stateChangeTime;
+    }
+
+    private static String getLockTime(NodeEventView nodeEvent) {
+        long lockTime = Long.parseLong(nodeEvent.getLockTime());
+
+        if (lockTime == -1) {
+            return "";
+        }
+
+        return Tools.getFormattedDate(lockTime) + " (" + Tools.getElapsedTime(lockTime) + ")";
+    }
+
+    private static String getLockState(NodeEventView nodeEvent) {
+        String lockState = nodeEvent.isLocked();
+
+        if (Boolean.TRUE.toString().equalsIgnoreCase(lockState)) {
+            lockState += " (by " + nodeEvent.getNodeLocker() + " since ";
+            lockState += Tools.getFormattedDate(Long.parseLong(nodeEvent.getLockTime()));
+            lockState += ")";
+        }
+
+        return lockState;
     }
 
     public static String string(NodeSourceView[] nodeSources) {
@@ -260,11 +295,8 @@ public class StringUtility {
         list.add("#EXECUTIONS");
         list.add("#NODES KILLED");
         formatter.setTitle(list);
-        // separator
         formatter.addEmptyLine();
 
-        // TaskState.setSortingBy(sort);
-        // Collections.sort(tasks);
         for (TaskStateData taskState : tasks) {
             list = new ArrayList<>();
             TaskInfoData taskInfo = taskState.getTaskInfo();
@@ -273,12 +305,12 @@ public class StringUtility {
             list.add(String.valueOf(taskId.getId()));
             list.add(taskId.getReadableName());
             if (displayTags) {
-                list.add((taskState.getTag() != null) ? taskState.getTag() : "");
+                list.add(toStringNullable(taskState.getTag()));
             }
             list.add((taskState.getIterationIndex() > 0) ? "" + taskState.getIterationIndex() : "");
             list.add((taskState.getReplicationIndex() > 0) ? "" + taskState.getReplicationIndex() : "");
             list.add(taskInfo.getTaskStatus().toString());
-            list.add((taskInfo.getExecutionHostName() == null) ? "unknown" : taskInfo.getExecutionHostName());
+            list.add(toStringNullable(taskInfo.getExecutionHostName(), "unknown"));
 
             if (taskInfo.getTaskStatus() == TaskStatusData.IN_ERROR) {
                 list.add(Tools.getFormattedDuration(taskInfo.getInErrorTime(), taskInfo.getStartTime()));
@@ -401,6 +433,16 @@ public class StringUtility {
         return Tools.getStringAsArray(formatter);
     }
 
-    private StringUtility() {
+    private static String toStringNullable(String obj) {
+        return toStringNullable(obj, "");
     }
+
+    private static String toStringNullable(String obj, String defaultValue) {
+        if (obj == null) {
+            return defaultValue;
+        }
+
+        return obj;
+    }
+
 }

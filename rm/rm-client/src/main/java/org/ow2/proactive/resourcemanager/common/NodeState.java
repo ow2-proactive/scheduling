@@ -51,10 +51,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- *
  */
 @PublicAPI
 public enum NodeState {
+
     /**
      * a node that can be provided to a RM user, and able to perform a task
      */
@@ -84,57 +84,45 @@ public enum NodeState {
     /**
      * a node cannot be provided to a RM user, it is under configuration
      */
-    CONFIGURING("Configuring"),
-
-    /**
-     * a node state "locked" means that node cannot be used for computations by anyone
-     * and the main difference with busy is that it remains locked after a user disconnects
-     * from the resource manager (busy node becomes free in this case).
-     */
-    LOCKED("Locked");
+    CONFIGURING("Configuring");
 
     private String desc;
 
     /**
      * Constructor
-     * @param nb state to specify.
+     *
+     * @param description Human readable description of the state.
      */
-    NodeState(String desc) {
-        this.desc = desc;
+    NodeState(String description) {
+        this.desc = description;
     }
 
     /**
-     * @param value value returned by NodeState.toString()
-     * @return enum instance corresponding the String representation provided
-     * @throws IllegalArgumentException provided value is no good
+     * Returns the enum constant of the specified NodeState with the specified description.
+     *
+     * @param value the value returned by {@link NodeState#toString()}.
+     * @return enum instance corresponding the String representation provided.
+     * @throws IllegalArgumentException if the specified enum type has no constant with the specified name, or the specified class object does not represent an enum type.
+     * @throws NullPointerException if enumType or name is {@code null}.
      */
     public static NodeState parse(String value) {
-        if (value.equals(FREE.toString()))
-            return NodeState.FREE;
-        else if (value.equals(BUSY.toString()))
-            return NodeState.BUSY;
-        else if (value.equals(DOWN.toString()))
-            return NodeState.DOWN;
-        else if (value.equals(TO_BE_REMOVED.toString()))
-            return NodeState.TO_BE_REMOVED;
-        else if (value.equals(DEPLOYING.toString()))
-            return NodeState.DEPLOYING;
-        else if (value.equals(LOST.toString()))
-            return NodeState.LOST;
-        else if (value.equals(CONFIGURING.toString()))
-            return NodeState.CONFIGURING;
-        else if (value.equals(LOCKED.toString()))
-            return NodeState.LOCKED;
-        else
-            throw new IllegalArgumentException("'" + value + "' is not a valid NodeState");
+        for (NodeState nodeState : values()) {
+            if (nodeState.toString().equals(value)) {
+                return nodeState;
+            }
+        }
+
+        throw new IllegalArgumentException("'" + value + "' is not a valid NodeState");
     }
 
     /**
-     * Gives a string representation of the state.
+     * Returns a string representation of the state.
+     *
      * @return String representation of the state.
      */
     @Override
     public String toString() {
         return desc;
     }
+
 }
