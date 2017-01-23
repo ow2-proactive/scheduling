@@ -6,8 +6,9 @@ import java.util.List;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
+import org.ow2.proactive.addons.email.exception.EmailException;
+import org.ow2.proactive.addons.email.exception.InvalidArgumentException;
+import org.ow2.proactive.addons.email.exception.MissingArgumentException;
 
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -77,9 +78,11 @@ public class JobEmailNotification {
         try {
             sender.sender(getTo(), getSubject(), getBody());
             return true;
-        } catch (AddressException e) {
+        } catch (InvalidArgumentException e) {
             throw new JobEmailNotificationException("Malformed email address", e);
-        } catch (MessagingException e) {
+        } catch (MissingArgumentException e) {
+            throw new JobEmailNotificationException("Error sending email (Missing argument): " + e.getMessage(), e);
+        } catch (EmailException e) {
             throw new JobEmailNotificationException("Error sending email: " + e.getMessage(), e);
         }
     }
