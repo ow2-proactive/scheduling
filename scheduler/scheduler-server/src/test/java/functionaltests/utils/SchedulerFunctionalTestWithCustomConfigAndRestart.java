@@ -51,7 +51,9 @@ public class SchedulerFunctionalTestWithCustomConfigAndRestart extends Scheduler
 
     @AfterClass
     public static void cleanupScheduler() throws Exception {
-        schedulerHelper.log("Kill Scheduler after test.");
-        schedulerHelper.killScheduler();
+        if (schedulerHelper != null) {
+            schedulerHelper.log("Kill Scheduler after test.");
+            schedulerHelper.killScheduler();
+        }
     }
 }

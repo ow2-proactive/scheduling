@@ -318,6 +318,33 @@ public class SchedulerTHelper {
     }
 
     /**
+     * Return Scheduler's interface. Start Scheduler if needed,
+     * connect as administrator if needed (if not yet connected as user).
+     *
+     * WARNING : if there was a previous connection as User, this connection is shut down.
+     * And so some event can be missed by event receiver, between disconnection and reconnection
+     * (only one connection to Scheduler per body is possible).
+     *
+     * @param username username
+     * @param password password
+     * @return scheduler interface
+     * @throws Exception if an error occurs.
+     */
+    public Scheduler getSchedulerInterface(String username, String password, byte[] key) throws Exception {
+
+        if (!SchedulerTestUser.getInstance().is(username, password)) { // changing user on the fly
+            SchedulerTestUser.getInstance().disconnectFromScheduler();
+            SchedulerTestUser.getInstance().connect(username, password, key, scheduler.getUrl());
+        }
+
+        if (!SchedulerTestUser.getInstance().isConnected()) {
+            SchedulerTestUser.getInstance().connect(username, password, key, scheduler.getUrl());
+        }
+
+        return SchedulerTestUser.getInstance().getScheduler();
+    }
+
+    /**
      * Submit a job, and return immediately.
      * Connect as user if needed (if not yet connected as user).
      * @param jobToSubmit job object to schedule.
@@ -499,7 +526,33 @@ public class SchedulerTHelper {
      *                   verification of events sequence.
      */
     public JobId testJobSubmission(Job jobToSubmit, boolean acceptSkipped, boolean failIfTaskError) throws Exception {
-        Scheduler userInt = getSchedulerInterface();
+        return testJobSubmission(getSchedulerInterface(), jobToSubmit, acceptSkipped, failIfTaskError);
+    }
+
+    /**
+     * Creates and submit a job from an XML job descriptor, and check, with assertions,
+     * event related to this job submission :
+     * 1/ job submitted event
+     * 2/ job passing from pending to running (with state set to running).
+     * 3/ job passing from running to finished (with state set to finished).
+     * 4/ every task finished with or without error (configurable)
+     * <p>
+     * Then returns.
+     * <p>
+     * This is the simplest events sequence of a job submission. If you need to test
+     * specific events or task states (failures, rescheduling etc, you must not use this
+     * helper and check events sequence with waitForEvent**() functions.
+     *
+     * @param userInt         scheduler interface
+     * @param jobToSubmit     job object to schedule.
+     * @param acceptSkipped   if true then skipped task will not fail the test
+     * @param failIfTaskError if true then the test will fail if a task was in error
+     * @return JobId, the job's identifier.
+     * @throws Exception if an error occurs at job submission, or during
+     *                   verification of events sequence.
+     */
+    public JobId testJobSubmission(Scheduler userInt, Job jobToSubmit, boolean acceptSkipped, boolean failIfTaskError)
+            throws Exception {
 
         JobId id = userInt.submit(jobToSubmit);
 
@@ -516,7 +569,7 @@ public class SchedulerTHelper {
         Assert.assertEquals("Job " + jInfo.getJobId(), JobStatus.RUNNING, jInfo.getStatus());
 
         log("Waiting for job finished");
-        jInfo = waitForEventJobFinished(id);
+        jInfo = waitForEventJobFinished(userInt, id);
         Assert.assertEquals("Job " + jInfo.getJobId(), JobStatus.FINISHED, jInfo.getStatus());
         log("Job finished");
 
@@ -666,8 +719,12 @@ public class SchedulerTHelper {
      * @return JobInfo event's associated object.
      */
     public JobInfo waitForEventJobFinished(JobId id) throws Exception {
+        return waitForEventJobFinished(getSchedulerInterface(), id);
+    }
+
+    public JobInfo waitForEventJobFinished(Scheduler userInterface, JobId id) throws Exception {
         try {
-            return waitForJobEvent(id, 0, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+            return waitForJobEvent(userInterface, id, 0, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         } catch (ProActiveTimeoutException e) {
             //unreachable block, 0 means infinite, no timeout
             //log sthing ?
@@ -690,11 +747,20 @@ public class SchedulerTHelper {
         return waitForJobEvent(id, timeout, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
     }
 
+    public JobInfo waitForEventJobFinished(Scheduler userInterface, JobId id, long timeout) throws Exception {
+        return waitForJobEvent(userInterface, id, timeout, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+    }
+
     private JobInfo waitForJobEvent(JobId id, long timeout, JobStatus jobStatusAfterEvent,
+            SchedulerEvent jobEvent) throws Exception {
+        return waitForJobEvent(getSchedulerInterface(), id, timeout, jobStatusAfterEvent, jobEvent);
+    }
+
+    private JobInfo waitForJobEvent(Scheduler userInterface, JobId id, long timeout, JobStatus jobStatusAfterEvent,
             SchedulerEvent jobEvent) throws Exception {
         JobState jobState = null;
         try {
-            jobState = getSchedulerInterface().getJobState(id);
+            jobState = userInterface.getJobState(id);
         } catch (UnknownJobException ignored) {
         }
         if (jobState != null && jobState.getStatus().equals(jobStatusAfterEvent)) {
