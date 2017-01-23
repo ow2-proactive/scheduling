@@ -210,7 +210,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * It corresponds to nodes that are in the `FREE` state and not locked.
      * Nodes which are locked are not part of this list.
      **/
-    private ArrayList<RMNode> freeNodes;
+    private ArrayList<RMNode> eligibleNodes;
 
     private SelectionManager selectionManager;
 
@@ -276,7 +276,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         nodeSources = new HashMap<>();
         brokenNodeSources = new ArrayList<>();
         allNodes = new HashMap<>();
-        freeNodes = new ArrayList<>();
+        eligibleNodes = new ArrayList<>();
 
         this.accountsManager = new RMAccountsManager();
         this.jmxHelper = new RMJMXHelper(this.accountsManager);
@@ -291,7 +291,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.caller = caller;
         this.monitoring = monitoring;
         this.selectionManager = manager;
-        this.freeNodes = freeNodesList;
+        this.eligibleNodes = freeNodesList;
         this.dataBaseManager = newDataBaseManager;
     }
 
@@ -499,8 +499,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // resetting owner here
         rmNode.setFree();
 
+        // an eligible node is a node that is free and not locked
         if (!rmNode.isLocked()) {
-            this.freeNodes.add(rmNode);
+            this.eligibleNodes.add(rmNode);
         }
 
         this.registerAndEmitNodeEvent(
@@ -579,7 +580,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         logger.debug("Removing node " + rmnode.getNodeURL() + " provided by " + rmnode.getProvider());
         // removing the node from the HM list
         if (rmnode.isFree()) {
-            freeNodes.remove(rmnode);
+            eligibleNodes.remove(rmnode);
         }
         this.allNodes.remove(rmnode.getNodeURL());
         // create the event
@@ -821,7 +822,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         // temporary list to avoid concurrent modification
         List<RMNode> nodelList = new LinkedList<>();
-        nodelList.addAll(freeNodes);
+        nodelList.addAll(eligibleNodes);
 
         logger.debug("Free nodes size " + nodelList.size());
         for (RMNode node : nodelList) {
@@ -1338,7 +1339,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
         rmNode.setBusy(owner);
-        this.freeNodes.remove(rmNode);
+        this.eligibleNodes.remove(rmNode);
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                 previousNodeState, owner.getName()));
@@ -1360,7 +1361,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // Get the previous state of the node needed for the event
             final NodeState previousNodeState = rmNode.getState();
             if (rmNode.isFree()) {
-                freeNodes.remove(rmNode);
+                eligibleNodes.remove(rmNode);
             }
             rmNode.setDown();
             // create the event
@@ -1395,7 +1396,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     public ArrayList<RMNode> getFreeNodes() {
-        return freeNodes;
+        return eligibleNodes;
     }
 
     /**
@@ -1471,7 +1472,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public RMState getState() {
-        RMStateNodeUrls rmStateNodeUrls = new RMStateNodeUrls(nodesListToUrlsSet(freeNodes), listAliveNodeUrls(), nodesListToUrlsSet(allNodes.values()));
+        RMStateNodeUrls rmStateNodeUrls = new RMStateNodeUrls(nodesListToUrlsSet(eligibleNodes), listAliveNodeUrls(), nodesListToUrlsSet(allNodes.values()));
         RMState state = new RMState(rmStateNodeUrls, maximumNumberOfNodes);
         return state;
     }
@@ -1710,7 +1711,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.checkNodeAdminPermission(rmnode, this.caller);
 
             rmnode.lock(this.caller);
-            this.freeNodes.remove(rmnode);
+            this.eligibleNodes.remove(rmnode);
         } catch (SecurityException ex) {
             logger.warn("", ex);
             return false;
@@ -1763,13 +1764,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.warn("Cannot unlock a node that is not locked: " + rmnode.getNodeURL());
             return false;
         }
+
         try {
             // can throw a security exception if the caller is not an admin
             this.checkNodeAdminPermission(rmnode, this.caller);
             rmnode.unlock(this.caller);
 
+            // an eligible node is a node that is free AND not locked
             if (rmnode.isFree()) {
-                freeNodes.add(rmnode);
+                eligibleNodes.add(rmnode);
             }
         } catch (Exception ex) {
             logger.warn("", ex);
