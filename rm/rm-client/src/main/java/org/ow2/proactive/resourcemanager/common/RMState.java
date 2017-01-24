@@ -77,7 +77,7 @@ public class RMState implements Serializable {
      * @return true if the scheduler has free resources, false if not.
      */
     public BooleanWrapper hasFreeResources() {
-        return new BooleanWrapper(!getRmNodeUrls().getFreeNodesUrls().isEmpty());
+        return new BooleanWrapper(!getFreeNodes().isEmpty());
     }
 
     /**
@@ -86,7 +86,7 @@ public class RMState implements Serializable {
      * @return free nodes number in the resource manager
      */
     public int getFreeNodesNumber() {
-        return getRmNodeUrls().getFreeNodesUrls().size();
+        return getFreeNodes().size();
     }
 
     /**
@@ -104,7 +104,7 @@ public class RMState implements Serializable {
      * @return total alive nodes number in the resource manager
      */
     public int getTotalAliveNodesNumber() {
-        return getRmNodeUrls().getAliveNodesUrls().size();
+        return getAliveNodes().size();
     }
 
     /**
@@ -122,7 +122,7 @@ public class RMState implements Serializable {
      * @return total nodes number in the resource manager
      */
     public int getTotalNodesNumber() {
-        return getRmNodeUrls().getAllNodesUrls().size();
+        return getAllNodes().size();
     }
 
     /**

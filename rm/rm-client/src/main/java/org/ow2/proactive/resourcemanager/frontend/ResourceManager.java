@@ -174,31 +174,29 @@ public interface ResourceManager {
 
     /**
      * Locks the set of nodes and makes them not available for others.
-     * The node state "locked" means that node cannot be used for computations by anyone
-     * and the main difference with busy is that it remains locked after a user disconnects
-     * from the resource manager (busy node becomes free in this case).
+     * The node state "locked" means that node cannot be used for computations by anyone.
      *
-     * Could be called only be node administrator, which is one of the following: rm admin,
+     * Could be called only by node administrator, which is one of the following: rm admin,
      * node source admin or node provider.
      *
-     * Only free nodes can be locked.
+     * Nodes can be locked whatever their state is.
      *
-     * @param urls is a set of free nodes
-     * @return true if all the nodes become locked, false otherwise
+     * @param urls is a set of nodes
+     * @return {@code true} if all the nodes become locked, {@code false} otherwise.
      *
      */
     BooleanWrapper lockNodes(Set<String> urls);
 
     /**
-     * Unlock nodes and makes them free. The specified nodes become
-     * available to other users for computations.
+     * Unlock nodes. The specified nodes become available to other users for computations.
+     * Real eligibility still depends on the Node state.
      *
-     * Could be called only be node administrator, which is one of the following: rm admin,
+     * Could be called only by node administrator, which is one of the following: rm admin,
      * node source admin or node provider.
      *
-     * @param urls is a set of nodes to be unlocked
+     * @param urls is a set of nodes to be unlocked.
      *
-     * @return true if all the nodes become free, false otherwise
+     * @return {@code true} if all the nodes are unlocked with success, {@code false} otherwise.
      */
     BooleanWrapper unlockNodes(Set<String> urls);
 

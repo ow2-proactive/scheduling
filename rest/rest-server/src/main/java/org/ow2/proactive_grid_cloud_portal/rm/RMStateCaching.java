@@ -131,12 +131,20 @@ public class RMStateCaching {
         rmUpdater = new Thread(new Runnable() {
             @Override
             public void run() {
+                boolean isDebugEnabled = logger.isDebugEnabled();
+                long startTime = 0;
+
                 while (!kill) {
                     try {
-                        long t1 = System.currentTimeMillis();
+                        if (isDebugEnabled) {
+                            startTime = System.currentTimeMillis();
+                        }
+
                         state = PAFuture.getFutureValue(rm.getRMInitialState());
-                        long t2 = System.currentTimeMillis();
-                        logger.debug("Updated RM initial state in " + (t2 - t1) + "ms");
+
+                        if (isDebugEnabled) {
+                            logger.debug("Updated RM initial state in " + (System.currentTimeMillis() - startTime) + "ms");
+                        }
                     } catch (Throwable t) {
                         logger
                                 .error("Exception occurrend while updating RM state cache, connection reset",

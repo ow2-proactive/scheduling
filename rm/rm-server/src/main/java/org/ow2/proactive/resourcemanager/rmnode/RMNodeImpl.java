@@ -36,6 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -46,7 +53,6 @@ import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.Script;
@@ -54,12 +60,6 @@ import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -81,9 +81,8 @@ import java.util.Map;
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
- *
  */
-public class RMNodeImpl implements RMNode, Serializable {
+public class RMNodeImpl extends AbstractRMNode {
 
     private final static Logger logger = Logger.getLogger(RMNodeImpl.class);
 
@@ -119,6 +118,25 @@ public class RMNodeImpl implements RMNode, Serializable {
 
     /** State of the node */
     private NodeState state;
+
+    /**
+     * Status associated to a ProActive Node.
+     * When a Node is locked, it is no longer eligible for Tasks execution.
+     * A ProActive node can be locked whatever its state is.
+     */
+    private boolean isLocked;
+
+    /**
+     * Defines the time at which the node has been locked.
+     * This field has a meaning when {@code isLocked} is {@code true} only.
+     */
+    private long lockTime = -1;
+
+    /**
+     * Defines who has locked the node.
+     * This field has a meaning when {@code isLocked} is {@code true} only.
+     */
+    private Client lockedBy;
 
     /** Time stamp of the latest state change */
     private long stateChangeTime;
@@ -171,6 +189,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Returns the name of the node.
      * @return the name of the node.
      */
+    @Override
     public String getNodeName() {
         return this.nodeName;
     }
@@ -178,6 +197,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getNode()
      */
+    @Override
     public Node getNode() {
         return this.node;
     }
@@ -186,6 +206,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Returns the Virtual node name of the RMNode.
      * @return the Virtual node name  of the RMNode.
      */
+    @Override
     public String getVNodeName() {
         return this.vnodeName;
     }
@@ -194,6 +215,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Returns the host name of the RMNode.
      * @return the host name of the RMNode.
      */
+    @Override
     public String getHostName() {
         return this.hostName;
     }
@@ -202,6 +224,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Returns the java virtual machine name of the RMNode.
      * @return the java virtual machine name of the RMNode.
      */
+    @Override
     public String getDescriptorVMName() {
         return this.jvmName;
     }
@@ -210,6 +233,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Returns the NodeSource name of the RMNode.
      * @return {@link NodeSource} name of the RMNode.
      */
+    @Override
     public String getNodeSourceName() {
         return this.nodeSourceName;
     }
@@ -218,6 +242,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Returns the unique id of the RMNode.
      * @return the unique id of the RMNode represented by its URL.
      */
+    @Override
     public String getNodeURL() {
         return nodeURL;
     }
@@ -225,6 +250,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * Changes the state of this node to {@link NodeState#BUSY}.
      */
+    @Override
     public void setBusy(Client owner) {
         this.state = NodeState.BUSY;
         this.stateChangeTime = System.currentTimeMillis();
@@ -234,6 +260,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * Changes the state of this node to {@link NodeState#FREE}.
      */
+    @Override
     public void setFree() {
         this.state = NodeState.FREE;
         this.stateChangeTime = System.currentTimeMillis();
@@ -243,6 +270,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * Changes the state of this node to {@link NodeState#CONFIGURING}
      */
+    @Override
     public void setConfiguring(Client owner) {
         if (!this.isDown()) {
             this.state = NodeState.CONFIGURING;
@@ -253,6 +281,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * Changes the state of this node to {@link NodeState#DOWN}.
      */
+    @Override
     public void setDown() {
         this.state = NodeState.DOWN;
         this.stateChangeTime = System.currentTimeMillis();
@@ -261,6 +290,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * Changes the state of this node to {@link NodeState#TO_BE_REMOVED}.
      */
+    @Override
     public void setToRemove() {
         this.state = NodeState.TO_BE_REMOVED;
         this.stateChangeTime = System.currentTimeMillis();
@@ -269,6 +299,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return true if the node is free, false otherwise.
      */
+    @Override
     public boolean isFree() {
         return this.state == NodeState.FREE;
     }
@@ -276,6 +307,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return true if the node is busy, false otherwise.
      */
+    @Override
     public boolean isBusy() {
         return this.state == NodeState.BUSY;
     }
@@ -283,6 +315,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return true if the node is down, false otherwise.
      */
+    @Override
     public boolean isDown() {
         return this.state == NodeState.DOWN;
     }
@@ -290,6 +323,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return true if the node is 'to be released', false otherwise.
      */
+    @Override
     public boolean isToRemove() {
         return this.state == NodeState.TO_BE_REMOVED;
     }
@@ -297,37 +331,78 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return true if the node is 'configuring', false otherwise.
      */
+    @Override
     public boolean isConfiguring() {
         return this.state == NodeState.CONFIGURING;
     }
 
+    @Override
     public boolean isLocked() {
-        return this.state == NodeState.LOCKED;
+        return isLocked;
+    }
+
+    @Override
+    public long getLockTime() {
+        return lockTime;
+    }
+
+    @Override
+    public Client getLockedBy() {
+        return lockedBy;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void lock(Client owner) {
-        this.state = NodeState.LOCKED;
-        this.stateChangeTime = System.currentTimeMillis();
-        this.owner = owner;
+    @Override
+    public void lock(Client client) {
+        this.isLocked = true;
+        this.lockTime = System.currentTimeMillis();
+        this.lockedBy = client;
+    }
+
+    @Override
+    public void unlock(Client client) {
+        this.isLocked = false;
+        this.lockTime = -1;
+        this.lockedBy = null;
     }
 
     /**
-     * @return a String showing informations about the node.
+     * @return a String showing information about the node.
      */
+    @Override
     public String getNodeInfo() {
         String newLine = System.lineSeparator();
         String nodeInfo = "Node " + nodeName + newLine;
-        nodeInfo += "URL : " + nodeURL + newLine;
-        nodeInfo += "Node source : " + nodeSourceName + newLine;
-        nodeInfo += "Provider : " + provider.getName() + newLine;
-        nodeInfo += "Used by : " + (owner == null ? "nobody" : owner.getName()) + newLine;
-        nodeInfo += "State : " + state + newLine;
+        nodeInfo += "URL: " + nodeURL + newLine;
+        nodeInfo += "Node source: " + nodeSourceName + newLine;
+        nodeInfo += "Provider: " + provider.getName() + newLine;
+        nodeInfo += "Used by: " + (owner == null ? "nobody" : owner.getName()) + newLine;
+        nodeInfo += "State: " + state + newLine;
+        nodeInfo += getLockStatus();
         nodeInfo += "JMX RMI: " + getJMXUrl(JMXTransportProtocol.RMI) + newLine;
         nodeInfo += "JMX RO: " + getJMXUrl(JMXTransportProtocol.RO) + newLine;
         return nodeInfo;
+    }
+
+    private String getLockStatus() {
+        String result = "Locked: " + Boolean.toString(isLocked);
+
+        if (isLocked) {
+            result += " (";
+
+            if (lockedBy != null) {
+                result += "by " + lockedBy.getName() + " ";
+            }
+
+            result += "since " + new Date(lockTime);
+            result += ")";
+        }
+
+        result += System.lineSeparator();
+
+        return result;
     }
 
     private void initHandler() throws NodeException {
@@ -355,8 +430,8 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @param script Selection script to execute
      * @param bindings bindings to use to execute the selection scripts
      * @return Result of the test.
-     *
      */
+    @Override
     public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
         try {
             this.initHandler();
@@ -376,6 +451,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * kill all active objects on the node.
      * @throws NodeException
      */
+    @Override
     public synchronized void clean() throws NodeException {
         handler = null;
         try {
@@ -412,6 +488,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Gives the HashMap of all scripts tested with corresponding results.
      * @return the HashMap of all scripts tested with corresponding results.
      */
+    @Override
     public HashMap<SelectionScript, Integer> getScriptStatus() {
         return this.scriptStatus;
     }
@@ -421,6 +498,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @param rmnode the RMNode object to compare
      * @return an integer
      */
+    @Override
     public int compareTo(RMNode rmnode) {
         if (this.getVNodeName().equals(rmnode.getVNodeName())) {
             if (this.getHostName().equals(rmnode.getHostName())) {
@@ -440,6 +518,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return the stub of the {@link NodeSource} that handle the RMNode.
      */
+    @Override
     public NodeSource getNodeSource() {
         return this.nodeSource;
     }
@@ -448,6 +527,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Set the NodeSource stub to the RMNode.
      * @param ns Stub of the NodeSource that handle the IMNode.
      */
+    @Override
     public void setNodeSource(NodeSource ns) {
         this.nodeSource = ns;
     }
@@ -455,13 +535,19 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getState()
      */
+    @Override
     public NodeState getState() {
         return this.state;
+    }
+
+    public void setState(NodeState nodeState) {
+        this.state = nodeState;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Client getOwner() {
         return owner;
     }
@@ -469,6 +555,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Client getProvider() {
         return provider;
     }
@@ -476,6 +563,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Permission getUserPermission() {
         return nodeAccessPermission;
     }
@@ -483,6 +571,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Permission getAdminPermission() {
         return new PrincipalPermission(provider.getName(), provider.getSubject().getPrincipals(
                 UserNamePrincipal.class));
@@ -491,6 +580,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RMNodeEvent getAddEvent() {
         return this.addEvent;
     }
@@ -498,6 +588,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RMNodeEvent getLastEvent() {
         return this.lastEvent;
     }
@@ -505,6 +596,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLastEvent(final RMNodeEvent lastEvent) {
         this.lastEvent = lastEvent;
     }
@@ -512,6 +604,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setAddEvent(final RMNodeEvent addEvent) {
         this.addEvent = addEvent;
     }
@@ -519,6 +612,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getStateChangeTime() {
         return stateChangeTime;
     }
@@ -526,14 +620,19 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setJMXUrl(JMXTransportProtocol protocol, String address) {
         jmxUrls[protocol.ordinal()] = address;
     }
 
+
+    @Override
     public String getJMXUrl(JMXTransportProtocol protocol) {
         return jmxUrls[protocol.ordinal()];
     }
 
+
+    @Override
     public boolean isProtectedByToken() {
         return protectedByToken;
     }
@@ -553,24 +652,6 @@ public class RMNodeImpl implements RMNode, Serializable {
         return rmNodeEvent;
     }
 
-    private RMNodeDescriptor toNodeDescriptor() {
-        RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
-        rmNodeDescriptor.setNodeURL(this.getNodeURL());
-        rmNodeDescriptor.setNodeSourceName(this.getNodeSourceName());
-        rmNodeDescriptor.setVNodeName(this.getVNodeName());
-        rmNodeDescriptor.setHostName(this.getHostName());
-        rmNodeDescriptor.setState(this.getState());
-        rmNodeDescriptor.setDefaultJMXUrl(getJMXUrl(JMXTransportProtocol.RMI));
-        rmNodeDescriptor.setProactiveJMXUrl(getJMXUrl(JMXTransportProtocol.RO));
-        rmNodeDescriptor.setDescriptorVMName(this.getDescriptorVMName());
-        rmNodeDescriptor.setStateChangeTime(this.getStateChangeTime());
-        rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
-        rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
-        rmNodeDescriptor.setNodeInfo(getNodeInfo());
-
-        return rmNodeDescriptor;
-    }
-
     @Override
     public RMNodeEvent createNodeEvent() {
         return createNodeEvent(null, null, null);
@@ -579,4 +660,5 @@ public class RMNodeImpl implements RMNode, Serializable {
     public void setProtectedByToken(boolean protectedByToken) {
         this.protectedByToken = protectedByToken;
     }
+
 }

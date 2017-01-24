@@ -105,6 +105,12 @@ public final class RMNodeEvent extends RMEvent {
     /** The node's proactive JMX url */
     private String proactiveJMXUrl;
 
+    private final boolean isLocked;
+
+    private final long lockTime;
+
+    private final String nodeLocker;
+
     /**
      * ProActive empty constructor
      */
@@ -122,6 +128,9 @@ public final class RMNodeEvent extends RMEvent {
         this.description = null;
         this.defaultJMXUrl = null;
         this.proactiveJMXUrl = null;
+        this.isLocked = false;
+        this.lockTime = -1;
+        this.nodeLocker = null;
     }
 
     /**
@@ -165,6 +174,10 @@ public final class RMNodeEvent extends RMEvent {
         this.previousNodeState = previousNodeState;
         this.nodeProvider = rmNode.getProviderName();
         this.nodeOwner = rmNode.getOwnerName();
+
+        this.isLocked = rmNode.isLocked();
+        this.lockTime = rmNode.getLockTime();
+        this.nodeLocker = rmNode.getLockedBy();
     }
 
     /**
@@ -300,6 +313,18 @@ public final class RMNodeEvent extends RMEvent {
      */
     public String getProactiveJMXUrl() {
         return proactiveJMXUrl;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public long getLockTime() {
+        return lockTime;
+    }
+
+    public String getNodeLocker() {
+        return nodeLocker;
     }
 
 }
