@@ -78,10 +78,6 @@ public class JobEmailNotification {
         try {
             sender.sender(getTo(), getSubject(), getBody());
             return true;
-        } catch (InvalidArgumentException e) {
-            throw new JobEmailNotificationException("Malformed email address", e);
-        } catch (MissingArgumentException e) {
-            throw new JobEmailNotificationException("Error sending email (Missing argument): " + e.getMessage(), e);
         } catch (EmailException e) {
             throw new JobEmailNotificationException("Error sending email: " + e.getMessage(), e);
         }

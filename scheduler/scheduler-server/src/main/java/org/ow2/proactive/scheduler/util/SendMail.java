@@ -3,7 +3,6 @@ package org.ow2.proactive.scheduler.util;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -13,6 +12,13 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public class SendMail {
 
+    /**
+     * Throws EmailException whenever configuration is wrong
+     * 
+     * @param to recipient
+     * @param subject email subject
+     * @param body email body
+     */
     public void sender(String to, String subject, String body) {
         final Properties properties = EmailConfiguration.getConfiguration().getProperties();
 
