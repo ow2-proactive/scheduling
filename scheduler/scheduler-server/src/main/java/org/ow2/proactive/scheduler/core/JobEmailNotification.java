@@ -7,8 +7,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.ow2.proactive.addons.email.exception.EmailException;
-import org.ow2.proactive.addons.email.exception.InvalidArgumentException;
-import org.ow2.proactive.addons.email.exception.MissingArgumentException;
 
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
