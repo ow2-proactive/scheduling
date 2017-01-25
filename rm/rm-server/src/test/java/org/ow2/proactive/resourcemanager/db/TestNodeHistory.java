@@ -92,6 +92,7 @@ public class TestNodeHistory {
         nodeHistory.setStartTime(startTime);
         nodeHistory.setEndTime(0);
         nodeHistory.setStoreInDataBase(true);
+        nodeHistory.setLocked(true);
 
         return nodeHistory;
     }

@@ -90,6 +90,9 @@ public class NodeHistory {
     @Column(name = "nodeState")
     private NodeState nodeState;
 
+    @Column(name = "locked")
+    private boolean locked;
+
     @Column(name = "startTime")
     protected long startTime;
 
@@ -118,6 +121,8 @@ public class NodeHistory {
         this.userName = event.getNodeOwner();
         this.providerName = event.getNodeProvider();
         this.nodeState = event.getNodeState();
+        this.locked = event.isLocked();
+
         this.startTime = event.getTimeStamp();
 
         storeInDataBase = true;
@@ -179,6 +184,14 @@ public class NodeHistory {
 
     public void setNodeState(NodeState nodeState) {
         this.nodeState = nodeState;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 
     public long getStartTime() {
