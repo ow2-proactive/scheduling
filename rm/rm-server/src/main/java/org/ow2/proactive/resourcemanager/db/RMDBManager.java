@@ -47,6 +47,11 @@ import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
@@ -55,11 +60,6 @@ import org.ow2.proactive.resourcemanager.core.history.Alive;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.apache.log4j.Logger;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 
 
 public class RMDBManager {
@@ -71,6 +71,8 @@ public class RMDBManager {
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
+
+    private long rmLastAliveTimeAfterStartup;
 
     private static final class LazyHolder {
 
@@ -158,15 +160,17 @@ public class RMDBManager {
             sessionFactory = configuration.buildSessionFactory();
             transactionHelper = new TransactionHelper(sessionFactory);
 
-            List<?> lastAliveTime = sqlQuery("from Alive");
-            if (lastAliveTime == null || lastAliveTime.size() == 0) {
+            List<?> lastAliveTimeResult = executeSqlQuery("from Alive");
+            if (lastAliveTimeResult == null || lastAliveTimeResult.size() == 0) {
                 createRmAliveTime();
             } else if (!drop) {
                 if (dropNS) {
                     removeNodeSources();
                 }
 
-                recover(((Alive) lastAliveTime.get(0)).getTime());
+                rmLastAliveTimeAfterStartup = ((Alive) lastAliveTimeResult.get(0)).getTime();
+
+                recover(rmLastAliveTimeAfterStartup);
             }
 
             int periodInMilliseconds = PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt();
@@ -177,7 +181,7 @@ public class RMDBManager {
                 public void run() {
                     updateRmAliveTime();
                 }
-            }, periodInMilliseconds, periodInMilliseconds);
+            }, 0, periodInMilliseconds);
 
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed", ex);
@@ -187,7 +191,7 @@ public class RMDBManager {
 
     private void recover(final long lastAliveTime) {
 
-        // updating node events with uncompleted end time        
+        // updating node events with uncompleted end time
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -206,7 +210,7 @@ public class RMDBManager {
             }
         });
 
-        // updating user events with uncompleted end time        
+        // updating user events with uncompleted end time
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -371,7 +375,7 @@ public class RMDBManager {
         });
     }
 
-    public List<?> sqlQuery(final String queryStr) {
+    public List<?> executeSqlQuery(final String queryStr) {
         return executeReadTransaction(new SessionWork<List<?>>() {
             @Override
             @SuppressWarnings("unchecked")
@@ -380,6 +384,17 @@ public class RMDBManager {
                 return query.list();
             }
         });
+    }
+
+    /**
+     * Returns the last timestamp at which the Resource Manager
+     * was acknowledged alive just after it started up.
+     *
+     * @return a Unix epoch time denoting the last timestamp at which
+     * the Resource Manager was acknowledged alive just after it started up.
+     */
+    public long getRmLastAliveTimeAfterStartup() {
+        return rmLastAliveTimeAfterStartup;
     }
 
 }

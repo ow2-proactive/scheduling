@@ -405,6 +405,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private void restoreNodeSources() {
         Collection<NodeSourceData> nodeSources = dataBaseManager.getNodeSources();
+
         for (NodeSourceData nsd : nodeSources) {
             if (NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nsd.getName())) {
                 // will be recreated by SchedulerStarter
