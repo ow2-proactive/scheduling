@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 
-public class TestNodeHistory {
+public class NodeHistoryTest {
 
     protected static RMDBManager dbManager;
 
