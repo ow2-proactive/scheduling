@@ -32,7 +32,7 @@
  *
  *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.task.utils;
+package org.ow2.proactive.scheduler.task.utils.task.termination;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.Sleeper;
@@ -42,7 +42,8 @@ public class TaskKiller {
 
     private static final Logger LOGGER = Logger.getLogger(TaskKiller.class);
 
-    private static final long CLEANUP_TIME_DEFAULT_SECONDS = 10;
+    private CleanupTimeoutGetter cleanupTimeoutGetter;
+
     private static final long SLEEP_MILLISECONDS_DURING_THREAD_INTERRUPT = 10;
     private static final long SLEEP_MILLISECONDS_BETWEEN_IS_THREAD_ALIVE_CHECK = 100;
     private static final long MULTIPLIER_FROM_SECONDS_TO_ITERATION_WITH_CLEANUP_TIME_SLEEPER = 10;
@@ -52,8 +53,9 @@ public class TaskKiller {
     private boolean wasKilled = false;
     private Status status = Status.NOT_YET_KILLED;
 
-    public TaskKiller(Thread threadToKill) { // executor service?
+    public TaskKiller(Thread threadToKill, CleanupTimeoutGetter cleanupTimeoutGetter) {
         this.threadToKill = threadToKill;
+        this.cleanupTimeoutGetter = cleanupTimeoutGetter;
     }
 
     public synchronized boolean wasKilled() {
@@ -70,22 +72,6 @@ public class TaskKiller {
         }
     }
 
-    private long getCleanupTimeSeconds() {
-        try {
-            String cleanupTimeString = System.getProperty(RMNodeStarter.SECONDS_TASK_CLEANUP_TIMEOUT_PROP_NAME);
-            if (cleanupTimeString != null) {
-                return Long.parseLong(cleanupTimeString);
-            } else {
-                return CLEANUP_TIME_DEFAULT_SECONDS;
-            }
-        } catch (NumberFormatException e) {
-            LOGGER.warn("proactive.task.cleanup.time: "
-                    + System.getProperty(RMNodeStarter.SECONDS_TASK_CLEANUP_TIMEOUT_PROP_NAME)
-                    + " is not parsable to long, fallback to default value. Error : "
-                    + e.getMessage());
-            return CLEANUP_TIME_DEFAULT_SECONDS;
-        }
-    }
 
     /**
      * Interrupts and gives the thread time to cleanup
@@ -93,7 +79,7 @@ public class TaskKiller {
     private void interruptAndWaitCleanupTime() {
         threadToKill.interrupt();
         long iterationsToHitWaitingTimeLimit =
-                getCleanupTimeSeconds() * MULTIPLIER_FROM_SECONDS_TO_ITERATION_WITH_CLEANUP_TIME_SLEEPER;
+                cleanupTimeoutGetter.getCleanupTimeSeconds() * MULTIPLIER_FROM_SECONDS_TO_ITERATION_WITH_CLEANUP_TIME_SLEEPER;
         for (long i = 0; threadToKill.isAlive() && i < iterationsToHitWaitingTimeLimit; i++) {
             cleanupTimeSleeper.sleep();
 

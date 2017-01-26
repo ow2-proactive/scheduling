@@ -37,6 +37,8 @@ package org.ow2.proactive.scheduler.task.utils;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.ow2.proactive.scheduler.task.utils.task.termination.TaskKiller;
+
 
 public class WallTimer {
 

@@ -74,8 +74,10 @@ import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
-import org.ow2.proactive.scheduler.task.utils.TaskKiller;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
+import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetter;
+import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetterDoubleValue;
+import org.ow2.proactive.scheduler.task.utils.task.termination.TaskKiller;
 
 import com.google.common.base.Stopwatch;
 
@@ -124,7 +126,8 @@ public class TaskLauncher implements InitActive {
         this.taskId = initializer.getTaskId();
         this.taskLogger = new TaskLogger(taskId, getHostname());
         this.progressFileReader = new ProgressFileReader();
-        this.taskKiller = new TaskKiller(Thread.currentThread());
+        this.taskKiller = new TaskKiller(Thread.currentThread(),
+                new CleanupTimeoutGetter());
         nodeShutdownHook = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -145,6 +148,8 @@ public class TaskLauncher implements InitActive {
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
         logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
+
+        this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
 
         WallTimer wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
 
@@ -247,6 +252,15 @@ public class TaskLauncher implements InitActive {
             } finally {
                 terminate();
             }
+        }
+    }
+
+    private TaskKiller replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(boolean isRunAsUser) {
+        if (isRunAsUser == true) {
+            return new TaskKiller(Thread.currentThread(),
+                    new CleanupTimeoutGetterDoubleValue());
+        } else {
+            return this.taskKiller;
         }
     }
 

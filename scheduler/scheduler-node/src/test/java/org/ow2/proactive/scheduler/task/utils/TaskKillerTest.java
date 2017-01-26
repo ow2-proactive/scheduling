@@ -3,9 +3,13 @@ package org.ow2.proactive.scheduler.task.utils;
 import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetter;
+import org.ow2.proactive.scheduler.task.utils.task.termination.TaskKiller;
 
 public class TaskKillerTest {
 
@@ -16,8 +20,10 @@ public class TaskKillerTest {
         KilledThread testThreadToBeInterrupted = new KilledThread();
         testThreadToBeInterrupted.start();
 
-        System.setProperty(this.taskKillerCleanupTimePropertyName, "5");
-        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted);
+        CleanupTimeoutGetter cleanupTimeoutGetterMock = mock(CleanupTimeoutGetter.class);
+        doReturn(5L).when(cleanupTimeoutGetterMock).getCleanupTimeSeconds();
+
+        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted, cleanupTimeoutGetterMock);
 
         assertThat("Task Killer must not interrupt thread before kill() is called",
                 testThreadToBeInterrupted.isInterruptedOnce, is(false));
@@ -44,43 +50,14 @@ public class TaskKillerTest {
     }
 
     @Test
-    public void testThatTaskKillerInterruptsThreadWithDefaultTimeoutWhenPropertyIsSetToGarbage() {
-        KilledThread testThreadToBeInterrupted = new KilledThread();
-        testThreadToBeInterrupted.start();
-
-        System.setProperty(this.taskKillerCleanupTimePropertyName, "A34Gf");
-        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted);
-
-        assertThat("Task Killer must not interrupt thread before kill() is called",
-                testThreadToBeInterrupted.isInterruptedOnce, is(false));
-        assertThat("Task Killer must not interrupt thread before kill() is called",
-                testThreadToBeInterrupted.isInterruptedMoreThanOnce, is(false));
-
-        startKilling(taskKiller);
-        // Wait a second for killing thread to start
-        waitOrFailTest(1000);
-
-        assertThat("Task Killer must interrupt once if kill() is called and then wait for the timeout which is set to 10 seconds.",
-                testThreadToBeInterrupted.isInterruptedOnce, is(true));
-        assertThat("Task Killer must only interrupt once (not twice) after kill() is called and then wait for the timeout which is set to 10 seconds.",
-                testThreadToBeInterrupted.isInterruptedMoreThanOnce, is(false));
-
-        // Wait 10 seconds for killing timeout to be exceeded
-        waitOrFailTest(10000);
-
-        assertThat("Task Killer must have interrupted at least twice after timeout has passed",
-                testThreadToBeInterrupted.isInterruptedMoreThanOnce, is(true));
-
-        // Cleanup - remove system property
-        System.clearProperty(this.taskKillerCleanupTimePropertyName);
-    }
-
-    @Test
     public void testThatTaskKillerInterruptsThreadThenWaitsUntilInterruptingAgainWithoutSystemPropertySet() {
         KilledThread testThreadToBeInterrupted = new KilledThread();
         testThreadToBeInterrupted.start();
 
-        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted);
+        CleanupTimeoutGetter cleanupTimeoutGetterMock = mock(CleanupTimeoutGetter.class);
+        doReturn(10L).when(cleanupTimeoutGetterMock).getCleanupTimeSeconds();
+
+        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted, cleanupTimeoutGetterMock);
 
         assertThat("Task Killer must not interrupt thread before kill() is called",
                 testThreadToBeInterrupted.isInterruptedOnce, is(false));
@@ -108,8 +85,10 @@ public class TaskKillerTest {
         KilledThread testThreadToBeInterrupted = new KilledThread();
         testThreadToBeInterrupted.start();
 
-        System.setProperty(this.taskKillerCleanupTimePropertyName, "0");
-        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted);
+        CleanupTimeoutGetter cleanupTimeoutGetterMock = mock(CleanupTimeoutGetter.class);
+        doReturn(0L).when(cleanupTimeoutGetterMock).getCleanupTimeSeconds();
+
+        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted, cleanupTimeoutGetterMock);
 
         assertThat("Task Killer must not interrupt thread before kill() is called",
                 testThreadToBeInterrupted.isInterruptedOnce, is(false));
@@ -134,8 +113,10 @@ public class TaskKillerTest {
         KilledThread testThreadToBeInterrupted = new KilledThread();
         testThreadToBeInterrupted.start();
 
-        System.setProperty(this.taskKillerCleanupTimePropertyName, "-20");
-        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted);
+        CleanupTimeoutGetter cleanupTimeoutGetterMock = mock(CleanupTimeoutGetter.class);
+        doReturn(-20L).when(cleanupTimeoutGetterMock).getCleanupTimeSeconds();
+
+        TaskKiller taskKiller = new TaskKiller(testThreadToBeInterrupted, cleanupTimeoutGetterMock);
 
         assertThat("Task Killer must not interrupt thread before kill() is called",
                 testThreadToBeInterrupted.isInterruptedOnce, is(false));
