@@ -5,40 +5,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-
-
 import org.apache.log4j.Logger;
-
+import org.ow2.proactive.addons.email.EmailSender;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class SendMail {
 
-    public void sender(String to, String subject, String body) throws MessagingException {
+    /**
+     * Throws EmailException whenever configuration is wrong
+     * 
+     * @param to recipient
+     * @param subject email subject
+     * @param body email body
+     */
+    public void sender(String to, String subject, String body) {
         final Properties properties = EmailConfiguration.getConfiguration().getProperties();
 
-        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(properties.getProperty("mail.smtp.username"),
-                        properties.getProperty("mail.smtp.password"));
-            }
-        });
-
-        Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString()));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-        message.setSubject(subject);
-        message.setText(body);
-
-        Transport.send(message);
+        EmailSender.Builder builder = new EmailSender.Builder(properties);
+        builder.setFrom(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString());
+        builder.addRecipient(to);
+        builder.setSubject(subject);
+        builder.setBody(body);
+        builder.build().sendPlainTextEmail();
     }
 
 }

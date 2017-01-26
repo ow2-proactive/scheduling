@@ -37,7 +37,8 @@ package org.ow2.proactive.resourcemanager.common.event;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 
 
-public class RMNodeDescriptor {
+public final class RMNodeDescriptor {
+
     private String nodeURL;
     private String nodeSourceName;
     private String VNodeName;
@@ -50,6 +51,10 @@ public class RMNodeDescriptor {
     private String providerName;
     private String ownerName;
     private String nodeInfo;
+
+    private boolean isLocked;
+    private long lockTime;
+    private String lockedBy;
 
     public String getNodeURL() {
         return nodeURL;
@@ -146,4 +151,29 @@ public class RMNodeDescriptor {
     public void setNodeInfo(String nodeInfo) {
         this.nodeInfo = nodeInfo;
     }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
+
+    public long getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(long lockTime) {
+        this.lockTime = lockTime;
+    }
+
+    public String getLockedBy() {
+        return lockedBy;
+    }
+
+    public void setLockedBy(String lockedBy) {
+        this.lockedBy = lockedBy;
+    }
+
 }

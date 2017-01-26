@@ -34,13 +34,8 @@
  */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Strings;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
@@ -50,7 +45,14 @@ import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.command.JavaPrefixCommandExtractor;
 import org.ow2.proactive.scripting.ForkEnvironmentScriptResult;
 import org.ow2.proactive.scripting.ScriptResult;
-import com.google.common.base.Strings;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 
 public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     private final static String javaHomePostfixJavaExecutable = File.separatorChar + "bin" + File.separatorChar + "java";
@@ -131,9 +133,13 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
 
     private StringBuilder getStandardClassPathEntries(Map<String, Serializable> variables) throws IOException {
         StringBuilder classpathEntries = new StringBuilder();
-        Serializable schedulerHomeSerializable = variables.get("PA_SCHEDULER_HOME");
-        if (schedulerHomeSerializable != null) {
-            File paHome = new File((String) schedulerHomeSerializable).getCanonicalFile();
+        String schedulerHome;
+        schedulerHome = System.getProperty(CentralPAPropertyRepository.PA_HOME.getName());
+        if (schedulerHome == null) {
+            schedulerHome = (String) variables.get("PA_SCHEDULER_HOME");
+        }
+        if (schedulerHome != null) {
+            File paHome = new File(schedulerHome).getCanonicalFile();
             File distLib = new File(paHome, "dist/lib").getCanonicalFile();
             if (distLib.exists()) {
                 File addons = new File(paHome, "addons").getCanonicalFile();

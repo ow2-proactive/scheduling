@@ -36,6 +36,19 @@
  */
 package org.ow2.proactive.resourcemanager.selection.policies;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -50,19 +63,6 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -82,6 +82,7 @@ public class TestNodeSourcePolicy {
             this.nsName = nsName;
         }
 
+        @Override
         public int compareTo(RMNode o) {
             return name.compareTo(o.getNodeName());
         }
@@ -90,10 +91,12 @@ public class TestNodeSourcePolicy {
             return null;
         }
 
+        @Override
         public HashMap<SelectionScript, Integer> getScriptStatus() {
             return null;
         }
 
+        @Override
         public void clean() throws NodeException {
         }
 
@@ -102,124 +105,172 @@ public class TestNodeSourcePolicy {
             return null;
         }
 
+        @Override
         public String getNodeName() {
             return name;
         }
 
+        @Override
         public org.objectweb.proactive.core.node.Node getNode() {
             return null;
         }
 
+        @Override
         public String getVNodeName() {
             return null;
         }
 
+        @Override
         public String getHostName() {
             return null;
         }
 
+        @Override
         public String getDescriptorVMName() {
             return null;
         }
 
+        @Override
         public String getNodeSourceName() {
             return nsName;
         }
 
+        @Override
         public String getNodeURL() {
             return null;
         }
 
+        @Override
         public NodeSource getNodeSource() {
             return null;
         }
 
+        @Override
         public NodeState getState() {
             return null;
         }
 
+        @Override
         public long getStateChangeTime() {
             return 0;
         }
 
+        @Override
         public Client getProvider() {
             return null;
         }
 
+        @Override
         public Client getOwner() {
             return null;
         }
 
+        @Override
         public Permission getUserPermission() {
             return null;
         }
 
+        @Override
         public Permission getAdminPermission() {
             return null;
         }
 
+        @Override
         public RMNodeEvent getAddEvent() {
             return null;
         }
 
+        @Override
         public RMNodeEvent getLastEvent() {
             return null;
         }
 
+        @Override
         public boolean isFree() {
             return false;
         }
 
+        @Override
         public boolean isDown() {
             return false;
         }
 
+        @Override
         public boolean isToRemove() {
             return false;
         }
 
+        @Override
         public boolean isBusy() {
             return false;
         }
 
+        @Override
         public boolean isConfiguring() {
             return false;
         }
 
+        @Override
         public boolean isLocked() {
             return false;
         }
 
+        @Override
+        public long getLockTime() {
+            return -1;
+        }
+
+        @Override
+        public Client getLockedBy() {
+            return null;
+        }
+
+        @Override
         public void setFree() {
         }
 
+        @Override
         public void setBusy(Client owner) {
         }
 
+        @Override
         public void setToRemove() {
         }
 
+        @Override
         public void setDown() {
         }
 
+        @Override
         public void setConfiguring(Client owner) {
         }
 
+        @Override
         public void lock(Client owner) {
         }
 
+        @Override
+        public void unlock(Client owner) {
+
+        }
+
+        @Override
         public void setNodeSource(NodeSource nodeSource) {
         }
 
+        @Override
         public void setAddEvent(RMNodeEvent addEvent) {
         }
 
+        @Override
         public void setLastEvent(RMNodeEvent lastEvent) {
         }
 
+        @Override
         public void setJMXUrl(JMXTransportProtocol protocol, String address) {
         }
 
+        @Override
         public String getJMXUrl(JMXTransportProtocol protocol) {
             return null;
         }
@@ -294,4 +345,5 @@ public class TestNodeSourcePolicy {
         }
         return nodes;
     }
+
 }

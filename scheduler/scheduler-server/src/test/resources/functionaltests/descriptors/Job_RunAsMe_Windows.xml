@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.7"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.7 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.7/schedulerjob.xsd"
+        name="RunAsMeJob"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+    <taskFlow>
+        <task name="Split">
+            <description>
+                <![CDATA[ This task defines some input, here strings to be processed. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <controlFlow>
+                <replicate>
+                    <script>
+                        <code language="groovy">
+                            <![CDATA[
+runs=10
+]]>
+                        </code>
+                    </script>
+                </replicate>
+            </controlFlow>
+        </task>
+        <task name="RunAsMeTask"
+              maxNumberOfExecution="1"
+
+
+              runAsMe="true">
+            <description>
+                <![CDATA[ This task will be replicated according to the 'runs' value specified in the replication script.                The replication index is used in each task's instance to select the input. ]]>
+            </description>
+            <depends>
+                <task ref="Split"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="cmd">
+                        <![CDATA[
+echo %USERNAME%
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Merge">
+            <description>
+                <![CDATA[ As a merge operation, we simply print the results from previous tasks. ]]>
+            </description>
+            <depends>
+                <task ref="RunAsMeTask"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println results
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>
