@@ -19,6 +19,9 @@ OSPL_E_CAUSE="CAUSE";
 OSLP_PACKAGE="org.objectweb.proactive.extensions.processbuilder.exception."
 #---------------
 
+
+trap "echo trapped signal" SIGTERM
+
 token=$1
 
 # temp file
