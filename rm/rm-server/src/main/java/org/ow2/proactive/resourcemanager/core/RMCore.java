@@ -127,6 +127,7 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Table;
 
 
 /**
@@ -404,6 +405,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void restoreNodeSources() {
+        Table<String, String, Integer> nodeLockingInformation =
+                dataBaseManager.getNodeLockingInformation();
+
+        System.out.println("Resource Manager locking information:");
+        for (String nodeSource : nodeLockingInformation.rowKeySet()) {
+            for (Entry<String, Integer> entry : nodeLockingInformation.row(nodeSource).entrySet()) {
+                System.out.println(nodeSource + " " + entry.getKey() + " " + entry.getValue());
+            }
+        }
+
         Collection<NodeSourceData> nodeSources = dataBaseManager.getNodeSources();
 
         for (NodeSourceData nsd : nodeSources) {

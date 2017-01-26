@@ -61,6 +61,10 @@ import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Table;
+
 
 public class RMDBManager {
 
@@ -349,6 +353,53 @@ public class RMDBManager {
                 return null;
             }
         });
+    }
+
+    /**
+     * Returns information about the nodes which have been locked on previous RM run.
+     * <p>
+     * The purpose of this method is to fetch the number of nodes locked per node source
+     * and host pair on the previous RM run.
+     *
+     * @return the number of nodes locked per node source and host pair on the previous RM run.
+     */
+    public Table<String, String, Integer> getNodeLockingInformation() {
+
+        List<Object[]> lockingInformation =
+                executeReadTransaction(new SessionWork<List<Object[]>>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public List<Object[]> doInTransaction(Session session) {
+                    return session.getNamedQuery("getNodeLockingInformation")
+                            .setLong("endTime", getRmLastAliveTimeAfterStartup()).list();
+            }
+        });
+
+        return groupNodeUrlsByHostAndNodeSource(lockingInformation);
+    }
+
+    private Table<String, String, Integer> groupNodeUrlsByHostAndNodeSource(List<Object[]> lockingInformation) {
+
+        Table<String, String, Integer> table =
+                HashBasedTable.create(lockingInformation.size(), 3);
+
+        for (Object[] row : lockingInformation) {
+
+            String nodeSource = (String) row[0];
+            String host = (String) row[1];
+
+            Integer nbNodes = table.get(nodeSource, host);
+
+            if (nbNodes == null) {
+                nbNodes = 1;
+            } else {
+                nbNodes++;
+            }
+
+            table.put(nodeSource, host, nbNodes);
+        }
+
+        return table;
     }
 
     protected void updateRmAliveTime() {

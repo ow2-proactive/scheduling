@@ -42,14 +42,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -57,11 +59,13 @@ import org.apache.log4j.Logger;
  * Basically for each node we store all state transitions and start/end time of each transition.
  */
 @Entity
-@Table(name = "NodeHistory", indexes = {
-        @Index(name = "NODE_HISTORY_NODE_URL", columnList = "nodeUrl"),
-        @Index(name = "NODE_HISTORY_USER_NAME", columnList = "userName"),
-        @Index(name = "NODE_HISTORY_END_TIME", columnList = "endTime")
-})
+@NamedQueries({ @NamedQuery(name = "getNodeLockingInformation", query = "select n.nodeSource, n.host, n.nodeUrl from NodeHistory n " +
+                                                                        "where n.endTime > 0 and n.endTime > :endTime and n.locked is true and n.host != '' " +
+                                                                        "group by n.nodeSource, n.host, n.nodeUrl") })
+@Table(name = "NodeHistory", indexes = { @Index(name = "NODE_HISTORY_NODE_URL", columnList = "nodeUrl"),
+                                         @Index(name = "NODE_HISTORY_USER_NAME", columnList = "userName"),
+                                         @Index(name = "NODE_HISTORY_END_TIME", columnList = "endTime"),
+                                         @Index(name = "NODE_HISTORY_LOCKED", columnList = "locked"), })
 public class NodeHistory {
 
     public static final Logger logger = Logger.getLogger(NodeHistory.class);
@@ -130,8 +134,7 @@ public class NodeHistory {
         //
         // when the node is removed do not create a new record - 
         // just updating the end time of the last state.
-        if (NodeState.TO_BE_REMOVED == event.getNodeState() ||
-                RMEventType.NODE_REMOVED == event.getEventType()) {
+        if (NodeState.TO_BE_REMOVED == event.getNodeState() || RMEventType.NODE_REMOVED == event.getEventType()) {
             // new node history event
             storeInDataBase = false;
             logger.debug("Creating new line in the data base for " + event);
@@ -217,5 +220,5 @@ public class NodeHistory {
     public void setStoreInDataBase(boolean storeInDataBase) {
         this.storeInDataBase = storeInDataBase;
     }
-
+    
 }
