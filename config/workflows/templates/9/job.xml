@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="urn:proactive:jobdescriptor:3.5"
-        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
-        name="Remote Visualization" projectName="2. Advanced Workflows"
-        priority="normal"
-        onTaskError="continueJobExecution"
-        maxNumberOfExecution="2"
->
-    <taskFlow>
-        <task name="Remote_Visualization">
-          <pre>
-            <script>
-              <code language="bash">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.7"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.7 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.7/schedulerjob.xsd"
+    name="Remote_Visualization" projectName="2. Advanced Workflows"
+    priority="normal"
+    onTaskError="continueJobExecution"
+    maxNumberOfExecution="2">
+  <taskFlow>
+    <task name="Remote_Visualization">
+      <pre>
+        <script>
+          <code language="bash">
             <![CDATA[
 echo '#
 # $Id: glass.dat,v 1.1 1998/04/15 19:16:41 lhecking Exp $
@@ -291,13 +290,13 @@ echo '#
   0.571879  -0.254617   1.101000
 0.626000 -0.000000 1.101000'>glass.dat
 ]]>
-              </code>
-            </script>
-          </pre>
-            <scriptExecutable>
-                <script>
-                    <code language="bash">
-                        <![CDATA[
+          </code>
+        </script>
+      </pre>
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
 #!/bin/bash
 # Create a X server with Xvnc and run a simple graphical app
 
@@ -309,7 +308,7 @@ if [ $? -eq 0 ]; then
     echo "PA_REMOTE_CONNECTION;$variables_PA_JOB_ID;$variables_PA_TASK_ID;vnc;$(hostname):5910"
     export DISPLAY=:10
     # RUN YOUR GUI BASED APPLICATION HERE
-    nohup jwm& gnuplot -e 'splot "glass.dat" with lines; pause 1000'
+    nohup jwm& gnuplot -e 'splot "glass.dat" with lines;  bind "q" "unset output ; exit gnuplot"; pause 120;'
 
     # To access it, go to the scheduler, enable remote visualization then on the "Tasks" tab, look for the rightmost column called "Visu" and click on the symbol there.
 
@@ -318,9 +317,9 @@ if [ $? -eq 0 ]; then
         exit
 fi
 ]]>
-                    </code>
-                </script>
-            </scriptExecutable>
-        </task>
-    </taskFlow>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
 </job>
