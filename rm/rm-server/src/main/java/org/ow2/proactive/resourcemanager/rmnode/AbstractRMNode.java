@@ -26,9 +26,14 @@
 package org.ow2.proactive.resourcemanager.rmnode;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
+import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 
 
 /**
@@ -37,6 +42,99 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
  * @since 16/01/17
  */
 public abstract class AbstractRMNode implements RMNode, Serializable {
+
+    /**
+     * Status associated to a ProActive Node.
+     * When a Node is locked, it is no longer eligible for Tasks execution.
+     * A ProActive node can be locked whatever its state is.
+     */
+    protected boolean isLocked;
+
+    /**
+     * Defines the time at which the node has been locked.
+     * This field has a meaning when {@code isLocked} is {@code true} only.
+     */
+    protected long lockTime = -1;
+
+    /**
+     * Defines who has locked the node.
+     * This field has a meaning when {@code isLocked} is {@code true} only.
+     */
+    protected Client lockedBy;
+
+    @Override
+    public RMNodeEvent createNodeEvent() {
+        return createNodeEvent(null, null, null);
+    }
+
+
+    @Override
+    public RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator) {
+
+        RMNodeEvent rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState, initiator);
+
+        // The rm node always keeps track on its last event, this is needed for rm node events logic
+        if (eventType != null) {
+            switch (eventType) {
+                case NODE_ADDED:
+                    this.setAddEvent(rmNodeEvent);
+                    break;
+            }
+            this.setLastEvent(rmNodeEvent);
+        }
+        return rmNodeEvent;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void lock(Client client) {
+        this.isLocked = true;
+        this.lockTime = System.currentTimeMillis();
+        this.lockedBy = client;
+    }
+
+    @Override
+    public void unlock(Client client) {
+        this.isLocked = false;
+        this.lockTime = -1;
+        this.lockedBy = null;
+    }
+
+    @Override
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    @Override
+    public long getLockTime() {
+        return lockTime;
+    }
+
+    @Override
+    public Client getLockedBy() {
+        return lockedBy;
+    }
+
+    protected String getLockStatus() {
+        String result = "Locked: " + Boolean.toString(isLocked);
+
+        if (isLocked) {
+            result += " (";
+
+            if (lockedBy != null) {
+                result += "by " + lockedBy.getName() + " ";
+            }
+
+            result += "since " + new Date(lockTime);
+            result += ")";
+        }
+
+        result += System.lineSeparator();
+
+        return result;
+    }
 
     protected RMNodeDescriptor toNodeDescriptor() {
 
@@ -58,6 +156,11 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         rmNodeDescriptor.setVNodeName(getVNodeName());
 
         return rmNodeDescriptor;
+    }
+
+    @Override
+    public String toString() {
+        return getNodeInfo();
     }
 
 }

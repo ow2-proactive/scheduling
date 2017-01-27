@@ -296,6 +296,11 @@ public class TestNodeSourcePolicy {
             return null;
         }
 
+        @Override
+        public boolean isDeploying() {
+            return false;
+        }
+
     }
 
     @Rule

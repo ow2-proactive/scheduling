@@ -207,6 +207,14 @@ public interface RMNode extends Comparable<RMNode> {
     //----------------------------------------------------------------------//
 
     /**
+     * Returns a boolean that says if the node is deploying or not.
+     *
+     * @return {@code true} if the node is an instance of {@link RMDeployingNode},
+     * {@code false} if it is an instance of {@link RMNodeImpl}.
+     */
+    boolean isDeploying();
+
+    /**
      * @return true if the node is free, false otherwise.
      */
     boolean isFree();
@@ -336,4 +344,5 @@ public interface RMNode extends Comparable<RMNode> {
     RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator);
 
     RMNodeEvent createNodeEvent();
+
 }

@@ -119,25 +119,6 @@ public class RMNodeImpl extends AbstractRMNode {
     /** State of the node */
     private NodeState state;
 
-    /**
-     * Status associated to a ProActive Node.
-     * When a Node is locked, it is no longer eligible for Tasks execution.
-     * A ProActive node can be locked whatever its state is.
-     */
-    private boolean isLocked;
-
-    /**
-     * Defines the time at which the node has been locked.
-     * This field has a meaning when {@code isLocked} is {@code true} only.
-     */
-    private long lockTime = -1;
-
-    /**
-     * Defines who has locked the node.
-     * This field has a meaning when {@code isLocked} is {@code true} only.
-     */
-    private Client lockedBy;
-
     /** Time stamp of the latest state change */
     private long stateChangeTime;
 
@@ -336,38 +317,6 @@ public class RMNodeImpl extends AbstractRMNode {
         return this.state == NodeState.CONFIGURING;
     }
 
-    @Override
-    public boolean isLocked() {
-        return isLocked;
-    }
-
-    @Override
-    public long getLockTime() {
-        return lockTime;
-    }
-
-    @Override
-    public Client getLockedBy() {
-        return lockedBy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void lock(Client client) {
-        this.isLocked = true;
-        this.lockTime = System.currentTimeMillis();
-        this.lockedBy = client;
-    }
-
-    @Override
-    public void unlock(Client client) {
-        this.isLocked = false;
-        this.lockTime = -1;
-        this.lockedBy = null;
-    }
-
     /**
      * @return a String showing information about the node.
      */
@@ -384,25 +333,6 @@ public class RMNodeImpl extends AbstractRMNode {
         nodeInfo += "JMX RMI: " + getJMXUrl(JMXTransportProtocol.RMI) + newLine;
         nodeInfo += "JMX RO: " + getJMXUrl(JMXTransportProtocol.RO) + newLine;
         return nodeInfo;
-    }
-
-    private String getLockStatus() {
-        String result = "Locked: " + Boolean.toString(isLocked);
-
-        if (isLocked) {
-            result += " (";
-
-            if (lockedBy != null) {
-                result += "by " + lockedBy.getName() + " ";
-            }
-
-            result += "since " + new Date(lockTime);
-            result += ")";
-        }
-
-        result += System.lineSeparator();
-
-        return result;
     }
 
     private void initHandler() throws NodeException {
@@ -637,28 +567,13 @@ public class RMNodeImpl extends AbstractRMNode {
         return protectedByToken;
     }
 
-    @Override
-    public RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator) {
-        RMNodeEvent rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState, initiator);
-        // The rm node always keeps track on its last event, this is needed for rm node events logic
-        if (eventType != null) {
-            switch (eventType) {
-                case NODE_ADDED:
-                    this.setAddEvent(rmNodeEvent);
-                    break;
-            }
-            this.setLastEvent(rmNodeEvent);
-        }
-        return rmNodeEvent;
-    }
-
-    @Override
-    public RMNodeEvent createNodeEvent() {
-        return createNodeEvent(null, null, null);
-    }
-
     public void setProtectedByToken(boolean protectedByToken) {
         this.protectedByToken = protectedByToken;
+    }
+
+    @Override
+    public boolean isDeploying() {
+        return false;
     }
 
 }

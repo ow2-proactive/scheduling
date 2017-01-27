@@ -58,8 +58,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 
 /**
  * This class stands for a node whose deployment has already been launched whereas the RMNode
- * has not been acquired by the RMCore yet. This purely informative.
- *
+ * has not been acquired by the RMCore yet. This is purely informative.
  */
 public final class RMDeployingNode extends AbstractRMNode {
 
@@ -341,6 +340,11 @@ public final class RMDeployingNode extends AbstractRMNode {
         return this.state == NodeState.LOST;
     }
 
+    @Override
+    public boolean isDeploying() {
+        return true;
+    }
+
     /**
      * Sets this deploying node's state to lost
      */
@@ -441,53 +445,17 @@ public final class RMDeployingNode extends AbstractRMNode {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @return false
-     */
-    @Override
-    public boolean isLocked() {
-        return false;
-    }
-
-    /**
-     * @return {@code -1}
-     */
-    @Override
-    public long getLockTime() {
-        return -1;
-    }
-
-    /**
-     * @return {@code null}
-     */
-    @Override
-    public Client getLockedBy() {
-        return null;
-    }
-
-    /**
-     * @throws UnsupportedOperationException
-     */
-    @Override
-    public void lock(Client owner) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void unlock(Client owner) {
-        throw new UnsupportedOperationException();
-    }
-
     @Override
     public String getNodeInfo() {
         String newLine = System.lineSeparator();
         String nodeInfo = "Node " + this.getNodeName() + newLine;
-        nodeInfo += "URL : " + this.getNodeURL() + newLine;
-        nodeInfo += "Node source : " + this.getNodeSourceName() + newLine;
-        nodeInfo += "Provider : " + this.getProvider().getName() + newLine;
-        nodeInfo += "State : " + this.getState() + newLine;
-        nodeInfo += "Description : " + this.getDescription() + newLine;
-        nodeInfo += "Command : " + this.getCommandLine() + newLine;
+        nodeInfo += "URL: " + this.getNodeURL() + newLine;
+        nodeInfo += "Node source: " + this.getNodeSourceName() + newLine;
+        nodeInfo += "Provider: " + this.getProvider().getName() + newLine;
+        nodeInfo += "State: " + this.getState() + newLine;
+        nodeInfo += getLockStatus();
+        nodeInfo += "Description: " + this.getDescription() + newLine;
+        nodeInfo += "Command: " + this.getCommandLine() + newLine;
         return nodeInfo;
     }
 
@@ -505,25 +473,6 @@ public final class RMDeployingNode extends AbstractRMNode {
         return false;
     }
 
-    @Override
-    public RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator) {
-        RMNodeEvent rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState, initiator);
-        // The rm node always keeps track on its last event, this is needed for rm node events logic
-        if (eventType != null) {
-            switch (eventType) {
-                case NODE_ADDED:
-                    this.setAddEvent(rmNodeEvent);
-                    break;
-            }
-            this.setLastEvent(rmNodeEvent);
-        }
-        return rmNodeEvent;
-    }
-
-    @Override
-    public RMNodeEvent createNodeEvent() {
-        return createNodeEvent(null, null, null);
-    }
 }
 
 /**

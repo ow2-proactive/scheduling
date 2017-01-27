@@ -475,8 +475,25 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return RMNode object containing the node.
      */
     private RMNode getNodebyUrl(String url) {
-        assert allNodes.containsKey(url);
         return allNodes.get(url);
+    }
+
+    protected RMNode getNodeByUrlIncludingDeployingNodes(String url) {
+        RMNode nodebyUrl = getNodebyUrl(url);
+
+        if (nodebyUrl != null) {
+            return nodebyUrl;
+        } else if (isDeployingNodeURL(url)) {
+            String[] chunks = url.split("/");
+            String nodeSourceName = chunks[2];
+            NodeSource nodeSource = nodeSources.get(nodeSourceName);
+
+            if (nodeSource != null) {
+                return nodeSource.getDeployingNode(url);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -1710,9 +1727,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, "lock");
     }
 
-    private boolean internalLockNode(RMNode rmnode) {
-        if (rmnode.isLocked()) {
-            logger.warn("Cannot lock a node that is already locked: " + rmnode.getNodeURL());
+    private boolean internalLockNode(RMNode rmNode) {
+        if (rmNode.isLocked()) {
+            logger.warn("Cannot lock a node that is already locked: " + rmNode.getNodeURL());
             // locking a node that is already locked must not update
             // the lock time neither change who has locked the node
             return false;
@@ -1720,21 +1737,22 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         try {
             // can throw a security exception if the caller is not an admin
-            this.checkNodeAdminPermission(rmnode, this.caller);
-
-            rmnode.lock(this.caller);
-            this.eligibleNodes.remove(rmnode);
+            this.checkNodeAdminPermission(rmNode, this.caller);
+            rmNode.lock(this.caller);
+            this.eligibleNodes.remove(rmNode);
         } catch (SecurityException ex) {
             logger.warn("", ex);
             return false;
         }
 
+        updateNode(rmNode);
+
         // sending the following event is required in order to have monitoring information
         // updated in the intermediate RM cache (see RMListenerProxy#nodeEvent)
         this.registerAndEmitNodeEvent(
-                rmnode.createNodeEvent(
+                rmNode.createNodeEvent(
                         RMEventType.NODE_STATE_CHANGED,
-                        rmnode.getState(),
+                        rmNode.getState(),
                         this.caller.getName()));
 
         return true;
@@ -1757,7 +1775,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         boolean result = true;
 
         for (String url : nodeUrls) {
-            RMNode rmnode = getNodebyUrl(url);
+            RMNode rmnode = getNodeByUrlIncludingDeployingNodes(url);
 
             if (rmnode == null) {
                 logger.warn("Cannot " + operationName + ", unknown node: " + url);
@@ -1771,33 +1789,47 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(result);
     }
 
-    private boolean internalUnlockNode(RMNode rmnode) {
-        if (!rmnode.isLocked()) {
-            logger.warn("Cannot unlock a node that is not locked: " + rmnode.getNodeURL());
+    private boolean internalUnlockNode(RMNode rmNode) {
+        if (!rmNode.isLocked()) {
+            logger.warn("Cannot unlock a node that is not locked: " + rmNode.getNodeURL());
             return false;
         }
 
         try {
             // can throw a security exception if the caller is not an admin
-            this.checkNodeAdminPermission(rmnode, this.caller);
-            rmnode.unlock(this.caller);
+            this.checkNodeAdminPermission(rmNode, this.caller);
+            rmNode.unlock(this.caller);
 
             // an eligible node is a node that is free AND not locked
-            if (rmnode.isFree()) {
-                eligibleNodes.add(rmnode);
+            if (rmNode.isFree()) {
+                eligibleNodes.add(rmNode);
             }
+
+            updateNode(rmNode);
         } catch (Exception ex) {
             logger.warn("", ex);
             return false;
         }
 
         this.registerAndEmitNodeEvent(
-                rmnode.createNodeEvent(
+                rmNode.createNodeEvent(
                         RMEventType.NODE_STATE_CHANGED,
-                        rmnode.getState(),
+                        rmNode.getState(),
                         caller.getName()));
 
         return true;
+    }
+
+    private void updateNode(RMNode rmNode) {
+        if (rmNode.isDeploying()) {
+            // A deploying node instance is retrieved from a NodeSource
+            // This last is an Active Object which returns a deep copy
+            // of the original object.
+            // As a consequence, any updates on the rmNode instance are not reflected
+            // to the instance stored in the NodeSource. The purpose of the following
+            // call is to update the information stored in the NodeSource.
+            rmNode.getNodeSource().update((RMDeployingNode) rmNode);
+        }
     }
 
     /**

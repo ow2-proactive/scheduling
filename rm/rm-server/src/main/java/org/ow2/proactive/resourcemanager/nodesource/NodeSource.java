@@ -400,6 +400,10 @@ public class NodeSource implements InitActive, RunActive {
         return rmnode;
     }
 
+    public RMDeployingNode update(RMDeployingNode rmNode) {
+        return infrastructureManager.update(rmNode);
+    }
+
     /**
      * Looks up the node
      */
@@ -626,6 +630,18 @@ public class NodeSource implements InitActive, RunActive {
         LinkedList<RMDeployingNode> result = new LinkedList<>();
         result.addAll(this.infrastructureManager.getDeployingNodes());
         return result;
+    }
+
+    /**
+     * Returns the deploying node identified by the specified {@code nodeUrl}.
+     *
+     * @param nodeUrl the URL of the deploying node to lookup.
+     * @return the deploying node found, or {@code null}. Since a node source
+     * is an Active Object, the caller will receive a deep copy of the original object.
+     */
+    @ImmediateService
+    public RMDeployingNode getDeployingNode(String nodeUrl) {
+        return infrastructureManager.getDeployingNode(nodeUrl);
     }
 
     /**

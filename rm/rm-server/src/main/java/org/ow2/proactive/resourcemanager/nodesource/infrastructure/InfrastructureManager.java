@@ -140,6 +140,16 @@ public abstract class InfrastructureManager implements Serializable {
 		return result;
 	}
 
+	public RMDeployingNode getDeployingNode(String nodeUrl) {
+		RMDeployingNode deployingNode = deployingNodes.get(nodeUrl);
+
+		if (deployingNode == null) {
+			return lostNodes.get(nodeUrl);
+		}
+
+		return deployingNode;
+	}
+
 	/**
 	 * To remove a deploying node given its url
 	 * 
@@ -549,7 +559,7 @@ public abstract class InfrastructureManager implements Serializable {
 			}
 		}
 		if (pn != null) {
-			logger.warn("Declaring node as lost: " + toUpdateURL + ", " + description);
+            logger.warn("Declaring node as lost: " + toUpdateURL + ", " + description);
 			NodeState previousState = pn.getState();
 			RMDeployingNodeAccessor.getDefault().setLost(pn);
 			if (description != null) {
@@ -558,6 +568,7 @@ public abstract class InfrastructureManager implements Serializable {
 			RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_STATE_CHANGED, previousState,
 					pn.getProvider().getName());
 			emitEvent(event);
+
 			if (logger.isTraceEnabled()) {
 				logger.trace(RMDeployingNode.class.getSimpleName() + " " + toUpdateURL + " declared lost in IM");
 			}
@@ -680,7 +691,28 @@ public abstract class InfrastructureManager implements Serializable {
 		return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
 	}
 
-	/**
+    /**
+     * Updates a deploying node.
+     * <p>
+     * The update is performed on deploying nodes first.
+     * If no node if found, lost nodes are considered.
+     *
+     * @param rmNode the new deploying node instance to use.
+     * @return the previous value or {@code null}.
+     */
+    public RMDeployingNode update(RMDeployingNode rmNode) {
+        String nodeUrl = rmNode.getNodeURL();
+
+        if (deployingNodes.containsKey(nodeUrl)) {
+            return deployingNodes.put(nodeUrl, rmNode);
+        } else if (lostNodes.containsKey(nodeUrl)) {
+            return lostNodes.put(nodeUrl, rmNode);
+        } else {
+            return null;
+        }
+    }
+
+    /**
 	 * Helper nested class. Used not to expose methods that should be package
 	 * private of the {@link RMDeployingNode} object.
 	 */
