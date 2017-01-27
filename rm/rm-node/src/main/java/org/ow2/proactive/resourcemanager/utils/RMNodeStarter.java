@@ -163,6 +163,7 @@ public class RMNodeStarter {
     protected static int NB_OF_RECONNECTION_ATTEMPTS = 2 * 5; // so 5 minutes by default
 
     public final static String SECONDS_TASK_CLEANUP_TIMEOUT_PROP_NAME = "proactive.node.task.cleanup.time";
+    public final static String SECONDS_TASK_CLEANUP_TIMEOUT_PROP_NAME_PROACTIVE_PROGRAMMING = "proactive.process.builder.cleanup.time.seconds";
     /** Name of the java property to set the number of attempts performed to add a node to the resource manager */
     public final static String NB_OF_RECONNECTION_ATTEMPTS_PROP_NAME = "proactive.node.reconnection.attempts";
 
