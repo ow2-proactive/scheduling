@@ -36,24 +36,17 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.*;
-import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
-import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
-import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
-import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.SelectionScript;
-import org.ow2.proactive.topology.descriptor.*;
-import org.w3c.dom.CDATASection;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,11 +57,38 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.NativeTask;
+import org.ow2.proactive.scheduler.common.task.ParallelEnvironment;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
+import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
+import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
+import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
+import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.MultipleHostsExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
+import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 
 /**
@@ -163,7 +183,7 @@ public class Job2XMLTransformer {
      * Creates the "job" element <define name="job">
      */
     private Element createRootJobElement(Document doc, TaskFlowJob job) {
-        Element rootJob = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, "job");
+        Element rootJob = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), "job");
 
         // ********** attributes ***********
         rootJob.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation",
@@ -245,7 +265,7 @@ public class Job2XMLTransformer {
      *
      */
     private Element createElement(Document doc, String tagName, String elementText, Attribute... attribs) {
-        Element el = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, tagName);
+        Element el = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), tagName);
         for (Attribute a : attribs) {
             el.setAttribute(a.getName(), a.getValue());
         }
@@ -263,7 +283,7 @@ public class Job2XMLTransformer {
         if (variables == null) {
             return null;
         }
-        Element variablesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.VARIABLES.getXMLName());
+        Element variablesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.VARIABLES.getXMLName());
         for (String name : variables.keySet()) {
             Element variableE = createElement(doc, XMLTags.VARIABLE.getXMLName(), null, new Attribute(
                     XMLAttributes.COMMON_NAME.getXMLName(), name), new Attribute(XMLAttributes.COMMON_VALUE
@@ -280,7 +300,7 @@ public class Job2XMLTransformer {
         if (variables == null) {
             return null;
         }
-        Element variablesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.VARIABLES.getXMLName());
+        Element variablesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.VARIABLES.getXMLName());
         for (TaskVariable variable : variables.values()) {
             Element variableE = createElement(doc, XMLTags.VARIABLE.getXMLName(), null, 
                     new Attribute( XMLAttributes.VARIABLE_NAME.getXMLName(), variable.getName()), 
@@ -301,7 +321,8 @@ public class Job2XMLTransformer {
         if (info == null)
             return null;
 
-        Element el = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.COMMON_GENERIC_INFORMATION.getXMLName());
+        Element el = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                         XMLTags.COMMON_GENERIC_INFORMATION.getXMLName());
 
         // <oneOrMore>
         // <ref name="info"/>
@@ -350,7 +371,8 @@ public class Job2XMLTransformer {
      *
      */
     private Element createTaskFlowElement(Document doc, TaskFlowJob job) {
-        Element taskFlowElement = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TASK_FLOW.getXMLName());
+        Element taskFlowElement = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                      XMLTags.TASK_FLOW.getXMLName());
 
         ArrayList<Task> tasks = job.getTasks();
 
@@ -369,7 +391,7 @@ public class Job2XMLTransformer {
      *
      */
     private Element createTaskElement(Document doc, Task task) {
-        Element taskE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TASK.getXMLName());
+        Element taskE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.TASK.getXMLName());
 
         // **** attributes *****
         // **** common attributes ***
@@ -429,9 +451,11 @@ public class Job2XMLTransformer {
         // <ref name="depends"/>
         List<Task> dependencies = task.getDependencesList();
         if ((dependencies != null) && (dependencies.size() > 0)) {
-            Element dependsE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TASK_DEPENDENCES.getXMLName());
+            Element dependsE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                   XMLTags.TASK_DEPENDENCES.getXMLName());
             for (Task dep : dependencies) {
-                Element dependsTask = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TASK_DEPENDENCES_TASK.getXMLName());
+                Element dependsTask = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                          XMLTags.TASK_DEPENDENCES_TASK.getXMLName());
                 setAttribute(dependsTask, XMLAttributes.TASK_DEPENDS_REF, dep.getName(), true);
                 dependsE.appendChild(dependsTask);
             }
@@ -441,10 +465,12 @@ public class Job2XMLTransformer {
         // <ref name="inputFiles"/>
         List<InputSelector> inputFiles = task.getInputFilesList();
         if (inputFiles != null) {
-            Element inputFilesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.DS_INPUT_FILES.getXMLName());
+            Element inputFilesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                      XMLTags.DS_INPUT_FILES.getXMLName());
             for (InputSelector inputSelector : inputFiles) {
                 FileSelector fs = inputSelector.getInputFiles();
-                Element filesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.DS_FILES.getXMLName());
+                Element filesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.DS_FILES.getXMLName());
                 // the xml only supports one value for the includes/excludes
                 // pattern
                 if (!fs.getIncludes().isEmpty())
@@ -468,7 +494,8 @@ public class Job2XMLTransformer {
         // <ref name="selection"/>
         List<SelectionScript> selectionScripts = task.getSelectionScripts();
         if (selectionScripts != null && selectionScripts.size() > 0) {
-            Element selectionE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_SELECTION.getXMLName());
+            Element selectionE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.SCRIPT_SELECTION.getXMLName());
             for (SelectionScript selectionScript : selectionScripts) {
                 Element scriptE = createScriptElement(doc, selectionScript);
                 selectionE.appendChild(scriptE);
@@ -486,7 +513,7 @@ public class Job2XMLTransformer {
         // <ref name="pre"/>
         Script preScript = task.getPreScript();
         if (preScript != null) {
-            Element preE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_PRE.getXMLName());
+            Element preE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.SCRIPT_PRE.getXMLName());
             Element scriptE = createScriptElement(doc, preScript);
             preE.appendChild(scriptE);
             taskE.appendChild(preE);
@@ -511,7 +538,7 @@ public class Job2XMLTransformer {
         // <ref name="post"/>
         Script postScript = task.getPostScript();
         if (postScript != null) {
-            Element postE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_POST.getXMLName());
+            Element postE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.SCRIPT_POST.getXMLName());
             Element scriptE = createScriptElement(doc, postScript);
             postE.appendChild(scriptE);
             taskE.appendChild(postE);
@@ -520,7 +547,8 @@ public class Job2XMLTransformer {
         // <ref name="cleaning"/>
         Script cleanScript = task.getCleaningScript();
         if (cleanScript != null) {
-            Element cleanE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_CLEANING.getXMLName());
+            Element cleanE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                 XMLTags.SCRIPT_CLEANING.getXMLName());
             Element scriptE = createScriptElement(doc, cleanScript);
             cleanE.appendChild(scriptE);
             taskE.appendChild(cleanE);
@@ -529,10 +557,12 @@ public class Job2XMLTransformer {
         // <ref name="outputFiles"/>
         List<OutputSelector> outputFiles = task.getOutputFilesList();
         if (outputFiles != null) {
-            Element outputFilesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.DS_OUTPUT_FILES.getXMLName());
+            Element outputFilesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                       XMLTags.DS_OUTPUT_FILES.getXMLName());
             for (OutputSelector outputSelector : outputFiles) {
                 FileSelector fs = outputSelector.getOutputFiles();
-                Element filesE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.DS_FILES.getXMLName());
+                Element filesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.DS_FILES.getXMLName());
                 // the xml only supports one value for the includes/excludes
                 // pattern
                 if (!fs.getIncludes().isEmpty())
@@ -562,7 +592,8 @@ public class Job2XMLTransformer {
         if (penv == null)
             return null;
 
-        Element parallelEnvE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.PARALLEL_ENV.getXMLName());
+        Element parallelEnvE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                   XMLTags.PARALLEL_ENV.getXMLName());
         setAttribute(parallelEnvE, XMLAttributes.TASK_NB_NODES, Integer.toString(penv.getNodesNumber()));
 
         // <ref name="topology"/>
@@ -579,28 +610,36 @@ public class Job2XMLTransformer {
             // <ref name="differentHostsExclusive"/>
             // </choice>
 
-            Element topologyE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TOPOLOGY.getXMLName());
+            Element topologyE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                    XMLTags.TOPOLOGY.getXMLName());
             Element topologyDescrE = null;
 
             if (topologyDescr instanceof ArbitraryTopologyDescriptor) {
-                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TOPOLOGY_ARBITRARY.getXMLName());
+                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.TOPOLOGY_ARBITRARY.getXMLName());
             } else if (topologyDescr instanceof ThresholdProximityDescriptor) {
-                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TOPOLOGY_THRESHOLD_PROXIMITY.getXMLName());
+                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.TOPOLOGY_THRESHOLD_PROXIMITY.getXMLName());
                 long threshold = ((ThresholdProximityDescriptor) topologyDescr).getThreshold();
                 topologyDescrE.setAttribute(XMLAttributes.TOPOLOGY_THRESHOLD.getXMLName(), Long
                         .toString(threshold));
             } else if (topologyDescr instanceof BestProximityDescriptor) {
-                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TOPOLOGY_BEST_PROXIMITY.getXMLName());
+                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.TOPOLOGY_BEST_PROXIMITY.getXMLName());
 
             } else if (topologyDescr instanceof SingleHostExclusiveDescriptor) {
-                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TOPOLOGY_SINGLE_HOST_EXCLUSIVE.getXMLName());
+                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.TOPOLOGY_SINGLE_HOST_EXCLUSIVE.getXMLName());
             } else if (topologyDescr instanceof SingleHostDescriptor) {
-                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TOPOLOGY_SINGLE_HOST.getXMLName());
+                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.TOPOLOGY_SINGLE_HOST.getXMLName());
             } else if (topologyDescr instanceof MultipleHostsExclusiveDescriptor) {
-                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TOPOLOGY_MULTIPLE_HOSTS_EXCLUSIVE.getXMLName());
+                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.TOPOLOGY_MULTIPLE_HOSTS_EXCLUSIVE.getXMLName());
             }
             if (topologyDescr instanceof DifferentHostsExclusiveDescriptor) {
-                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TOPOLOGY_DIFFERENT_HOSTS_EXCLUSIVE.getXMLName());
+                topologyDescrE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.TOPOLOGY_DIFFERENT_HOSTS_EXCLUSIVE.getXMLName());
             }
 
             if (topologyDescrE != null) {
@@ -624,7 +663,7 @@ public class Job2XMLTransformer {
 
         // <ref name="block"/>
         if (task.getFlowBlock() != FlowBlock.NONE) {
-            controlFlowE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FLOW.getXMLName());
+            controlFlowE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.FLOW.getXMLName());
             setAttribute(controlFlowE, XMLAttributes.FLOW_BLOCK, task.getFlowBlock().toString());
         }
 
@@ -644,7 +683,7 @@ public class Job2XMLTransformer {
             // *** if ***
             // <element name="if">
             if (flowScript.getActionType().equals(FlowActionType.IF.toString())) {
-                flowActionE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FLOW_IF.getXMLName());
+                flowActionE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.FLOW_IF.getXMLName());
                 setAttribute(flowActionE, XMLAttributes.FLOW_TARGET, flowScript.getActionTarget(), true);
                 setAttribute(flowActionE, XMLAttributes.FLOW_ELSE, flowScript.getActionTargetElse(), true);
                 setAttribute(flowActionE, XMLAttributes.FLOW_CONTINUATION,
@@ -654,19 +693,20 @@ public class Job2XMLTransformer {
             // *** loop ***
             // <element name="loop">
             if (flowScript.getActionType().equals(FlowActionType.LOOP.toString())) {
-                flowActionE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FLOW_LOOP.getXMLName());
+                flowActionE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.FLOW_LOOP.getXMLName());
                 setAttribute(flowActionE, XMLAttributes.FLOW_TARGET, flowScript.getActionTarget(), true);
             }
 
             // *** replicate ***
             // <element name="replicate">
             if (flowScript.getActionType().equals(FlowActionType.REPLICATE.toString())) {
-                flowActionE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FLOW_REPLICATE.getXMLName());
+                flowActionE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                  XMLTags.FLOW_REPLICATE.getXMLName());
             }
 
             if (flowActionE != null) {
                 if (controlFlowE == null) {
-                    controlFlowE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FLOW.getXMLName());
+                    controlFlowE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.FLOW.getXMLName());
                 }
                 Element scriptE = createScriptElement(doc, flowScript);
                 flowActionE.appendChild(scriptE);
@@ -696,8 +736,9 @@ public class Job2XMLTransformer {
      *
      */
     private Element createScriptElement(Document doc, Script script) {
-        Element scriptElement = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_SCRIPT.getXMLName());
-        Element codeE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_CODE.getXMLName());
+        Element scriptElement = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                    XMLTags.SCRIPT_SCRIPT.getXMLName());
+        Element codeE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.SCRIPT_CODE.getXMLName());
         setAttribute(codeE, XMLAttributes.LANGUAGE, script.getEngineName(), true);
         String scriptText = script.getScript();
         Serializable[] params = script.getParameters();
@@ -736,7 +777,8 @@ public class Job2XMLTransformer {
      *
      */
     private Element createJavaExecutableElement(Document doc, JavaTask t) {
-        Element executableE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.JAVA_EXECUTABLE.getXMLName());
+        Element executableE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                  XMLTags.JAVA_EXECUTABLE.getXMLName());
         setAttribute(executableE, XMLAttributes.TASK_CLASS_NAME, t.getExecutableClassName(), true);
 
         // <ref name="javaParameters"/>
@@ -744,10 +786,12 @@ public class Job2XMLTransformer {
             Map<String, Serializable> args = t.getArguments();
             if ((args != null) && (args.size() > 0)) {
                 // <element name="parameter">
-                Element paramsE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TASK_PARAMETERS.getXMLName());
+                Element paramsE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                      XMLTags.TASK_PARAMETERS.getXMLName());
                 for (String name : args.keySet()) {
                     Serializable val = args.get(name);
-                    Element paramE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.TASK_PARAMETER.getXMLName());
+                    Element paramE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                         XMLTags.TASK_PARAMETER.getXMLName());
                     setAttribute(paramE, XMLAttributes.COMMON_NAME, name, true);
                     setAttribute(paramE, XMLAttributes.COMMON_VALUE, val.toString(), true);
                     paramsE.appendChild(paramE);
@@ -765,7 +809,8 @@ public class Job2XMLTransformer {
      *
      */
     private Element createForkEnvironmentElement(Document doc, ForkEnvironment fe) {
-        Element forkEnvE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FORK_ENVIRONMENT.getXMLName());
+        Element forkEnvE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                               XMLTags.FORK_ENVIRONMENT.getXMLName());
         // attributes
         setAttribute(forkEnvE, XMLAttributes.TASK_WORKDING_DIR, fe.getWorkingDir(), true);
         setAttribute(forkEnvE, XMLAttributes.FORK_JAVA_HOME, fe.getJavaHome(), true);
@@ -773,14 +818,16 @@ public class Job2XMLTransformer {
         // <ref name="sysProps"/>
         if ((fe.getSystemEnvironment() != null) && (fe.getSystemEnvironment().keySet().size() > 0)) {
             // <element name="SystemEnvironment">
-            Element sysEnvE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FORK_SYSTEM_PROPERTIES.getXMLName());
+            Element sysEnvE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                  XMLTags.FORK_SYSTEM_PROPERTIES.getXMLName());
             if (fe.getSystemEnvironment() != null) {
 
                 // <oneOrMore>
                 // <ref name="sysProp"/>
                 // </oneOrMore>
                 for (Map.Entry<String, String> entry : fe.getSystemEnvironment().entrySet()) {
-                    Element variableE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.VARIABLE.getXMLName());
+                    Element variableE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                            XMLTags.VARIABLE.getXMLName());
                     setAttribute(variableE, XMLAttributes.COMMON_NAME, entry.getKey());
                     setAttribute(variableE, XMLAttributes.COMMON_VALUE, entry.getValue());
 
@@ -793,9 +840,11 @@ public class Job2XMLTransformer {
         // <ref name="jvmArgs"/>
         List<String> args = fe.getJVMArguments();
         if (args != null && (args.size() > 0)) {
-            Element jvmArgsE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FORK_JVM_ARGS.getXMLName());
+            Element jvmArgsE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                   XMLTags.FORK_JVM_ARGS.getXMLName());
             for (String arg : args) {
-                Element argE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FORK_JVM_ARG.getXMLName());
+                Element argE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                   XMLTags.FORK_JVM_ARG.getXMLName());
                 setAttribute(argE, XMLAttributes.COMMON_VALUE, arg, true);
                 jvmArgsE.appendChild(argE);
             }
@@ -805,9 +854,11 @@ public class Job2XMLTransformer {
         // <ref name="additionalClasspath"/>
         List<String> additionalCP = fe.getAdditionalClasspath();
         if ((additionalCP != null) && (additionalCP.size() > 0)) {
-            Element additionalCPE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FORK_ADDITIONAL_CLASSPATH.getXMLName());
+            Element additionalCPE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                        XMLTags.FORK_ADDITIONAL_CLASSPATH.getXMLName());
             for (String pathElement : additionalCP) {
-                Element pathE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.FORK_PATH_ELEMENT.getXMLName());
+                Element pathE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                    XMLTags.FORK_PATH_ELEMENT.getXMLName());
                 setAttribute(pathE, XMLAttributes.PATH, pathElement, true);
                 additionalCPE.appendChild(pathE);
             }
@@ -817,7 +868,8 @@ public class Job2XMLTransformer {
 
         // <ref name="envScript"/>
         if (fe.getEnvScript() != null) {
-            Element envScriptE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_ENV.getXMLName());
+            Element envScriptE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.SCRIPT_ENV.getXMLName());
             Element scriptElement = createScriptElement(doc, fe.getEnvScript());
             envScriptE.appendChild(scriptElement);
             forkEnvE.appendChild(envScriptE);
@@ -829,7 +881,8 @@ public class Job2XMLTransformer {
      * Corresponds to <element name="nativeExecutable">
      */
     private Element createNativeExecutableElement(Document doc, NativeTask t) {
-        Element nativeExecE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.NATIVE_EXECUTABLE.getXMLName());
+        Element nativeExecE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                  XMLTags.NATIVE_EXECUTABLE.getXMLName());
 
         // <choice>
         // <ref name="staticCommand"/>
@@ -838,16 +891,19 @@ public class Job2XMLTransformer {
         String[] cmd = t.getCommandLine();
         if (cmd != null && cmd.length > 0) {
             // <element name="staticCommand">
-            Element staticCmdE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.NATIVE_TASK_STATIC_COMMAND.getXMLName());
+            Element staticCmdE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                     XMLTags.NATIVE_TASK_STATIC_COMMAND.getXMLName());
             setAttribute(staticCmdE, XMLAttributes.TASK_COMMAND_VALUE, cmd[0], true);
 
             // <ref name="commandArguments"/>
             if (cmd.length > 1) {
                 // <element name="arguments">
-                Element argsE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.NATIVE_TASK_ARGUMENTS.getXMLName());
+                Element argsE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                    XMLTags.NATIVE_TASK_ARGUMENTS.getXMLName());
                 for (int i = 1; i < cmd.length; i++) {
                     // <element name="argument">
-                    Element argE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.NATIVE_TASK_ARGUMENT.getXMLName());
+                    Element argE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                       XMLTags.NATIVE_TASK_ARGUMENT.getXMLName());
                     setAttribute(argE, XMLAttributes.COMMON_VALUE, cmd[i], true);
                     argsE.appendChild(argE);
                 }
@@ -862,7 +918,8 @@ public class Job2XMLTransformer {
     }
 
     private Element createScriptExecutableElement(Document doc, ScriptTask t) {
-        Element scriptExecE = doc.createElementNS(Schemas.SCHEMA_LATEST.namespace, XMLTags.SCRIPT_EXECUTABLE.getXMLName());
+        Element scriptExecE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                  XMLTags.SCRIPT_EXECUTABLE.getXMLName());
         Element scriptE = createScriptElement(doc, t.getScript());
         scriptExecE.appendChild(scriptE);
         return scriptExecE;

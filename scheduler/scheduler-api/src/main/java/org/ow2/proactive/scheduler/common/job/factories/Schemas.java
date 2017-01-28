@@ -71,15 +71,11 @@ public enum Schemas {
     // should contain a reference to the last one declared, see #validate
     SCHEMA_LATEST(SCHEMA_3_7.location, SCHEMA_3_7.namespace);
 
-    String location;
-    String namespace;
+    private String location;
 
-    Schemas(String location, String namespace) {
-        this.location = location;
-        this.namespace = namespace;
-    }
+    private String namespace;
 
-    protected static Map<String, Schemas> SCHEMAS_BY_NAMESPACE;
+    private static final Map<String, Schemas> SCHEMAS_BY_NAMESPACE;
 
     static {
         SCHEMAS_BY_NAMESPACE = new HashMap<>(Schemas.values().length, 1.0f);
@@ -87,6 +83,23 @@ public enum Schemas {
         for (Schemas schema : Schemas.values()) {
             SCHEMAS_BY_NAMESPACE.put(schema.namespace, schema);
         }
+    }
+
+    Schemas(String location, String namespace) {
+        this.location = location;
+        this.namespace = namespace;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public static Schemas getSchemaByNamespace(String namespace) {
+        return SCHEMAS_BY_NAMESPACE.get(namespace);
     }
 
 }
