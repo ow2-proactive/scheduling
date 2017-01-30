@@ -45,7 +45,15 @@ public class ModelFromURLParserValidator extends BaseParserValidator<String> {
 
     public static final String MODEL_FROM_URL_TYPE = "MODEL_FROM_URL";
 
-    public static final String MODEL_FROM_URL_TYPE_REGEXP = "[Mm][Oo][Dd][Ee][Ll]_[Ff][Rr][Oo][Mm]_[Uu][Rr][Ll]";
+    public static final String LEFT_DELIMITER = "(";
+
+    public static final String RIGHT_DELIMITER = ")";
+
+    protected static final String MODEL_FROM_URL_TYPE_REGEXP = "[Mm][Oo][Dd][Ee][Ll]_[Ff][Rr][Oo][Mm]_[Uu][Rr][Ll]";
+
+    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
+
+    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
 
     public ModelFromURLParserValidator(String model) throws ModelSyntaxException {
         super(model);
@@ -84,7 +92,8 @@ public class ModelFromURLParserValidator extends BaseParserValidator<String> {
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
-        String modelFromUrlRegexp = "^" + MODEL_FROM_URL_TYPE_REGEXP + "\\((.+)\\)$";
+        String modelFromUrlRegexp = "^" + MODEL_FROM_URL_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "(.+)" +
+                                    RIGHT_DELIMITER_REGEXP + "$";
 
         String urlString = parseAndGetOneGroup(model, modelFromUrlRegexp);
 

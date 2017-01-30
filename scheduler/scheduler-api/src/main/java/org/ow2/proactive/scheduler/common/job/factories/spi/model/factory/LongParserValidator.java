@@ -34,7 +34,7 @@ public class LongParserValidator extends RangeParserValidator<Long> {
 
     public static final String LONG_TYPE = "LONG";
 
-    public static final String LONG_TYPE_REGEXP = "[Ll][Oo][Nn][Gg]";
+    protected static final String LONG_TYPE_REGEXP = "[Ll][Oo][Nn][Gg]";
 
 
     public LongParserValidator(String model) throws ModelSyntaxException {

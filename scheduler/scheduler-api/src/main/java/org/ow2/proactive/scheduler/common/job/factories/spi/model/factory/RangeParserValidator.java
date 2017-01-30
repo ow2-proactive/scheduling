@@ -38,6 +38,17 @@ import com.google.common.collect.Range;
 
 public abstract class RangeParserValidator<T extends Comparable<T>> extends BaseParserValidator<T> {
 
+    public static final String LEFT_RANGE_DELIMITER = "[";
+
+    public static final String RIGHT_RANGE_DELIMITER = "]";
+
+    protected static final String LEFT_RANGE_DELIMITER_REGEXP = "\\" + LEFT_RANGE_DELIMITER;
+
+    protected static final String RIGHT_RANGE_DELIMITER_REGEXP = "\\" + RIGHT_RANGE_DELIMITER;
+
+    protected static final String RANGE_MAIN_REGEXP = LEFT_RANGE_DELIMITER_REGEXP + "([^)]+)" +
+                                                      RIGHT_RANGE_DELIMITER_REGEXP;
+
     public RangeParserValidator(String model) throws ModelSyntaxException {
         super(model);
     }
@@ -47,7 +58,7 @@ public abstract class RangeParserValidator<T extends Comparable<T>> extends Base
         if (model.matches(getTypeRegexp())) {
             return new RangeValidator();
         }
-        String mainRangeRegexp = "^" + getTypeRegexp() + "\\((.+)\\)$";
+        String mainRangeRegexp = "^" + getTypeRegexp() + RANGE_MAIN_REGEXP + "$";
         String rangeString = parseAndGetOneGroup(model, mainRangeRegexp);
         try {
             return new RangeValidator<>(extractRange(rangeString, converter));

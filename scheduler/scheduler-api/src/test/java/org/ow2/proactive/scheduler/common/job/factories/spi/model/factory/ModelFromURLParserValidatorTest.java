@@ -41,9 +41,10 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 
 public class ModelFromURLParserValidatorTest {
 
-    public static final String VALID_LIST_MODEL_PARAMETER = "(1,2,3)";
+    public static final String VALID_LIST_MODEL_PARAMETER = ListParserValidator.LEFT_DELIMITER + "1,2,3" +
+                                                            ListParserValidator.RIGHT_DELIMITER;
 
-    public static final String INVALID_LIST_MODEL_PARAMETER = "(1,2,";
+    public static final String INVALID_LIST_MODEL_PARAMETER = ListParserValidator.LEFT_DELIMITER + "1,2,"; // missing right delimiter
 
     public static final String INVALID_URL = "wrongurl";
 
@@ -75,44 +76,49 @@ public class ModelFromURLParserValidatorTest {
         Assert.assertEquals(VALID_VALUE,
                             new ModelFromURLParserValidator(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE + "(" +
                                                             tempFile.toURI().toURL() +
-                                                            ")").parseAndValidate(VALID_VALUE));
+                                                            ModelFromURLParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_VALUE));
     }
 
     @Test(expected = ValidationException.class)
     public void testModelFromURLParserValidatorKO()
             throws ModelSyntaxException, ValidationException, ConversionException, IOException {
         File tempFile = generateModelFile(VALID_LIST_MODEL_PARAMETER);
-        new ModelFromURLParserValidator(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE + "(" +
-                                        tempFile.toURI().toURL() + ")").parseAndValidate(INVALID_VALUE);
+        new ModelFromURLParserValidator(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE +
+                                        ModelFromURLParserValidator.LEFT_DELIMITER + tempFile.toURI().toURL() +
+                                        ModelFromURLParserValidator.RIGHT_DELIMITER).parseAndValidate(INVALID_VALUE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testModelFromURLParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException, IOException {
         File tempFile = generateModelFile(VALID_LIST_MODEL_PARAMETER);
-        new ModelFromURLParserValidator("ILLEGAL_" + ModelFromURLParserValidator.MODEL_FROM_URL_TYPE + "(" +
-                                        tempFile.toURI().toURL() + ")").parseAndValidate(VALID_VALUE);
+        new ModelFromURLParserValidator("ILLEGAL_" + ModelFromURLParserValidator.MODEL_FROM_URL_TYPE +
+                                        ModelFromURLParserValidator.LEFT_DELIMITER + tempFile.toURI().toURL() +
+                                        ModelFromURLParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_VALUE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testModelFromURLParserValidatorInvalidURL()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new ModelFromURLParserValidator(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE + "(" + INVALID_URL +
-                                        ")").parseAndValidate(VALID_VALUE);
+        new ModelFromURLParserValidator(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE +
+                                        ModelFromURLParserValidator.LEFT_DELIMITER + INVALID_URL +
+                                        ModelFromURLParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_VALUE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testModelFromURLParserValidatorUnreachableURL()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new ModelFromURLParserValidator(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE + "(" + UNREACHABLE_URL +
-                                        ")").parseAndValidate(VALID_VALUE);
+        new ModelFromURLParserValidator(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE +
+                                        ModelFromURLParserValidator.LEFT_DELIMITER + UNREACHABLE_URL +
+                                        ModelFromURLParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_VALUE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testModelFromURLParserValidatorInvalidModelInFile()
             throws ModelSyntaxException, ValidationException, ConversionException, IOException {
         File tempFile = generateModelFile(INVALID_LIST_MODEL_PARAMETER);
-        new ModelFromURLParserValidator("ILLEGAL_" + ModelFromURLParserValidator.MODEL_FROM_URL_TYPE + "(" +
-                                        tempFile.toURI().toURL() + ")").parseAndValidate(VALID_VALUE);
+        new ModelFromURLParserValidator("ILLEGAL_" + ModelFromURLParserValidator.MODEL_FROM_URL_TYPE +
+                                        ModelFromURLParserValidator.LEFT_DELIMITER + tempFile.toURI().toURL() +
+                                        ModelFromURLParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_VALUE);
     }
 }

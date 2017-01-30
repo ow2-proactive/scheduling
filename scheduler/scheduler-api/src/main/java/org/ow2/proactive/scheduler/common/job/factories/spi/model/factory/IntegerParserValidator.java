@@ -34,7 +34,7 @@ public class IntegerParserValidator extends RangeParserValidator<Integer> {
 
     public static final String INTEGER_TYPE = "INTEGER";
 
-    public static final String INTEGER_TYPE_REGEXP = "[Ii][Nn][Tt][Ee][Gg][Ee][Rr]";
+    protected static final String INTEGER_TYPE_REGEXP = "[Ii][Nn][Tt][Ee][Gg][Ee][Rr]";
 
     public IntegerParserValidator(String model) throws ModelSyntaxException {
         super(model);

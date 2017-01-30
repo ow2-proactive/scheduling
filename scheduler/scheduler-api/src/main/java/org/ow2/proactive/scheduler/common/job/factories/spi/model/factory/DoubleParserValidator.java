@@ -34,7 +34,7 @@ public class DoubleParserValidator extends RangeParserValidator<Double> {
 
     public static final String DOUBLE_TYPE = "DOUBLE";
 
-    public static final String DOUBLE_TYPE_REGEXP = "[Dd][Oo][Uu][Bb][Ll][Ee]";
+    protected static final String DOUBLE_TYPE_REGEXP = "[Dd][Oo][Uu][Bb][Ll][Ee]";
 
     public DoubleParserValidator(String model) throws ModelSyntaxException {
         super(model);

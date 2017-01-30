@@ -38,7 +38,7 @@ public class URLParserValidator extends BaseParserValidator<URL> {
 
     public static final String URL_TYPE = "URL";
 
-    public static final String URL_TYPE_REGEXP = "[Uu][Rr][Ll]";
+    protected static final String URL_TYPE_REGEXP = "[Uu][Rr][Ll]";
 
 
     public URLParserValidator(String model) throws ModelSyntaxException {
