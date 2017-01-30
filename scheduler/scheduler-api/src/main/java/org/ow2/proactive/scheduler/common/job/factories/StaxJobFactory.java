@@ -41,8 +41,6 @@ import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filter
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -62,11 +60,14 @@ import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorService;
+import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorRegistry;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -91,7 +92,6 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Tools;
-import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -105,7 +105,9 @@ import com.google.common.collect.ImmutableMap;
 public class StaxJobFactory extends JobFactory {
 
     public static final Logger logger = Logger.getLogger(StaxJobFactory.class);
-    
+
+    public static final String MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES = "Unable to instanciate job validation factories";
+
     private enum ScriptType{
         SELECTION,
         FLOW,
@@ -196,6 +198,9 @@ public class StaxJobFactory extends JobFactory {
             xmlsr.close();
             //make dependencies
             makeDependences(job, dependencies);
+
+            validate((TaskFlowJob) job);
+
             logger.debug("Job successfully created!");
             //debug mode only
             displayJobInfo(job);
@@ -203,8 +208,6 @@ public class StaxJobFactory extends JobFactory {
         } catch (JobCreationException jce) {
             jce.pushTag(XMLTags.JOB.getXMLName());
             throw jce;
-        } catch (SAXException e) {
-            throw new JobCreationException(true, e);
         } catch (Exception e) {
             throw new JobCreationException(e);
         }
@@ -213,35 +216,48 @@ public class StaxJobFactory extends JobFactory {
     /*
      * Validate the given job descriptor
      */
-    private void validate(File file) throws XMLStreamException, JobCreationException,
-            VerifierConfigurationException, SAXException, IOException {
-        String findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(file);
-        InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed);
-        ValidationUtil.validate(file, schemaStream);
+    private void validate(File file) throws VerifierConfigurationException, JobCreationException {
+        Map<String, JobValidatorService> factories;
+        try {
+            factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
+        } catch (Exception e) {
+            logger.error(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
+            throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
+        }
+
+        try {
+
+            for (JobValidatorService factory : factories.values()) {
+                factory.validateJob(file);
+            }
+        } catch (JobValidationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobValidationException(true, e);
+        }
     }
 
-    private String findSchemaByNamespaceUsed(File file) throws FileNotFoundException, XMLStreamException {
-        XMLStreamReader cursorRoot = xmlInputFactory.createXMLStreamReader(new FileInputStream(file));
-        String current;
+    /*
+     * Validate the given job descriptor
+     */
+    private void validate(TaskFlowJob job) throws VerifierConfigurationException, JobCreationException {
+
+        Map<String, JobValidatorService> factories;
         try {
-            int eventType;
-            while (cursorRoot.hasNext()) {
-                eventType = cursorRoot.next();
-                if (eventType == XMLEvent.START_ELEMENT) {
-                    current = cursorRoot.getLocalName();
-                    if (XMLTags.JOB.matches(current)) {
-                        String namespace = cursorRoot.getName().getNamespaceURI();
-                        return Schemas.SCHEMAS_BY_NAMESPACE.get(namespace).location;
-                    }
-                }
-            }
-            return Schemas.SCHEMA_LATEST.location;
+            factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
         } catch (Exception e) {
-            return Schemas.SCHEMA_LATEST.location;
-        } finally {
-            if (cursorRoot != null) {
-                cursorRoot.close();
+            throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
+        }
+
+        try {
+
+            for (JobValidatorService factory : factories.values()) {
+                factory.validateJob(job);
             }
+        } catch (JobValidationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobValidationException(e);
         }
     }
 
