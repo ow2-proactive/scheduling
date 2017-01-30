@@ -34,7 +34,7 @@ public class FloatParserValidator extends RangeParserValidator<Float> {
 
     public static final String FLOAT_TYPE = "FLOAT";
 
-    public static final String FLOAT_TYPE_REGEXP = "[Ff][Ll][Oo][Aa][Tt]";
+    protected static final String FLOAT_TYPE_REGEXP = "[Ff][Ll][Oo][Aa][Tt]";
 
 
     public FloatParserValidator(String model) throws ModelSyntaxException {

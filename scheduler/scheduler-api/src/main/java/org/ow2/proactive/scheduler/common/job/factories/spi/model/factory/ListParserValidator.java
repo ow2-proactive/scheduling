@@ -39,7 +39,15 @@ public class ListParserValidator extends BaseParserValidator<String> {
 
     public static final String LIST_TYPE = "LIST";
 
-    public static final String LIST_TYPE_REGEXP = "[Ll][Ii][Ss][Tt]";
+    public static final String LEFT_DELIMITER = "(";
+
+    public static final String RIGHT_DELIMITER = ")";
+
+    protected static final String LIST_TYPE_REGEXP = "[Ll][Ii][Ss][Tt]";
+
+    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
+
+    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
 
     public ListParserValidator(String model) throws ModelSyntaxException {
         super(model);
@@ -67,7 +75,7 @@ public class ListParserValidator extends BaseParserValidator<String> {
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
-        String listRegexp = "^" + LIST_TYPE_REGEXP + "\\(([^)]+)\\)$";
+        String listRegexp = "^" + LIST_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "([^)]+)" + RIGHT_DELIMITER_REGEXP + "$";
 
         String commaSeparatedValuesString = parseAndGetOneGroup(model, listRegexp);
 

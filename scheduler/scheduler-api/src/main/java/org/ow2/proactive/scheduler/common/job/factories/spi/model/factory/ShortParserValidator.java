@@ -34,7 +34,7 @@ public class ShortParserValidator extends RangeParserValidator<Short> {
 
     public static final String SHORT_TYPE = "SHORT";
 
-    public static final String SHORT_TYPE_REGEXP = "[Ss][Hh][Oo][Rr][Tt]";
+    protected static final String SHORT_TYPE_REGEXP = "[Ss][Hh][Oo][Rr][Tt]";
 
     public ShortParserValidator(String model) throws ModelSyntaxException {
         super(model);

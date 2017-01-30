@@ -34,13 +34,17 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 
 public class RegexpParserValidatorTest {
 
-    public static final String VALID_MODEL_PARAMETER = "([A-Za-z]+)";
+    public static final String VALID_MODEL_PARAMETER = RegexpParserValidator.LEFT_DELIMITER +
+                                                       "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,12}$" +
+                                                       RegexpParserValidator.RIGHT_DELIMITER; // regexp used to check passwords containing a mix of uppercase, lowercase and digits
 
-    public static final String INVALID_MODEL_PARAMETER = "([A-Za-z+)";
 
-    public static final String VALID_VALUE = "RightMate";
+    public static final String INVALID_MODEL_PARAMETER = RegexpParserValidator.LEFT_DELIMITER + "[A-Za-z+" +
+                                                         RegexpParserValidator.RIGHT_DELIMITER;
 
-    public static final String INVALID_VALUE = "NotRight123";
+    public static final String VALID_VALUE = "RightMate123";
+
+    public static final String INVALID_VALUE = "NotRightMate"; // missing digits
 
     @Test
     public void testRegexpParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {

@@ -42,7 +42,18 @@ public class DateTimeParserValidator extends RangeParserValidator<Date> {
 
     public static final String DATETIME_TYPE = "DATETIME";
 
-    public static final String DATETIME_TYPE_REGEXP = "[Dd][Aa][Tt][Ee][Tt][Ii][Mm][Ee]";
+    public static final String LEFT_DELIMITER = "(";
+
+    public static final String RIGHT_DELIMITER = ")";
+
+    protected static final String DATETIME_TYPE_REGEXP = "[Dd][Aa][Tt][Ee][Tt][Ii][Mm][Ee]";
+
+    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
+
+    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
+
+    protected static final String DATETYPE_MAIN_REGEXP = DATETIME_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "([^)]+)" +
+                                                         RIGHT_DELIMITER_REGEXP;
 
     public DateTimeParserValidator(String model) throws ModelSyntaxException {
         super(model);
@@ -85,8 +96,8 @@ public class DateTimeParserValidator extends RangeParserValidator<Date> {
     }
 
     private List<String> getDateModelArguments(String model) throws ModelSyntaxException {
-        String dateTimeMainRegexp = "^" + DATETIME_TYPE_REGEXP + "\\(([^)]+)\\)$" + "|" + "^" + DATETIME_TYPE_REGEXP +
-                                    "\\(([^)]+)\\)\\(([^)]+)\\)$";
+        String dateTimeMainRegexp = "^" + DATETYPE_MAIN_REGEXP + "$" + "|" + "^" + DATETYPE_MAIN_REGEXP +
+                                    RANGE_MAIN_REGEXP + "$";
 
         List<String> modelArguments = parseAndGetRegexGroups(model, dateTimeMainRegexp);
         if ((modelArguments.size() == 1) || (modelArguments.size() == 2)) {
