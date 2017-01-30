@@ -39,7 +39,6 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.Permission;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,13 +46,12 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeInformation;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -92,12 +90,6 @@ public class RMNodeImpl extends AbstractRMNode {
     /** ProActive Node Object of the RMNode */
     private Node node;
 
-    /** URL of the node, considered as its unique ID */
-    private String nodeURL;
-
-    /** Name of the node */
-    private String nodeName;
-
     /** {@link VirtualNode} name of the node */
     private String vnodeName;
 
@@ -110,69 +102,44 @@ public class RMNodeImpl extends AbstractRMNode {
     /** Script handled, manage scripts launching and results recovering */
     private ScriptHandler handler = null;
 
-    /** {@link NodeSource} Stub of NodeSource that handle the RMNode */
-    private NodeSource nodeSource;
-
-    /** {@link NodeSource} NodeSource that handle the RMNode */
-    private String nodeSourceName;
-
-    /** State of the node */
-    private NodeState state;
-
-    /** Time stamp of the latest state change */
-    private long stateChangeTime;
-
-    /** client registered the node in the resource manager */
-    private Client provider;
-
     /** client taken the node for computations */
     private Client owner;
 
     /** Node access permission*/
     private Permission nodeAccessPermission;
 
-    /** The add event */
-    private RMNodeEvent addEvent;
-
-    /** The last event */
-    private RMNodeEvent lastEvent;
-
     private String[] jmxUrls;
 
     /** true if node is protected with token */
     private boolean protectedByToken = false;
 
-    /** Create an RMNode Object.
-     * A Created node begins to be free.
+    /**
+     * Constructs a new instance. Initial state is set to {@link NodeState#FREE}.
+     *
      * @param node ProActive node deployed.
-     * @param nodeSource {@link VirtualNode} name of the node.
-     * @param nodeSource {@link NodeSource} Stub of NodeSource that handle the RMNode.
+     * @param nodeSource {@link NodeSource} Stub of NodeSource that handles the Node.
+     * @param provider the client who deployed the Node.
+     * @param nodeAccessPermission the permissions associated with the Node.
      */
     public RMNodeImpl(Node node, NodeSource nodeSource, Client provider, Permission nodeAccessPermission) {
+
+        NodeInformation nodeInformation = node.getNodeInformation();
+
+        this.addEvent = null;
+        this.jmxUrls = new String[JMXTransportProtocol.values().length];
+        this.jvmName = node.getProActiveRuntime().getURL();
+        this.hostName = nodeInformation.getVMInformation().getHostName();
+        this.lastEvent = null;
         this.node = node;
+        this.nodeAccessPermission = nodeAccessPermission;
+        this.nodeName = nodeInformation.getName();
         this.nodeSource = nodeSource;
         this.nodeSourceName = nodeSource.getName();
+        this.nodeURL = nodeInformation.getURL();
         this.provider = provider;
-        this.nodeAccessPermission = nodeAccessPermission;
-        this.nodeName = node.getNodeInformation().getName();
-        this.nodeURL = node.getNodeInformation().getURL();
-        this.hostName = node.getNodeInformation().getVMInformation().getHostName();
-        this.jvmName = node.getProActiveRuntime().getURL();
         this.scriptStatus = new HashMap<>();
-        this.state = NodeState.FREE;
-        this.stateChangeTime = System.currentTimeMillis();
-        this.addEvent = null;
-        this.lastEvent = null;
-        this.jmxUrls = new String[JMXTransportProtocol.values().length];
-    }
 
-    /**
-     * Returns the name of the node.
-     * @return the name of the node.
-     */
-    @Override
-    public String getNodeName() {
-        return this.nodeName;
+        changeState(NodeState.FREE);
     }
 
     /**
@@ -211,30 +178,11 @@ public class RMNodeImpl extends AbstractRMNode {
     }
 
     /**
-     * Returns the NodeSource name of the RMNode.
-     * @return {@link NodeSource} name of the RMNode.
-     */
-    @Override
-    public String getNodeSourceName() {
-        return this.nodeSourceName;
-    }
-
-    /**
-     * Returns the unique id of the RMNode.
-     * @return the unique id of the RMNode represented by its URL.
-     */
-    @Override
-    public String getNodeURL() {
-        return nodeURL;
-    }
-
-    /**
      * Changes the state of this node to {@link NodeState#BUSY}.
      */
     @Override
     public void setBusy(Client owner) {
-        this.state = NodeState.BUSY;
-        this.stateChangeTime = System.currentTimeMillis();
+        changeState(NodeState.BUSY);
         this.owner = owner;
     }
 
@@ -243,8 +191,7 @@ public class RMNodeImpl extends AbstractRMNode {
      */
     @Override
     public void setFree() {
-        this.state = NodeState.FREE;
-        this.stateChangeTime = System.currentTimeMillis();
+        changeState(NodeState.FREE);
         this.owner = null;
     }
 
@@ -254,8 +201,7 @@ public class RMNodeImpl extends AbstractRMNode {
     @Override
     public void setConfiguring(Client owner) {
         if (!this.isDown()) {
-            this.state = NodeState.CONFIGURING;
-            this.stateChangeTime = System.currentTimeMillis();
+            changeState(NodeState.CONFIGURING);
         }
     }
 
@@ -264,8 +210,7 @@ public class RMNodeImpl extends AbstractRMNode {
      */
     @Override
     public void setDown() {
-        this.state = NodeState.DOWN;
-        this.stateChangeTime = System.currentTimeMillis();
+        changeState(NodeState.DOWN);
     }
 
     /**
@@ -273,8 +218,7 @@ public class RMNodeImpl extends AbstractRMNode {
      */
     @Override
     public void setToRemove() {
-        this.state = NodeState.TO_BE_REMOVED;
-        this.stateChangeTime = System.currentTimeMillis();
+        changeState(NodeState.TO_BE_REMOVED);
     }
 
     /**
@@ -393,28 +337,6 @@ public class RMNodeImpl extends AbstractRMNode {
     }
 
     /**
-     * Compare two RMNode objects
-     * @return true if the two RMNode objects represent the same Node.
-     */
-    @Override
-    public boolean equals(Object imnode) {
-        if (imnode instanceof RMNode) {
-            return this.nodeURL.equals(((RMNode) imnode).getNodeURL());
-        }
-
-        return false;
-    }
-
-    /**
-     * @return HashCode of node's ID,
-     * i.e. the hashCode of the node's URL.
-     */
-    @Override
-    public int hashCode() {
-        return this.nodeURL.hashCode();
-    }
-
-    /**
      * Gives the HashMap of all scripts tested with corresponding results.
      * @return the HashMap of all scripts tested with corresponding results.
      */
@@ -445,31 +367,6 @@ public class RMNodeImpl extends AbstractRMNode {
         }
     }
 
-    /**
-     * @return the stub of the {@link NodeSource} that handle the RMNode.
-     */
-    @Override
-    public NodeSource getNodeSource() {
-        return this.nodeSource;
-    }
-
-    /**
-     * Set the NodeSource stub to the RMNode.
-     * @param ns Stub of the NodeSource that handle the IMNode.
-     */
-    @Override
-    public void setNodeSource(NodeSource ns) {
-        this.nodeSource = ns;
-    }
-
-    /**
-     * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getState()
-     */
-    @Override
-    public NodeState getState() {
-        return this.state;
-    }
-
     public void setState(NodeState nodeState) {
         this.state = nodeState;
     }
@@ -486,14 +383,6 @@ public class RMNodeImpl extends AbstractRMNode {
      * {@inheritDoc}
      */
     @Override
-    public Client getProvider() {
-        return provider;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Permission getUserPermission() {
         return nodeAccessPermission;
     }
@@ -503,48 +392,8 @@ public class RMNodeImpl extends AbstractRMNode {
      */
     @Override
     public Permission getAdminPermission() {
-        return new PrincipalPermission(provider.getName(), provider.getSubject().getPrincipals(
-                UserNamePrincipal.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RMNodeEvent getAddEvent() {
-        return this.addEvent;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RMNodeEvent getLastEvent() {
-        return this.lastEvent;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setLastEvent(final RMNodeEvent lastEvent) {
-        this.lastEvent = lastEvent;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setAddEvent(final RMNodeEvent addEvent) {
-        this.addEvent = addEvent;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getStateChangeTime() {
-        return stateChangeTime;
+        return new PrincipalPermission(provider.getName(),
+                                       provider.getSubject().getPrincipals(UserNamePrincipal.class));
     }
 
     /**
@@ -555,12 +404,10 @@ public class RMNodeImpl extends AbstractRMNode {
         jmxUrls[protocol.ordinal()] = address;
     }
 
-
     @Override
     public String getJMXUrl(JMXTransportProtocol protocol) {
         return jmxUrls[protocol.ordinal()];
     }
-
 
     @Override
     public boolean isProtectedByToken() {

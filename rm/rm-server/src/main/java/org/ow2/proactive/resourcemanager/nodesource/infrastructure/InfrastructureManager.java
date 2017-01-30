@@ -558,13 +558,16 @@ public abstract class InfrastructureManager implements Serializable {
 				this.lostNodes.put(toUpdateURL, pn);
 			}
 		}
+
 		if (pn != null) {
-            logger.warn("Declaring node as lost: " + toUpdateURL + ", " + description);
+			logger.warn("Declaring node as lost: " + toUpdateURL + ", " + description);
 			NodeState previousState = pn.getState();
 			RMDeployingNodeAccessor.getDefault().setLost(pn);
 			if (description != null) {
 				RMDeployingNodeAccessor.getDefault().setDescription(pn, description);
 			}
+
+			nodeSource.setLost(pn);
 			RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_STATE_CHANGED, previousState,
 					pn.getProvider().getName());
 			emitEvent(event);

@@ -404,6 +404,10 @@ public class NodeSource implements InitActive, RunActive {
         return infrastructureManager.update(rmNode);
     }
 
+    public boolean setLost(RMNode rmNode) {
+        return rmcore.setLost(rmNode);
+    }
+
     /**
      * Looks up the node
      */
@@ -675,6 +679,7 @@ public class NodeSource implements InitActive, RunActive {
             } catch (RMException e) {
             }
         }
+
         rmcore.setDownNode(nodeUrl);
     }
 

@@ -59,13 +59,13 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
  * Basically for each node we store all state transitions and start/end time of each transition.
  */
 @Entity
-@NamedQueries({ @NamedQuery(name = "getNodeLockingInformation", query = "select n.nodeSource, n.host, n.nodeUrl from NodeHistory n " +
-                                                                        "where n.endTime > 0 and n.endTime > :endTime and n.locked is true and n.host != '' " +
-                                                                        "group by n.nodeSource, n.host, n.nodeUrl") })
-@Table(name = "NodeHistory", indexes = { @Index(name = "NODE_HISTORY_NODE_URL", columnList = "nodeUrl"),
-                                         @Index(name = "NODE_HISTORY_USER_NAME", columnList = "userName"),
-                                         @Index(name = "NODE_HISTORY_END_TIME", columnList = "endTime"),
-                                         @Index(name = "NODE_HISTORY_LOCKED", columnList = "locked"), })
+@NamedQueries({ @NamedQuery(name = "getNodesLockedOnPreviousRun", query = "select n.nodeSource, n.host, n.nodeUrl from NodeHistory n " +
+                                                                          "where n.endTime > :endTime and n.locked is true " +
+                                                                          "group by n.nodeSource, n.host, n.nodeUrl") })
+@Table(name = "NodeHistory", indexes = { @Index(name = "NODE_HISTORY_END_TIME", columnList = "endTime"),
+                                         @Index(name = "NODE_HISTORY_LOCKED", columnList = "locked"),
+                                         @Index(name = "NODE_HISTORY_NODE_URL", columnList = "nodeUrl"),
+                                         @Index(name = "NODE_HISTORY_USER_NAME", columnList = "userName"), })
 public class NodeHistory {
 
     public static final Logger logger = Logger.getLogger(NodeHistory.class);
@@ -130,6 +130,7 @@ public class NodeHistory {
         this.startTime = event.getTimeStamp();
 
         storeInDataBase = true;
+
         // do not store TO_BE REMOVED record as it reflects nothing
         //
         // when the node is removed do not create a new record - 
@@ -220,5 +221,5 @@ public class NodeHistory {
     public void setStoreInDataBase(boolean storeInDataBase) {
         this.storeInDataBase = storeInDataBase;
     }
-    
+
 }

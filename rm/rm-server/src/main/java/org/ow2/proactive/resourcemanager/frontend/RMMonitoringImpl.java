@@ -116,7 +116,6 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             eventDispatcherThreadPool = Executors
                     .newFixedThreadPool(PAResourceManagerProperties.RM_MONITORING_MAX_THREAD_NUMBER
                             .getValueAsInt());
-
         } catch (ProActiveException e) {
             logger.debug("Cannot register RMMonitoring. Aborting...", e);
             PAActiveObject.terminateActiveObject(true);
@@ -374,13 +373,22 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void removeRMEventListener() throws RMException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+
+        String shortId = id.shortString();
+        if (removeRMEventListener(id)) {
+            logger.debug("Removing the RM listner for " + shortId);
+        } else {
+            throw new RMException("Unknow listener found: " + shortId);
+        }
+    }
+
+    public boolean removeRMEventListener(UniqueID id) throws RMException {
+        if (dispatchers == null || dispatchers.isEmpty()) {
+            return false;
+        }
+
         synchronized (dispatchers) {
-            if (dispatchers.containsKey(id)) {
-                logger.debug("Removing the RM listner for " + id.shortString());
-                dispatchers.remove(id);
-            } else {
-                throw new RMException("Listener is unknown");
-            }
+            return dispatchers.remove(id) != null;
         }
     }
 

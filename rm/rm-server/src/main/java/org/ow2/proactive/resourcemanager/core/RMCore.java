@@ -36,6 +36,8 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import static org.ow2.proactive.resourcemanager.common.event.RMEventType.NODE_STATE_CHANGED;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Permission;
@@ -65,6 +67,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -115,6 +118,7 @@ import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
+import org.ow2.proactive.resourcemanager.utils.RMNodeHelper;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
@@ -127,7 +131,6 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Table;
 
 
 /**
@@ -193,7 +196,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private Node nodeRM;
 
     /** stub of RMMonitoring active object of the RM */
-    private RMMonitoringImpl monitoring;
+    protected RMMonitoringImpl monitoring;
 
     /** authentication active object */
     private RMAuthenticationImpl authentication;
@@ -233,7 +236,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public static Map<UniqueID, Client> clients =
             Collections.synchronizedMap(new HashMap<UniqueID, Client>());
 
-    /** nodes topology */
+    /** Nodes topology */
     public static TopologyManager topologyManager;
 
     /** Client pinger */
@@ -249,7 +252,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /** utility ao used to configure nodes (compute topology, configure dataspaces...) */
     private RMNodeConfigurator nodeConfigurator;
 
-    private RMDBManager dataBaseManager;
+    protected RMDBManager dbManager;
+
+    private NodesLockRestorationManager nodesLockRestorationManager;
 
     /**
      * ProActive Empty constructor
@@ -293,7 +298,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.monitoring = monitoring;
         this.selectionManager = manager;
         this.eligibleNodes = freeNodesList;
-        this.dataBaseManager = newDataBaseManager;
+        this.dbManager = newDataBaseManager;
     }
 
     /**
@@ -306,26 +311,28 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *            the active object's body.
      */
     public void initActivity(Body body) {
-
         if (logger.isDebugEnabled()) {
             logger.debug("RMCore start : initActivity");
         }
+
         try {
             // setting up the policy
             logger.debug("Setting up the resource manager security policy");
             ClientsPolicy.init();
 
-            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
-                    RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
+            StubObject rmCoreStub = PAActiveObject.getStubOnThis();
 
-            dataBaseManager = RMDBManager.getInstance();
+            PAActiveObject.registerByName(rmCoreStub, RMConstants.NAME_ACTIVE_OBJECT_RMCORE);
+
+            dbManager = RMDBManager.getInstance();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating RMAuthentication active object");
             }
 
-            authentication = (RMAuthenticationImpl) PAActiveObject.newActive(RMAuthenticationImpl.class
-                    .getName(), new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+            authentication = (RMAuthenticationImpl) PAActiveObject.newActive(RMAuthenticationImpl.class.getName(),
+                                                                             new Object[] { rmCoreStub },
+                                                                             nodeRM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating RMMonitoring active object");
@@ -335,33 +342,38 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.jmxHelper.boot(authentication);
 
             monitoring = (RMMonitoringImpl) PAActiveObject.newActive(RMMonitoringImpl.class.getName(),
-                    new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+                                                                     new Object[] { rmCoreStub },
+                                                                     nodeRM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating SelectionManager active object");
             }
-            selectionManager = (SelectionManager) PAActiveObject.newActive(ProbablisticSelectionManager.class
-                    .getName(), new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+            selectionManager = (SelectionManager) PAActiveObject.newActive(ProbablisticSelectionManager.class.getName(),
+                                                                           new Object[] { rmCoreStub },
+                                                                           nodeRM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating ClientPinger active object");
             }
             clientPinger = (ClientPinger) PAActiveObject.newActive(ClientPinger.class.getName(),
-                    new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+                                                                   new Object[] { rmCoreStub },
+                                                                   nodeRM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating NodeCleaner active object");
             }
             nodesCleaner = (NodesCleaner) PAActiveObject.newActive(NodesCleaner.class.getName(),
-                    new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+                                                                   new Object[] { rmCoreStub },
+                                                                   nodeRM);
 
             topologyManager = new TopologyManager();
 
-            nodeConfigurator = (RMNodeConfigurator) PAActiveObject.newActive(RMNodeConfigurator.class
-                    .getName(), new Object[] { PAActiveObject.getStubOnThis() }, nodeRM);
+            nodeConfigurator = (RMNodeConfigurator) PAActiveObject.newActive(RMNodeConfigurator.class.getName(),
+                                                                             new Object[] { rmCoreStub },
+                                                                             nodeRM);
 
             // adding shutdown hook
-            final RMCore rmcoreStub = (RMCore) PAActiveObject.getStubOnThis();
+            final RMCore rmcoreStub = (RMCore) rmCoreStub;
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
@@ -386,10 +398,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.monitoring.rmEvent(new RMEvent(RMEventType.STARTED));
 
             authentication.setActivated(true);
+
             clientPinger.ping();
 
-            restoreNodeSources();
+            nodesLockRestorationManager = new NodesLockRestorationManager(this);
+            nodesLockRestorationManager.initialize();
 
+            restoreNodeSources();
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
         } catch (NodeException e) {
@@ -399,38 +414,33 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         } catch (ClassNotFoundException e) {
             logger.error("", e);
         }
+
         if (logger.isDebugEnabled()) {
-            logger.debug("RMCore end : initActivity");
+            logger.debug("RMCore end: initActivity");
         }
     }
 
-    private void restoreNodeSources() {
-        Table<String, String, Integer> nodeLockingInformation =
-                dataBaseManager.getNodeLockingInformation();
+    public boolean restoreNodeSources() {
+        Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
 
-        System.out.println("Resource Manager locking information:");
-        for (String nodeSource : nodeLockingInformation.rowKeySet()) {
-            for (Entry<String, Integer> entry : nodeLockingInformation.row(nodeSource).entrySet()) {
-                System.out.println(nodeSource + " " + entry.getKey() + " " + entry.getValue());
-            }
-        }
+        for (NodeSourceData nodeSourceData : nodeSources) {
+            String nodeSourceDataName = nodeSourceData.getName();
 
-        Collection<NodeSourceData> nodeSources = dataBaseManager.getNodeSources();
-
-        for (NodeSourceData nsd : nodeSources) {
-            if (NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nsd.getName())) {
+            if (NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceDataName)) {
                 // will be recreated by SchedulerStarter
-                dataBaseManager.removeNodeSource(nsd.getName());
+                dbManager.removeNodeSource(nodeSourceDataName);
             } else {
                 try {
-                    logger.info("Restoring node source " + nsd.getName());
-                    createNodeSource(nsd);
+                    logger.info("Restoring node source " + nodeSourceDataName);
+                    createNodeSource(nodeSourceData);
                 } catch (Throwable t) {
                     logger.error(t.getMessage(), t);
-                    brokenNodeSources.add(nsd.getName());
+                    brokenNodeSources.add(nodeSourceDataName);
                 }
             }
         }
+
+        return true;
     }
 
     /**
@@ -483,7 +493,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         if (nodebyUrl != null) {
             return nodebyUrl;
-        } else if (isDeployingNodeURL(url)) {
+        } else {
             String[] chunks = url.split("/");
             String nodeSourceName = chunks[2];
             NodeSource nodeSource = nodeSources.get(nodeSourceName);
@@ -525,6 +535,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             client = rmNode.getProvider();
         }
 
+        nodesLockRestorationManager.handle(rmNode);
+
         // resetting owner here
         rmNode.setFree();
 
@@ -535,7 +547,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.registerAndEmitNodeEvent(
                 rmNode.createNodeEvent(
-                        RMEventType.NODE_STATE_CHANGED,
+                        NODE_STATE_CHANGED,
                         previousNodeState,
                         client.getName()));
 
@@ -577,7 +589,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         final NodeState previousNodeState = rmNode.getState();
         rmNode.setToRemove();
         // create the event
-        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                 previousNodeState, initiator.getName()));
     }
 
@@ -816,7 +828,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         //waiting for better integration of deploying node
         //if we get a "deploying node url" we change the flow
-        if (isDeployingNodeURL(nodeUrl)) {
+        if (RMNodeHelper.isDeployingNodeURL(nodeUrl)) {
             return new BooleanWrapper(removeDeployingNode(nodeUrl));
         }
 
@@ -969,20 +981,20 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceData nodeSourceData = new NodeSourceData(nodeSourceName, infrastructureType,
             infrastructureParameters, policyType, policyParameters, caller);
-        boolean added = dataBaseManager.addNodeSource(nodeSourceData);
+        boolean added = dbManager.addNodeSource(nodeSourceData);
 
         try {
             return createNodeSource(nodeSourceData);
         } catch (RuntimeException ex) {
             logger.error(ex.getMessage(), ex);
             if (added) {
-                dataBaseManager.removeNodeSource(nodeSourceName);
+                dbManager.removeNodeSource(nodeSourceName);
             }
             throw ex;
         }
     }
 
-    private BooleanWrapper createNodeSource(NodeSourceData data) {
+    protected BooleanWrapper createNodeSource(NodeSourceData data) {
 
         //checking that nsname doesn't contain invalid characters and doesn't exist yet
         checkNodeSourceName(data.getName());
@@ -991,6 +1003,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         InfrastructureManager im = InfrastructureManagerFactory.create(data.getInfrastructureType(), data
                 .getInfrastructureParameters());
+
         NodeSourcePolicy policy = NodeSourcePolicyFactory.create(data.getPolicyType(), data
                 .getInfrastructureType(), data.getPolicyParameters());
 
@@ -1370,7 +1383,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         rmNode.setBusy(owner);
         this.eligibleNodes.remove(rmNode);
         // create the event
-        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                 previousNodeState, owner.getName()));
     }
 
@@ -1392,9 +1405,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             if (rmNode.isFree()) {
                 eligibleNodes.remove(rmNode);
             }
+
+            nodesLockRestorationManager.handle(rmNode);
             rmNode.setDown();
             // create the event
-            this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+            this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                     previousNodeState, rmNode.getProvider().getName()));
         } else {
             // the nodes has been removed from core asynchronously
@@ -1483,13 +1498,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
             nodeSource.shutdown(caller);
-            dataBaseManager.removeNodeSource(sourceName);
+            dbManager.removeNodeSource(sourceName);
 
             return new BooleanWrapper(true);
         } else if (brokenNodeSources.contains(sourceName)) {
             logger.info(caller + " requested removal of the " + sourceName + " node source (broken)");
             brokenNodeSources.remove(sourceName);
-            dataBaseManager.removeNodeSource(sourceName);
+            dbManager.removeNodeSource(sourceName);
 
             return new BooleanWrapper(true);
         } else {
@@ -1552,7 +1567,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             if (client.getHistory() != null) {
                 UserHistory userHistory = client.getHistory();
                 userHistory.setEndTime(System.currentTimeMillis());
-                dataBaseManager.updateUserHistory(userHistory);
+                dbManager.updateUserHistory(userHistory);
             }
             logger.info(client + " disconnected from " + client.getId().shortString());
         } else {
@@ -1613,20 +1628,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new TopologyException("Topology is disabled");
         }
         return topologyManager.getTopology();
-    }
-
-    /**
-     * Returns true if the given parameter is the representation of
-     * a deploying node ( starts with deploying://nsName/nodeName )
-     * @param url
-     * @return true if the parameter is a deploying node's url, false otherwise
-     */
-    private boolean isDeployingNodeURL(String url) {
-        if (url != null && url.startsWith(RMDeployingNode.PROTOCOL_ID + "://")) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -1751,7 +1752,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // updated in the intermediate RM cache (see RMListenerProxy#nodeEvent)
         this.registerAndEmitNodeEvent(
                 rmNode.createNodeEvent(
-                        RMEventType.NODE_STATE_CHANGED,
+                        NODE_STATE_CHANGED,
                         rmNode.getState(),
                         this.caller.getName()));
 
@@ -1813,7 +1814,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.registerAndEmitNodeEvent(
                 rmNode.createNodeEvent(
-                        RMEventType.NODE_STATE_CHANGED,
+                        NODE_STATE_CHANGED,
                         rmNode.getState(),
                         caller.getName()));
 
@@ -1828,7 +1829,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // As a consequence, any updates on the rmNode instance are not reflected
             // to the instance stored in the NodeSource. The purpose of the following
             // call is to update the information stored in the NodeSource.
-            rmNode.getNodeSource().update((RMDeployingNode) rmNode);
+            PAFuture.waitFor(rmNode.getNodeSource().update((RMDeployingNode) rmNode));
         }
     }
 
@@ -1959,6 +1960,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         for (RMNode rmnode : selectedRMNodes) {
             this.internalUnlockNode(rmnode);
         }
+    }
+
+    public boolean setLost(RMNode rmNode) {
+        nodesLockRestorationManager.handle(rmNode);
+        return true;
     }
 
 }

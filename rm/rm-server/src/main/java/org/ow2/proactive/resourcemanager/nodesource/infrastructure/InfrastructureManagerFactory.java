@@ -97,7 +97,6 @@ public class InfrastructureManagerFactory {
      */
     public static Collection<Class<?>> getSupportedInfrastructures() {
         // reload file each time as it can be updated while the rm is running
-        supportedInfrastructures = new ArrayList<>();
         Properties properties = new Properties();
         try {
             String propFileName = PAResourceManagerProperties.RM_NODESOURCE_INFRASTRUCTURE_FILE
@@ -115,6 +114,8 @@ public class InfrastructureManagerFactory {
             e.printStackTrace();
         }
 
+        supportedInfrastructures = new ArrayList<>(properties.size());
+
         for (Object className : properties.keySet()) {
             try {
                 Class<?> cls = Class.forName(className.toString());
@@ -124,6 +125,7 @@ public class InfrastructureManagerFactory {
                         "Cannot find class " + className.toString());
             }
         }
+
         return supportedInfrastructures;
     }
 }

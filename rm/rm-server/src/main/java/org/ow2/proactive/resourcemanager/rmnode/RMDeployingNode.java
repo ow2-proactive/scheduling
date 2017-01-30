@@ -47,8 +47,6 @@ import org.objectweb.proactive.core.node.NodeInformation;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.scripting.Script;
@@ -74,44 +72,19 @@ public final class RMDeployingNode extends AbstractRMNode {
     /** The description of this deploying node */
     private String description = "";
 
-    /** URL of the node, considered as its unique ID */
-    private String nodeURL;
-
-    /** Name of the node */
-    private String nodeName;
-
-    /** {@link NodeSource} Stub of NodeSource that handle the RMNode */
-    private NodeSource nodeSource;
-
-    /** {@link NodeSource} NodeSource that handle the RMNode */
-    private String nodeSourceName;
-
-    /** State of the node */
-    private NodeState state;
-
-    /** Time stamp of the latest state change */
-    private long stateChangeTime;
-
-    /** The add event */
-    private RMNodeEvent addEvent;
-
-    /** The last event */
-    private RMNodeEvent lastEvent;
-
-    /** client registered the node in the resource manager */
-    private Client provider;
-
+    /**
+     * Required by ProActive Programming.
+     */
     RMDeployingNode() {
     }
 
     RMDeployingNode(String name, NodeSource ns, String command, Client provider) {
+        changeState(NodeState.DEPLOYING);
         this.nodeName = name;
         this.nodeSource = ns;
         this.commandLine = command;
         this.nodeSourceName = ns.getName();
         this.nodeURL = this.buildNodeURL();
-        this.state = NodeState.DEPLOYING;
-        this.stateChangeTime = System.currentTimeMillis();
         this.provider = provider;
         this.addEvent = null;
         this.lastEvent = null;
@@ -123,43 +96,44 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @return the deploying node's description
+     * Returns the deploying node's description.
+     *
+     * @return the deploying node's description.
      */
     public String getDescription() {
         return this.description;
     }
 
     /**
-     * @param desc the new description of the deploying node
+     * Sets the new description of the deploying node.
+     *
+     * @param desc the new description of the deploying node.
      */
     void setDescription(final String desc) {
         this.description = desc;
     }
 
     /**
-     * @return this deploying node's name
-     */
-    public String getName() {
-        return this.nodeName;
-    }
-
-    /**
-     * @return this deploying node's command line
+     * Returns the command line of the node that is deploying.
+     *
+     * @return the command line of the node that is deploying.
      */
     public String getCommandLine() {
         return this.commandLine;
     }
 
     /**
-     * {@inheritDoc}
+     * The behaviour is to do nothing.
      */
     @Override
     public void clean() throws NodeException {
-        //implementation does nothing
+        // implementation does nothing
     }
 
     /**
-     * {@inheritDoc}
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
@@ -167,15 +141,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RMNodeEvent getAddEvent() {
-        return this.addEvent;
-    }
-
-    /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public Permission getAdminPermission() {
@@ -183,7 +151,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @return empty string
+     * A deploying node has no VM descriptor.
+     *
+     * @return an empty String.
      */
     @Override
     public String getDescriptorVMName() {
@@ -191,7 +161,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @return empty string
+     * A deploying node has no hostname assigned yet.
+     *
+     * @return an empty String.
      */
     @Override
     public String getHostName() {
@@ -199,15 +171,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RMNodeEvent getLastEvent() {
-        return this.lastEvent;
-    }
-
-    /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public Node getNode() {
@@ -215,34 +181,12 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     public NodeInformation getNodeInformation() throws NodeException {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNodeName() {
-        return this.nodeName;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeSource getNodeSource() {
-        return this.nodeSource;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNodeURL() {
-        return this.nodeURL;
     }
 
     /**
@@ -254,15 +198,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Client getProvider() {
-        return this.provider;
-    }
-
-    /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public HashMap<SelectionScript, Integer> getScriptStatus() {
@@ -270,23 +208,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeState getState() {
-        return this.state;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getStateChangeTime() {
-        return this.stateChangeTime;
-    }
-
-    /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public Permission getUserPermission() {
@@ -294,7 +218,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @return an empty string
+     * Returns {@code false} under all conditions.
+     *
+     * @return {@code false} under all conditions.
      */
     @Override
     public String getVNodeName() {
@@ -302,7 +228,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @return false;
+     * Returns {@code false} under all conditions.
+     *
+     * @return {@code false} under all conditions.
      */
     @Override
     public boolean isBusy() {
@@ -310,7 +238,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @return false;
+     * Returns {@code false} under all conditions.
+     *
+     * @return {@code false} under all conditions.
      */
     @Override
     public boolean isDown() {
@@ -318,7 +248,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @return false;
+     * Returns {@code false} under all conditions.
+     *
+     * @return {@code false} under all conditions.
      */
     @Override
     public boolean isFree() {
@@ -326,7 +258,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @return false;
+     * Returns {@code false} under all conditions.
+     *
+     * @return {@code false} under all conditions.
      */
     @Override
     public boolean isToRemove() {
@@ -349,20 +283,13 @@ public final class RMDeployingNode extends AbstractRMNode {
      * Sets this deploying node's state to lost
      */
     public void setLost() {
-        this.state = NodeState.LOST;
-        this.stateChangeTime = System.currentTimeMillis();
+        changeState(NodeState.LOST);
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setAddEvent(final RMNodeEvent addEvent) {
-        this.addEvent = addEvent;
-    }
-
-    /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public void setBusy(Client owner) {
@@ -370,7 +297,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public void setDown() {
@@ -378,7 +307,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public void setFree() {
@@ -386,23 +317,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setLastEvent(final RMNodeEvent lastEvent) {
-        this.lastEvent = lastEvent;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setNodeSource(NodeSource nodeSource) {
-        this.nodeSource = nodeSource;
-    }
-
-    /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public void setToRemove() {
@@ -410,27 +327,18 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     @Override
-    public int compareTo(RMNode o) {
-        return this.getNodeURL().compareTo(o.getNodeURL());
+    public int compareTo(RMNode rmNode) {
+        return this.getNodeURL().compareTo(rmNode.getNodeURL());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNodeSourceName() {
-        return this.nodeSourceName;
-    }
-
-    /**
-     * @return the url of this deploying node
-     */
     private String buildNodeURL() {
         return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSourceName + "/" + this.nodeName;
     }
 
     /**
-     * @return false
+     * Returns {@code false} under all conditions.
+     *
+     * @return {@code false} under all conditions.
      */
     @Override
     public boolean isConfiguring() {
@@ -438,7 +346,9 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * Unsupported operation.
+     *
+     * @throws UnsupportedOperationException under all conditions.
      */
     @Override
     public void setConfiguring(Client owner) {
@@ -483,8 +393,8 @@ class RMDeployingNodeAccessorImpl extends InfrastructureManager.RMDeployingNodeA
 
     /** {@inheritDoc} */
     @Override
-    protected RMDeployingNode newRMDeployingNode(String name, NodeSource ns, String commandLine,
-            Client provider, String description) {
+    protected RMDeployingNode newRMDeployingNode(String name, NodeSource ns, String commandLine, Client provider,
+            String description) {
         return new RMDeployingNode(name, ns, commandLine, provider, description);
     }
 

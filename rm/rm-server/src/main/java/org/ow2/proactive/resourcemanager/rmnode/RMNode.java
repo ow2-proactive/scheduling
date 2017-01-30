@@ -36,6 +36,11 @@
  */
 package org.ow2.proactive.resourcemanager.rmnode;
 
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -47,11 +52,6 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -108,7 +108,9 @@ public interface RMNode extends Comparable<RMNode> {
     //----------------------------------------------------------------------//
 
     /**
-     * @return the name of the node
+     * Returns the name of the node.
+     *
+     * @return the name of the node.
      */
     String getNodeName();
 
@@ -137,17 +139,23 @@ public interface RMNode extends Comparable<RMNode> {
     String getDescriptorVMName();
 
     /**
-     * @return the {@link NodeSource} name of the source that handle the node
+     * Returns the NodeSource name of the node.
+     *
+     * @return the NodeSource name of the node.
      */
     String getNodeSourceName();
 
     /**
-     * @return the URL of the node.
+     * Returns the unique ID of the node.
+     *
+     * @return the unique ID of the node represented by its URL.
      */
     String getNodeURL();
 
-    /** Get the node source object that handle the node
-     * @return the stub of the node source active object
+    /**
+     * Returns the Stub of the {@link NodeSource} that handles the node.
+     *
+     * @return the stub of the {@link NodeSource} that handles the node.
      */
     NodeSource getNodeSource();
 
@@ -309,8 +317,9 @@ public interface RMNode extends Comparable<RMNode> {
     void unlock(Client client);
 
     /**
-     * Change the {@link NodeSource} from where the node is.
-     * @param nodeSource
+     * Sets the Stub of the NodeSource to the specified value.
+     *
+     * @param nodeSource the new NodeSource Stub to use.
      */
     void setNodeSource(NodeSource nodeSource);
 

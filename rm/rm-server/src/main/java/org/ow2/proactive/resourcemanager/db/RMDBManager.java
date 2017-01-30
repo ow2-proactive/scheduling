@@ -42,8 +42,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -52,6 +54,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.objectweb.proactive.core.util.MutableInteger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
@@ -62,7 +65,6 @@ import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 
 
@@ -363,14 +365,14 @@ public class RMDBManager {
      *
      * @return the number of nodes locked per node source and host pair on the previous RM run.
      */
-    public Table<String, String, Integer> getNodeLockingInformation() {
+    public Table<String, String, MutableInteger> getNodesLockedOnPreviousRun() {
 
         List<Object[]> lockingInformation =
                 executeReadTransaction(new SessionWork<List<Object[]>>() {
             @Override
             @SuppressWarnings("unchecked")
             public List<Object[]> doInTransaction(Session session) {
-                    return session.getNamedQuery("getNodeLockingInformation")
+                    return session.getNamedQuery("getNodesLockedOnPreviousRun")
                             .setLong("endTime", getRmLastAliveTimeAfterStartup()).list();
             }
         });
@@ -378,25 +380,36 @@ public class RMDBManager {
         return groupNodeUrlsByHostAndNodeSource(lockingInformation);
     }
 
-    private Table<String, String, Integer> groupNodeUrlsByHostAndNodeSource(List<Object[]> lockingInformation) {
+    protected Table<String, String, MutableInteger> groupNodeUrlsByHostAndNodeSource(List<Object[]> lockingInformation) {
 
-        Table<String, String, Integer> table =
+        Table<String, String, MutableInteger> table =
                 HashBasedTable.create(lockingInformation.size(), 3);
+
+        // Used to remove duplicate node URLs
+        // The JPQL query already applies GROUP BY but DISTINCT is not possible on a specific column
+        // As a consequence, filtering is done at this level
+        Set<String> nodeUrls = new HashSet<>(lockingInformation.size(), 1f);
 
         for (Object[] row : lockingInformation) {
 
             String nodeSource = (String) row[0];
             String host = (String) row[1];
+            String nodeUrl = (String) row[2];
 
-            Integer nbNodes = table.get(nodeSource, host);
-
-            if (nbNodes == null) {
-                nbNodes = 1;
-            } else {
-                nbNodes++;
+            int increment = 0;
+            if (nodeUrls.add(nodeUrl)) {
+                increment = 1;
             }
 
-            table.put(nodeSource, host, nbNodes);
+            MutableInteger nodeCount = table.get(nodeSource, host);
+
+            if (nodeCount == null) {
+                nodeCount = new MutableInteger(increment);
+            } else {
+                nodeCount.add(increment);
+            }
+
+            table.put(nodeSource, host, nodeCount);
         }
 
         return table;
