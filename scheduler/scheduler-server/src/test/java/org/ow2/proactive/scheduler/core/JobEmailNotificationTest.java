@@ -154,7 +154,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
 
         } catch (JobEmailNotificationException e) {
             Assert.assertThat("Wrong exception message", e.getMessage(),
-                    containsString("Malformed email address"));
+                    containsString("Error sending email"));
             throw e;
         }
     }
@@ -172,7 +172,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
 
         } catch (JobEmailNotificationException e) {
             Assert.assertThat("Wrong exception message", e.getMessage(),
-                    containsString("Malformed email address"));
+                    containsString("Error sending email"));
             throw e;
         }
     }

@@ -38,6 +38,7 @@
 package org.ow2.proactive_grid_cloud_portal.cli.json;
 
 public class NodeEventView {
+
     private String hostName;
     private String nodeSource;
     private String nodeState;
@@ -49,6 +50,9 @@ public class NodeEventView {
     private String nodeOwner;
     private String defaultJMXUrl;
     private String proactiveJMXUrl;
+    private String locked;
+    private String lockTime;
+    private String nodeLocker;
 
     public String getHostName() {
         return hostName;
@@ -137,4 +141,29 @@ public class NodeEventView {
     public void setProactiveJMXUrl(String proactiveJMXUrl) {
         this.proactiveJMXUrl = proactiveJMXUrl;
     }
+
+    public String isLocked() {
+        return locked;
+    }
+
+    public void setLocked(String locked) {
+        this.locked = locked;
+    }
+
+    public String getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(String lockTime) {
+        this.lockTime = lockTime;
+    }
+
+    public String getNodeLocker() {
+        return nodeLocker;
+    }
+
+    public void setNodeLocker(String nodeLocker) {
+        this.nodeLocker = nodeLocker;
+    }
+
 }
