@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job xmlns="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.2/schedulerjob.xsd"
-	name="${jobName}" cancelJobOnError="true" maxNumberOfExecution="2" projectName="${PROJECT}" restartTaskOnError="elsewhere">
+	name="${jobName}" cancelJobOnError="true" maxNumberOfExecution="${NB_EXECUTION}" projectName="${PROJECT}" restartTaskOnError="elsewhere" priority="${PRIORITY}">
 	<!-- ${jobName} is set as JVM parameter in the TestJobFactory -->
 	<variables>
 		<!-- Relative path is from Scheduler root directory for the tests -->
@@ -10,6 +10,8 @@
 		<variable name="EXCLUSION_STRING" value="paquit"/>
 		<variable name="JAVA_HOME" value="/bin/java/jdk1.5"/>
 		<variable name="PROJECT" value="My_project"/>
+		<variable name="PRIORITY" value="${priority}"/>
+		<variable name="NB_EXECUTION" value="${nb.execution}"/>
 	</variables>
 	<description>No ${EXCLUSION_STRING} in its HostName.</description>
 	<inputSpace url="input/space"/>

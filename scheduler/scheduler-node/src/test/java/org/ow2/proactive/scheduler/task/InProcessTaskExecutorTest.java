@@ -1,6 +1,24 @@
 package org.ow2.proactive.scheduler.task;
 
-import com.google.common.collect.ImmutableMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
+
+import java.io.Serializable;
+import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -10,6 +28,7 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -25,20 +44,7 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.ClasspathUtils;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.Serializable;
-import java.security.KeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
+import com.google.common.collect.ImmutableMap;
 
 
 public class InProcessTaskExecutorTest {
@@ -170,7 +176,7 @@ public class InProcessTaskExecutorTest {
         initializer.setPostScript(
                 new SimpleScript("print(variables.get('var')); variables.put('var', 'post')", "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L));
-        initializer.setVariables(Collections.singletonMap("var", "value"));
+        initializer.setJobVariables(Collections.singletonMap("var", new JobVariable("var", "value")));
 
         TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(
                         new ScriptExecutableContainer(new TaskScript(new SimpleScript(

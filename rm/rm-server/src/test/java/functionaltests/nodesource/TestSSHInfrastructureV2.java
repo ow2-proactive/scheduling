@@ -36,9 +36,15 @@
  */
 package functionaltests.nodesource;
 
-import functionaltests.monitor.RMMonitorsHandler;
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.util.OsUtils;
@@ -70,14 +76,9 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertEquals;
+import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 
 public class TestSSHInfrastructureV2 extends RMFunctionalTest {
@@ -107,6 +108,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                 StaticPolicy.class.getName(), policyParameters);
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
 
+        RMTHelper.log("Checking scheduler state after node source creation");
         RMState s = resourceManager.getState();
         assertEquals(NB_NODES, s.getTotalNodesNumber());
         assertEquals(NB_NODES, s.getFreeNodesNumber());
@@ -133,16 +135,21 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         NodeSet ns = resourceManager.getNodes(new Criteria(NB_NODES));
 
-        assertEquals(NB_NODES, ns.size());
+        if (ns.size() != NB_NODES) {
+            RMTHelper.log("Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
+            return;
+        }
 
         for (Node n : ns) {
             rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 60000, monitorsHandler);
         }
 
         String nodeUrl = ns.get(0).getNodeInformation().getURL();
+        RMTHelper.log("Killing nodes");
         // Nodes will be redeployed only if we kill the whole runtime
         rmHelper.killRuntime(nodeUrl);
 
+        RMTHelper.log("Wait for down nodes detection by the rm");
         for (Node n : ns) {
             RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 120000, monitorsHandler);
             assertEquals(NodeState.DOWN, ev.getNodeState());
@@ -152,6 +159,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
             rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL(), 120000, monitorsHandler);
         }
 
+        RMTHelper.log("Wait for nodes restart by the policy");
         rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES);
         for (int i = 0; i < NB_NODES; i++) {
             rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
@@ -159,6 +167,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
             rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         }
 
+        RMTHelper.log("Final checks on the scheduler state");
         s = resourceManager.getState();
         assertEquals(NB_NODES, s.getTotalNodesNumber());
         assertEquals(NB_NODES, s.getFreeNodesNumber());
@@ -167,6 +176,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
     @After
     public void removeNS() throws Exception {
+        RMTHelper.log("Removing node source");
         try {
             resourceManager.removeNodeSource(nsname, true);
         } catch (Exception ignored) {

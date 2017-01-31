@@ -34,10 +34,9 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.ow2.proactive.scheduler.common.task;
+package org.ow2.proactive.scheduler.common.job;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobVariable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -48,66 +47,88 @@ import java.io.Serializable;
  * 
  * 
  * @author The ProActive Team
- * @since ProActive Scheduling 7.20
+ * @since ProActive Scheduling 7.24
  */
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TaskVariable extends JobVariable implements Serializable {
+public class JobVariable implements Serializable {
 
-    private boolean jobInherited;
+    private String name;
 
-    public TaskVariable() {
+    private String value;
+
+    private String model;
+
+    public JobVariable() {
         //Empty constructor
     }
 
-    public TaskVariable(String name, String value, String model, boolean isJobInherited) {
-        super(name, value, model);
-        this.jobInherited = isJobInherited;
+    public JobVariable(String name, String value) {
+        this(name, value, null);
     }
 
-    public boolean isJobInherited() {
-        return jobInherited;
+    public JobVariable(String name, String value, String model) {
+        this.name = name;
+        this.value = value;
+        this.model = model;
     }
 
-    public void setJobInherited(boolean inherited) {
-        this.jobInherited = inherited;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 
     @Override
-    public boolean equals(Object object){
-        if (this == object){
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-        if (object == null){
+        if (object == null) {
             return false;
-        }        
-        if (getClass() != object.getClass()){
+        }
+        if (getClass() != object.getClass()) {
             return false;
         }
 
-        TaskVariable taskVariable = (TaskVariable) object;
-        if (jobInherited != taskVariable.isJobInherited()){
-            return false;
-        }
-        if (getName() == null) {
-            if (taskVariable.getName() != null) {
+        JobVariable jobVariable = (JobVariable) object;
+        if (name == null) {
+            if (jobVariable.name != null) {
                 return false;
             }
-        } else if (!getName().equals(taskVariable.getName())) {
+        } else if (!name.equals(jobVariable.name)) {
             return false;
         }
-        if (getValue() == null) {
-            if (taskVariable.getValue() != null) {
+        if (value == null) {
+            if (jobVariable.value != null) {
                 return false;
             }
-        } else if (!getValue().equals(taskVariable.getValue())) {
+        } else if (!value.equals(jobVariable.value)) {
             return false;
         }
-        if (getModel() == null) {
-            if (taskVariable.getModel() != null) {
+        if (model == null) {
+            if (jobVariable.model != null) {
                 return false;
             }
-        } else if (!getModel().equals(taskVariable.getModel())) {
+        } else if (!model.equals(jobVariable.model)) {
             return false;
         }
         return true;
@@ -117,17 +138,15 @@ public class TaskVariable extends JobVariable implements Serializable {
     public int hashCode() {
         final int primeNumber = 31;
         int result = 1;
-        result = primeNumber * result + (jobInherited ? 3 : 5);
-        result = primeNumber * result + ((getName() == null) ? 0 : getName().hashCode());
-        result = primeNumber * result + ((getValue() == null) ? 0 : getValue().hashCode());
-        result = primeNumber * result + ((getModel() == null) ? 0 : getModel().hashCode());
+        result = primeNumber * result + ((name == null) ? 0 : name.hashCode());
+        result = primeNumber * result + ((value == null) ? 0 : value.hashCode());
+        result = primeNumber * result + ((model == null) ? 0 : model.hashCode());
         return result;
     }
 
     @Override
     public String toString() {
-        return "TaskVariable{" + "name='" + getName() + '\'' + ", value='" + getValue() + '\'' + ", model='" +
-               getModel() + '\'' + ", jobInherited=" + jobInherited + '}';
+        return "JobVariable{" + "name='" + name + '\'' + ", value='" + value + '\'' + ", model='" + model + '\'' + '}';
     }
 
 }

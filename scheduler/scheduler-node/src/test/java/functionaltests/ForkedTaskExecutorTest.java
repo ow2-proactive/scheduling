@@ -1,11 +1,27 @@
 package functionaltests;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.InputStreamReader;
+import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Collections;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -22,12 +38,8 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
-import java.io.File;
-import java.io.InputStreamReader;
-import java.security.*;
-import java.util.Collections;
-
-import static org.junit.Assert.*;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 
 /**
  * The ForkedTaskExecutorTest executes several scenarios on the ForkedTaskExecutor
@@ -191,7 +203,7 @@ public class ForkedTaskExecutorTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
-        initializer.setVariables(Collections.singletonMap("aVar", "aValue"));
+        initializer.setJobVariables(Collections.singletonMap("aVar", new JobVariable("aVar", "aValue")));
 
         ForkEnvironment forkEnvironment = new ForkEnvironment();
         forkEnvironment.addSystemEnvironmentVariable("envVar", "$aVar");

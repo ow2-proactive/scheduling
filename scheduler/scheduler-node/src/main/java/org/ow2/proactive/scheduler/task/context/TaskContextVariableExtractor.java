@@ -39,6 +39,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
@@ -53,7 +54,7 @@ public class TaskContextVariableExtractor implements Serializable {
 
     public Map<String, String> extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(TaskContext taskContext) throws Exception {
         ForkEnvironment forkEnvironment = taskContext.getInitializer().getForkEnvironment();
-        Map<String, Serializable> variables = this.extractTaskVariables(taskContext);
+        Map<String, Serializable> variables = this.extractVariables(taskContext, true);
         Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
         HashMap<String, Serializable> systemEnvironmentVariables = new HashMap<String, Serializable>(
                 System.getenv());
@@ -64,14 +65,15 @@ public class TaskContextVariableExtractor implements Serializable {
                 systemEnvironmentVariables);
     }
 
-    public Map<String, Serializable> extractTaskVariables(TaskContext taskContext) throws Exception {
-        return extractTaskVariables(taskContext, (TaskResult) null);
+    public Map<String, Serializable> extractVariables(TaskContext taskContext, boolean useTaskVariables)
+            throws Exception {
+        return extractVariables(taskContext, (TaskResult) null, useTaskVariables);
     }
 
-    private Map<String, Serializable> extractTaskVariables(TaskContext container, TaskResult taskResult,
-            String nodesFile)
+    private Map<String, Serializable> extractVariables(TaskContext container, TaskResult taskResult, String nodesFile,
+            boolean useTaskVariables)
             throws Exception {
-        Map<String, Serializable> variables = extractTaskVariables(container, taskResult);
+        Map<String, Serializable> variables = extractVariables(container, taskResult, useTaskVariables);
 
         variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getOtherNodesURLs().size() + 1);
         variables.put(SchedulerVars.PA_NODESFILE.toString(), nodesFile);
@@ -81,20 +83,33 @@ public class TaskContextVariableExtractor implements Serializable {
         return variables;
     }
 
-    public Map<String, Serializable> extractTaskVariables(TaskContext taskContext,
-            TaskResult taskResult) throws Exception {
+    @SuppressWarnings("squid:S134")
+    public Map<String, Serializable> extractVariables(TaskContext taskContext, TaskResult taskResult,
+            boolean useTaskVariables) throws Exception {
         Map<String, Serializable> variables = new HashMap<>();
 
-        // variables from workflow definition
-        if (taskContext.getInitializer().getVariables() != null) {
-            variables.putAll(taskContext.getInitializer().getVariables());
+        // job variables from workflow definition
+        if (taskContext.getInitializer().getJobVariables() != null) {
+            for (JobVariable jobVariable : taskContext.getInitializer().getJobVariables().values()) {
+                variables.put(jobVariable.getName(), jobVariable.getValue());
+            }
         }
 
         try {
             // variables from previous tasks
             if (taskContext.getPreviousTasksResults() != null) {
-                variables.putAll(extractPrevoiusTaskResultVariablesFromTaskContext(taskContext));
+                variables.putAll(extractPreviousTaskResultVariablesFromTaskContext(taskContext));
             }
+
+            // task variables from workflow definition
+            if (useTaskVariables && taskContext.getInitializer().getTaskVariables() != null) {
+                for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
+                    if (!taskVariable.isJobInherited()) {
+                        variables.put(taskVariable.getName(), taskVariable.getValue());
+                    }
+                }
+            }
+
             // and from this task execution
             if (taskResult != null && taskResult.getPropagatedVariables() != null) {
                 variables.putAll(SerializationUtil.deserializeVariableMap(taskResult
@@ -126,9 +141,9 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
 
-    public Map<String, Serializable> extractTaskVariables(TaskContext container,
-            String nodesFile) throws Exception {
-        return extractTaskVariables(container, null, nodesFile);
+    public Map<String, Serializable> extractVariables(TaskContext container, String nodesFile, boolean useTaskVariables)
+            throws Exception {
+        return extractVariables(container, null, nodesFile, useTaskVariables);
     }
 
     public Map<String, Serializable> retrieveContextVariables(TaskLauncherInitializer initializer) {
@@ -145,7 +160,7 @@ public class TaskContextVariableExtractor implements Serializable {
         return variables;
     }
 
-    private Map<String, Serializable> extractPrevoiusTaskResultVariablesFromTaskContext(TaskContext container)
+    private Map<String, Serializable> extractPreviousTaskResultVariablesFromTaskContext(TaskContext container)
             throws IOException, ClassNotFoundException {
         Map<String, Serializable> result = new HashMap<>();
         for (TaskResult previousTaskResult : container.getPreviousTasksResults()) {

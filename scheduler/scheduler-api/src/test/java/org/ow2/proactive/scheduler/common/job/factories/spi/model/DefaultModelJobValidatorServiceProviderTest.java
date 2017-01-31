@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
@@ -48,37 +49,60 @@ public class DefaultModelJobValidatorServiceProviderTest {
     }
 
     @Test
-    public void testValidateJobWithModelOK() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithModelVariable("true", BooleanParserValidator.BOOLEAN_TYPE));
+    public void testValidateJobWithJobModelVariableOK() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithJobModelVariable("true", BooleanParserValidator.BOOLEAN_TYPE));
     }
 
     @Test(expected = JobValidationException.class)
-    public void testValidateJobWithModelKO() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithModelVariable("blabla", BooleanParserValidator.BOOLEAN_TYPE));
+    public void testValidateJobWithJobModelVariableKO() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithJobModelVariable("blabla", BooleanParserValidator.BOOLEAN_TYPE));
     }
 
     @Test
-    public void testValidateJobEmptyModel() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithModelVariable("blabla", ""));
+    public void testValidateJobWithJobModelVariableEmptyModel() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithJobModelVariable("blabla", "  "));
     }
 
     @Test
-    public void testValidateJobUnknownModel() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithModelVariable("blabla", "UNKNOWN"));
+    public void testValidateJobWithJobModelVariableUnknownModel() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithJobModelVariable("blabla", "UNKNOWN"));
     }
 
-    private TaskFlowJob createJobWithModelVariable(String value, String model) throws UserException {
+    @Test
+    public void testValidateJobWithTaskModelVariableOK() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithTaskModelVariable("true", BooleanParserValidator.BOOLEAN_TYPE));
+    }
+
+    @Test(expected = JobValidationException.class)
+    public void testValidateJobWithTaskModelVariableKO() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithTaskModelVariable("blabla", BooleanParserValidator.BOOLEAN_TYPE));
+    }
+
+    @Test
+    public void testValidateJobWithTaskModelVariableEmptyModel() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithTaskModelVariable("blabla", "  "));
+    }
+
+    @Test
+    public void testValidateJobWithTaskModelVariableUnknownModel() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithTaskModelVariable("blabla", "UNKNOWN"));
+    }
+
+    private TaskFlowJob createJobWithJobModelVariable(String value, String model) throws UserException {
         TaskFlowJob job = new TaskFlowJob();
-        Task task = createTaskWithModelVariable(value, model);
-        job.addTask(task);
+        JobVariable jobVariable = new JobVariable("VAR", value, model);
+        job.setVariables(Collections.singletonMap(jobVariable.getName(), jobVariable));
         return job;
     }
 
-    private Task createTaskWithModelVariable(String value, String model) {
+    private TaskFlowJob createJobWithTaskModelVariable(String value, String model) throws UserException {
+        TaskFlowJob job = new TaskFlowJob();
         TaskVariable variable = new TaskVariable("VAR", value, model, false);
         Task task = new ScriptTask();
         task.setName("ModelTask");
         task.setVariables(Collections.singletonMap(variable.getName(), variable));
-        return task;
+        job.addTask(task);
+        return job;
     }
+
 }
