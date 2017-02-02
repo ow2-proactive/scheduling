@@ -745,7 +745,9 @@ public abstract class Task extends CommonAttribute {
             (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
             (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
                 maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
-            "\ttag = " + tag + nl + "\tgenericInformation = {" + nl +
+               "\ttag = " + tag + nl + "\tvariables = {" + nl +
+               Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}" + nl + "\tgenericInformation = {" +
+               nl +
             Joiner.on('\n').withKeyValueSeparator("=").join(genericInformation) + nl + "}" + nl +
             "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
             "\tParallelEnvironment = " + parallelEnvironment + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
