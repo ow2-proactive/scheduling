@@ -571,7 +571,9 @@ public class StaxJobFactory extends JobFactory {
                      taskVariable.setName(attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName()));
                      taskVariable.setValue(attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
                      taskVariable.setModel(attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
-                     taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
+                    if (attributesAsMap.containsKey(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())) {
+                        taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
+                    }
 
                      variablesMap.put(taskVariable.getName(), taskVariable);
                  }else if (eventType == XMLEvent.END_ELEMENT && XMLTags.VARIABLES.matches(cursorVariables.getLocalName())){
