@@ -34,6 +34,11 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
+
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
@@ -45,11 +50,6 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
-
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Map;
 
 public class ForkEnvironmentScriptExecutor implements Serializable {
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
@@ -69,7 +69,7 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
             PrintStream errorSink) throws Exception {
 
         VariablesMap variables = new VariablesMap();
-        variables.setInheritedMap(taskContextVariableExtractor.extractTaskVariables(context));
+        variables.setInheritedMap(taskContextVariableExtractor.extractVariables(context, false));
         variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(context));
         Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
                 context);

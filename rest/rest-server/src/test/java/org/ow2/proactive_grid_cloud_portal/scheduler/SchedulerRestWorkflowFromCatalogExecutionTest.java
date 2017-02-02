@@ -37,6 +37,21 @@
 
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,18 +66,6 @@ import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
 
 public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServer {
 
@@ -140,7 +143,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         verify(scheduler).submit(argumentCaptor.capture());
         Job interceptedJob = argumentCaptor.getValue();
         Assert.assertEquals(1, interceptedJob.getVariables().size());
-        Assert.assertEquals("defaultvalue", interceptedJob.getVariables().get("var1"));
+        Assert.assertEquals("defaultvalue", interceptedJob.getVariables().get("var1").getValue());
 
         Assert.assertEquals(88L, response.getId());
         Assert.assertEquals("job", response.getReadableName());
@@ -160,7 +163,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         Job interceptedJob = argumentCaptor.getValue();
 
         Assert.assertEquals(1, interceptedJob.getVariables().size());
-        Assert.assertEquals("value1", interceptedJob.getVariables().get("var1"));
+        Assert.assertEquals("value1", interceptedJob.getVariables().get("var1").getValue());
 
         Assert.assertEquals(99L, response.getId());
         Assert.assertEquals("job", response.getReadableName());

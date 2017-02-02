@@ -36,6 +36,7 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -84,7 +85,7 @@ public abstract class Job extends CommonAttribute {
     protected String userSpace = null;
 
     /** A map to holds job descriptor variables */
-    protected ConcurrentHashMap<String, String> variables = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<String, JobVariable> variables = new ConcurrentHashMap<>();
 
     /** ProActive Empty Constructor */
     public Job() {
@@ -243,8 +244,19 @@ public abstract class Job extends CommonAttribute {
      * 
      * @param variables the variables map
      */
-    public void setVariables(Map<String, String> variables) {
+    public void setVariables(Map<String, JobVariable> variables) {
+        verifyVariableMap(variables);
         this.variables = new ConcurrentHashMap<>(variables);
+    }
+
+    public static void verifyVariableMap(Map<String, ? extends JobVariable> variables) {
+        for (Map.Entry<String, ? extends JobVariable> entry : variables.entrySet()) {
+            if (!entry.getKey().equals(entry.getValue().getName())) {
+                throw new IllegalArgumentException("Variables map entry key (" + entry.getKey() +
+                                                   ") is different from variable name (" + entry.getValue().getName() +
+                                                   ")");
+            }
+        }
     }
 
     /**
@@ -252,8 +264,21 @@ public abstract class Job extends CommonAttribute {
      * 
      * @return a variable map
      */
-    public Map<String, String> getVariables() {
+    public Map<String, JobVariable> getVariables() {
         return this.variables;
+    }
+
+    /**
+     * Returns a map containing the variable names and their values.
+     *
+     * @return a variable map
+     */
+    public Map<String, String> getVariablesAsReplacementMap() {
+        HashMap<String, String> replacementVariables = new HashMap<>(variables.size());
+        for (JobVariable variable : variables.values()) {
+            replacementVariables.put(variable.getName(), variable.getValue());
+        }
+        return replacementVariables;
     }
 
     @Override

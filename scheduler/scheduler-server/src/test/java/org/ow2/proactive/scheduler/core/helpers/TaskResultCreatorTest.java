@@ -6,6 +6,7 @@ import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
@@ -30,12 +31,7 @@ import java.util.Vector;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TaskResultCreatorTest {
 
@@ -125,13 +121,17 @@ public class TaskResultCreatorTest {
 
         InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());
         
-        Map<String, String> fakeVariableMap = new HashMap<>();
-                fakeVariableMap.put("TestVar", "h234");
+        Map<String, JobVariable> fakeVariableMap = new HashMap<>();
+        fakeVariableMap.put("TestVar", new JobVariable("TestVar", "h234"));
                 when(mockedInternalJob.getVariables()).thenReturn(fakeVariableMap);
+
+        Map<String, String> fakeReplacementVariableMap = new HashMap<>();
+        fakeReplacementVariableMap.put("TestVar", "h234");
+        when(mockedInternalJob.getVariablesAsReplacementMap()).thenReturn(fakeReplacementVariableMap);
 
         TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, mockedInternalJob, this.getMockedInternalTask());
 
-        verify(mockedInternalJob, atLeastOnce()).getVariables();
+        verify(mockedInternalJob, atLeastOnce()).getVariablesAsReplacementMap();
 
         assertThat(new String(taskResult
                         .getPropagatedVariables()
@@ -234,7 +234,7 @@ public class TaskResultCreatorTest {
         InternalJob mockedInternalJob = mock(InternalJob.class);
         when(mockedInternalJob.getJobDescriptor()).thenReturn(mockedJobDescriptor);
         when(mockedInternalJob.getType()).thenReturn(JobType.TASKSFLOW);
-        when(mockedInternalJob.getVariables()).thenReturn(new HashMap<String, String>());
+        when(mockedInternalJob.getVariables()).thenReturn(new HashMap<String, JobVariable>());
         return mockedInternalJob;
     }
 

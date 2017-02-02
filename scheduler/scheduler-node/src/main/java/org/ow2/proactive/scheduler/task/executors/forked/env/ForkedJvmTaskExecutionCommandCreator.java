@@ -34,7 +34,13 @@
  */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
-import com.google.common.base.Strings;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -46,12 +52,7 @@ import org.ow2.proactive.scheduler.task.executors.forked.env.command.JavaPrefixC
 import org.ow2.proactive.scripting.ForkEnvironmentScriptResult;
 import org.ow2.proactive.scripting.ScriptResult;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Strings;
 
 
 public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
@@ -77,7 +78,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         if (taskContext == null) {
             return new ArrayList<>(0);
         }
-        Map<String, Serializable> variables = taskContextVariableExtractor.extractTaskVariables(taskContext);
+        Map<String, Serializable> variables = taskContextVariableExtractor.extractVariables(taskContext, true);
         String javaHome = System.getProperty("java.home");
         ArrayList<String> jvmArguments = new ArrayList<>(1);
 

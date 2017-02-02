@@ -48,12 +48,14 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
@@ -73,7 +75,7 @@ public class TestStaxJobFactory {
 
     private static URI jobDescriptorSysPropsUri;
 
-    private JobFactory factory;
+    private StaxJobFactory factory;
 
     @BeforeClass
     public static void setJobDescriptorcUri() throws Exception {
@@ -82,11 +84,13 @@ public class TestStaxJobFactory {
         jobDescriptorSysPropsUri = TestStaxJobFactory.class.getResource(
                 "/org/ow2/proactive/scheduler/common/job/factories/job_update_variables_using_system_properties.xml")
                 .toURI();
+        BasicConfigurator.resetConfiguration();
+        BasicConfigurator.configure();
     }
 
     @Before
     public void setJobFactory() {
-        factory = JobFactory.getFactory(JOB_FACTORY_IMPL);
+        factory = (StaxJobFactory) JobFactory.getFactory(JOB_FACTORY_IMPL);
     }
 
     @Test
@@ -133,7 +137,8 @@ public class TestStaxJobFactory {
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap);
 
         assertEquals("from_create_job_parameter_value", testJob.getVariables().get(
-                "from_create_job_parameter"));
+                                                                    "from_create_job_parameter")
+                                                               .getValue());
     }
 
     @Test
@@ -142,7 +147,7 @@ public class TestStaxJobFactory {
 
         Job testJob = factory.createJob(jobDescriptorSysPropsUri);
 
-        assertEquals("system_property_value", testJob.getVariables().get("system_property"));
+        assertEquals("system_property_value", testJob.getVariables().get("system_property").getValue());
     }
 
     /**
@@ -168,8 +173,122 @@ public class TestStaxJobFactory {
     @Test
     public void testJobCreationAttributeOrderDefinitionVariableXmlElement() throws URISyntaxException, JobCreationException {
         Job job = factory.createJob(getResource("job_attr_def_variable_xml_element.xml"));
-        Map<String, String> variables = job.getVariables();
-        assertExpectedKeyValueEntriesMatch(variables);
+        Map<String, JobVariable> jobVariables = job.getVariables();
+        assertEquals(2, jobVariables.size());
+        JobVariable jobVariable = jobVariables.get("name1");
+        assertNotNull(jobVariable);
+        assertEquals("name1", jobVariable.getName());
+        assertEquals("value1", jobVariable.getValue());
+        assertEquals("model1", jobVariable.getModel());
+        jobVariable = jobVariables.get("name2");
+        assertNotNull(jobVariable);
+        assertEquals("name2", jobVariable.getName());
+        assertEquals("value2", jobVariable.getValue());
+        assertEquals("model2", jobVariable.getModel());
+    }
+
+    @Test
+    public void testHandleVariablesReplacements() throws JobCreationException {
+        // null replacement
+        Assert.assertEquals(ImmutableMap.<String, JobVariable> of("a1", new JobVariable("a1", "v1", "m1")),
+                            factory.replaceVariablesInJobVariablesMap(ImmutableMap.<String, JobVariable> of("a1",
+                                                                                                            new JobVariable("a1",
+                                                                                                                            "v1",
+                                                                                                                            "m1")),
+                                                                      null));
+
+        // replace existing variable, leave the model intact
+        Assert.assertEquals(ImmutableMap.<String, JobVariable> of("a1", new JobVariable("a1", "v2", "m1")),
+                            factory.replaceVariablesInJobVariablesMap(ImmutableMap.<String, JobVariable> of("a1",
+                                                                                                            new JobVariable("a1",
+                                                                                                                            "v1",
+                                                                                                                            "m1")),
+                                                                      ImmutableMap.<String, String> of("a1", "v2")));
+
+        // add new variable
+        Assert.assertEquals(ImmutableMap.<String, JobVariable> of("a1",
+                                                                  new JobVariable("a1", "v1", "m1"),
+                                                                  "a2",
+                                                                  new JobVariable("a2", "v2")),
+                            factory.replaceVariablesInJobVariablesMap(ImmutableMap.<String, JobVariable> of("a1",
+                                                                                                            new JobVariable("a1",
+                                                                                                                            "v1",
+                                                                                                                            "m1")),
+                                                                      ImmutableMap.<String, String> of("a2", "v2")));
+
+        // reuse replacement variable in pattern and add new variable
+        Assert.assertEquals(ImmutableMap.<String, JobVariable> of("a1",
+                                                                  new JobVariable("a1", "v1v2", "m1v2"),
+                                                                  "a2",
+                                                                  new JobVariable("a2", "v2")),
+                            factory.replaceVariablesInJobVariablesMap(ImmutableMap.<String, JobVariable> of("a1",
+                                                                                                            new JobVariable("a1",
+                                                                                                                            "v1${a2}",
+                                                                                                                            "m1${a2}")),
+                                                                      ImmutableMap.<String, String> of("a2", "v2")));
+
+        // existing variable uses another existing variable in a pattern, null replacements
+        Assert.assertEquals(ImmutableMap.<String, JobVariable> of("a1",
+                                                                  new JobVariable("a1", "v1v2", "m1v2"),
+                                                                  "a2",
+                                                                  new JobVariable("a2", "v2")),
+                            factory.replaceVariablesInJobVariablesMap(ImmutableMap.<String, JobVariable> of("a1",
+                                                                                                            new JobVariable("a1",
+                                                                                                                            "v1${a2}",
+                                                                                                                            "m1${a2}"),
+                                                                                                            "a2",
+                                                                                                            new JobVariable("a2",
+                                                                                                                            "v2")),
+                                                                      null));
+
+        // existing variable uses another existing variable in a pattern, this other existing variable uses itself a replacement variable
+        Assert.assertEquals(ImmutableMap.<String, JobVariable> of("a1",
+                                                                  new JobVariable("a1", "v1v3", "m1v3"),
+                                                                  "a2",
+                                                                  new JobVariable("a2", "v3", "m2v3"),
+                                                                  "a3",
+                                                                  new JobVariable("a3", "v3")),
+                            factory.replaceVariablesInJobVariablesMap(ImmutableMap.<String, JobVariable> of("a1",
+                                                                                                            new JobVariable("a1",
+                                                                                                                            "v1${a2}",
+                                                                                                                            "m1${a2}"),
+                                                                                                            "a2",
+                                                                                                            new JobVariable("a2",
+                                                                                                                            "${a3}",
+                                                                                                                            "m2${a3}")),
+                                                                      ImmutableMap.<String, String> of("a3", "v3")));
+
+        // existing variable uses a replacement variable in a pattern, this replacement variable uses itself a job variable from the workflow
+        Assert.assertEquals(ImmutableMap.<String, JobVariable> of("a1",
+                                                                  new JobVariable("a1", "v1v3", "m1v3"),
+                                                                  "a2",
+                                                                  new JobVariable("a2", "v3"),
+                                                                  "a3",
+                                                                  new JobVariable("a3", "v3", "m3v3")),
+                            factory.replaceVariablesInJobVariablesMap(ImmutableMap.<String, JobVariable> of("a1",
+                                                                                                            new JobVariable("a1",
+                                                                                                                            "v1${a2}",
+                                                                                                                            "m1${a2}"),
+                                                                                                            "a3",
+                                                                                                            new JobVariable("a3",
+                                                                                                                            "v3",
+                                                                                                                            "m3${a2}")),
+                                                                      ImmutableMap.<String, String> of("a2", "${a3}")));
+
+        // existing variable uses a replacement variable in a pattern, but is overwritten by another replacement variable
+        Assert.assertEquals(ImmutableMap.<String, JobVariable> of("a1",
+                                                                  new JobVariable("a1", "v1", "m1v2"),
+                                                                  "a2",
+                                                                  new JobVariable("a2", "v2")),
+                            factory.replaceVariablesInJobVariablesMap(ImmutableMap.<String, JobVariable> of("a1",
+                                                                                                            new JobVariable("a1",
+                                                                                                                            "v1${a2}",
+                                                                                                                            "m1${a2}")),
+                                                                      ImmutableMap.<String, String> of("a2",
+                                                                                                       "v2",
+                                                                                                       "a1",
+                                                                                                       "v1")));
+
     }
 
     @Test

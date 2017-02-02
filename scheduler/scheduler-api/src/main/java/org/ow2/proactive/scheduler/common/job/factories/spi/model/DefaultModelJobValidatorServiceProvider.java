@@ -28,13 +28,12 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 import java.io.File;
 
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.JobValidatorService;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
-
-import com.google.common.base.Strings;
 
 
 /**
@@ -53,21 +52,25 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
 
     @Override
     public void validateJob(TaskFlowJob job) throws JobValidationException {
+        for (JobVariable jobVariable : job.getVariables().values()) {
+            checkVariableFormat(null, jobVariable);
+        }
         for (Task task : job.getTasks()) {
-            for (TaskVariable variable : task.getVariables().values()) {
-                checkVariableFormat(task, variable);
+            for (TaskVariable taskVariable : task.getVariables().values()) {
+                checkVariableFormat(task, taskVariable);
             }
         }
     }
 
-    protected void checkVariableFormat(Task task, TaskVariable variable) throws JobValidationException {
-        if (!Strings.isNullOrEmpty(variable.getModel())) {
+    protected void checkVariableFormat(Task task, JobVariable variable) throws JobValidationException {
+        if (variable.getModel() != null && !variable.getModel().trim().isEmpty()) {
             String model = variable.getModel().trim();
 
             try {
                 new ModelValidator(model).validate(variable.getValue());
             } catch (Exception e) {
-                throw new JobValidationException("Task '" + task.getName() + "': Variable '" + variable.getName() +
+                throw new JobValidationException((task != null ? "Task '" + task.getName() + "': " : "") +
+                                                 "Variable '" + variable.getName() +
                                                  "': Model " + variable.getModel() + ": " + e.getMessage(), e);
             }
         }

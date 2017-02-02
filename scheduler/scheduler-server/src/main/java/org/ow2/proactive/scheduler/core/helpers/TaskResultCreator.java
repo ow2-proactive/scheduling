@@ -34,6 +34,12 @@
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -47,12 +53,6 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.TaskLogger;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 
 public class TaskResultCreator {
@@ -134,7 +134,7 @@ public class TaskResultCreator {
     private Map<String, byte[]> extractJobVariables(InternalJob job) {
         Map<String, byte[]> jobVariables = new HashMap<>();
         // otherwise use the default job variables
-        for (Entry<String, String> entry : job.getVariables().entrySet()) {
+        for (Entry<String, String> entry : job.getVariablesAsReplacementMap().entrySet()) {
             jobVariables.put(entry.getKey(), entry.getValue().getBytes());
         }
         return jobVariables;

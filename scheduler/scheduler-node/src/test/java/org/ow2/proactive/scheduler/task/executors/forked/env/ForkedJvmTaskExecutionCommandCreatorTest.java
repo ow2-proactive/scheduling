@@ -1,7 +1,20 @@
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -15,18 +28,6 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 
 public class ForkedJvmTaskExecutionCommandCreatorTest {
     private String jobNameValue = "TestJobName";
@@ -198,9 +199,9 @@ public class ForkedJvmTaskExecutionCommandCreatorTest {
     private TaskLauncherInitializer getTaskLauncherInitializerWithWorkflowVariableAndForkEnvironment() {
         // Create and setup task launcher initializer
         TaskLauncherInitializer taskLauncherInitializer = createTaskLauncherInitializer();
-        Map<String, String> variablesToPut = new HashMap<>();
-        variablesToPut.put(testVariable1Key, testVariable1Value);
-        taskLauncherInitializer.setVariables(variablesToPut);
+        Map<String, JobVariable> variablesToPut = new HashMap<>();
+        variablesToPut.put(testVariable1Key, new JobVariable(testVariable1Key, testVariable1Value));
+        taskLauncherInitializer.setJobVariables(variablesToPut);
         return taskLauncherInitializer;
     }
 

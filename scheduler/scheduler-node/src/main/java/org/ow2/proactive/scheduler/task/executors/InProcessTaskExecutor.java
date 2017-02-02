@@ -34,7 +34,19 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
-import com.google.common.base.Stopwatch;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
@@ -55,11 +67,7 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.PAProperties;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.google.common.base.Stopwatch;
 
 
 /**
@@ -128,8 +136,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         try {
             nodesFile = writeNodesFile(taskContext);
             VariablesMap variables = new VariablesMap();
-            variables.setInheritedMap(taskContextVariableExtractor.extractTaskVariables(
-                    taskContext, nodesFile));
+            variables.setInheritedMap(taskContextVariableExtractor.extractVariables(taskContext, nodesFile, false));
             variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(
                     taskContext));
             Map<String, String> resultMetadata = new HashMap<>();

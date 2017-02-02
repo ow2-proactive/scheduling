@@ -36,13 +36,17 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -55,11 +59,8 @@ import org.ow2.proactive.scheduler.common.task.RestartMode;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
-import org.junit.Assert;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import com.google.common.collect.ImmutableMap;
 
 
 /**
@@ -90,27 +91,27 @@ public class TestJobFactory {
         TaskFlowJob tfJob = getJob(jobTaskFlowDescriptor, impl, scriptFolder);
 
         //Check job properties
-        assertEquals(tfJob.getDescription(), "No paquit in its HostName.");
-        assertEquals(tfJob.getName(), "Job_TaskFlow");
-        assertEquals(tfJob.getProjectName(), "My_project");
-        assertEquals(tfJob.getPriority(), JobPriority.NORMAL);
+        assertEquals("No paquit in its HostName.", tfJob.getDescription());
+        assertEquals("Job_TaskFlow", tfJob.getName());
+        assertEquals("My_project", tfJob.getProjectName());
+        assertEquals(JobPriority.HIGH, tfJob.getPriority());
         assertEquals(OnTaskError.CANCEL_JOB, tfJob.getOnTaskErrorProperty().getValue());
-        assertEquals(tfJob.getMaxNumberOfExecution(), 2);
-        assertEquals(tfJob.getRestartTaskOnError(), RestartMode.ELSEWHERE);
-        assertEquals(tfJob.getType(), JobType.TASKSFLOW);
-        assertEquals(tfJob.getTasks().size(), 4);
+        assertEquals(2, tfJob.getMaxNumberOfExecution());
+        assertEquals(RestartMode.ELSEWHERE, tfJob.getRestartTaskOnError());
+        assertEquals(JobType.TASKSFLOW, tfJob.getType());
+        assertEquals(4, tfJob.getTasks().size());
         assertEquals("input/space", tfJob.getInputSpace());
         assertEquals("output/space", tfJob.getOutputSpace());
 
         //Check task 1 properties
         Task task1 = tfJob.getTask("task1");
 
-        assertEquals(task1.getName(), "task1");
+        assertEquals("task1", task1.getName());
         assertEquals(OnTaskError.NONE, task1.getOnTaskErrorProperty().getValue()); // The job factory overwrites the task settings with the job settings if they are set to none.
-        assertEquals(task1.isPreciousResult(), false);
-        assertEquals(task1.getRestartTaskOnError(), RestartMode.ANYWHERE);
-        assertEquals(task1.getMaxNumberOfExecution(), 1);
-        assertEquals(task1.getDescription(), "Parallel Tasks - Task 1");
+        assertEquals(false, task1.isPreciousResult());
+        assertEquals(RestartMode.ANYWHERE, task1.getRestartTaskOnError());
+        assertEquals(1, task1.getMaxNumberOfExecution());
+        assertEquals("Parallel Tasks - Task 1", task1.getDescription());
         assertEquals(2, task1.getSelectionScripts().size());
         assertEquals(false, task1.getSelectionScripts().get(0).isDynamic());
         Assert.assertTrue(task1.getSelectionScripts().get(0).getScript() != null);
@@ -126,41 +127,41 @@ public class TestJobFactory {
         assertNull(task1.getPostScript().getParameters());
         Assert.assertTrue(task1.getCleaningScript().getScript().contains("Beginning of clean script"));
         assertNull(task1.getCleaningScript().getParameters());
-        assertEquals(task1.getDependencesList(), null);
-        assertEquals(task1.getNumberOfNodesNeeded(), 1);
-        assertEquals(task1.getWallTime(), 12 * 1000);
-        assertEquals(task1.isWallTimeSet(), true);
-        assertEquals(task1.getGenericInformation().size(), 0);
+        assertEquals(null, task1.getDependencesList());
+        assertEquals(1, task1.getNumberOfNodesNeeded());
+        assertEquals(12 * 1000, task1.getWallTime());
+        assertEquals(true, task1.isWallTimeSet());
+        assertEquals(0, task1.getGenericInformation().size());
         assertNull(task1.getInputFilesList());
         assertNull(task1.getOutputFilesList());
-        assertEquals(((JavaTask) task1).getArgument("sleepTime"), "1");
-        assertEquals(((JavaTask) task1).getArgument("number"), "1");
-        assertEquals(((JavaTask) task1).getExecutableClassName(), "org.ow2.proactive.scheduler.examples.WaitAndPrint");
-        assertEquals(((JavaTask) task1).isFork(), true);
-        assertEquals(task1.getForkEnvironment(), null);
+        assertEquals("1", ((JavaTask) task1).getArgument("sleepTime"));
+        assertEquals("1", ((JavaTask) task1).getArgument("number"));
+        assertEquals("org.ow2.proactive.scheduler.examples.WaitAndPrint", ((JavaTask) task1).getExecutableClassName());
+        assertEquals(true, ((JavaTask) task1).isFork());
+        assertEquals(null, task1.getForkEnvironment());
 
         //Check task 2 properties
         Task task2 = tfJob.getTask("task2");
-        assertEquals(task2.getName(), "task2");
+        assertEquals("task2", task2.getName());
         assertEquals(OnTaskError.NONE, task2.getOnTaskErrorProperty().getValue());
         //the following commented check fails, it is what we expect, because replacement is done in the internal factory.
         //it avoids complex changes during user job creation process.
         //this property is tested in the TestDatabaseCRUD
         //Assert.assertEquals(tfJob.getTask("task2").isCancelJobOnError(),true);
-        assertEquals(task2.isPreciousResult(), false);
-        assertEquals(task2.getRestartTaskOnError(), RestartMode.ELSEWHERE);
-        assertEquals(task2.getMaxNumberOfExecution(), 2);
-        assertEquals(task2.getDescription(), "Parallel Tasks - Task 2");
-        assertEquals(task2.getSelectionScripts(), null);
+        assertEquals(false, task2.isPreciousResult());
+        assertEquals(RestartMode.ELSEWHERE, task2.getRestartTaskOnError());
+        assertEquals(2, task2.getMaxNumberOfExecution());
+        assertEquals("Parallel Tasks - Task 2", task2.getDescription());
+        assertEquals(null, task2.getSelectionScripts());
         Assert.assertTrue(task2.getPreScript().getScript().contains(
                 "Beginning of Pre-Script"));
-        assertEquals(task2.getPostScript(), null);
-        assertEquals(task2.getCleaningScript(), null);
-        assertEquals(task2.getDependencesList(), null);
-        assertEquals(task2.getNumberOfNodesNeeded(), 1);
-        assertEquals(task2.getWallTime(), 0);
-        assertEquals(task2.isWallTimeSet(), false);
-        assertEquals(task2.getGenericInformation().size(), 0);
+        assertEquals(null, task2.getPostScript());
+        assertEquals(null, task2.getCleaningScript());
+        assertEquals(null, task2.getDependencesList());
+        assertEquals(1, task2.getNumberOfNodesNeeded());
+        assertEquals(0, task2.getWallTime());
+        assertEquals(false, task2.isWallTimeSet());
+        assertEquals(0, task2.getGenericInformation().size());
         Assert.assertTrue(task2.getInputFilesList().get(0).getInputFiles()
                 .getIncludes().contains("tata*"));
         Assert.assertTrue(task2.getInputFilesList().get(0).getInputFiles()
@@ -185,18 +186,16 @@ public class TestJobFactory {
                 .getExcludes().contains("titi*3.txt"));
         assertEquals(OutputAccessMode.TransferToOutputSpace,
           task2.getOutputFilesList().get(1).getMode());
-        assertEquals(((JavaTask) task2).getArgument("sleepTime"), "12");
-        assertEquals(((JavaTask) task2).getArgument("number"), "21");
-        assertEquals(((JavaTask) task2).getArgument("test"), "/bin/java/jdk1.5");
-        assertEquals(((JavaTask) task2).getExecutableClassName(),
-          "org.ow2.proactive.scheduler.examples.WaitAndPrint");
-        assertEquals(((JavaTask) task2).isFork(), true);
-        assertEquals(task2.isWallTimeSet(), false);
-        assertEquals(task2.getForkEnvironment().getJavaHome(), "/bin/java/jdk1.5");
-        assertEquals(task2.getForkEnvironment().getWorkingDir(), "/bin/java/jdk1.5/toto");
-        assertEquals(task2.getForkEnvironment().getJVMArguments().get(0), "-dparam=12");
-        assertEquals(task2.getForkEnvironment().getJVMArguments().get(1),
-          "-djhome=/bin/java/jdk1.5");
+        assertEquals("12", ((JavaTask) task2).getArgument("sleepTime"));
+        assertEquals("21", ((JavaTask) task2).getArgument("number"));
+        assertEquals("/bin/java/jdk1.5", ((JavaTask) task2).getArgument("test"));
+        assertEquals("org.ow2.proactive.scheduler.examples.WaitAndPrint", ((JavaTask) task2).getExecutableClassName());
+        assertEquals(true, ((JavaTask) task2).isFork());
+        assertEquals(false, task2.isWallTimeSet());
+        assertEquals("/bin/java/jdk1.5", task2.getForkEnvironment().getJavaHome());
+        assertEquals("/bin/java/jdk1.5/toto", task2.getForkEnvironment().getWorkingDir());
+        assertEquals("-dparam=12", task2.getForkEnvironment().getJVMArguments().get(0));
+        assertEquals("-djhome=/bin/java/jdk1.5", task2.getForkEnvironment().getJVMArguments().get(1));
         Map<String, String> props = task2.getForkEnvironment()
                 .getSystemEnvironment();
         assertEquals(2, props.size());
@@ -216,14 +215,14 @@ public class TestJobFactory {
 
         //Check task 3 properties
         Task task3 = tfJob.getTask("task3");
-        assertEquals(task3.getName(), "task3");
+        assertEquals("task3", task3.getName());
         assertEquals(OnTaskError.NONE, task3.getOnTaskErrorProperty().getValue());
         //the following commented check fails, it is what we expect, because replacement is done in the
         // internal factory.
         //it avoids complex changes during user job creation process.
         //this property is tested in the TestDatabaseCRUD
         //Assert.assertEquals(tfJob.getTask("task3").isCancelJobOnError(),true);
-        assertEquals(task3.isPreciousResult(), false);
+        assertEquals(false, task3.isPreciousResult());
         //the following commented check fails, it is what we expect, because replacement is done in the
         // internal factory.
         //it avoids complex changes during user job creation process.
@@ -233,19 +232,19 @@ public class TestJobFactory {
         //it avoids complex changes during user job creation process.
         //this property is tested in the TestDatabaseCRUD
         //Assert.assertEquals(tfJob.getTask("task3").getMaxNumberOfExecution(),2);
-        assertEquals(task3.getDescription(), "Dependent Tasks - Task 3");
-        assertEquals(task3.getSelectionScripts(), null);
-        assertEquals(task3.getPreScript(), null);
+        assertEquals("Dependent Tasks - Task 3", task3.getDescription());
+        assertEquals(null, task3.getSelectionScripts());
+        assertEquals(null, task3.getPreScript());
         Assert.assertTrue(task3.getPostScript().getScript().contains(
                 "Unsetting system property user.property1"));
-        assertEquals(task3.getPostScript().getParameters(), null);
-        assertEquals(task3.getCleaningScript(), null);
-        assertEquals(task3.getDependencesList().size(), 2);
-        assertEquals(task3.getDependencesList().get(0).getName(), "task1");
-        assertEquals(task3.getDependencesList().get(1).getName(), "task2");
-        assertEquals(task3.getWallTime(), 10 * 60 * 1000 + 53 * 1000);
-        assertEquals(task3.isWallTimeSet(), true);
-        assertEquals(task3.getGenericInformation().size(), 0);
+        assertNull(task3.getPostScript().getParameters());
+        assertEquals(null, task3.getCleaningScript());
+        assertEquals(2, task3.getDependencesList().size());
+        assertEquals("task1", task3.getDependencesList().get(0).getName());
+        assertEquals("task2", task3.getDependencesList().get(1).getName());
+        assertEquals(10 * 60 * 1000 + 53 * 1000, task3.getWallTime());
+        assertEquals(true, task3.isWallTimeSet());
+        assertEquals(0, task3.getGenericInformation().size());
         assertEquals(1, task3.getInputFilesList().size());
         Assert.assertTrue(task3.getInputFilesList().get(0).getInputFiles()
                 .getIncludes().contains("tata*"));
@@ -253,32 +252,32 @@ public class TestJobFactory {
                 task3.getInputFilesList().get(0).getInputFiles().getExcludes().isEmpty());
         assertEquals(InputAccessMode.none, task3.getInputFilesList().get(0).getMode());
         assertNull(task3.getOutputFilesList());
-        assertEquals(((NativeTask) task3).getCommandLine().length, 5);
-        assertEquals(((NativeTask) task3).getCommandLine()[1], "1");
-        assertEquals(((NativeTask) task3).getCommandLine()[2], "2 2");
-        assertEquals(((NativeTask) task3).getCommandLine()[3], "3");
-        assertEquals(((NativeTask) task3).getCommandLine()[4], "12");
+        assertEquals(5, ((NativeTask) task3).getCommandLine().length);
+        assertEquals("1", ((NativeTask) task3).getCommandLine()[1]);
+        assertEquals("2 2", ((NativeTask) task3).getCommandLine()[2]);
+        assertEquals("3", ((NativeTask) task3).getCommandLine()[3]);
+        assertEquals("12", ((NativeTask) task3).getCommandLine()[4]);
         assertNull(((NativeTask) task3).getWorkingDir());
-        assertEquals(task3.getNumberOfNodesNeeded(), 3);
+        assertEquals(3, task3.getNumberOfNodesNeeded());
 
         //Check task 4 properties
         Task task4 = tfJob.getTask("task4");
-        assertEquals(task4.getName(), "task4");
+        assertEquals("task4", task4.getName());
         assertEquals(OnTaskError.CANCEL_JOB, task4.getOnTaskErrorProperty().getValue());
-        assertEquals(task4.isPreciousResult(), true);
-        assertEquals(task4.getRestartTaskOnError(), RestartMode.ANYWHERE);
-        assertEquals(task4.getMaxNumberOfExecution(), 3);
-        assertEquals(task4.getDescription(), null);
-        assertEquals(task4.getSelectionScripts(), null);
-        assertEquals(task4.getPreScript(), null);
-        assertEquals(task4.getPostScript(), null);
-        assertEquals(task4.getCleaningScript(), null);
-        assertEquals(task4.getDependencesList().size(), 1);
-        assertEquals(task4.getDependencesList().get(0).getName(), "task3");
-        assertEquals(task4.getWallTime(), 0);
-        assertEquals(task4.isWallTimeSet(), false);
-        assertEquals(task4.getGenericInformation().get("n11"), "v11");
-        assertEquals(task4.getGenericInformation().get("n22"), "v22");
+        assertEquals(true, task4.isPreciousResult());
+        assertEquals(RestartMode.ANYWHERE, task4.getRestartTaskOnError());
+        assertEquals(3, task4.getMaxNumberOfExecution());
+        assertEquals(null, task4.getDescription());
+        assertEquals(null, task4.getSelectionScripts());
+        assertEquals(null, task4.getPreScript());
+        assertEquals(null, task4.getPostScript());
+        assertEquals(null, task4.getCleaningScript());
+        assertEquals(1, task4.getDependencesList().size());
+        assertEquals("task3", task4.getDependencesList().get(0).getName());
+        assertEquals(0, task4.getWallTime());
+        assertEquals(false, task4.isWallTimeSet());
+        assertEquals("v11", task4.getGenericInformation().get("n11"));
+        assertEquals("v22", task4.getGenericInformation().get("n22"));
         assertNull(task4.getInputFilesList());
         assertEquals(5, task4.getOutputFilesList().size());
         Assert.assertTrue(task4.getOutputFilesList().get(0).getOutputFiles()
@@ -308,37 +307,37 @@ public class TestJobFactory {
           task4.getOutputFilesList().get(3).getMode());
         assertEquals(OutputAccessMode.none, task4.getOutputFilesList().get(4).getMode());
         assertEquals(null, ((NativeTask) task4).getWorkingDir());
-        assertEquals(task4.getNumberOfNodesNeeded(), 10);
+        assertEquals(10, task4.getNumberOfNodesNeeded());
 
         log("Test Job MULTI_NODES");
         TaskFlowJob mnJob = getJob(jobMultiNodesDescriptor, impl, scriptFolder);
         //Check job properties
-        assertEquals(mnJob.getDescription(), "No description");
-        assertEquals(mnJob.getName(), "job_multiNodes");
-        assertEquals(mnJob.getPriority(), JobPriority.LOW);
-        assertEquals(mnJob.getOnTaskErrorProperty().getValue(), OnTaskError.NONE);
-        assertEquals(mnJob.getMaxNumberOfExecution(), 1);
-        assertEquals(mnJob.getRestartTaskOnError(), RestartMode.ANYWHERE);
-        assertEquals(mnJob.getType(), JobType.TASKSFLOW);
-        assertEquals(mnJob.getGenericInformation().get("n1"), "v1");
-        assertEquals(mnJob.getGenericInformation().get("n2"), "v2");
+        assertEquals("No description", mnJob.getDescription());
+        assertEquals("job_multiNodes", mnJob.getName());
+        assertEquals(JobPriority.LOW, mnJob.getPriority());
+        assertEquals(OnTaskError.NONE, mnJob.getOnTaskErrorProperty().getValue());
+        assertEquals(1, mnJob.getMaxNumberOfExecution());
+        assertEquals(RestartMode.ANYWHERE, mnJob.getRestartTaskOnError());
+        assertEquals(JobType.TASKSFLOW, mnJob.getType());
+        assertEquals("v1", mnJob.getGenericInformation().get("n1"));
+        assertEquals("v2", mnJob.getGenericInformation().get("n2"));
         //Check task properties
         JavaTask jt = (JavaTask) mnJob.getTask("Controller");
-        assertEquals(jt.getArgument("numberToFind"), "100");
-        assertEquals(jt.getOnTaskErrorProperty().getValue(), OnTaskError.NONE);
-        assertEquals(jt.getCleaningScript(), null);
-        assertEquals(jt.getDependencesList(), null);
-        assertEquals(jt.getDescription(), "Will control the workers in order to find the prime number");
-        assertEquals(jt.getExecutableClassName(), "org.ow2.proactive.scheduler.examples.MultiNodeExample");
-        assertEquals(jt.getGenericInformation().get("n11"), "v11");
-        assertEquals(jt.getGenericInformation().get("n22"), "v22");
-        assertEquals(jt.getMaxNumberOfExecution(), 1);
-        assertEquals(jt.getName(), "Controller");
-        assertEquals(jt.getNumberOfNodesNeeded(), 3);
-        assertEquals(jt.getPreScript(), null);
-        assertEquals(jt.getPostScript(), null);
-        assertEquals(jt.getRestartTaskOnError(), RestartMode.ANYWHERE);
-        assertEquals(jt.getSelectionScripts(), null);
+        assertEquals("100", jt.getArgument("numberToFind"));
+        assertEquals(OnTaskError.NONE, jt.getOnTaskErrorProperty().getValue());
+        assertEquals(null, jt.getCleaningScript());
+        assertEquals(null, jt.getDependencesList());
+        assertEquals("Will control the workers in order to find the prime number", jt.getDescription());
+        assertEquals("org.ow2.proactive.scheduler.examples.MultiNodeExample", jt.getExecutableClassName());
+        assertEquals("v11", jt.getGenericInformation().get("n11"));
+        assertEquals("v22", jt.getGenericInformation().get("n22"));
+        assertEquals(1, jt.getMaxNumberOfExecution());
+        assertEquals("Controller", jt.getName());
+        assertEquals(3, jt.getNumberOfNodesNeeded());
+        assertEquals(null, jt.getPreScript());
+        assertEquals(null, jt.getPostScript());
+        assertEquals(RestartMode.ANYWHERE, jt.getRestartTaskOnError());
+        assertEquals(null, jt.getSelectionScripts());
         Assert.assertTrue(jt.isPreciousResult());
 
         log("Test generated task name");
@@ -369,7 +368,13 @@ public class TestJobFactory {
     private TaskFlowJob getJob(URL jobDesc, String jobFacImpl, String scriptFolder) throws JobCreationException,
             URISyntaxException {
         return ScriptUpdateUtil.resolveScripts((TaskFlowJob) JobFactory.getFactory(jobFacImpl).createJob(
-          new File(jobDesc.toURI()).getAbsolutePath(), Collections.singletonMap("scripts.folder", scriptFolder)));
+                                                                                                         new File(jobDesc.toURI()).getAbsolutePath(),
+                                                                                                         ImmutableMap.of("scripts.folder",
+                                                                                                                         scriptFolder,
+                                                                                                                         "priority",
+                                                                                                                         "high",
+                                                                                                                         "nb.execution",
+                                                                                                                         "2")));
     }
 
 }
