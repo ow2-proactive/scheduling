@@ -565,14 +565,7 @@ public class StaxJobFactory extends JobFactory {
              while (cursorVariables.hasNext()) {
                  eventType = cursorVariables.next();
                  if (eventType == XMLEvent.START_ELEMENT && XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
-                     Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables, variables);
-
-                     TaskVariable taskVariable = new TaskVariable();
-                     taskVariable.setName(attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName()));
-                     taskVariable.setValue(attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
-                     taskVariable.setModel(attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
-                     taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
-
+                    TaskVariable taskVariable = getTaskVariable(cursorVariables, variables);
                      variablesMap.put(taskVariable.getName(), taskVariable);
                  }else if (eventType == XMLEvent.END_ELEMENT && XMLTags.VARIABLES.matches(cursorVariables.getLocalName())){
                      return variablesMap;
@@ -590,6 +583,19 @@ public class StaxJobFactory extends JobFactory {
          }
          return variablesMap;
      }
+
+    private TaskVariable getTaskVariable(XMLStreamReader cursorVariables, Map<String, String> variables)
+            throws JobCreationException {
+        TaskVariable taskVariable = new TaskVariable();
+        Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables, variables);
+        taskVariable.setName(attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName()));
+        taskVariable.setValue(attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
+        taskVariable.setModel(attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
+        if (attributesAsMap.containsKey(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())) {
+            taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
+        }
+        return taskVariable;
+    }
 
     private Map<String, String> getAttributesAsMap(XMLStreamReader cursorVariables,
             Map<String, String> replacementVariables)

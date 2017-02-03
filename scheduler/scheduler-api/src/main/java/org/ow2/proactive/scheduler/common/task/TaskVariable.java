@@ -36,12 +36,13 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.job.JobVariable;
+import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import java.io.Serializable;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 
 
 /**
@@ -54,7 +55,7 @@ import java.io.Serializable;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskVariable extends JobVariable implements Serializable {
 
-    private boolean jobInherited;
+    private boolean jobInherited = false;
 
     public TaskVariable() {
         //Empty constructor

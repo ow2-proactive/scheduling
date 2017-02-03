@@ -95,7 +95,7 @@ taskName = ## Identification of this task (identifier)
 taskVariables = ## Definition of variables which can be used throughout the task
     element variables { taskVariable+ }
 taskVariable = ## Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}
-    element variable { taskVariableName, taskVariableValue, taskVariableInheritance, taskVariableModel}
+    element variable { taskVariableName, taskVariableValue, taskVariableInheritance?, taskVariableModel?}
 taskVariableName = ## Name of a variable
     attribute name  { xsd:string }
 taskVariableValue = ## The patterns ${variable_name} will be replaced by this value

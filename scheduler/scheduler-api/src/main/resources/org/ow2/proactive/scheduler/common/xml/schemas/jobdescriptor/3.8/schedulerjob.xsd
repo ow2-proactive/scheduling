@@ -346,8 +346,16 @@
         <xs:complexType>
           <xs:attributeGroup ref="jd:taskVariableName"/>
           <xs:attributeGroup ref="jd:taskVariableValue"/>
-          <xs:attributeGroup ref="jd:taskVariableInheritance"/>
-          <xs:attributeGroup ref="jd:taskVariableModel"/>
+          <xs:attribute name="inherited" type="xs:boolean">
+            <xs:annotation>
+              <xs:documentation>States whether variable value is inherited from parents</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="model" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>Variable type</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
