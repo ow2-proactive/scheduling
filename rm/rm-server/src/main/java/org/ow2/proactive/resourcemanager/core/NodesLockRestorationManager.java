@@ -78,7 +78,7 @@ public class NodesLockRestorationManager {
 
         if (log.isInfoEnabled()) {
             stopwatch.stop();
-            log.info("Identifying nodes locked on previous run required " + stopwatch.elapsed(TimeUnit.MILLISECONDS) +
+            log.info("Identifying nodes locked on the previous run required " + stopwatch.elapsed(TimeUnit.MILLISECONDS) +
                      " ms");
         }
 

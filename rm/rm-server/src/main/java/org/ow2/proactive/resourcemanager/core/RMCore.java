@@ -37,6 +37,7 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import static org.ow2.proactive.resourcemanager.common.event.RMEventType.NODE_STATE_CHANGED;
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -402,7 +403,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             clientPinger.ping();
 
             nodesLockRestorationManager = new NodesLockRestorationManager(this);
-            nodesLockRestorationManager.initialize();
+
+            if (RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
+                nodesLockRestorationManager.initialize();
+            } else {
+                logger.info("Nodes lock restoration is disabled");
+            }
 
             restoreNodeSources();
         } catch (ActiveObjectCreationException e) {
