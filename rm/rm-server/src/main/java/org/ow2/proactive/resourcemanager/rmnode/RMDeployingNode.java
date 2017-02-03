@@ -78,16 +78,12 @@ public final class RMDeployingNode extends AbstractRMNode {
     RMDeployingNode() {
     }
 
-    RMDeployingNode(String name, NodeSource ns, String command, Client provider) {
+    RMDeployingNode(String name, NodeSource nodeSource, String command, Client provider) {
+        super(nodeSource, name, null, provider);
+
         changeState(NodeState.DEPLOYING);
-        this.nodeName = name;
-        this.nodeSource = ns;
+
         this.commandLine = command;
-        this.nodeSourceName = ns.getName();
-        this.nodeURL = this.buildNodeURL();
-        this.provider = provider;
-        this.addEvent = null;
-        this.lastEvent = null;
     }
 
     RMDeployingNode(String name, NodeSource ns, String command, Client provider, String description) {
@@ -331,8 +327,9 @@ public final class RMDeployingNode extends AbstractRMNode {
         return this.getNodeURL().compareTo(rmNode.getNodeURL());
     }
 
-    private String buildNodeURL() {
-        return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSourceName + "/" + this.nodeName;
+    @Override
+    public String getNodeURL() {
+        return RMDeployingNode.PROTOCOL_ID + "://" + super.nodeSourceName + "/" + super.nodeName;
     }
 
     /**

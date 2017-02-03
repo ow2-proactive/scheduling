@@ -123,23 +123,16 @@ public class RMNodeImpl extends AbstractRMNode {
      */
     public RMNodeImpl(Node node, NodeSource nodeSource, Client provider, Permission nodeAccessPermission) {
 
-        NodeInformation nodeInformation = node.getNodeInformation();
-
-        this.addEvent = null;
-        this.jmxUrls = new String[JMXTransportProtocol.values().length];
-        this.jvmName = node.getProActiveRuntime().getURL();
-        this.hostName = nodeInformation.getVMInformation().getHostName();
-        this.lastEvent = null;
-        this.node = node;
-        this.nodeAccessPermission = nodeAccessPermission;
-        this.nodeName = nodeInformation.getName();
-        this.nodeSource = nodeSource;
-        this.nodeSourceName = nodeSource.getName();
-        this.nodeURL = nodeInformation.getURL();
-        this.provider = provider;
-        this.scriptStatus = new HashMap<>();
+        super(nodeSource, node.getNodeInformation().getName(), node.getNodeInformation().getURL(), provider);
 
         changeState(NodeState.FREE);
+
+        this.hostName = node.getNodeInformation().getVMInformation().getHostName();
+        this.jmxUrls = new String[JMXTransportProtocol.values().length];
+        this.jvmName = node.getProActiveRuntime().getURL();
+        this.node = node;
+        this.nodeAccessPermission = nodeAccessPermission;
+        this.scriptStatus = new HashMap<>();
     }
 
     /**
@@ -268,7 +261,7 @@ public class RMNodeImpl extends AbstractRMNode {
     public String getNodeInfo() {
         String newLine = System.lineSeparator();
         String nodeInfo = "Node " + nodeName + newLine;
-        nodeInfo += "URL: " + nodeURL + newLine;
+        nodeInfo += "URL: " + getNodeURL() + newLine;
         nodeInfo += "Node source: " + nodeSourceName + newLine;
         nodeInfo += "Provider: " + provider.getName() + newLine;
         nodeInfo += "Used by: " + (owner == null ? "nobody" : owner.getName()) + newLine;
@@ -329,7 +322,7 @@ public class RMNodeImpl extends AbstractRMNode {
     public synchronized void clean() throws NodeException {
         handler = null;
         try {
-            logger.debug(nodeURL + " : cleaning");
+            logger.debug(getNodeURL() + " : cleaning");
             node.killAllActiveObjects();
         } catch (IOException e) {
             throw new NodeException("Node is down");

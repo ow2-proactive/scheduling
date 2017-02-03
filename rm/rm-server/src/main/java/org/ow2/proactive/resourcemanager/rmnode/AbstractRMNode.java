@@ -74,7 +74,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
     protected long lockTime = -1;
 
     /** Name of the node */
-    protected String nodeName;
+    protected final String nodeName;
 
     /** {@link NodeSource} Stub that handles the node */
     protected NodeSource nodeSource;
@@ -83,7 +83,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
     protected String nodeSourceName;
 
     /** URL of the node, considered as its unique ID */
-    protected String nodeURL;
+    private final String nodeURL;
 
     /** client registered the node in the resource manager */
     protected Client provider;
@@ -93,6 +93,26 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
 
     /** Time stamp of the latest state change */
     protected long stateChangeTime;
+
+
+    public AbstractRMNode() {
+        this.nodeName = null;
+        this.nodeURL = null;
+    }
+
+    public AbstractRMNode(NodeSource nodeSource, String nodeName, String nodeURL, Client provider) {
+        this.addEvent = null;
+        this.lastEvent = null;
+        this.nodeSource = nodeSource;
+
+        if (nodeSource != null) {
+            this.nodeSourceName = nodeSource.getName();
+        }
+
+        this.nodeName = nodeName;
+        this.nodeURL = nodeURL;
+        this.provider = provider;
+    }
 
     /**
      * {@inheritDoc}
@@ -203,8 +223,10 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
      */
     @Override
     public boolean equals(Object rmNode) {
-        return rmNode instanceof RMNode
-                && this.nodeURL.equals(((RMNode) rmNode).getNodeURL());
+        return this == rmNode ||
+                rmNode instanceof RMNode
+                        && this.nodeURL.equals(((RMNode) rmNode).getNodeURL());
+
     }
 
     /**
@@ -301,6 +323,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
     @Override
     public void setNodeSource(NodeSource nodeSource) {
         this.nodeSource = nodeSource;
+        this.nodeSourceName = nodeSource.getName();
     }
 
     protected RMNodeDescriptor toNodeDescriptor() {
