@@ -81,7 +81,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         String[] outputNoVariablesLines = outputNoVariables.getStdoutLogs(false).split(System.lineSeparator());        
 
         //Tests variable access
-        assertEquals("testvarjob3", job.getVariables().get("TESTVAR3"));
+        assertEquals("testvarjob3", job.getVariables().get("TESTVAR3").getValue());
         //Selection files access
         assertTrue(logs.contains("testvartask0"));
 

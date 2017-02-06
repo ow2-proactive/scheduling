@@ -70,6 +70,9 @@
       <doc:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</doc:documentation>
       <ref name="variableName"/>
       <ref name="variableValue"/>
+      <optional>
+        <ref name="variableModel"/>
+      </optional>
     </element>
   </define>
   <define name="variableName">
@@ -81,6 +84,12 @@
   <define name="variableValue">
     <attribute name="value">
       <doc:documentation>The patterns ${variable_name} will be replaced by this value</doc:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+  <define name="variableModel">
+    <attribute name="model">
+      <doc:documentation>Model definition of the variable</doc:documentation>
       <data type="string"/>
     </attribute>
   </define>
@@ -268,8 +277,12 @@
       <doc:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</doc:documentation>
       <ref name="taskVariableName"/>
       <ref name="taskVariableValue"/>
-      <ref name="taskVariableInheritance"/>
-      <ref name="taskVariableModel"/>
+      <optional>
+        <ref name="taskVariableInheritance"/>
+      </optional>
+      <optional>
+        <ref name="taskVariableModel"/>
+      </optional>
     </element>
   </define>
   <define name="taskVariableName">

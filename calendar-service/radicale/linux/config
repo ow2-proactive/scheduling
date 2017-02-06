@@ -2,14 +2,14 @@
 
 # Authentication method
 # Value: None | htpasswd | IMAP | LDAP | PAM | courier | http | remote_user | custom
-type = htpasswd
+type = None
 
 # Htpasswd filename
 htpasswd_filename = ~/.config/radicale/users
 
 # Htpasswd encryption method
 # Value: plain | sha1 | ssha | crypt | bcrypt | md5
-htpasswd_encryption = sha1
+htpasswd_encryption = plain
 
 # LDAP server URL, with protocol and port
 #ldap_url = ldap://localhost:389/

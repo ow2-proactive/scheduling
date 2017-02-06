@@ -61,6 +61,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -208,7 +209,7 @@ public class Job2XMLTransformer {
 
         // <ref name="variables"/>
         if (job.getVariables() != null && !job.getVariables().isEmpty()) {
-            Element variablesE = createVariablesElement(doc, job.getVariables());
+            Element variablesE = createJobVariablesElement(doc, job.getVariables());
             rootJob.appendChild(variablesE);
         }
 
@@ -277,17 +278,21 @@ public class Job2XMLTransformer {
     }
 
     /*
-     * Creates the variables element
+     * Creates the job variables element
      */
-    private Element createVariablesElement(Document doc, Map<String, String> variables) {
-        if (variables == null) {
+    private Element createJobVariablesElement(Document doc, Map<String, JobVariable> jobVariables) {
+        if (jobVariables == null) {
             return null;
         }
         Element variablesE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.VARIABLES.getXMLName());
-        for (String name : variables.keySet()) {
+        for (String name : jobVariables.keySet()) {
             Element variableE = createElement(doc, XMLTags.VARIABLE.getXMLName(), null, new Attribute(
-                    XMLAttributes.COMMON_NAME.getXMLName(), name), new Attribute(XMLAttributes.COMMON_VALUE
-                    .getXMLName(), variables.get(name)));
+                                                            XMLAttributes.VARIABLE_NAME.getXMLName(),
+                                                            name),
+                                              new Attribute(XMLAttributes.VARIABLE_VALUE.getXMLName(),
+                                                            jobVariables.get(name).getValue()),
+                                              new Attribute(XMLAttributes.VARIABLE_MODEL.getXMLName(),
+                                                            jobVariables.get(name).getModel()));
             variablesE.appendChild(variableE);
         }
         return variablesE;

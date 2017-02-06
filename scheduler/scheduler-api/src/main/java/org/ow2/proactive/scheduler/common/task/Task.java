@@ -36,7 +36,17 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import com.google.common.base.Joiner;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -51,15 +61,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.base.Joiner;
 
 
 /**
@@ -698,18 +700,8 @@ public abstract class Task extends CommonAttribute {
      * @param variables the variables map
      */
     public void setVariables(Map<String, TaskVariable> variables) {
-        verifyVariableMap(variables);
+        Job.verifyVariableMap(variables);
         this.variables = new ConcurrentHashMap<>(variables);
-    }
-
-    private void verifyVariableMap(Map<String, TaskVariable> variables) {
-        for (Map.Entry<String, TaskVariable> entry : variables.entrySet()) {
-            if (!entry.getKey().equals(entry.getValue().getName())) {
-                throw new IllegalArgumentException("Variables map entry key (" + entry.getKey() +
-                                                   ") is different from task variable name (" +
-                                                   entry.getValue().getName() + ")");
-            }
-        }
     }
 
     /**
@@ -729,7 +721,7 @@ public abstract class Task extends CommonAttribute {
     public Map<String, String> getVariablesOverriden(Job job) {
         Map<String, String> taskVariables = new HashMap<>();
         if (job != null){
-            taskVariables.putAll(job.getVariables());
+            taskVariables.putAll(job.getVariablesAsReplacementMap());
         }
         for (TaskVariable variable: getVariables().values()){
             if (!variable.isJobInherited()){
@@ -753,7 +745,9 @@ public abstract class Task extends CommonAttribute {
             (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
             (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
                 maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
-            "\ttag = " + tag + nl + "\tgenericInformation = {" + nl +
+               "\ttag = " + tag + nl + "\tvariables = {" + nl +
+               Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}" + nl + "\tgenericInformation = {" +
+               nl +
             Joiner.on('\n').withKeyValueSeparator("=").join(genericInformation) + nl + "}" + nl +
             "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
             "\tParallelEnvironment = " + parallelEnvironment + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +

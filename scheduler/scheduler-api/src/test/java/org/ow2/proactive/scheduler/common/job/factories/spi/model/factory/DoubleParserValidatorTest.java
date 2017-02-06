@@ -69,8 +69,8 @@ public class DoubleParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         Assert.assertEquals(VALID_DOUBLE,
                             new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE +
-                                                      "(" + VALID_LOWER_RANGE +
-                                                      ")").parseAndValidate(VALID_DOUBLE_STRING),
+                                                      RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
+                                                      RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_STRING),
                             0.0);
     }
 
@@ -78,15 +78,17 @@ public class DoubleParserValidatorTest {
     @SuppressWarnings("squid:S1848")
     public void testDoubleParserValidatorLowerRangeKO()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + "(" + VALID_LOWER_RANGE +
-                                  ")").parseAndValidate(VALID_DOUBLE_OUT_OF_RANGE_STRING);
+        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
+                                  VALID_LOWER_RANGE +
+                                  RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_OUT_OF_RANGE_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testDoubleParserValidatorInvalidLowerRange()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + "(" + INVALID_LOWER_RANGE +
-                                  ")").parseAndValidate(VALID_DOUBLE_STRING);
+        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
+                                  INVALID_LOWER_RANGE +
+                                  RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_STRING);
     }
 
     @Test
@@ -94,23 +96,26 @@ public class DoubleParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         Assert.assertEquals(VALID_DOUBLE,
                             new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE +
-                                                      "(" + VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE +
-                                                      ")").parseAndValidate(VALID_DOUBLE_STRING),
+                                                      RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
+                                                      "," + VALID_UPPER_RANGE +
+                                                      RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_STRING),
                             0.0);
     }
 
     @Test(expected = ValidationException.class)
     public void testDoubleParserValidatorIntervalKO()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + "(" + VALID_LOWER_RANGE + "," +
-                                  VALID_UPPER_RANGE + ")").parseAndValidate(VALID_DOUBLE_OUT_OF_RANGE_STRING);
+        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
+                                  VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE +
+                                  RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_OUT_OF_RANGE_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testDoubleParserValidatorInvalidInterval()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + "(" + VALID_LOWER_RANGE + "," +
-                                  INVALID_UPPER_RANGE + ")").parseAndValidate(VALID_DOUBLE_STRING);
+        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
+                                  VALID_LOWER_RANGE + "," + INVALID_UPPER_RANGE +
+                                  RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
@@ -122,9 +127,10 @@ public class DoubleParserValidatorTest {
     @Test(expected = ModelSyntaxException.class)
     public void testDoubleParserValidatorInvalidModelRangeMoreThanTwo()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + "(" + VALID_LOWER_RANGE + "," +
+        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
+                                  VALID_LOWER_RANGE + "," +
                                   VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
-                                  ")").parseAndValidate(VALID_DOUBLE_STRING);
+                                  RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
@@ -136,7 +142,8 @@ public class DoubleParserValidatorTest {
     @Test(expected = ModelSyntaxException.class)
     public void testDoubleParserValidatorInvalidModelRangeInverse()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + "(" + VALID_UPPER_RANGE + "," +
-                                  VALID_LOWER_RANGE + ")").parseAndValidate(VALID_DOUBLE_STRING);
+        new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
+                                  VALID_UPPER_RANGE + "," + VALID_LOWER_RANGE +
+                                  RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_STRING);
     }
 }

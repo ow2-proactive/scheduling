@@ -34,9 +34,10 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 
 public class ListParserValidatorTest {
 
-    public static final String VALID_MODEL_PARAMETER = "(1,2,3)";
+    public static final String VALID_MODEL_PARAMETER = ListParserValidator.LEFT_DELIMITER + "1,2,3" +
+                                                       ListParserValidator.RIGHT_DELIMITER;
 
-    public static final String INVALID_MODEL_PARAMETER = "(1,2,";
+    public static final String INVALID_MODEL_PARAMETER = ListParserValidator.LEFT_DELIMITER + "1,2,3"; // missing right delimiter
 
     public static final String VALID_VALUE = "2";
 

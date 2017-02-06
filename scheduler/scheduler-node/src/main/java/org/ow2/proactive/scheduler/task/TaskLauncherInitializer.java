@@ -36,8 +36,15 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import com.google.common.collect.ImmutableMap;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
@@ -47,12 +54,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scripting.Script;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.ImmutableMap;
 
 
 /**
@@ -95,7 +97,7 @@ public class TaskLauncherInitializer implements Serializable {
     private NamingService namingService;
     private boolean preciousLogs;
 
-    private ImmutableMap<String, String> variables;
+    private ImmutableMap<String, JobVariable> variables;
 
     private ImmutableMap<String, TaskVariable> taskVariables = ImmutableMap.of();
     private int pingPeriod;
@@ -322,11 +324,11 @@ public class TaskLauncherInitializer implements Serializable {
         this.preciousLogs = preciousLogs;
     }
 
-    public void setVariables(Map<String, String> variables) {
+    public void setJobVariables(Map<String, JobVariable> variables) {
         this.variables = ImmutableMap.copyOf(variables);
     }
 
-    public ImmutableMap<String, String> getVariables() {
+    public ImmutableMap<String, JobVariable> getJobVariables() {
         return this.variables;
     }
 

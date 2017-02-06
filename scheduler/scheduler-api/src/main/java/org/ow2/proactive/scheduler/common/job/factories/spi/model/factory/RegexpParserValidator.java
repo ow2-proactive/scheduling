@@ -38,7 +38,15 @@ public class RegexpParserValidator extends BaseParserValidator<String> {
 
     public static final String REGEXP_TYPE = "REGEXP";
 
-    public static final String REGEXP_TYPE_REGEXP = "[Rr][Ee][Gg][Ee][Xx][Pp]";
+    public static final String LEFT_DELIMITER = "(";
+
+    public static final String RIGHT_DELIMITER = ")";
+
+    protected static final String REGEXP_TYPE_REGEXP = "[Rr][Ee][Gg][Ee][Xx][Pp]";
+
+    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
+
+    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
 
 
     public RegexpParserValidator(String model) throws ModelSyntaxException {
@@ -67,7 +75,7 @@ public class RegexpParserValidator extends BaseParserValidator<String> {
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
-        String regexpRegexp = "^" + REGEXP_TYPE_REGEXP + "\\((.+)\\)$";
+        String regexpRegexp = "^" + REGEXP_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "(.+)" + RIGHT_DELIMITER_REGEXP + "$";
         String regexpString = parseAndGetOneGroup(model, regexpRegexp);
         try {
             return new RegexpValidator(regexpString);

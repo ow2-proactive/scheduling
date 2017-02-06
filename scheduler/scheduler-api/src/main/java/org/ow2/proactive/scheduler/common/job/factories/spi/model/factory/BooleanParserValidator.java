@@ -36,7 +36,7 @@ public class BooleanParserValidator extends BaseParserValidator<Boolean> {
 
     public static final String BOOLEAN_TYPE = "BOOLEAN";
 
-    public static final String BOOLEAN_TYPE_REGEXP = "[Bb][Oo][Oo][Ll][Ee][Aa][Nn]";
+    protected static final String BOOLEAN_TYPE_REGEXP = "[Bb][Oo][Oo][Ll][Ee][Aa][Nn]";
 
 
     public BooleanParserValidator(String model) throws ModelSyntaxException {

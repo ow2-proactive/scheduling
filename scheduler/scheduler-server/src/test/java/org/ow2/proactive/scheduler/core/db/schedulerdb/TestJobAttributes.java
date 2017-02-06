@@ -6,6 +6,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -68,6 +69,9 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         Assert.assertEquals(JobPriority.HIGHEST, jobData.getPriority());
         Assert.assertNotNull(jobData.getGenericInformation());
         Assert.assertTrue(jobData.getGenericInformation().isEmpty());
+        Map<String, JobVariable> jobDataVariables = jobData.getVariables();
+        Assert.assertNotNull(jobDataVariables);
+        Assert.assertTrue(jobDataVariables.isEmpty());
     }
 
     @Test
@@ -102,6 +106,43 @@ public class TestJobAttributes extends BaseSchedulerDBTest {
         jobData = defaultSubmitJobAndLoadInternal(false, job);
         Assert.assertEquals(1, jobData.getGenericInformation().size());
         Assert.assertEquals(longString.toString(), jobData.getGenericInformation().get("longProperty"));
+    }
+
+    @Test
+    public void testJobVariables() throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+
+        InternalJob jobData;
+
+        HashMap<String, JobVariable> jobVariables = new HashMap<>();
+        job.setVariables(jobVariables);
+        jobData = defaultSubmitJobAndLoadInternal(false, job);
+        Assert.assertNotNull(jobData.getVariables());
+        Assert.assertTrue(jobData.getVariables().isEmpty());
+
+        jobVariables.put("var1", new JobVariable("var1", "value1", null));
+        jobVariables.put("var2", new JobVariable("var2", "value2", null));
+        job.setVariables(jobVariables);
+
+        jobVariables = new HashMap<>();
+        jobVariables.put("var1", new JobVariable("var1", "value1", null));
+        jobVariables.put("var2", new JobVariable("var2", "value2", null));
+        job.setVariables(jobVariables);
+        jobData = defaultSubmitJobAndLoadInternal(false, job);
+        Assert.assertEquals(2, jobData.getVariables().size());
+        Assert.assertEquals("value1", jobData.getVariables().get("var1").getValue());
+        Assert.assertEquals("value2", jobData.getVariables().get("var2").getValue());
+
+        StringBuilder longString = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            longString.append("0123456789abcdefghijklmnopqrstuvwxyz");
+        }
+        jobVariables = new HashMap<>();
+        jobVariables.put("longProperty", new JobVariable("longProperty", longString.toString()));
+        job.setVariables(jobVariables);
+        jobData = defaultSubmitJobAndLoadInternal(false, job);
+        Assert.assertEquals(1, jobData.getVariables().size());
+        Assert.assertEquals(longString.toString(), jobData.getVariables().get("longProperty").getValue());
     }
 
 }

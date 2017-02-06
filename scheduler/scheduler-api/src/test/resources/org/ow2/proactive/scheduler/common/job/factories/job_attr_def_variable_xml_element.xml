@@ -3,8 +3,8 @@
 	 xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 	 name="${job_name}" onTaskError="continueJobExecution" priority="normal">
 	<variables>
-		<variable name="name1" value="value1" />
-		<variable value="value2" name="name2" />
+		<variable name="name1" value="value1" model="model1"/>
+		<variable value="value2" model="model2" name="name2"/>
 	</variables>
 	<description>Test</description>
 	<taskFlow>

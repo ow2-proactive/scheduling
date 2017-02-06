@@ -1139,7 +1139,7 @@ public abstract class InternalTask extends TaskState {
             tli.setWalltime(wallTime);
         }
         tli.setPreciousLogs(isPreciousLogs());
-        tli.setVariables(internalJob.getVariables());
+        tli.setJobVariables(internalJob.getVariables());
         tli.setTaskVariables(getVariables());
 
         tli.setPingPeriod(PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt());
@@ -1175,7 +1175,7 @@ public abstract class InternalTask extends TaskState {
     public synchronized void updateVariables(SchedulingService schedulingService) {
         if (updatedVariables == null) {
             updatedVariables = new LinkedHashMap<>();
-            updatedVariables.putAll(internalJob.getVariables());
+            updatedVariables.putAll(internalJob.getVariablesAsReplacementMap());
             updatedVariables.putAll(getScopeVariables());
 
             if (internalTasksDependencies != null) {

@@ -35,6 +35,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
@@ -104,7 +105,7 @@ public class JobData implements Serializable {
 
     private Map<String, String> genericInformation;
 
-    private Map<String, String> variables;
+    private Map<String, JobVariable> variables;
 
     private String owner;
 
@@ -267,11 +268,11 @@ public class JobData implements Serializable {
 
     @Column(name = "VARIABLES", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Map<String, String> getVariables() {
+    public Map<String, JobVariable> getVariables() {
         return variables;
     }
 
-    public void setVariables(Map<String, String> variables) {
+    public void setVariables(Map<String, JobVariable> variables) {
         this.variables = variables;
     }
 

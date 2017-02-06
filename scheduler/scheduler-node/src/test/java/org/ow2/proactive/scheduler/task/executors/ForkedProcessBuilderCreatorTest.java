@@ -1,11 +1,24 @@
 package org.ow2.proactive.scheduler.task.executors;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+
+import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -21,18 +34,6 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-
-import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 
 public class ForkedProcessBuilderCreatorTest {
     @Rule
@@ -162,9 +163,9 @@ public class ForkedProcessBuilderCreatorTest {
         // Create and setup task launcher initializer
         TaskLauncherInitializer taskLauncherInitializer = createTaskLauncherInitializer();
         taskLauncherInitializer.setForkEnvironment(createForkEnvironment());
-        Map<String, String> variablesToPut = new HashMap<>();
-        variablesToPut.put(testVariable1Key, testVariable1Value);
-        taskLauncherInitializer.setVariables(variablesToPut);
+        Map<String, JobVariable> variablesToPut = new HashMap<>();
+        variablesToPut.put(testVariable1Key, new JobVariable(testVariable1Key, testVariable1Value));
+        taskLauncherInitializer.setJobVariables(variablesToPut);
         return taskLauncherInitializer;
     }
 

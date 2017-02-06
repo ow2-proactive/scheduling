@@ -296,11 +296,11 @@ public class TaskLauncher implements InitActive {
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)
             throws Exception {
-        return taskContextVariableExtractor.extractTaskVariables(taskContext, taskResult);
+        return taskContextVariableExtractor.extractVariables(taskContext, taskResult, true);
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext) throws Exception {
-        return taskContextVariableExtractor.extractTaskVariables(taskContext);
+        return taskContextVariableExtractor.extractVariables(taskContext, true);
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
@@ -323,7 +323,8 @@ public class TaskLauncher implements InitActive {
             String workingDirPath = taskContext.getInitializer().getForkEnvironment().getWorkingDir();
             if (workingDirPath != null) {
                 workingDirPath = VariableSubstitutor.filterAndUpdate(workingDirPath,
-                        taskContextVariableExtractor.extractTaskVariables(taskContext));
+                                                                     taskContextVariableExtractor.extractVariables(taskContext,
+                                                                                                                   true));
                 workingDir = new File(workingDirPath);
             }
         }

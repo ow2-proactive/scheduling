@@ -1,12 +1,23 @@
 package org.ow2.proactive.scheduler.task;
 
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
@@ -18,15 +29,6 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static org.junit.Assert.*;
-import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
 
 
 public class TaskLauncherDataSpacesTest {
@@ -89,7 +91,7 @@ public class TaskLauncherDataSpacesTest {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
-        initializer.setVariables(singletonMap("aVar", "foo"));
+        initializer.setJobVariables(singletonMap("aVar", new JobVariable("aVar", "foo")));
         initializer.setTaskInputFiles(singletonList(
           new InputSelector(new FileSelector("input_${aVar}_${aResultVar}.txt"),
             InputAccessMode.TransferFromInputSpace)));
