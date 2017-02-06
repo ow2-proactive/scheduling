@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 
@@ -57,13 +58,14 @@ public class NodesLockRestorationManager {
 
     private static final Logger log = Logger.getLogger(NodesLockRestorationManager.class);
 
-    private RMCore rmCore;
+    private final RMCore rmCore;
 
-    private Table<String, String, MutableInteger> nodeLockedOnPreviousRun;
+    protected Table<String, String, MutableInteger> nodeLockedOnPreviousRun;
 
-    private boolean initialized;
+    protected boolean initialized;
 
-    public NodesLockRestorationManager(RMCore rmCore) {
+    NodesLockRestorationManager(RMCore rmCore) {
+        this.nodeLockedOnPreviousRun = HashBasedTable.create();
         this.rmCore = rmCore;
     }
 
@@ -74,7 +76,7 @@ public class NodesLockRestorationManager {
             stopwatch = Stopwatch.createStarted();
         }
 
-        nodeLockedOnPreviousRun = rmCore.dbManager.getNodesLockedOnPreviousRun();
+        nodeLockedOnPreviousRun = findNodesLockedOnPreviousRun();
 
         if (log.isInfoEnabled()) {
             stopwatch.stop();
@@ -96,6 +98,18 @@ public class NodesLockRestorationManager {
         }
 
         initialized = true;
+    }
+
+    Table<String, String, MutableInteger> findNodesLockedOnPreviousRun() {
+        return rmCore.dbManager.getNodesLockedOnPreviousRun();
+    }
+
+    Table<String, String, MutableInteger> getNodeLockedOnPreviousRun() {
+        return nodeLockedOnPreviousRun;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 
     /**
@@ -141,17 +155,19 @@ public class NodesLockRestorationManager {
         log.info("Node " + nodeUrl + " skipped because " + reason);
     }
 
-    protected boolean isRestorationCompleted() {
-        return nodeLockedOnPreviousRun.isEmpty();
+    boolean isRestorationCompleted() {
+        return initialized && nodeLockedOnPreviousRun.isEmpty();
     }
 
-    protected void lockNode(RMNode node) {
+    boolean lockNode(RMNode node) {
         String nodeUrl = node.getNodeURL();
 
         if (rmCore.lockNodes(ImmutableSet.of(nodeUrl)).getBooleanValue()) {
             log.info("Node " + nodeUrl + " has been locked with success");
+            return true;
         } else {
             log.info("Locking " + nodeUrl + " has failed");
+            return false;
         }
     }
 

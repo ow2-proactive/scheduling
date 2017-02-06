@@ -46,6 +46,7 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
+
 /**
  * @author ActiveEon Team
  * @since 06/02/17
@@ -53,15 +54,18 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 public class RMNodeHelper {
 
     public static Pair<RMNodeImpl, Node> basicWithMockedInternals() {
-        return basicWithMockedInternals(
-                "name", "hostName", "nodeInformationUrl", "proactiveRuntimeUrl");
+        return basicWithMockedInternals("nodeSourceName",
+                                        "name",
+                                        "hostName",
+                                        "nodeInformationUrl",
+                                        "proactiveRuntimeUrl");
     }
 
-    public static Pair<RMNodeImpl, Node> basicWithMockedInternals(
-            String name, String hostname, String nodeUrl, String proActiveRuntimeUrl) {
+    public static Pair<RMNodeImpl, Node> basicWithMockedInternals(String nodeSourceName, String name, String hostname,
+            String nodeUrl, String proActiveRuntimeUrl) {
         Node node = createNode(name, hostname, nodeUrl, proActiveRuntimeUrl);
 
-        return basicWithMockedInternals(node);
+        return basicWithMockedInternals(nodeSourceName, node);
     }
 
     private static Node createNode(String name, String hostname, String nodeUrl, String proActiveRuntimeUrl) {
@@ -82,21 +86,18 @@ public class RMNodeHelper {
         return node;
     }
 
-    public static Pair<RMNodeImpl, Node> basicWithMockedInternals(Node node) {
+    public static Pair<RMNodeImpl, Node> basicWithMockedInternals(String nodeSourceName, Node node) {
 
         NodeSource nodeSource = Mockito.mock(NodeSource.class);
 
         Set<Principal> principals = new HashSet<>();
         principals.add(new UserNamePrincipal("provider"));
 
-        Client provider =
-                new Client(
-                        new Subject(
-                                false, principals, emptySet(), emptySet()), false);
+        Client provider = new Client(new Subject(false, principals, emptySet(), emptySet()), false);
 
         Permission permission = Mockito.mock(Permission.class);
 
-        when(nodeSource.getName()).thenReturn("nodeSourceName");
+        when(nodeSource.getName()).thenReturn(nodeSourceName);
 
         return new ImmutablePair<>(new RMNodeImpl(node, nodeSource, provider, permission), node);
     }

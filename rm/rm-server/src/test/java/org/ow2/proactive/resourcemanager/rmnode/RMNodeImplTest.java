@@ -69,11 +69,12 @@ public class RMNodeImplTest {
 
     @Test
     public void testCompareToDifferentHostNames() throws Exception {
-        RMNodeImpl rmNode2 = RMNodeHelper.basicWithMockedInternals("name",
-                "hostName2",
-                "nodeInformationUrl",
-                "proactiveRuntimeUrl")
-                .getLeft();
+        RMNodeImpl rmNode2 = RMNodeHelper.basicWithMockedInternals("nodeSourceName",
+                                                                   "name",
+                                                                   "hostName2",
+                                                                   "nodeInformationUrl",
+                                                                   "proactiveRuntimeUrl")
+                                         .getLeft();
 
         int nodesComparison = rmNode.compareTo(rmNode2);
         assertThat(nodesComparison).isNotEqualTo(0);
@@ -82,11 +83,12 @@ public class RMNodeImplTest {
 
     @Test
     public void testCompareToDifferentDescriptorVMNames() throws Exception {
-        RMNodeImpl rmNode2 = RMNodeHelper.basicWithMockedInternals("name",
-                "hostName",
-                "nodeInformationUrl",
-                "proactiveRuntimeUrl2")
-                .getLeft();
+        RMNodeImpl rmNode2 = RMNodeHelper.basicWithMockedInternals("nodeSourceName",
+                                                                   "name",
+                                                                   "hostName",
+                                                                   "nodeInformationUrl",
+                                                                   "proactiveRuntimeUrl2")
+                                         .getLeft();
 
         int nodesComparison = rmNode.compareTo(rmNode2);
         assertThat(nodesComparison).isNotEqualTo(0);
