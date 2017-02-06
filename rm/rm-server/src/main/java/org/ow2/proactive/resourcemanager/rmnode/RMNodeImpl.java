@@ -348,18 +348,24 @@ public class RMNodeImpl extends AbstractRMNode {
      */
     @Override
     public int compareTo(RMNode rmnode) {
-        if (this.getVNodeName().equals(rmnode.getVNodeName())) {
-            if (this.getHostName().equals(rmnode.getHostName())) {
-                if (this.getDescriptorVMName().equals(rmnode.getDescriptorVMName())) {
+        int vNodeNameComparison = this.getVNodeName().compareTo(rmnode.getVNodeName());
+
+        if (vNodeNameComparison == 0) {
+            int hostNameComparison = this.getHostName().compareTo(rmnode.getHostName());
+
+            if (hostNameComparison == 0) {
+                int descriptorVmNameComparison = this.getDescriptorVMName().compareTo(rmnode.getDescriptorVMName());
+
+                if (descriptorVmNameComparison == 0) {
                     return this.getNodeURL().compareTo(rmnode.getNodeURL());
                 } else {
-                    return this.getDescriptorVMName().compareTo(rmnode.getDescriptorVMName());
+                    return descriptorVmNameComparison;
                 }
             } else {
-                return this.getHostName().compareTo(rmnode.getHostName());
+                return hostNameComparison;
             }
         } else {
-            return this.getVNodeName().compareTo(rmnode.getVNodeName());
+            return vNodeNameComparison;
         }
     }
 
