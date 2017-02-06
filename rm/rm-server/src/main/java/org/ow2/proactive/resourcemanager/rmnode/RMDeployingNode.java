@@ -67,7 +67,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     public static final String PROTOCOL_ID = "deploying";
 
     /** The command that was used to launch the node */
-    private String commandLine;
+    private final String commandLine;
 
     /** The description of this deploying node */
     private String description = "";
@@ -76,6 +76,7 @@ public final class RMDeployingNode extends AbstractRMNode {
      * Required by ProActive Programming.
      */
     RMDeployingNode() {
+        this.commandLine = "";
     }
 
     RMDeployingNode(String name, NodeSource nodeSource, String command, Client provider) {
@@ -173,15 +174,6 @@ public final class RMDeployingNode extends AbstractRMNode {
      */
     @Override
     public Node getNode() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Unsupported operation.
-     *
-     * @throws UnsupportedOperationException under all conditions.
-     */
-    public NodeInformation getNodeInformation() throws NodeException {
         throw new UnsupportedOperationException();
     }
 
