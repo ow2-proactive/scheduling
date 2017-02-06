@@ -32,6 +32,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNodeHelper;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImplTest;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
@@ -520,7 +521,7 @@ public class RMCoreTest {
     }
 
     private void testLockNodeState(NodeState nodeState) {
-        RMNodeImpl rmNode = Mockito.spy(RMNodeImplTest.createRmNode());
+        RMNodeImpl rmNode = Mockito.spy(RMNodeHelper.basicWithMockedInternals().getLeft());
         rmNode.setState(nodeState);
 
         HashMap<String, RMNode> allNodes = new HashMap<>();

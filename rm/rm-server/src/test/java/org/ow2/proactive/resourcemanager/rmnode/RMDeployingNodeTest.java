@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.Script;
 
@@ -50,6 +51,11 @@ public class RMDeployingNodeTest {
     public void testCompareToTrue() {
         RMDeployingNode secondDeployingNode = createDeployingNode("deploying");
         assertThat(deployingNode.compareTo(secondDeployingNode)).isEqualTo(0);
+    }
+
+    @Test
+    public void testConstructor() {
+        assertThat(deployingNode.getState()).isEqualTo(NodeState.DEPLOYING);
     }
 
     @Test(expected = UnsupportedOperationException.class)

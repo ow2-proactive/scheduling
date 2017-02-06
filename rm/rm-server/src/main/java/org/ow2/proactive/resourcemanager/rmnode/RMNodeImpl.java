@@ -46,7 +46,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeInformation;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
@@ -91,7 +90,11 @@ public class RMNodeImpl extends AbstractRMNode {
     private Node node;
 
     /** {@link VirtualNode} name of the node */
-    private String vnodeName;
+    // TODO: Investigate if this field is still required
+    // The value of this field seems never set in other places.
+    // Either it is set by introspection in a non-maintained project
+    // or the field is no longer used and can be removed.
+    private String vnodeName = "";
 
     /** Host name of the node */
     private String hostName;
