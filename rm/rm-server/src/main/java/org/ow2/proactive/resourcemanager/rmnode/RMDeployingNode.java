@@ -75,11 +75,11 @@ public final class RMDeployingNode extends AbstractRMNode {
     /**
      * Required by ProActive Programming.
      */
-    RMDeployingNode() {
+    public RMDeployingNode() {
         this.commandLine = "";
     }
 
-    RMDeployingNode(String name, NodeSource nodeSource, String command, Client provider) {
+    public RMDeployingNode(String name, NodeSource nodeSource, String command, Client provider) {
         super(nodeSource, name, null, provider);
 
         changeState(NodeState.DEPLOYING);
@@ -87,7 +87,7 @@ public final class RMDeployingNode extends AbstractRMNode {
         this.commandLine = command;
     }
 
-    RMDeployingNode(String name, NodeSource ns, String command, Client provider, String description) {
+    public RMDeployingNode(String name, NodeSource ns, String command, Client provider, String description) {
         this(name, ns, command, provider);
         this.description = description;
     }
