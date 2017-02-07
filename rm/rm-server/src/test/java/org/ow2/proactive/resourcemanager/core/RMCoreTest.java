@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,6 +41,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -81,6 +83,8 @@ public class RMCoreTest {
 
     @Mock
     private RMNode mockedFreeButLockedNode;
+
+    private NodesLockRestorationManager nodesLockRestorationManager;
 
     @Before
     public void setUp() {
@@ -622,6 +626,21 @@ public class RMCoreTest {
                             mockedSelectionManager,
                             freeNodes,
                             dataBaseManager);
+
+        rmCore = Mockito.spy(rmCore);
+
+        nodesLockRestorationManager = null;
+
+        doReturn(new Function<RMCore, NodesLockRestorationManager>() {
+            @Override
+            public NodesLockRestorationManager apply(RMCore rmCore) {
+                nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
+                nodesLockRestorationManager = Mockito.spy(nodesLockRestorationManager);
+                return nodesLockRestorationManager;
+            }
+        }).when(rmCore).getNodesLockRestorationManagerBuilder();
+
+        rmCore.initNodesRestorationManager();
     }
 
     private void configureRMNode(MockedRMNodeParameters param) {

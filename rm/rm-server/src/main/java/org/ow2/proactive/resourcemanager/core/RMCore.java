@@ -55,6 +55,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.ws.Provider;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -131,6 +133,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 
 
@@ -402,13 +405,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             clientPinger.ping();
 
-            nodesLockRestorationManager = new NodesLockRestorationManager(this);
-
-            if (RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
-                nodesLockRestorationManager.initialize();
-            } else {
-                logger.info("Nodes lock restoration is disabled");
-            }
+            initNodesRestorationManager();
 
             restoreNodeSources();
         } catch (ActiveObjectCreationException e) {
@@ -424,6 +421,25 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (logger.isDebugEnabled()) {
             logger.debug("RMCore end: initActivity");
         }
+    }
+
+    void initNodesRestorationManager() {
+        nodesLockRestorationManager = getNodesLockRestorationManagerBuilder().apply(this);
+
+        if (RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
+            nodesLockRestorationManager.initialize();
+        } else {
+            logger.info("Nodes lock restoration is disabled");
+        }
+    }
+
+    Function<RMCore, NodesLockRestorationManager> getNodesLockRestorationManagerBuilder() {
+        return new Function<RMCore, NodesLockRestorationManager>() {
+            @Override
+            public NodesLockRestorationManager apply(RMCore rmCore) {
+                return new NodesLockRestorationManager(rmCore);
+            }
+        };
     }
 
     public boolean restoreNodeSources() {
