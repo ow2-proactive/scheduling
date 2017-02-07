@@ -1,5 +1,7 @@
 package org.ow2.proactive.resourcemanager.db;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.List;
 
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -10,6 +12,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.google.common.truth.Truth;
 
 
 public class NodeHistoryTest {
@@ -67,6 +71,16 @@ public class NodeHistoryTest {
         assertEquals(expected2, (NodeHistory) rows.get(1));
 
         dbManager.close();
+    }
+
+    @Test
+    public void testSetLocked() {
+        NodeHistory nodeHistory = new NodeHistory();
+        assertThat(nodeHistory.isLocked()).isFalse();
+        nodeHistory.setLocked(true);
+        assertThat(nodeHistory.isLocked()).isTrue();
+        nodeHistory.setLocked(false);
+        assertThat(nodeHistory.isLocked()).isFalse();
     }
 
     private void assertEquals(NodeHistory expected, NodeHistory actual) {
