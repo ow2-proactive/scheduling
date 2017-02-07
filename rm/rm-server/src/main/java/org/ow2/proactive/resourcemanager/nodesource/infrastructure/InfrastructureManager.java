@@ -151,7 +151,11 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     public RMDeployingNode getDeployingNode(String nodeUrl) {
-        RMDeployingNode deployingNode = deployingNodes.get(nodeUrl);
+        RMDeployingNode deployingNode;
+
+        synchronized (deployingNodes) {
+            deployingNode = deployingNodes.get(nodeUrl);
+        }
 
         if (deployingNode == null) {
             return lostNodes.get(nodeUrl);
@@ -562,28 +566,38 @@ public abstract class InfrastructureManager implements Serializable {
      * @return true if the method ran successfully, false otherwise.
      */
     protected final boolean declareDeployingNodeLost(String toUpdateURL, String description) {
-        RMDeployingNode pn;
+        RMDeployingNode deployingNode;
         // we need to atomically move the node from the deploying collection to
         // the lost one.
         synchronized (deployingNodes) {
-            pn = this.deployingNodes.remove(toUpdateURL);
-            if (pn != null) {
-                this.lostNodes.put(toUpdateURL, pn);
+            deployingNode = this.deployingNodes.remove(toUpdateURL);
+            if (deployingNode != null) {
+                this.lostNodes.put(toUpdateURL, deployingNode);
             }
         }
 
-        if (pn != null) {
+        if (deployingNode != null) {
             logger.warn("Declaring node as lost: " + toUpdateURL + ", " + description);
-            NodeState previousState = pn.getState();
-            RMDeployingNodeAccessor.getDefault().setLost(pn);
+            NodeState previousState = deployingNode.getState();
+            RMDeployingNodeAccessor.getDefault().setLost(deployingNode);
             if (description != null) {
-                RMDeployingNodeAccessor.getDefault().setDescription(pn, description);
+                RMDeployingNodeAccessor.getDefault().setDescription(deployingNode, description);
             }
 
-            nodeSource.setLost(pn);
-            RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                                                   previousState,
-                                                   pn.getProvider().getName());
+            nodeSource.setLost(deployingNode);
+
+            // The value for 'deployingNode' is fetched before calling 'nodeSource.setLost'
+            // However, 'nodeSource.setLost' may lock the node that is currently handled and thus update 'lostNodes'.
+            // In such a case, the 'lostNodes' collection is updated with a new deploying node instance which as the
+            // same URL as 'deployingNode' but different state information (e.g. lock status).
+            // This is due to deep copies made by ProActive Programming with calls on Active Object
+            // As a consequence, the 'deployingNode' variable must be updated with the last value available
+            // in the 'lostNodes' collection
+            deployingNode = lostNodes.get(toUpdateURL);
+
+            RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                              previousState,
+                                                              deployingNode.getProvider().getName());
             emitEvent(event);
 
             if (logger.isTraceEnabled()) {
