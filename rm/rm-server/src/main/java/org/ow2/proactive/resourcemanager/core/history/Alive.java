@@ -64,7 +64,18 @@ public class Alive {
     @Column(name = "time")
     protected long time;
 
+    @Column(name = "lastStartupTime")
+    protected long lastStartupTime;
+
     public Alive() {
+    }
+
+    public long getLastStartupTime() {
+        return lastStartupTime;
+    }
+
+    public void setLastStartupTime(long lastStartupTime) {
+        this.lastStartupTime = lastStartupTime;
     }
 
     public long getTime() {
@@ -74,4 +85,5 @@ public class Alive {
     public void setTime(long time) {
         this.time = time;
     }
+
 }

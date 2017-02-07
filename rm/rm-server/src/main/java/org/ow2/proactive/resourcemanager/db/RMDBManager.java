@@ -78,7 +78,7 @@ public class RMDBManager {
 
     private final TransactionHelper transactionHelper;
 
-    private long rmLastAliveTimeAfterStartup;
+    private long rmLastStartupTime;
 
     private static final class LazyHolder {
 
@@ -96,17 +96,14 @@ public class RMDBManager {
         if (System.getProperty(RM_DATABASE_IN_MEMORY) != null) {
             return createInMemoryRMDBManager();
         } else {
-            File configFile = new File(PAResourceManagerProperties
-                    .getAbsolutePath(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getValueAsString()));
+            File configFile = new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getValueAsString()));
 
             boolean drop = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getValueAsBoolean();
-            boolean dropNS = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB_NODESOURCES
-                    .getValueAsBoolean();
+            boolean dropNS = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB_NODESOURCES.getValueAsBoolean();
 
             if (logger.isInfoEnabled()) {
-                logger.info("Starting RM DB Manager " + "with drop DB = " + drop +
-                        " and drop nodesources = " + dropNS + " and configuration file = " +
-                        configFile.getAbsolutePath());
+                logger.info("Starting RM DB Manager " + "with drop DB = " + drop + " and drop nodesources = " + dropNS +
+                            " and configuration file = " + configFile.getAbsolutePath());
             }
 
             Configuration configuration = new Configuration();
@@ -131,7 +128,7 @@ public class RMDBManager {
         Configuration config = new Configuration();
         config.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbc.JDBCDriver");
         config.setProperty("hibernate.connection.url",
-                "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
+                           "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
         config.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         return new RMDBManager(config, true, true);
     }
@@ -150,10 +147,8 @@ public class RMDBManager {
                 configuration.setProperty("hibernate.hbm2ddl.auto", "create");
 
                 // dropping RRD database as well
-                File ddrDB =
-                        new File(
-                                PAResourceManagerProperties.RM_HOME.getValueAsString(),
-                                PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
+                File ddrDB = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
+                                      PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
 
                 if (ddrDB.exists()) {
                     if (!ddrDB.delete()) {
@@ -168,18 +163,21 @@ public class RMDBManager {
             sessionFactory = configuration.buildSessionFactory();
             transactionHelper = new TransactionHelper(sessionFactory);
 
-            List<?> lastAliveTimeResult = executeSqlQuery("from Alive");
-            if (lastAliveTimeResult == null || lastAliveTimeResult.size() == 0) {
-                createRmAliveTime();
+            Alive lastAliveTimeResult = findRmLastAliveEntry();
+
+            if (lastAliveTimeResult == null) {
+                createRmAliveEntry();
             } else if (!drop) {
                 if (dropNS) {
                     removeNodeSources();
                 }
 
-                rmLastAliveTimeAfterStartup = ((Alive) lastAliveTimeResult.get(0)).getTime();
+                rmLastStartupTime = lastAliveTimeResult.getLastStartupTime();
 
-                recover(rmLastAliveTimeAfterStartup);
+                recover(rmLastStartupTime);
             }
+
+            updateRmLastStartupTime();
 
             int periodInMilliseconds = PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt();
 
@@ -189,12 +187,23 @@ public class RMDBManager {
                 public void run() {
                     updateRmAliveTime();
                 }
-            }, 0, periodInMilliseconds);
+            }, periodInMilliseconds, periodInMilliseconds);
 
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed", ex);
         }
+    }
+
+    public Alive findRmLastAliveEntry() {
+
+        List<?> lastAliveTimeResult = executeSqlQuery("from Alive");
+
+        if (lastAliveTimeResult == null || lastAliveTimeResult.isEmpty()) {
+            return null;
+        }
+
+        return ((Alive) lastAliveTimeResult.get(0));
     }
 
     private void recover(final long lastAliveTime) {
@@ -203,12 +212,11 @@ public class RMDBManager {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                int updated = session.createSQLQuery(
-                        "update NodeHistory set endTime = :endTime where endTime = 0").setParameter(
-                        "endTime", lastAliveTime).executeUpdate();
-                updated = +session.createSQLQuery(
-                        "update NodeHistory set endTime = startTime where endTime < startTime")
-                        .executeUpdate();
+                int updated = session.createSQLQuery("update NodeHistory set endTime = :endTime where endTime = 0")
+                                     .setParameter("endTime", lastAliveTime)
+                                     .executeUpdate();
+                updated = +session.createSQLQuery("update NodeHistory set endTime = startTime where endTime < startTime")
+                                  .executeUpdate();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("Restoring the node history: " + updated + " raws updated");
@@ -222,12 +230,11 @@ public class RMDBManager {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                int updated = session.createSQLQuery(
-                        "update UserHistory set endTime = :endTime where endTime = 0").setParameter(
-                        "endTime", lastAliveTime).executeUpdate();
-                updated = +session.createSQLQuery(
-                        "update UserHistory set endTime = startTime where endTime < startTime")
-                        .executeUpdate();
+                int updated = session.createSQLQuery("update UserHistory set endTime = :endTime where endTime = 0")
+                                     .setParameter("endTime", lastAliveTime)
+                                     .executeUpdate();
+                updated = +session.createSQLQuery("update UserHistory set endTime = startTime where endTime < startTime")
+                                  .executeUpdate();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("Restoring the user history: " + updated + " raws updated");
@@ -284,7 +291,8 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while adding new node source '" + nodeSourceData.getName() + "'");
+            throw new RuntimeException("Exception occured while adding new node source '" + nodeSourceData.getName() +
+                                       "'");
         }
     }
 
@@ -293,8 +301,7 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 logger.info("Removing the node source " + sourceName + " from the database");
-                session.getNamedQuery("deleteNodeSourceDataByName")
-                        .setParameter("name", sourceName).executeUpdate();
+                session.getNamedQuery("deleteNodeSourceDataByName").setParameter("name", sourceName).executeUpdate();
                 return null;
             }
         });
@@ -346,10 +353,10 @@ public class RMDBManager {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                session.createSQLQuery(
-                        "update NodeHistory set endTime=:endTime where nodeUrl=:nodeUrl and endTime=0")
-                        .setParameter("endTime", nodeHistory.getStartTime()).setParameter("nodeUrl",
-                        nodeHistory.getNodeUrl()).executeUpdate();
+                session.createSQLQuery("update NodeHistory set endTime=:endTime where nodeUrl=:nodeUrl and endTime=0")
+                       .setParameter("endTime", nodeHistory.getStartTime())
+                       .setParameter("nodeUrl", nodeHistory.getNodeUrl())
+                       .executeUpdate();
 
                 if (nodeHistory.isStoreInDataBase()) {
                     session.save(nodeHistory);
@@ -368,24 +375,32 @@ public class RMDBManager {
      * @return the number of nodes locked per node source and host pair on the previous RM run.
      */
     public Table<String, String, MutableInteger> getNodesLockedOnPreviousRun() {
+        return getNodesLockedOnPreviousRun(getRmLastStartupTime());
+    }
 
-        List<Object[]> lockingInformation =
-                executeReadTransaction(new SessionWork<List<Object[]>>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public List<Object[]> doInTransaction(Session session) {
-                    return session.getNamedQuery("getNodesLockedOnPreviousRun")
-                            .setLong("endTime", getRmLastAliveTimeAfterStartup()).list();
-            }
-        });
+    Table<String, String, MutableInteger> getNodesLockedOnPreviousRun(final long rmLastStartupTime) {
+
+        List<Object[]> lockingInformation = findNodesLockedOnPreviousRun(rmLastStartupTime);
 
         return groupNodeUrlsByHostAndNodeSource(lockingInformation);
     }
 
-    protected Table<String, String, MutableInteger> groupNodeUrlsByHostAndNodeSource(List<Object[]> lockingInformation) {
+    public List<Object[]> findNodesLockedOnPreviousRun(final long rmLastStartupTime) {
+        return executeReadTransaction(new SessionWork<List<Object[]>>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public List<Object[]> doInTransaction(Session session) {
+                return session.getNamedQuery("getNodesLockedOnPreviousRun")
+                              .setLong("endTime", rmLastStartupTime)
+                              .list();
+            }
+        });
+    }
 
-        Table<String, String, MutableInteger> table =
-                HashBasedTable.create(lockingInformation.size(), 3);
+    protected Table<String, String, MutableInteger>
+            groupNodeUrlsByHostAndNodeSource(List<Object[]> lockingInformation) {
+
+        Table<String, String, MutableInteger> table = HashBasedTable.create(lockingInformation.size(), 3);
 
         // Used to remove duplicate node URLs
         // The JPQL query already applies GROUP BY but DISTINCT is not possible on a specific column
@@ -418,24 +433,37 @@ public class RMDBManager {
     }
 
     protected void updateRmAliveTime() {
+        updateAliveTable("time", System.currentTimeMillis());
+    }
+
+    protected void updateRmLastStartupTime() {
+        updateAliveTable("lastStartupTime", System.currentTimeMillis());
+        ;
+    }
+
+    private void updateAliveTable(final String columnName, final Object value) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                long curMilliseconds = System.currentTimeMillis();
-                session.createSQLQuery("update Alive set time = :time").setParameter("time", curMilliseconds)
-                        .executeUpdate();
+                session.createSQLQuery("update Alive set " + columnName + " = :time")
+                       .setParameter("time", value)
+                       .executeUpdate();
                 return null;
             }
         });
     }
 
-    private void createRmAliveTime() {
+    private void createRmAliveEntry() {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
+                long now = System.currentTimeMillis();
+
                 Alive alive = new Alive();
-                alive.setTime(System.currentTimeMillis());
+                alive.setLastStartupTime(now);
+                alive.setTime(now);
                 session.save(alive);
+
                 return null;
             }
         });
@@ -453,14 +481,15 @@ public class RMDBManager {
     }
 
     /**
-     * Returns the last timestamp at which the Resource Manager
-     * was acknowledged alive just after it started up.
+     * Returns the timestamp at which the Resource Manager
+     * was started up the last time.
      *
      * @return a Unix epoch time denoting the last timestamp at which
-     * the Resource Manager was acknowledged alive just after it started up.
+     * the Resource Manager was restarted for the last time. A return
+     * value of {@code 0} means the RM is starting for the first time.
      */
-    public long getRmLastAliveTimeAfterStartup() {
-        return rmLastAliveTimeAfterStartup;
+    public long getRmLastStartupTime() {
+        return rmLastStartupTime;
     }
 
 }
