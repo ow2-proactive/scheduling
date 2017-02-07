@@ -156,7 +156,9 @@ public class RMDBManager {
                                 PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
 
                 if (ddrDB.exists()) {
-                    ddrDB.delete();
+                    if (!ddrDB.delete()) {
+                        logger.error("Dropping RRD database has failed: " + ddrDB);
+                    }
                 }
             }
 
