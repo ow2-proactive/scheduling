@@ -152,7 +152,7 @@ public class NodesLockRestorationManager {
     }
 
     private void logSkipReason(String nodeUrl, String reason) {
-        log.info("Node " + nodeUrl + " skipped because " + reason);
+        log.info("Node '" + nodeUrl + "' skipped because " + reason);
     }
 
     boolean isRestorationCompleted() {
@@ -163,10 +163,10 @@ public class NodesLockRestorationManager {
         String nodeUrl = node.getNodeURL();
 
         if (rmCore.lockNodes(ImmutableSet.of(nodeUrl)).getBooleanValue()) {
-            log.info("Node " + nodeUrl + " has been locked with success");
+            log.info("Node '" + nodeUrl + "' has been locked with success");
             return true;
         } else {
-            log.info("Locking " + nodeUrl + " has failed");
+            log.info("Locking '" + nodeUrl + "' has failed");
             return false;
         }
     }

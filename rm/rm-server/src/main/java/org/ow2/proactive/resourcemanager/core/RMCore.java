@@ -560,8 +560,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             client = rmNode.getProvider();
         }
 
-        nodesLockRestorationManager.handle(rmNode);
-
         // resetting owner here
         rmNode.setFree();
 
@@ -810,7 +808,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public BooleanWrapper addNode(String nodeUrl, String sourceName) {
-
         if (toShutDown) {
             throw new AddingNodesException("The resource manager is shutting down");
         }
@@ -1431,7 +1428,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 eligibleNodes.remove(rmNode);
             }
 
-            nodesLockRestorationManager.handle(rmNode);
             rmNode.setDown();
             // create the event
             this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
@@ -1987,7 +1983,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    public boolean setLost(RMNode rmNode) {
+    public boolean setDeploying(RMNode rmNode) {
         nodesLockRestorationManager.handle(rmNode);
         return true;
     }

@@ -308,23 +308,9 @@ public class RMCoreTest {
     }
 
     @Test
-    public void testNodesRestorationManagerHandleInSetDownNode() {
+    public void testNodesRestorationManagerHandleInSetDeploying() {
         verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class));
-        rmCore.setDownNode(mockedBusyNode.getNodeURL());
-        verify(nodesLockRestorationManager).handle(Mockito.any(RMNode.class));
-    }
-
-    @Test
-    public void testNodesRestorationManagerHandleInSetLost() {
-        verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class));
-        rmCore.setLost(mockedBusyNode);
-        verify(nodesLockRestorationManager).handle(Mockito.any(RMNode.class));
-    }
-
-    @Test
-    public void testNodesRestorationManagerHandleInInternalSetFree() {
-        verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class));
-        rmCore.internalSetFree(mockedBusyNode);
+        rmCore.setDeploying(mockedBusyNode);
         verify(nodesLockRestorationManager).handle(Mockito.any(RMNode.class));
     }
 

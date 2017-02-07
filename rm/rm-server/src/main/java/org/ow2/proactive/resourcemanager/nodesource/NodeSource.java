@@ -65,6 +65,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
+import org.ow2.proactive.resourcemanager.rmnode.AbstractRMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
@@ -247,15 +248,17 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Updates internal node source structures.
      */
-    private void internalAddNode(Node node) throws RMException {
+    private RMDeployingNode internalAddNode(Node node) throws RMException {
         String nodeUrl = node.getNodeInformation().getURL();
         if (this.nodes.containsKey(nodeUrl)) {
             throw new RMException("The node " + nodeUrl + " already added to the node source " + name);
         }
 
         logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
-        infrastructureManager.internalRegisterAcquiredNode(node);
+        RMDeployingNode deployingNode = infrastructureManager.internalRegisterAcquiredNode(node);
         nodes.put(nodeUrl, node);
+
+        return deployingNode;
     }
 
     /**
@@ -338,16 +341,23 @@ public class NodeSource implements InitActive, RunActive {
         }
 
         // if any exception occurs in internalAddNode(node) do not add the node to the core
+        RMDeployingNode deployingNode;
         try {
-            internalAddNode(nodeToAdd);
+            deployingNode = internalAddNode(nodeToAdd);
         } catch (RMException e) {
             throw new AddingNodesException(e);
         }
         //we build the rmnode
-        RMNode rmnodeToAdd = buildRMNode(nodeToAdd, provider);
+        RMNode rmNode = buildRMNode(nodeToAdd, provider);
+
+        if (deployingNode != null) {
+            // inherit locking status from associated deploying node created before
+            ((AbstractRMNode) rmNode).copyLockStatusFrom(deployingNode);
+        }
+
         //we notify the configuration of the node to the rmcore
         //it then will be seen as "configuring"
-        rmcore.internalRegisterConfiguringNode(rmnodeToAdd);
+        rmcore.internalRegisterConfiguringNode(rmNode);
 
         return new BooleanWrapper(true);
     }
@@ -404,8 +414,8 @@ public class NodeSource implements InitActive, RunActive {
         return infrastructureManager.update(rmNode);
     }
 
-    public boolean setLost(RMNode rmNode) {
-        return rmcore.setLost(rmNode);
+    public boolean setDeploying(RMDeployingNode deployingNode) {
+        return rmcore.setDeploying(deployingNode);
     }
 
     /**

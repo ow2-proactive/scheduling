@@ -95,9 +95,9 @@ public abstract class InfrastructureManager implements Serializable {
     protected NodeSource nodeSource;
 
     /** deploying nodes list */
-    protected Map<String, RMDeployingNode> deployingNodes = new ConcurrentHashMap<>();
+    protected final Map<String, RMDeployingNode> deployingNodes = new ConcurrentHashMap<>();
 
-    protected Map<String, RMDeployingNode> lostNodes = new ConcurrentHashMap<>();
+    protected final Map<String, RMDeployingNode> lostNodes = new ConcurrentHashMap<>();
 
     /**
      * node list, miror of nodesource.getAliveNodes(), to implement random
@@ -124,7 +124,7 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Sets an infrastructure node source. Also sets the field rmUrl if it is
      * not provided by users.
-     * 
+     *
      * @param nodeSource
      *            policy node source
      */
@@ -135,7 +135,7 @@ public abstract class InfrastructureManager implements Serializable {
 
     /**
      * To retrieve nodes whose registration status is deploying or lost.
-     * 
+     *
      * @return nodes whose registration status is deploying or lost.
      */
     public ArrayList<RMDeployingNode> getDeployingNodes() {
@@ -166,7 +166,7 @@ public abstract class InfrastructureManager implements Serializable {
 
     /**
      * To remove a deploying node given its url
-     * 
+     *
      * @param pnUrl
      *            the url of the deploying node to remove.
      * @return true if successful, false otherwise
@@ -202,7 +202,7 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Performs some cleanup ( essentially removal of the cached node ) and call
      * removeNodeImpl
-     * 
+     *
      * @param node
      *            the node to be removed
      * @throws RMException
@@ -227,20 +227,21 @@ public abstract class InfrastructureManager implements Serializable {
      * method ensures that the implementation method (see
      * {@link InfrastructureManager#notifyAcquiredNode(Node)} is only called if
      * no timeout has occurred for the associated deploying node.
-     * 
+     *
      * @param node
      *            the newly added node
      * @throws RMException
      */
-    public final void internalRegisterAcquiredNode(Node node) throws RMException {
+    public final RMDeployingNode internalRegisterAcquiredNode(Node node) throws RMException {
         // if implementation doesn't use deploying nodes, we just execute
         // factory method and return
+
         if (!usingDeployingNodes) {
             this.notifyAcquiredNode(node);
-            return;
+            return null;
         }
         // here we use deploying nodes and timeout
-        RMDeployingNode pn = null;
+        RMDeployingNode pn;
         // we build the url of the associated deploying node
         String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
         synchronized (nodeAcquisitionLock) {
@@ -267,6 +268,8 @@ public abstract class InfrastructureManager implements Serializable {
                 throw new RMException("Not expected node registered, discarding it: " + url);
             }
         }
+
+        return pn;
     }
 
     /**
@@ -304,7 +307,7 @@ public abstract class InfrastructureManager implements Serializable {
      * called by the node source at configuration time. Shifts the parameter
      * array once done to let implementation only care about their own
      * configurable parameters.
-     * 
+     *
      * @param parameters
      *            the parameters of the infrastructure manager
      * @throws IllegalArgumentException
@@ -341,7 +344,7 @@ public abstract class InfrastructureManager implements Serializable {
     // *****************************************\\
     // **********************************************************************************************\\
     /**
-     * 
+     *
      * @return The Description of the implemented Infrastructure
      */
     public abstract String getDescription();
@@ -349,7 +352,7 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Adds information required to deploy nodes in the future. Do not initiate
      * a real nodes deployment/acquisition as it's up to the policy.
-     * 
+     *
      * @param parameters
      *            of the infrastructure manager
      * @throws IllegalArgumentException
@@ -381,7 +384,7 @@ public abstract class InfrastructureManager implements Serializable {
 
     /**
      * Removes the node from the resource manager.
-     * 
+     *
      * @param node
      *            node to release
      * @throws RMException
@@ -395,7 +398,7 @@ public abstract class InfrastructureManager implements Serializable {
      * because implementors don't necessary use this feature. Anyway, if they
      * decide to do so, they can override this method, for instance, to change a
      * flag that would get a control loop to exit...
-     * 
+     *
      * @param pnURL
      *            the deploying node's URL for which one the timeout occurred.
      */
@@ -410,7 +413,7 @@ public abstract class InfrastructureManager implements Serializable {
      * {@link InfrastructureManager#addDeployingNode(String, String, String, long)}
      * was made), and is called only for deploying nodes for which one no
      * timeout occurred.
-     * 
+     *
      * @param node
      *            the newly registered node
      * @throws RMException
@@ -446,7 +449,7 @@ public abstract class InfrastructureManager implements Serializable {
      * <li>Finally, it tries to set the nodesource's name, the rm's URL and the
      * node's name.</li>
      * </ul>
-     * 
+     *
      * @param targetOS
      *            the operating system on which one the node will be deployed
      */
@@ -475,7 +478,7 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Returns an empty
      * {@link org.ow2.proactive.resourcemanager.utils.CommandLineBuilder}
-     * 
+     *
      * @return Returns an empty
      *         {@link org.ow2.proactive.resourcemanager.utils.CommandLineBuilder}
      */
@@ -486,7 +489,7 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Creates a new RMDeployingNode's, stores it in a local ArrayList and
      * notify the owning NodeSource of the RMDeployingNode creation
-     * 
+     *
      * @param name
      *            The RMDeployingNode's name.
      * @param description
@@ -508,29 +511,44 @@ public abstract class InfrastructureManager implements Serializable {
         // mecanism
         usingDeployingNodes = true;
         NodeSource nsStub = this.nodeSource.getStub();
-        RMDeployingNode result = RMDeployingNodeAccessor.getDefault().newRMDeployingNode(name,
+        RMDeployingNode deployingNode = RMDeployingNodeAccessor.getDefault().newRMDeployingNode(name,
                                                                                          nsStub,
                                                                                          command,
                                                                                          nsStub.getAdministrator(),
                                                                                          description);
-        final String resultURL = result.getNodeURL();
-        this.deployingNodes.put(result.getNodeURL(), result);
-        logger.trace("New DeployingNode " + name + " instanciated in IM");
-        RMNodeEvent event = result.createNodeEvent(RMEventType.NODE_ADDED, null, result.getProvider().getName());
+        final String deployingNodeUrl = deployingNode.getNodeURL();
+        this.deployingNodes.put(deployingNodeUrl, deployingNode);
+
+        nodeSource.setDeploying(deployingNode);
+        // The value for 'deployingNode' is retrieved before calling 'nodeSource.setDeploying'
+        // However, 'nodeSource.setDeploying' may lock the node that is currently handled
+        // (e.g. node lock restoration on RM startup) and thus update 'deployingNodes'.
+        // In such a case, the 'deployingNodes' collection is updated with a new deploying node instance which has the
+        // same URL as 'deployingNode' but different state information (e.g. lock status).
+        // This is due to deep copies made by ProActive Programming with method invocation on Active Objects.
+        // As a consequence, the 'deployingNode' variable must be updated with the last value available
+        // in the 'deployingNodes' collection
+        deployingNode = getDeployingNode(deployingNodeUrl);
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("New DeployingNode " + name + " instantiated in IM");
+        }
+
+        RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_ADDED, null, deployingNode.getProvider().getName());
         emitEvent(event);
         this.sched(new TimerTask() {
             @Override
             public void run() {
-                InfrastructureManager.this.timeout(resultURL, timeout);
+                InfrastructureManager.this.timeout(deployingNodeUrl, timeout);
             }
         }, timeout);
-        return result.getNodeURL();
+        return deployingNode.getNodeURL();
     }
 
     /**
      * To update the description of a deploying node. If a timeout has occurred
      * for this node, the update is discarded.
-     * 
+     *
      * @param toUpdateURL
      *            The RMDeployingNode's URL whose description will be updated.
      * @param newDescription
@@ -558,7 +576,7 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Declares a deploying node lost. Future attempts to modify the deploying
      * node will be ignored.
-     * 
+     *
      * @param toUpdateURL
      *            The RMDeployingNode's URL which is to be declared as lost
      * @param description
@@ -583,17 +601,6 @@ public abstract class InfrastructureManager implements Serializable {
             if (description != null) {
                 RMDeployingNodeAccessor.getDefault().setDescription(deployingNode, description);
             }
-
-            nodeSource.setLost(deployingNode);
-
-            // The value for 'deployingNode' is fetched before calling 'nodeSource.setLost'
-            // However, 'nodeSource.setLost' may lock the node that is currently handled and thus update 'lostNodes'.
-            // In such a case, the 'lostNodes' collection is updated with a new deploying node instance which as the
-            // same URL as 'deployingNode' but different state information (e.g. lock status).
-            // This is due to deep copies made by ProActive Programming with calls on Active Object
-            // As a consequence, the 'deployingNode' variable must be updated with the last value available
-            // in the 'lostNodes' collection
-            deployingNode = lostNodes.get(toUpdateURL);
 
             RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                               previousState,
@@ -622,7 +629,7 @@ public abstract class InfrastructureManager implements Serializable {
      * is in mutual exclusion with
      * {@link InfrastructureManager#internalRegisterAcquiredNode(Node)} to avoid
      * races.
-     * 
+     *
      * @param nodeName
      *            the node's name
      * @param toRunWhenOK
@@ -716,7 +723,7 @@ public abstract class InfrastructureManager implements Serializable {
 
     /**
      * Builds the name of the deploying node given its name
-     * 
+     *
      * @param pnName
      *            The name of the deploying node
      * @return the URL of the deploying node
@@ -771,7 +778,7 @@ public abstract class InfrastructureManager implements Serializable {
 
         /**
          * Instantiate a new {@link RMDeployingNode} with the given parameters
-         * 
+         *
          * @param name
          *            The deploying node's name
          * @param ns
@@ -790,7 +797,7 @@ public abstract class InfrastructureManager implements Serializable {
 
         /**
          * To set the Description of the {@link RMDeployingNode}
-         * 
+         *
          * @param pn
          *            the deploying node to update
          * @param newDescription
@@ -800,7 +807,7 @@ public abstract class InfrastructureManager implements Serializable {
 
         /**
          * To update the lost field of the deploying node
-         * 
+         *
          * @param pn
          *            The deploying node to update
          */

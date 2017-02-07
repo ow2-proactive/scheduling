@@ -114,6 +114,14 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         this.provider = provider;
     }
 
+    public void copyLockStatusFrom(RMNode node) {
+        if (this == node || isLocked != node.isLocked()) {
+            isLocked = node.isLocked();
+            lockedBy = node.getLockedBy();
+            lockTime = node.getLockTime();
+        }
+    }
+
     /**
      * {@inheritDoc}
      */

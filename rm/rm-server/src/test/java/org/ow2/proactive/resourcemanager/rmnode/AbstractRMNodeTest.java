@@ -1,17 +1,25 @@
 package org.ow2.proactive.resourcemanager.rmnode;
 
 import static com.google.common.truth.Truth.assertThat;
+import static java.util.Collections.emptySet;
 
 import java.io.Serializable;
 import java.security.Permission;
+import java.security.Principal;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.security.auth.Subject;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.scripting.Script;
@@ -32,6 +40,66 @@ public class AbstractRMNodeTest {
     public void setUp() {
         client = new Client(null, false);
         rmNode = new BasicRMNode("1");
+    }
+
+    @Test
+    public void testCopyLockStatusFromSameNode() {
+        rmNode.lock(client);
+        assertThat(rmNode.isLocked()).isTrue();
+
+        boolean oldLockStatus = rmNode.isLocked();
+        Client oldLockedBy = rmNode.getLockedBy();
+        long oldLockTime = rmNode.getLockTime();
+
+        rmNode.copyLockStatusFrom(rmNode);
+
+        assertThat(rmNode.isLocked()).isEqualTo(oldLockStatus);
+        assertThat(rmNode.getLockedBy()).isEqualTo(oldLockedBy);
+        assertThat(rmNode.getLockTime()).isEqualTo(oldLockTime);
+    }
+
+    @Test
+    public void testCopyLockStatusFromUsingNodesHavingDifferentLockStatuses() throws InterruptedException {
+        rmNode.unlock(client);
+        assertThat(rmNode.isLocked()).isFalse();
+
+        TimeUnit.MILLISECONDS.sleep(1);
+
+        BasicRMNode rmNode2 = new BasicRMNode("2");
+        rmNode2.lock(client);
+        assertThat(rmNode2.isLocked()).isTrue();
+
+        rmNode.copyLockStatusFrom(rmNode2);
+        assertThat(rmNode.isLocked()).isTrue();
+        assertThat(rmNode.isLocked()).isEqualTo(rmNode2.isLocked);
+        assertThat(rmNode.getLockedBy()).isEqualTo(rmNode2.getLockedBy());
+        assertThat(rmNode.getLockTime()).isEqualTo(rmNode2.getLockTime());
+    }
+
+    @Test
+    public void testCopyLockStatusFromUsingNodesHavingSameLockStatuses() throws InterruptedException {
+        rmNode.lock(client);
+        assertThat(rmNode.isLocked()).isTrue();
+
+        TimeUnit.MILLISECONDS.sleep(1);
+
+        BasicRMNode rmNode2 = new BasicRMNode("2");
+        rmNode2.lock(createClient("2"));
+        assertThat(rmNode2.isLocked()).isTrue();
+
+        rmNode.copyLockStatusFrom(rmNode2);
+        assertThat(rmNode.isLocked()).isTrue();
+        assertThat(rmNode2.isLocked()).isTrue();
+        assertThat(rmNode.isLocked()).isEqualTo(rmNode2.isLocked);
+        assertThat(rmNode.getLockedBy()).isNotEqualTo(rmNode2.getLockedBy());
+        assertThat(rmNode.getLockTime()).isNotEqualTo(rmNode2.getLockTime());
+    }
+
+    private Client createClient(String name) {
+        Set<Principal> principals = new HashSet<>(1, 1f);
+        principals.add(new UserNamePrincipal(name));
+
+        return new Client(new Subject(false, principals, emptySet(), emptySet()), false);
     }
 
     @Test
