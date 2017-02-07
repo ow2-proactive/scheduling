@@ -511,17 +511,20 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     protected RMNode getNodeByUrlIncludingDeployingNodes(String url) {
-        RMNode nodebyUrl = getNodebyUrl(url);
+        RMNode nodeByUrl = getNodebyUrl(url);
 
-        if (nodebyUrl != null) {
-            return nodebyUrl;
+        if (nodeByUrl != null) {
+            return nodeByUrl;
         } else {
             String[] chunks = url.split("/");
-            String nodeSourceName = chunks[2];
-            NodeSource nodeSource = nodeSources.get(nodeSourceName);
 
-            if (nodeSource != null) {
-                return nodeSource.getDeployingNode(url);
+            if (chunks.length >= 3) {
+                String nodeSourceName = chunks[2];
+                NodeSource nodeSource = nodeSources.get(nodeSourceName);
+
+                if (nodeSource != null) {
+                    return nodeSource.getDeployingNode(url);
+                }
             }
         }
 
@@ -536,7 +539,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param rmNode node to set free.
      * @return true if the node successfully set as free, false if it was down before.
      */
-    private BooleanWrapper internalSetFree(final RMNode rmNode) {
+    BooleanWrapper internalSetFree(final RMNode rmNode) {
         if (logger.isDebugEnabled()) {
             logger.debug("Current node state " + rmNode.getState() + " " + rmNode.getNodeURL());
             logger.debug("Setting node state to free " + rmNode.getNodeURL());
