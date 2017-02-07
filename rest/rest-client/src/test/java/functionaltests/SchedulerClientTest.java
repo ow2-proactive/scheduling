@@ -36,12 +36,17 @@
  */
 package functionaltests;
 
-import com.google.common.io.Files;
-import functionaltests.jobs.ErrorTask;
-import functionaltests.jobs.LogTask;
-import functionaltests.jobs.MetadataTask;
-import functionaltests.jobs.SimpleJob;
-import functionaltests.jobs.VariableTask;
+import static functionaltests.RestFuncTHelper.getRestServerUrl;
+import static functionaltests.jobs.SimpleJob.TEST_JOB;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -54,24 +59,35 @@ import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.*;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URL;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import com.google.common.io.Files;
 
-import static functionaltests.RestFuncTHelper.getRestServerUrl;
-import static functionaltests.jobs.SimpleJob.TEST_JOB;
+import functionaltests.jobs.ErrorTask;
+import functionaltests.jobs.LogTask;
+import functionaltests.jobs.MetadataTask;
+import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.SimpleJob;
+import functionaltests.jobs.VariableTask;
 
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
@@ -123,6 +139,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
     }
 
+
     @Test(timeout = MAX_WAIT_TIME)
     public void testJobResult() throws Throwable {
         ISchedulerClient client = clientInstance();
@@ -150,39 +167,39 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
         checkJobInfo(jobState.getJobInfo());
 
-        TaskState errorTaskState = findTask(ErrorTask.class.getSimpleName() + "Task", jobState.getHMTasks());
+        TaskState errorTaskState = findTask(getTaskNameForClass(ErrorTask.class), jobState.getHMTasks());
         Assert.assertNotNull(errorTaskState);
-        TaskState simpleTaskState = findTask(SimpleJob.class.getSimpleName() + "Task", jobState.getHMTasks());
+        TaskState simpleTaskState = findTask(getTaskNameForClass(SimpleJob.class), jobState.getHMTasks());
         Assert.assertNotNull(simpleTaskState);
         Assert.assertEquals(TaskStatus.FAULTY, errorTaskState.getStatus());
         Assert.assertEquals(TaskStatus.FINISHED, simpleTaskState.getStatus());
 
         // task result simple
-        TaskResult tResSimple = result.getResult(SimpleJob.class.getSimpleName() + "Task");
+        TaskResult tResSimple = result.getResult(getTaskNameForClass(SimpleJob.class));
         Assert.assertNotNull(tResSimple.value());
         Assert.assertEquals(new StringWrapper(TEST_JOB), tResSimple.value());
 
         // task result with error
-        TaskResult tResError = result.getResult(ErrorTask.class.getSimpleName() + "Task");
+        TaskResult tResError = result.getResult(getTaskNameForClass(ErrorTask.class));
         Assert.assertNotNull(tResError);
         Assert.assertTrue(tResError.hadException());
         Assert.assertNotNull(tResError.getException());
         Assert.assertTrue(tResError.getException() instanceof TaskException);
 
         // task result with logs
-        TaskResult tResLog = result.getResult(LogTask.class.getSimpleName() + "Task");
+        TaskResult tResLog = result.getResult(getTaskNameForClass(LogTask.class));
         Assert.assertNotNull(tResLog);
         Assert.assertNotNull(tResLog.getOutput());
         System.err.println(tResLog.getOutput().getStdoutLogs(false));
         Assert.assertTrue(tResLog.getOutput().getStdoutLogs(false).contains(LogTask.HELLO_WORLD));
 
         // task result with variables
-        TaskResult tResVar = result.getResult(VariableTask.class.getSimpleName() + "Task");
+        TaskResult tResVar = result.getResult(getTaskNameForClass(VariableTask.class));
         Assert.assertNotNull(tResVar.getPropagatedVariables());
         Assert.assertTrue(tResVar.getPropagatedVariables().containsKey(VariableTask.MYVAR));
 
         // task result with metadata
-        TaskResult tMetaVar = result.getResult(MetadataTask.class.getSimpleName() + "Task");
+        TaskResult tMetaVar = result.getResult(getTaskNameForClass(MetadataTask.class));
         Assert.assertNotNull(tMetaVar.getMetadata());
         Assert.assertTrue(tMetaVar.getMetadata().containsKey(MetadataTask.MYVAR));
 
@@ -315,6 +332,26 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
+    public void testKillTask() throws Exception {
+        ISchedulerClient client = clientInstance();
+        Job job = createJob(NonTerminatingJob.class);
+        SchedulerEventListenerImpl listener = new SchedulerEventListenerImpl();
+        client.addEventListener(listener, true, SchedulerEvent.TASK_PENDING_TO_RUNNING);
+        JobId jobId = submitJob(job, client);
+
+        TaskInfo startedTask = listener.getStartedTask();
+        while (!startedTask.getJobId().value().equals(jobId.value())) {
+            startedTask = listener.getStartedTask();
+        }
+
+        client.killTask(jobId, getTaskNameForClass(NonTerminatingJob.class));
+
+        client.removeEventListener();
+        // should return immediately
+        client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
     public void testPushFileWithNonAdminUserPwdShouldSucceed() throws Exception {
         File tmpFile = testFolder.newFile();
         Files.write("non_admin_user_push_file_contents".getBytes(), tmpFile);
@@ -341,6 +378,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     private static class SchedulerEventListenerImpl implements SchedulerEventListener {
         private Stack<JobState> jobStateStack = new Stack<>();
 
+        private Stack<TaskInfo> taskStateStack = new Stack<>();
+
         @Override
         public void jobSubmittedEvent(JobState jobState) {
             System.out.println("JobSubmittedEvent()");
@@ -352,7 +391,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
 
         public JobState getSubmittedJob() {
-            System.out.println("getSubmittedJbo");
+            System.out.println("getSubmittedJob");
             synchronized (this) {
                 if (jobStateStack.isEmpty()) {
                     System.out.println("Stack is empty");
@@ -366,6 +405,21 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
             }
         }
 
+        public TaskInfo getStartedTask() {
+            System.out.println("getStartedTask");
+            synchronized (this) {
+                if (taskStateStack.isEmpty()) {
+                    System.out.println("Stack is empty");
+                    try {
+                        System.out.println("wait");
+                        wait();
+                    } catch (InterruptedException ie) {
+                    }
+                }
+                return taskStateStack.pop();
+            }
+        }
+
         @Override
         public void jobStateUpdatedEvent(NotificationData<JobInfo> arg0) {
         }
@@ -375,7 +429,12 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
 
         @Override
-        public void taskStateUpdatedEvent(NotificationData<TaskInfo> arg0) {
+        public void taskStateUpdatedEvent(NotificationData<TaskInfo> data) {
+            System.out.println("taskStateUpdatedEvent() : " + data);
+            synchronized (this) {
+                taskStateStack.push(data.getData());
+                notifyAll();
+            }
         }
 
         @Override
