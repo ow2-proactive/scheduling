@@ -21,7 +21,7 @@ import org.ow2.proactive.resourcemanager.db.RMDBManager;
  */
 public class RMDBManagerFunctionalTest {
 
-    private static final String DB_CONFIGURATION_FILE = "/functionaltests/config/hibernate.cfg.xml";
+    private static final String DB_CONFIGURATION_FILE = "/functionaltests/config/hibernate-rm.cfg.xml";
 
     @Before
     public void setUp() {
