@@ -55,6 +55,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public enum NodeState {
 
+    // WARNING: do not change the order of the fields in this enum or
+    // some features will be broken (e.g. SQL queries in RMAccountsManager)
+    // As a corollary, new fields must be added at the end!
+
+    // TODO: make implementation NodeState ordinal agnostic
+
     /**
      * a node that can be provided to a RM user, and able to perform a task
      */
