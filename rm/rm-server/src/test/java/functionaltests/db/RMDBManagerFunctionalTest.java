@@ -38,7 +38,7 @@ public class RMDBManagerFunctionalTest {
 
         // put 100 node history events in the database
         for (int i = 1; i <= 100; i++) {
-            NodeHistory nodeHistory = createSequentialNodeHistory(now, i);
+             NodeHistory nodeHistory = createSequentialNodeHistory(now, i);
 
             if (i % 3 == 0) {
                 nodeHistory.setNodeState(NodeState.LOST);
@@ -116,7 +116,7 @@ public class RMDBManagerFunctionalTest {
             dbManager.close();
 
             // on restart, the value must be defined
-            dbManager = new RMDBManager(new Configuration().configure("/functionaltests/config/hibernate.cfg.xml"),
+            dbManager = new RMDBManager(new Configuration().configure(DB_CONFIGURATION_FILE),
                                         false,
                                         false);
 
