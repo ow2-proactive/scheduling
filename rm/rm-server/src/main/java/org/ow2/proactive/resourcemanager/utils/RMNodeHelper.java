@@ -32,7 +32,10 @@ import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
  * @author ActiveEon Team
  * @since 01/02/17
  */
-public class RMNodeHelper {
+public final class RMNodeHelper {
+
+    private RMNodeHelper() {
+    }
 
     /**
      * Returns {@code true} if the given parameter is the representation of

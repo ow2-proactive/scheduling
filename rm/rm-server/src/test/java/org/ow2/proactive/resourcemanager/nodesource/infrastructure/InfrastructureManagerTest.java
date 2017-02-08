@@ -167,22 +167,6 @@ public class InfrastructureManagerTest {
 
     private static final class TestingInfrastructureManager extends InfrastructureManager {
 
-        public void addDeployingNode(RMDeployingNode node) {
-            deployingNodes.put(node.getNodeURL(), node);
-        }
-
-        public void addLostNode(RMDeployingNode node) {
-            lostNodes.put(node.getNodeURL(), node);
-        }
-
-        public Map<String, RMDeployingNode> getDeployingNodesDeployingState() {
-            return deployingNodes;
-        }
-
-        public Map<String, RMDeployingNode> getDeployingNodesLostState() {
-            return lostNodes;
-        }
-
         @Override
         public String getDescription() {
             return null;

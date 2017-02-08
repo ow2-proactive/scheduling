@@ -36,6 +36,17 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -71,12 +82,6 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
-import java.security.Permission;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 
 /**
  * Abstract class designed to manage a NodeSource. A NodeSource active object is
@@ -93,7 +98,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @ActiveObject
-public class NodeSource implements InitActive, RunActive {
+public class NodeSource implements InitActive, RunActive, Serializable {
 
     private static Logger logger = Logger.getLogger(NodeSource.class);
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
@@ -110,14 +115,14 @@ public class NodeSource implements InitActive, RunActive {
     private final InfrastructureManager infrastructureManager;
     private final NodeSourcePolicy nodeSourcePolicy;
     private final String description;
-    private final RMCore rmcore;
+    private final transient RMCore rmcore;
     // The url used by spawn nodes to register themself
     private final String registrationURL;
     private boolean toShutdown = false;
 
     // all nodes except down
-    private Map<String, Node> nodes;
-    private Map<String, Node> downNodes;
+    private transient Map<String, Node> nodes;
+    private transient Map<String, Node> downNodes;
 
     private static ThreadPoolHolder threadPoolHolder;
 
@@ -125,7 +130,7 @@ public class NodeSource implements InitActive, RunActive {
     private final Client administrator;
 
     // to be able to emit rmdeployingnode related events
-    private final RMMonitoringImpl monitoring;
+    private final transient RMMonitoringImpl monitoring;
     // admin can remove node source, add nodes to the node source, remove any node
     // it is a PrincipalPermission of the user who created this node source
     private final Permission adminPermission;

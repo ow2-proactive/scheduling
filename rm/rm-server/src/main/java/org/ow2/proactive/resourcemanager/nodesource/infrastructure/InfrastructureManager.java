@@ -95,9 +95,9 @@ public abstract class InfrastructureManager implements Serializable {
     protected NodeSource nodeSource;
 
     /** deploying nodes list */
-    protected final Map<String, RMDeployingNode> deployingNodes = new ConcurrentHashMap<>();
+    private final Map<String, RMDeployingNode> deployingNodes = new ConcurrentHashMap<>();
 
-    protected final Map<String, RMDeployingNode> lostNodes = new ConcurrentHashMap<>();
+    private final Map<String, RMDeployingNode> lostNodes = new ConcurrentHashMap<>();
 
     /**
      * node list, miror of nodesource.getAliveNodes(), to implement random
@@ -751,6 +751,22 @@ public abstract class InfrastructureManager implements Serializable {
         } else {
             return null;
         }
+    }
+
+    void addDeployingNode(RMDeployingNode node) {
+        deployingNodes.put(node.getNodeURL(), node);
+    }
+
+    void addLostNode(RMDeployingNode node) {
+        lostNodes.put(node.getNodeURL(), node);
+    }
+
+    Map<String, RMDeployingNode> getDeployingNodesDeployingState() {
+        return deployingNodes;
+    }
+
+    Map<String, RMDeployingNode> getDeployingNodesLostState() {
+        return lostNodes;
     }
 
     /**

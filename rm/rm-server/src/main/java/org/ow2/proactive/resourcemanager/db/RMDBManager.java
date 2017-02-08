@@ -150,10 +150,8 @@ public class RMDBManager {
                 File ddrDB = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
                                       PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
 
-                if (ddrDB.exists()) {
-                    if (!ddrDB.delete()) {
-                        logger.error("Dropping RRD database has failed: " + ddrDB);
-                    }
+                if (ddrDB.exists() && !ddrDB.delete()) {
+                    logger.error("Dropping RRD database has failed: " + ddrDB);
                 }
             }
 
@@ -203,7 +201,7 @@ public class RMDBManager {
             return null;
         }
 
-        return ((Alive) lastAliveTimeResult.get(0));
+        return (Alive) lastAliveTimeResult.get(0);
     }
 
     private void recover(final long lastAliveTime) {
@@ -438,7 +436,6 @@ public class RMDBManager {
 
     protected void updateRmLastStartupTime() {
         updateAliveTable("lastStartupTime", System.currentTimeMillis());
-        ;
     }
 
     private void updateAliveTable(final String columnName, final Object value) {

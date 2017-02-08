@@ -140,10 +140,8 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
 
         // The rm node always keeps track on its last event, this is needed for rm node events logic
         if (eventType != null) {
-            switch (eventType) {
-                case NODE_ADDED:
-                    this.setAddEvent(rmNodeEvent);
-                    break;
+            if (eventType == RMEventType.NODE_ADDED) {
+                this.setAddEvent(rmNodeEvent);
             }
             this.setLastEvent(rmNodeEvent);
         }
