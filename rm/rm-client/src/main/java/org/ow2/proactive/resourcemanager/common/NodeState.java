@@ -56,41 +56,35 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public enum NodeState {
 
     /**
+     * a node that can be provided to a RM user, and able to perform a task
+     */
+    FREE("Free"),
+    /**
      * a node provided to a RM user.
      */
     BUSY("Busy"),
-
     /**
-     * a node cannot be provided to a RM user, it is under configuration
+     * a node that has been detected down.
      */
-    CONFIGURING("Configuring"),
-
+    DOWN("Down"),
+    /**
+     * a busy node which must be removed from resource manager when the user
+     * will give back the node.
+     */
+    TO_BE_REMOVED("To be removed"),
     /**
      * a node for which one the deployment process has been triggered but which
      * is not registered yet.
      */
     DEPLOYING("Deploying"),
-
-    /**
-     * a node that has been detected down.
-     */
-    DOWN("Down"),
-
-    /**
-     * a node that can be provided to a RM user, and able to perform a task
-     */
-    FREE("Free"),
-
     /**
      * a node for which one the deployment process failed
      */
     LOST("Lost"),
-
     /**
-     * a busy node which must be removed from resource manager when the user
-     * will give back the node.
+     * a node cannot be provided to a RM user, it is under configuration
      */
-    TO_BE_REMOVED("To be removed");
+    CONFIGURING("Configuring");
 
     private String desc;
 
