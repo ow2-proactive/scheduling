@@ -115,11 +115,11 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
             rows = dbmanager.executeSqlQuery(areBusy);
             account.usedNodeTime += aggregateNodeUsageTime(rows);
 
-            // select SUM(endTime-startTime), COUNT(DISTINCT nodeUrl) from History where endTime <> 0 and nodeState in (0,1,3,6,7) and providerName='rm'
+            // select SUM(endTime-startTime), COUNT(DISTINCT nodeUrl) from History where endTime <> 0 and nodeState in (0,1,3,6) and providerName='rm'
             String wereProvided = "SELECT COUNT(DISTINCT " + nodeUrl + "), SUM(" + endTime + "-" + startTime +
                 ") " + "FROM " + history + " WHERE " + providerName + "='" + user + "' AND " + endTime +
                 " <> 0 AND " + nodeState + " in (0,1,3,6)";
-            // select SUM(CURRNET_TIME-startTime), COUNT(DISTINCT nodeUrl) from History where endTime = 0 and nodeState in (0,1,3,6,7) and providerName='rm'
+            // select SUM(CURRNET_TIME-startTime), COUNT(DISTINCT nodeUrl) from History where endTime = 0 and nodeState in (0,1,3,6) and providerName='rm'
             String areProvided = "SELECT 0, SUM(" + System.currentTimeMillis() + "-" + startTime + ") " +
                 "FROM " + history + " WHERE " + providerName + "='" + user + "' AND " + endTime +
                 " = 0 AND " + nodeState + " in (0,1,3,6)";

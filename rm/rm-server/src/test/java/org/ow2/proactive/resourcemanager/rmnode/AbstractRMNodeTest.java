@@ -26,6 +26,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 
+
 /**
  * @author ActiveEon Team
  * @since 03/02/17
@@ -172,7 +173,6 @@ public class AbstractRMNodeTest {
     }
 
     private static class BasicRMNode extends AbstractRMNode {
-
 
         public BasicRMNode(String name) {
             super(null, name, "url" + name, null);

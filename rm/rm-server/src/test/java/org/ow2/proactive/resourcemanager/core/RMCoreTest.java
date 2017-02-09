@@ -4,6 +4,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -42,10 +44,10 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 import com.google.common.base.Function;
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 
 public class RMCoreTest {
@@ -65,7 +67,7 @@ public class RMCoreTest {
     private SelectionManager mockedSelectionManager;
 
     @Mock
-    private RMDBManager dataBaseManager;
+    private RMDBManager dbManager;
 
     @Mock
     private RMNode mockedRemovableNodeInDeploy;
@@ -175,6 +177,7 @@ public class RMCoreTest {
 
     /**
      * Set the private value maximumNumberOfNodes (Long) to a certain value.
+     *
      * @param newValue
      */
     private void setMaxNumberOfNodesTo(Long newValue) throws NoSuchFieldException, IllegalAccessException {
@@ -603,6 +606,69 @@ public class RMCoreTest {
         verify(nodesLockRestorationManager).initialize();
     }
 
+    @Test
+    public void testInternalLockNodeWithNodeNotLocked() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalLockNode(mockedRemovableNode);
+
+        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testInternalLockNodeWithNodeLocked() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalLockNode(mockedBusyNode);
+
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testInternalUnlockNodeWithNodeNotLocked() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalUnlockNode(mockedRemovableNode);
+
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testInternalUnlockNodeWithNodeLocked() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalUnlockNode(mockedBusyNode);
+
+        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testInternalSetToRemoveNodeWithNodeNotSetToRemoveNotLockedNode() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalSetToRemove(mockedRemovableNode, new Client());
+
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testRemoveNodeCreateLockEntryLockedNonDeployingNode() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.removeNode(mockedBusyNode.getNodeURL(), false, false);
+
+        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testRemoveNodeDoCreateLockEntryLockedNonDeployingNode() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.removeNode(mockedBusyNode.getNodeURL(), false, true);
+
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
     /**
      * 6 nodes (same nodesource).
      */
@@ -681,7 +747,7 @@ public class RMCoreTest {
                             mockedMonitoring,
                             mockedSelectionManager,
                             freeNodes,
-                            dataBaseManager);
+                            dbManager);
 
         rmCore = Mockito.spy(rmCore);
 
@@ -693,7 +759,7 @@ public class RMCoreTest {
                 nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
                 nodesLockRestorationManager = Mockito.spy(nodesLockRestorationManager);
 
-                doReturn(HashBasedTable.create()).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
+                doReturn(Maps.newHashMap()).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
                 return nodesLockRestorationManager;
             }

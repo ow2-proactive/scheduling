@@ -208,4 +208,22 @@ public class RMDeployingNodeTest {
         deployingNode.setToRemove();
     }
 
+    @Test
+    public void testHashCode() {
+        // The purpose is to check that no NPE is thrown.
+        // It happens if AbstractRMNode makes use of the internal
+        // field nodeURL instead of the associated getter that is overridden
+        // by RMDeployingNodeImpl
+        deployingNode.hashCode();
+    }
+
+    @Test
+    public void testEquals() {
+        // The purpose is to check that no NPE is thrown.
+        // It happens if AbstractRMNode makes use of the internal
+        // field nodeURL instead of the associated getter that is overridden
+        // by RMDeployingNodeImpl
+        deployingNode.equals(deployingNode);
+    }
+
 }

@@ -94,7 +94,6 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
     /** Time stamp of the latest state change */
     protected long stateChangeTime;
 
-
     public AbstractRMNode() {
         this.nodeName = null;
         this.nodeURL = null;
@@ -229,10 +228,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
      */
     @Override
     public boolean equals(Object rmNode) {
-        return this == rmNode ||
-                rmNode instanceof RMNode
-                        && this.nodeURL.equals(((RMNode) rmNode).getNodeURL());
-
+        return this == rmNode || rmNode instanceof RMNode && this.getNodeURL().equals(((RMNode) rmNode).getNodeURL());
     }
 
     /**
@@ -240,7 +236,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
      */
     @Override
     public int hashCode() {
-        return this.nodeURL.hashCode();
+        return this.getNodeURL().hashCode();
     }
 
     /**

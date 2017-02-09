@@ -36,22 +36,12 @@
  */
 package org.ow2.proactive.resourcemanager.core.history;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+
+import javax.persistence.*;
 
 
 /**
@@ -59,11 +49,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
  * Basically for each node we store all state transitions and start/end time of each transition.
  */
 @Entity
-@NamedQueries({ @NamedQuery(name = "getNodesLockedOnPreviousRun", query = "select n.nodeSource, n.host, n.nodeUrl from NodeHistory n " +
-                                                                          "where n.endTime > :endTime and n.locked is true " +
-                                                                          "group by n.nodeSource, n.host, n.nodeUrl") })
 @Table(name = "NodeHistory", indexes = { @Index(name = "NODE_HISTORY_END_TIME", columnList = "endTime"),
-                                         @Index(name = "NODE_HISTORY_LOCKED", columnList = "locked"),
                                          @Index(name = "NODE_HISTORY_NODE_URL", columnList = "nodeUrl"),
                                          @Index(name = "NODE_HISTORY_USER_NAME", columnList = "userName"), })
 public class NodeHistory {
@@ -94,9 +80,6 @@ public class NodeHistory {
     @Column(name = "nodeState")
     private NodeState nodeState;
 
-    @Column(name = "locked")
-    private boolean locked;
-
     @Column(name = "startTime")
     protected long startTime;
 
@@ -125,7 +108,6 @@ public class NodeHistory {
         this.userName = event.getNodeOwner();
         this.providerName = event.getNodeProvider();
         this.nodeState = event.getNodeState();
-        this.locked = event.isLocked();
 
         this.startTime = event.getTimeStamp();
 
@@ -188,14 +170,6 @@ public class NodeHistory {
 
     public void setNodeState(NodeState nodeState) {
         this.nodeState = nodeState;
-    }
-
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
     }
 
     public long getStartTime() {

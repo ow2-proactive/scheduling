@@ -371,6 +371,10 @@ public final class RMDeployingNode extends AbstractRMNode {
         return false;
     }
 
+    public RMDeployingNode updateOnNodeSource() {
+        return nodeSource.update(this);
+    }
+
 }
 
 /**

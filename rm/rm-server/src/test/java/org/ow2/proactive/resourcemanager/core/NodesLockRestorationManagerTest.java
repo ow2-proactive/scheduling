@@ -1,22 +1,21 @@
 package org.ow2.proactive.resourcemanager.core;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
+import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeHelper;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 
-import com.google.common.collect.HashBasedTable;
+import java.util.Map;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -25,51 +24,69 @@ import com.google.common.collect.HashBasedTable;
  */
 public class NodesLockRestorationManagerTest {
 
+    private RMDBManager dbManager;
+
     private NodesLockRestorationManager nodesLockRestorationManager;
 
     private RMCore rmCore;
 
     @Before
     public void setUp() {
+        dbManager = mock(RMDBManager.class);
         rmCore = mock(RMCore.class);
 
         nodesLockRestorationManager = Mockito.spy(new NodesLockRestorationManager(rmCore));
 
-        HashBasedTable<String, String, MutableInteger> table = HashBasedTable.create();
-        table.put("row", "column", new MutableInteger(42));
-        doReturn(table).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
+        doReturn(dbManager).when(rmCore).getDbManager();
     }
 
     @Test
-    public void testHandleNotInitialized() throws Exception {
+    public void testConstructor() {
+        assertThat(nodesLockRestorationManager.getNodeLockedOnPreviousRun()).isNotNull();
+        assertThat(nodesLockRestorationManager.getNodeLockedOnPreviousRun()).isEmpty();
+    }
+
+    @Test
+    public void testFindNodesLockedOnPreviousRun() {
+        verify(dbManager, never()).findNodesLockedOnPreviousRun();
+        verify(dbManager, never()).clearLockHistory();
+
+        nodesLockRestorationManager.findNodesLockedOnPreviousRun();
+
+        verify(dbManager).findNodesLockedOnPreviousRun();
+        verify(dbManager).clearLockHistory();
+    }
+
+    @Test
+    public void testHandleNotInitialized() {
 
         // creates a node that matches an entry in the table specifying the nodes to lock
 
         RMNodeImpl rmNode = RMNodeHelper.basicWithMockedInternals("ns1", "n1", "h1", "nurl1", "parurl1").getLeft();
         assertThat(rmNode.isLocked()).isFalse();
 
-        HashBasedTable<String, String, MutableInteger> table = HashBasedTable.create();
-        MutableInteger putResult = table.put("ns1", "h1", new MutableInteger(1));
+        Map<String, MutableInteger> table = Maps.newHashMap();
+        MutableInteger putResult = table.put("ns", new MutableInteger(1));
         assertThat(putResult).isNull();
         doReturn(table).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
         assertThat(table).hasSize(1);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
         nodesLockRestorationManager.handle(rmNode);
 
         assertThat(table).hasSize(1);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
     }
 
     @Test
-    public void testHandleNodeAlreadyLocked() throws Exception {
+    public void testHandleNodeAlreadyLocked() {
         RMNodeImpl rmNode = RMNodeHelper.basicWithMockedInternals("ns1", "n1", "h1", "nurl1", "parurl1").getLeft();
         rmNode.lock(null);
         assertThat(rmNode.isLocked()).isTrue();
 
-        HashBasedTable<String, String, MutableInteger> table = HashBasedTable.create();
-        MutableInteger putResult = table.put("ns1", "h1", new MutableInteger(1));
+        Map<String, MutableInteger> table = Maps.newHashMap();
+        MutableInteger putResult = table.put("ns", new MutableInteger(1));
         assertThat(putResult).isNull();
         doReturn(table).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
@@ -78,20 +95,20 @@ public class NodesLockRestorationManagerTest {
         verify(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
         assertThat(table).hasSize(1);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
         nodesLockRestorationManager.handle(rmNode);
 
         assertThat(table).hasSize(1);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
     }
 
     @Test
-    public void testHandleNoNodesToLock() throws Exception {
+    public void testHandleNoNodesToLock() {
         RMNodeImpl rmNode = RMNodeHelper.basicWithMockedInternals("ns1", "n1", "h1", "nurl1", "parurl1").getLeft();
         assertThat(rmNode.isLocked()).isFalse();
 
-        HashBasedTable<String, String, MutableInteger> table = HashBasedTable.create();
+        Map<String, MutableInteger> table = Maps.newHashMap();
         doReturn(table).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
         nodesLockRestorationManager.initialize();
@@ -99,28 +116,28 @@ public class NodesLockRestorationManagerTest {
         verify(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
         assertThat(table).hasSize(0);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
         nodesLockRestorationManager.handle(rmNode);
 
         assertThat(table).hasSize(0);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
     }
 
     @Test
-    public void testHandleMatchingNode() throws Exception {
-        doReturn(new BooleanWrapper(true)).when(rmCore).lockNodes(anySet());
+    public void testHandleMatchingNode() {
+        doReturn(new BooleanWrapper(true)).when(rmCore).lockNodes(anySetOf(String.class));
 
         RMNodeImpl rmNode = RMNodeHelper.basicWithMockedInternals("ns1", "n1", "h1", "nurl1", "parurl1").getLeft();
         assertThat(rmNode.isLocked()).isFalse();
 
-        HashBasedTable<String, String, MutableInteger> table = HashBasedTable.create();
-        MutableInteger putResult = table.put("ns1", "h1", new MutableInteger(1));
+        Map<String, MutableInteger> table = Maps.newHashMap();
+        MutableInteger putResult = table.put("ns1", new MutableInteger(1));
         assertThat(putResult).isNull();
         doReturn(table).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
         assertThat(table).hasSize(1);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
         nodesLockRestorationManager.initialize();
         assertThat(nodesLockRestorationManager.isInitialized()).isTrue();
@@ -129,21 +146,21 @@ public class NodesLockRestorationManagerTest {
         nodesLockRestorationManager.handle(rmNode);
 
         assertThat(table).hasSize(0);
-        verify(rmCore).lockNodes(anySet());
+        verify(rmCore).lockNodes(anySetOf(String.class));
     }
 
     @Test
-    public void testHandleNonMatchingNode() throws Exception {
+    public void testHandleNonMatchingNode() {
         RMNodeImpl rmNode = RMNodeHelper.basicWithMockedInternals("ns2", "n1", "h1", "nurl1", "parurl1").getLeft();
         assertThat(rmNode.isLocked()).isFalse();
 
-        HashBasedTable<String, String, MutableInteger> table = HashBasedTable.create();
-        MutableInteger putResult = table.put("ns1", "h1", new MutableInteger(1));
+        Map<String, MutableInteger> table = Maps.newHashMap();
+        MutableInteger putResult = table.put("ns1", new MutableInteger(1));
         assertThat(putResult).isNull();
         doReturn(table).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
         assertThat(table).hasSize(1);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
         nodesLockRestorationManager.initialize();
         assertThat(nodesLockRestorationManager.isInitialized()).isTrue();
@@ -152,11 +169,15 @@ public class NodesLockRestorationManagerTest {
         nodesLockRestorationManager.handle(rmNode);
 
         assertThat(table).hasSize(1);
-        verify(rmCore, never()).lockNodes(anySet());
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
     }
 
     @Test
-    public void testInitialize() throws Exception {
+    public void testInitialize() {
+        Map<String, MutableInteger> map = Maps.newHashMap();
+        map.put("nodeSource", new MutableInteger(42));
+        doReturn(map).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
+
         assertThat(nodesLockRestorationManager.isInitialized()).isFalse();
         assertThat(nodesLockRestorationManager.getNodeLockedOnPreviousRun()).isEmpty();
 
@@ -167,7 +188,7 @@ public class NodesLockRestorationManagerTest {
     }
 
     @Test
-    public void testIsRestorationCompleted() throws Exception {
+    public void testIsRestorationCompleted() {
         assertThat(nodesLockRestorationManager.isRestorationCompleted()).isFalse();
 
         nodesLockRestorationManager.initialize();
@@ -178,27 +199,27 @@ public class NodesLockRestorationManagerTest {
     }
 
     @Test
-    public void testLockNodeSucceeds() throws Exception {
-        doReturn(new BooleanWrapper(true)).when(rmCore).lockNodes(anySet());
-        verify(rmCore, never()).lockNodes(anySet());
+    public void testLockNodeSucceeds() {
+        doReturn(new BooleanWrapper(true)).when(rmCore).lockNodes(anySetOf(String.class));
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
         RMNode rmNode = RMNodeHelper.basicWithMockedInternals().getLeft();
         boolean lockResult = nodesLockRestorationManager.lockNode(rmNode);
 
         assertThat(lockResult).isTrue();
-        verify(rmCore).lockNodes(anySet());
+        verify(rmCore).lockNodes(anySetOf(String.class));
     }
 
     @Test
-    public void testLockNodeFails() throws Exception {
-        doReturn(new BooleanWrapper(false)).when(rmCore).lockNodes(anySet());
-        verify(rmCore, never()).lockNodes(anySet());
+    public void testLockNodeFails() {
+        doReturn(new BooleanWrapper(false)).when(rmCore).lockNodes(anySetOf(String.class));
+        verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
         RMNode rmNode = RMNodeHelper.basicWithMockedInternals().getLeft();
         boolean lockResult = nodesLockRestorationManager.lockNode(rmNode);
 
         assertThat(lockResult).isFalse();
-        verify(rmCore).lockNodes(anySet());
+        verify(rmCore).lockNodes(anySetOf(String.class));
     }
 
 }

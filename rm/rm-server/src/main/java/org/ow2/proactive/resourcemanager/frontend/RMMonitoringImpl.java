@@ -376,9 +376,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
         String shortId = id.shortString();
         if (removeRMEventListener(id)) {
-            logger.debug("Removing the RM listner for " + shortId);
+            logger.debug("Removing the RM listener for " + shortId);
         } else {
-            throw new RMException("Unknow listener found: " + shortId);
+            throw new RMException("Unknown listener found: " + shortId);
         }
     }
 

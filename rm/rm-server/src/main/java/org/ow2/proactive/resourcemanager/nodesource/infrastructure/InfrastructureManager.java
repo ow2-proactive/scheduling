@@ -512,10 +512,10 @@ public abstract class InfrastructureManager implements Serializable {
         usingDeployingNodes = true;
         NodeSource nsStub = this.nodeSource.getStub();
         RMDeployingNode deployingNode = RMDeployingNodeAccessor.getDefault().newRMDeployingNode(name,
-                                                                                         nsStub,
-                                                                                         command,
-                                                                                         nsStub.getAdministrator(),
-                                                                                         description);
+                                                                                                nsStub,
+                                                                                                command,
+                                                                                                nsStub.getAdministrator(),
+                                                                                                description);
         final String deployingNodeUrl = deployingNode.getNodeURL();
         this.deployingNodes.put(deployingNodeUrl, deployingNode);
 
@@ -534,7 +534,9 @@ public abstract class InfrastructureManager implements Serializable {
             logger.trace("New DeployingNode " + name + " instantiated in IM");
         }
 
-        RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_ADDED, null, deployingNode.getProvider().getName());
+        RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_ADDED,
+                                                          null,
+                                                          deployingNode.getProvider().getName());
         emitEvent(event);
         this.sched(new TimerTask() {
             @Override

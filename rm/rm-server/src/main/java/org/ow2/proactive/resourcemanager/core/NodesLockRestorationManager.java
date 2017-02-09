@@ -25,18 +25,16 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.MutableInteger;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
-import com.google.common.base.Stopwatch;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Table;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -60,12 +58,12 @@ public class NodesLockRestorationManager {
 
     private final RMCore rmCore;
 
-    protected Table<String, String, MutableInteger> nodeLockedOnPreviousRun;
+    protected Map<String, MutableInteger> nodeLockedOnPreviousRun;
 
     protected boolean initialized;
 
     NodesLockRestorationManager(RMCore rmCore) {
-        this.nodeLockedOnPreviousRun = HashBasedTable.create();
+        this.nodeLockedOnPreviousRun = Maps.newHashMap();
         this.rmCore = rmCore;
     }
 
@@ -89,22 +87,23 @@ public class NodesLockRestorationManager {
         } else {
             log.info("Here is the number of nodes to lock per node source:");
 
-            for (String nodeSource : nodeLockedOnPreviousRun.rowKeySet()) {
-                for (Map.Entry<String, MutableInteger> entry : nodeLockedOnPreviousRun.row(nodeSource).entrySet()) {
-                    log.info("  - nodeSource=" + nodeSource + ", host=" + entry.getKey() + ", count=" +
-                             entry.getValue().getValue());
-                }
+            for (Map.Entry<String, MutableInteger> entry : nodeLockedOnPreviousRun.entrySet()) {
+                log.info("  - nodeSource=" + entry.getKey() + ", host=" + entry.getKey() + ", count=" +
+                        entry.getValue().getValue());
             }
         }
 
         initialized = true;
     }
 
-    Table<String, String, MutableInteger> findNodesLockedOnPreviousRun() {
-        return rmCore.dbManager.getNodesLockedOnPreviousRun();
+    Map<String, MutableInteger> findNodesLockedOnPreviousRun() {
+        RMDBManager dbManager = rmCore.getDbManager();
+        Map<String, MutableInteger> nodesLockedOnPreviousRun = dbManager.findNodesLockedOnPreviousRun();
+        dbManager.clearLockHistory();
+        return nodesLockedOnPreviousRun;
     }
 
-    Table<String, String, MutableInteger> getNodeLockedOnPreviousRun() {
+    Map<String, MutableInteger> getNodeLockedOnPreviousRun() {
         return nodeLockedOnPreviousRun;
     }
 
@@ -119,7 +118,7 @@ public class NodesLockRestorationManager {
      */
     public void handle(RMNode node) {
 
-        if (!initialized || node.isLocked() || isRestorationCompleted()) {
+        if (!isNodeValidToBeRestored(node)) {
             if (log.isDebugEnabled()) {
                 String nodeUrl = node.getNodeURL();
 
@@ -137,18 +136,22 @@ public class NodesLockRestorationManager {
 
         String nodeSource = node.getNodeSourceName();
 
-        Map<String, MutableInteger> nodeCountPerHostnames = nodeLockedOnPreviousRun.row(nodeSource);
+        MutableInteger nodeCount = nodeLockedOnPreviousRun.get(nodeSource);
 
-        if (!nodeCountPerHostnames.isEmpty()) {
-            Iterator<MutableInteger> nodeCountPerHostnameIterator = nodeCountPerHostnames.values().iterator();
-            MutableInteger nodeCount = nodeCountPerHostnameIterator.next();
+        if (nodeCount != null) {
 
             lockNode(node);
 
-            if (nodeCount.add(-1) == 0) {
-                nodeCountPerHostnameIterator.remove();
+            int newNodeCount = nodeCount.add(-1);
+
+            if (newNodeCount == 0) {
+                nodeLockedOnPreviousRun.remove(nodeSource);
             }
         }
+    }
+
+    private boolean isNodeValidToBeRestored(RMNode node) {
+        return initialized && !node.isLocked() && !isRestorationCompleted();
     }
 
     private void logSkipReason(String nodeUrl, String reason) {

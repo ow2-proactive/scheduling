@@ -42,10 +42,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -60,12 +60,12 @@ import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.db.TransactionHelper;
 import org.ow2.proactive.resourcemanager.core.history.Alive;
+import org.ow2.proactive.resourcemanager.core.history.LockHistory;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
+import com.google.common.collect.Maps;
 
 
 public class RMDBManager {
@@ -77,8 +77,6 @@ public class RMDBManager {
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
-
-    private long rmLastStartupTime;
 
     private static final class LazyHolder {
 
@@ -139,10 +137,11 @@ public class RMDBManager {
      */
     public RMDBManager(Configuration configuration, boolean drop, boolean dropNS) {
         try {
-            configuration.addAnnotatedClass(NodeSourceData.class);
-            configuration.addAnnotatedClass(NodeHistory.class);
-            configuration.addAnnotatedClass(UserHistory.class);
             configuration.addAnnotatedClass(Alive.class);
+            configuration.addAnnotatedClass(LockHistory.class);
+            configuration.addAnnotatedClass(NodeHistory.class);
+            configuration.addAnnotatedClass(NodeSourceData.class);
+            configuration.addAnnotatedClass(UserHistory.class);
             if (drop) {
                 configuration.setProperty("hibernate.hbm2ddl.auto", "create");
 
@@ -170,12 +169,8 @@ public class RMDBManager {
                     removeNodeSources();
                 }
 
-                rmLastStartupTime = lastAliveTimeResult.getLastStartupTime();
-
-                recover(rmLastStartupTime);
+                recover(lastAliveTimeResult.getTime());
             }
-
-            updateRmLastStartupTime();
 
             int periodInMilliseconds = PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt();
 
@@ -365,77 +360,61 @@ public class RMDBManager {
     }
 
     /**
-     * Returns information about the nodes which have been locked on previous RM run.
-     * <p>
-     * The purpose of this method is to fetch the number of nodes locked per node source
-     * and host pair on the previous RM run.
-     *
-     * @return the number of nodes locked per node source and host pair on the previous RM run.
+     * Removes all entries from LockHistory table.
      */
-    public Table<String, String, MutableInteger> getNodesLockedOnPreviousRun() {
-        return getNodesLockedOnPreviousRun(getRmLastStartupTime());
-    }
-
-    Table<String, String, MutableInteger> getNodesLockedOnPreviousRun(final long rmLastStartupTime) {
-
-        List<Object[]> lockingInformation = findNodesLockedOnPreviousRun(rmLastStartupTime);
-
-        return groupNodeUrlsByHostAndNodeSource(lockingInformation);
-    }
-
-    public List<Object[]> findNodesLockedOnPreviousRun(final long rmLastStartupTime) {
-        return executeReadTransaction(new SessionWork<List<Object[]>>() {
+    public void clearLockHistory() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
-            @SuppressWarnings("unchecked")
-            public List<Object[]> doInTransaction(Session session) {
-                return session.getNamedQuery("getNodesLockedOnPreviousRun")
-                              .setLong("endTime", rmLastStartupTime)
-                              .list();
+            public Void doInTransaction(Session session) {
+                int nbDeletes = session.createSQLQuery("delete from LockHistory").executeUpdate();
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug(nbDeletes + " delete(s) performed with success on LockHistory table.");
+                }
+
+                return null;
             }
         });
     }
 
-    protected Table<String, String, MutableInteger>
-            groupNodeUrlsByHostAndNodeSource(List<Object[]> lockingInformation) {
+    /**
+     * Returns information about the nodes which have been locked on previous RM run.
+     * <p>
+     * The purpose of this method is to fetch the number of nodes locked per node source
+     * on the previous RM run.
+     *
+     * @return the number of nodes locked, per node source, on the previous RM run.
+     */
+    public Map<String, MutableInteger> findNodesLockedOnPreviousRun() {
+        List<LockHistory> lockHistoryResult = getLockHistories();
+        return entityToMap(lockHistoryResult);
+    }
 
-        Table<String, String, MutableInteger> table = HashBasedTable.create(lockingInformation.size(), 3);
+    List<LockHistory> getLockHistories() {
+        return (List<LockHistory>) executeSqlQuery("from LockHistory");
+    }
 
-        // Used to remove duplicate node URLs
-        // The JPQL query already applies GROUP BY but DISTINCT is not possible on a specific column
-        // As a consequence, filtering is done at this level
-        Set<String> nodeUrls = new HashSet<>(lockingInformation.size(), 1f);
-
-        for (Object[] row : lockingInformation) {
-
-            String nodeSource = (String) row[0];
-            String host = (String) row[1];
-            String nodeUrl = (String) row[2];
-
-            int increment = 0;
-            if (nodeUrls.add(nodeUrl)) {
-                increment = 1;
-            }
-
-            MutableInteger nodeCount = table.get(nodeSource, host);
-
-            if (nodeCount == null) {
-                nodeCount = new MutableInteger(increment);
-            } else {
-                nodeCount.add(increment);
-            }
-
-            table.put(nodeSource, host, nodeCount);
+    Map<String, MutableInteger> entityToMap(List<LockHistory> lockHistoryResult) {
+        if (lockHistoryResult == null || lockHistoryResult.isEmpty()) {
+            return Maps.newHashMap();
         }
 
-        return table;
+        Map<String, MutableInteger> result = new HashMap<>(lockHistoryResult.size(), 1f);
+
+        for (Object entry : lockHistoryResult) {
+            LockHistory lockHistory = (LockHistory) entry;
+
+            int lockCount = lockHistory.getLockCount();
+            if (lockCount > 0) {
+                result.put(lockHistory.getNodeSource(), new MutableInteger(lockCount));
+            }
+        }
+
+        return result;
     }
 
     protected void updateRmAliveTime() {
         updateAliveTable("time", System.currentTimeMillis());
-    }
-
-    protected void updateRmLastStartupTime() {
-        updateAliveTable("lastStartupTime", System.currentTimeMillis());
     }
 
     private void updateAliveTable(final String columnName, final Object value) {
@@ -450,6 +429,53 @@ public class RMDBManager {
         });
     }
 
+    public void createLockEntryOrUpdate(final String nodeSource, final NodeLockUpdateAction actionOnUpdate) {
+
+        if (!PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
+            return;
+        }
+
+        executeReadWriteTransaction(new SessionWork<Void>() {
+            @Override
+            public Void doInTransaction(Session session) {
+                LockHistory lockHistory = session.get(LockHistory.class, nodeSource);
+
+                if (lockHistory == null) {
+                    lockHistory = new LockHistory(nodeSource, 1);
+                    session.save(lockHistory);
+                } else {
+                    switch (actionOnUpdate) {
+                        case DECREMENT:
+                            lockHistory.decrementLockCount();
+                            break;
+                        case INCREMENT:
+                            lockHistory.incrementLockCount();
+                            break;
+                        default:
+                            break;
+                    }
+
+                    int nbUpdates = session.createSQLQuery("update LockHistory set lockCount = :lockCount where nodeSource = :nodeSource")
+                                           .setParameter("lockCount", lockHistory.getLockCount())
+                                           .setParameter("nodeSource", lockHistory.getNodeSource())
+                                           .executeUpdate();
+
+                    if (nbUpdates <= 0) {
+                        logger.warn("Lock history update has failed for a node that belongs to Node source " +
+                                    nodeSource);
+                    }
+                }
+
+                return null;
+            }
+        });
+    }
+
+    public enum NodeLockUpdateAction {
+        DECREMENT,
+        INCREMENT
+    }
+
     private void createRmAliveEntry() {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
@@ -457,7 +483,6 @@ public class RMDBManager {
                 long now = System.currentTimeMillis();
 
                 Alive alive = new Alive();
-                alive.setLastStartupTime(now);
                 alive.setTime(now);
                 session.save(alive);
 
@@ -475,18 +500,6 @@ public class RMDBManager {
                 return query.list();
             }
         });
-    }
-
-    /**
-     * Returns the timestamp at which the Resource Manager
-     * was started up the last time.
-     *
-     * @return a Unix epoch time denoting the last timestamp at which
-     * the Resource Manager was restarted for the last time. A return
-     * value of {@code 0} means the RM is starting for the first time.
-     */
-    public long getRmLastStartupTime() {
-        return rmLastStartupTime;
     }
 
 }

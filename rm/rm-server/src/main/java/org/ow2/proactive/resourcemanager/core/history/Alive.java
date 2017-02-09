@@ -36,20 +36,13 @@
  */
 package org.ow2.proactive.resourcemanager.core.history;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 /**
  * 
  * This table stores the last time stamp of the resource manager up time.
  * It has always only one row.
- * 
  */
 @Entity
 @Table(name = "Alive")
@@ -64,18 +57,7 @@ public class Alive {
     @Column(name = "time")
     protected long time;
 
-    @Column(name = "lastStartupTime")
-    protected long lastStartupTime;
-
     public Alive() {
-    }
-
-    public long getLastStartupTime() {
-        return lastStartupTime;
-    }
-
-    public void setLastStartupTime(long lastStartupTime) {
-        this.lastStartupTime = lastStartupTime;
     }
 
     public long getTime() {

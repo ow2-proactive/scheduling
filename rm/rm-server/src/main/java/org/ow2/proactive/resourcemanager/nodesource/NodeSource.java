@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
-import java.io.Serializable;
 import java.security.Permission;
 import java.util.Collections;
 import java.util.HashMap;
@@ -98,47 +97,61 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
  *
  */
 @ActiveObject
-public class NodeSource implements InitActive, RunActive, Serializable {
+public class NodeSource implements InitActive, RunActive {
 
     private static Logger logger = Logger.getLogger(NodeSource.class);
+
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
     /** Default name for NS with local nodes started with the Scheduler by default */
     public static final String DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME = "LocalNodes";
+
     public static final String DEFAULT = "Default";
+
     public static final int INTERNAL_POOL = 0;
+
     public static final int EXTERNAL_POOL = 1;
 
     /** unique name of the source */
     private final String name;
 
     private final InfrastructureManager infrastructureManager;
+
     private final NodeSourcePolicy nodeSourcePolicy;
+
     private final String description;
-    private final transient RMCore rmcore;
+
+    private final RMCore rmcore;
+
     // The url used by spawn nodes to register themself
     private final String registrationURL;
+
     private boolean toShutdown = false;
 
     // all nodes except down
-    private transient Map<String, Node> nodes;
-    private transient Map<String, Node> downNodes;
+    private Map<String, Node> nodes;
+
+    private Map<String, Node> downNodes;
 
     private static ThreadPoolHolder threadPoolHolder;
 
     private NodeSource stub;
+
     private final Client administrator;
 
     // to be able to emit rmdeployingnode related events
     private final transient RMMonitoringImpl monitoring;
+
     // admin can remove node source, add nodes to the node source, remove any node
     // it is a PrincipalPermission of the user who created this node source
     private final Permission adminPermission;
+
     // provider can add nodes to the node source, remove only its nodes
     // level is configured by ns admin at the moment of ns creation
     // NOTE: the administrator is always the provider because each provider is one of those:
     // ns creator, ns creator groups, all
     private final Permission providerPermission;
+
     // user can get nodes for running computations
     // level is configured by ns admin at the moment of ns creation
     private AccessType nodeUserAccessType;
@@ -199,13 +212,14 @@ public class NodeSource implements InitActive, RunActive, Serializable {
 
         // node source admin permission
         // it's the PrincipalPermission of the user who created the node source
-        this.adminPermission = new PrincipalPermission(provider.getName(), provider.getSubject()
-                .getPrincipals(UserNamePrincipal.class));
+        this.adminPermission = new PrincipalPermission(provider.getName(),
+                                                       provider.getSubject().getPrincipals(UserNamePrincipal.class));
         // creating node source provider permission
         // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
         // or PrincipalPermission (anyone)
-        this.providerPermission = new PrincipalPermission(provider.getName(), nodeSourcePolicy
-                .getProviderAccessType().getIdentityPrincipals(provider));
+        this.providerPermission = new PrincipalPermission(provider.getName(),
+                                                          nodeSourcePolicy.getProviderAccessType()
+                                                                          .getIdentityPrincipals(provider));
         this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
     }
 
@@ -276,13 +290,13 @@ public class NodeSource implements InitActive, RunActive, Serializable {
 
         if (toShutdown) {
             throw new AddingNodesException("[" + name + "] node " + nodeUrl +
-                " adding request discarded because node source is shutting down");
+                                           " adding request discarded because node source is shutting down");
         }
 
         // checking that client has a right to change this node source
         // if the provider is the administrator of the node source it always has this permission
-        provider.checkPermission(providerPermission, provider + " is not authorized to add node " + nodeUrl +
-            " to " + name);
+        provider.checkPermission(providerPermission,
+                                 provider + " is not authorized to add node " + nodeUrl + " to " + name);
 
         // lookup for a new Node
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
@@ -293,7 +307,7 @@ public class NodeSource implements InitActive, RunActive, Serializable {
             logger.info("The node " + nodeUrl + " has been successfully looked up");
         } catch (Exception e) {
             logger.warn("Cannot look up the node " + nodeUrl + " within " + lookUpTimeout + " ms due to " +
-                e.getMessage(), e);
+                        e.getMessage(), e);
             throw new AddingNodesException(e);
         }
 
@@ -330,14 +344,11 @@ public class NodeSource implements InitActive, RunActive, Serializable {
             } else {
                 // adding another node with the same url
                 // replacing the old node by the new one
-                logger
-                        .debug("Removing existing node from the RM without request propagation to the infrastructure manager");
+                logger.debug("Removing existing node from the RM without request propagation to the infrastructure manager");
                 BooleanWrapper result = rmcore.removeNodeFromCore(nodeUrl);
                 if (result.getBooleanValue()) {
                     if (logger.isDebugEnabled())
-                        logger
-                                .debug("[" + name + "] successfully removed node " + nodeUrl +
-                                    " from the core");
+                        logger.debug("[" + name + "] successfully removed node " + nodeUrl + " from the core");
                     // removing it from the nodes list but don't propagate
                     // the request the the infrastructure because the restarted node will be killed
                     nodes.remove(nodeUrl);
@@ -380,17 +391,14 @@ public class NodeSource implements InitActive, RunActive, Serializable {
         // ME/MY_GROUPS (ns creator/ns creator groups) and in this case
         // creator's principals will be used
         Client permissionOwner = administrator;
-        if (nodeUserAccessType.equals(AccessType.PROVIDER) ||
-            nodeUserAccessType.equals(AccessType.PROVIDER_GROUPS)) {
+        if (nodeUserAccessType.equals(AccessType.PROVIDER) || nodeUserAccessType.equals(AccessType.PROVIDER_GROUPS)) {
             permissionOwner = provider;
         }
         // now selecting the type (user or group) and construct the permission
-        Set<IdentityPrincipal> principals = (Set<IdentityPrincipal>) nodeUserAccessType
-                .getIdentityPrincipals(permissionOwner);
+        Set<IdentityPrincipal> principals = (Set<IdentityPrincipal>) nodeUserAccessType.getIdentityPrincipals(permissionOwner);
 
         boolean tokenInNode = false;
-        boolean tokenInNodeSource = nodeUserAccessType.getTokens() != null &&
-            nodeUserAccessType.getTokens().length > 0;
+        boolean tokenInNodeSource = nodeUserAccessType.getTokens() != null && nodeUserAccessType.getTokens().length > 0;
 
         try {
             String nodeAccessToken = node.getProperty(RMNodeStarter.NODE_ACCESS_TOKEN);
@@ -398,7 +406,7 @@ public class NodeSource implements InitActive, RunActive, Serializable {
 
             if (tokenInNode) {
                 logger.debug("Node " + node.getNodeInformation().getURL() + " is protected by access token " +
-                    nodeAccessToken);
+                             nodeAccessToken);
                 // it overrides all other principals
                 principals.clear();
                 principals.add(new TokenPrincipal(nodeAccessToken));
@@ -407,8 +415,8 @@ public class NodeSource implements InitActive, RunActive, Serializable {
             throw new AddingNodesException(e);
         }
 
-        PrincipalPermission nodeAccessPermission = new PrincipalPermission(
-            node.getNodeInformation().getURL(), principals);
+        PrincipalPermission nodeAccessPermission = new PrincipalPermission(node.getNodeInformation().getURL(),
+                                                                           principals);
         RMNodeImpl rmnode = new RMNodeImpl(node, stub, provider, nodeAccessPermission);
 
         rmnode.setProtectedByToken(tokenInNode || tokenInNodeSource);
@@ -475,8 +483,7 @@ public class NodeSource implements InitActive, RunActive, Serializable {
     public void acquireAllNodes() {
 
         if (toShutdown) {
-            logger.warn("[" + name +
-                "] acquireAllNodes request discarded because node source is shutting down");
+            logger.warn("[" + name + "] acquireAllNodes request discarded because node source is shutting down");
             return;
         }
 
@@ -510,8 +517,7 @@ public class NodeSource implements InitActive, RunActive, Serializable {
             if (downNode != null) {
                 logger.info("[" + name + "] removing down node : " + nodeUrl);
             } else {
-                logger.error("[" + name + "] removing node : " + nodeUrl +
-                    " which not belongs to this node source");
+                logger.error("[" + name + "] removing node : " + nodeUrl + " which not belongs to this node source");
                 return new BooleanWrapper(false);
             }
         }
@@ -611,9 +617,12 @@ public class NodeSource implements InitActive, RunActive, Serializable {
      * Terminates a node source active object when the policy is shutdown. 
      */
     public void finishNodeSourceShutdown(Client initiator) {
-        PAFuture.waitFor(rmcore.nodeSourceUnregister(name, new RMNodeSourceEvent(
-            RMEventType.NODESOURCE_REMOVED, initiator.getName(), this.getName(), this.getDescription(), this
-                    .getAdministrator().getName())));
+        PAFuture.waitFor(rmcore.nodeSourceUnregister(name,
+                                                     new RMNodeSourceEvent(RMEventType.NODESOURCE_REMOVED,
+                                                                           initiator.getName(),
+                                                                           this.getName(),
+                                                                           this.getDescription(),
+                                                                           this.getAdministrator().getName())));
 
         PAActiveObject.terminateActiveObject(false);
     }
@@ -679,8 +688,7 @@ public class NodeSource implements InitActive, RunActive, Serializable {
     public void detectedPingedDownNode(String nodeUrl) {
 
         if (toShutdown) {
-            logger.warn("[" + name +
-                "] detectedPingedDownNode request discarded because node source is shutting down");
+            logger.warn("[" + name + "] detectedPingedDownNode request discarded because node source is shutting down");
             return;
         }
 

@@ -59,8 +59,6 @@ public enum NodeState {
     // some features will be broken (e.g. SQL queries in RMAccountsManager)
     // As a corollary, new fields must be added at the end!
 
-    // TODO: make implementation NodeState ordinal agnostic
-
     /**
      * a node that can be provided to a RM user, and able to perform a task
      */

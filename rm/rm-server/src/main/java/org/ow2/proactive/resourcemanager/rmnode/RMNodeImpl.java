@@ -90,10 +90,6 @@ public class RMNodeImpl extends AbstractRMNode {
     private Node node;
 
     /** {@link VirtualNode} name of the node */
-    // TODO: Investigate if this field is still required
-    // The value of this field seems never set in other places.
-    // Either it is set by introspection in a non-maintained project
-    // or the field is no longer used and can be removed.
     private String vnodeName = "";
 
     /** Host name of the node */

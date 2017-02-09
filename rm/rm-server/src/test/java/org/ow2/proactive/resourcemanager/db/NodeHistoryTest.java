@@ -1,19 +1,15 @@
 package org.ow2.proactive.resourcemanager.db;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import java.util.List;
-
-import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.hibernate.cfg.Configuration;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
-import com.google.common.truth.Truth;
+import java.util.List;
 
 
 public class NodeHistoryTest {
@@ -73,16 +69,6 @@ public class NodeHistoryTest {
         dbManager.close();
     }
 
-    @Test
-    public void testSetLocked() {
-        NodeHistory nodeHistory = new NodeHistory();
-        assertThat(nodeHistory.isLocked()).isFalse();
-        nodeHistory.setLocked(true);
-        assertThat(nodeHistory.isLocked()).isTrue();
-        nodeHistory.setLocked(false);
-        assertThat(nodeHistory.isLocked()).isFalse();
-    }
-
     private void assertEquals(NodeHistory expected, NodeHistory actual) {
         Assert.assertEquals(expected.getHost(), actual.getHost());
         Assert.assertEquals(expected.getNodeSource(), actual.getNodeSource());
@@ -105,7 +91,6 @@ public class NodeHistoryTest {
         nodeHistory.setStartTime(startTime);
         nodeHistory.setEndTime(0);
         nodeHistory.setStoreInDataBase(true);
-        nodeHistory.setLocked(true);
 
         return nodeHistory;
     }
