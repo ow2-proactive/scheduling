@@ -706,8 +706,8 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     /**
-     * Creates a lost node to notify the user that the deployment faile because
-     * of an error
+     * Creates a lost node to notify the user that the deployment
+     * has failed because of an error
      * 
      * @param clb
      * @param e

@@ -218,7 +218,18 @@ public enum PAResourceManagerProperties {
 
     RM_SELECTION_LOGS_MAX_SIZE("pa.rm.logs.selection.max.size", PropertyType.STRING),
 
-    RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER);
+    RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER),
+
+    /**
+     * Defines if the lock restoration feature is enabled on RM startup.
+     * <p>
+     * When set to {@code true}, the RM will try to lock per Node Source
+     * as many Nodes as there were on the previous run.
+     * <p>
+     * The approach is best effort and Node hostname is not considered.
+     * As a result, Nodes are not necessarily locked on the same host.
+     */
+    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

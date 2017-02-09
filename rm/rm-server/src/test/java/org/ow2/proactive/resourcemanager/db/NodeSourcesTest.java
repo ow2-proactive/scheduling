@@ -16,7 +16,7 @@ import org.junit.Test;
 import static com.google.common.truth.Truth.assertThat;
 
 
-public class TestNodeSources extends ProActiveTest {
+public class NodeSourcesTest extends ProActiveTest {
 
     protected static RMDBManager dbManager;
 

@@ -1,19 +1,18 @@
 package org.ow2.proactive.resourcemanager.db;
 
-import java.util.List;
-
-import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.hibernate.cfg.Configuration;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+
+import java.util.List;
 
 
-public class TestNodeHistory {
+public class NodeHistoryTest {
 
     protected static RMDBManager dbManager;
 
@@ -46,7 +45,7 @@ public class TestNodeHistory {
 
         dbManager.saveNodeHistory(expected);
 
-        List<?> rows = dbManager.sqlQuery("from NodeHistory");
+        List<?> rows = dbManager.executeSqlQuery("from NodeHistory");
         Assert.assertEquals(1, rows.size());
 
         NodeHistory actual = (NodeHistory) rows.get(0);
@@ -61,7 +60,7 @@ public class TestNodeHistory {
 
         dbManager.saveNodeHistory(expected2);
 
-        List<?> rows = dbManager.sqlQuery("from NodeHistory");
+        List<?> rows = dbManager.executeSqlQuery("from NodeHistory");
         Assert.assertEquals(2, rows.size());
 
         assertEquals(expected1, (NodeHistory) rows.get(0));

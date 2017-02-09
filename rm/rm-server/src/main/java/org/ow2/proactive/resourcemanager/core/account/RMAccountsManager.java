@@ -106,29 +106,29 @@ public final class RMAccountsManager extends AbstractAccountsManager<RMAccount> 
             String wereBusy = "SELECT SUM(" + endTime + "-" + startTime + ") " + "FROM " + history +
                 " WHERE " + userName + "='" + user + "' AND " + endTime + " <> 0 AND " + nodeState + " = 1";
 
-            List<?> rows = dbmanager.sqlQuery(wereBusy);
+            List<?> rows = dbmanager.executeSqlQuery(wereBusy);
             account.usedNodeTime += aggregateNodeUsageTime(rows);
 
             String areBusy = "SELECT SUM(" + System.currentTimeMillis() + "-" + startTime + ") " + "FROM " +
                 history + " WHERE " + userName + "='" + user + "' AND " + endTime + " = 0 AND " + nodeState +
                 " = 1";
-            rows = dbmanager.sqlQuery(areBusy);
+            rows = dbmanager.executeSqlQuery(areBusy);
             account.usedNodeTime += aggregateNodeUsageTime(rows);
 
-            // select SUM(endTime-startTime), COUNT(DISTINCT nodeUrl) from History where endTime <> 0 and nodeState in (0,1,3,6,7) and providerName='rm'
+            // select SUM(endTime-startTime), COUNT(DISTINCT nodeUrl) from History where endTime <> 0 and nodeState in (0,1,3,6) and providerName='rm'
             String wereProvided = "SELECT COUNT(DISTINCT " + nodeUrl + "), SUM(" + endTime + "-" + startTime +
                 ") " + "FROM " + history + " WHERE " + providerName + "='" + user + "' AND " + endTime +
-                " <> 0 AND " + nodeState + " in (0,1,3,6,7)";
-            // select SUM(CURRNET_TIME-startTime), COUNT(DISTINCT nodeUrl) from History where endTime = 0 and nodeState in (0,1,3,6,7) and providerName='rm'
+                " <> 0 AND " + nodeState + " in (0,1,3,6)";
+            // select SUM(CURRNET_TIME-startTime), COUNT(DISTINCT nodeUrl) from History where endTime = 0 and nodeState in (0,1,3,6) and providerName='rm'
             String areProvided = "SELECT 0, SUM(" + System.currentTimeMillis() + "-" + startTime + ") " +
                 "FROM " + history + " WHERE " + providerName + "='" + user + "' AND " + endTime +
-                " = 0 AND " + nodeState + " in (0,1,3,6,7)";
+                " = 0 AND " + nodeState + " in (0,1,3,6)";
 
-            rows = dbmanager.sqlQuery(wereProvided);
+            rows = dbmanager.executeSqlQuery(wereProvided);
             account.providedNodesCount += aggregateProvidedNodesCount(rows);
             account.providedNodeTime += aggregateProvidedNodeTime(rows);
 
-            rows = dbmanager.sqlQuery(areProvided);
+            rows = dbmanager.executeSqlQuery(areProvided);
             account.providedNodesCount += aggregateProvidedNodesCount(rows);
             account.providedNodeTime += aggregateProvidedNodeTime(rows);
 
