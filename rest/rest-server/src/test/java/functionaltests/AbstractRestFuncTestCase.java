@@ -36,9 +36,10 @@
  */
 package functionaltests;
 
-import functionaltests.jobs.NonTerminatingJob;
-import functionaltests.jobs.SimpleJob;
-import functionaltests.utils.RestFuncTUtils;
+import java.security.Policy;
+
+import javax.ws.rs.core.MediaType;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -64,8 +65,9 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 
-import javax.ws.rs.core.MediaType;
-import java.security.Policy;
+import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.SimpleJob;
+import functionaltests.utils.RestFuncTUtils;
 
 
 public abstract class AbstractRestFuncTestCase {
@@ -247,6 +249,10 @@ public abstract class AbstractRestFuncTestCase {
         return createJob(NonTerminatingJob.class);
     }
 
+    protected String getTaskNameForClass(Class<?> clazz) {
+        return clazz.getSimpleName() + "Task";
+    }
+
     protected Job createJob(Class<?> clazz) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(clazz.getSimpleName());
@@ -256,7 +262,7 @@ public abstract class AbstractRestFuncTestCase {
         job.setMaxNumberOfExecution(1);
 
         JavaTask task = new JavaTask();
-        task.setName(clazz.getSimpleName() + "Task");
+        task.setName(getTaskNameForClass(clazz));
         task.setExecutableClassName(clazz.getName());
         task.setMaxNumberOfExecution(1);
         task.setOnTaskError(OnTaskError.CANCEL_JOB);
