@@ -1,38 +1,38 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.utils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.net.BindException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -49,15 +49,6 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.web.WebProperties;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.BindException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 
 public class JettyStarter {
@@ -113,9 +104,7 @@ public class JettyStarter {
                 httpProtocol = "http";
             }
 
-            Server server =
-                    createHttpServer(
-                            properties, httpPort, httpsPort, httpsEnabled, redirectHttpToHttps);
+            Server server = createHttpServer(properties, httpPort, httpsPort, httpsEnabled, redirectHttpToHttps);
 
             server.setStopAtShutdown(true);
 
@@ -155,16 +144,14 @@ public class JettyStarter {
     }
 
     private boolean isHttpToHttpsRedirectionEnabled(Properties properties) {
-        return properties.getProperty(
-                WebProperties.WEB_REDIRECT_HTTP_TO_HTTPS, "true").equalsIgnoreCase("true");
+        return properties.getProperty(WebProperties.WEB_REDIRECT_HTTP_TO_HTTPS, "true").equalsIgnoreCase("true");
     }
 
     private boolean isHttpsEnabled(Properties properties) {
         return properties.getProperty(WebProperties.WEB_HTTPS, "false").equalsIgnoreCase("true");
     }
 
-    protected Server createHttpServer(
-            Properties properties, int httpPort, int httpsPort, boolean httpsEnabled,
+    protected Server createHttpServer(Properties properties, int httpPort, int httpsPort, boolean httpsEnabled,
             boolean redirectHttpToHttps) {
 
         int maxThreads = Integer.parseInt(properties.getProperty(WebProperties.WEB_MAX_THREADS, "100"));
@@ -187,11 +174,8 @@ public class JettyStarter {
             checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE, httpsKeystore);
             checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD, httpsKeystorePassword);
 
-            sslContextFactory.setKeyStorePath(
-                    absolutePathOrRelativeToSchedulerHome(
-                            httpsKeystore));
-            sslContextFactory.setKeyStorePassword(
-                    httpsKeystorePassword);
+            sslContextFactory.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(httpsKeystore));
+            sslContextFactory.setKeyStorePassword(httpsKeystorePassword);
 
             HttpConfiguration secureHttpConfiguration = new HttpConfiguration(httpConfiguration);
             secureHttpConfiguration.addCustomizer(new SecureRequestCustomizer());
@@ -202,8 +186,9 @@ public class JettyStarter {
 
             // Connector to listen for HTTPS requests
             ServerConnector httpsConnector = new ServerConnector(server,
-                    new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.toString()),
-                    new HttpConnectionFactory(secureHttpConfiguration));
+                                                                 new SslConnectionFactory(sslContextFactory,
+                                                                                          HttpVersion.HTTP_1_1.toString()),
+                                                                 new HttpConnectionFactory(secureHttpConfiguration));
             httpsConnector.setName(HTTPS_CONNECTOR_NAME);
             httpsConnector.setPort(httpsPort);
 
@@ -236,8 +221,7 @@ public class JettyStarter {
         }
     }
 
-    private ServerConnector createHttpConnector(
-            Server server, HttpConfiguration httpConfiguration, int httpPort) {
+    private ServerConnector createHttpConnector(Server server, HttpConfiguration httpConfiguration, int httpPort) {
         ServerConnector httpConnector = new ServerConnector(server);
         httpConnector.addConnectionFactory(new HttpConnectionFactory(httpConfiguration));
         httpConnector.setName(HTTP_CONNECTOR_NAME);
@@ -259,8 +243,7 @@ public class JettyStarter {
                 }
             }
         } catch (BindException bindException) {
-            logger.error("Failed to start web applications. Port " + restPort +
-                    " is already used", bindException);
+            logger.error("Failed to start web applications. Port " + restPort + " is already used", bindException);
             System.exit(2);
         } catch (Exception e) {
             logger.error("Failed to start web applications", e);
@@ -269,9 +252,9 @@ public class JettyStarter {
         return new ArrayList<>();
     }
 
-    private String getApplicationUrl(String httpProtocol, String schedulerHost, int restPort, WebAppContext webAppContext) {
-        return httpProtocol + "://" + schedulerHost + ":" + restPort +
-                webAppContext.getContextPath();
+    private String getApplicationUrl(String httpProtocol, String schedulerHost, int restPort,
+            WebAppContext webAppContext) {
+        return httpProtocol + "://" + schedulerHost + ":" + restPort + webAppContext.getContextPath();
     }
 
     private List<String> printDeployedApplications(Server server, String schedulerHost, int restPort,
@@ -291,14 +274,13 @@ public class JettyStarter {
                         String applicationUrl = getApplicationUrl(httpProtocol, schedulerHost, restPort, webAppContext);
                         applicationsUrls.add(applicationUrl);
                         logger.info("The web application " + webAppContext.getContextPath() + " created on " +
-                                applicationUrl);
+                                    applicationUrl);
                     }
                 } else {
                     logger.warn("Failed to start context " + webAppContext.getContextPath(), startException);
                 }
             }
-            logger.info("*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort +
-                    " ***");
+            logger.info("*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort + " ***");
         }
         return applicationsUrls;
     }

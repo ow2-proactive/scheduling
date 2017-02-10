@@ -1,4 +1,40 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.rmproxies;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Future;
+
+import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.ImmediateService;
@@ -14,8 +50,8 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -23,16 +59,6 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-
-import javax.security.auth.login.LoginException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Future;
 
 
 @ActiveObject
@@ -55,7 +81,7 @@ public class RMProxyActiveObject {
     static RMProxyActiveObject createAOProxy(RMAuthentication rmAuth, Credentials creds)
             throws RMProxyCreationException {
         try {
-            RMProxyActiveObject proxy = PAActiveObject.newActive(RMProxyActiveObject.class, new Object[]{});
+            RMProxyActiveObject proxy = PAActiveObject.newActive(RMProxyActiveObject.class, new Object[] {});
             proxy.connect(rmAuth, creds);
             return proxy;
         } catch (Exception e) {
@@ -133,8 +159,8 @@ public class RMProxyActiveObject {
      * @see #releaseNodes(NodeSet)
      */
     @ImmediateService
-    public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables, Map<String,
-            String> genericInformation, TaskId taskId) {
+    public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
+            Map<String, String> genericInformation, TaskId taskId) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes);
@@ -143,7 +169,9 @@ public class RMProxyActiveObject {
                     handleCleaningScript(node, cleaningScript, variables, genericInformation, taskId);
                 }
             } else {
-                TaskLogger.getInstance().error(taskId, "Unauthorized clean script: " + System.getProperty("line.separator") + cleaningScript.getScript());
+                TaskLogger.getInstance().error(taskId,
+                                               "Unauthorized clean script: " + System.getProperty("line.separator") +
+                                                       cleaningScript.getScript());
                 releaseNodes(nodes);
             }
         }
@@ -157,23 +185,21 @@ public class RMProxyActiveObject {
      * @param variables
      * @param genericInformation
      */
-    private void handleCleaningScript(Node node, Script<?> cleaningScript,
-            VariablesMap variables, Map<String, String> genericInformation,TaskId taskId) {
+    private void handleCleaningScript(Node node, Script<?> cleaningScript, VariablesMap variables,
+            Map<String, String> genericInformation, TaskId taskId) {
         try {
             this.nodesTaskId.put(node, taskId);
             ScriptHandler handler = ScriptLoader.createHandler(node);
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
-            handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable)genericInformation);
+            handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
             ScriptResult<?> future = handler.handle(cleaningScript);
             try {
                 PAEventProgramming.addActionOnFuture(future, "cleanCallBack");
             } catch (IllegalArgumentException e) {
                 //TODO - linked to PROACTIVE-936 -> IllegalArgumentException is raised if method name is unknown
                 //should be replaced by checked exception
-                logger
-                        .error(
-                                "ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
-                                e);
+                logger.error("ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
+                             e);
             }
             this.nodeScriptResult.put(node, future);
             logger.info("Cleaning Script started on node" + node.getNodeInformation().getURL());
@@ -216,11 +242,11 @@ public class RMProxyActiveObject {
         }
     }
 
-    private void printCleaningScriptInformations(String nodeUrl, ScriptResult<?> sResult, TaskId taskId){
+    private void printCleaningScriptInformations(String nodeUrl, ScriptResult<?> sResult, TaskId taskId) {
         if (logger.isInfoEnabled()) {
             TaskLogger instance = TaskLogger.getInstance();
             if (sResult.errorOccured()) {
-                instance.error(taskId, "Exception while running cleaning script on " + nodeUrl,sResult.getException());
+                instance.error(taskId, "Exception while running cleaning script on " + nodeUrl, sResult.getException());
             } else {
                 instance.info(taskId, "Cleaning script successful, node freed : " + nodeUrl);
             }

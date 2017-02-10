@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import java.util.ArrayList;
@@ -39,25 +64,25 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         TaskFlowJob jobDef = createJob(2);
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
 
-        dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"),
-                new TaskResultImpl(null, "OK1", null, 0));
-        dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"),
-                new TaskResultImpl(null, "OK2", null, 0));
-        dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"),
-                new TaskResultImpl(null, "OK3", null, 0));
+        dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"), new TaskResultImpl(null, "OK1", null, 0));
+        dbManager.updateAfterTaskFinished(job,
+                                          job.getTask("forkedJavaTask-0"),
+                                          new TaskResultImpl(null, "OK2", null, 0));
+        dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"), new TaskResultImpl(null, "OK3", null, 0));
 
         job.setStatus(JobStatus.FINISHED);
 
         dbManager.updateAfterTaskFinished(job, null, null);
 
-        checkAllEntitiesDeleted(JobData.class.getName(), JobContent.class.getName(), TaskData.class.getName(),
-                TaskResultData.class.getName());
+        checkAllEntitiesDeleted(JobData.class.getName(),
+                                JobContent.class.getName(),
+                                TaskData.class.getName(),
+                                TaskResultData.class.getName());
 
         // check can still load task results
 
         Assert.assertEquals("OK1", dbManager.loadTaskResult(job.getTask("javaTask-0").getId(), 0).value());
-        Assert.assertEquals("OK2",
-                dbManager.loadTaskResult(job.getTask("forkedJavaTask-0").getId(), 0).value());
+        Assert.assertEquals("OK2", dbManager.loadTaskResult(job.getTask("forkedJavaTask-0").getId(), 0).value());
         Assert.assertEquals("OK3", dbManager.loadTaskResult(job.getTask("nativeTask-0").getId(), 0).value());
     }
 
@@ -79,12 +104,15 @@ public class TestJobRemove extends BaseSchedulerDBTest {
                 @Override
                 public void run() {
                     try {
-                        dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-0"),
-                                new TaskResultImpl(null, "OK1", null, 0));
-                        dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-0"),
-                                new TaskResultImpl(null, "OK2", null, 0));
-                        dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-0"),
-                                new TaskResultImpl(null, "OK3", null, 0));
+                        dbManager.updateAfterTaskFinished(job,
+                                                          job.getTask("javaTask-0"),
+                                                          new TaskResultImpl(null, "OK1", null, 0));
+                        dbManager.updateAfterTaskFinished(job,
+                                                          job.getTask("forkedJavaTask-0"),
+                                                          new TaskResultImpl(null, "OK2", null, 0));
+                        dbManager.updateAfterTaskFinished(job,
+                                                          job.getTask("nativeTask-0"),
+                                                          new TaskResultImpl(null, "OK3", null, 0));
 
                         job.setStatus(JobStatus.FINISHED);
 
@@ -106,17 +134,16 @@ public class TestJobRemove extends BaseSchedulerDBTest {
             List<InternalJob> jobsNotFinished = dbManager.loadNotFinishedJobs(true);
             Assert.assertEquals("All jobs should be finished", 0, jobsNotFinished.size());
 
-            checkAllEntitiesDeleted(JobData.class.getName(), JobContent.class.getName(), TaskData.class.getName(),
-                    TaskResultData.class.getName());
+            checkAllEntitiesDeleted(JobData.class.getName(),
+                                    JobContent.class.getName(),
+                                    TaskData.class.getName(),
+                                    TaskResultData.class.getName());
 
             // check can still load task results
 
-            Assert.assertEquals("OK1",
-                    dbManager.loadTaskResult(job.getTask("javaTask-0").getId(), 0).value());
-            Assert.assertEquals("OK2",
-                    dbManager.loadTaskResult(job.getTask("forkedJavaTask-0").getId(), 0).value());
-            Assert.assertEquals("OK3",
-                    dbManager.loadTaskResult(job.getTask("nativeTask-0").getId(), 0).value());
+            Assert.assertEquals("OK1", dbManager.loadTaskResult(job.getTask("javaTask-0").getId(), 0).value());
+            Assert.assertEquals("OK2", dbManager.loadTaskResult(job.getTask("forkedJavaTask-0").getId(), 0).value());
+            Assert.assertEquals("OK3", dbManager.loadTaskResult(job.getTask("nativeTask-0").getId(), 0).value());
         }
 
     }
@@ -199,8 +226,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
             forkEnv.addJVMArgument("jvmArg2");
             forkEnv.addSystemEnvironmentVariable("e1", "v1");
             forkEnv.addSystemEnvironmentVariable("e2", "v2");
-            forkEnv.setEnvScript(
-                    new SimpleScript("env script", "javascript", new String[] { "param1", "param2" }));
+            forkEnv.setEnvScript(new SimpleScript("env script", "javascript", new String[] { "param1", "param2" }));
 
             task2.setForkEnvironment(forkEnv);
             task2.addArgument("arg1", "arg1");
@@ -232,18 +258,24 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         InternalJob job = defaultSubmitJobAndLoadInternal(false, jobDef);
 
         for (int i = 0; i < tasksNumber; i++) {
-            dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-" + i),
-                    new TaskResultImpl(null, "OK", null, 0));
-            dbManager.updateAfterTaskFinished(job, job.getTask("javaTask-" + i),
-                    new TaskResultImpl(null, "OK", null, 0));
-            dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-" + i),
-                    new TaskResultImpl(null, "OK", null, 0));
-            dbManager.updateAfterTaskFinished(job, job.getTask("forkedJavaTask-" + i),
-                    new TaskResultImpl(null, "OK", null, 0));
-            dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-" + i),
-                    new TaskResultImpl(null, "OK", null, 0));
-            dbManager.updateAfterTaskFinished(job, job.getTask("nativeTask-" + i),
-                    new TaskResultImpl(null, "OK", null, 0));
+            dbManager.updateAfterTaskFinished(job,
+                                              job.getTask("javaTask-" + i),
+                                              new TaskResultImpl(null, "OK", null, 0));
+            dbManager.updateAfterTaskFinished(job,
+                                              job.getTask("javaTask-" + i),
+                                              new TaskResultImpl(null, "OK", null, 0));
+            dbManager.updateAfterTaskFinished(job,
+                                              job.getTask("forkedJavaTask-" + i),
+                                              new TaskResultImpl(null, "OK", null, 0));
+            dbManager.updateAfterTaskFinished(job,
+                                              job.getTask("forkedJavaTask-" + i),
+                                              new TaskResultImpl(null, "OK", null, 0));
+            dbManager.updateAfterTaskFinished(job,
+                                              job.getTask("nativeTask-" + i),
+                                              new TaskResultImpl(null, "OK", null, 0));
+            dbManager.updateAfterTaskFinished(job,
+                                              job.getTask("nativeTask-" + i),
+                                              new TaskResultImpl(null, "OK", null, 0));
         }
 
         System.out.println("Remove job");
@@ -257,19 +289,23 @@ public class TestJobRemove extends BaseSchedulerDBTest {
     private void setAttributes(Task task) throws Exception {
         task.addGenericInformation("k1", "v1");
         task.addGenericInformation("k2", "v2");
-        SimpleScript script = new SimpleScript(task.getName() + "selection script", "javascript",
-            new String[] { "param1", "param2" });
+        SimpleScript script = new SimpleScript(task.getName() + "selection script",
+                                               "javascript",
+                                               new String[] { "param1", "param2" });
         SelectionScript ss1 = new SelectionScript(script, true);
         SelectionScript ss2 = new SelectionScript(script, false);
         task.addSelectionScript(ss1);
         task.addSelectionScript(ss2);
 
-        task.setPreScript(new SimpleScript(task.getName() + "pre script", "javascript",
-            new String[] { "param1", "param2" }));
-        task.setPostScript(new SimpleScript(task.getName() + "post script", "javascript",
-            new String[] { "param1", "param2" }));
-        task.setCleaningScript(new SimpleScript(task.getName() + "clean script", "javascript",
-            new String[] { "param1", "param2" }));
+        task.setPreScript(new SimpleScript(task.getName() + "pre script",
+                                           "javascript",
+                                           new String[] { "param1", "param2" }));
+        task.setPostScript(new SimpleScript(task.getName() + "post script",
+                                            "javascript",
+                                            new String[] { "param1", "param2" }));
+        task.setCleaningScript(new SimpleScript(task.getName() + "clean script",
+                                                "javascript",
+                                                new String[] { "param1", "param2" }));
         task.setFlowScript(FlowScript.createContinueFlowScript());
 
         task.addInputFiles("f1", InputAccessMode.TransferFromGlobalSpace);

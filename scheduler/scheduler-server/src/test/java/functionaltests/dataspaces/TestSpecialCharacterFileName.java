@@ -1,42 +1,36 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.dataspaces;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import static org.junit.Assume.assumeTrue;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -44,11 +38,7 @@ import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-
-import static org.junit.Assume.assumeTrue;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
@@ -62,17 +52,23 @@ import static org.junit.Assume.assumeTrue;
 public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRestart {
 
     private static String fileNameWithAccent = "myfile-é";
+
     private static String inputSpace = "data\\defaultinput\\user";
+
     private static String outputSpace = "data\\defaultoutput\\user";
 
     private static String schedulerStarterBatPath = "bin\\proactive-server.bat";
+
     private static String clientBatPath = "bin\\proactive-client.bat";
+
     private static String jobXmlPath = "scheduler\\scheduler-server\\src\\test\\resources\\functionaltests\\dataspaces\\Job_SpecialCharacterFileName.xml";
 
     private static int TIMEOUT = 300; // in seconds
+
     private static final String ERROR_COMMAND_EXECUTION = "Error command execution";
 
-    private static String returnExprInResultBeforeTimeout(InputStream inputStream, String expr, int timeout) throws Exception {
+    private static String returnExprInResultBeforeTimeout(InputStream inputStream, String expr, int timeout)
+            throws Exception {
         StringBuilder sb = new StringBuilder();
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         String line;
@@ -92,6 +88,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRes
     }
 
     File fileWithAccentIn;
+
     File fileWithAccentOut;
 
     @Before
@@ -100,8 +97,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRes
 
         // In some cases, the current directory can be scheduler-server/.
         // So we have to set it to the project root dir
-        if(new File(".").getAbsolutePath().contains("scheduler-server"))
-        {
+        if (new File(".").getAbsolutePath().contains("scheduler-server")) {
             String pathCorrector = ".." + File.separator + ".." + File.separator;
             inputSpace = pathCorrector + inputSpace;
             schedulerStarterBatPath = pathCorrector + schedulerStarterBatPath;
@@ -134,8 +130,9 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRes
         ProcessBuilder schedulerProcessBuilder = new ProcessBuilder(schedulerCommand);
         schedulerProcessBuilder.environment().put("processID", "0");
         long startTime = System.currentTimeMillis();
-        if(returnExprInResultBeforeTimeout(schedulerProcessBuilder.start().getInputStream(), "started", TIMEOUT) == null)
-        {
+        if (returnExprInResultBeforeTimeout(schedulerProcessBuilder.start().getInputStream(),
+                                            "started",
+                                            TIMEOUT) == null) {
             long duration = (System.currentTimeMillis() - startTime) / 1000;
             // Kill & Clean
             ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
@@ -157,8 +154,9 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRes
         String jobSubmissionStr;
 
         startTime = System.currentTimeMillis();
-        if ((jobSubmissionStr= returnExprInResultBeforeTimeout(jobSubmissionProcessBuilder.start().getInputStream(), "submitted", TIMEOUT))==null)
-        {
+        if ((jobSubmissionStr = returnExprInResultBeforeTimeout(jobSubmissionProcessBuilder.start().getInputStream(),
+                                                                "submitted",
+                                                                TIMEOUT)) == null) {
             long duration = (System.currentTimeMillis() - startTime) / 1000;
             // Kill & Clean
             ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
@@ -185,11 +183,11 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRes
             System.out.println("SLEEP");
             Thread.sleep(5000);
             jobFinished = (returnExprInResultBeforeTimeout(jobStatusProcessBuilder.start().getInputStream(),
-                    "FINISHED", TIMEOUT) != null);
+                                                           "FINISHED",
+                                                           TIMEOUT) != null);
         }
 
-        if (!jobFinished)
-        {
+        if (!jobFinished) {
             // Kill & Clean
             ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
             fileWithAccentIn.delete();
@@ -203,7 +201,7 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRes
 
         try {
             Assert.assertTrue(fileWithAccentOut.exists());
-        }finally {
+        } finally {
             // Kill & Clean
             ProcessTree.get().killAll(Collections.singletonMap("processID", "0"));
             fileWithAccentIn.delete();
@@ -211,4 +209,3 @@ public class TestSpecialCharacterFileName extends SchedulerFunctionalTestWithRes
         }
     }
 }
-

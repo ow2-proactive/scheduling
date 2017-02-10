@@ -1,43 +1,41 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.jmx.account;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestUsers;
+import java.security.PublicKey;
+import java.util.HashMap;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
@@ -52,15 +50,8 @@ import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-import java.security.PublicKey;
-import java.util.HashMap;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -80,7 +71,6 @@ public final class AddGetReleaseRemoveTest extends RMFunctionalTest {
     /** GET->RELEASE duration time in ms */
     public static long GR_DURATION = 1000;
 
-
     @Test
     public void action() throws Exception {
 
@@ -92,11 +82,9 @@ public final class AddGetReleaseRemoveTest extends RMFunctionalTest {
         // All accounting values are checked through JMX
         final RMAuthentication auth = rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
-        final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
-                pubKey);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword), pubKey);
 
-        final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth
-                .getJMXConnectorURL(JMXTransportProtocol.RMI));
+        final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI));
         final HashMap<String, Object> env = new HashMap<>(1);
         env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
 
@@ -107,8 +95,9 @@ public final class AddGetReleaseRemoveTest extends RMFunctionalTest {
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
 
         // Ensure that no refreshes was done and all account values are correctly initialized        
-        AttributeList atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime",
-                "ProvidedNodeTime", "ProvidedNodesCount" });
+        AttributeList atts = conn.getAttributes(myAccountMBeanName,
+                                                new String[] { "UsedNodeTime", "ProvidedNodeTime",
+                                                               "ProvidedNodesCount" });
 
         long usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
         long providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
@@ -144,17 +133,17 @@ public final class AddGetReleaseRemoveTest extends RMFunctionalTest {
         conn.invoke(managementMBeanName, "clearAccoutingCache", null, null);
 
         // Check account values validity                      
-        atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime", "ProvidedNodeTime",
-                "ProvidedNodesCount" });
+        atts = conn.getAttributes(myAccountMBeanName,
+                                  new String[] { "UsedNodeTime", "ProvidedNodeTime", "ProvidedNodesCount" });
         usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue() - usedNodeTime;
         providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue() - providedNodeTime;
         providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue() - providedNodesCount;
 
         Assert.assertTrue("Invalid value of the usedNodeTime attribute (usedNodeTime=" + usedNodeTime + ")",
-                (usedNodeTime >= GR_DURATION));
+                          (usedNodeTime >= GR_DURATION));
         Assert.assertTrue("Invalid value of the usedNodeTime attribute (getReleaseMaxDuration=" +
-            getReleaseMaxDuration + ")", (usedNodeTime <= getReleaseMaxDuration));
+                          getReleaseMaxDuration + ")", (usedNodeTime <= getReleaseMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
-                (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
+                          (providedNodeTime >= usedNodeTime) && (providedNodeTime <= addRemoveMaxDuration));
     }
 }

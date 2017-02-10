@@ -1,50 +1,40 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.monitor;
 
-import functionaltests.utils.RMTHelper;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.utils.TimeoutAccounter;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import functionaltests.utils.RMTHelper;
 
 
 public class RMMonitorsHandler {
@@ -111,8 +101,7 @@ public class RMMonitorsHandler {
                 nodeSourcesEvent.remove(monitor);
                 return;
             }
-            monitor = (NodeSourceEventMonitor) getMonitor(new NodeSourceEventMonitor(eventType,
-                nodeSourceName));
+            monitor = (NodeSourceEventMonitor) getMonitor(new NodeSourceEventMonitor(eventType, nodeSourceName));
         }
         waitWithMonitor(monitor, timeout);
     }
@@ -132,8 +121,7 @@ public class RMMonitorsHandler {
         return monitor.getNodeEvent();
     }
 
-    public RMNodeEvent waitForAnyNodeEvent(RMEventType eventType, long timeout)
-            throws ProActiveTimeoutException {
+    public RMNodeEvent waitForAnyNodeEvent(RMEventType eventType, long timeout) throws ProActiveTimeoutException {
         NodeEventMonitor monitor = new NodeEventMonitor(eventType, "");
         synchronized (this) {
             for (NodeEventMonitor e : nodesEvent) {
@@ -166,8 +154,7 @@ public class RMMonitorsHandler {
     */
     public void handleNodesourceEvent(RMNodeSourceEvent event) {
         synchronized (this) {
-            NodeSourceEventMonitor nsem = new NodeSourceEventMonitor(event.getEventType(),
-                event.getSourceName());
+            NodeSourceEventMonitor nsem = new NodeSourceEventMonitor(event.getEventType(), event.getSourceName());
             if (!lookAndNotifyMonitor(nsem)) {
                 this.nodeSourcesEvent.add(nsem);
             }

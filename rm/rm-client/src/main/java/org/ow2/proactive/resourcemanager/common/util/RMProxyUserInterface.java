@@ -1,40 +1,36 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.common.util;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import javax.management.*;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -53,12 +49,6 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-
-import javax.management.*;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -85,11 +75,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public BooleanWrapper addNode(String arg0, String arg1) {
         return target.addNode(arg0, arg1);
     }
-    
+
     @Override
-	public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
-		return target.getExistingNodeSourcesList();
-	}
+    public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
+        return target.getExistingNodeSourcesList();
+    }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#createNodeSource(java.lang.String, java.lang.String, java.lang.Object[], java.lang.String, java.lang.Object[])
@@ -97,7 +87,6 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4) {
         return target.createNodeSource(arg0, arg1, arg2, arg3, arg4);
     }
-    
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getAtMostNodes(int, org.ow2.proactive.scripting.SelectionScript)
@@ -233,8 +222,8 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getAtMostNodes(int, org.ow2.proactive.topology.descriptor.TopologyDescriptor, java.util.List, org.ow2.proactive.utils.NodeSet)
      */
     @SuppressWarnings("deprecation")
-    public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor,
-            List<SelectionScript> selectionScriptsList, NodeSet exclusion) {
+    public NodeSet getAtMostNodes(int number, TopologyDescriptor descriptor, List<SelectionScript> selectionScriptsList,
+            NodeSet exclusion) {
         return target.getAtMostNodes(number, descriptor, selectionScriptsList, exclusion);
     }
 
@@ -269,8 +258,8 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
      * @throws ReflectionException
      * @throws IOException
      */
-    public MBeanInfo getMBeanInfo(ObjectName name) throws InstanceNotFoundException, IntrospectionException,
-            ReflectionException, IOException {
+    public MBeanInfo getMBeanInfo(ObjectName name)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
         return this.jmxClient.getConnector().getMBeanServerConnection().getMBeanInfo(name);
     }
 
@@ -305,8 +294,8 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
 
     @Override
     @Deprecated
-    public NodeSet getNodes(int number, TopologyDescriptor descriptor,
-            List<SelectionScript> selectionScriptsList, NodeSet exclusion, boolean bestEffort) {
+    public NodeSet getNodes(int number, TopologyDescriptor descriptor, List<SelectionScript> selectionScriptsList,
+            NodeSet exclusion, boolean bestEffort) {
         return this.target.getNodes(number, descriptor, selectionScriptsList, exclusion, bestEffort);
     }
 

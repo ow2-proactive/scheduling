@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.job.termination.handlers;
 
 import java.util.ArrayList;
@@ -41,7 +66,7 @@ public class TerminateIfTaskHandler {
         InternalTask targetJoin = targets[2];
 
         LOGGER.info("Control Flow Action IF: " + targetIf.getId() + " join: " +
-            ((targetJoin == null) ? "null" : targetJoin.getId()));
+                    ((targetJoin == null) ? "null" : targetJoin.getId()));
 
         // these 2 tasks delimit the Task Block formed by the IF branch
         InternalTask branchStart = targetIf;
@@ -50,8 +75,8 @@ public class TerminateIfTaskHandler {
         String match = targetIf.getMatchingBlock();
         if (match != null) {
             for (InternalTask t : internalJob.getIHMTasks().values()) {
-                if (match.equals(t.getName()) && !(t.getStatus().equals(TaskStatus.FINISHED) ||
-                    t.getStatus().equals(TaskStatus.SKIPPED))) {
+                if (match.equals(t.getName()) &&
+                    !(t.getStatus().equals(TaskStatus.FINISHED) || t.getStatus().equals(TaskStatus.SKIPPED))) {
                     branchEnd = t;
                 }
             }
@@ -101,14 +126,18 @@ public class TerminateIfTaskHandler {
         if (targetJoin != null) {
             joinId = targetJoin.getId();
         }
-        internalJob.getJobDescriptor().doIf(initiator.getId(), branchStart.getId(), branchEnd.getId(), joinId,
-                targetElse.getId(), elseTasks);
+        internalJob.getJobDescriptor().doIf(initiator.getId(),
+                                            branchStart.getId(),
+                                            branchEnd.getId(),
+                                            joinId,
+                                            targetElse.getId(),
+                                            elseTasks);
 
         ((JobInfoImpl) internalJob.getJobInfo()).setTasksChanges(changesInfo, internalJob);
         // notify frontend that tasks were modified
         if (frontend != null) {
             frontend.jobStateUpdated(internalJob.getOwner(),
-                    new NotificationData<>(SchedulerEvent.TASK_SKIPPED, internalJob.getJobInfo()));
+                                     new NotificationData<>(SchedulerEvent.TASK_SKIPPED, internalJob.getJobInfo()));
             frontend.jobUpdatedFullData(internalJob);
         }
         ((JobInfoImpl) internalJob.getJobInfo()).clearTasksChanges();
@@ -178,8 +207,7 @@ public class TerminateIfTaskHandler {
                 if (targetElse == null || targetElse.getIterationIndex() < it.getIterationIndex()) {
                     targetElse = it;
                 }
-            } else
-                if (searchJoin && InternalTask.getInitialName(action.getTargetContinuation()).equals(name)) {
+            } else if (searchJoin && InternalTask.getInitialName(action.getTargetContinuation()).equals(name)) {
                 if (targetJoin == null || targetJoin.getIterationIndex() < it.getIterationIndex()) {
                     targetJoin = it;
                 }

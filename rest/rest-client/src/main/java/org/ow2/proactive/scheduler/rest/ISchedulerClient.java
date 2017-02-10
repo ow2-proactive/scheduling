@@ -1,38 +1,36 @@
 /*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.rest;
+
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
@@ -46,13 +44,6 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-
-import java.io.File;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -104,8 +95,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(File job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+    JobId submit(File job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler.
@@ -123,8 +114,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(URL job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+    JobId submit(URL job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler with provided variables.
@@ -143,8 +134,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(File job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+    JobId submit(File job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler with provided variables.
@@ -163,8 +154,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(URL job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+    JobId submit(URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the
@@ -181,8 +172,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the user does not have permission to view the state of the
      *             specified job
      */
-    boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException;
+    boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
      * Returns <tt>true</tt>, if the scheduler has terminated the execution of
@@ -193,8 +183,7 @@ public interface ISchedulerClient extends Scheduler {
      *
      * @see #isJobFinished(JobId)
      */
-    boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException,
-            PermissionException;
+    boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
      * Causes the current thread to wait until the scheduler has finished the
@@ -222,8 +211,8 @@ public interface ISchedulerClient extends Scheduler {
      *             if the job execution does not finish before the elapse of
      *             wait time
      */
-    JobResult waitForJob(JobId jobId, long timeout) throws NotConnectedException, UnknownJobException,
-            PermissionException, TimeoutException;
+    JobResult waitForJob(JobId jobId, long timeout)
+            throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException;
 
     /**
      * Causes the current thread to wait until the scheduler has finished the
@@ -238,8 +227,8 @@ public interface ISchedulerClient extends Scheduler {
      *            the job identifier string
      * @see #waitForJob(JobId, long)
      */
-    JobResult waitForJob(String jobId, long timeout) throws NotConnectedException,
-            UnknownJobException, PermissionException, TimeoutException;
+    JobResult waitForJob(String jobId, long timeout)
+            throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException;
 
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the
@@ -260,8 +249,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws UnknownTaskException
      *             if the task name is invalid
      */
-    boolean isTaskFinished(String jobId, String taskName) throws UnknownJobException,
-            NotConnectedException, PermissionException, UnknownTaskException;
+    boolean isTaskFinished(String jobId, String taskName)
+            throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException;
 
     /**
      * Causes the current thread to wait until the scheduler has finished
@@ -315,8 +304,8 @@ public interface ISchedulerClient extends Scheduler {
      *             if the execution of all jobs specified does not finish before
      *             the elapse of specified wait time
      */
-    List<JobResult> waitForAllJobs(List<String> jobIds, long timeout) throws NotConnectedException,
-            UnknownJobException, PermissionException, TimeoutException;
+    List<JobResult> waitForAllJobs(List<String> jobIds, long timeout)
+            throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException;
 
     /**
      * Causes the current thread to wait until the execution of any job finishes
@@ -446,8 +435,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the user does not have permission to retrieve the
      *             specified file from the server
      */
-    void pullFile(String space, String pathname, String outputFile) throws NotConnectedException,
-            PermissionException;
+    void pullFile(String space, String pathname, String outputFile) throws NotConnectedException, PermissionException;
 
     /**
      * Deletes the specified file from the server.
@@ -463,7 +451,6 @@ public interface ISchedulerClient extends Scheduler {
      *             if the user does not have permission to delete the file from
      *             the server
      */
-    boolean deleteFile(String space, String pathname) throws NotConnectedException,
-            PermissionException;
+    boolean deleteFile(String space, String pathname) throws NotConnectedException, PermissionException;
 
 }

@@ -24,20 +24,20 @@ if [ "$passw" == "" ]; then
     ssh -n -o PasswordAuthentication=no -o StrictHostKeyChecking=no -i $keyfile $username@localhost whoami
     if [ $? == 0 ]; then
       echo $usr
-    else 
+    else
       echo FAIL
     fi;
     rm -f $keyfile
     exit 0;
   fi;
-else 
-  # check if we are running on a 64bit arch, or a 32bit one. 
+else
+  # check if we are running on a 64bit arch, or a 32bit one.
   # The only difference between the 'suer' executables is their
   # target architecture used at compilation time.
   if [[ `uname -m` == *64* ]];
   then
     if [ ! -e "$2/suer64" ];
-    then 
+    then
       error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such file (${2}/suer64) ";
       echo $error 1>&2;
       exit 1;
@@ -45,19 +45,18 @@ else
     echo "$passw" | "$2"/suer64 $username whoami
   else
     if [ ! -e "$2/suer32" ];
-    then 
+    then
       error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such file (${2}/suer32) ";
       echo $error 1>&2;
       exit 1;
     fi
     echo "$passw" | "$2"/suer32 $username whoami
-  fi  
+  fi
   ###### DEVELOPER NOTE:
   #	In case the 'suer' solution does not meet all requirements, it is possible to conveniently replace
   #	it with a solution built on the Expect library. We need just a script which could interpret the 'su'
-  #	messages. Since expect mixes together the error and output channels, a named pipe should be used to 
+  #	messages. Since expect mixes together the error and output channels, a named pipe should be used to
   #	forward the error of the inner commands to the outside world. This named pipe could be created in the
   #	temp directory, and deleted when the scripts exit.
   ######
 fi;
-

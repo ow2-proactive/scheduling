@@ -1,43 +1,35 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.nodestate;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestUsers;
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.*;
+
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
@@ -55,10 +47,8 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfras
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.util.Collections;
-
-import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.*;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -76,8 +66,11 @@ public class TestConcurrentUsers extends RMFunctionalTest {
         String node1Name = "node1";
         testNode = rmHelper.createNode(node1Name);
         String node1URL = testNode.getNode().getNodeInformation().getURL();
-        resourceManager.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), null);
+        resourceManager.createNodeSource(nsName,
+                                         DefaultInfrastructureManager.class.getName(),
+                                         null,
+                                         StaticPolicy.class.getName(),
+                                         null);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
         resourceManager.addNode(node1URL, nsName);
 
@@ -104,9 +97,11 @@ public class TestConcurrentUsers extends RMFunctionalTest {
             @Override
             public void run() {
                 try {
-                    Credentials cred = Credentials.createCredentials(new CredData(
-                        CredData.parseLogin("user"), CredData.parseDomain("user"), "pwd"),
-                            TestConcurrentUsers.this.rmHelper.getRMAuth().getPublicKey());
+                    Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin("user"),
+                                                                                  CredData.parseDomain("user"),
+                                                                                  "pwd"),
+                                                                     TestConcurrentUsers.this.rmHelper.getRMAuth()
+                                                                                                      .getPublicKey());
 
                     ResourceManager rm2 = TestConcurrentUsers.this.rmHelper.getRMAuth().login(cred);
                     rm2.releaseNode(ns.get(0)).getBooleanValue();
@@ -138,10 +133,9 @@ public class TestConcurrentUsers extends RMFunctionalTest {
         assertEquals(1, resourceManager.getState().getFreeNodesNumber());
 
         log("Test 3 - client crash detection");
-        JVMProcessImpl nodeProcess = new JVMProcessImpl(
-            new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
+        JVMProcessImpl nodeProcess = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setJvmOptions(Collections.singletonList(PAResourceManagerProperties.RM_HOME.getCmdLine() +
-            PAResourceManagerProperties.RM_HOME.getValueAsString()));
+                                                            PAResourceManagerProperties.RM_HOME.getValueAsString()));
         nodeProcess.setClassname(GetAllNodes.class.getName());
         nodeProcess.startProcess();
 
@@ -177,8 +171,9 @@ public class TestConcurrentUsers extends RMFunctionalTest {
             public void run() {
                 try {
                     RMAuthentication auth = rmHelper.getRMAuth();
-                    Credentials cred = Credentials.createCredentials(new CredData(
-                        TestUsers.TEST.username, TestUsers.TEST.password), auth.getPublicKey());
+                    Credentials cred = Credentials.createCredentials(new CredData(TestUsers.TEST.username,
+                                                                                  TestUsers.TEST.password),
+                                                                     auth.getPublicKey());
                     ResourceManager rm = auth.login(cred);
                     rm.disconnect().getBooleanValue();
                 } catch (Exception e) {

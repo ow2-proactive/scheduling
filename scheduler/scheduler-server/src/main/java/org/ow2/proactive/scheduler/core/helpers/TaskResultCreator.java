@@ -1,36 +1,27 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2016 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- *  * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
@@ -77,7 +68,7 @@ public class TaskResultCreator {
     }
 
     public TaskResultImpl getTaskResult(SchedulerDBManager dbManager, InternalJob job, InternalTask task,
-                                        Throwable exception, TaskLogs output) throws UnknownTaskException {
+            Throwable exception, TaskLogs output) throws UnknownTaskException {
         if (task == null) {
             throw new UnknownTaskException();
         }
@@ -99,26 +90,26 @@ public class TaskResultCreator {
     }
 
     public TaskResultImpl getEmptyTaskResult(InternalTask task, Throwable exception, TaskLogs output) {
-        return new TaskResultImpl(task.getId(), exception,
-                output, System.currentTimeMillis() - task.getStartTime());
+        return new TaskResultImpl(task.getId(), exception, output, System.currentTimeMillis() - task.getStartTime());
     }
 
     private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager,
-            EligibleTaskDescriptor eligibleTaskDescriptor, InternalJob job, InternalTask task) throws UnknownTaskException {
+            EligibleTaskDescriptor eligibleTaskDescriptor, InternalJob job, InternalTask task)
+            throws UnknownTaskException {
 
         Map<String, byte[]> variables = new HashMap<>();
 
         if (job.getType() == JobType.TASKSFLOW && eligibleTaskDescriptor != null) {
             TaskResultImpl taskResult = null;
-            try{
+            try {
                 taskResult = (TaskResultImpl) dbManager.loadLastTaskResult(task.getId());
-            }catch(DatabaseManagerException exception){
+            } catch (DatabaseManagerException exception) {
                 tlogger.error(task.getId(), exception.getMessage(), exception);
             }
-            
-            if (taskResult != null){
+
+            if (taskResult != null) {
                 variables.putAll(taskResult.getPropagatedVariables());
-            }else{
+            } else {
                 // retrieve from the database the previous task results if available
                 int numberOfParentTasks = eligibleTaskDescriptor.getParents().size();
                 if ((numberOfParentTasks > 0) && task.handleResultsArguments()) {
@@ -140,7 +131,7 @@ public class TaskResultCreator {
         return jobVariables;
     }
 
-    private Map<String, byte[]> extractTaskResultsAndMergeIntoMap(SchedulerDBManager dbManager, 
+    private Map<String, byte[]> extractTaskResultsAndMergeIntoMap(SchedulerDBManager dbManager,
             EligibleTaskDescriptor eligibleTaskDescriptor, InternalJob job) {
         Map<String, byte[]> mergedVariables = new HashMap<>();
 
@@ -149,8 +140,7 @@ public class TaskResultCreator {
         for (int i = 0; i < numberOfParentTasks; i++) {
             parentIds.add(eligibleTaskDescriptor.getParents().get(i).getTaskId());
         }
-        Map<TaskId, TaskResult> taskResults = dbManager
-                .loadTasksResults(job.getId(), parentIds);
+        Map<TaskId, TaskResult> taskResults = dbManager.loadTasksResults(job.getId(), parentIds);
         for (TaskResult taskResult : taskResults.values()) {
             if (taskResult.getPropagatedVariables() != null) {
                 mergedVariables.putAll(taskResult.getPropagatedVariables());

@@ -70,8 +70,8 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
                 new ModelValidator(model).validate(variable.getValue());
             } catch (Exception e) {
                 throw new JobValidationException((task != null ? "Task '" + task.getName() + "': " : "") +
-                                                 "Variable '" + variable.getName() +
-                                                 "': Model " + variable.getModel() + ": " + e.getMessage(), e);
+                                                 "Variable '" + variable.getName() + "': Model " + variable.getModel() +
+                                                 ": " + e.getMessage(), e);
             }
         }
     }

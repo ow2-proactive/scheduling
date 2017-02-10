@@ -1,45 +1,34 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.permissions;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.TestNode;
-import functionaltests.utils.TestUsers;
+import static org.junit.Assert.fail;
+
+import java.util.List;
+
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -47,9 +36,10 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
-import java.util.List;
-
-import static org.junit.Assert.fail;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.TestNode;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -75,8 +65,11 @@ import static org.junit.Assert.fail;
 public class TestNSProviderPermissions extends RMFunctionalTest {
 
     ResourceManager nsadmin;
+
     ResourceManager admin;
+
     ResourceManager user;
+
     static String nsName = "ns";
 
     @Test
@@ -85,8 +78,11 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         RMTHelper.log("Test1 - node providers = ME");
 
         ResourceManager nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[]{"ALL", "ME"});
+        nsadmin.createNodeSource(nsName,
+                                 DefaultInfrastructureManager.class.getName(),
+                                 null,
+                                 StaticPolicy.class.getName(),
+                                 new Object[] { "ALL", "ME" });
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 2);
 
@@ -115,7 +111,6 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         } catch (Exception expected) {
         }
 
-
         // AllPermission user
         ResourceManager admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         // user does not allow to add nodes
@@ -136,8 +131,11 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
     public void testNodeProviderMyGroups() throws Exception {
         RMTHelper.log("Test2 - node providers = MY_GROUPS");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-                .getName(), new Object[]{"ALL", "MY_GROUPS"});
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "MY_GROUPS" });
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);
@@ -195,8 +193,11 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
     public void testNodeProviderAll() throws Exception {
         RMTHelper.log("Test3 - node providers = ALL");
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[]{"ALL", "ALL"});
+        nsadmin.createNodeSource(nsName,
+                                 DefaultInfrastructureManager.class.getName(),
+                                 null,
+                                 StaticPolicy.class.getName(),
+                                 new Object[] { "ALL", "ALL" });
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);
@@ -237,8 +238,11 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         RMTHelper.log("Test4 - admin priviledges");
 
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
-        nsadmin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[]{"ALL", "ALL"});
+        nsadmin.createNodeSource(nsName,
+                                 DefaultInfrastructureManager.class.getName(),
+                                 null,
+                                 StaticPolicy.class.getName(),
+                                 new Object[] { "ALL", "ALL" });
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 2);
@@ -257,13 +261,15 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
     }
 
-
     @Test
     public void testSpecificUsers() throws Exception {
         RMTHelper.log("Test5.1 - specific users");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-                .getName(), new Object[]{"ALL", "users=nsadmin"});
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "users=nsadmin" });
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);
@@ -315,8 +321,12 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
 
         RMTHelper.log("Test5.2 - specific groups");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[]{"ALL", "groups=nsadmins"}).getBooleanValue();
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "groups=nsadmins" })
+             .getBooleanValue();
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);
@@ -363,8 +373,11 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
     public void testSpecificUsersGroups() throws Exception {
         RMTHelper.log("Test5.3 - specific users/groups");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
-        admin.createNodeSource(nsName, DefaultInfrastructureManager.class.getName(), null, StaticPolicy.class
-                .getName(), new Object[]{"ALL", "users=radmin;groups=nsadmins"});
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "users=radmin;groups=nsadmins" });
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);

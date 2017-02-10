@@ -1,8 +1,34 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -12,7 +38,6 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
-import org.apache.log4j.Logger;
 
 
 public class SchedulerStateListener {
@@ -86,8 +111,8 @@ public class SchedulerStateListener {
 
     private void connect() throws InterruptedException {
         String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
-        String cred_path = PortalConfiguration.getProperties().getProperty(
-                PortalConfiguration.scheduler_cache_credential);
+        String cred_path = PortalConfiguration.getProperties()
+                                              .getProperty(PortalConfiguration.scheduler_cache_credential);
         File credFile = new File(cred_path);
 
         while (scheduler == null && !killed) {
@@ -100,10 +125,10 @@ public class SchedulerStateListener {
                     Credentials credential = Credentials.getCredentials(cred_path);
                     scheduler.init(url, credential);
                 } else {
-                    String login = PortalConfiguration.getProperties().getProperty(
-                            PortalConfiguration.scheduler_cache_login);
-                    String password = PortalConfiguration.getProperties().getProperty(
-                            PortalConfiguration.scheduler_cache_password);
+                    String login = PortalConfiguration.getProperties()
+                                                      .getProperty(PortalConfiguration.scheduler_cache_login);
+                    String password = PortalConfiguration.getProperties()
+                                                         .getProperty(PortalConfiguration.scheduler_cache_password);
                     scheduler.init(url, login, password);
                 }
 
@@ -129,8 +154,7 @@ public class SchedulerStateListener {
         return state.getRevision();
     }
 
-    public SchedulerStatus getSchedulerStatus(Scheduler scheduler) throws PermissionException,
-            NotConnectedException {
+    public SchedulerStatus getSchedulerStatus(Scheduler scheduler) throws PermissionException, NotConnectedException {
         SchedulerStatus status = state.getStatus();
         if (status == null) {
             status = scheduler.getStatus();

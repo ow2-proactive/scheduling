@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.scheduler.task.internal;
 
@@ -130,8 +119,7 @@ public abstract class InternalTask extends TaskState {
     protected transient ExecutableContainer executableContainer = null;
 
     /** Maximum number of execution for this task in case of failure (node down) */
-    private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE
-            .getValueAsInt();
+    private int maxNumberOfExecutionOnFailure = PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt();
 
     /** iteration number if the task was replicated by a IF control flow action */
     private int iteration = 0;
@@ -203,8 +191,7 @@ public abstract class InternalTask extends TaskState {
         //ExecutableContainer replicatedContainer = null;
         try {
             // Deep copy of the InternalTask using proactive serialization
-            replicatedTask = (InternalTask) ProActiveMakeDeepCopy.WithProActiveObjectStream
-                    .makeDeepCopy(this);
+            replicatedTask = (InternalTask) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(this);
         } catch (Throwable t) {
             throw new ExecutableCreationException("Failed to serialize task", t);
         }
@@ -292,8 +279,8 @@ public abstract class InternalTask extends TaskState {
      *
      * @throws ExecutableCreationException one task could not be replicated
      */
-    private void internalReplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction,
-            int dupIndex, int itIndex) throws ExecutableCreationException {
+    private void internalReplicateTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
+            int itIndex) throws ExecutableCreationException {
 
         InternalTask nt = null;
         if (!acc.containsKey(this.getId())) {
@@ -349,8 +336,8 @@ public abstract class InternalTask extends TaskState {
      *
      * @throws Exception instantiation error
      */
-    private void internalReconstructTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction,
-            int dupIndex, int itIndex) {
+    private void internalReconstructTree(Map<TaskId, InternalTask> acc, TaskId target, boolean loopAction, int dupIndex,
+            int itIndex) {
         if (target.equals(this.getId())) {
             return;
         }
@@ -469,8 +456,7 @@ public abstract class InternalTask extends TaskState {
         if (this.getId().equals(parent.getId())) {
             return (depth >= 0);
         }
-        if (this.getIDependences() == null && this.getJoinedBranches() == null &&
-            this.getIfBranch() == null) {
+        if (this.getIDependences() == null && this.getJoinedBranches() == null && this.getIfBranch() == null) {
             return false;
         }
         if (this.joinedBranches != null) {
@@ -503,8 +489,7 @@ public abstract class InternalTask extends TaskState {
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
      */
-    public abstract TaskLauncher createLauncher(Node node)
-            throws ActiveObjectCreationException, NodeException;
+    public abstract TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException;
 
     /**
      * Return true if this task can handle parent results arguments in its executable
@@ -566,9 +551,8 @@ public abstract class InternalTask extends TaskState {
     @Override
     public synchronized void update(TaskInfo taskInfo) {
         if (!getId().equals(taskInfo.getTaskId())) {
-            throw new IllegalArgumentException(
-                "This task info is not applicable for this task. (expected id is '" + getId() +
-                    "' but was '" + taskInfo.getTaskId() + "'");
+            throw new IllegalArgumentException("This task info is not applicable for this task. (expected id is '" +
+                                               getId() + "' but was '" + taskInfo.getTaskId() + "'");
         }
         this.taskInfo = (TaskInfoImpl) taskInfo;
         this.taskInfo.setJobId(internalJob.getId());
@@ -585,8 +569,8 @@ public abstract class InternalTask extends TaskState {
 
             if (folder.exists() && folder.isDirectory()) {
                 logger.info(id,
-                        "The resource manager will accept only fork environment or cleaning scripts from " +
-                            dirName);
+                            "The resource manager will accept only fork environment or cleaning scripts from " +
+                                dirName);
                 long currentTime = System.currentTimeMillis();
                 long configuredAuthorizedScriptLoadPeriod = getConfiguredAuthorizedScriptLoadPeriod();
                 if (currentTime - lastAuthorizedFolderLoadingTime > configuredAuthorizedScriptLoadPeriod) {
@@ -618,8 +602,7 @@ public abstract class InternalTask extends TaskState {
     private static long getConfiguredAuthorizedScriptLoadPeriod() {
         long configuredAuthorizedScriptLoadPeriod = DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD;
         if (PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.isSet()) {
-            configuredAuthorizedScriptLoadPeriod = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD
-                    .getValueAsInt();
+            configuredAuthorizedScriptLoadPeriod = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsInt();
         }
         return configuredAuthorizedScriptLoadPeriod;
     }
@@ -627,7 +610,7 @@ public abstract class InternalTask extends TaskState {
     public static synchronized boolean isScriptAuthorized(TaskId id, Script script) {
         updateAuthorizedScriptsSignatures(id);
         return authorizedSelectionScripts == null ||
-            authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()));
+               authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()));
     }
 
     @Override
@@ -847,8 +830,8 @@ public abstract class InternalTask extends TaskState {
 
         String n = this.getTaskNameSuffix();
         if (newName.length() + n.length() > 255) {
-            throw new IllegalArgumentException(
-                "The name is too long, it must have 255 chars length max : " + newName + n);
+            throw new IllegalArgumentException("The name is too long, it must have 255 chars length max : " + newName +
+                                               n);
         }
 
         super.setName(newName + n);
@@ -872,8 +855,7 @@ public abstract class InternalTask extends TaskState {
         }
 
         // same stuff with IF
-        if (this.getFlowScript() != null &&
-            this.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
+        if (this.getFlowScript() != null && this.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
             String ifBranch = getInitialName(this.getFlowScript().getActionTarget());
             String elseBranch = getInitialName(this.getFlowScript().getActionTargetElse());
             this.getFlowScript().setActionTarget(ifBranch + getTaskNameSuffix());
@@ -921,7 +903,7 @@ public abstract class InternalTask extends TaskState {
 
     static {
         String[] regexps = new String[] { "^(.*)[" + TaskId.ITERATION_SEPARATOR + "].*$",
-                "^(.*)[" + TaskId.REPLICATION_SEPARATOR + "].*$", "^(.*)$" };
+                                          "^(.*)[" + TaskId.REPLICATION_SEPARATOR + "].*$", "^(.*)$" };
 
         namePatterns = new Pattern[regexps.length];
 
@@ -1119,8 +1101,9 @@ public abstract class InternalTask extends TaskState {
         tli.setControlFlowScript(getFlowScript());
         tli.setTaskInputFiles(getInputFilesList());
         tli.setTaskOutputFiles(getOutputFilesList());
-        tli.setNamingService(
-                internalJob.getTaskDataSpaceApplications().get(getId().longValue()).getNamingServiceStub());
+        tli.setNamingService(internalJob.getTaskDataSpaceApplications()
+                                        .get(getId().longValue())
+                                        .getNamingServiceStub());
         tli.setIterationIndex(getIterationIndex());
         tli.setReplicationIndex(getReplicationIndex());
 
@@ -1182,11 +1165,13 @@ public abstract class InternalTask extends TaskState {
                 Set<TaskId> parentIds = new HashSet<>(internalTasksDependencies.size());
                 for (InternalTask parentTask : internalTasksDependencies) {
                     parentIds.addAll(InternalTaskParentFinder.getInstance()
-                            .getFirstNotSkippedParentTaskIds(parentTask));
+                                                             .getFirstNotSkippedParentTaskIds(parentTask));
                 }
                 if (!parentIds.isEmpty()) {
-                    Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
-                            .loadTasksResults(internalJob.getId(), new ArrayList(parentIds));
+                    Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure()
+                                                                           .getDBManager()
+                                                                           .loadTasksResults(internalJob.getId(),
+                                                                                             new ArrayList(parentIds));
                     updateVariablesWithTaskResults(taskResults);
                 }
             }
@@ -1199,8 +1184,7 @@ public abstract class InternalTask extends TaskState {
         for (TaskResult taskResult : taskResults.values()) {
             if (taskResult.getPropagatedVariables() != null) {
                 try {
-                    updatedVariables.putAll(
-                            SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
+                    updatedVariables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
                 } catch (Exception e) {
                     throw new IllegalStateException("Could not deserialize variable map", e);
                 }
@@ -1239,8 +1223,8 @@ public abstract class InternalTask extends TaskState {
         }
 
         if (genericInformation != null) {
-            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(
-                    genericInformation, getRuntimeVariables());
+            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(genericInformation,
+                                                                                               getRuntimeVariables());
             gInfo.putAll(updatedTaskGenericInfo);
         }
 

@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests;
 
@@ -100,19 +89,24 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     protected static int NB_TASKS = 4;
 
     protected File inputLocalFolder;
+
     protected File outputLocalFolder;
 
     protected String userspace;
 
     protected String pushUrl;
+
     protected String pullUrl;
 
     protected static final String TASK_NAME = "TestJavaTask";
 
     // we add special characters to ensure they are supported
     public final static String INPUT_FILE_BASE_NAME = "input é";
+
     public final static String INPUT_FILE_EXT = ".txt";
+
     public final static String OUTPUT_FILE_BASE_NAME = "output é";
+
     public final static String OUTPUT_FILE_EXT = ".out";
 
     protected RestSmartProxyImpl restSmartProxy;
@@ -189,8 +183,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
             public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
                 JobStatus status = notification.getData().getStatus();
 
-                System.out.println("RestSmartProxyTest.jobStateUpdatedEvent, eventType=" +
-                    notification.getEventType() + ", jobStatus=" + status);
+                System.out.println("RestSmartProxyTest.jobStateUpdatedEvent, eventType=" + notification.getEventType() +
+                                   ", jobStatus=" + status);
 
                 if (notification.getEventType() == SchedulerEvent.JOB_RESTARTED_FROM_ERROR) {
                     restartedFromErrorEventReceived.setTrue();
@@ -235,8 +229,13 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         restSmartProxy.addEventListener(listener);
 
-        JobId jobId = restSmartProxy.submit(job, inputLocalFolder.getAbsolutePath(), pushUrl,
-                outputLocalFolder.getAbsolutePath(), pullUrl, false, false);
+        JobId jobId = restSmartProxy.submit(job,
+                                            inputLocalFolder.getAbsolutePath(),
+                                            pushUrl,
+                                            outputLocalFolder.getAbsolutePath(),
+                                            pullUrl,
+                                            false,
+                                            false);
 
         // the next line blocks until jobStateUpdatedEvent is called on the
         // listener
@@ -332,8 +331,13 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
             restSmartProxy.addEventListener(notifier);
         }
 
-        JobId id = restSmartProxy.submit(job, inputLocalFolder.getAbsolutePath(), pushUrl,
-                outputLocalFolder.getAbsolutePath(), pullUrl, isolateTaskOutput, automaticTransfer);
+        JobId id = restSmartProxy.submit(job,
+                                         inputLocalFolder.getAbsolutePath(),
+                                         pushUrl,
+                                         outputLocalFolder.getAbsolutePath(),
+                                         pullUrl,
+                                         isolateTaskOutput,
+                                         automaticTransfer);
 
         JobState jobState = waitForJobFinishState(id.toString());
 
@@ -357,8 +361,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         for (int i = 0; i < NB_TASKS; i++) {
             String outputFileName = OUTPUT_FILE_BASE_NAME + "_" + i + OUTPUT_FILE_EXT;
             File outputFile = new File(outputLocalFolder, outputFileName);
-            Assert.assertTrue(String.format("%s does not exist.", outputFile.getAbsolutePath()),
-                    outputFile.exists());
+            Assert.assertTrue(String.format("%s does not exist.", outputFile.getAbsolutePath()), outputFile.exists());
         }
     }
 

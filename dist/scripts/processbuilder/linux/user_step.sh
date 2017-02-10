@@ -1,9 +1,9 @@
 #! /bin/bash
-# This script will try to proceed with the next step of the launching mechanism, i.e. 
+# This script will try to proceed with the next step of the launching mechanism, i.e.
 # it will SUDO the command_step.
 #
 # If it fails, it will write an error message to the stderr and exit with error code 0.
-# The error code however is not relevant, because the JAVA process launcher will interpret the 
+# The error code however is not relevant, because the JAVA process launcher will interpret the
 # error immediately, and ignore any follow-up
 
 # parameters:
@@ -22,7 +22,7 @@ OSPL_E_CAUSE="CAUSE";
 OSLP_PACKAGE="org.objectweb.proactive.extensions.processbuilder.exception."
 #---------------
 
-token=$1 
+token=$1
 
 # temp file
 tmp=$2
@@ -54,12 +54,12 @@ if test "$PA_OSPB_CUSTOM_VARIABLES"; then
     done
 fi
 
-if [ "$passw" == "" ]; then 
-  if [ "$keycont" == "" ]; then 
+if [ "$passw" == "" ]; then
+  if [ "$keycont" == "" ]; then
     # use sudo
     echo 0 | sudo -ESHu $usr `pwd`/command_step.sh $token $tmp $tmpenv "$workdir" "$@"
     exitc=$?
-  else 
+  else
     # use ssh
     # PROACTIVE-970 : default env is used
     # Note that tmp is still used fo return value
@@ -71,7 +71,7 @@ if [ "$passw" == "" ]; then
     umask $OLD_UMASK
     echo "$keycont" > $keyfile
 
-    for i in "$@" 
+    for i in "$@"
       do
       args="${args} ""'"${i//\'/\'\"\'\"\'}"'"
     done
@@ -82,18 +82,18 @@ if [ "$passw" == "" ]; then
 else
   # if we use the 'suer' than since it will write the command to the shell as text, we have to make
   # sure that our command will always be wellformed. Thus, we write it out to environment variables
-  # and pass their names to the executable. We actually pass the environment variables complete with 
+  # and pass their names to the executable. We actually pass the environment variables complete with
   # dollar sign, so when they get written to the bash, they will be replaced with their values automatically
   env_var_prefix="PA_OSPB_CMD_ARG_NO_"
   cnt=1
-  for i in "$@" 
-  do 
+  for i in "$@"
+  do
     export ${env_var_prefix}${cnt}="$i"
     args="${args} "\"""\$"$env_var_prefix$cnt"\"
     cnt=`expr $cnt + 1`
   done
 
-  # check if we are running on a 64bit arch, or a 32bit one. 
+  # check if we are running on a 64bit arch, or a 32bit one.
   # The only difference between the 'suer' executables is their
   # target architecture used at compilation time.
   if [[ `uname -m` == *64* ]];
@@ -109,11 +109,11 @@ else
   else
     echo "$passw" | ./suer32 $usr ./command_step.sh $token $tmp $tmpenv "$workdir" $args;
     exitc=$?
-  fi  
+  fi
   ###### DEVELOPER NOTE:
   #	In case the 'suer' solution does not meet all requirements, it is possible to conveniently replace
   #	it with a solution built on the Expect library. We need just a script which could interpret the 'su'
-  #	messages. Since expect mixes together the error and output channels, a named pipe should be used to 
+  #	messages. Since expect mixes together the error and output channels, a named pipe should be used to
   #	forward the error of the inner commands to the outside world. This named pipe could be created in the
   #	temp directory, and deleted when the scripts exit.
   ######
@@ -126,4 +126,3 @@ if [ $exitc != 0 ]; then
   echo $error 1>&2;
   exit 1;
 fi;
-  

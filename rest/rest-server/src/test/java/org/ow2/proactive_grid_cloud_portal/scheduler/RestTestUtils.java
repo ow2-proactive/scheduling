@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import static org.junit.Assert.assertEquals;
@@ -38,8 +63,8 @@ public class RestTestUtils {
      * ################################################################################
      */
 
-    protected static Page<JobInfo> newMockedJobInfoPage(String jobStr, String taskTag, int nbJobs,
-            int nbTasks, int nbTotalJobs) {
+    protected static Page<JobInfo> newMockedJobInfoPage(String jobStr, String taskTag, int nbJobs, int nbTasks,
+            int nbTotalJobs) {
 
         List<JobInfo> lJobInfo = new ArrayList<JobInfo>(nbJobs);
 
@@ -50,8 +75,7 @@ public class RestTestUtils {
         return new Page<JobInfo>(lJobInfo, nbTotalJobs);
     }
 
-    protected static JobInfo newMockedJobInfo(String jobStr, String taskTag,
-                                              int nbTasks) {
+    protected static JobInfo newMockedJobInfo(String jobStr, String taskTag, int nbTasks) {
         JobInfo jobInfo = RestTestUtils.newMockedJob(jobStr, taskTag, nbTasks).getJobInfo();
         return jobInfo;
     }
@@ -140,14 +164,14 @@ public class RestTestUtils {
         assertEquals("Number of tasks is incorrect", nbTasks, page.getSize());
 
         for (int i = 0; i < nbTasks; i++) {
-            assertEquals("Task readable name is incorrect", generateReadableName(jobIdStr, i, nbTasks),
-                    page.getList().get(i));
+            assertEquals("Task readable name is incorrect",
+                         generateReadableName(jobIdStr, i, nbTasks),
+                         page.getList().get(i));
         }
     }
 
     protected static void assertTaskStates(Page<TaskState> expected, RestPage<TaskStateData> actual) {
-        assertEquals("Number of tasks in page is incorrect", expected.getList().size(),
-                actual.getList().size());
+        assertEquals("Number of tasks in page is incorrect", expected.getList().size(), actual.getList().size());
         assertEquals("Total number of tasks is incorrect", expected.getSize(), actual.getSize());
         for (int i = 0; i < expected.getList().size(); i++) {
             TaskState tExpected = expected.getList().get(i);
@@ -159,8 +183,7 @@ public class RestTestUtils {
 
     protected static void assertJobInfoPage(Page<JobInfo> expected, RestPage<String> actual) {
 
-        assertEquals("Returned number of jobs is incorrect", expected.getList().size(),
-                actual.getList().size());
+        assertEquals("Returned number of jobs is incorrect", expected.getList().size(), actual.getList().size());
 
         assertEquals("Total number of jobs is incorrect", expected.getSize(), actual.getSize());
         for (int i = 0; i < expected.getList().size(); i++) {
@@ -170,8 +193,7 @@ public class RestTestUtils {
 
     protected static void assertJobsInfoPage(Page<JobInfo> expected, RestPage<UserJobData> actual) {
 
-        assertEquals("Returned number of jobs is incorrect", expected.getList().size(),
-                actual.getList().size());
+        assertEquals("Returned number of jobs is incorrect", expected.getList().size(), actual.getList().size());
 
         assertEquals("Total number of jobs is incorrect", expected.getSize(), actual.getSize());
         for (int i = 0; i < expected.getList().size(); i++) {
@@ -188,8 +210,9 @@ public class RestTestUtils {
     }
 
     protected static void assertJobInfo(JobInfo expectedJobInfo, JobInfoData actualJobInfoData) {
-        assertEquals("JobId value incorrect", expectedJobInfo.getJobId().value(),
-                String.valueOf(actualJobInfoData.getJobId().getId()));
+        assertEquals("JobId value incorrect",
+                     expectedJobInfo.getJobId().value(),
+                     String.valueOf(actualJobInfoData.getJobId().getId()));
     }
 
     /**

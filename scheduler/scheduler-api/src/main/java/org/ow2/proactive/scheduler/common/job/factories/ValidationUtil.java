@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
@@ -80,8 +69,8 @@ public class ValidationUtil {
      * @throws JobCreationException
      *             if the job descriptor is invalid
      */
-    public static void validate(File jobFile, InputStream schemaIs) throws SAXException, IOException,
-            JobCreationException {
+    public static void validate(File jobFile, InputStream schemaIs)
+            throws SAXException, IOException, JobCreationException {
         try {
 
             XMLReader reader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
@@ -140,15 +129,19 @@ public class ValidationUtil {
                     if (TASK_FLOW.getXMLName().equals(qName)) {
                         sb.append("Uncompleted job: At least one task must be defined.").append('\n');
                     } else if (TASK.getXMLName().equals(qName)) {
-                        sb.append("Uncompleted task: At least the Executable element must be define.")
-                                .append('\n');
+                        sb.append("Uncompleted task: At least the Executable element must be define.").append('\n');
                     } else if (SCRIPT_EXECUTABLE.getXMLName().equals(qName)) {
                         sb.append("Uncompleted scriptExecutable.").append('\n');
                     }
                 }
             }
-            sb.append("Error: ").append(se.getMessage()).append(" at line ").append(se.getLineNumber())
-                    .append(" , column ").append(se.getColumnNumber()).append('.');
+            sb.append("Error: ")
+              .append(se.getMessage())
+              .append(" at line ")
+              .append(se.getLineNumber())
+              .append(" , column ")
+              .append(se.getColumnNumber())
+              .append('.');
             JobCreationException ne = new JobCreationException(sb.toString(), se);
             String currentTask = decorator.currentTask();
             if (currentTask != null && !currentTask.isEmpty()) {
@@ -162,6 +155,7 @@ public class ValidationUtil {
         private ContentHandler handler;
 
         private Stack<String> currentTask = new Stack<String>();
+
         private Stack<String> currentE = new Stack<String>();
 
         ContentHandlerDecorator(ContentHandler handler) {
@@ -194,8 +188,7 @@ public class ValidationUtil {
         }
 
         @Override
-        public void startElement(String uri, String localName, String qName, Attributes atts)
-                throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
             if (TASK.getXMLName().equals(currentE.push(qName))) {
                 nameAttrValue(atts);
                 currentTask.push(nameAttrValue(atts));

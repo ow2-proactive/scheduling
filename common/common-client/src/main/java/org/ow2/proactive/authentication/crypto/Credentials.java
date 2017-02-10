@@ -1,47 +1,30 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.authentication.crypto;
 
-import org.apache.commons.codec.binary.Base64;
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
-import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
-
-import javax.crypto.interfaces.DHPublicKey;
 import java.io.*;
 import java.security.*;
 import java.security.interfaces.DSAPublicKey;
@@ -49,6 +32,13 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
+import javax.crypto.interfaces.DHPublicKey;
+
+import org.apache.commons.codec.binary.Base64;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 
 
 /**
@@ -77,15 +67,15 @@ public class Credentials implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Default credentials location */
-    private static final String DEFAULT_CREDS = System.getProperty("user.home") + File.separator +
-        ".proactive" + File.separator + "security" + File.separator + "creds.enc";
+    private static final String DEFAULT_CREDS = System.getProperty("user.home") + File.separator + ".proactive" +
+                                                File.separator + "security" + File.separator + "creds.enc";
 
     /** Java properly describing the path to the encrypted credentials on the local drive */
     public static final String credentialsPathProperty = "pa.common.auth.credentials";
 
     /** Default pubkey location */
-    private static final String DEFAULT_PUBKEY = System.getProperty("user.home") + File.separator +
-        ".proactive" + File.separator + "security" + File.separator + "pub.key";
+    private static final String DEFAULT_PUBKEY = System.getProperty("user.home") + File.separator + ".proactive" +
+                                                 File.separator + "security" + File.separator + "pub.key";
 
     /** Java property describing the path to the public key on the local drive */
     public static final String pubkeyPathProperty = "pa.common.auth.pubkey";
@@ -103,12 +93,16 @@ public class Credentials implements Serializable {
 
     /** key generation algorithm */
     private String algorithm;
+
     /** key size */
     private int size;
+
     /** cipher initialization parameters */
     private String cipher;
+
     /** encrypted data with AES cipher */
     private byte[] data;
+
     /** AES key encrypted with RSA */
     private byte[] aes;
 
@@ -506,8 +500,7 @@ public class Credentials implements Serializable {
      * @return the Credentials object containing the encrypted data
      * @throws KeyException key generation or encryption failed
      */
-    public static Credentials createCredentials(final CredData cc, final PublicKey pubKey)
-            throws KeyException {
+    public static Credentials createCredentials(final CredData cc, final PublicKey pubKey) throws KeyException {
         return createCredentials(cc, pubKey, "RSA/ECB/PKCS1Padding");
     }
 
@@ -535,8 +528,9 @@ public class Credentials implements Serializable {
             throw new KeyException(e1.getMessage());
         }
 
-        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encrypt(pubKey, cipher,
-                clearCred);
+        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encrypt(pubKey,
+                                                                                              cipher,
+                                                                                              clearCred);
         byte[] encAes = encryptedData.getEncryptedSymmetricKey();
         byte[] encData = encryptedData.getEncryptedData();
 
@@ -566,8 +560,9 @@ public class Credentials implements Serializable {
      * @throws KeyException decryption failure, malformed data
      */
     public CredData decrypt(PrivateKey privKey) throws KeyException {
-        byte[] decryptedData = HybridEncryptionUtil.decrypt(privKey, this.cipher,
-                new HybridEncryptionUtil.HybridEncryptedData(aes, data));
+        byte[] decryptedData = HybridEncryptionUtil.decrypt(privKey,
+                                                            this.cipher,
+                                                            new HybridEncryptionUtil.HybridEncryptedData(aes, data));
 
         // deserialize clear credentials and obtain login & password
         try {
@@ -598,8 +593,7 @@ public class Credentials implements Serializable {
      * @throws KeyException key generation or encryption failed
      */
     @Deprecated
-    public static Credentials createCredentials(String login, String password, String pubPath)
-            throws KeyException {
+    public static Credentials createCredentials(String login, String password, String pubPath) throws KeyException {
         return createCredentials(login, password, pubPath, "RSA/ECB/PKCS1Padding");
     }
 
@@ -615,8 +609,7 @@ public class Credentials implements Serializable {
      * @throws KeyException key generation or encryption failed
      */
     @Deprecated
-    public static Credentials createCredentials(String login, String password, PublicKey pubKey)
-            throws KeyException {
+    public static Credentials createCredentials(String login, String password, PublicKey pubKey) throws KeyException {
         return createCredentials(login, password, null, pubKey, "RSA/ECB/PKCS1Padding");
     }
 
@@ -658,8 +651,8 @@ public class Credentials implements Serializable {
      * @throws KeyException key generation or encryption failed
      */
     @Deprecated
-    public static Credentials createCredentials(String login, String password, byte[] datakey,
-            PublicKey pubKey, String cipher) throws KeyException {
+    public static Credentials createCredentials(String login, String password, byte[] datakey, PublicKey pubKey,
+            String cipher) throws KeyException {
 
         CredData cc = new CredData();
         cc.setLogin(CredData.parseLogin(login));
@@ -677,8 +670,9 @@ public class Credentials implements Serializable {
 
         int size = keySize(pubKey);
 
-        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encrypt(pubKey, cipher,
-                clearCred);
+        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encrypt(pubKey,
+                                                                                              cipher,
+                                                                                              clearCred);
         byte[] encAes = encryptedData.getEncryptedSymmetricKey();
         byte[] encData = encryptedData.getEncryptedData();
 

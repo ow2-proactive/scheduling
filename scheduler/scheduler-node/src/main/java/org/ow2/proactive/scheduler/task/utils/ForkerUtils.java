@@ -1,48 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.scheduler.task.utils;
+
+import java.io.File;
+import java.security.KeyException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.processbuilder.OSUser;
 import org.objectweb.proactive.extensions.processbuilder.PAOSProcessBuilderFactory;
 import org.ow2.proactive.authentication.crypto.CredData;
-
-import java.io.File;
-import java.security.KeyException;
 
 
 /**
@@ -58,8 +47,10 @@ public final class ForkerUtils {
 
     /** System property Key of the fork method */
     public static final String FORK_METHOD_KEY = "pas.launcher.forkas.method";
+
     /** System property value of the fork method */
     private static final ForkMethod FORK_METHOD_VALUE;
+
     /** OS Process builder factory */
     private static PAOSProcessBuilderFactory OSBuilderFactory = null;
 
@@ -75,12 +66,14 @@ public final class ForkerUtils {
         } else {
             FORK_METHOD_VALUE = ForkMethod.PWD;
             logger.debug("Java Property " + FORK_METHOD_KEY +
-                " is not set or uses invalid value. Fallback to method password");
+                         " is not set or uses invalid value. Fallback to method password");
         }
     }
 
     public enum ForkMethod {
-        NONE("none"), PWD("pwd"), KEY("key");
+        NONE("none"),
+        PWD("pwd"),
+        KEY("key");
         private String value;
 
         ForkMethod(String value) {
@@ -125,8 +118,7 @@ public final class ForkerUtils {
      * @throws IllegalArgumentException if decrypter is null
      * @throws IllegalAccessException if node fork method is not set
      */
-    public static OSUser checkConfigAndGetUser(Decrypter decrypter) throws IllegalAccessException,
-            KeyException {
+    public static OSUser checkConfigAndGetUser(Decrypter decrypter) throws IllegalAccessException, KeyException {
         if (decrypter != null) {
             CredData data = decrypter.decrypt();
 
@@ -140,8 +132,7 @@ public final class ForkerUtils {
             }
             if (ForkMethod.PWD == FORK_METHOD_VALUE) {
                 if (data.getPassword() == null) {
-                    throw new IllegalAccessException(
-                        "Password not found in Credentials, cannot fork using password");
+                    throw new IllegalAccessException("Password not found in Credentials, cannot fork using password");
                 }
                 OSUser u = new OSUser(data.getLogin(), data.getPassword());
                 if (data.getDomain() != null) {
@@ -151,8 +142,7 @@ public final class ForkerUtils {
             }
             if (ForkMethod.KEY == FORK_METHOD_VALUE) {
                 if (data.getKey() == null) {
-                    throw new IllegalAccessException(
-                        "SSH key not found in Credentials, cannot fork using ssh Key");
+                    throw new IllegalAccessException("SSH key not found in Credentials, cannot fork using ssh Key");
                 }
                 OSUser u = new OSUser(data.getLogin(), data.getKey());
                 if (data.getDomain() != null) {
@@ -160,8 +150,8 @@ public final class ForkerUtils {
                 }
                 return u;
             }
-            throw new IllegalAccessException("Cannot fork under " + data.getLogin() + ", Property " +
-                FORK_METHOD_KEY + " is not configured.");
+            throw new IllegalAccessException("Cannot fork under " + data.getLogin() + ", Property " + FORK_METHOD_KEY +
+                                             " is not configured.");
         } else {
             throw new IllegalArgumentException("Decrypter could not be null");
         }

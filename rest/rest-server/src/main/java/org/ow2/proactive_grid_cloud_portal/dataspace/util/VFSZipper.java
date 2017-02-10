@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive_grid_cloud_portal.dataspace.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -23,6 +48,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 
+
 public class VFSZipper {
 
     private VFSZipper() {
@@ -34,16 +60,14 @@ public class VFSZipper {
             Zipper.GZIP.zip(fo.getContent().getInputStream(), os);
         }
 
-        public static void unzip(InputStream is, FileObject outputFile) throws FileSystemException,
-                IOException {
+        public static void unzip(InputStream is, FileObject outputFile) throws FileSystemException, IOException {
             Zipper.GZIP.unzip(is, outputFile.getContent().getOutputStream());
         }
     }
 
     public static class ZIP {
 
-        public static void zip(FileObject root, List<FileObject> children, OutputStream os)
-                throws IOException {
+        public static void zip(FileObject root, List<FileObject> children, OutputStream os) throws IOException {
             checkNotNull(root);
             checkNotNull(children);
             checkNotNull(os);
@@ -54,12 +78,12 @@ public class VFSZipper {
                 closer.register(zos);
                 if (children.size() == 1) {
                     FileObject ffo = children.get(0);
-                    Zipper.ZIP.writeZipEntry(new ZipEntry(ffo.getName().getBaseName()), ffo.getContent()
-                            .getInputStream(), zos);
+                    Zipper.ZIP.writeZipEntry(new ZipEntry(ffo.getName().getBaseName()),
+                                             ffo.getContent().getInputStream(),
+                                             zos);
                 } else {
                     for (FileObject ffo : children) {
-                        Zipper.ZIP.writeZipEntry(zipEntry(basePath, ffo), ffo.getContent().getInputStream(),
-                                zos);
+                        Zipper.ZIP.writeZipEntry(zipEntry(basePath, ffo), ffo.getContent().getInputStream(), zos);
                     }
                 }
             } catch (IOException ioe) {
@@ -74,8 +98,7 @@ public class VFSZipper {
             return new ZipEntry(name);
         }
 
-        public static void unzip(InputStream is, FileObject outfileObj) throws FileSystemException,
-                IOException {
+        public static void unzip(InputStream is, FileObject outfileObj) throws FileSystemException, IOException {
             Closer closer = Closer.create();
             try {
                 ZipInputStream zis = new ZipInputStream(is);

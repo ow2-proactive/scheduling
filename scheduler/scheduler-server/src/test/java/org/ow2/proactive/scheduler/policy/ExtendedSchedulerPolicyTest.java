@@ -1,40 +1,38 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.scheduler.policy;
+
+import static org.junit.Assert.*;
+import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_INFO_START_AT_KEY;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,15 +48,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_INFO_START_AT_KEY;
-
 
 /**
  * Unit tests for ExtendedSchedulerPolicy class.
@@ -66,7 +55,9 @@ import static org.ow2.proactive.scheduler.common.task.CommonAttribute.GENERIC_IN
 public class ExtendedSchedulerPolicyTest {
 
     private ExtendedSchedulerPolicy policy;
+
     private String now;
+
     private String later;
 
     private int jobId = 0;
@@ -163,8 +154,7 @@ public class ExtendedSchedulerPolicyTest {
 
     @Test
     public void testMalformedTaskStartAt() {
-        List<JobDescriptor> jobDescList = asModifiableList(
-                createJobDescWithTwoTasks(later, now, "malformed-start-at"));
+        List<JobDescriptor> jobDescList = asModifiableList(createJobDescWithTwoTasks(later, now, "malformed-start-at"));
         LinkedList<EligibleTaskDescriptor> orderedTasks = policy.getOrderedTasks(jobDescList);
         assertTrue(orderedTasks != null && orderedTasks.size() == 2);
     }
@@ -196,10 +186,12 @@ public class ExtendedSchedulerPolicyTest {
         return taskDescList.get(0);
     }
 
-    private JobDescriptor createJobDescWithTwoTasks(String jobStartAt, String oneTaskStartAt,
-            String otherTaskStartAt) {
+    private JobDescriptor createJobDescWithTwoTasks(String jobStartAt, String oneTaskStartAt, String otherTaskStartAt) {
 
-        InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test", JobPriority.NORMAL, OnTaskError.CANCEL_JOB, "");
+        InternalTaskFlowJob taskFlowJob = new InternalTaskFlowJob("test",
+                                                                  JobPriority.NORMAL,
+                                                                  OnTaskError.CANCEL_JOB,
+                                                                  "");
         taskFlowJob.setId(JobIdImpl.makeJobId(Integer.toString(jobId++)));
 
         ArrayList<InternalTask> tasks = new ArrayList<>();
@@ -215,8 +207,10 @@ public class ExtendedSchedulerPolicyTest {
     }
 
     private InternalScriptTask createTask(String taskStartAt) {
-        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
-                "description");
+        InternalJob job = new InternalTaskFlowJob("test-name",
+                                                  JobPriority.NORMAL,
+                                                  OnTaskError.CANCEL_JOB,
+                                                  "description");
         InternalScriptTask task1 = new InternalScriptTask(job);
         if (taskStartAt != null) {
             task1.addGenericInformation("START_AT", taskStartAt);

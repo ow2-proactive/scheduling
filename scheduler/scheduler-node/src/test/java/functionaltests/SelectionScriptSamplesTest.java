@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package functionaltests;
 
 import java.io.File;
@@ -11,17 +36,19 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.scripting.InvalidScriptException;
 import org.python.icu.impl.Assert;
+
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
+
 
 /**
  * This class is in charge to evaluate all selection scripts available in
@@ -70,7 +97,8 @@ public class SelectionScriptSamplesTest {
     }
 
     @Test
-    public void testSelectionScriptValidity() throws IOException, NodeException, InvalidScriptException, ClassNotFoundException, InterruptedException {
+    public void testSelectionScriptValidity()
+            throws IOException, NodeException, InvalidScriptException, ClassNotFoundException, InterruptedException {
         log.info("Evaluating " + selectionScript);
 
         try {
@@ -80,8 +108,8 @@ public class SelectionScriptSamplesTest {
         }
     }
 
-    public static void evaluateSelectionScript(
-            Path selectionScript) throws IOException, InterruptedException, ScriptEvaluationException {
+    public static void evaluateSelectionScript(Path selectionScript)
+            throws IOException, InterruptedException, ScriptEvaluationException {
         Process process = forkEvaluation(selectionScript);
 
         int exitCode = process.waitFor();
@@ -101,10 +129,11 @@ public class SelectionScriptSamplesTest {
         String classpath = System.getProperty("java.class.path");
         String className = SelectionScriptEvaluator.class.getCanonicalName();
 
-        ProcessBuilder builder =
-                new ProcessBuilder(
-                        javaBin, "-cp", classpath,
-                        className, selectionScript.toAbsolutePath().toString());
+        ProcessBuilder builder = new ProcessBuilder(javaBin,
+                                                    "-cp",
+                                                    classpath,
+                                                    className,
+                                                    selectionScript.toAbsolutePath().toString());
 
         builder.directory(new File(PA_SCHEDULER_HOME));
         return builder.start();
@@ -113,13 +142,13 @@ public class SelectionScriptSamplesTest {
     private static List<Path> getSelectionScriptsToTest() throws IOException {
         ImmutableList.Builder<Path> result = ImmutableList.builder();
 
-        try (DirectoryStream<Path> directoryStream =
-                     Files.newDirectoryStream(
-                             Paths.get(PA_SCHEDULER_HOME, "samples", "scripts", "selection"))) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(PA_SCHEDULER_HOME,
+                                                                                        "samples",
+                                                                                        "scripts",
+                                                                                        "selection"))) {
             for (Path path : directoryStream) {
-                if (Files.isRegularFile(path)
-                        && !com.google.common.io.Files.getFileExtension(
-                        path.getFileName().toString()).equals("txt")) {
+                if (Files.isRegularFile(path) &&
+                    !com.google.common.io.Files.getFileExtension(path.getFileName().toString()).equals("txt")) {
                     result.add(path);
                 }
             }

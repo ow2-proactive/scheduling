@@ -105,4 +105,3 @@ rootProject.dist.dependsOn project.proActiveWar
 artifacts {
     jar
 }
-

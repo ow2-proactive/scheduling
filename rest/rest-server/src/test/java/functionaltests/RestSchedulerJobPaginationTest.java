@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $PROACTIVE_INITIAL_DEV$
  */
 package functionaltests;
 
@@ -170,29 +159,25 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         pending = true;
         running = true;
         finished = true;
-        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" +
-            finished);
+        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" + finished);
         checkRevisionJobsInfo(url, "1", "2", "3");
 
         pending = false;
         running = true;
         finished = true;
-        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" +
-            finished);
+        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" + finished);
         checkRevisionJobsInfo(url, "1");
 
         pending = true;
         running = false;
         finished = true;
-        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" +
-            finished);
+        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" + finished);
         checkRevisionJobsInfo(url, "2", "3");
 
         pending = false;
         running = false;
         finished = true;
-        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" +
-            finished);
+        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" + finished);
         checkRevisionJobsInfo(url);
     }
 
@@ -206,27 +191,23 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         pending = true;
         running = true;
         finished = true;
-        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" +
-            finished);
+        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" + finished);
         checkRevisionJobsInfo(url, "1", "2", "3");
 
         pending = false;
         running = false;
         finished = true;
-        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" +
-            finished);
+        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" + finished);
         checkRevisionJobsInfo(url, "1", "2", "3");
 
         pending = true;
         running = true;
         finished = false;
-        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" +
-            finished);
+        url = getResourceUrl("revisionjobsinfo?pending=" + pending + "&running=" + running + "&finished=" + finished);
         checkRevisionJobsInfo(url);
     }
 
-    private void checkJob(JSONObject job, JobStatus status, int runningTasks, int finishedTasks)
-            throws Exception {
+    private void checkJob(JSONObject job, JobStatus status, int runningTasks, int finishedTasks) throws Exception {
         Assert.assertEquals("1", job.get("jobid"));
         Assert.assertEquals(getLogin(), job.get("jobOwner"));
         JSONObject jobInfo = (JSONObject) job.get("jobInfo");
@@ -267,8 +248,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
         checkJobIds(true, 0, 10, "3", "2", "1");
     }
 
-    private void checkJobIds(boolean indexAndRange, int index, int limit, String... expectedIds)
-            throws Exception {
+    private void checkJobIds(boolean indexAndRange, int index, int limit, String... expectedIds) throws Exception {
         JSONObject page;
         JSONArray jobs;
 
@@ -327,9 +307,7 @@ public class RestSchedulerJobPaginationTest extends AbstractRestFuncTestCase {
             JSONObject job = (JSONObject) jobs.get(i);
             actual.add((String) job.get("jobid"));
         }
-        Assert
-                .assertEquals("Unexpected result of 'revisionjobsinfo' request (" + url + ")", expected,
-                        actual);
+        Assert.assertEquals("Unexpected result of 'revisionjobsinfo' request (" + url + ")", expected, actual);
     }
 
 }

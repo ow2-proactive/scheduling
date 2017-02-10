@@ -1,4 +1,34 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.task;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -7,13 +37,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.*;
-import org.ow2.proactive.scripting.helper.progress.ProgressFile;
 import org.junit.rules.TemporaryFolder;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
+import org.ow2.proactive.scripting.helper.progress.ProgressFile;
 
 
 /**
@@ -48,7 +73,7 @@ public class ProgressFileReaderTest {
 
         int lastProgressValue = -1;
 
-        for (int i=1; i <= NB_UPDATES; i++) {
+        for (int i = 1; i <= NB_UPDATES; i++) {
             lastProgressValue = i * (100 / NB_UPDATES);
             ProgressFile.setProgress(progressFile, lastProgressValue);
             TimeUnit.MILLISECONDS.sleep(SLEEP_TIMEOUT);
@@ -65,7 +90,7 @@ public class ProgressFileReaderTest {
         int lastProgressValue = -1;
         int nbValidValues = 0;
 
-        for (int i=1; i <= NB_UPDATES; i++) {
+        for (int i = 1; i <= NB_UPDATES; i++) {
             if (i % 2 == 0) {
                 ProgressFile.setProgress(progressFile, i * (100 / NB_UPDATES));
                 nbValidValues++;

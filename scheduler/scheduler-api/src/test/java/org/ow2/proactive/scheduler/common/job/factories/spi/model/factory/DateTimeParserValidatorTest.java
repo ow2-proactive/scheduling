@@ -38,13 +38,21 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class DateTimeParserValidatorTest {
 
     private static final String VALID_DATE_FORMAT = "yyyy-M-d";
+
     private static final String INVALID_DATE_FORMAT = "aa-bb-cc";
+
     private static final String VALID_DATE = "2014-01-01";
+
     private static final String VALID_LOWER_RANGE = "2013-01-01";
+
     private static final String VALID_UPPER_RANGE = "2015-01-01";
+
     private static final String VALID_DATE_OUT_OF_RANGE = "2012-12-24";
+
     private static final String INVALID_LOWER_RANGE = "2013";
+
     private static final String INVALID_UPPER_RANGE = "2015";
+
     private static final String INVALID_DATE = "2014";
 
     @Test
@@ -117,8 +125,8 @@ public class DateTimeParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
                                     VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
-                                    RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                    VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE +
+                                    RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE + "," +
+                                    VALID_UPPER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE_OUT_OF_RANGE);
     }
 
@@ -143,8 +151,8 @@ public class DateTimeParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
                                     VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
-                                    RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                    VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
+                                    RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE + "," +
+                                    VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE);
     }
 

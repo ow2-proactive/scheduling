@@ -1,40 +1,28 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import static org.junit.Assert.fail;
@@ -67,10 +55,13 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
+
 public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServer {
 
     private SchedulerStateRest schedulerRest;
+
     private SchedulerProxyUserInterface scheduler;
+
     private String sessionId;
 
     @BeforeClass
@@ -89,7 +80,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
 
     @Test
     public void testWhenSubmittingUsingAValidWfContentUrlThenAJobIdMustBeRetrieved() throws Exception {
-        when(scheduler.submit(Matchers.<Job>any())).thenReturn(new JobIdImpl(77L, "job"));
+        when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(77L, "job"));
 
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
         JobIdData jobId = schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
@@ -102,7 +93,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     @Test
     public void testWhenSubmittingConcurrentlyUsingAValidWfContentUrlAllValidJobIdsMustBeRetrieved() throws Exception {
         Integer NRO_THREADS = 100;
-        when(scheduler.submit(Matchers.<Job>any())).thenReturn(new JobIdImpl(55L, "job"));
+        when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(55L, "job"));
 
         final AtomicInteger successfullyFinished = new AtomicInteger(0);
         Runnable runnable = new Runnable() {
@@ -133,7 +124,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
 
     @Test
     public void testWhenSubmittingAValidTemplateWithoutVariablesThenTheDefaultJobVariableIsUsed() throws Exception {
-        when(scheduler.submit(Matchers.<Job>any())).thenReturn(new JobIdImpl(88L, "job"));
+        when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(88L, "job"));
         ArgumentCaptor<Job> argumentCaptor = ArgumentCaptor.forClass(Job.class);
 
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
@@ -151,13 +142,14 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
 
     @Test
     public void testWhenSubmittingAValidTemplateWithVariablesThenTheProvidedJobVariableIsUsed() throws Exception {
-        when(scheduler.submit(Matchers.<Job>any())).thenReturn(new JobIdImpl(99L, "job"));
+        when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(99L, "job"));
         ArgumentCaptor<Job> argumentCaptor = ArgumentCaptor.forClass(Job.class);
 
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
 
-        JobIdData response = schedulerRest.submitFromUrl(
-                sessionId, workflowUrl, getOneVariablePathSegment("var1", "value1"));
+        JobIdData response = schedulerRest.submitFromUrl(sessionId,
+                                                         workflowUrl,
+                                                         getOneVariablePathSegment("var1", "value1"));
 
         verify(scheduler).submit(argumentCaptor.capture());
         Job interceptedJob = argumentCaptor.getValue();
@@ -168,7 +160,6 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         Assert.assertEquals(99L, response.getId());
         Assert.assertEquals("job", response.getReadableName());
     }
-
 
     @Test(expected = JobCreationRestException.class)
     public void testWhenSubmittingACorruptWorkflowThenThrowException() throws Exception {

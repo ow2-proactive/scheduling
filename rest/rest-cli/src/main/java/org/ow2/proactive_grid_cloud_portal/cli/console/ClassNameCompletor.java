@@ -1,10 +1,28 @@
 /*
- * Copyright (c) 2002-2007, Marc Prud'hommeaux. All rights reserved.
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * This software is distributable under the BSD license. See the terms of the
- * BSD license in the documentation provided with this software.
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  */
-
 package org.ow2.proactive_grid_cloud_portal.cli.console;
 
 import java.io.*;
@@ -38,8 +56,7 @@ public class ClassNameCompletor extends SimpleCompletor {
     public static String[] getClassNames() throws IOException {
         Set urls = new HashSet();
 
-        for (ClassLoader loader = ClassNameCompletor.class.getClassLoader(); loader != null; loader = loader
-                .getParent()) {
+        for (ClassLoader loader = ClassNameCompletor.class.getClassLoader(); loader != null; loader = loader.getParent()) {
             if (!(loader instanceof URLClassLoader)) {
                 continue;
             }
@@ -53,8 +70,7 @@ public class ClassNameCompletor extends SimpleCompletor {
         Class[] systemClasses = new Class[] { String.class, javax.swing.JFrame.class };
 
         for (int i = 0; i < systemClasses.length; i++) {
-            URL classURL = systemClasses[i].getResource("/" + systemClasses[i].getName().replace('.', '/') +
-                ".class");
+            URL classURL = systemClasses[i].getResource("/" + systemClasses[i].getName().replace('.', '/') + ".class");
 
             if (classURL != null) {
                 URLConnection uc = (URLConnection) classURL.openConnection();

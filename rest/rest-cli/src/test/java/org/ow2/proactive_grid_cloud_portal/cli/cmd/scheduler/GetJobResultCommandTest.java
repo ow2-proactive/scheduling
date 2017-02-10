@@ -1,40 +1,28 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2012 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.scheduler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,7 +47,6 @@ import objectFaker.DataFaker;
 import objectFaker.propertyGenerator.PrefixPropertyGenerator;
 
 
-
 public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
 
     protected JobResultData jobResult;
@@ -73,8 +60,7 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
         DataFaker<JobResultData> jobResultFaker = new DataFaker<JobResultData>(JobResultData.class);
         jobResultFaker.setGenerator("id.readableName", new PrefixPropertyGenerator("job", 1));
         jobResultFaker.setGenerator("allResults.key", new PrefixPropertyGenerator("task", 1));
-        jobResultFaker.setGenerator("allResults.value.id.readableName",
-                new PrefixPropertyGenerator("task", 1));
+        jobResultFaker.setGenerator("allResults.value.id.readableName", new PrefixPropertyGenerator("task", 1));
 
         jobResult = jobResultFaker.fake();
 
@@ -119,16 +105,17 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
         System.out.println(out);
 
         assertThat(out,
-                equalTo("An error occurred while retrieving job('2') result:" + System.lineSeparator() +
-                    "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
-                    "You can enable debug mode for getting more information using -X or --debug option." +
-                    System.lineSeparator()));
+                   equalTo("An error occurred while retrieving job('2') result:" + System.lineSeparator() +
+                           "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
+                           "You can enable debug mode for getting more information using -X or --debug option." +
+                           System.lineSeparator()));
     }
 
     @Test
     public void testCommandJobIdUnknownTag() throws Exception {
-        when(restApi.taskResultByTag(anyString(), eq(jobId), eq(unknownTag)))
-                .thenReturn(new ArrayList<TaskResultData>());
+        when(restApi.taskResultByTag(anyString(),
+                                     eq(jobId),
+                                     eq(unknownTag))).thenReturn(new ArrayList<TaskResultData>());
         executeTest(jobId, unknownTag);
 
         String out = capturedOutput.toString();
@@ -139,18 +126,17 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandUnknownJobIdUnknownTag() throws Exception {
-        when(restApi.taskResultByTag(anyString(), eq(unknownJobId), anyString()))
-                .thenThrow(exceptionUnknownJob);
+        when(restApi.taskResultByTag(anyString(), eq(unknownJobId), anyString())).thenThrow(exceptionUnknownJob);
         executeTest(unknownJobId, unknownTag);
 
         String out = capturedOutput.toString();
         System.out.println(out);
 
         assertThat(out,
-                equalTo("An error occurred while retrieving job('2') result:" + System.lineSeparator() +
-                    "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
-                    "You can enable debug mode for getting more information using -X or --debug option." +
-                    System.lineSeparator()));
+                   equalTo("An error occurred while retrieving job('2') result:" + System.lineSeparator() +
+                           "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
+                           "You can enable debug mode for getting more information using -X or --debug option." +
+                           System.lineSeparator()));
     }
 
     @Ignore

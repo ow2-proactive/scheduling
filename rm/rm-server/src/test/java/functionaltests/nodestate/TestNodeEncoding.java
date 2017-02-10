@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.nodestate;
 
@@ -92,11 +81,10 @@ public class TestNodeEncoding extends RMFunctionalTest {
 
         String nodeUrl = createNodeSourceWithOneLocalNode();
 
-        List<ScriptResult<Object>> results =
-                resourceManager.executeScript(
-                        "import org.ow2.proactive.utils.PAProperties; print PAProperties.getFileEncoding()",
-                        "groovy", TargetType.NODE_URL.name(),
-                        ImmutableSet.of(nodeUrl));
+        List<ScriptResult<Object>> results = resourceManager.executeScript("import org.ow2.proactive.utils.PAProperties; print PAProperties.getFileEncoding()",
+                                                                           "groovy",
+                                                                           TargetType.NODE_URL.name(),
+                                                                           ImmutableSet.of(nodeUrl));
 
         Assert.assertTrue(!results.isEmpty());
         Assert.assertEquals(FILE_ENCODING_NAME, results.get(0).getOutput());
@@ -110,22 +98,16 @@ public class TestNodeEncoding extends RMFunctionalTest {
     }
 
     protected String createNodeSourceWithOneLocalNode() throws Exception {
-        byte[] credentials =
-                FileToBytesConverter.convertFileToByteArray(
-                        new File(PAResourceManagerProperties.getAbsolutePath(
-                                PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        byte[] credentials = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
 
-        String javaProperty =
-                "-D" + PAProperties.KEY_PA_FILE_ENCODING + "=" + FILE_ENCODING_NAME;
+        String javaProperty = "-D" + PAProperties.KEY_PA_FILE_ENCODING + "=" + FILE_ENCODING_NAME;
 
-        rmHelper.getResourceManager(TestUsers.TEST, javaProperty).createNodeSource(
-                "testEncoding", LocalInfrastructure.class.getName(),
-                new Object[]{
-                        credentials,
-                        1,
-                        RMTHelper.DEFAULT_NODES_TIMEOUT,
-                        ""},
-                StaticPolicy.class.getName(), null);
+        rmHelper.getResourceManager(TestUsers.TEST, javaProperty)
+                .createNodeSource("testEncoding",
+                                  LocalInfrastructure.class.getName(),
+                                  new Object[] { credentials, 1, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
+                                  StaticPolicy.class.getName(),
+                                  null);
 
         rmHelper.waitForNodeSourceCreation("testEncoding");
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);

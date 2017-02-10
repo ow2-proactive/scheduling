@@ -1,6 +1,45 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.smartproxy.common;
 
-import com.google.common.net.UrlEscapers;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.base.Throwables.propagateIfInstanceOf;
+import static org.ow2.proactive.scheduler.common.SchedulerEvent.*;
+
+import java.io.File;
+import java.security.KeyException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import javax.security.auth.login.LoginException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.ConnectionInfo;
@@ -18,19 +57,7 @@ import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
-import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.security.KeyException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.base.Throwables.propagate;
-import static com.google.common.base.Throwables.propagateIfInstanceOf;
-import static org.ow2.proactive.scheduler.common.SchedulerEvent.*;
+import com.google.common.net.UrlEscapers;
 
 
 /**
@@ -44,25 +71,42 @@ import static org.ow2.proactive.scheduler.common.SchedulerEvent.*;
 public abstract class AbstractSmartProxy<T extends JobTracker> implements Scheduler, SchedulerEventListener {
 
     public static final String GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME = "client_input_data_folder";
-    public static final String GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME = "client_output_data_folder";
-    public static final String GENERIC_INFO_PUSH_URL_PROPERTY_NAME = "push_url";
-    public static final String GENERIC_INFO_PULL_URL_PROPERTY_NAME = "pull_url";
-    public static final int MAX_NB_OF_DATA_TRANSFER_THREADS = 3 * Runtime.getRuntime().availableProcessors();
-    protected static final SchedulerEvent[] PROXY_SCHED_EVENTS = new SchedulerEvent[] {
-            JOB_RUNNING_TO_FINISHED, JOB_PENDING_TO_RUNNING, JOB_PENDING_TO_FINISHED, JOB_PAUSED, JOB_RESUMED,
-            TASK_PENDING_TO_RUNNING, KILLED, SHUTDOWN, SHUTTING_DOWN, STOPPED, RESUMED,
-            TASK_RUNNING_TO_FINISHED, TASK_PROGRESS, JOB_RESTARTED_FROM_ERROR, JOB_IN_ERROR, TASK_IN_ERROR };
-    private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
-    protected T jobTracker;
-    protected ConnectionInfo connectionInfo;
-    protected Set<SchedulerEventListenerExtended> eventListeners = Collections
-            .synchronizedSet(new HashSet<SchedulerEventListenerExtended>());
-    private ThreadFactory threadFactory = new NamedThreadFactory("SmartProxyDataTransferThread");
-    protected final ExecutorService threadPool = Executors.newFixedThreadPool(MAX_NB_OF_DATA_TRANSFER_THREADS,
-            threadFactory);
 
+    public static final String GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME = "client_output_data_folder";
+
+    public static final String GENERIC_INFO_PUSH_URL_PROPERTY_NAME = "push_url";
+
+    public static final String GENERIC_INFO_PULL_URL_PROPERTY_NAME = "pull_url";
+
+    public static final int MAX_NB_OF_DATA_TRANSFER_THREADS = 3 * Runtime.getRuntime().availableProcessors();
+
+    protected static final SchedulerEvent[] PROXY_SCHED_EVENTS = new SchedulerEvent[] { JOB_RUNNING_TO_FINISHED,
+                                                                                        JOB_PENDING_TO_RUNNING,
+                                                                                        JOB_PENDING_TO_FINISHED,
+                                                                                        JOB_PAUSED, JOB_RESUMED,
+                                                                                        TASK_PENDING_TO_RUNNING, KILLED,
+                                                                                        SHUTDOWN, SHUTTING_DOWN,
+                                                                                        STOPPED, RESUMED,
+                                                                                        TASK_RUNNING_TO_FINISHED,
+                                                                                        TASK_PROGRESS,
+                                                                                        JOB_RESTARTED_FROM_ERROR,
+                                                                                        JOB_IN_ERROR, TASK_IN_ERROR };
+
+    private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
+
+    protected T jobTracker;
+
+    protected ConnectionInfo connectionInfo;
+
+    protected Set<SchedulerEventListenerExtended> eventListeners = Collections.synchronizedSet(new HashSet<SchedulerEventListenerExtended>());
+
+    private ThreadFactory threadFactory = new NamedThreadFactory("SmartProxyDataTransferThread");
+
+    protected final ExecutorService threadPool = Executors.newFixedThreadPool(MAX_NB_OF_DATA_TRANSFER_THREADS,
+                                                                              threadFactory);
 
     private boolean initialized = false;
+
     private boolean terminated = false;
 
     public AbstractSmartProxy() {
@@ -138,8 +182,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public String getJobServerLogs(String id)
-            throws UnknownJobException, NotConnectedException, PermissionException {
+    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException, PermissionException {
         return getScheduler().getJobServerLogs(id);
     }
 
@@ -157,8 +200,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
-            List<SortParameter<JobSortParameter>> sortParameters)
-                    throws NotConnectedException, PermissionException {
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         return getScheduler().getJobs(offset, limit, filterCriteria, sortParameters);
     }
 
@@ -199,10 +241,15 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * @throws Exception
      */
     public JobId submit(TaskFlowJob job, String localInputFolderPath, String localOutputFolderPath,
-            boolean isolateTaskOutputs, boolean automaticTransfer) throws NotConnectedException,
-                    PermissionException, SubmissionClosedException, JobCreationException, Exception {
-        return submit(job, localInputFolderPath, null, localOutputFolderPath, null, isolateTaskOutputs,
-                automaticTransfer);
+            boolean isolateTaskOutputs, boolean automaticTransfer) throws NotConnectedException, PermissionException,
+            SubmissionClosedException, JobCreationException, Exception {
+        return submit(job,
+                      localInputFolderPath,
+                      null,
+                      localOutputFolderPath,
+                      null,
+                      isolateTaskOutputs,
+                      automaticTransfer);
     }
 
     /**
@@ -221,9 +268,9 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    public JobId submit(TaskFlowJob job, String localInputFolderPath, String pushUrl,
-            String localOutputFolderPath, String pullUrl, boolean isolateTaskOutputs,
-            boolean automaticTransfer) throws Exception, SubmissionClosedException, JobCreationException {
+    public JobId submit(TaskFlowJob job, String localInputFolderPath, String pushUrl, String localOutputFolderPath,
+            String pullUrl, boolean isolateTaskOutputs, boolean automaticTransfer)
+            throws Exception, SubmissionClosedException, JobCreationException {
         checkInitialized();
 
         if (isNullOrEmpty(pushUrl)) {
@@ -234,8 +281,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         }
         String newFolderName = createNewFolderName();
         String pushUrlUpdate = prepareJobInput(job, localInputFolderPath, pushUrl, newFolderName);
-        String pullUrlUpdate = prepareJobOutput(job, localOutputFolderPath, pullUrl, newFolderName,
-                isolateTaskOutputs);
+        String pullUrlUpdate = prepareJobOutput(job, localOutputFolderPath, pullUrl, newFolderName, isolateTaskOutputs);
         uploadInputfiles(job, localInputFolderPath);
         JobId id = null;
         try {
@@ -262,9 +308,16 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             awaitedTaskMap.put(t.getName(), new AwaitedTask(t.getName(), t.getOutputFilesList()));
         }
 
-        AwaitedJob awaitedJob = new AwaitedJob(id.toString(), localInputFolderPath, job.getInputSpace(),
-            pushUrlUpdate, localOutputFolderPath, job.getOutputSpace(), pullUrlUpdate, isolateTaskOutputs,
-            automaticTransfer, awaitedTaskMap);
+        AwaitedJob awaitedJob = new AwaitedJob(id.toString(),
+                                               localInputFolderPath,
+                                               job.getInputSpace(),
+                                               pushUrlUpdate,
+                                               localOutputFolderPath,
+                                               job.getOutputSpace(),
+                                               pullUrlUpdate,
+                                               isolateTaskOutputs,
+                                               automaticTransfer,
+                                               awaitedTaskMap);
         jobTracker.putAwaitedJob(id.toString(), awaitedJob);
 
         return id;
@@ -288,8 +341,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             throw new IllegalArgumentException("The job " + jobId + " is unknown or has been removed");
         }
         if (awaitedjob.isAutomaticTransfer()) {
-            throw new UnsupportedOperationException(
-                "Transfer of input files with job " + jobId + " is handled automatically.");
+            throw new UnsupportedOperationException("Transfer of input files with job " + jobId +
+                                                    " is handled automatically.");
         }
 
         String localOutFolderPath = null;
@@ -300,7 +353,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         }
         if (localOutFolderPath == null) {
             throw new IllegalArgumentException("The job " + awaitedjob.getJobId() +
-                " does not define an output folder on local machine, please provide an outputFolder.");
+                                               " does not define an output folder on local machine, please provide an outputFolder.");
         }
 
         downloadTaskOutputFiles(awaitedjob, jobId, t_name, localOutFolderPath);
@@ -308,8 +361,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     protected void checkInitialized() {
         if (terminated) {
-            throw new IllegalStateException(
-                "This SmartProxy instance has been terminated and cannot be used any more.");
+            throw new IllegalStateException("This SmartProxy instance has been terminated and cannot be used any more.");
         }
         if (!initialized) {
             throw new IllegalStateException("This SmartProxy instance has not been initialized.");
@@ -320,8 +372,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         this.initialized = initialized;
     }
 
-    protected void reinitializeState()
-            throws NotConnectedException, PermissionException {
+    protected void reinitializeState() throws NotConnectedException, PermissionException {
         jobTracker.loadJobs();
         registerAsListener();
         syncAwaitedJobs();
@@ -361,45 +412,42 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                         tres = getTaskResult(id, tname);
                         if (tres != null) {
                             log.debug("Synchonizing task " + tname + " of job " + id);
-                            taskStateUpdatedEvent(new NotificationData<>(
-                                SchedulerEvent.TASK_RUNNING_TO_FINISHED, ts.getTaskInfo()));
+                            taskStateUpdatedEvent(new NotificationData<>(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                                                                         ts.getTaskInfo()));
                         }
                     } catch (NotConnectedException e) {
                         e.printStackTrace();
                     } catch (UnknownJobException e) {
                         log.error("Could not retrieve output data for job " + id +
-                            " because this job is not known by the Scheduler. \n ", e);
+                                  " because this job is not known by the Scheduler. \n ", e);
                     } catch (UnknownTaskException e) {
                         log.error("Could not retrieve output data for task " + tname + " of job " + id +
-                            " because this task is not known by the Scheduler. \n ", e);
+                                  " because this task is not known by the Scheduler. \n ", e);
                     } catch (Exception e) {
-                        log.error("Unexpected error while getting the output data for task " + tname +
-                            " of job " + id, e);
+                        log.error("Unexpected error while getting the output data for task " + tname + " of job " + id,
+                                  e);
                     }
                 }
             }
 
             if (js.isFinished()) {
-                jobStateUpdatedEvent(
-                        new NotificationData<>(SchedulerEvent.JOB_RUNNING_TO_FINISHED, js.getJobInfo()));
+                jobStateUpdatedEvent(new NotificationData<>(SchedulerEvent.JOB_RUNNING_TO_FINISHED, js.getJobInfo()));
             }
         } catch (NotConnectedException e) {
-            log.error(
-                    "A connection error occured while trying to download output data of Job " + id +
-                        ". This job will remain in the list of awaited jobs. Another attempt to dowload the output data will be made next time the application is initialized. ",
-                    e);
+            log.error("A connection error occured while trying to download output data of Job " + id +
+                      ". This job will remain in the list of awaited jobs. Another attempt to dowload the output data will be made next time the application is initialized. ",
+                      e);
         } catch (UnknownJobException e) {
             log.error("Could not retrieve output data for job " + id +
-                " because this job is not known by the Scheduler. \n ", e);
+                      " because this job is not known by the Scheduler. \n ", e);
             log.warn("Job  " + id +
-                " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You could try to manually copy the data from the location  " +
-                awaitedJob.getPullURL());
+                     " will be removed from the known job list. The system will not attempt again to retrieve data for this job. You could try to manually copy the data from the location  " +
+                     awaitedJob.getPullURL());
             jobTracker.removeAwaitedJob(id);
         } catch (PermissionException e) {
-            log.error(
-                    "Could not retrieve output data for job " + id +
-                        " because you don't have permmission to access this job. You need to use the same connection credentials you used for submitting the job.  \n Another attempt to dowload the output data for this job will be made next time the application is initialized. ",
-                    e);
+            log.error("Could not retrieve output data for job " + id +
+                      " because you don't have permmission to access this job. You need to use the same connection credentials you used for submitting the job.  \n Another attempt to dowload the output data for this job will be made next time the application is initialized. ",
+                      e);
         }
     }
 
@@ -454,9 +502,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * @param isolateTaskOutputs task output isolation (see method submit)
      * @return a String representing the updated value of the pull_url
      */
-    protected String prepareJobOutput(TaskFlowJob job, String localOutputFolder, String pull_url,
-            String newFolderName, boolean isolateTaskOutputs)
-                    throws NotConnectedException, PermissionException {
+    protected String prepareJobOutput(TaskFlowJob job, String localOutputFolder, String pull_url, String newFolderName,
+            boolean isolateTaskOutputs) throws NotConnectedException, PermissionException {
         // if the job defines an output space
         // and the localOutputFolder is not null
         // create a remote folder for the output data
@@ -487,7 +534,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
             job.setOutputSpace(outputSpace_url_updated);
             job.addGenericInformation(GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME,
-                    new File(localOutputFolder).getAbsolutePath());
+                                      new File(localOutputFolder).getAbsolutePath());
             job.addGenericInformation(GENERIC_INFO_PULL_URL_PROPERTY_NAME, pull_url_updated);
         }
 
@@ -550,7 +597,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             createFolder(push_url_updated);
             job.setInputSpace(inputSpace_url_updated);
             job.addGenericInformation(GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME,
-                    new File(localInputFolder).getAbsolutePath());
+                                      new File(localInputFolder).getAbsolutePath());
 
             job.addGenericInformation(GENERIC_INFO_PUSH_URL_PROPERTY_NAME, push_url_updated);
         }
@@ -577,8 +624,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     // ******** Scheduler Event Listener *********************** //
 
-    public void addEventListener(SchedulerEventListenerExtended sel)
-            throws NotConnectedException, PermissionException {
+    public void addEventListener(SchedulerEventListenerExtended sel) throws NotConnectedException, PermissionException {
         eventListeners.add(sel);
     }
 
@@ -753,8 +799,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             case NOT_RESTARTED:
             case NOT_STARTED:
             case SKIPPED: {
-                log.debug("The task " + tname + " from job " + id +
-                    " couldn't start. No data will be transfered");
+                log.debug("The task " + tname + " from job " + id + " couldn't start. No data will be transfered");
                 jobTracker.removeAwaitedTask(id.toString(), tname);
                 break;
             }
@@ -766,7 +811,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                         downloadTaskOutputFiles(aj, id.toString(), tname, aj.getLocalOutputFolder());
                     } catch (Throwable t) {
                         log.error("Error while handling data for finished task " + tname + " for job " + id +
-                            ", task will be removed");
+                                  ", task will be removed");
                         jobTracker.removeAwaitedTask(id.toString(), tname);
                     }
                 }
@@ -780,7 +825,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                         downloadTaskOutputFiles(aj, id.toString(), tname, aj.getLocalOutputFolder());
                     } catch (Throwable t) {
                         log.error("Error while handling data for finished task " + tname + " for job " + id +
-                            ", task will be removed");
+                                  ", task will be removed");
                         jobTracker.removeAwaitedTask(id.toString(), tname);
                     }
                 }
@@ -815,7 +860,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
         if (scheduler == null) {
             throw new IllegalStateException("No connection to the scheduler has been established yet. " +
-                "Have you initialized the smartproxy with a call to the init method?");
+                                            "Have you initialized the smartproxy with a call to the init method?");
         }
 
         return scheduler;
@@ -847,12 +892,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     protected abstract void downloadTaskOutputFiles(AwaitedJob awaitedjob, String jobId, String t_name,
             String localFolder) throws Exception;
 
-    public abstract JobId submit(Job job) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException;
+    public abstract JobId submit(Job job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     @Override
-    public JobResult getJobResult(String jobId)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         return getScheduler().getJobResult(jobId);
     }
 
@@ -865,8 +909,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public JobState getJobState(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().getJobState(jobId);
     }
 
@@ -887,9 +930,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            boolean getCurrentState, SchedulerEvent... events)
-                    throws NotConnectedException, PermissionException {
+    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
+            SchedulerEvent... events) throws NotConnectedException, PermissionException {
         return getScheduler().addEventListener(sel, myEventsOnly, getCurrentState, events);
     }
 
@@ -914,8 +956,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public boolean removeJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().removeJob(jobId);
     }
 
@@ -926,8 +967,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public boolean killJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().killJob(jobId);
     }
 
@@ -950,20 +990,18 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public boolean pauseJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().pauseJob(jobId);
     }
 
     @Override
-    public boolean resumeJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().resumeJob(jobId);
     }
 
     @Override
-    public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(String jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         getScheduler().changeJobPriority(jobId, priority);
     }
 
@@ -972,8 +1010,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     public abstract List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException;
 
     @Override
-    public JobResult getJobResult(JobId jobId)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         return getScheduler().getJobResult(jobId);
     }
 
@@ -1002,8 +1039,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public boolean removeJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().removeJob(jobId);
     }
 
@@ -1014,26 +1050,23 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public boolean killJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().killJob(jobId);
     }
 
     @Override
-    public boolean pauseJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().pauseJob(jobId);
     }
 
     @Override
-    public boolean resumeJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return getScheduler().resumeJob(jobId);
     }
 
     @Override
-    public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(JobId jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         getScheduler().changeJobPriority(jobId, priority);
     }
 

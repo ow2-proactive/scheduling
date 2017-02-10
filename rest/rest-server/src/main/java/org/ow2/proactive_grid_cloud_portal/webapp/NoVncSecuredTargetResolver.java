@@ -1,36 +1,27 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
@@ -41,6 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -52,10 +46,8 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+
 import com.netiq.websockify.IProxyTargetResolver;
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 
 
 /**
@@ -71,7 +63,9 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
     private static final String PLATFORM_INDEPENDENT_LINE_BREAK = "\r\n?|\n";
 
     private static final String PA_REMOTE_CONNECTION = "PA_REMOTE_CONNECTION";
+
     private static final String PA_REMOTE_CONNECTION_SEPARATOR = ";";
+
     private static final String PA_REMOTE_CONNECTION_HOST_PORT_SEPARATOR = ":";
 
     private static final String VNC_PROTOCOL = "vnc";
@@ -124,8 +118,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         return null;
     }
 
-    private InetSocketAddress resolveVncTargetFromLogs(List<String> paRemoteConnectionLines,
-            String jobId,
+    private InetSocketAddress resolveVncTargetFromLogs(List<String> paRemoteConnectionLines, String jobId,
             String taskId) {
         for (String paRemoteConnectionLine : paRemoteConnectionLines) {
             String[] paRemoteConnectionArgs = paRemoteConnectionLine.split(PA_REMOTE_CONNECTION);
@@ -137,7 +130,8 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
                     String type = paRemoteConnectionArgs[3];
                     String args = paRemoteConnectionArgs[4];
 
-                    if (jobIdFromRemoteConnectionArgs.equals(jobId) && taskIdFromRemoteConnectionArgs.equals(taskId) && VNC_PROTOCOL.equals(type)) {
+                    if (jobIdFromRemoteConnectionArgs.equals(jobId) && taskIdFromRemoteConnectionArgs.equals(taskId) &&
+                        VNC_PROTOCOL.equals(type)) {
                         String[] targetHostAndPort = args.split(PA_REMOTE_CONNECTION_HOST_PORT_SEPARATOR);
                         String vncHost = targetHostAndPort[0].trim();
                         String vncPort = targetHostAndPort[1].trim();
@@ -145,12 +139,12 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
                         return new InetSocketAddress(vncHost, Integer.parseInt(vncPort));
                     } else {
                         LOGGER.debug("Protocol or task unknown in PA_REMOTE_CONNECTION string (" +
-                            paRemoteConnectionLine + ")");
+                                     paRemoteConnectionLine + ")");
                     }
                 }
             }
-            LOGGER.debug("Missing arguments in PA_REMOTE_CONNECTION string, " + "(" + paRemoteConnectionLine +
-                ")" + "format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
+            LOGGER.debug("Missing arguments in PA_REMOTE_CONNECTION string, " + "(" + paRemoteConnectionLine + ")" +
+                         "format should be PA_REMOTE_CONNECTION;$taskId;vnc;host:port");
         }
         LOGGER.warn("Could not find the PA_REMOTE_CONNECTION string");
         return null;
@@ -173,8 +167,7 @@ public class NoVncSecuredTargetResolver implements IProxyTargetResolver {
         }
         if (paRemoteConnectionLines.isEmpty()) {
             if (taskResult != null && taskResult.getOutput() != null) {
-                paRemoteConnectionLines = retrievePaRemoteConnectionLines(taskResult.getOutput().getAllLogs(
-                        false));
+                paRemoteConnectionLines = retrievePaRemoteConnectionLines(taskResult.getOutput().getAllLogs(false));
             }
         }
         return paRemoteConnectionLines;

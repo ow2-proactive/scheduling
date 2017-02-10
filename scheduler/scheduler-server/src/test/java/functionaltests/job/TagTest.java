@@ -1,38 +1,28 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2013 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$PROACTIVE_INITIAL_DEV$$
  */
-
 package functionaltests.job;
 
 import static org.junit.Assert.assertEquals;
@@ -61,6 +51,7 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.tests.ProActiveTest;
 
+
 /**
  * This integration test creates different tasks and check that they're
  * tagged accordingly to their type
@@ -68,13 +59,14 @@ import org.ow2.tests.ProActiveTest;
  * @author sandrine
  *
  */
-public class TagTest extends ProActiveTest{
+public class TagTest extends ProActiveTest {
 
     /* mocks */
     protected TaskResultImpl resultMock = mock(TaskResultImpl.class);
-    protected SchedulerStateUpdate schedulerStateUpdateMock = mock(SchedulerStateUpdate.class);
-    protected ExecuterInformation executerInformationMock = mock(ExecuterInformation.class);
 
+    protected SchedulerStateUpdate schedulerStateUpdateMock = mock(SchedulerStateUpdate.class);
+
+    protected ExecuterInformation executerInformationMock = mock(ExecuterInformation.class);
 
     protected InternalTaskFlowJob job = null;
 
@@ -83,19 +75,19 @@ public class TagTest extends ProActiveTest{
         job = new InternalTaskFlowJob();
     }
 
-
-    private InternalScriptTask createTask(String name, InternalTask[] dependences, FlowBlock block, String matchingBlock) {
+    private InternalScriptTask createTask(String name, InternalTask[] dependences, FlowBlock block,
+            String matchingBlock) {
 
         InternalScriptTask result = new InternalScriptTask(job);
         result.setName(name);
 
-        if(dependences != null && dependences.length > 0){
-            for(InternalTask dep: dependences){
+        if (dependences != null && dependences.length > 0) {
+            for (InternalTask dep : dependences) {
                 result.addDependence(dep);
             }
         }
 
-        if(block != null){
+        if (block != null) {
             result.setFlowBlock(block);
             result.setMatchingBlock(matchingBlock);
         }
@@ -104,12 +96,10 @@ public class TagTest extends ProActiveTest{
         return result;
     }
 
-
-
-    private InternalScriptTask createLoopTask(String name, String scriptContent, InternalTask[] dependences, String targetName, boolean block)
-            throws InvalidScriptException {
+    private InternalScriptTask createLoopTask(String name, String scriptContent, InternalTask[] dependences,
+            String targetName, boolean block) throws InvalidScriptException {
         FlowBlock fb = null;
-        if(block){
+        if (block) {
             fb = FlowBlock.END;
         }
         InternalScriptTask result = createTask(name, dependences, fb, targetName);
@@ -119,49 +109,44 @@ public class TagTest extends ProActiveTest{
         return result;
     }
 
-
-    private InternalScriptTask createReplicateTask(String name, InternalTask[] dependences, FlowBlock block, String matchingBlock, int nbRuns)
-            throws InvalidScriptException {
+    private InternalScriptTask createReplicateTask(String name, InternalTask[] dependences, FlowBlock block,
+            String matchingBlock, int nbRuns) throws InvalidScriptException {
         InternalScriptTask result = createTask(name, dependences, block, matchingBlock);
         FlowScript replicate = FlowScript.createReplicateFlowScript("runs = " + nbRuns + ";");
         result.setFlowScript(replicate);
         return result;
     }
 
-
-
-    private void execute(InternalTask task){
+    private void execute(InternalTask task) {
         task.setExecuterInformation(executerInformationMock);
         job.startTask(task);
         FlowScript script = task.getFlowScript();
         FlowAction action = null;
-        if(script != null) {
+        if (script != null) {
             action = task.getFlowScript().execute().getResult();
         }
         job.terminateTask(false, task.getId(), schedulerStateUpdateMock, action, resultMock);
         System.out.println("executed " + task.getName() + " -> " + getTaskNameList(true));
     }
 
-
-    private void execute(String [] tasks) throws UnknownTaskException {
-        for(String currentTaskName: tasks){
+    private void execute(String[] tasks) throws UnknownTaskException {
+        for (String currentTaskName : tasks) {
             InternalTask currentTask = job.getTask(currentTaskName);
             execute(currentTask);
         }
     }
 
-
-    private String getTaskNameList(boolean showTags){
+    private String getTaskNameList(boolean showTags) {
         StringBuilder builder = new StringBuilder();
         ArrayList<InternalTask> tasks = job.getITasks();
-        if(tasks.size() > 0){
+        if (tasks.size() > 0) {
             builder.append(tasks.get(0).getName());
-            for(int i = 1; i < tasks.size(); i++){
+            for (int i = 1; i < tasks.size(); i++) {
                 InternalTask currentTask = tasks.get(i);
                 builder.append(", ");
                 builder.append(currentTask.getName());
-                if(showTags){
-                    if(currentTask.getTag() != null){
+                if (showTags) {
+                    if (currentTask.getTag() != null) {
                         builder.append("(");
                         builder.append(currentTask.getTag());
                         builder.append(")");
@@ -172,15 +157,14 @@ public class TagTest extends ProActiveTest{
         return builder.toString();
     }
 
-
     private void assertTags(String expectedTag, String[] taskNames) throws UnknownTaskException {
-        for(String currentTaskName: taskNames){
+        for (String currentTaskName : taskNames) {
             assertEquals(expectedTag, job.getTask(currentTaskName).getTag());
         }
     }
 
     private void assertTagsStartsWith(String expectedTag, String[] taskNames) throws UnknownTaskException {
-        for(String currentTaskName: taskNames){
+        for (String currentTaskName : taskNames) {
             assertTrue(job.getTask(currentTaskName).getTag().startsWith(expectedTag));
         }
     }
@@ -200,28 +184,28 @@ public class TagTest extends ProActiveTest{
     @Test
     public void testReplicationLoopTag() throws Exception {
         InternalTask task1 = createTask("T1", null, FlowBlock.START, "T3");
-        InternalTask task2 = createTask("T2", new InternalTask[]{task1}, null, null);
-        InternalTask task3 = createLoopTask("T3", "loop = true;", new InternalTask[]{task2}, "T1", true);
+        InternalTask task2 = createTask("T2", new InternalTask[] { task1 }, null, null);
+        InternalTask task3 = createLoopTask("T3", "loop = true;", new InternalTask[] { task2 }, "T1", true);
 
-        execute(new String[]{"T1", "T2", "T3", "T1#1", "T2#1", "T3#1"});
+        execute(new String[] { "T1", "T2", "T3", "T1#1", "T2#1", "T3#1" });
 
-        assertTags("LOOP-T3-1", new String[]{"T1#1", "T2#1", "T3#1"});
-        assertTags("LOOP-T3-2", new String[]{"T1#2", "T2#2", "T3#2"});
+        assertTags("LOOP-T3-1", new String[] { "T1#1", "T2#1", "T3#1" });
+        assertTags("LOOP-T3-2", new String[] { "T1#2", "T2#2", "T3#2" });
     }
 
     @Test
     public void testReplicationLoopSelfCronTag() throws Exception {
         InternalScriptTask task1 = createLoopTask("T1", "loop = '* * * * *'", null, "T1", false);
-        execute(new String[]{"T1", "T1#1"});
+        execute(new String[] { "T1", "T1#1" });
 
-        assertTagsStartsWith("LOOP-T1-", new String[]{"T1#1", "T1#2"});
+        assertTagsStartsWith("LOOP-T1-", new String[] { "T1#1", "T1#2" });
     }
 
     @Test
     public void testReplicationReplicateTag() throws Exception {
         InternalTask task1 = createReplicateTask("T1", null, null, null, 3);
-        InternalTask task2 = createTask("T2", new InternalTask[]{task1}, null, null);
-        InternalTask task3 = createTask("T3", new InternalTask[]{task2}, null, null);
+        InternalTask task2 = createTask("T2", new InternalTask[] { task1 }, null, null);
+        InternalTask task3 = createTask("T3", new InternalTask[] { task2 }, null, null);
 
         execute(task1);
 
@@ -230,13 +214,12 @@ public class TagTest extends ProActiveTest{
         assertEquals("REPLICATE-T1-2", job.getTask("T2*2").getTag());
     }
 
-
     @Test
     public void testReplicationReplicateBlockTag() throws Exception {
         InternalTask task1 = createReplicateTask("T1", null, null, null, 3);
-        InternalTask task2 = createTask("T2", new InternalTask[]{task1}, FlowBlock.START, "T4");
-        InternalTask task3 = createTask("T3", new InternalTask[]{task2}, null, null);
-        InternalTask task4 = createTask("T4", new InternalTask[]{task3}, FlowBlock.END, "T2");
+        InternalTask task2 = createTask("T2", new InternalTask[] { task1 }, FlowBlock.START, "T4");
+        InternalTask task3 = createTask("T3", new InternalTask[] { task2 }, null, null);
+        InternalTask task4 = createTask("T4", new InternalTask[] { task3 }, FlowBlock.END, "T2");
 
         execute(task1);
 
@@ -244,98 +227,91 @@ public class TagTest extends ProActiveTest{
         assertNull(job.getTask("T3").getTag());
         assertNull(job.getTask("T4").getTag());
 
-        assertTags("REPLICATE-T1-1", new String[]{"T2*1", "T3*1", "T4*1"});
-        assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2"});
+        assertTags("REPLICATE-T1-1", new String[] { "T2*1", "T3*1", "T4*1" });
+        assertTags("REPLICATE-T1-2", new String[] { "T2*2", "T3*2", "T4*2" });
     }
 
     @Test
     public void testReplicationReplicateCombinedTag() throws Exception {
         InternalTask T = createReplicateTask("T", null, FlowBlock.START, "T2", 3);
-        InternalTask T1 = createTask("T1", new InternalTask[]{T}, FlowBlock.START, "T5");
-        InternalTask T3 = createTask("T3", new InternalTask[]{T1}, null, null);
-        InternalTask T4 = createTask("T4", new InternalTask[]{T1}, null, null);
-        InternalTask T5 = createTask("T5", new InternalTask[]{T3, T4}, FlowBlock.END, "T1");
-        InternalTask T2 = createLoopTask("T2", "loop = true;", new InternalTask[]{T5}, "T", true);
+        InternalTask T1 = createTask("T1", new InternalTask[] { T }, FlowBlock.START, "T5");
+        InternalTask T3 = createTask("T3", new InternalTask[] { T1 }, null, null);
+        InternalTask T4 = createTask("T4", new InternalTask[] { T1 }, null, null);
+        InternalTask T5 = createTask("T5", new InternalTask[] { T3, T4 }, FlowBlock.END, "T1");
+        InternalTask T2 = createLoopTask("T2", "loop = true;", new InternalTask[] { T5 }, "T", true);
 
-        execute(new String[]{"T", "T1", "T3", "T4", "T5",
-                "T1*1", "T3*1", "T4*1", "T5*1",
-                "T1*2", "T3*2", "T4*2", "T5*2",
-                "T2", "T#1", "T1#1", "T3#1", "T4#1", "T5#1",
-                "T1#1*1", "T3#1*1", "T4#1*1", "T5#1*1",
-                "T1#1*2", "T3#1*2", "T4#1*2", "T5#1*2"});
+        execute(new String[] { "T", "T1", "T3", "T4", "T5", "T1*1", "T3*1", "T4*1", "T5*1", "T1*2", "T3*2", "T4*2",
+                               "T5*2", "T2", "T#1", "T1#1", "T3#1", "T4#1", "T5#1", "T1#1*1", "T3#1*1", "T4#1*1",
+                               "T5#1*1", "T1#1*2", "T3#1*2", "T4#1*2", "T5#1*2" });
 
-        assertTags("REPLICATE-T-1", new String[]{"T1*1", "T3*1", "T4*1", "T5*1"});
-        assertTags("REPLICATE-T-2", new String[]{"T1*2", "T3*2", "T4*2", "T5*2"});
-        assertTags("LOOP-T2-1", new String[]{"T#1", "T1#1", "T3#1", "T4#1", "T5#1"});
-        assertTags("REPLICATE-T#1-1", new String[]{"T1#1*1", "T3#1*1", "T4#1*1", "T5#1*1"});
-        assertTags("REPLICATE-T#1-2", new String[]{"T1#1*2", "T3#1*2", "T4#1*2", "T5#1*2"});
+        assertTags("REPLICATE-T-1", new String[] { "T1*1", "T3*1", "T4*1", "T5*1" });
+        assertTags("REPLICATE-T-2", new String[] { "T1*2", "T3*2", "T4*2", "T5*2" });
+        assertTags("LOOP-T2-1", new String[] { "T#1", "T1#1", "T3#1", "T4#1", "T5#1" });
+        assertTags("REPLICATE-T#1-1", new String[] { "T1#1*1", "T3#1*1", "T4#1*1", "T5#1*1" });
+        assertTags("REPLICATE-T#1-2", new String[] { "T1#1*2", "T3#1*2", "T4#1*2", "T5#1*2" });
     }
 
     @Test
     public void testReplicationReplicateCombined2Tag() throws Exception {
         InternalTask T1 = createReplicateTask("T1", null, null, null, 3);
-        InternalTask T2 = createTask("T2", new InternalTask[]{T1}, FlowBlock.START, "T4");
-        InternalTask T3 = createTask("T3", new InternalTask[]{T2}, null, null);
-        InternalTask T4 = createLoopTask("T4", "loop = true;", new InternalTask[]{T3}, "T2", true);
+        InternalTask T2 = createTask("T2", new InternalTask[] { T1 }, FlowBlock.START, "T4");
+        InternalTask T3 = createTask("T3", new InternalTask[] { T2 }, null, null);
+        InternalTask T4 = createLoopTask("T4", "loop = true;", new InternalTask[] { T3 }, "T2", true);
 
-        execute(new String[]{"T1", "T2", "T3", "T4",
-                "T2#1", "T3#1", "T4#1",
-                "T2*1", "T3*1", "T4*1",
-                "T2#1*1", "T3#1*1", "T4#1*1",
-                "T2*2", "T3*2", "T4*2",
-                "T2#1*2", "T3#1*2", "T4#1*2"
-        });
+        execute(new String[] { "T1", "T2", "T3", "T4", "T2#1", "T3#1", "T4#1", "T2*1", "T3*1", "T4*1", "T2#1*1",
+                               "T3#1*1", "T4#1*1", "T2*2", "T3*2", "T4*2", "T2#1*2", "T3#1*2", "T4#1*2" });
 
-        assertTags("LOOP-T4-1", new String[]{"T2#1", "T3#1", "T4#1"});
-        assertTags("LOOP-T4-2", new String[]{"T2#2", "T3#2", "T4#2"});
-        assertTags("REPLICATE-T1-1", new String[]{"T2*1", "T3*1", "T4*1"});
-        assertTags("LOOP-T4*1-1", new String[]{"T2#1*1", "T3#1*1", "T4#1*1"});
-        assertTags("LOOP-T4*2-1", new String[]{"T2#1*2", "T3#1*2", "T4#1*2"});
-        assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2"});
-        assertTags("LOOP-T4*1-2", new String[]{"T2#2*1", "T3#2*1", "T4#2*1"});
-        assertTags("LOOP-T4*2-2", new String[]{"T2#2*2", "T3#2*2", "T4#2*2"});
+        assertTags("LOOP-T4-1", new String[] { "T2#1", "T3#1", "T4#1" });
+        assertTags("LOOP-T4-2", new String[] { "T2#2", "T3#2", "T4#2" });
+        assertTags("REPLICATE-T1-1", new String[] { "T2*1", "T3*1", "T4*1" });
+        assertTags("LOOP-T4*1-1", new String[] { "T2#1*1", "T3#1*1", "T4#1*1" });
+        assertTags("LOOP-T4*2-1", new String[] { "T2#1*2", "T3#1*2", "T4#1*2" });
+        assertTags("REPLICATE-T1-2", new String[] { "T2*2", "T3*2", "T4*2" });
+        assertTags("LOOP-T4*1-2", new String[] { "T2#2*1", "T3#2*1", "T4#2*1" });
+        assertTags("LOOP-T4*2-2", new String[] { "T2#2*2", "T3#2*2", "T4#2*2" });
     }
 
     @Test
     public void testReplicationReplicateDoubleTag() throws Exception {
         InternalTask T1 = createReplicateTask("T1", null, null, null, 3);
-        InternalTask T2 = createReplicateTask("T2", new InternalTask[]{T1}, FlowBlock.START, "T6", 3);
-        InternalTask T3 = createTask("T3", new InternalTask[]{T2}, FlowBlock.START, "T5");
-        InternalTask T4 = createTask("T4", new InternalTask[]{T3}, null, null);
-        InternalTask T5 = createTask("T5", new InternalTask[]{T4}, FlowBlock.END, "T3");
-        InternalTask T6 = createTask("T6", new InternalTask[]{T5}, FlowBlock.END, "T2");
+        InternalTask T2 = createReplicateTask("T2", new InternalTask[] { T1 }, FlowBlock.START, "T6", 3);
+        InternalTask T3 = createTask("T3", new InternalTask[] { T2 }, FlowBlock.START, "T5");
+        InternalTask T4 = createTask("T4", new InternalTask[] { T3 }, null, null);
+        InternalTask T5 = createTask("T5", new InternalTask[] { T4 }, FlowBlock.END, "T3");
+        InternalTask T6 = createTask("T6", new InternalTask[] { T5 }, FlowBlock.END, "T2");
 
-        execute(new String[]{"T1", "T2*1", "T2*2"});
+        execute(new String[] { "T1", "T2*1", "T2*2" });
 
-        assertTags("REPLICATE-T1-1", new String[]{"T2*1", "T3*1", "T4*1", "T5*1", "T6*1"});
-        assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2", "T5*2", "T6*2"});
-        assertTags("REPLICATE-T2*1-3", new String[]{"T3*3", "T4*3", "T5*3"});
-        assertTags("REPLICATE-T2*1-4", new String[]{"T3*4", "T4*4", "T5*4"});
-        assertTags("REPLICATE-T2*2-5", new String[]{"T3*5", "T4*5", "T5*5"});
-        assertTags("REPLICATE-T2*2-6", new String[]{"T3*6", "T4*6", "T5*6"});
+        assertTags("REPLICATE-T1-1", new String[] { "T2*1", "T3*1", "T4*1", "T5*1", "T6*1" });
+        assertTags("REPLICATE-T1-2", new String[] { "T2*2", "T3*2", "T4*2", "T5*2", "T6*2" });
+        assertTags("REPLICATE-T2*1-3", new String[] { "T3*3", "T4*3", "T5*3" });
+        assertTags("REPLICATE-T2*1-4", new String[] { "T3*4", "T4*4", "T5*4" });
+        assertTags("REPLICATE-T2*2-5", new String[] { "T3*5", "T4*5", "T5*5" });
+        assertTags("REPLICATE-T2*2-6", new String[] { "T3*6", "T4*6", "T5*6" });
     }
 
-
-    /*@Test
-    public void testReplicationLoopDoubleTag() throws Exception {
-        InternalTask T1 = createTask("T1", null, FlowBlock.START, "T5");
-        InternalTask T2 = createTask("T2", new InternalTask[]{T1}, FlowBlock.START, "T4");
-        InternalTask T3 = createTask("T3", new InternalTask[]{T2}, null, null);
-        InternalTask T4 = createLoopTask("T4", "loop = true;", new InternalTask[]{T3}, "T2", true);
-        InternalTask T5 = createLoopTask("T5", "loop = true;", new InternalTask[]{T4}, "T1", true);
-
-        job.getJobDescriptor().getEligibleTasks();
-
-
-        execute(new String[]{"T5"});
-
-        assertTags("REPLICATE-T1-1", new String[]{"T2*1", "T3*1", "T4*1", "T5*1", "T6*1"});
-        assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2", "T5*2", "T6*2"});
-        assertTags("REPLICATE-T2*1-3", new String[]{"T3*3", "T4*3", "T5*3"});
-        assertTags("REPLICATE-T2*1-4", new String[]{"T3*4", "T4*4", "T5*4"});
-        assertTags("REPLICATE-T2*2-5", new String[]{"T3*5", "T4*5", "T5*5"});
-        assertTags("REPLICATE-T2*2-6", new String[]{"T3*6", "T4*6", "T5*6"});
-    }*/
+    /*
+     * @Test
+     * public void testReplicationLoopDoubleTag() throws Exception {
+     * InternalTask T1 = createTask("T1", null, FlowBlock.START, "T5");
+     * InternalTask T2 = createTask("T2", new InternalTask[]{T1}, FlowBlock.START, "T4");
+     * InternalTask T3 = createTask("T3", new InternalTask[]{T2}, null, null);
+     * InternalTask T4 = createLoopTask("T4", "loop = true;", new InternalTask[]{T3}, "T2", true);
+     * InternalTask T5 = createLoopTask("T5", "loop = true;", new InternalTask[]{T4}, "T1", true);
+     * 
+     * job.getJobDescriptor().getEligibleTasks();
+     * 
+     * 
+     * execute(new String[]{"T5"});
+     * 
+     * assertTags("REPLICATE-T1-1", new String[]{"T2*1", "T3*1", "T4*1", "T5*1", "T6*1"});
+     * assertTags("REPLICATE-T1-2", new String[]{"T2*2", "T3*2", "T4*2", "T5*2", "T6*2"});
+     * assertTags("REPLICATE-T2*1-3", new String[]{"T3*3", "T4*3", "T5*3"});
+     * assertTags("REPLICATE-T2*1-4", new String[]{"T3*4", "T4*4", "T5*4"});
+     * assertTags("REPLICATE-T2*2-5", new String[]{"T3*5", "T4*5", "T5*5"});
+     * assertTags("REPLICATE-T2*2-6", new String[]{"T3*6", "T4*6", "T5*6"});
+     * }
+     */
 
     @Test
     public void testTaskLogger() throws InvalidScriptException, UnknownTaskException {

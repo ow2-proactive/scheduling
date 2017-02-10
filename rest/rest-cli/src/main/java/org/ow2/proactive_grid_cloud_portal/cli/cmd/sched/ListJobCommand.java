@@ -1,40 +1,28 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import java.io.IOException;
@@ -54,12 +42,15 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
+
 public class ListJobCommand extends AbstractCommand implements Command {
 
     private String[] filterings;
 
     private boolean offsetFlag = false;
+
     private int offset = -1;
+
     private int beginIndex = 0;
 
     public ListJobCommand() {
@@ -86,7 +77,9 @@ public class ListJobCommand extends AbstractCommand implements Command {
                     for (; iterCount < pages - 1; iterCount++) {
                         printJobsList(beginIndex + (iterCount * numOfJobsPerPage), numOfJobsPerPage, currentContext);
                         String response = readLine(currentContext,
-                                "Page(%d/%d). Press ENTER to continue. 'q' to quit. ", (iterCount + 1), pages);
+                                                   "Page(%d/%d). Press ENTER to continue. 'q' to quit. ",
+                                                   (iterCount + 1),
+                                                   pages);
                         if ("q".equalsIgnoreCase(response)) {
                             hasQuit = true;
                             break;
@@ -94,13 +87,13 @@ public class ListJobCommand extends AbstractCommand implements Command {
                     }
                     if (!hasQuit) {
                         // last page
-                        printJobsList(beginIndex + (iterCount * numOfJobsPerPage), numOfJobs - (iterCount * numOfJobsPerPage),
-                                currentContext);
+                        printJobsList(beginIndex + (iterCount * numOfJobsPerPage),
+                                      numOfJobs - (iterCount * numOfJobsPerPage),
+                                      currentContext);
                     }
                 }
             } else {
-                printJobsList(beginIndex, (offsetFlag) ? offset : RestConstants.DFLT_PAGINATION_SIZE,
-                        currentContext);
+                printJobsList(beginIndex, (offsetFlag) ? offset : RestConstants.DFLT_PAGINATION_SIZE, currentContext);
             }
         } catch (Exception e) {
             handleError("An error occurred while retrieving job list:", e, currentContext);
@@ -136,8 +129,15 @@ public class ListJobCommand extends AbstractCommand implements Command {
 
     private static void printJobsList(int index, int offset, ApplicationContext currentContext)
             throws PermissionRestException, NotConnectedRestException, IOException {
-        RestMapPage<Long, ArrayList<UserJobData>> page = currentContext.getRestClient().getScheduler()
-                .revisionAndJobsInfo(currentContext.getSessionId(), index, offset, false, true, true, true);
+        RestMapPage<Long, ArrayList<UserJobData>> page = currentContext.getRestClient()
+                                                                       .getScheduler()
+                                                                       .revisionAndJobsInfo(currentContext.getSessionId(),
+                                                                                            index,
+                                                                                            offset,
+                                                                                            false,
+                                                                                            true,
+                                                                                            true,
+                                                                                            true);
         Map<Long, ArrayList<UserJobData>> stateMap = page.getMap();
         List<UserJobData> jobs = stateMap.values().iterator().next();
         currentContext.getDevice().writeLine("%s", StringUtility.jobsAsString(jobs));
@@ -145,8 +145,11 @@ public class ListJobCommand extends AbstractCommand implements Command {
 
     private static int getNumberOfJobs(int index, int offset, ApplicationContext currentContext)
             throws NotConnectedRestException, PermissionRestException {
-        return currentContext.getRestClient().getScheduler()
-                .jobs(currentContext.getSessionId(), index, offset).getList().size();
+        return currentContext.getRestClient()
+                             .getScheduler()
+                             .jobs(currentContext.getSessionId(), index, offset)
+                             .getList()
+                             .size();
     }
 
     private static Integer valueAsInt(String nameValue) {

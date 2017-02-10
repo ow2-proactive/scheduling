@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.util;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -28,15 +53,17 @@ public class ServerJobAndTaskLogsTest {
     public TemporaryFolder fakeSchedulerHome = new TemporaryFolder();
 
     private JobLogger jobLogger;
+
     private TaskLogger taskLogger;
 
     private JobId jobId;
+
     private TaskId taskId;
 
     @Before
     public void setUp() {
-        PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION
-                .updateProperty(fakeSchedulerHome.getRoot().getAbsolutePath() + File.separator + "logs");
+        PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.updateProperty(fakeSchedulerHome.getRoot().getAbsolutePath() +
+                                                                         File.separator + "logs");
         // set a very small limit so that only 1 line would fit
         PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.updateProperty("10");
 
@@ -72,15 +99,13 @@ public class ServerJobAndTaskLogsTest {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogRelativePath(jobId))
-                .exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogRelativePath(jobId) + ".1")
-                .exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogRelativePath(taskId))
-                .exists());
-        assertTrue(
-                new File(ServerJobAndTaskLogs.getLogsLocation(), TaskLogger.getTaskLogRelativePath(taskId) + ".1")
-                        .exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogRelativePath(jobId)).exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(),
+                            JobLogger.getJobLogRelativePath(jobId) + ".1").exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(),
+                            TaskLogger.getTaskLogRelativePath(taskId)).exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(),
+                            TaskLogger.getTaskLogRelativePath(taskId) + ".1").exists());
 
         assertEquals(4, new File(ServerJobAndTaskLogs.getLogsLocation() + "/" + jobId).list().length);
 
@@ -105,17 +130,17 @@ public class ServerJobAndTaskLogsTest {
 
     private void checkContains(JobId jobId, TaskId taskId, String word) {
         assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
-                containsString(word + " job log"));
+                   containsString(word + " job log"));
         assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
-                containsString(word + " task log"));
+                   containsString(word + " task log"));
         assertThat(ServerJobAndTaskLogs.getTaskLog(taskId), containsString(word + " task log"));
     }
 
     private void checkDoesNotContain(JobId jobId, TaskId taskId, String word) {
         assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
-                not(containsString(word + " job log")));
+                   not(containsString(word + " job log")));
         assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
-                not(containsString(word + " task log")));
+                   not(containsString(word + " task log")));
         assertThat(ServerJobAndTaskLogs.getTaskLog(taskId), not(containsString(word + " task log")));
     }
 

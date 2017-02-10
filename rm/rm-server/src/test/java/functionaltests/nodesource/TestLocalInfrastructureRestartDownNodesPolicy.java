@@ -1,43 +1,34 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.nodesource;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
@@ -53,9 +44,8 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.File;
-
-import static org.junit.Assert.assertEquals;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 
 /**
@@ -75,13 +65,13 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
 
         // creating node source
         // first parameter of im is empty default rmHelper url
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
-                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rmHelper.getResourceManager().createNodeSource(
-                sourceName,
-                LocalInfrastructure.class.getName(),
-                new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
-                RestartDownNodesPolicy.class.getName(), policyParameters);
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        rmHelper.getResourceManager()
+                .createNodeSource(sourceName,
+                                  LocalInfrastructure.class.getName(),
+                                  new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
+                                  RestartDownNodesPolicy.class.getName(),
+                                  policyParameters);
 
         rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }
@@ -115,7 +105,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         nodeSourceName = "Node_source_1";
 
         RMTHelper.log("Test 1 - restart down nodes policy");
-        createNodeSourceWithNodes(nodeSourceName, new Object[]{"ALL", "ALL", "10000"});
+        createNodeSourceWithNodes(nodeSourceName, new Object[] { "ALL", "ALL", "10000" });
 
         RMState stateTest1 = resourceManager.getState();
         assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
@@ -143,7 +133,6 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalAliveNodesNumber());
     }
 
-
     /**
      * This test ensures that when a node has been manually removed it is not redeployed by the policy
      */
@@ -152,7 +141,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         nodeSourceName = "Node_source_2";
 
         RMTHelper.log("Test 2 - restart down nodes policy with a node removed");
-        createNodeSourceWithNodes(nodeSourceName, new Object[]{"ALL", "ALL", "10000"});
+        createNodeSourceWithNodes(nodeSourceName, new Object[] { "ALL", "ALL", "10000" });
 
         RMState stateTest1 = resourceManager.getState();
         assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
@@ -187,7 +176,6 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeUrl);
 
         assertEquals(NodeState.DOWN, ev.getNodeState());
-
 
         // one node is down - the policy should detect it and redeploy
         for (int i = 0; i < defaultDescriptorNodesNb - 1; i++) {

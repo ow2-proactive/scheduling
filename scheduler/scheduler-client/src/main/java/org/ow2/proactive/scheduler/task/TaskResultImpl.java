@@ -1,40 +1,38 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.task;
+
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
@@ -45,14 +43,6 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -73,6 +63,7 @@ public class TaskResultImpl implements TaskResult {
 
     /** The value of the result if no exception occurred as a byte array */
     private byte[] serializedValue = null;
+
     /** The value of the result if no exception occurred */
     private transient Serializable value = null;
 
@@ -80,6 +71,7 @@ public class TaskResultImpl implements TaskResult {
 
     /** The exception thrown by the task as a byte array */
     private byte[] serializedException = null;
+
     /** The exception thrown by the task */
     private transient Throwable exception = null;
 
@@ -101,8 +93,8 @@ public class TaskResultImpl implements TaskResult {
      */
     private Map<String, byte[]> propagatedVariables;
 
-    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output, Map<String, String> metadata,
-                          Map<String, byte[]> propagatedVariables) {
+    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
+            Map<String, String> metadata, Map<String, byte[]> propagatedVariables) {
         this(id, serializedValue, serializedException, output);
         this.propagatedVariables = propagatedVariables;
         this.metadata = metadata;
@@ -155,8 +147,7 @@ public class TaskResultImpl implements TaskResult {
                 logger.error("", ioe2);
                 try {
                     //serialize a NotSerializableException with the cause message
-                    this.serializedException = ObjectToByteConverter.ObjectStream
-                            .convert(new NotSerializableException(ioe2.getMessage()));
+                    this.serializedException = ObjectToByteConverter.ObjectStream.convert(new NotSerializableException(ioe2.getMessage()));
                 } catch (IOException ioe3) {
                     //this should not append as the NotSerializableException is serializable and
                     //the given argument is a string (also serializable)
@@ -191,8 +182,7 @@ public class TaskResultImpl implements TaskResult {
             logger.error("", ioe2);
             try {
                 //serialize a NotSerializableException with the cause message
-                answer = ObjectToByteConverter.ObjectStream.convert(new NotSerializableException(ioe2
-                        .getMessage()));
+                answer = ObjectToByteConverter.ObjectStream.convert(new NotSerializableException(ioe2.getMessage()));
             } catch (IOException ioe3) {
                 //this should not append as the NotSerializableException is serializable and
                 //the given argument is a string (also serializable)
@@ -259,11 +249,11 @@ public class TaskResultImpl implements TaskResult {
             try {
                 thrown = this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
-                throw new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
-                    this.id + " : " + e.getMessage(), e);
+                throw new InternalSchedulerException("Cannot instanciate exception thrown by the task " + this.id +
+                                                     " : " + e.getMessage(), e);
             } catch (ClassNotFoundException e) {
-                throw new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
-                    this.id + " : " + e.getMessage(), e);
+                throw new InternalSchedulerException("Cannot instanciate exception thrown by the task " + this.id +
+                                                     " : " + e.getMessage(), e);
             }
             throw thrown;
         } else {
@@ -271,12 +261,12 @@ public class TaskResultImpl implements TaskResult {
                 return this.instanciateValue(this.getTaskClassLoader());
             } catch (IOException e) {
                 logger.error("", e);
-                throw new InternalSchedulerException("Cannot instanciate result of the task " + this.id +
-                    " : " + e.getMessage(), e);
+                throw new InternalSchedulerException("Cannot instanciate result of the task " + this.id + " : " +
+                                                     e.getMessage(), e);
             } catch (ClassNotFoundException e) {
                 logger.error("", e);
-                throw new InternalSchedulerException("Cannot instanciate result of the task " + this.id +
-                    " : " + e.getMessage(), e);
+                throw new InternalSchedulerException("Cannot instanciate result of the task " + this.id + " : " +
+                                                     e.getMessage(), e);
             }
         }
     }
@@ -289,11 +279,11 @@ public class TaskResultImpl implements TaskResult {
             try {
                 return this.instanciateException(this.getTaskClassLoader());
             } catch (IOException e) {
-                return new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
-                    this.id + " : " + e.getMessage(), e);
+                return new InternalSchedulerException("Cannot instanciate exception thrown by the task " + this.id +
+                                                      " : " + e.getMessage(), e);
             } catch (ClassNotFoundException e) {
-                return new InternalSchedulerException("Cannot instanciate exception thrown by the task " +
-                    this.id + " : " + e.getMessage(), e);
+                return new InternalSchedulerException("Cannot instanciate exception thrown by the task " + this.id +
+                                                      " : " + e.getMessage(), e);
             }
         } else {
             return null;
@@ -338,8 +328,7 @@ public class TaskResultImpl implements TaskResult {
      */
     private Throwable instanciateException(ClassLoader cl) throws IOException, ClassNotFoundException {
         if (this.serializedException != null && this.exception == null) {
-            this.exception = (Throwable) ByteToObjectConverter.ObjectStream.convert(this.serializedException,
-                    cl);
+            this.exception = (Throwable) ByteToObjectConverter.ObjectStream.convert(this.serializedException, cl);
         }
         return this.exception;
     }

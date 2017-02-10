@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.scheduler.core;
 
@@ -122,14 +111,17 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
                 Set<TaskId> parentIds = new HashSet<>(resultSize);
                 for (int i = 0; i < resultSize; i++) {
-                    parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(
-                            taskDescriptor.getParents().get(i).getInternal()));
+                    parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(taskDescriptor.getParents()
+                                                                                                            .get(i)
+                                                                                                            .getInternal()));
                 }
 
                 params = new TaskResult[parentIds.size()];
 
-                Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure().getDBManager()
-                        .loadTasksResults(job.getId(), new ArrayList<>(parentIds));
+                Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure()
+                                                                       .getDBManager()
+                                                                       .loadTasksResults(job.getId(),
+                                                                                         new ArrayList<>(parentIds));
 
                 int i = 0;
                 for (TaskId taskId : parentIds) {
@@ -167,22 +159,24 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
         PublicKey nodePublicKey = launcher.generatePublicKey();
         Credentials nodeEncryptedUserCredentials = Credentials.createCredentials(decryptedUserCredentials,
-                nodePublicKey);
+                                                                                 nodePublicKey);
 
         task.getExecutableContainer().setCredentials(nodeEncryptedUserCredentials);
     }
 
     protected boolean areThirdPartyCredentialsDefined() {
-        return schedulingService.getInfrastructure().getDBManager()
-                .hasThirdPartyCredentials(job.getJobInfo().getJobOwner());
+        return schedulingService.getInfrastructure()
+                                .getDBManager()
+                                .hasThirdPartyCredentials(job.getJobInfo().getJobOwner());
     }
 
     private void enrichWithThirdPartyCredentials(CredData decryptedUserCredentials) throws KeyException {
         Map<String, HybridEncryptedData> thirdPartyCredentials = schedulingService.getInfrastructure()
-                .getDBManager().thirdPartyCredentialsMap(job.getJobInfo().getJobOwner());
+                                                                                  .getDBManager()
+                                                                                  .thirdPartyCredentialsMap(job.getJobInfo()
+                                                                                                               .getJobOwner());
         for (Map.Entry<String, HybridEncryptedData> thirdPartyCredential : thirdPartyCredentials.entrySet()) {
-            String decryptedValue = HybridEncryptionUtil.decryptString(thirdPartyCredential.getValue(),
-                    corePrivateKey);
+            String decryptedValue = HybridEncryptionUtil.decryptString(thirdPartyCredential.getValue(), corePrivateKey);
             decryptedUserCredentials.addThirdPartyCredential(thirdPartyCredential.getKey(), decryptedValue);
         }
     }

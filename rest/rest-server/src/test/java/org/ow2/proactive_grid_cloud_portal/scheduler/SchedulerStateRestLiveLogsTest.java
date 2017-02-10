@@ -1,40 +1,41 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
+
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import java.io.ByteArrayInputStream;
+import java.net.URI;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
@@ -61,23 +62,13 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 
 public class SchedulerStateRestLiveLogsTest extends RestTestServer {
 
     private SchedulerRestInterface client;
+
     private SchedulerProxyUserInterface scheduler;
+
     private String sessionId;
 
     @BeforeClass
@@ -88,9 +79,9 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
     @Before
     public void setUp() throws Exception {
         client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
-        PortalConfiguration
-                .load(new ByteArrayInputStream((PortalConfiguration.scheduler_logforwardingservice_provider +
-                    "=" + SynchronousLocalLogForwardingProvider.class.getName()).getBytes()));
+        PortalConfiguration.load(new ByteArrayInputStream((PortalConfiguration.scheduler_logforwardingservice_provider +
+                                                           "=" +
+                                                           SynchronousLocalLogForwardingProvider.class.getName()).getBytes()));
         scheduler = mock(SchedulerProxyUserInterface.class);
         sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
     }
@@ -121,18 +112,20 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
         assertTrue(firstJobLogs.isEmpty());
     }
 
-    private Appender verifyListenAndGetAppender(String jobId) throws NotConnectedException,
-            UnknownJobException, PermissionException, LogForwardingException {
-        ArgumentCaptor<AppenderProvider> appenderProviderArgumentCaptor = ArgumentCaptor
-                .forClass(AppenderProvider.class);
+    private Appender verifyListenAndGetAppender(String jobId)
+            throws NotConnectedException, UnknownJobException, PermissionException, LogForwardingException {
+        ArgumentCaptor<AppenderProvider> appenderProviderArgumentCaptor = ArgumentCaptor.forClass(AppenderProvider.class);
         verify(scheduler).listenJobLogs(eq(jobId), appenderProviderArgumentCaptor.capture());
         AppenderProvider appenderProvider = appenderProviderArgumentCaptor.getValue();
         return appenderProvider.getAppender();
     }
 
     private LoggingEvent createLoggingEvent(String firstJobId, String message) {
-        return new LoggingEvent(null, Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + firstJobId),
-            Level.DEBUG, message, null);
+        return new LoggingEvent(null,
+                                Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + firstJobId),
+                                Level.DEBUG,
+                                message,
+                                null);
     }
 
     @Test

@@ -1,42 +1,40 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.job;
 
-import com.google.common.base.Joiner;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.exception.InternalException;
@@ -63,15 +61,7 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.base.Joiner;
 
 
 /**
@@ -189,8 +179,7 @@ public class InternalJobFactory {
         for (InternalTask it : tasksList.values()) {
 
             // it performs an IF action
-            if (it.getFlowScript() != null &&
-                it.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
+            if (it.getFlowScript() != null && it.getFlowScript().getActionType().equals(FlowActionType.IF.toString())) {
                 String ifBranch = it.getFlowScript().getActionTarget();
                 String elseBranch = it.getFlowScript().getActionTargetElse();
                 String join = it.getFlowScript().getActionContinuation();
@@ -250,7 +239,8 @@ public class InternalJobFactory {
         return job;
     }
 
-    private static InternalTask createTask(Job userJob, InternalJob internalJob, Task task) throws JobCreationException {
+    private static InternalTask createTask(Job userJob, InternalJob internalJob, Task task)
+            throws JobCreationException {
         // TODO: avoid branching with double dispatch
         if (task instanceof NativeTask) {
             return createTask(userJob, internalJob, (NativeTask) task);
@@ -273,7 +263,8 @@ public class InternalJobFactory {
      * @throws JobCreationException an exception if the factory cannot create the given task.
      */
     @SuppressWarnings("unchecked")
-    private static InternalTask createTask(Job userJob, InternalJob internalJob, JavaTask task) throws JobCreationException {
+    private static InternalTask createTask(Job userJob, InternalJob internalJob, JavaTask task)
+            throws JobCreationException {
         InternalTask javaTask;
 
         if (task.getExecutableClassName() != null) {
@@ -281,17 +272,17 @@ public class InternalJobFactory {
 
             try {
                 if (isForkingTask()) {
-                    javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript(task.getExecutableClassName(),
-                            JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
-                                new Serializable[]{args}))), internalJob);
+                    javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
+                                                                                                                          JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
+                                                                                                                          new Serializable[] { args }))),
+                                                            internalJob);
                     javaTask.setForkEnvironment(task.getForkEnvironment());
                     configureRunAsMe(task);
                 } else {
-                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript(task.getExecutableClassName(),
-                            JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
-                                new Serializable[]{args}))), internalJob);
+                    javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
+                                                                                                                    JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
+                                                                                                                    new Serializable[] { args }))),
+                                                      internalJob);
                 }
             } catch (InvalidScriptException e) {
                 throw new JobCreationException(e);
@@ -324,7 +315,8 @@ public class InternalJobFactory {
      * @return the created internal task.
      * @throws JobCreationException an exception if the factory cannot create the given task.
      */
-    private static InternalTask createTask(Job userJob, InternalJob internalJob, NativeTask task) throws JobCreationException {
+    private static InternalTask createTask(Job userJob, InternalJob internalJob, NativeTask task)
+            throws JobCreationException {
         if (((task.getCommandLine() == null) || (task.getCommandLine().length == 0))) {
             String msg = "The command line is null or empty and not generated !";
             logger.info(msg);
@@ -335,12 +327,14 @@ public class InternalJobFactory {
             String commandAndArguments = "\"" + Joiner.on("\" \"").join(task.getCommandLine()) + "\"";
             InternalTask scriptTask;
             if (isForkingTask()) {
-                scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript(commandAndArguments, "native"))), internalJob);
+                scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(commandAndArguments,
+                                                                                                                        "native"))),
+                                                          internalJob);
                 configureRunAsMe(task);
             } else {
-                scriptTask = new InternalScriptTask(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript(commandAndArguments, "native"))), internalJob);
+                scriptTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(commandAndArguments,
+                                                                                                                  "native"))),
+                                                    internalJob);
             }
             ForkEnvironment forkEnvironment = new ForkEnvironment();
             scriptTask.setForkEnvironment(forkEnvironment);
@@ -353,7 +347,8 @@ public class InternalJobFactory {
         }
     }
 
-    private static InternalTask createTask(Job userJob, InternalJob internalJob, ScriptTask task) throws JobCreationException {
+    private static InternalTask createTask(Job userJob, InternalJob internalJob, ScriptTask task)
+            throws JobCreationException {
         InternalTask scriptTask;
         if (isForkingTask()) {
             scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()), internalJob);
