@@ -1,4 +1,34 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.common.job.factories;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +41,9 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -18,23 +51,19 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 
 public class Job2XMLTransformerTest {
 
     private static final String matchEvery = "[\\w\\W]*";
+
     // Regex do match possible characters in xml but not the >
     private static final String notMatchSmallerSign = "[\\w\\d\\s=_/.\"-]*";
+
     private static final String matchSmallerSign = ">";
+
     private static final String matchJobTagOpening = "<job";
+
     private static final String matchTaskTagOpening = "<task";
 
     @Rule
@@ -52,8 +81,7 @@ public class Job2XMLTransformerTest {
         job.addTask(task);
 
         new Job2XMLTransformer().job2xmlFile(job, xmlFile);
-        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(
-                xmlFile.getAbsolutePath()));
+        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 
         assertNotNull(recreatedJob.getTask("forkedTask").getForkEnvironment());
     }
@@ -78,7 +106,8 @@ public class Job2XMLTransformerTest {
     }
 
     @Test
-    public void onTaskErrorIsContinueJobExecutionInJob() throws IOException, TransformerException, ParserConfigurationException {
+    public void onTaskErrorIsContinueJobExecutionInJob()
+            throws IOException, TransformerException, ParserConfigurationException {
         checkIfOnTaskErrorIsInJobInXML(OnTaskError.CONTINUE_JOB_EXECUTION);
     }
 
@@ -87,28 +116,34 @@ public class Job2XMLTransformerTest {
         checkIfOnTaskErrorIsInJobInXML(OnTaskError.NONE);
     }
 
-    private void checkIfOnTaskErrorIsInJobInXML(
-            OnTaskError jobOnTaskErrorSetting) throws TransformerException, ParserConfigurationException, IOException {
+    private void checkIfOnTaskErrorIsInJobInXML(OnTaskError jobOnTaskErrorSetting)
+            throws TransformerException, ParserConfigurationException, IOException {
         TaskFlowJob jobWithCancelJobOnErrorTrue = new TaskFlowJob();
         jobWithCancelJobOnErrorTrue.setOnTaskError(jobOnTaskErrorSetting);
 
         // Check that onTaskError is inside the <job [here] > xml tag
         assertThat("XML must contain onTaskError=\\\"" + jobOnTaskErrorSetting.toString() + "\\\"",
-                new Job2XMLTransformer().jobToxmlString(jobWithCancelJobOnErrorTrue),
-                org.hamcrest.Matchers.matchesPattern(
-                        matchEvery + matchJobTagOpening + notMatchSmallerSign + matchOnTaskErrorEquals(
-                                jobOnTaskErrorSetting) + matchEvery + matchSmallerSign + matchEvery));
+                   new Job2XMLTransformer().jobToxmlString(jobWithCancelJobOnErrorTrue),
+                   org.hamcrest.Matchers.matchesPattern(matchEvery + matchJobTagOpening + notMatchSmallerSign +
+                                                        matchOnTaskErrorEquals(jobOnTaskErrorSetting) + matchEvery +
+                                                        matchSmallerSign + matchEvery));
     }
 
     @Test
-    public void onTaskErrorIsCancelJobInTaskandJob() throws IOException, TransformerException, ParserConfigurationException, UserException {
+    public void onTaskErrorIsCancelJobInTaskandJob()
+            throws IOException, TransformerException, ParserConfigurationException, UserException {
         checkIfOnTaskErrorIsInJobAndTaskInXML(OnTaskError.CANCEL_JOB, OnTaskError.CANCEL_JOB);
     }
 
     @Test
-    public void onTaskErrorEveryPossibleCombinationInTaskandJob() throws IOException, TransformerException, ParserConfigurationException, UserException {
-        Set<OnTaskError> allPossibleOnTaskErrorStates = new HashSet<>(Arrays.asList(OnTaskError.CANCEL_JOB, OnTaskError.CONTINUE_JOB_EXECUTION, OnTaskError.NONE, OnTaskError.PAUSE_JOB, OnTaskError.PAUSE_TASK));
-        for(OnTaskError jobSetting : allPossibleOnTaskErrorStates) {
+    public void onTaskErrorEveryPossibleCombinationInTaskandJob()
+            throws IOException, TransformerException, ParserConfigurationException, UserException {
+        Set<OnTaskError> allPossibleOnTaskErrorStates = new HashSet<>(Arrays.asList(OnTaskError.CANCEL_JOB,
+                                                                                    OnTaskError.CONTINUE_JOB_EXECUTION,
+                                                                                    OnTaskError.NONE,
+                                                                                    OnTaskError.PAUSE_JOB,
+                                                                                    OnTaskError.PAUSE_TASK));
+        for (OnTaskError jobSetting : allPossibleOnTaskErrorStates) {
             for (OnTaskError taskSetting : allPossibleOnTaskErrorStates) {
                 checkIfOnTaskErrorIsInJobAndTaskInXML(jobSetting, taskSetting);
             }
@@ -116,7 +151,8 @@ public class Job2XMLTransformerTest {
     }
 
     private void checkIfOnTaskErrorIsInJobAndTaskInXML(OnTaskError jobOnTaskErrorSetting,
-            OnTaskError taskOnTaskErrorSetting) throws UserException, TransformerException, ParserConfigurationException, IOException {
+            OnTaskError taskOnTaskErrorSetting)
+            throws UserException, TransformerException, ParserConfigurationException, IOException {
         String taskName = "taskName";
         TaskFlowJob jobWithCancelJobOnErrorTrue = new TaskFlowJob();
         jobWithCancelJobOnErrorTrue.setOnTaskError(jobOnTaskErrorSetting);
@@ -128,18 +164,17 @@ public class Job2XMLTransformerTest {
 
         // Check that onTaskError is inside the <job [here] > xml tag
         assertThat("XML must contain onTaskError=\\\"" + jobOnTaskErrorSetting.toString() + "\\\"",
-                new Job2XMLTransformer().jobToxmlString(jobWithCancelJobOnErrorTrue),
-                org.hamcrest.Matchers.matchesPattern(
-                        matchEvery + matchJobTagOpening + notMatchSmallerSign + matchOnTaskErrorEquals(
-                                jobOnTaskErrorSetting) + matchEvery + matchSmallerSign + matchEvery));
-
+                   new Job2XMLTransformer().jobToxmlString(jobWithCancelJobOnErrorTrue),
+                   org.hamcrest.Matchers.matchesPattern(matchEvery + matchJobTagOpening + notMatchSmallerSign +
+                                                        matchOnTaskErrorEquals(jobOnTaskErrorSetting) + matchEvery +
+                                                        matchSmallerSign + matchEvery));
 
         // Check that onTaskError is inside the <task [here] > xml tag
         assertThat("XML must contain onTaskError=\\\"" + taskOnTaskErrorSetting.toString() + "\\\"",
-                new Job2XMLTransformer().jobToxmlString(jobWithCancelJobOnErrorTrue),
-                org.hamcrest.Matchers.matchesPattern(
-                        matchEvery + matchTaskTagOpening + notMatchSmallerSign + matchOnTaskErrorEquals(
-                                taskOnTaskErrorSetting) + matchEvery + matchSmallerSign + matchEvery));
+                   new Job2XMLTransformer().jobToxmlString(jobWithCancelJobOnErrorTrue),
+                   org.hamcrest.Matchers.matchesPattern(matchEvery + matchTaskTagOpening + notMatchSmallerSign +
+                                                        matchOnTaskErrorEquals(taskOnTaskErrorSetting) + matchEvery +
+                                                        matchSmallerSign + matchEvery));
     }
 
     @Test
@@ -167,8 +202,7 @@ public class Job2XMLTransformerTest {
         job.addTask(task);
 
         new Job2XMLTransformer().job2xmlFile(job, xmlFile);
-        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(
-                xmlFile.getAbsolutePath()));
+        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 
         Map<String, TaskVariable> resVariables = recreatedJob.getTask("task").getVariables();
         assertEquals(2, resVariables.size());
@@ -193,11 +227,11 @@ public class Job2XMLTransformerTest {
             job.addTask(task);
 
             new Job2XMLTransformer().job2xmlFile(job, xmlFile);
-            TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(
-                    xmlFile.getAbsolutePath()));
+            TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 
-            assertEquals("Walltimes between original and recreated job must be equal", walltimesToTest[i],
-                    recreatedJob.getTask(taskName).getWallTime());
+            assertEquals("Walltimes between original and recreated job must be equal",
+                         walltimesToTest[i],
+                         recreatedJob.getTask(taskName).getWallTime());
         }
     }
 }

@@ -1,42 +1,35 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.job.scheduling;
 
-import com.google.common.collect.ImmutableMap;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTestNonForkModeWithRestart;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
@@ -54,18 +47,18 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.examples.EmptyTask;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.ImmutableMap;
+
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerFunctionalTestNonForkModeWithRestart;
+
 
 /**
  * Several tests related to job scheduling priorities and starvation
  */
 public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalTestNonForkModeWithRestart {
 
-    private static URL jobDescriptor = TestJobSchedulingStarvationAndPriority.class
-            .getResource("/functionaltests/descriptors/Job_With_Replication.xml");
+    private static URL jobDescriptor = TestJobSchedulingStarvationAndPriority.class.getResource("/functionaltests/descriptors/Job_With_Replication.xml");
 
     private static final String REPLICATE_TASK_NAME = "task2replicate";
 
@@ -145,7 +138,6 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
         testJobPriority(true);
     }
 
-
     public void testJobPriority(boolean addNewNodes) throws Exception {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
@@ -175,14 +167,17 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
         Pair<Long, Long> minMaxHigh = computeMinMaxStartingTime(scheduler, jobIdHigh, REPLICATE_TASK_NAME_FILTER);
         Pair<Long, Long> minMaxLow = computeMinMaxStartingTime(scheduler, jobIdLow, REPLICATE_TASK_NAME_FILTER);
 
-        Assert.assertTrue("Low Priority tasks min start time : " + minMaxLow.getLeft() + " should be greater than the max start time of high priority jobs : " + minMaxHigh.getRight(), minMaxLow.getLeft() > minMaxHigh.getRight());
+        Assert.assertTrue("Low Priority tasks min start time : " + minMaxLow.getLeft() +
+                          " should be greater than the max start time of high priority jobs : " + minMaxHigh.getRight(),
+                          minMaxLow.getLeft() > minMaxHigh.getRight());
     }
 
     /**
      * Computes min start time and max start time for all tasks which match a given pattern
      * If a task in the set did not start, then the set max will be Long.MAX_VALUE
      */
-    Pair<Long, Long> computeMinMaxStartingTime(Scheduler scheduler, JobId jobId, String taskNameFilter) throws Exception {
+    Pair<Long, Long> computeMinMaxStartingTime(Scheduler scheduler, JobId jobId, String taskNameFilter)
+            throws Exception {
         long min = Long.MAX_VALUE;
         long max = -1;
         for (TaskState state : scheduler.getJobState(jobId).getTasks()) {
@@ -204,7 +199,8 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
     }
 
     /*
-     * Job high priority with one task, task's selection script always returns 'false' so task can't start
+     * Job high priority with one task, task's selection script always returns 'false' so task can't
+     * start
      */
     private TaskFlowJob createJobHighSelectFalse() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
@@ -222,7 +218,8 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
     }
 
     /*
-     * Job high priority with one task and with a required number of nodes greater than currently available
+     * Job high priority with one task and with a required number of nodes greater than currently
+     * available
      */
     private TaskFlowJob createJobHighMoreMultiNode() throws Exception {
         TaskFlowJob job = new TaskFlowJob();

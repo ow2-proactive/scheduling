@@ -1,39 +1,38 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2016 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive.scheduler.task.client;
+
+import java.io.File;
+import java.net.URL;
+import java.security.KeyException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
@@ -57,14 +56,6 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 
-import java.io.File;
-import java.net.URL;
-import java.security.KeyException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Scheduler api available as a variable during the execution of a task. it is based on the ISchedulerClient interface.
@@ -107,13 +98,15 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+    public List<JobUsage> getMyAccountUsage(Date startDate, Date endDate)
+            throws NotConnectedException, PermissionException {
         renewSession();
         return client.getMyAccountUsage(startDate, endDate);
     }
 
     @Override
-    public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate) throws NotConnectedException, PermissionException {
+    public List<JobUsage> getAccountUsage(String user, Date startDate, Date endDate)
+            throws NotConnectedException, PermissionException {
         renewSession();
         return client.getAccountUsage(user, startDate, endDate);
     }
@@ -137,25 +130,29 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.getTaskResultFromIncarnation(jobId, taskName, inc);
     }
 
     @Override
-    public boolean killTask(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean killTask(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.killTask(jobId, taskName);
     }
 
     @Override
-    public boolean restartTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean restartTask(JobId jobId, String taskName, int restartDelay)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.restartTask(jobId, taskName, restartDelay);
     }
 
     @Override
-    public boolean preemptTask(JobId jobId, String taskName, int restartDelay) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean preemptTask(JobId jobId, String taskName, int restartDelay)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.preemptTask(jobId, taskName, restartDelay);
     }
@@ -167,7 +164,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws NotConnectedException, UnknownJobException, PermissionException {
+    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         client.listenJobLogs(jobId, appenderProvider);
     }
@@ -191,7 +189,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(JobId jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         renewSession();
         client.changeJobPriority(jobId, priority);
     }
@@ -257,31 +256,36 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public JobId submit(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId submit(Job job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job);
     }
 
     @Override
-    public JobId submit(File job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId submit(File job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job);
     }
 
     @Override
-    public JobId submit(URL job) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId submit(URL job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job);
     }
 
     @Override
-    public JobId submit(File job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId submit(File job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job, variables);
     }
 
     @Override
-    public JobId submit(URL job, Map<String, String> variables) throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId submit(URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job, variables);
     }
@@ -293,31 +297,36 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public TaskResult getTaskResult(String jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public TaskResult getTaskResult(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.getTaskResult(jobId, taskName);
     }
 
     @Override
-    public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag) throws NotConnectedException, UnknownJobException, PermissionException {
+    public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.getTaskResultsByTag(jobId, taskTag);
     }
 
     @Override
-    public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag) throws NotConnectedException, UnknownJobException, PermissionException {
+    public List<TaskResult> getTaskResultsByTag(String jobId, String taskTag)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.getTaskResultsByTag(jobId, taskTag);
     }
 
     @Override
-    public TaskResult getTaskResult(JobId jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public TaskResult getTaskResult(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.getTaskResult(jobId, taskName);
     }
 
     @Override
-    public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.getTaskResultFromIncarnation(jobId, taskName, inc);
     }
@@ -329,7 +338,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public void listenJobLogs(String jobId, AppenderProvider appenderProvider) throws NotConnectedException, UnknownJobException, PermissionException {
+    public void listenJobLogs(String jobId, AppenderProvider appenderProvider)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         client.listenJobLogs(jobId, appenderProvider);
     }
@@ -341,31 +351,36 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public boolean killTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean killTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.killTask(jobId, taskName);
     }
 
     @Override
-    public boolean restartTask(String jobId, String taskName, int restartDelay) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean restartTask(String jobId, String taskName, int restartDelay)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.restartTask(jobId, taskName, restartDelay);
     }
 
     @Override
-    public boolean finishInErrorTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean finishInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.finishInErrorTask(jobId, taskName);
     }
 
     @Override
-    public boolean restartInErrorTask(String jobId, String taskName) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean restartInErrorTask(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.restartInErrorTask(jobId, taskName);
     }
 
     @Override
-    public boolean preemptTask(String jobId, String taskName, int restartDelay) throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+    public boolean preemptTask(String jobId, String taskName, int restartDelay)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();
         return client.preemptTask(jobId, taskName, restartDelay);
     }
@@ -377,7 +392,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public boolean restartAllInErrorTasks(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean restartAllInErrorTasks(String jobId)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.restartAllInErrorTasks(jobId);
     }
@@ -389,7 +405,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(String jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         renewSession();
         client.changeJobPriority(jobId, priority);
     }
@@ -425,13 +442,15 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events) throws NotConnectedException, PermissionException {
+    public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
+            throws NotConnectedException, PermissionException {
         renewSession();
         client.addEventListener(sel, myEventsOnly, events);
     }
 
     @Override
-    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState, SchedulerEvent... events) throws NotConnectedException, PermissionException {
+    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
+            SchedulerEvent... events) throws NotConnectedException, PermissionException {
         renewSession();
         return client.addEventListener(sel, myEventsOnly, getCurrentState, events);
     }
@@ -464,19 +483,22 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public String getTaskServerLogs(String id, String taskName) throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
+    public String getTaskServerLogs(String id, String taskName)
+            throws UnknownJobException, UnknownTaskException, NotConnectedException, PermissionException {
         renewSession();
         return client.getTaskServerLogs(id, taskName);
     }
 
     @Override
-    public String getTaskServerLogsByTag(String id, String taskTag) throws UnknownJobException, NotConnectedException, PermissionException {
+    public String getTaskServerLogsByTag(String id, String taskTag)
+            throws UnknownJobException, NotConnectedException, PermissionException {
         renewSession();
         return client.getTaskServerLogsByTag(id, taskTag);
     }
 
     @Override
-    public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria, List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
+    public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         renewSession();
         return client.getJobs(offset, limit, filterCriteria, sortParameters);
     }
@@ -494,13 +516,17 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit) throws NotConnectedException, PermissionException {
+    public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit)
+            throws NotConnectedException, PermissionException {
         renewSession();
         return client.getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
     }
 
     @Override
-    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams) throws NotConnectedException, PermissionException {
+    public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
+            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
+            throws NotConnectedException, PermissionException {
         renewSession();
         return client.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit, sortParams);
     }
@@ -512,13 +538,16 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public boolean changeStartAt(JobId jobId, String startAt) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean changeStartAt(JobId jobId, String startAt)
+            throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.changeStartAt(jobId, startAt);
     }
 
     @Override
-    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo) throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
+            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
+            JobCreationException {
         renewSession();
         return client.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
     }
@@ -551,61 +580,73 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public JobResult waitForJob(JobId jobId, long timeout) throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
+    public JobResult waitForJob(JobId jobId, long timeout)
+            throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
         renewSession();
         return client.waitForJob(jobId, timeout);
     }
 
     @Override
-    public JobResult waitForJob(String jobId, long timeout) throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
+    public JobResult waitForJob(String jobId, long timeout)
+            throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
         renewSession();
         return client.waitForJob(jobId, timeout);
     }
 
     @Override
-    public boolean isTaskFinished(String jobId, String taskName) throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException {
+    public boolean isTaskFinished(String jobId, String taskName)
+            throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException {
         renewSession();
         return client.isTaskFinished(jobId, taskName);
     }
 
     @Override
-    public TaskResult waitForTask(String jobId, String taskName, long timeout) throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException, TimeoutException {
+    public TaskResult waitForTask(String jobId, String taskName, long timeout) throws UnknownJobException,
+            NotConnectedException, PermissionException, UnknownTaskException, TimeoutException {
         renewSession();
         return client.waitForTask(jobId, taskName, timeout);
     }
 
     @Override
-    public List<JobResult> waitForAllJobs(List<String> jobIds, long timeout) throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
+    public List<JobResult> waitForAllJobs(List<String> jobIds, long timeout)
+            throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
         renewSession();
         return client.waitForAllJobs(jobIds, timeout);
     }
 
     @Override
-    public Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds, long timeout) throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
+    public Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds, long timeout)
+            throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
         renewSession();
         return client.waitForAnyJob(jobIds, timeout);
     }
 
     @Override
-    public Map.Entry<String, TaskResult> waitForAnyTask(String jobId, List<String> taskNames, long timeout) throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException, TimeoutException {
+    public Map.Entry<String, TaskResult> waitForAnyTask(String jobId, List<String> taskNames, long timeout)
+            throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
+            TimeoutException {
         renewSession();
         return client.waitForAnyTask(jobId, taskNames, timeout);
     }
 
     @Override
-    public List<Map.Entry<String, TaskResult>> waitForAllTasks(String jobId, List<String> taskNames, long timeout) throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException, TimeoutException {
+    public List<Map.Entry<String, TaskResult>> waitForAllTasks(String jobId, List<String> taskNames, long timeout)
+            throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
+            TimeoutException {
         renewSession();
         return client.waitForAllTasks(jobId, taskNames, timeout);
     }
 
     @Override
-    public boolean pushFile(String spacename, String pathname, String filename, String file) throws NotConnectedException, PermissionException {
+    public boolean pushFile(String spacename, String pathname, String filename, String file)
+            throws NotConnectedException, PermissionException {
         renewSession();
         return client.pushFile(spacename, pathname, filename, file);
     }
 
     @Override
-    public void pullFile(String space, String pathname, String outputFile) throws NotConnectedException, PermissionException {
+    public void pullFile(String space, String pathname, String outputFile)
+            throws NotConnectedException, PermissionException {
         renewSession();
         client.pullFile(space, pathname, outputFile);
     }
@@ -617,7 +658,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException, KeyException {
+    public void putThirdPartyCredential(String key, String value)
+            throws NotConnectedException, PermissionException, KeyException {
         renewSession();
         client.putThirdPartyCredential(key, value);
     }

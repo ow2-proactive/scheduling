@@ -1,40 +1,36 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -48,10 +44,6 @@ import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.RestTestServer;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -66,18 +58,15 @@ import org.json.simple.parser.JSONParser;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.RestTestServer;
+import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 public class RMRestTest extends RestTestServer {
@@ -96,8 +85,7 @@ public class RMRestTest extends RestTestServer {
 
         JSONObject jsonObject = callGetStatHistory();
 
-        assertEquals(EXPECTED_RRD_VALUE, (Double) ((JSONArray) jsonObject.get("AverageActivity")).get(0),
-                0.001);
+        assertEquals(EXPECTED_RRD_VALUE, (Double) ((JSONArray) jsonObject.get("AverageActivity")).get(0), 0.001);
 
     }
 
@@ -105,10 +93,9 @@ public class RMRestTest extends RestTestServer {
         RMProxyUserInterface rmMock = mock(RMProxyUserInterface.class);
         String sessionId = SharedSessionStoreTestUtils.createValidSession(rmMock);
 
-        AttributeList value = new AttributeList(Collections.singletonList(new Attribute("test", createRrdDb()
-                .getBytes())));
-        when(rmMock.getMBeanAttributes(Matchers.<ObjectName> any(), Matchers.<String[]> any())).thenReturn(
-                value);
+        AttributeList value = new AttributeList(Collections.singletonList(new Attribute("test",
+                                                                                        createRrdDb().getBytes())));
+        when(rmMock.getMBeanAttributes(Matchers.<ObjectName> any(), Matchers.<String[]> any())).thenReturn(value);
         RMRestInterface client = ProxyFactory.create(RMRestInterface.class, "http://localhost:" + port + "/");
 
         String statHistory = client.getStatHistory(sessionId, "hhhhh");
@@ -171,8 +158,8 @@ public class RMRestTest extends RestTestServer {
         String sessionId = SharedSessionStoreTestUtils.createValidSession(rm);
         when(rm.addNode(anyString())).thenReturn(new BooleanWrapper(true));
 
-        List<NameValuePair> firstCall = Collections.<NameValuePair> singletonList(new BasicNameValuePair(
-            "nodeurl", "url"));
+        List<NameValuePair> firstCall = Collections.<NameValuePair> singletonList(new BasicNameValuePair("nodeurl",
+                                                                                                         "url"));
         callHttpPostMethod("node", sessionId, firstCall);
 
         verify(rm).addNode("url");
@@ -194,8 +181,8 @@ public class RMRestTest extends RestTestServer {
         return new DefaultHttpClient().execute(httpGet);
     }
 
-    private HttpResponse callHttpPostMethod(String httpMethod, String sessionId,
-            List<NameValuePair> postParameters) throws IOException {
+    private HttpResponse callHttpPostMethod(String httpMethod, String sessionId, List<NameValuePair> postParameters)
+            throws IOException {
         HttpPost httpPost = new HttpPost("http://localhost:" + port + "/rm/" + httpMethod);
         httpPost.setHeader("sessionid", sessionId);
         httpPost.setEntity(new UrlEncodedFormEntity(postParameters));

@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scripting.helper.selection;
 
@@ -68,17 +57,23 @@ public class SelectionUtils {
 
     /** Less than operator */
     public static final int LESS_THAN = 1;
+
     /** Greater than operator */
     public static final int GREATER_THAN = 2;
+
     /** Equal than operator */
     public static final int EQUAL = 3;
+
     /** Pattern matching operator */
     public static final int CONTAINS = 4;
 
     private static final String winTestCuda = "deviceQueryWin.exe";
+
     //TODO get cuda check on UNIX
     private static final String unixTestCuda = "deviceQueryUnix";
+
     private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
+
     private static boolean isJ6 = !System.getProperty("java.version").contains("1.5");
 
     /**
@@ -124,11 +119,9 @@ public class SelectionUtils {
         try {
             switch (condition.getOperator()) {
                 case LESS_THAN:
-                    return (Double.parseDouble(props.getProperty(key)) < Double.parseDouble(condition
-                            .getValue()));
+                    return (Double.parseDouble(props.getProperty(key)) < Double.parseDouble(condition.getValue()));
                 case GREATER_THAN:
-                    return (Double.parseDouble(props.getProperty(key)) > Double.parseDouble(condition
-                            .getValue()));
+                    return (Double.parseDouble(props.getProperty(key)) > Double.parseDouble(condition.getValue()));
                 case EQUAL:
                     return props.getProperty(key).equals(condition.getValue());
                 case CONTAINS:

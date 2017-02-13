@@ -142,8 +142,7 @@ public class IntegerParserValidatorTest {
     public void testIntegerParserValidatorInvalidModelRangeMoreThanTwo()
             throws ModelSyntaxException, ValidationException, ConversionException {
         new IntegerParserValidator((IntegerParserValidator.INTEGER_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                    VALID_LOWER_RANGE + "," +
-                                    VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
+                                    VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER)).parseAndValidate(VALID_INTEGER_STRING);
     }
 }

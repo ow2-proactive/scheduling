@@ -1,46 +1,35 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.authentication.crypto;
-
-import org.objectweb.proactive.annotation.PublicAPI;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -62,9 +51,12 @@ public class CredData implements Serializable {
     public static final String SSH_PRIVATE_KEY = "SSH_PRIVATE_KEY";
 
     private String login = null;
+
     private String pass = null;
+
     // Windows domain name, optional
     private String domain = null;
+
     // Optional ssh key
     private byte[] key = null;
 
@@ -73,11 +65,11 @@ public class CredData implements Serializable {
     /**
      * Extract the Windows domain name from the full login
      * parseDomain("domain\\user") returns domain
-	 * parseDomain("user") returns null
-	 * @param fullLogin the login to parse
-	 * @return the domain name, null if no domain is specified
-	 * @since Scheduling 3.0.1
-	 */
+     * parseDomain("user") returns null
+     * @param fullLogin the login to parse
+     * @return the domain name, null if no domain is specified
+     * @since Scheduling 3.0.1
+     */
     public static String parseDomain(String fullLogin) {
         if (fullLogin.contains("\\")) {
             String domain = fullLogin.substring(0, fullLogin.indexOf("\\"));
@@ -93,11 +85,11 @@ public class CredData implements Serializable {
     /**
      * Extract the user name from the full login
      * parseDomain("domain\\user") returns user
-	 * parseDomain("user") returns user
-	 * @param fullLogin the login to parse
-	 * @return the user name
-	 * @since Scheduling 3.0.1
-	 */
+     * parseDomain("user") returns user
+     * @param fullLogin the login to parse
+     * @return the user name
+     * @since Scheduling 3.0.1
+     */
     public static String parseLogin(String fullLogin) {
         if (fullLogin.contains("\\")) {
             return fullLogin.substring(fullLogin.indexOf("\\") + 1, fullLogin.length());
@@ -186,8 +178,7 @@ public class CredData implements Serializable {
      * @return the key
      */
     public byte[] getKey() {
-        if (key == null && thirdPartyCredentials != null &&
-            thirdPartyCredentials.containsKey(SSH_PRIVATE_KEY)) {
+        if (key == null && thirdPartyCredentials != null && thirdPartyCredentials.containsKey(SSH_PRIVATE_KEY)) {
             return thirdPartyCredentials.get(SSH_PRIVATE_KEY).getBytes();
         }
         return key;

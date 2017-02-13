@@ -1,8 +1,34 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
+
+import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Assert;
 import org.junit.Test;
-import static org.hamcrest.CoreMatchers.*;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -55,8 +81,7 @@ public class TestJobRuntimeData extends BaseSchedulerDBTest {
         System.out.println("Load internal job");
         runtimeData = loadInternalJob(true, runtimeData.getId());
 
-        Assert.assertEquals(this.getClass().getSimpleName(), runtimeData.getJobInfo().getJobId()
-                .getReadableName());
+        Assert.assertEquals(this.getClass().getSimpleName(), runtimeData.getJobInfo().getJobId().getReadableName());
         Assert.assertEquals(JobStatus.RUNNING, runtimeData.getStatus());
         Assert.assertEquals(1, runtimeData.getNumberOfRunningTasks());
         Assert.assertEquals(0, runtimeData.getNumberOfFinishedTasks());
@@ -68,21 +93,21 @@ public class TestJobRuntimeData extends BaseSchedulerDBTest {
         Assert.assertTrue(internalTask.getStartTime() > 0);
         Assert.assertNotNull(internalTask.getExecutionHostName());
     }
-    
+
     @Test
-	public void submitAndLoadJobContent() throws Exception {
-		TaskFlowJob job = new TaskFlowJob();
+    public void submitAndLoadJobContent() throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
         job.addTask(createDefaultTask("task1"));
         job.setPriority(JobPriority.LOW);
-        
+
         InternalJob runtimeData = defaultSubmitJobAndLoadInternal(true, job);
         Job content = dbManager.loadInitalJobContent(runtimeData.getId());
-        
+
         Assert.assertThat(content.getName(), is(job.getName()));
         Assert.assertThat(content.getPriority(), is(JobPriority.LOW));
         Assert.assertTrue(content instanceof TaskFlowJob);
-        Assert.assertThat(((TaskFlowJob)content).getTasks().size(), is(1));
-	}
+        Assert.assertThat(((TaskFlowJob) content).getTasks().size(), is(1));
+    }
 
 }

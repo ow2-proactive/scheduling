@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
@@ -64,10 +53,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+
 public class TestStaxJobFactory {
 
-    private static final ImmutableMap<String, String> EXPECTED_KEY_VALUE_ENTRIES =
-            ImmutableMap.of("name1", "value1", "name2", "value2");
+    private static final ImmutableMap<String, String> EXPECTED_KEY_VALUE_ENTRIES = ImmutableMap.of("name1",
+                                                                                                   "value1",
+                                                                                                   "name2",
+                                                                                                   "value2");
 
     private static final String JOB_FACTORY_IMPL = StaxJobFactory.class.getName();
 
@@ -79,11 +71,10 @@ public class TestStaxJobFactory {
 
     @BeforeClass
     public static void setJobDescriptorcUri() throws Exception {
-        jobDescriptorUri = TestStaxJobFactory.class.getResource(
-                "/org/ow2/proactive/scheduler/common/job/factories/job_update_variables.xml").toURI();
-        jobDescriptorSysPropsUri = TestStaxJobFactory.class.getResource(
-                "/org/ow2/proactive/scheduler/common/job/factories/job_update_variables_using_system_properties.xml")
-                .toURI();
+        jobDescriptorUri = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_update_variables.xml")
+                                                   .toURI();
+        jobDescriptorSysPropsUri = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_update_variables_using_system_properties.xml")
+                                                           .toURI();
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
     }
@@ -108,41 +99,37 @@ public class TestStaxJobFactory {
     }
 
     @Test
-    public void testCreateJobShouldUseJobVariablesToReplaceTaskGenericInfoVariables()
-            throws Exception {
+    public void testCreateJobShouldUseJobVariablesToReplaceTaskGenericInfoVariables() throws Exception {
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri);
 
-        assertEquals("updated_task_generic_info_value", testJob.getTask("task1").getGenericInformation()
-                .get("task_generic_info"));
+        assertEquals("updated_task_generic_info_value",
+                     testJob.getTask("task1").getGenericInformation().get("task_generic_info"));
     }
 
     @Test
-    public void testCreateJobShouldUseVariableMapToReplaceTaskGenericInfoVariables()
-            throws Exception {
+    public void testCreateJobShouldUseVariableMapToReplaceTaskGenericInfoVariables() throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("task_generic_info", "updated_task_generic_info_value2");
 
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap);
 
-        assertEquals("updated_task_generic_info_value2", testJob.getTask("task1").getGenericInformation()
-                .get("task_generic_info"));
+        assertEquals("updated_task_generic_info_value2",
+                     testJob.getTask("task1").getGenericInformation().get("task_generic_info"));
     }
 
     @Test
-    public void testCreateJobShouldUseVariableMapParameterToReplaceVariableValue()
-      throws Exception {
+    public void testCreateJobShouldUseVariableMapParameterToReplaceVariableValue() throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("from_create_job_parameter", "from_create_job_parameter_value");
 
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap);
 
-        assertEquals("from_create_job_parameter_value", testJob.getVariables().get(
-                                                                    "from_create_job_parameter")
-                                                               .getValue());
+        assertEquals("from_create_job_parameter_value",
+                     testJob.getVariables().get("from_create_job_parameter").getValue());
     }
 
     @Test
-    public void testCreateJobShouldUseSyspropsToReplaceVariables() throws Exception{
+    public void testCreateJobShouldUseSyspropsToReplaceVariables() throws Exception {
         System.setProperty("system_property", "system_property_value");
 
         Job testJob = factory.createJob(jobDescriptorSysPropsUri);
@@ -157,21 +144,24 @@ public class TestStaxJobFactory {
      */
 
     @Test
-    public void testJobCreationAttributeOrderDefinitionGenericInformationXmlElement() throws URISyntaxException, JobCreationException {
+    public void testJobCreationAttributeOrderDefinitionGenericInformationXmlElement()
+            throws URISyntaxException, JobCreationException {
         TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_attr_def_generic_information_xml_element.xml"));
         Map<String, String> genericInformation = job.getTask("task").getGenericInformation();
         assertExpectedKeyValueEntriesMatch(genericInformation);
     }
 
     @Test
-    public void testJobCreationAttributeOrderDefinitionParameterXmlElement() throws URISyntaxException, JobCreationException, IOException, ClassNotFoundException {
+    public void testJobCreationAttributeOrderDefinitionParameterXmlElement()
+            throws URISyntaxException, JobCreationException, IOException, ClassNotFoundException {
         TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_attr_def_parameter_xml_element.xml"));
         Map<String, Serializable> arguments = ((JavaTask) job.getTask("task")).getArguments();
         assertExpectedKeyValueEntriesMatch(arguments);
     }
 
     @Test
-    public void testJobCreationAttributeOrderDefinitionVariableXmlElement() throws URISyntaxException, JobCreationException {
+    public void testJobCreationAttributeOrderDefinitionVariableXmlElement()
+            throws URISyntaxException, JobCreationException {
         Job job = factory.createJob(getResource("job_attr_def_variable_xml_element.xml"));
         Map<String, JobVariable> jobVariables = job.getVariables();
         assertEquals(2, jobVariables.size());
@@ -310,26 +300,21 @@ public class TestStaxJobFactory {
         assertTrue(taskVariable.isJobInherited());
     }
 
-    private static <K,V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
+    private static <K, V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
         // map variable is assumed to contain attributes name/value parsed from XML
 
         // expected attribute names and parsed ones should be the same, so the symmetric
         // difference between both sets should be empty
-        Assert.assertTrue(
-                Sets.symmetricDifference(
-                        EXPECTED_KEY_VALUE_ENTRIES.keySet(),
-                        map.keySet()).isEmpty());
+        Assert.assertTrue(Sets.symmetricDifference(EXPECTED_KEY_VALUE_ENTRIES.keySet(), map.keySet()).isEmpty());
 
         // expected attribute values and parsed ones should be the same, so the symmetric
         // difference between both sets should be empty
-        Assert.assertTrue(
-                CollectionUtils.disjunction(
-                        EXPECTED_KEY_VALUE_ENTRIES.values(), map.values()).isEmpty());
+        Assert.assertTrue(CollectionUtils.disjunction(EXPECTED_KEY_VALUE_ENTRIES.values(), map.values()).isEmpty());
     }
 
     private URI getResource(String filename) throws URISyntaxException {
-        return TestStaxJobFactory.class.getResource(
-                "/org/ow2/proactive/scheduler/common/job/factories/" + filename).toURI();
+        return TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/" + filename)
+                                       .toURI();
     }
 
 }

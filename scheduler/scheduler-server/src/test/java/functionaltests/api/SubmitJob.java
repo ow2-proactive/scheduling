@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.api;
 
@@ -60,7 +49,9 @@ import functionaltests.utils.TestUsers;
 public class SubmitJob implements SchedulerEventListener {
 
     private JobId myJobId;
+
     private Scheduler user;
+
     private int terminated = 0;
 
     public void begin() {
@@ -68,16 +59,18 @@ public class SubmitJob implements SchedulerEventListener {
         try {
             //connect the Scheduler
             //get the authentication interface using the SchedulerConnection
-            SchedulerAuthenticationInterface auth = SchedulerConnection
-                    .waitAndJoin(SchedulerTHelper.getLocalUrl());
+            SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(SchedulerTHelper.getLocalUrl());
             //get the user interface using the retrieved SchedulerAuthenticationInterface
             user = auth.login(Credentials.createCredentials(new CredData(TestUsers.DEMO.username,
-              TestUsers.DEMO.password), auth.getPublicKey()));
+                                                                         TestUsers.DEMO.password),
+                                                            auth.getPublicKey()));
 
             //let the client be notified of its own 'job termination' -> job running to finished event
-            user.addEventListener((SubmitJob) PAActiveObject.getStubOnThis(), true,
-                    SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                    SchedulerEvent.JOB_PENDING_TO_FINISHED);
+            user.addEventListener((SubmitJob) PAActiveObject.getStubOnThis(),
+                                  true,
+                                  SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                                  SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                                  SchedulerEvent.JOB_PENDING_TO_FINISHED);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -96,8 +89,7 @@ public class SubmitJob implements SchedulerEventListener {
             try {
                 //1. get the job result
                 JobResult result = user.getJobResult(myJobId);
-                System.out.println(result.getJobInfo().getFinishedTime() -
-                    result.getJobInfo().getStartTime() + "ms");
+                System.out.println(result.getJobInfo().getFinishedTime() - result.getJobInfo().getStartTime() + "ms");
                 //notify the test that it is terminated
                 user.removeJob(notification.getData().getJobId());
             } catch (Throwable e) {
@@ -109,8 +101,8 @@ public class SubmitJob implements SchedulerEventListener {
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notif) {
         try {
             System.out.println("Task '" + notif.getData().getTaskId() + "' result received !!");
-            TaskResult result = user.getTaskResult(notif.getData().getJobId(), notif.getData().getTaskId()
-                    .getReadableName());
+            TaskResult result = user.getTaskResult(notif.getData().getJobId(),
+                                                   notif.getData().getTaskId().getReadableName());
             terminated++;
             System.out.println("(" + terminated + ")Result value = " + result.value());
         } catch (Throwable t) {
@@ -127,8 +119,8 @@ public class SubmitJob implements SchedulerEventListener {
     public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
     }
 
-	@Override
-	public void jobUpdatedFullDataEvent(JobState job) {		
-	}
+    @Override
+    public void jobUpdatedFullDataEvent(JobState job) {
+    }
 
 }

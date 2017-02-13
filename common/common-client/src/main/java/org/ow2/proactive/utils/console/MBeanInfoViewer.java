@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.utils.console;
 
@@ -62,12 +51,16 @@ import org.ow2.proactive.jmx.JMXClientHelper;
 public final class MBeanInfoViewer {
     /** The authentication interface */
     private final Authentication auth;
+
     /** The connector environment */
     private final HashMap<String, Object> env;
+
     /** The name of the MBean to view */
     private ObjectName mbeanName;
+
     /** The connection to the MBeanServer */
     private MBeanServerConnection connection;
+
     /** The names of the attributes of the MBean */
     private String[] names;
 
@@ -118,8 +111,7 @@ public final class MBeanInfoViewer {
             this.connection.setAttribute(this.mbeanName, new Attribute(attributeName, value));
             this.mbeanName = null;
         } catch (Exception e) {
-            throw new RuntimeException("Unable to set the attribute " + attributeName + " of " +
-                mbeanNameAsString, e);
+            throw new RuntimeException("Unable to set the attribute " + attributeName + " of " + mbeanNameAsString, e);
         }
     }
 
@@ -164,8 +156,7 @@ public final class MBeanInfoViewer {
             // If new name create a new ObjectName and refresh attribute names
             if (this.mbeanName == null || !this.mbeanName.getCanonicalName().equals(mbeanNameAsString)) {
                 this.mbeanName = new ObjectName(mbeanNameAsString);
-                final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName)
-                        .getAttributes();
+                final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName).getAttributes();
 
                 this.names = new String[attrs.length];
                 for (int i = 0; i < attrs.length; i++) {
@@ -215,8 +206,7 @@ public final class MBeanInfoViewer {
             // If new name create a new ObjectName and refresh attribute names
             if (this.mbeanName == null || !this.mbeanName.getCanonicalName().equals(mbeanNameAsString)) {
                 this.mbeanName = new ObjectName(mbeanNameAsString);
-                final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName)
-                        .getAttributes();
+                final MBeanAttributeInfo[] attrs = this.connection.getMBeanInfo(this.mbeanName).getAttributes();
                 List<String> attrNames = new ArrayList<>(attrs.length - 1);
                 for (int i = 0; i < attrs.length; i++) {
                     // reading only primitive or string-type attributes
@@ -253,9 +243,9 @@ public final class MBeanInfoViewer {
         if (type == null)
             return false;
 
-        if (type.equals("boolean") || type.equals("byte") || type.equals("character") ||
-            type.equals("short") || type.equals("int") || type.equals("integer") || type.equals("long") ||
-            type.equals("float") || type.equals("double")) {
+        if (type.equals("boolean") || type.equals("byte") || type.equals("character") || type.equals("short") ||
+            type.equals("int") || type.equals("integer") || type.equals("long") || type.equals("float") ||
+            type.equals("double")) {
             return true;
         }
 

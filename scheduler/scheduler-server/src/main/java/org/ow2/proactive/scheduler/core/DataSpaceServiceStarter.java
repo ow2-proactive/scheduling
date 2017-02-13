@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.core;
 
@@ -47,6 +36,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -64,8 +55,6 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.extensions.vfsprovider.util.URIHelper;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 
 
 public class DataSpaceServiceStarter implements Serializable {
@@ -76,11 +65,16 @@ public class DataSpaceServiceStarter implements Serializable {
      * Default Local Paths
      */
     private static final String DEFAULT_LOCAL = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-        File.separator + "data";
+                                                File.separator + "data";
+
     private static final String DEFAULT_LOCAL_INPUT = DEFAULT_LOCAL + File.separator + "defaultinput";
+
     private static final String DEFAULT_LOCAL_OUTPUT = DEFAULT_LOCAL + File.separator + "defaultoutput";
+
     private static final String DEFAULT_LOCAL_GLOBAL = DEFAULT_LOCAL + File.separator + "defaultglobal";
+
     private static final String DEFAULT_LOCAL_USER = DEFAULT_LOCAL + File.separator + "defaultuser";
+
     private static final String DEFAULT_LOCAL_SCRATCH = DEFAULT_LOCAL + File.separator + "scratch";
 
     private static HashMap<String, HashSet<String>> spacesConfigurations = new HashMap<>();
@@ -89,7 +83,9 @@ public class DataSpaceServiceStarter implements Serializable {
      * Naming service
      */
     private static String namingServiceURL;
+
     private static NamingServiceDeployer namingServiceDeployer;
+
     private static NamingService namingService;
 
     private static String localhostname = null;
@@ -143,29 +139,28 @@ public class DataSpaceServiceStarter implements Serializable {
 
         // configure node for Data Spaces
         final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
-            DEFAULT_LOCAL_SCRATCH);
+                                                                                            DEFAULT_LOCAL_SCRATCH);
         DataSpacesNodes.configureNode(schedulerNode, scratchConf);
 
         //set default INPUT/OUTPUT spaces if needed
 
-        PASchedulerProperties[][] confs = {
-                { PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL,
-                        PASchedulerProperties.DATASPACE_DEFAULTINPUT_LOCALPATH,
-                        PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME },
-                { PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL,
-                        PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_LOCALPATH,
-                        PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME },
-                { PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL,
-                        PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH,
-                        PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME },
-                { PASchedulerProperties.DATASPACE_DEFAULTUSER_URL,
-                        PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH,
-                        PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME } };
+        PASchedulerProperties[][] confs = { { PASchedulerProperties.DATASPACE_DEFAULTINPUT_URL,
+                                              PASchedulerProperties.DATASPACE_DEFAULTINPUT_LOCALPATH,
+                                              PASchedulerProperties.DATASPACE_DEFAULTINPUT_HOSTNAME },
+                                            { PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_URL,
+                                              PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_LOCALPATH,
+                                              PASchedulerProperties.DATASPACE_DEFAULTOUTPUT_HOSTNAME },
+                                            { PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL,
+                                              PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH,
+                                              PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_HOSTNAME },
+                                            { PASchedulerProperties.DATASPACE_DEFAULTUSER_URL,
+                                              PASchedulerProperties.DATASPACE_DEFAULTUSER_LOCALPATH,
+                                              PASchedulerProperties.DATASPACE_DEFAULTUSER_HOSTNAME } };
         String[] spacesNames = { "DefaultInputSpace", "DefaultOutputSpace", "GlobalSpace", "UserSpaces" };
         String[] humanReadableNames = { "default INPUT space", "default OUTPUT space", "shared GLOBAL space",
-                "USER spaces" };
+                                        "USER spaces" };
         String[] default_paths = { DEFAULT_LOCAL_INPUT, DEFAULT_LOCAL_OUTPUT, DEFAULT_LOCAL_GLOBAL,
-                DEFAULT_LOCAL_USER };
+                                   DEFAULT_LOCAL_USER };
 
         for (int i = 0; i < confs.length; i++) {
             //variable used to precise exception
@@ -193,8 +188,7 @@ public class DataSpaceServiceStarter implements Serializable {
                         dir.mkdirs();
                     }
 
-                    FileSystemServerDeployer server = startServer(spacesNames[i], humanReadableNames[i],
-                            spaceDir);
+                    FileSystemServerDeployer server = startServer(spacesNames[i], humanReadableNames[i], spaceDir);
 
                     servers.add(server);
 
@@ -207,23 +201,25 @@ public class DataSpaceServiceStarter implements Serializable {
                     logger.debug(humanReadableNames[i] + " server local path is " + spaceDir);
                 } catch (IllegalArgumentException iae) {
                     throw new IllegalArgumentException("Directory '" + spaceDir +
-                        "' cannot be accessed. Check if directory exists or if you have read/write rights.");
+                                                       "' cannot be accessed. Check if directory exists or if you have read/write rights.");
                 }
             }
         }
 
         Set<SpaceInstanceInfo> predefinedSpaces = new HashSet<>();
-        namingService.registerApplication(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
-                predefinedSpaces);
+        namingService.registerApplication(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID, predefinedSpaces);
 
         serviceStarted = true;
 
         try {
             // register the Global space
             createSpace(SchedulerConstants.SCHEDULER_DATASPACE_APPLICATION_ID,
-                    SchedulerConstants.GLOBALSPACE_NAME, PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL
-                            .getValueAsString(), PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH
-                            .getValueAsString(), localhostname, false, true);
+                        SchedulerConstants.GLOBALSPACE_NAME,
+                        PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_URL.getValueAsString(),
+                        PASchedulerProperties.DATASPACE_DEFAULTGLOBAL_LOCALPATH.getValueAsString(),
+                        localhostname,
+                        false,
+                        true);
         } catch (Exception e) {
             logger.error("", e);
         }
@@ -263,8 +259,8 @@ public class DataSpaceServiceStarter implements Serializable {
      * @param localConfiguration if the local node needs to be configured for the provided application
      */
     public void createSpace(String appID, String name, String urlsproperty, String path, String hostname,
-            boolean inputConfiguration, boolean localConfiguration) throws FileSystemException,
-            URISyntaxException, ProActiveException, MalformedURLException {
+            boolean inputConfiguration, boolean localConfiguration)
+            throws FileSystemException, URISyntaxException, ProActiveException, MalformedURLException {
         if (!serviceStarted) {
             throw new IllegalStateException("DataSpace service is not started");
         }
@@ -272,12 +268,12 @@ public class DataSpaceServiceStarter implements Serializable {
         if (!spacesConfigurations.containsKey(appID)) {
             if (localConfiguration) {
                 if (appidConfigured != null) {
-                    logger.warn("Node " + schedulerNode.getNodeInformation().getURL() +
-                        " was configured for appid = " + appidConfigured + ", reconfiguring...");
+                    logger.warn("Node " + schedulerNode.getNodeInformation().getURL() + " was configured for appid = " +
+                                appidConfigured + ", reconfiguring...");
                 }
                 DataSpacesNodes.configureApplication(schedulerNode, appID, namingService);
-                logger.debug("Node " + schedulerNode.getNodeInformation().getURL() +
-                    " configured for appid = " + appID);
+                logger.debug("Node " + schedulerNode.getNodeInformation().getURL() + " configured for appid = " +
+                             appID);
 
                 appidConfigured = appID;
             } else {
@@ -287,20 +283,25 @@ public class DataSpaceServiceStarter implements Serializable {
         }
         if (spacesConfigurations.get(appID).contains(name) && !PADataSpaces.DEFAULT_IN_OUT_NAME.equals(name)) {
             throw new SpaceAlreadyRegisteredException("Space " + name + " for appid=" + appID +
-                " is already registered");
+                                                      " is already registered");
         }
         InputOutputSpaceConfiguration spaceConf = null;
 
         // Converts the property to an ArrayList
-        ArrayList<String> finalurls = new ArrayList<>(Arrays
-                .asList(dsConfigPropertyToUrls(urlsproperty)));
+        ArrayList<String> finalurls = new ArrayList<>(Arrays.asList(dsConfigPropertyToUrls(urlsproperty)));
 
         if (inputConfiguration) {
-            spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(finalurls, path,
-                    hostname != null ? hostname : localhostname, name);
+            spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(finalurls,
+                                                                                    path,
+                                                                                    hostname != null ? hostname
+                                                                                                     : localhostname,
+                                                                                    name);
         } else {
-            spaceConf = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(finalurls, path,
-                    hostname != null ? hostname : localhostname, name);
+            spaceConf = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(finalurls,
+                                                                                     path,
+                                                                                     hostname != null ? hostname
+                                                                                                      : localhostname,
+                                                                                     name);
         }
 
         namingService.register(new SpaceInstanceInfo(appID, spaceConf));
@@ -352,8 +353,7 @@ public class DataSpaceServiceStarter implements Serializable {
         String newPropertyValue = urlsToDSConfigProperty(updatedArray);
 
         // create the User Space for the given user
-        createSpace(appID, spaceName, newPropertyValue, localpath, hostname, inputConfiguration,
-                localConfiguration);
+        createSpace(appID, spaceName, newPropertyValue, localpath, hostname, inputConfiguration, localConfiguration);
 
     }
 

@@ -1,47 +1,36 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
-import org.ow2.proactive.scripting.InvalidScriptException;
-import org.ow2.proactive.scripting.SimpleScript;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.exception.ExecutableCreationException;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.SimpleScript;
 
 
 /**
@@ -101,8 +90,7 @@ public class TestForkEnvironment {
         Assert.assertEquals("a", forkEnvironment.getAdditionalClasspath().get(0));
         Assert.assertEquals("b", forkEnvironment.getAdditionalClasspath().get(1));
         Assert.assertEquals("c", forkEnvironment.getAdditionalClasspath().get(2));
-        Assert.assertFalse(
-                forkEnvironment.getAdditionalClasspath() == forkEnvironment.getAdditionalClasspath());
+        Assert.assertFalse(forkEnvironment.getAdditionalClasspath() == forkEnvironment.getAdditionalClasspath());
     }
 
     @Test(expected = NullPointerException.class)
@@ -157,8 +145,7 @@ public class TestForkEnvironment {
         try {
             internalForkEnvironment.addSystemEnvironmentVariable("toto", null);
             forkEnvironment.addSystemEnvironmentVariable(null, "tata");
-            throw new RuntimeException(
-                    "forkEnvironment.addSystemEnvironmentVariable(null,value) did not throw an IllegalArgumentException");
+            throw new RuntimeException("forkEnvironment.addSystemEnvironmentVariable(null,value) did not throw an IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
     }
@@ -166,11 +153,9 @@ public class TestForkEnvironment {
     @Test
     public void testEquality() throws ExecutableCreationException {
         InternalForkEnvironment internalForkEnvironment = new InternalForkEnvironment(forkEnvironment);
-        Assert.assertEquals(forkEnvironment.getAdditionalClasspath(),
-                internalForkEnvironment.getAdditionalClasspath());
+        Assert.assertEquals(forkEnvironment.getAdditionalClasspath(), internalForkEnvironment.getAdditionalClasspath());
         Assert.assertEquals(forkEnvironment.getJavaHome(), internalForkEnvironment.getJavaHome());
-        Assert.assertEquals(forkEnvironment.getSystemEnvironment(),
-                internalForkEnvironment.getSystemEnvironment());
+        Assert.assertEquals(forkEnvironment.getSystemEnvironment(), internalForkEnvironment.getSystemEnvironment());
         Assert.assertEquals(forkEnvironment.getWorkingDir(), internalForkEnvironment.getWorkingDir());
         Assert.assertEquals(forkEnvironment.getEnvScript(), internalForkEnvironment.getEnvScript());
         Assert.assertEquals(forkEnvironment.getJVMArguments(), internalForkEnvironment.getJVMArguments());

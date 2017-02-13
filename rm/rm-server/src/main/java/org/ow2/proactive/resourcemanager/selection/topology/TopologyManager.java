@@ -1,40 +1,32 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.selection.topology;
+
+import java.net.InetAddress;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -52,9 +44,6 @@ import org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger;
 import org.ow2.proactive.topology.descriptor.*;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.net.InetAddress;
-import java.util.*;
-
 
 /**
  * Class is responsible for collecting the topology information, keeping it up to date and taking it into
@@ -65,12 +54,16 @@ public class TopologyManager {
 
     // logger
     private final static Logger logger = Logger.getLogger(TopologyManager.class);
+
     // list of handlers corresponded to topology descriptors
     private final HashMap<Class<? extends TopologyDescriptor>, TopologyHandler> handlers = new HashMap<>();
+
     // hosts distances
     private final TopologyImpl topology = new TopologyImpl();
+
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
     private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<>();
+
     // class using for pinging
     private Class<? extends Pinger> pingerClass;
 
@@ -89,8 +82,7 @@ public class TopologyManager {
         handlers.put(MultipleHostsExclusiveDescriptor.class, new MultipleHostsExclusiveHandler());
         handlers.put(DifferentHostsExclusiveDescriptor.class, new DifferentHostsExclusiveHandler());
 
-        pingerClass = (Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER
-                .getValueAsString());
+        pingerClass = (Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER.getValueAsString());
     }
 
     /**
@@ -102,7 +94,8 @@ public class TopologyManager {
             !PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
             throw new TopologyDisabledException("Topology is disabled");
         }
-        if (topologyDescriptor instanceof BestProximityDescriptor || topologyDescriptor instanceof ThresholdProximityDescriptor) {
+        if (topologyDescriptor instanceof BestProximityDescriptor ||
+            topologyDescriptor instanceof ThresholdProximityDescriptor) {
             if (!PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
                 throw new TopologyDisabledException("Topology distance is disabled, cannot use distance-based descriptors");
             }
@@ -135,7 +128,7 @@ public class TopologyManager {
                 // host topology is already known
                 if (logger.isDebugEnabled()) {
                     logger.debug("The topology information has been already added for node " +
-                            node.getNodeInformation().getURL());
+                                 node.getNodeInformation().getURL());
                 }
                 nodesOnHost.get(host).add(node);
                 return;
@@ -158,7 +151,6 @@ public class TopologyManager {
                     }
                 }
             }
-
 
             if (PAResourceManagerProperties.RM_TOPOLOGY_DISTANCE_ENABLED.getValueAsBoolean()) {
                 hostsTopology = pingNode(node, toPing);
@@ -193,9 +185,7 @@ public class TopologyManager {
             synchronized (topology) {
                 InetAddress host = node.getVMInformation().getInetAddress();
                 if (!topology.knownHost(host)) {
-                    logger
-                            .warn("Topology info does not exist for node " +
-                                node.getNodeInformation().getURL());
+                    logger.warn("Topology info does not exist for node " + node.getNodeInformation().getURL());
                 } else {
                     nodesOnHost.get(host).remove(node);
                     if (nodesOnHost.get(host).isEmpty()) {
@@ -224,8 +214,8 @@ public class TopologyManager {
             Pinger pinger = PAActiveObject.newActive(pingerClass, null, node);
             HashMap<InetAddress, Long> result = pinger.ping(nodes);
             PAFuture.waitFor(result);
-            logger.debug(result.size() + " hosts were pinged from " + node.getNodeInformation().getURL() +
-                " in " + (System.currentTimeMillis() - timeStamp) + " ms");
+            logger.debug(result.size() + " hosts were pinged from " + node.getNodeInformation().getURL() + " in " +
+                         (System.currentTimeMillis() - timeStamp) + " ms");
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Distances are:");
@@ -550,6 +540,7 @@ public class TopologyManager {
 
         private class Host implements Comparable<Host> {
             private InetAddress address;
+
             private int nodesNumber;
 
             public Host(InetAddress address, int nodesNumber) {
@@ -639,8 +630,7 @@ public class TopologyManager {
                     if (nbNodes > 0) {
                         result.add(hostNodes.iterator().next());
                         if (nbNodes > 1) {
-                            List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes,
-                                    1, nbNodes));
+                            List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes, 1, nbNodes));
                             if (result.getExtraNodes() == null) {
                                 result.setExtraNodes(new LinkedList<Node>());
                             }

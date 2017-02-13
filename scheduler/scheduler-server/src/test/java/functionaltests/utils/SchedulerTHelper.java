@@ -1,43 +1,41 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.utils;
 
-import functionaltests.monitor.RMMonitorsHandler;
-import functionaltests.monitor.SchedulerMonitorsHandler;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -60,16 +58,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.monitor.SchedulerMonitorsHandler;
 
 
 /**
@@ -114,8 +104,7 @@ public class SchedulerTHelper {
     }
 
     // can be changed by starting the Scheduler manually
-    private SchedulerTestConfiguration currentTestConfiguration = SchedulerTestConfiguration
-            .defaultConfiguration();
+    private SchedulerTestConfiguration currentTestConfiguration = SchedulerTestConfiguration.defaultConfiguration();
 
     /**
      * Creates a test scheduler
@@ -174,8 +163,7 @@ public class SchedulerTHelper {
      */
     public SchedulerTHelper(boolean restart, boolean emptyRM, String configuration) throws Exception {
         if (emptyRM) {
-            startScheduler(restart,
-                    SchedulerTestConfiguration.emptyRMandCustomSchedulerConfig(configuration));
+            startScheduler(restart, SchedulerTestConfiguration.emptyRMandCustomSchedulerConfig(configuration));
         } else {
             startScheduler(restart, SchedulerTestConfiguration.customSchedulerConfig(configuration));
         }
@@ -199,10 +187,13 @@ public class SchedulerTHelper {
         startScheduler(true, SchedulerTestConfiguration.customSchedulerConfig(configuration));
     }
 
-    private void startScheduler(boolean localnodes, String schedPropertiesFilePath,
-            String rmPropertiesFilePath, String rmUrl) throws Exception {
+    private void startScheduler(boolean localnodes, String schedPropertiesFilePath, String rmPropertiesFilePath,
+            String rmUrl) throws Exception {
         SchedulerTestConfiguration configuration = new SchedulerTestConfiguration(schedPropertiesFilePath,
-            rmPropertiesFilePath, localnodes, TestScheduler.PNP_PORT, rmUrl);
+                                                                                  rmPropertiesFilePath,
+                                                                                  localnodes,
+                                                                                  TestScheduler.PNP_PORT,
+                                                                                  rmUrl);
         startScheduler(true, configuration);
     }
 
@@ -705,8 +696,7 @@ public class SchedulerTHelper {
      * @throws ProActiveTimeoutException if timeout is reached.
      */
     public JobInfo waitForEventJobRunning(JobId id, long timeout) {
-        return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_RUNNING, id,
-                timeout);
+        return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_RUNNING, id, timeout);
     }
 
     /**
@@ -751,8 +741,8 @@ public class SchedulerTHelper {
         return waitForJobEvent(userInterface, id, timeout, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
     }
 
-    private JobInfo waitForJobEvent(JobId id, long timeout, JobStatus jobStatusAfterEvent,
-            SchedulerEvent jobEvent) throws Exception {
+    private JobInfo waitForJobEvent(JobId id, long timeout, JobStatus jobStatusAfterEvent, SchedulerEvent jobEvent)
+            throws Exception {
         return waitForJobEvent(getSchedulerInterface(), id, timeout, jobStatusAfterEvent, jobEvent);
     }
 
@@ -779,8 +769,7 @@ public class SchedulerTHelper {
     }
 
     public JobInfo waitForEventPendingJobFinished(JobId id, long timeout) throws ProActiveTimeoutException {
-        return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_FINISHED, id,
-                timeout);
+        return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_FINISHED, id, timeout);
     }
 
     /**
@@ -849,8 +838,10 @@ public class SchedulerTHelper {
      * @throws ProActiveTimeoutException if timeout is reached.
      */
     public TaskInfo waitForEventTaskRunning(JobId jobId, String taskName, long timeout) {
-        return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING, jobId,
-                taskName, timeout);
+        return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_PENDING_TO_RUNNING,
+                                                              jobId,
+                                                              taskName,
+                                                              timeout);
     }
 
     /**
@@ -886,8 +877,10 @@ public class SchedulerTHelper {
      * @throws ProActiveTimeoutException if timeout is reached.
      */
     public TaskInfo waitForEventTaskWaitingForRestart(JobId jobId, String taskName, long timeout) {
-        return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_WAITING_FOR_RESTART, jobId,
-                taskName, timeout);
+        return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_WAITING_FOR_RESTART,
+                                                              jobId,
+                                                              taskName,
+                                                              timeout);
     }
 
     /**
@@ -923,8 +916,10 @@ public class SchedulerTHelper {
      * @throws ProActiveTimeoutException if timeout is reached.
      */
     public TaskInfo waitForEventTaskFinished(JobId jobId, String taskName, long timeout) {
-        return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_RUNNING_TO_FINISHED, jobId,
-                taskName, timeout);
+        return getSchedulerMonitorsHandler().waitForEventTask(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                                                              jobId,
+                                                              taskName,
+                                                              timeout);
     }
 
     /**
@@ -1039,13 +1034,11 @@ public class SchedulerTHelper {
     }
 
     public List<TestNode> addNodesToDefaultNodeSource(int nbNodes) throws Exception {
-        return RMTHelper.addNodesToDefaultNodeSource(nbNodes, null, getResourceManager(),
-                getRMMonitorsHandler());
+        return RMTHelper.addNodesToDefaultNodeSource(nbNodes, null, getResourceManager(), getRMMonitorsHandler());
     }
 
     public List<TestNode> addNodesToDefaultNodeSource(int nbNodes, List<String> vmOptions) throws Exception {
-        return RMTHelper.addNodesToDefaultNodeSource(nbNodes, vmOptions, getResourceManager(),
-                getRMMonitorsHandler());
+        return RMTHelper.addNodesToDefaultNodeSource(nbNodes, vmOptions, getResourceManager(), getRMMonitorsHandler());
     }
 
     public TestNode createNode(String nodeName) throws Exception {
@@ -1053,8 +1046,7 @@ public class SchedulerTHelper {
         return RMTHelper.createNode(nodeName);
     }
 
-    public RMNodeEvent waitForNodeEvent(RMEventType nodeAdded, String nodeUrl, long timeout)
-            throws Exception {
+    public RMNodeEvent waitForNodeEvent(RMEventType nodeAdded, String nodeUrl, long timeout) throws Exception {
         return RMTHelper.waitForNodeEvent(nodeAdded, nodeUrl, timeout, getRMMonitorsHandler());
     }
 
@@ -1073,8 +1065,13 @@ public class SchedulerTHelper {
         Map<String, String> vmParameters = new HashMap<>();
         vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
         JVMProcessImpl nodeProcess = RMTHelper.createJvmProcess(RMNodeStarter.class.getName(),
-                Arrays.asList("-n", nodeName, "-r", getLocalUrl(), "-Dproactive.net.nolocal=false"),
-                vmParameters, null);
+                                                                Arrays.asList("-n",
+                                                                              nodeName,
+                                                                              "-r",
+                                                                              getLocalUrl(),
+                                                                              "-Dproactive.net.nolocal=false"),
+                                                                vmParameters,
+                                                                null);
         return RMTHelper.createNode(nodeName, nodeUrl, nodeProcess);
     }
 

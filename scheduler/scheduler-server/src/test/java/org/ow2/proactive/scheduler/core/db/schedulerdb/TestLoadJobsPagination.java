@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import java.util.ArrayList;
@@ -65,50 +90,108 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
 
         List<JobInfo> jobs;
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                        .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)))
+                        .getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
-                new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
-                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
+                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                        .getList();
         checkJobs(jobs, 1, 4, 2, 5, 3, 6);
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
-                new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
-                new SortParameter<>(JobSortParameter.ID, SortOrder.DESC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.NAME, SortOrder.ASC),
+                                                new SortParameter<>(JobSortParameter.ID, SortOrder.DESC)))
+                        .getList();
         checkJobs(jobs, 4, 1, 5, 2, 6, 3);
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.ASC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.ASC)))
+                        .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true,
-                sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.DESC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.OWNER, SortOrder.DESC)))
+                        .getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
-        jobs = dbManager
-                .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<>(
-                        JobSortParameter.PRIORITY, SortOrder.ASC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.PRIORITY, SortOrder.ASC)))
+                        .getList();
         checkJobs(jobs, 1, 2, 3, 4, 5, 6);
 
-        jobs = dbManager
-                .getJobs(0, 10, null, true, true, true, sortParameters(new SortParameter<>(
-                        JobSortParameter.PRIORITY, SortOrder.DESC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.PRIORITY, SortOrder.DESC)))
+                        .getList();
         checkJobs(jobs, 6, 5, 4, 3, 2, 1);
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
-                new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
-                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.STATE, SortOrder.ASC),
+                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                        .getList();
         checkJobs(jobs, 2, 4, 6, 3, 5, 1);
 
-        jobs = dbManager.getJobs(0, 10, null, true, true, true, sortParameters(
-                new SortParameter<>(JobSortParameter.STATE, SortOrder.DESC),
-                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC))).getList();
+        jobs = dbManager.getJobs(0,
+                                 10,
+                                 null,
+                                 true,
+                                 true,
+                                 true,
+                                 sortParameters(new SortParameter<>(JobSortParameter.STATE, SortOrder.DESC),
+                                                new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                        .getList();
         checkJobs(jobs, 1, 3, 5, 2, 4, 6);
     }
 
@@ -145,8 +228,7 @@ public class TestLoadJobsPagination extends BaseSchedulerDBTest {
         TaskResultImpl result = new TaskResultImpl(null, new TestResult(0, "result"), null, 0);
         job.terminateTask(false, task.getId(), null, null, result);
         job.terminate();
-        dbManager.updateAfterTaskFinished(job, task, new TaskResultImpl(null, new TestResult(0, "result"),
-            null, 0));
+        dbManager.updateAfterTaskFinished(job, task, new TaskResultImpl(null, new TestResult(0, "result"), null, 0));
 
         // canceled job - 7
         job = defaultSubmitJob(createJob());

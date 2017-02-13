@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package functionaltests.api;
 
 import static org.junit.Assert.assertEquals;
@@ -48,11 +73,11 @@ import functionaltests.utils.TestUsers;
  */
 public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
-    private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_ASC = ImmutableList
-            .of(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC));
+    private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_ASC = ImmutableList.of(new SortParameter<>(JobSortParameter.ID,
+                                                                                                                     SortOrder.ASC));
 
-    private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_DESC = ImmutableList
-            .of(new SortParameter<>(JobSortParameter.ID, SortOrder.DESC));
+    private static final List<SortParameter<JobSortParameter>> SORT_BY_ID_DESC = ImmutableList.of(new SortParameter<>(JobSortParameter.ID,
+                                                                                                                      SortOrder.DESC));
 
     private MonitorEventReceiver eventReceiver;
 
@@ -62,8 +87,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
-        List<JobInfo> jobs = scheduler.getJobs(0, 1000, criteria(true, true, true, true), SORT_BY_ID_ASC)
-                .getList();
+        List<JobInfo> jobs = scheduler.getJobs(0, 1000, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
 
         for (JobInfo job : jobs) {
             scheduler.removeJob(job.getJobId());
@@ -97,8 +121,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         logger.info("File lock location is " + fileLockPath);
 
         JobInfo job;
-        List<JobInfo> jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC)
-                .getList();
+        List<JobInfo> jobs = scheduler.getJobs(0, 1, criteria(true, true, true, true), SORT_BY_ID_ASC).getList();
         checkJobs(jobs);
 
         JobId firstJob = scheduler.submit(createJob(fileLockPath));
@@ -116,9 +139,9 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         assertEquals(JobStatus.RUNNING, job.getStatus());
 
         assertTrue("Unexpected submit time: " + job.getSubmittedTime(),
-                job.getSubmittedTime() > time && job.getSubmittedTime() < System.currentTimeMillis());
+                   job.getSubmittedTime() > time && job.getSubmittedTime() < System.currentTimeMillis());
         assertTrue("Unexpected start time: " + job.getStartTime(),
-                job.getStartTime() > time && job.getStartTime() < System.currentTimeMillis());
+                   job.getStartTime() > time && job.getStartTime() < System.currentTimeMillis());
         assertEquals(-1, job.getFinishedTime());
         assertEquals(-1, job.getRemovedTime());
         assertEquals(TestUsers.DEMO.username, job.getJobOwner());
@@ -164,8 +187,8 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
         SchedulerMonitorsHandler monitorsHandler = new SchedulerMonitorsHandler();
 
         SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
-        Credentials cred = Credentials.createCredentials(
-                new CredData(TestUsers.USER.username, TestUsers.USER.password), auth.getPublicKey());
+        Credentials cred = Credentials.createCredentials(new CredData(TestUsers.USER.username, TestUsers.USER.password),
+                                                         auth.getPublicKey());
         scheduler = auth.login(cred);
 
         eventReceiver = new MonitorEventReceiver(monitorsHandler);
@@ -284,8 +307,7 @@ public class TestLoadJobs extends SchedulerFunctionalTestNoRestart {
 
     }
 
-    private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running,
-            boolean finished) {
+    private JobFilterCriteria criteria(boolean myJobsOnly, boolean pending, boolean running, boolean finished) {
         return new JobFilterCriteria(myJobsOnly, pending, running, finished);
     }
 

@@ -14,4 +14,3 @@ log "Starting housekeeping $(date)\n"
 /usr/bin/psql scheduler postgres < $PLPGSQL_FILE 2>&1 >> $LOG_FILE
 
 log "End $(date)\n\n\n"
-

@@ -12,4 +12,3 @@ task stub(type: StubTask) {
     ]
 }
 serialver.dependsOn stub
-

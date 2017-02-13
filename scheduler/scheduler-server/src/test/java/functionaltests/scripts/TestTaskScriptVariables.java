@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.scripts;
 
@@ -57,16 +46,15 @@ import functionaltests.utils.SchedulerFunctionalTestNoRestart;
  */
 public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
 
-    private static URL jobDescriptor = TestTaskScriptVariables.class
-            .getResource("/functionaltests/descriptors/Task_script_variables.xml");
+    private static URL jobDescriptor = TestTaskScriptVariables.class.getResource("/functionaltests/descriptors/Task_script_variables.xml");
 
     @Test
     public void testTaskVariables() throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
-                new File(jobDescriptor.toURI()).getAbsolutePath());
-        
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory()
+                                                      .createJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+
         JobId id = schedulerHelper.submitJob(job);
-        schedulerHelper.waitForEventJobFinished(id);  
+        schedulerHelper.waitForEventJobFinished(id);
 
         //Wait for cleaning scripts to be executed
         Thread.sleep(2000);
@@ -78,7 +66,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         TaskLogs outputChild = schedulerHelper.getTaskResult(id, "childTask").getOutput();
         String[] outputChildLines = outputChild.getStdoutLogs(false).split(System.lineSeparator());
         TaskLogs outputNoVariables = schedulerHelper.getTaskResult(id, "taskNoVariables").getOutput();
-        String[] outputNoVariablesLines = outputNoVariables.getStdoutLogs(false).split(System.lineSeparator());        
+        String[] outputNoVariablesLines = outputNoVariables.getStdoutLogs(false).split(System.lineSeparator());
 
         //Tests variable access
         assertEquals("testvarjob3", job.getVariables().get("TESTVAR3").getValue());
@@ -93,7 +81,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         assertEquals("testvartask4", outputVariablesLines[3]);
         //Inherited value
         assertEquals("testvarjob6", outputVariablesLines[4]);
-        
+
         //Test that child tasks don't have access to task variables
         assertEquals(8, outputChildLines.length);
         assertEquals("testvarjob0", outputChildLines[0]);
@@ -104,7 +92,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         assertEquals("testvarjob5", outputChildLines[5]);
         assertEquals("testvarjob6", outputChildLines[6]);
         assertEquals("testvar7modified", outputChildLines[7]);
-        
+
         //Test that other tasks don't have access to task variables
         assertEquals(8, outputNoVariablesLines.length);
         assertEquals("testvarjob0", outputNoVariablesLines[0]);
@@ -118,7 +106,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
 
         //Cleaning script
         assertTrue(logs.contains("(taskVariables) testvartask5"));
-        
+
         //Variables use into generic information
         Map<String, String> genericInformations = job.getGenericInformation();
         assertEquals(1, genericInformations.size());
@@ -135,7 +123,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         genericInformations = job.getTask("taskNoVariables").getGenericInformation();
         assertEquals(1, genericInformations.size());
         assertEquals("testvarjob2", genericInformations.get("taskNoVariablesGI"));
-        
+
         //Variables use into node configuration
         assertEquals(2, job.getTask("taskVariables").getParallelEnvironment().getNodesNumber());
         assertEquals(1, job.getTask("childTask").getParallelEnvironment().getNodesNumber());

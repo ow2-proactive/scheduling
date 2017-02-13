@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.resourcemanager.selection;
 
 import static java.util.Collections.emptySet;
@@ -48,13 +73,13 @@ public class SelectionManagerTest {
     @Test
     public void selectWithDifferentPermissions() throws Exception {
         PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.updateProperty("10");
-        System.out.println("PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER=" + PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER);
+        System.out.println("PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER=" +
+                           PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER);
         System.setSecurityManager(securityManagerRejectingUser());
 
         RMCore.topologyManager = mock(TopologyManager.class);
         RMCore rmCore = mock(RMCore.class);
-        when(RMCore.topologyManager.getHandler(Matchers.<TopologyDescriptor> any())).thenReturn(
-                selectAllTopology());
+        when(RMCore.topologyManager.getHandler(Matchers.<TopologyDescriptor> any())).thenReturn(selectAllTopology());
 
         SelectionManager selectionManager = createSelectionManager(rmCore);
 
@@ -126,7 +151,7 @@ public class SelectionManagerTest {
             @Override
             public void checkPermission(Permission perm) {
                 if (perm.getName().equals("Identities collection") &&
-                        ((PrincipalPermission) perm).hasPrincipal(new UserNamePrincipal("user"))) {
+                    ((PrincipalPermission) perm).hasPrincipal(new UserNamePrincipal("user"))) {
                     throw new SecurityException();
                 }
             }
@@ -142,8 +167,7 @@ public class SelectionManagerTest {
     private SelectionManager createSelectionManager(final RMCore rmCore) {
         return new SelectionManager(rmCore) {
             @Override
-            public List<RMNode> arrangeNodesForScriptExecution(List<RMNode> nodes,
-                                                               List<SelectionScript> scripts) {
+            public List<RMNode> arrangeNodesForScriptExecution(List<RMNode> nodes, List<SelectionScript> scripts) {
                 return nodes;
             }
 
@@ -154,7 +178,7 @@ public class SelectionManagerTest {
 
             @Override
             public boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
-                                               RMNode rmnode) {
+                    RMNode rmnode) {
                 return false;
             }
         };
@@ -173,7 +197,6 @@ public class SelectionManagerTest {
         return newMockedRMCore(0);
     }
 
-
     private RMCore newMockedRMCore(int nbNodes) {
         RMCore mockedRMCore = Mockito.mock(RMCore.class);
         TopologyManager mockedTopologyManager = Mockito.mock(TopologyManager.class);
@@ -183,7 +206,7 @@ public class SelectionManagerTest {
         if (nbNodes > 0) {
             ArrayList<RMNode> freeNodes = new ArrayList<RMNode>(nbNodes);
             for (int i = 0; i < nbNodes; i++) {
-                freeNodes.add(createMockeNode("user", "mocked-node-" + (i+1), "mocked-node-" + (i+1)));
+                freeNodes.add(createMockeNode("user", "mocked-node-" + (i + 1), "mocked-node-" + (i + 1)));
             }
             when(mockedRMCore.getFreeNodes()).thenReturn(freeNodes);
         }
@@ -205,8 +228,8 @@ public class SelectionManagerTest {
         when(rmNode.getNodeName()).thenReturn(nodeName);
         when(rmNode.getNodeSource()).thenReturn(new NodeSource());
         when(rmNode.getNode()).thenReturn(node);
-        when(rmNode.getUserPermission()).thenReturn(
-                new PrincipalPermission("permissions", singleton(new UserNamePrincipal(nodeUser))));
+        when(rmNode.getUserPermission()).thenReturn(new PrincipalPermission("permissions",
+                                                                            singleton(new UserNamePrincipal(nodeUser))));
         return rmNode;
     }
 }

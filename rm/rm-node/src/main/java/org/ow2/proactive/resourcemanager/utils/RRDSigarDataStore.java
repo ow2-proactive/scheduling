@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.resourcemanager.utils;
 
@@ -63,9 +52,10 @@ import org.rrd4j.core.Sample;
 public class RRDSigarDataStore extends RRDDataStore {
 
     private static final String[] OBJECT_NAMES = { "java.lang:type=OperatingSystem", "java.lang:type=Memory",
-            "java.lang:type=Threading", "java.lang:type=ClassLoading", "sigar:Type=CpuCoreUsage,Name=*",
-            "sigar:Type=FileSystem,Name=*", "sigar:Type=CpuUsage", "sigar:Type=Mem",
-            "sigar:Type=NetInterface,Name=*", "sigar:Type=Swap" };
+                                                   "java.lang:type=Threading", "java.lang:type=ClassLoading",
+                                                   "sigar:Type=CpuCoreUsage,Name=*", "sigar:Type=FileSystem,Name=*",
+                                                   "sigar:Type=CpuUsage", "sigar:Type=Mem",
+                                                   "sigar:Type=NetInterface,Name=*", "sigar:Type=Swap" };
 
     private HashMap<String, String> compositeTypes = new HashMap<>();
 
@@ -79,9 +69,8 @@ public class RRDSigarDataStore extends RRDDataStore {
      * @param step             is the data base refresh period
      * @throws java.io.IOException is thrown when the data base exists but cannot be read
      */
-    public RRDSigarDataStore(MBeanServer mbs, String dataBaseFilePath, int step, Logger logger)
-            throws IOException, MalformedObjectNameException, IntrospectionException,
-            InstanceNotFoundException, ReflectionException {
+    public RRDSigarDataStore(MBeanServer mbs, String dataBaseFilePath, int step, Logger logger) throws IOException,
+            MalformedObjectNameException, IntrospectionException, InstanceNotFoundException, ReflectionException {
         super(dataBaseFilePath, step, logger);
 
         compositeTypes.put("HeapMemoryUsage-java.lang:type=Memory", "used");
@@ -189,23 +178,21 @@ public class RRDSigarDataStore extends RRDDataStore {
                 sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
                 if (logger.isTraceEnabled()) {
                     logger.trace(timeInMs / 1000 + " sampling: " + dataSource + " / " + fullName + " " +
-                        Double.parseDouble(attrValue.toString()));
+                                 Double.parseDouble(attrValue.toString()));
                 }
             } catch (NumberFormatException ex) {
                 // do not save non-numeric values
                 if (logger.isTraceEnabled()) {
-                    logger.trace("Non numeric value for " + dataSource + " / " + fullName + ": " +
-                        ex.getMessage());
+                    logger.trace("Non numeric value for " + dataSource + " / " + fullName + ": " + ex.getMessage());
                 }
             } catch (InstanceNotFoundException | AttributeNotFoundException e) {
                 if (logger.isTraceEnabled()) {
                     logger.trace("Cannot read attribute " + attrName + " for object " + objectName + ": " +
-                        e.getMessage());
+                                 e.getMessage());
                 }
 
             } catch (Exception e) {
-                logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ",
-                        e);
+                logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
 
             }
         }

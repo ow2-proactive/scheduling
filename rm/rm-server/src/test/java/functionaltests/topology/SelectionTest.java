@@ -1,43 +1,35 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.topology;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,10 +48,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 
 /**
@@ -80,10 +70,12 @@ import java.util.List;
 @Ignore("requires several machines")
 public class SelectionTest extends RMFunctionalTest {
 
-    private String vmPropSelectionScriptpath = this.getClass().getResource(
-            "/functionaltests/selectionscript/vmPropertySelectionScript.groovy").getPath();
+    private String vmPropSelectionScriptpath = this.getClass()
+                                                   .getResource("/functionaltests/selectionscript/vmPropertySelectionScript.groovy")
+                                                   .getPath();
 
     private String vmPropKey1 = "myProperty1";
+
     private String vmPropValue1 = "myValue1";
 
     @Test
@@ -103,17 +95,21 @@ public class SelectionTest extends RMFunctionalTest {
             String javaExec = System.getenv("JAVA_HOME") + "/bin/java";
 
             // properties are defined, trying to deploy nodes to these hosts
-            BooleanWrapper result = rmHelper.getResourceManager().createNodeSource("remote",
-                    SSHInfrastructure.class.getName(), new Object[] { "", // ssh options
-                            javaExec, // java executable path
-                            rmHome, // rmHelper distrib path
-                            "30000", // node lookup timeout
-                            "2", //attempts
-                            "Linux", // os
-                            "", // java options
-                            FileToBytesConverter.convertFileToByteArray(new File(rmCredPath)), // rmHelper credential
-                            (distantHost + " 2\n" + neighborHost).getBytes() }, StaticPolicy.class.getName(),
-                    null);
+            BooleanWrapper result = rmHelper.getResourceManager()
+                                            .createNodeSource("remote",
+                                                              SSHInfrastructure.class.getName(),
+                                                              new Object[] { "", // ssh options
+                                                                             javaExec, // java executable path
+                                                                             rmHome, // rmHelper distrib path
+                                                                             "30000", // node lookup timeout
+                                                                             "2", //attempts
+                                                                             "Linux", // os
+                                                                             "", // java options
+                                                                             FileToBytesConverter.convertFileToByteArray(new File(rmCredPath)), // rmHelper credential
+                                                                             (distantHost + " 2\n" +
+                                                                              neighborHost).getBytes() },
+                                                              StaticPolicy.class.getName(),
+                                                              null);
 
             if (result.getBooleanValue()) {
                 rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -133,8 +129,9 @@ public class SelectionTest extends RMFunctionalTest {
         }
 
         // creating the selection script object
-        SelectionScript script = new SelectionScript(new File(vmPropSelectionScriptpath), new String[] {
-                this.vmPropKey1, this.vmPropValue1 }, true);
+        SelectionScript script = new SelectionScript(new File(vmPropSelectionScriptpath),
+                                                     new String[] { this.vmPropKey1, this.vmPropValue1 },
+                                                     true);
         List<SelectionScript> scriptList = new LinkedList<>();
         scriptList.add(script);
 
@@ -245,8 +242,7 @@ public class SelectionTest extends RMFunctionalTest {
         Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        ns = resourceManager
-                .getAtMostNodes(100, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
+        ns = resourceManager.getAtMostNodes(100, new ThresholdProximityDescriptor(Long.MAX_VALUE), null, null);
         Assert.assertEquals(9, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
@@ -263,32 +259,34 @@ public class SelectionTest extends RMFunctionalTest {
             Assert.assertTrue("Please put full host names to the parameters", false);
         }
         if (current2neighborDistance > current2distantDistance) {
-            Assert.assertTrue("Distant host is close to current than neighbor according to the topology",
-                    false);
+            Assert.assertTrue("Distant host is close to current than neighbor according to the topology", false);
         }
 
         System.out.println("Distance between " + currentHost + " and " + neighborHost + " is " +
-            current2neighborDistance);
+                           current2neighborDistance);
         System.out.println("Distance between " + currentHost + " and " + distantHost + " is " +
-            current2distantDistance);
+                           current2distantDistance);
         System.out.println("Distance between " + neighborHost + " and " + distantHost + " is " +
-            distant2neightborDistance);
+                           distant2neightborDistance);
 
-        long maxThreshold = Math.max(current2neighborDistance, Math.max(current2distantDistance,
-                distant2neightborDistance));
+        long maxThreshold = Math.max(current2neighborDistance,
+                                     Math.max(current2distantDistance, distant2neightborDistance));
 
-        ns = resourceManager.getAtMostNodes(100, new ThresholdProximityDescriptor(
-            current2neighborDistance - 1), null, null);
+        ns = resourceManager.getAtMostNodes(100,
+                                            new ThresholdProximityDescriptor(current2neighborDistance - 1),
+                                            null,
+                                            null);
         Assert.assertEquals(6, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        ns = resourceManager.getAtMostNodes(100, new ThresholdProximityDescriptor(current2neighborDistance),
-                null, null);
+        ns = resourceManager.getAtMostNodes(100,
+                                            new ThresholdProximityDescriptor(current2neighborDistance),
+                                            null,
+                                            null);
         Assert.assertEquals(7, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        ns = resourceManager.getAtMostNodes(100, new ThresholdProximityDescriptor(maxThreshold - 1), null,
-                null);
+        ns = resourceManager.getAtMostNodes(100, new ThresholdProximityDescriptor(maxThreshold - 1), null, null);
         for (Node node : ns) {
             if (node.getNodeInformation().getURL().contains(distantHost)) {
                 Assert.assertTrue("Node from distant host selected", false);
@@ -413,8 +411,7 @@ public class SelectionTest extends RMFunctionalTest {
         Assert.assertEquals(null, ns.getExtraNodes());
         resourceManager.releaseNodes(ns).getBooleanValue();
 
-        ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, scriptList,
-                null);
+        ns = resourceManager.getAtMostNodes(100, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, scriptList, null);
         // selection script specified => no such set
         Assert.assertEquals(0, ns.size());
         resourceManager.releaseNodes(ns).getBooleanValue();

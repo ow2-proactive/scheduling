@@ -1,4 +1,31 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -14,7 +41,6 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
-import static com.google.common.base.Throwables.getStackTraceAsString;
 
 /**
  *
@@ -25,17 +51,22 @@ import static com.google.common.base.Throwables.getStackTraceAsString;
 public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManager {
 
     public static final String CLI_FILE_PROPERTY = "cli.file.property";
+
     public static final String NODE_NAME = "node.name";
+
     public static final String HOST_NAME = "host.name";
+
     public static final String NODESOURCE_NAME = "nodesource.name";
+
     public static final String NODESOURCE_CREDENTIALS = "nodesource.credentials";
+
     public static final String NB_NODES = "nb.nodes";
 
     @Configurable(description = "Command that will be launched for every host")
     protected String command = "scp -o StrictHostKeyChecking=no ${pa.rm.home}/dist/war/rest/node.jar ${host.name}:/tmp/${node.name}.jar && " +
-        "ssh -o StrictHostKeyChecking=no ${host.name} " +
-            "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -w ${nb.nodes} -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +
-        "1>>/tmp/${node.name}.log 2>&1\"";
+                               "ssh -o StrictHostKeyChecking=no ${host.name} " +
+                               "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -w ${nb.nodes} -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +
+                               "1>>/tmp/${node.name}.log 2>&1\"";
 
     @Override
     public void configure(Object... parameters) {
@@ -80,7 +111,10 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
 
         final List<String> depNodeURLs = new ArrayList<>(nbNodes);
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
-        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, filledCommand, "Deploying node on host " + host, this.nodeTimeOut));
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
+                                                     filledCommand,
+                                                     "Deploying node on host " + host,
+                                                     this.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
         Process p;
@@ -89,8 +123,10 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             logger.debug("Launching the command: " + filledCommand);
             p = Runtime.getRuntime().exec(new String[] { "bash", "-c", filledCommand });
         } catch (IOException e1) {
-            multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + filledCommand +
-                    " - \n The following exception occurred: " + getStackTraceAsString(e1));
+            multipleDeclareDeployingNodeLost(depNodeURLs,
+                                             "Cannot run command: " + filledCommand +
+                                                          " - \n The following exception occurred: " +
+                                                          getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + filledCommand, e1);
         }
 
@@ -101,16 +137,15 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("Child process at " + host.getHostName() + " exited abnormally (" +
-                        exitCode + ").");
+                    logger.error("Child process at " + host.getHostName() + " exited abnormally (" + exitCode + ").");
                 } else {
                     logger.error("Launching node script has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
-                final String description = "Script failed to launch a node on host " + host.getHostName() +
-                    lf + "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " +
-                    pOutPut;
+                final String description = "Script failed to launch a node on host " + host.getHostName() + lf +
+                                           "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut +
+                                           "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
@@ -120,8 +155,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
                     return;
                 } else {
                     // there isn't any race regarding node registration
-                    throw new RMException(
-                        "A node " + nodeName + " is not expected anymore because of an error.");
+                    throw new RMException("A node " + nodeName + " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");

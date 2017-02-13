@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.task;
 
@@ -93,16 +82,23 @@ import com.google.common.base.Stopwatch;
 public class TaskLauncher implements InitActive {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
+
     final private TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
+
     private TaskLauncherFactory factory;
 
     private TaskId taskId;
+
     private TaskLauncherInitializer initializer;
 
     private TaskLogger taskLogger;
+
     private TaskKiller taskKiller;
+
     private Decrypter decrypter;
+
     private ProgressFileReader progressFileReader;
+
     private Thread nodeShutdownHook;
 
     /**
@@ -126,8 +122,7 @@ public class TaskLauncher implements InitActive {
         this.taskId = initializer.getTaskId();
         this.taskLogger = new TaskLogger(taskId, getHostname());
         this.progressFileReader = new ProgressFileReader();
-        this.taskKiller = new TaskKiller(Thread.currentThread(),
-                new CleanupTimeoutGetter());
+        this.taskKiller = new TaskKiller(Thread.currentThread(), new CleanupTimeoutGetter());
         nodeShutdownHook = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -163,18 +158,26 @@ public class TaskLauncher implements InitActive {
             addShutdownHook();
             // lock the cache space cleaning mechanism
             DataSpaceNodeConfigurationAgent.lockCacheSpaceCleaning();
-            dataspaces = factory.createTaskDataspaces(taskId, initializer.getNamingService(),
-                    executableContainer.isRunAsUser());
+            dataspaces = factory.createTaskDataspaces(taskId,
+                                                      initializer.getNamingService(),
+                                                      executableContainer.isRunAsUser());
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
-            TaskContext context = new TaskContext(executableContainer, initializer, previousTasksResults,
-                new NodeDataSpacesURIs(dataspaces.getScratchURI(), dataspaces.getCacheURI(),
-                    dataspaces.getInputURI(), dataspaces.getOutputURI(), dataspaces.getUserURI(),
-                    dataspaces.getGlobalURI()),
-                progressFileReader.getProgressFile().toString(), getHostname(), decrypter);
+            TaskContext context = new TaskContext(executableContainer,
+                                                  initializer,
+                                                  previousTasksResults,
+                                                  new NodeDataSpacesURIs(dataspaces.getScratchURI(),
+                                                                         dataspaces.getCacheURI(),
+                                                                         dataspaces.getInputURI(),
+                                                                         dataspaces.getOutputURI(),
+                                                                         dataspaces.getUserURI(),
+                                                                         dataspaces.getGlobalURI()),
+                                                  progressFileReader.getProgressFile().toString(),
+                                                  getHostname(),
+                                                  decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
@@ -188,8 +191,7 @@ public class TaskLauncher implements InitActive {
 
             wallTimer.start();
 
-            dataspaces
-                    .copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
+            dataspaces.copyInputDataToScratch(initializer.getFilteredInputFiles(fileSelectorsFilters(context))); // should handle interrupt
 
             if (decrypter != null) {
                 decrypter.setCredentials(executableContainer.getCredentials());
@@ -211,8 +213,8 @@ public class TaskLauncher implements InitActive {
                     return;
             }
 
-            dataspaces.copyScratchDataToOutput(
-                    initializer.getFilteredOutputFiles(fileSelectorsFilters(context, taskResult)));
+            dataspaces.copyScratchDataToOutput(initializer.getFilteredOutputFiles(fileSelectorsFilters(context,
+                                                                                                       taskResult)));
 
             wallTimer.stop();
 
@@ -234,8 +236,10 @@ public class TaskLauncher implements InitActive {
                 default:
                     logger.info("Failed to execute task", taskFailure);
                     taskFailure.printStackTrace(taskLogger.getErrorSink());
-                    taskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(),
-                        taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+                    taskResult = new TaskResultImpl(taskId,
+                                                    taskFailure,
+                                                    taskLogger.getLogs(),
+                                                    taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
                     sendResultToScheduler(terminateNotification, taskResult);
             }
         } finally {
@@ -257,8 +261,7 @@ public class TaskLauncher implements InitActive {
 
     private TaskKiller replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(boolean isRunAsUser) {
         if (isRunAsUser == true) {
-            return new TaskKiller(Thread.currentThread(),
-                    new CleanupTimeoutGetterDoubleValue());
+            return new TaskKiller(Thread.currentThread(), new CleanupTimeoutGetterDoubleValue());
         } else {
             return this.taskKiller;
         }
@@ -281,8 +284,7 @@ public class TaskLauncher implements InitActive {
     }
 
     private TaskResultImpl getWalltimedTaskResult(Stopwatch taskStopwatchForFailures) {
-        String message = "Walltime of " + initializer.getWalltime() + " ms reached on task " +
-            taskId.getReadableName();
+        String message = "Walltime of " + initializer.getWalltime() + " ms reached on task " + taskId.getReadableName();
 
         return getTaskResult(taskStopwatchForFailures, new WalltimeExceededException(message));
     }
@@ -290,8 +292,10 @@ public class TaskLauncher implements InitActive {
     private TaskResultImpl getTaskResult(Stopwatch taskStopwatchForFailures, SchedulerException exception) {
         taskLogger.getErrorSink().println(exception.getMessage());
 
-        return new TaskResultImpl(taskId, exception, taskLogger.getLogs(),
-            taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+        return new TaskResultImpl(taskId,
+                                  exception,
+                                  taskLogger.getLogs(),
+                                  taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)
@@ -307,10 +311,9 @@ public class TaskLauncher implements InitActive {
         if (initializer.isPreciousLogs()) {
             try {
                 FileSelector taskLogFileSelector = new FileSelector(taskLogFile.getName());
-                taskLogFileSelector
-                        .setIncludes(new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
-                dataspaces.copyScratchDataToOutput(Collections.singletonList(
-                        new OutputSelector(taskLogFileSelector, OutputAccessMode.TransferToUserSpace)));
+                taskLogFileSelector.setIncludes(new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
+                dataspaces.copyScratchDataToOutput(Collections.singletonList(new OutputSelector(taskLogFileSelector,
+                                                                                                OutputAccessMode.TransferToUserSpace)));
             } catch (FileSystemException e) {
                 logger.warn("Cannot copy logs of task to user data spaces", e);
             }
@@ -331,8 +334,7 @@ public class TaskLauncher implements InitActive {
         return workingDir;
     }
 
-    private void sendResultToScheduler(TaskTerminateNotification terminateNotification,
-            TaskResultImpl taskResult) {
+    private void sendResultToScheduler(TaskTerminateNotification terminateNotification, TaskResultImpl taskResult) {
         if (isNodeShuttingDown()) {
             return;
         }
@@ -345,8 +347,8 @@ public class TaskLauncher implements InitActive {
                 logger.debug("Successfully notified task termination " + taskId);
                 return;
             } catch (Throwable t) {
-                logger.warn("Cannot notify task termination " + taskId + ", will try again in " +
-                    pingPeriodMs + " ms", t);
+                logger.warn("Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms",
+                            t);
 
                 if (i != pingAttempts - 1) {
                     try {
@@ -359,7 +361,7 @@ public class TaskLauncher implements InitActive {
         }
 
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
-            " attempts, terminating task launcher now");
+                     " attempts, terminating task launcher now");
     }
 
     private boolean isNodeShuttingDown() {

@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.nodesource;
 
@@ -84,13 +73,17 @@ import functionaltests.utils.RMTHelper;
 public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
     private static int port;
+
     private static SshServer sshd;
 
-
     private static String javaExePath;
+
     private static Object[] infraParams;
+
     private static Object[] policyParameters;
+
     private static String nsname = "testSSHInfra";
+
     private static int NB_NODES = 3;
 
     private ResourceManager resourceManager;
@@ -104,8 +97,11 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         RMTHelper.log("Test - Create SSH infrastructure on ssh://localhost on port " + this.port);
 
-        resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
-                StaticPolicy.class.getName(), policyParameters);
+        resourceManager.createNodeSource(nsname,
+                                         SSHInfrastructureV2.class.getName(),
+                                         infraParams,
+                                         StaticPolicy.class.getName(),
+                                         policyParameters);
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
 
         RMTHelper.log("Checking scheduler state after node source creation");
@@ -121,10 +117,14 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         resourceManager = this.rmHelper.getResourceManager();
 
-        RMTHelper.log("Test - Create SSH infrastructure with RestartDownNodes policy on ssh://localhost on port " + this.port);
+        RMTHelper.log("Test - Create SSH infrastructure with RestartDownNodes policy on ssh://localhost on port " +
+                      this.port);
 
-        resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
-                RestartDownNodesPolicy.class.getName(), policyParameters);
+        resourceManager.createNodeSource(nsname,
+                                         SSHInfrastructureV2.class.getName(),
+                                         infraParams,
+                                         RestartDownNodesPolicy.class.getName(),
+                                         policyParameters);
         RMMonitorsHandler monitorsHandler = this.rmHelper.getMonitorsHandler();
 
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, monitorsHandler);
@@ -141,7 +141,10 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         }
 
         for (Node n : ns) {
-            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 60000, monitorsHandler);
+            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                      n.getNodeInformation().getURL(),
+                                      60000,
+                                      monitorsHandler);
         }
 
         String nodeUrl = ns.get(0).getNodeInformation().getURL();
@@ -151,12 +154,18 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         RMTHelper.log("Wait for down nodes detection by the rm");
         for (Node n : ns) {
-            RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 120000, monitorsHandler);
+            RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                       n.getNodeInformation().getURL(),
+                                                       120000,
+                                                       monitorsHandler);
             assertEquals(NodeState.DOWN, ev.getNodeState());
         }
 
         for (Node n : ns) {
-            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL(), 120000, monitorsHandler);
+            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED,
+                                      n.getNodeInformation().getURL(),
+                                      120000,
+                                      monitorsHandler);
         }
 
         RMTHelper.log("Wait for nodes restart by the policy");
@@ -173,7 +182,6 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         assertEquals(NB_NODES, s.getFreeNodesNumber());
     }
 
-
     @After
     public void removeNS() throws Exception {
         RMTHelper.log("Removing node source");
@@ -183,7 +191,6 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         }
     }
-
 
     @BeforeClass
     public static void startSSHServer() throws Exception {
@@ -195,12 +202,13 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
         if (OsUtils.isUNIX()) {
-            sshd.setShellFactory(new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" }, EnumSet
-                    .of(ProcessShellFactory.TtyOptions.ONlCr)));
+            sshd.setShellFactory(new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" },
+                                                         EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr)));
         } else {
-            sshd.setShellFactory(new ProcessShellFactory(new String[] { "cmd.exe " }, EnumSet.of(
-                    ProcessShellFactory.TtyOptions.Echo, ProcessShellFactory.TtyOptions.ICrNl,
-                    ProcessShellFactory.TtyOptions.ONlCr)));
+            sshd.setShellFactory(new ProcessShellFactory(new String[] { "cmd.exe " },
+                                                         EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
+                                                                    ProcessShellFactory.TtyOptions.ICrNl,
+                                                                    ProcessShellFactory.TtyOptions.ONlCr)));
         }
 
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
@@ -222,7 +230,8 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr);
                 } else {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
-                            ProcessShellFactory.TtyOptions.ICrNl, ProcessShellFactory.TtyOptions.ONlCr);
+                                            ProcessShellFactory.TtyOptions.ICrNl,
+                                            ProcessShellFactory.TtyOptions.ONlCr);
                 }
                 return new ProcessShellFactory(splitCommand(command), ttyOptions).create();
             }
@@ -233,22 +242,22 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         port = sshd.getPort();
 
         javaExePath = System.getProperty("java.home") + File.separator + "bin" + File.separator +
-                (OsUtils.isWin32() ? "java.exe" : "java");
+                      (OsUtils.isWin32() ? "java.exe" : "java");
         javaExePath = "\"" + javaExePath + "\"";
 
-        infraParams = new Object[]{("localhost " + NB_NODES + "\n").getBytes(), //hosts
-                60000, //timeout
-                1, //attempts
-                port, //ssh server port
-                "toto", //ssh username
-                "toto", //ssh password
-                new byte[0], // optional ssh private key
-                new byte[0], // optional ssh options file
-                javaExePath, //java path on the remote machines
-                PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
-                OperatingSystem.getOperatingSystem(), ""}; // extra java options
+        infraParams = new Object[] { ("localhost " + NB_NODES + "\n").getBytes(), //hosts
+                                     60000, //timeout
+                                     1, //attempts
+                                     port, //ssh server port
+                                     "toto", //ssh username
+                                     "toto", //ssh password
+                                     new byte[0], // optional ssh private key
+                                     new byte[0], // optional ssh options file
+                                     javaExePath, //java path on the remote machines
+                                     PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
+                                     OperatingSystem.getOperatingSystem(), "" }; // extra java options
 
-        policyParameters = new Object[]{AccessType.ALL.toString(), AccessType.ALL.toString(), "20000"};
+        policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString(), "20000" };
 
     }
 

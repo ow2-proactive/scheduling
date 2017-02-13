@@ -40,7 +40,6 @@ public class URLParserValidator extends BaseParserValidator<URL> {
 
     protected static final String URL_TYPE_REGEXP = "[Uu][Rr][Ll]";
 
-
     public URLParserValidator(String model) throws ModelSyntaxException {
         super(model);
         if (!model.matches("^" + URL_TYPE_REGEXP + "$")) {

@@ -1,4 +1,39 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.helpers;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -23,15 +58,6 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
 
 public class TaskResultCreatorTest {
 
@@ -50,26 +76,31 @@ public class TaskResultCreatorTest {
         loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenThrow(DatabaseManagerException.class);
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class),
+                                                       any(List.class))).thenThrow(DatabaseManagerException.class);
 
-        taskResultCreator.getTaskResult(mockedschedulerDbManager, this.getMockedInternalJob(this.getMockedJobDescriptorWithPausedTask()), this.getMockedInternalTask());
+        taskResultCreator.getTaskResult(mockedschedulerDbManager,
+                                        this.getMockedInternalJob(this.getMockedJobDescriptorWithPausedTask()),
+                                        this.getMockedInternalTask());
     }
 
     @Test
     public void testThatEmptyTaskResultIsUsedWhenResultIsNotInDatabase() throws UnknownTaskException {
         TaskResultCreator taskResultCreator = spy(TaskResultCreator.class);
         TaskResultImpl mockedTaskResultImpl = mock(TaskResultImpl.class);
-        doReturn(mockedTaskResultImpl).when(taskResultCreator)
-                .getEmptyTaskResult(any(InternalTask.class), any(Throwable.class), any(TaskLogs.class));
+        doReturn(mockedTaskResultImpl).when(taskResultCreator).getEmptyTaskResult(any(InternalTask.class),
+                                                                                  any(Throwable.class),
+                                                                                  any(TaskLogs.class));
         Map<TaskId, TaskResult> loadTaskResultsValue = new HashMap<>();
         loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenThrow(DatabaseManagerException.class);
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class),
+                                                       any(List.class))).thenThrow(DatabaseManagerException.class);
 
-        taskResultCreator.getTaskResult(mockedschedulerDbManager, this.getMockedInternalJob(this.getMockedJobDescriptorWithPausedTask()), this.getMockedInternalTask());
+        taskResultCreator.getTaskResult(mockedschedulerDbManager,
+                                        this.getMockedInternalJob(this.getMockedJobDescriptorWithPausedTask()),
+                                        this.getMockedInternalTask());
 
         verify(mockedTaskResultImpl).setPropagatedVariables(any(Map.class));
 
@@ -87,7 +118,6 @@ public class TaskResultCreatorTest {
         assertThat(taskResult.getTaskDuration(), Matchers.greaterThan(0L));
         assertThat(taskResult.getTaskDuration(), Matchers.lessThan(1000L));
 
-
     }
 
     @Test
@@ -102,10 +132,12 @@ public class TaskResultCreatorTest {
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
 
-        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenReturn(loadParentTaskResultsValue);
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class),
+                                                       any(List.class))).thenReturn(loadParentTaskResultsValue);
 
-        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTask()), this.getMockedInternalTask());
+        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager,
+                                                                this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTask()),
+                                                                this.getMockedInternalTask());
 
         when(taskResult.getPropagatedVariables()).thenCallRealMethod();
         assertThat(new String(taskResult.getPropagatedVariables().get("ParentVar")), is("5623g"));
@@ -116,27 +148,26 @@ public class TaskResultCreatorTest {
         TaskResultCreator taskResultCreator = new TaskResultCreator();
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenThrow(new DatabaseManagerException());
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class),
+                                                       any(List.class))).thenThrow(new DatabaseManagerException());
 
         InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());
-        
+
         Map<String, JobVariable> fakeVariableMap = new HashMap<>();
         fakeVariableMap.put("TestVar", new JobVariable("TestVar", "h234"));
-                when(mockedInternalJob.getVariables()).thenReturn(fakeVariableMap);
+        when(mockedInternalJob.getVariables()).thenReturn(fakeVariableMap);
 
         Map<String, String> fakeReplacementVariableMap = new HashMap<>();
         fakeReplacementVariableMap.put("TestVar", "h234");
         when(mockedInternalJob.getVariablesAsReplacementMap()).thenReturn(fakeReplacementVariableMap);
 
-        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, mockedInternalJob, this.getMockedInternalTask());
+        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager,
+                                                                mockedInternalJob,
+                                                                this.getMockedInternalTask());
 
         verify(mockedInternalJob, atLeastOnce()).getVariablesAsReplacementMap();
 
-        assertThat(new String(taskResult
-                        .getPropagatedVariables()
-                        .get("TestVar")),
-                is("h234"));
+        assertThat(new String(taskResult.getPropagatedVariables().get("TestVar")), is("h234"));
     }
 
     @Test
@@ -148,19 +179,17 @@ public class TaskResultCreatorTest {
         when(mockedTaskResultImpl.getPropagatedVariables()).thenReturn(fakeVariableMap);
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-        when(mockedschedulerDbManager.loadLastTaskResult(any(TaskId.class)))
-                .thenReturn(mockedTaskResultImpl);
+        when(mockedschedulerDbManager.loadLastTaskResult(any(TaskId.class))).thenReturn(mockedTaskResultImpl);
 
         InternalJob mockedInternalJob = this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTaskWithoutParent());
 
-        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager, mockedInternalJob, this.getMockedInternalTask());
+        TaskResult taskResult = taskResultCreator.getTaskResult(mockedschedulerDbManager,
+                                                                mockedInternalJob,
+                                                                this.getMockedInternalTask());
 
         verify(mockedTaskResultImpl, atLeastOnce()).getPropagatedVariables();
 
-        assertThat(new String(taskResult
-                        .getPropagatedVariables()
-                        .get("TestVar")),
-                is("h234"));
+        assertThat(new String(taskResult.getPropagatedVariables().get("TestVar")), is("h234"));
     }
 
     @Test
@@ -170,14 +199,15 @@ public class TaskResultCreatorTest {
         Map<TaskId, TaskResult> loadTaskResultsValue = new HashMap<>();
         loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
 
-        when(mockedTaskResultImpl.getPropagatedVariables())
-                .thenReturn(new HashMap<String, byte[]>());
+        when(mockedTaskResultImpl.getPropagatedVariables()).thenReturn(new HashMap<String, byte[]>());
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenReturn(loadTaskResultsValue);
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class),
+                                                       any(List.class))).thenReturn(loadTaskResultsValue);
 
-        taskResultCreator.getTaskResult(mockedschedulerDbManager, this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTask()), this.getMockedInternalTask());
+        taskResultCreator.getTaskResult(mockedschedulerDbManager,
+                                        this.getMockedInternalJobTaskFlowType(this.getMockedJobDescriptorWithPausedTask()),
+                                        this.getMockedInternalTask());
 
         verify(mockedTaskResultImpl, atLeastOnce()).getPropagatedVariables();
     }
@@ -190,12 +220,14 @@ public class TaskResultCreatorTest {
         loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenReturn(loadTaskResultsValue);
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class),
+                                                       any(List.class))).thenReturn(loadTaskResultsValue);
 
         JobDescriptorImpl mockedJobDescriptorHasRunningTask = this.getMockedJobDescriptorWithRunningTask();
 
-        taskResultCreator.getTaskResult(mockedschedulerDbManager, this.getMockedInternalJob(mockedJobDescriptorHasRunningTask), this.getMockedInternalTask());
+        taskResultCreator.getTaskResult(mockedschedulerDbManager,
+                                        this.getMockedInternalJob(mockedJobDescriptorHasRunningTask),
+                                        this.getMockedInternalTask());
 
         verify(mockedJobDescriptorHasRunningTask, atLeastOnce()).getRunningTasks();
     }
@@ -208,12 +240,14 @@ public class TaskResultCreatorTest {
         loadTaskResultsValue.put(this.createTaskID(), mockedTaskResultImpl);
 
         SchedulerDBManager mockedschedulerDbManager = mock(SchedulerDBManager.class);
-        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class), any(List.class)))
-                .thenReturn(loadTaskResultsValue);
+        when(mockedschedulerDbManager.loadTasksResults(any(JobId.class),
+                                                       any(List.class))).thenReturn(loadTaskResultsValue);
 
         JobDescriptorImpl mockedJobDescriptorHasPausedTask = this.getMockedJobDescriptorWithPausedTask();
 
-        taskResultCreator.getTaskResult(mockedschedulerDbManager, this.getMockedInternalJob(mockedJobDescriptorHasPausedTask), this.getMockedInternalTask());
+        taskResultCreator.getTaskResult(mockedschedulerDbManager,
+                                        this.getMockedInternalJob(mockedJobDescriptorHasPausedTask),
+                                        this.getMockedInternalTask());
 
         verify(mockedJobDescriptorHasPausedTask, atLeastOnce()).getPausedTasks();
     }
@@ -250,8 +284,7 @@ public class TaskResultCreatorTest {
     }
 
     private EligibleTaskDescriptorImpl createParentTaskDescriptor() {
-        EligibleTaskDescriptorImpl mockedEligibleTaskDescriptorImpl
-                = mock(EligibleTaskDescriptorImpl.class);
+        EligibleTaskDescriptorImpl mockedEligibleTaskDescriptorImpl = mock(EligibleTaskDescriptorImpl.class);
         TaskId parentId = this.createParentTaskID();
         doReturn(parentId).when(mockedEligibleTaskDescriptorImpl).getTaskId();
         return mockedEligibleTaskDescriptorImpl;
@@ -264,11 +297,9 @@ public class TaskResultCreatorTest {
     }
 
     private EligibleTaskDescriptor createEligibleTaskDescriptor(Vector<TaskDescriptor> fakeParentVector) {
-        EligibleTaskDescriptorImpl mockedEligibleTaskDescriptorImpl =
-                mock(EligibleTaskDescriptorImpl.class);
+        EligibleTaskDescriptorImpl mockedEligibleTaskDescriptorImpl = mock(EligibleTaskDescriptorImpl.class);
 
-        when(mockedEligibleTaskDescriptorImpl.getParents())
-                .thenReturn(fakeParentVector);
+        when(mockedEligibleTaskDescriptorImpl.getParents()).thenReturn(fakeParentVector);
 
         return mockedEligibleTaskDescriptorImpl;
     }

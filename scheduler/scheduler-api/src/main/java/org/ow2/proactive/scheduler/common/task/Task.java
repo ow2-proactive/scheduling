@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.task;
 
@@ -288,8 +277,7 @@ public abstract class Task extends CommonAttribute {
             return;
         }
         if (name.length() > 255) {
-            throw new IllegalArgumentException(
-                "The name is too long, it must have 255 chars length max : " + name);
+            throw new IllegalArgumentException("The name is too long, it must have 255 chars length max : " + name);
         }
         this.name = name;
     }
@@ -554,8 +542,7 @@ public abstract class Task extends CommonAttribute {
      */
     public void setWallTime(long walltime) {
         if (walltime < 0) {
-            throw new IllegalArgumentException(
-                "The walltime must be a positive or nul integer value (>=0) !");
+            throw new IllegalArgumentException("The walltime must be a positive or nul integer value (>=0) !");
         }
         this.wallTime = walltime;
     }
@@ -580,8 +567,7 @@ public abstract class Task extends CommonAttribute {
     @Deprecated
     public void setNumberOfNeededNodes(int numberOfNodesNeeded) {
         if (parallelEnvironment != null) {
-            throw new IllegalStateException(
-                "Cannot set numberOfNodesNeeded as it could be inconsistent with the parallel environment");
+            throw new IllegalStateException("Cannot set numberOfNodesNeeded as it could be inconsistent with the parallel environment");
         }
         this.parallelEnvironment = new ParallelEnvironment(numberOfNodesNeeded);
     }
@@ -720,11 +706,11 @@ public abstract class Task extends CommonAttribute {
      */
     public Map<String, String> getVariablesOverriden(Job job) {
         Map<String, String> taskVariables = new HashMap<>();
-        if (job != null){
+        if (job != null) {
             taskVariables.putAll(job.getVariablesAsReplacementMap());
         }
-        for (TaskVariable variable: getVariables().values()){
-            if (!variable.isJobInherited()){
+        for (TaskVariable variable : getVariables().values()) {
+            if (!variable.isJobInherited()) {
                 taskVariables.put(variable.getName(), variable.getValue());
             }
         }
@@ -740,24 +726,24 @@ public abstract class Task extends CommonAttribute {
         String nl = System.lineSeparator();
 
         return "Task \'" + name + "\' : " + nl + "\tDescription = '" + description + "'" + nl +
-            (restartTaskOnError.isSet()
-                    ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl : "") +
-            (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
-            (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
-                maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl : "") +
+               (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl
+                                           : "") +
+               (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
+               (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
+                                               maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl
+                                             : "") +
                "\ttag = " + tag + nl + "\tvariables = {" + nl +
                Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}" + nl + "\tgenericInformation = {" +
-               nl +
-            Joiner.on('\n').withKeyValueSeparator("=").join(genericInformation) + nl + "}" + nl +
-            "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
-            "\tParallelEnvironment = " + parallelEnvironment + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
-            "\tSelectionScripts = " + displaySelectionScripts() + nl + "\tForkEnvironment = " +
-            forkEnvironment + nl + "\tPreScript = " + ((preScript != null) ? preScript.display() : null) +
-            nl + "\tPostScript = " + ((postScript != null) ? postScript.display() : null) + nl +
-            "\tCleanScript = " + ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
-            ((flowScript != null) ? flowScript.display() : null) + nl + "\tPreciousResult = " +
-            preciousResult + nl + "\tPreciousLogs = " + preciousLogs + nl + "\tRunAsMe = " + runAsMe + nl +
-            "\tWallTime = " + wallTime + nl + "\tDependences = " + dependences;
+               nl + Joiner.on('\n').withKeyValueSeparator("=").join(genericInformation) + nl + "}" + nl +
+               "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
+               "\tParallelEnvironment = " + parallelEnvironment + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
+               "\tSelectionScripts = " + displaySelectionScripts() + nl + "\tForkEnvironment = " + forkEnvironment +
+               nl + "\tPreScript = " + ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
+               ((postScript != null) ? postScript.display() : null) + nl + "\tCleanScript = " +
+               ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
+               ((flowScript != null) ? flowScript.display() : null) + nl + "\tPreciousResult = " + preciousResult + nl +
+               "\tPreciousLogs = " + preciousLogs + nl + "\tRunAsMe = " + runAsMe + nl + "\tWallTime = " + wallTime +
+               nl + "\tDependences = " + dependences;
     }
 
     private String displaySelectionScripts() {

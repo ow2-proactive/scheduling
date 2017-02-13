@@ -1,40 +1,34 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.rmnode;
+
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -47,11 +41,6 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -108,7 +97,9 @@ public interface RMNode extends Comparable<RMNode> {
     //----------------------------------------------------------------------//
 
     /**
-     * @return the name of the node
+     * Returns the name of the node.
+     *
+     * @return the name of the node.
      */
     String getNodeName();
 
@@ -137,17 +128,23 @@ public interface RMNode extends Comparable<RMNode> {
     String getDescriptorVMName();
 
     /**
-     * @return the {@link NodeSource} name of the source that handle the node
+     * Returns the NodeSource name of the node.
+     *
+     * @return the NodeSource name of the node.
      */
     String getNodeSourceName();
 
     /**
-     * @return the URL of the node.
+     * Returns the unique ID of the node.
+     *
+     * @return the unique ID of the node represented by its URL.
      */
     String getNodeURL();
 
-    /** Get the node source object that handle the node
-     * @return the stub of the node source active object
+    /**
+     * Returns the Stub of the {@link NodeSource} that handles the node.
+     *
+     * @return the stub of the {@link NodeSource} that handles the node.
      */
     NodeSource getNodeSource();
 
@@ -205,6 +202,14 @@ public interface RMNode extends Comparable<RMNode> {
     // ---------------------------------------------------------------------//
     // IS
     //----------------------------------------------------------------------//
+
+    /**
+     * Returns a boolean that says if the node is deploying or not.
+     *
+     * @return {@code true} if the node is an instance of {@link RMDeployingNode},
+     * {@code false} if it is an instance of {@link RMNodeImpl}.
+     */
+    boolean isDeploying();
 
     /**
      * @return true if the node is free, false otherwise.
@@ -301,8 +306,9 @@ public interface RMNode extends Comparable<RMNode> {
     void unlock(Client client);
 
     /**
-     * Change the {@link NodeSource} from where the node is.
-     * @param nodeSource
+     * Sets the Stub of the NodeSource to the specified value.
+     *
+     * @param nodeSource the new NodeSource Stub to use.
      */
     void setNodeSource(NodeSource nodeSource);
 
@@ -336,4 +342,5 @@ public interface RMNode extends Comparable<RMNode> {
     RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator);
 
     RMNodeEvent createNodeEvent();
+
 }

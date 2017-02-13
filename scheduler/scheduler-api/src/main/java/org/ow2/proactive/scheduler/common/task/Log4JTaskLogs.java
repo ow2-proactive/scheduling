@@ -1,40 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.task;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
+
+import java.io.IOException;
+import java.util.LinkedList;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -45,13 +42,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.utils.ObjectByteConverter;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import java.io.IOException;
-import java.util.LinkedList;
-
-import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 /**
@@ -70,8 +60,10 @@ public class Log4JTaskLogs implements TaskLogs {
     public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";
 
     public static final String MDC_JOB_ID = "job.id";
+
     /** Log4j context variable name for task ids */
     public static final String MDC_TASK_ID = "task.id";
+
     public static final String MDC_TASK_NAME = "task.name";
 
     /** Log4j context variable name for task ids */
@@ -83,9 +75,8 @@ public class Log4JTaskLogs implements TaskLogs {
         if (PASchedulerProperties.SCHEDULER_JOB_LOGS_PATTERN.isSet()) {
             patternLayout = new PatternLayout(PASchedulerProperties.SCHEDULER_JOB_LOGS_PATTERN.getValueAsString());
         } else {
-            patternLayout = new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" +
-                    Log4JTaskLogs.MDC_TASK_ID + "}@%X{" + Log4JTaskLogs.MDC_HOST +
-                    "};%d{HH:mm:ss}]" + " %m %n");
+            patternLayout = new PatternLayout("[%X{" + Log4JTaskLogs.MDC_JOB_ID + "}t%X{" + Log4JTaskLogs.MDC_TASK_ID +
+                                              "}@%X{" + Log4JTaskLogs.MDC_HOST + "};%d{HH:mm:ss}]" + " %m %n");
         }
         return patternLayout;
     }
@@ -145,8 +136,7 @@ public class Log4JTaskLogs implements TaskLogs {
         return logs.toString();
     }
 
-    private void appendEventToLogs(LoggingEvent logEvent, StringBuffer logs, Layout logFormat,
-            boolean timeStamp) {
+    private void appendEventToLogs(LoggingEvent logEvent, StringBuffer logs, Layout logFormat, boolean timeStamp) {
         if (timeStamp) {
             logs.append(logFormat.format(logEvent));
         } else {
@@ -163,13 +153,16 @@ public class Log4JTaskLogs implements TaskLogs {
         if (this.allEvents == null) {
             // restore log4j events
             try {
-                this.allEvents = (LinkedList<LoggingEvent>) ObjectByteConverter.byteArrayToObject(
-                        this.serializedAllEvents, true);
+                this.allEvents = (LinkedList<LoggingEvent>) ObjectByteConverter.byteArrayToObject(this.serializedAllEvents,
+                                                                                                  true);
             } catch (Exception e) {
                 //store exception event in logs if we cannot convert
-                LoggingEvent logError = new LoggingEvent(loggerName, Logger.getLogger(loggerName),
-                    STDERR_LEVEL, "Cannot restore logging event from byte array : " +
-                        getStackTraceAsString(e), e);
+                LoggingEvent logError = new LoggingEvent(loggerName,
+                                                         Logger.getLogger(loggerName),
+                                                         STDERR_LEVEL,
+                                                         "Cannot restore logging event from byte array : " +
+                                                                       getStackTraceAsString(e),
+                                                         e);
                 this.allEvents = new LinkedList<LoggingEvent>();
                 this.allEvents.add(logError);
             }
@@ -186,9 +179,12 @@ public class Log4JTaskLogs implements TaskLogs {
                 this.serializedAllEvents = ObjectByteConverter.objectToByteArray(this.allEvents, true);
             } catch (IOException e) {
                 //create a log4j event with e inside
-                LoggingEvent logError = new LoggingEvent(loggerName, Logger.getLogger(loggerName),
-                    STDERR_LEVEL, "Could not convert logging event to byte array : " +
-                        getStackTraceAsString(e), e);
+                LoggingEvent logError = new LoggingEvent(loggerName,
+                                                         Logger.getLogger(loggerName),
+                                                         STDERR_LEVEL,
+                                                         "Could not convert logging event to byte array : " +
+                                                                       getStackTraceAsString(e),
+                                                         e);
                 LinkedList<LoggingEvent> errorEvent = new LinkedList<LoggingEvent>();
                 errorEvent.add(logError);
                 try {

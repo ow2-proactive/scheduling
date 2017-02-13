@@ -84,8 +84,10 @@ public class InternalTaskParentFinderTest {
     }
 
     private InternalTask generateInternalTask(long id, TaskStatus taskStatus) {
-        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
-            "description");
+        InternalJob job = new InternalTaskFlowJob("test-name",
+                                                  JobPriority.NORMAL,
+                                                  OnTaskError.CANCEL_JOB,
+                                                  "description");
         InternalTask internalTask = new InternalScriptTask(job);
         internalTask.setId(TaskIdImpl.createTaskId(new JobIdImpl(666L, "JobName"), "readableName", id));
         internalTask.setStatus(taskStatus);

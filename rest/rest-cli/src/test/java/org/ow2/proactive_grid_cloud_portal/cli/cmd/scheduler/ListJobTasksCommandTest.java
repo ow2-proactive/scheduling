@@ -1,40 +1,28 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2012 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.scheduler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -80,7 +68,8 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdOnly() throws Exception {
-        when(restApi.getTasksNames(anyString(), eq(jobId))).thenReturn(new RestPage<String>(this.taskNames, taskNames.size()));
+        when(restApi.getTasksNames(anyString(), eq(jobId))).thenReturn(new RestPage<String>(this.taskNames,
+                                                                                            taskNames.size()));
 
         executeTest(jobId);
 
@@ -92,8 +81,10 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
 
     @Test
     public void testCommandJobIdTag() throws Exception {
-        when(restApi.getJobTasksIdsByTag(anyString(), eq(jobId), eq(tag)))
-                .thenReturn(new RestPage<String>(this.filteredTaskNames, filteredTaskNames.size()));
+        when(restApi.getJobTasksIdsByTag(anyString(),
+                                         eq(jobId),
+                                         eq(tag))).thenReturn(new RestPage<String>(this.filteredTaskNames,
+                                                                                   filteredTaskNames.size()));
         executeTest(jobId, tag);
 
         String out = capturedOutput.toString();
@@ -105,7 +96,8 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
     @Test
     public void testCommandJobIdUnknownTag() throws Exception {
         when(restApi.getJobTasksIdsByTag(anyString(), eq(jobId), eq(unknownTag)))
-                .thenReturn(new RestPage<String>(new ArrayList<String>(), 0));
+                                                                                 .thenReturn(new RestPage<String>(new ArrayList<String>(),
+                                                                                                                  0));
 
         executeTest(jobId, unknownTag);
 
@@ -124,27 +116,26 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
         System.out.println(out);
 
         assertThat(out,
-                equalTo("An error occurred while retrieving job('2') tasks:" + System.lineSeparator() +
-                    "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
-                    "You can enable debug mode for getting more information using -X or --debug option." +
-                    System.lineSeparator()));
+                   equalTo("An error occurred while retrieving job('2') tasks:" + System.lineSeparator() +
+                           "Error message: Job 2 does not exists" + System.lineSeparator() + System.lineSeparator() +
+                           "You can enable debug mode for getting more information using -X or --debug option." +
+                           System.lineSeparator()));
     }
 
     @Test
     public void testCommandUnknownJobUnknownTag() throws Exception {
-        when(restApi.getJobTasksIdsByTag(anyString(), eq(unknownJobId), anyString()))
-                .thenThrow(exceptionUnknownJob);
+        when(restApi.getJobTasksIdsByTag(anyString(), eq(unknownJobId), anyString())).thenThrow(exceptionUnknownJob);
         executeTest(unknownJobId, unknownTag);
 
         String out = capturedOutput.toString();
         System.out.println(out);
 
         assertThat(out,
-                equalTo("An error occurred while retrieving job('2') tasks filtered by tag unknownTag:" +
-                    System.lineSeparator() + "Error message: Job 2 does not exists" + System.lineSeparator() +
-                    System.lineSeparator() +
-                    "You can enable debug mode for getting more information using -X or --debug option." +
-                    System.lineSeparator()));
+                   equalTo("An error occurred while retrieving job('2') tasks filtered by tag unknownTag:" +
+                           System.lineSeparator() + "Error message: Job 2 does not exists" + System.lineSeparator() +
+                           System.lineSeparator() +
+                           "You can enable debug mode for getting more information using -X or --debug option." +
+                           System.lineSeparator()));
     }
 
     @Ignore
@@ -169,28 +160,37 @@ public class ListJobTasksCommandTest extends AbstractJobTagCommandTest {
             case 1:
                 // args: jobId
                 ListJobTasksCommand.LJTCommandBuilder.newInstance()
-                .jobId((String) args[0]).instance().execute(this.context);
+                                                     .jobId((String) args[0])
+                                                     .instance()
+                                                     .execute(this.context);
                 break;
             case 2:
                 // args: jobId and tag
                 ListJobTasksCommand.LJTCommandBuilder.newInstance()
-                .jobId((String) args[0]).tag((String) args[1]).instance()
-                .execute(this.context);
+                                                     .jobId((String) args[0])
+                                                     .tag((String) args[1])
+                                                     .instance()
+                                                     .execute(this.context);
                 break;
             case 3:
                 // args: jobId, offset and limit
                 ListJobTasksCommand.LJTCommandBuilder.newInstance()
-                .jobId((String) args[0]).offset((String) args[1])
-                .limit((String) args[2]).instance()
-                .execute(this.context);
+                                                     .jobId((String) args[0])
+                                                     .offset((String) args[1])
+                                                     .limit((String) args[2])
+                                                     .instance()
+                                                     .execute(this.context);
                 break;
             default:
                 // args: jobId, tag, offset and limit
                 // We don't consider parameters beyond the fourth
                 ListJobTasksCommand.LJTCommandBuilder.newInstance()
-                .jobId((String) args[0]).tag((String) args[1])
-                .offset((String) args[2]).limit((String) args[3])
-                .instance().execute(this.context);
+                                                     .jobId((String) args[0])
+                                                     .tag((String) args[1])
+                                                     .offset((String) args[2])
+                                                     .limit((String) args[3])
+                                                     .instance()
+                                                     .execute(this.context);
                 break;
         }
     }

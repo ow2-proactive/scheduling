@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $PROACTIVE_INITIAL_DEV$
  */
 package functionaltests;
 
@@ -139,11 +128,15 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
     }
 
-
     @Test(timeout = MAX_WAIT_TIME)
     public void testJobResult() throws Throwable {
         ISchedulerClient client = clientInstance();
-        Job job = createJobManyTasks("JobResult", SimpleJob.class, ErrorTask.class, LogTask.class, VariableTask.class, MetadataTask.class);
+        Job job = createJobManyTasks("JobResult",
+                                     SimpleJob.class,
+                                     ErrorTask.class,
+                                     LogTask.class,
+                                     VariableTask.class,
+                                     MetadataTask.class);
         JobId jobId = submitJob(job, client);
         JobResult result = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
         // job result
@@ -224,7 +217,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test(timeout = MAX_WAIT_TIME)
     public void testSchedulerNodeClient() throws Throwable {
         ISchedulerClient client = clientInstance();
-        Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy", "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
+        Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
+                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
@@ -235,7 +229,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test(timeout = MAX_WAIT_TIME)
     public void testDataSpaceNodeClientPushPull() throws Throwable {
         ISchedulerClient client = clientInstance();
-        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_pull.groovy", "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_pull.groovy",
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
@@ -246,14 +241,14 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test(timeout = MAX_WAIT_TIME)
     public void testDataSpaceNodeClientPushDelete() throws Throwable {
         ISchedulerClient client = clientInstance();
-        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy", "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
         Assert.assertNotNull(tres);
         Assert.assertEquals("OK", tres.value());
     }
-
 
     protected Job nodeClientJob(String groovyScript, String forkScript) throws Exception {
 
@@ -294,21 +289,18 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.pushFile("USERSPACE", "", emptyFile.getName(), emptyFile.getCanonicalPath());
 
         // Delete the local file
-        Assert.assertTrue(
-                "Unable to delete the local file after push, maybe there are still some open streams?",
-                emptyFile.delete());
+        Assert.assertTrue("Unable to delete the local file after push, maybe there are still some open streams?",
+                          emptyFile.delete());
 
         // Pull it from the userspace to be sure that it was pushed
         client.pullFile("USERSPACE", "", emptyFile.getCanonicalPath());
 
         // Check the file was pulled
-        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken?",
-                emptyFile.exists());
+        Assert.assertTrue("Unable to pull the empty file, maybe the pull mechanism is broken?", emptyFile.exists());
 
         // Delete the local file
-        Assert.assertTrue(
-                "Unable to delete the local file after pull, maybe there are still some open streams?",
-                emptyFile.delete());
+        Assert.assertTrue("Unable to delete the local file after pull, maybe there are still some open streams?",
+                          emptyFile.delete());
 
         // Delete the file in the user space
         client.deleteFile("USERSPACE", "/" + emptyFile.getName()); //TODO: TEST THIS
@@ -356,10 +348,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         File tmpFile = testFolder.newFile();
         Files.write("non_admin_user_push_file_contents".getBytes(), tmpFile);
         ISchedulerClient client = SchedulerClient.createInstance();
-        client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(),
-            null, true));
-        client.pushFile("USERSPACE", "/test_non_admin_user_push_file", "tmpfile.tmp",
-                tmpFile.getAbsolutePath());
+        client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(), null, true));
+        client.pushFile("USERSPACE", "/test_non_admin_user_push_file", "tmpfile.tmp", tmpFile.getAbsolutePath());
         String destDirPath = URI.create(client.getUserSpaceURIs().get(0)).getPath();
         File destFile = new File(destDirPath, "test_non_admin_user_push_file/tmpfile.tmp");
         assertTrue(Files.equal(tmpFile, destFile));

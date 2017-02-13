@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.descriptor;
 
@@ -152,8 +141,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                 TaskDescriptor taskDescriptor = allTasksWithTheirChildren.get(td);
 
                 for (InternalTask depends : td.getIDependences()) {
-                    ((EligibleTaskDescriptorImpl) taskDescriptor)
-                            .addParent(allTasksWithTheirChildren.get(depends));
+                    ((EligibleTaskDescriptorImpl) taskDescriptor).addParent(allTasksWithTheirChildren.get(depends));
                 }
 
                 for (TaskDescriptor lt : taskDescriptor.getParents()) {
@@ -247,8 +235,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param tree InternalTask tree of replicated tasks
      * @param target Target task of the LOOP action
      */
-    public void doLoop(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
-            InternalTask newInit) {
+    public void doLoop(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target, InternalTask newInit) {
         Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<>();
 
         // create new EligibleTasks and accumulate it
@@ -426,8 +413,8 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param oldEnd End task of the replicated block ; original version
      * @param newEnd End task of the replicated block ; dup version
      */
-    public void doReplicate(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target,
-            TaskId oldEnd, TaskId newEnd) {
+    public void doReplicate(TaskId initiator, Map<TaskId, InternalTask> tree, InternalTask target, TaskId oldEnd,
+            TaskId newEnd) {
         Map<TaskId, EligibleTaskDescriptorImpl> acc = new HashMap<>();
 
         // create new EligibleTasks and accumulate it
@@ -569,7 +556,7 @@ public class JobDescriptorImpl implements JobDescriptor {
                         if (internalJob.getStatus() == JobStatus.PAUSED) {
                             pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
                         } else if (internalJob.getStatus() == JobStatus.IN_ERROR &&
-                            childTask.getInternal().getStatus() == TaskStatus.PAUSED) {
+                                   childTask.getInternal().getStatus() == TaskStatus.PAUSED) {
                             pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
                         } else if (childTask.getInternal().getStatus() == TaskStatus.SKIPPED) {
                             runningTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
@@ -593,8 +580,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     }
 
     private void decreaseParentCount(TaskDescriptor childTask) {
-        ((EligibleTaskDescriptorImpl) childTask)
-                .setCount(((EligibleTaskDescriptorImpl) childTask).getCount() - 1);
+        ((EligibleTaskDescriptorImpl) childTask).setCount(((EligibleTaskDescriptorImpl) childTask).getCount() - 1);
     }
 
     private void decreaseChildrenCountForAllParents(TaskDescriptor taskToTerminate) {

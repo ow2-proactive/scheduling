@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core;
 
 import static org.hamcrest.Matchers.is;
@@ -17,6 +42,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 
+
 public class JobRemoveHandlerTest {
 
     private JobRemoveHandler jobRemoveHandler;
@@ -25,16 +51,22 @@ public class JobRemoveHandlerTest {
 
     @Mock
     private SchedulingInfrastructure infrastructure;
+
     @Mock
     private SchedulerStateUpdate listener;
+
     @Mock
     private SchedulingMethod schedulingMethod;
+
     @Mock
     private SchedulerDBManager dbManager;
+
     @Mock
     private RMProxiesManager rmProxiesManager;
+
     @Mock
     private InternalJob job;
+
     @Mock
     private JobInfoImpl jobInfo;
 
@@ -59,16 +91,16 @@ public class JobRemoveHandlerTest {
         jobRemoveHandler = new JobRemoveHandler(service, jobId);
     }
 
-
     @Test
     public void testJobRemovedAndStatusUpdated() {
         boolean removed = jobRemoveHandler.call();
         assertThat(removed, is(true));
         Mockito.verify(dbManager, Mockito.times(1)).loadJobWithTasksIfNotRemoved(jobId);
         Mockito.verify(dbManager, Mockito.times(1)).removeJob(org.mockito.Matchers.any(JobId.class),
-                org.mockito.Matchers.anyLong(), org.mockito.Matchers.anyBoolean());
+                                                              org.mockito.Matchers.anyLong(),
+                                                              org.mockito.Matchers.anyBoolean());
         Mockito.verify(listener, Mockito.times(1)).jobStateUpdated(org.mockito.Matchers.anyString(),
-                org.mockito.Matchers.any(NotificationData.class));
+                                                                   org.mockito.Matchers.any(NotificationData.class));
     }
 
     @Test

@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.util.logforwarder.providers;
 
@@ -42,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.api.PARemoteObject;
@@ -52,7 +42,6 @@ import org.objectweb.proactive.core.util.log.remote.ProActiveAppender;
 import org.objectweb.proactive.core.util.log.remote.ProActiveLogCollector;
 import org.objectweb.proactive.core.util.log.remote.ThrottlingProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.*;
-import org.apache.log4j.Appender;
 
 
 /**
@@ -69,9 +58,12 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
 
     // bind name
     public static final String COLLECTOR_BIND_NAME = "proactive_lfs_collector";
+
     private LoggingEventProcessor eventProcessor;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see LogForwardingProvider#createAppenderProvider(java.net.URI)
      */
     public AppenderProvider createAppenderProvider(URI serverURI) throws LogForwardingException {
@@ -86,8 +78,10 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
     public URI createServer(LoggingEventProcessor eventProcessor) throws LogForwardingException {
         try {
             collectorDeployer = new LogCollectorDeployer(ProActiveRuntimeImpl.getProActiveRuntime()
-                    .getVMInformation().getName() +
-                COLLECTOR_BIND_NAME + collectorCounter.addAndGet(1), eventProcessor);
+                                                                             .getVMInformation()
+                                                                             .getName() +
+                                                         COLLECTOR_BIND_NAME + collectorCounter.addAndGet(1),
+                                                         eventProcessor);
             return new URI(collectorDeployer.getCollectorURL());
         } catch (URISyntaxException e) {
             throw new LogForwardingException("Cannot create ProActive log collector.", e);
@@ -96,7 +90,9 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see LogForwardingProvider#destroyServer()
      */
     public void terminateServer() throws LogForwardingException {
@@ -125,11 +121,9 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
         public Appender getAppender() throws LogForwardingException {
             try {
                 LogCollector remoteCollector = (LogCollector) PARemoteObject.lookup(remoteCollectorURI);
-                return new ProActiveAppender(new ThrottlingProvider(FLUSH_PERIOD, 50, 10000, true),
-                    remoteCollector);
+                return new ProActiveAppender(new ThrottlingProvider(FLUSH_PERIOD, 50, 10000, true), remoteCollector);
             } catch (ProActiveException e) {
-                throw new LogForwardingException("Cannot lookup remote log collector at " +
-                    this.remoteCollectorURI, e);
+                throw new LogForwardingException("Cannot lookup remote log collector at " + this.remoteCollectorURI, e);
             }
         }
 
@@ -142,8 +136,7 @@ public class ProActiveBasedForwardingProvider implements LogForwardingProvider {
 
         final RemoteObjectExposer<LogCollector> roe;
 
-        public LogCollectorDeployer(String name, LoggingEventProcessor eventProcessor)
-                throws ProActiveException {
+        public LogCollectorDeployer(String name, LoggingEventProcessor eventProcessor) throws ProActiveException {
             this.collector = new LogCollector(eventProcessor);
             this.roe = PARemoteObject.newRemoteObject(LogCollector.class.getName(), this.collector);
             this.roe.createRemoteObject(name, false);

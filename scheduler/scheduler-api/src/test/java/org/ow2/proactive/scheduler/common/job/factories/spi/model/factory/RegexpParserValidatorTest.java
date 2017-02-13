@@ -38,7 +38,6 @@ public class RegexpParserValidatorTest {
                                                        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,12}$" +
                                                        RegexpParserValidator.RIGHT_DELIMITER; // regexp used to check passwords containing a mix of uppercase, lowercase and digits
 
-
     public static final String INVALID_MODEL_PARAMETER = RegexpParserValidator.LEFT_DELIMITER + "[A-Za-z+" +
                                                          RegexpParserValidator.RIGHT_DELIMITER;
 

@@ -48,7 +48,6 @@ public class RegexpParserValidator extends BaseParserValidator<String> {
 
     protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
 
-
     public RegexpParserValidator(String model) throws ModelSyntaxException {
         super(model);
     }

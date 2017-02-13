@@ -25,9 +25,9 @@ fi
 RSYNC_VER=$( rsync --version|grep "protocol version"|awk '{print $6}' )
 
 if [[ $RSYNC_VER -ge 31 ]]; then
-	RSYNC_PROGRESS="--info=progress2"
+    RSYNC_PROGRESS="--info=progress2"
 else
-	RSYNC_PROGRESS="--progress"
+    RSYNC_PROGRESS="--progress"
 fi
 
 trim() {
@@ -77,7 +77,7 @@ JAVA_CMD=
 
 if [ ! -f "$INSTALL_PADIR/jre/bin/java" ]; then
     if [[ "$JAVA_HOME" == "" ]]; then
-	    if ! which java > /dev/null 2>&1; then
+        if ! which java > /dev/null 2>&1; then
             echo "JAVA_HOME is not set, no 'java' command could be found in your PATH, and this ProActive distribution does not contain an embedded JRE, please install a JRE or JDK." ; exit 1 ;
         else
             JAVA_CMD=java
@@ -105,7 +105,7 @@ if [ -f /etc/init.d/proactive-scheduler ]; then
 fi
 
 # installation of the ProActive distribution
- 
+
 read -e -p "Directory where to install the scheduler: " -i "/opt/proactive" PA_ROOT
 
 PA_ROOT=$(trim "$PA_ROOT")
@@ -533,6 +533,3 @@ if  ! $CONFLICT ; then
         service proactive-scheduler start
     fi
 fi
-
-
-

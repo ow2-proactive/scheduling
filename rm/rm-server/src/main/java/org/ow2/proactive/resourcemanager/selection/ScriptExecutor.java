@@ -1,40 +1,32 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.selection;
+
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAFuture;
@@ -48,16 +40,17 @@ import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 
-import java.util.List;
-import java.util.concurrent.Callable;
-
 
 public class ScriptExecutor implements Callable<Node> {
 
     private final static Logger logger = Logger.getLogger(ScriptExecutor.class);
+
     private final Criteria criteria;
+
     private RMNode rmnode;
+
     private SelectionManager manager;
+
     private List<SelectionScript> selectionScriptList;
 
     public ScriptExecutor(RMNode rmnode, Criteria criteria, SelectionManager manager) {
@@ -90,8 +83,7 @@ public class ScriptExecutor implements Callable<Node> {
             for (SelectionScript script : selectionScriptList) {
                 if (manager.isPassed(script, rmnode)) {
                     // already executed static script
-                    logger.info(rmnode.getNodeURL() + " : " + script.hashCode() +
-                        " skipping script execution");
+                    logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " skipping script execution");
                     continue;
                 }
 
@@ -104,7 +96,7 @@ public class ScriptExecutor implements Callable<Node> {
                         // could not create script execution handler
                         // probably the node id down
                         logger.warn(rmnode.getNodeURL() + " : " + script.hashCode() + " exception",
-                                scriptResult.getException());
+                                    scriptResult.getException());
                         logger.warn(rmnode.getNodeURL() + " : pinging the node");
                         rmnode.getNodeSource().pingNode(rmnode.getNode());
 
@@ -114,7 +106,7 @@ public class ScriptExecutor implements Callable<Node> {
 
                         try {
                             PAFuture.waitFor(scriptResult,
-                                    PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt());
+                                             PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt());
                         } catch (ProActiveTimeoutException e) {
                             // do not produce an exception here
                             nodeMatch = false;
@@ -124,11 +116,11 @@ public class ScriptExecutor implements Callable<Node> {
                         // display the script result and output in the scheduler logs
                         if (scriptResult != null && logger.isInfoEnabled()) {
                             logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " result " +
-                                    scriptResult.getResult());
+                                        scriptResult.getResult());
 
                             if (scriptResult.getOutput() != null && scriptResult.getOutput().length() > 0) {
                                 logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " output\n" +
-                                        scriptResult.getOutput());
+                                            scriptResult.getOutput());
                             }
                         }
 
@@ -136,7 +128,7 @@ public class ScriptExecutor implements Callable<Node> {
                             nodeMatch = false;
                             exception = new ScriptException(scriptResult.getException());
                             logger.warn(rmnode.getNodeURL() + " : exception during the script execution",
-                                    scriptResult.getException());
+                                        scriptResult.getException());
                             break;
                         }
 
@@ -178,7 +170,7 @@ public class ScriptExecutor implements Callable<Node> {
                 rmnode.getNodeSource().pingNode(rmnode.getNode());
             } catch (Throwable pingError) {
                 logger.warn(rmnode.getNodeURL() + " : nodeSource " + rmnode.getNodeSourceName() +
-                    " seems to be removed ", pingError);
+                            " seems to be removed ", pingError);
             }
             return null;
         }
@@ -196,8 +188,7 @@ public class ScriptExecutor implements Callable<Node> {
     public String toString() {
         boolean selectionScriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
         if (selectionScriptSpecified) {
-            String result = "script execution on the node " + rmnode.getNodeURL() +
-                " using the following scripts\n";
+            String result = "script execution on the node " + rmnode.getNodeURL() + " using the following scripts\n";
             for (SelectionScript ss : selectionScriptList) {
                 result += ss.getScript() + "\n";
             }

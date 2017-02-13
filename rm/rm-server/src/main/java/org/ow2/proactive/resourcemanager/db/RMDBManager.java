@@ -1,40 +1,28 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
-
 package org.ow2.proactive.resourcemanager.db;
 
 import java.io.File;
@@ -42,24 +30,30 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.ow2.proactive.db.DatabaseManagerException;
-import org.ow2.proactive.db.SessionWork;
-import org.ow2.proactive.db.TransactionHelper;
-import org.ow2.proactive.resourcemanager.core.history.Alive;
-import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
-import org.ow2.proactive.resourcemanager.core.history.UserHistory;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.objectweb.proactive.core.util.MutableInteger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.db.DatabaseManagerException;
+import org.ow2.proactive.db.SessionWork;
+import org.ow2.proactive.db.TransactionHelper;
+import org.ow2.proactive.resourcemanager.core.history.Alive;
+import org.ow2.proactive.resourcemanager.core.history.LockHistory;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
+import org.ow2.proactive.resourcemanager.core.history.UserHistory;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+
+import com.google.common.collect.Maps;
 
 
 public class RMDBManager {
@@ -88,17 +82,14 @@ public class RMDBManager {
         if (System.getProperty(RM_DATABASE_IN_MEMORY) != null) {
             return createInMemoryRMDBManager();
         } else {
-            File configFile = new File(PAResourceManagerProperties
-                    .getAbsolutePath(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getValueAsString()));
+            File configFile = new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getValueAsString()));
 
             boolean drop = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getValueAsBoolean();
-            boolean dropNS = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB_NODESOURCES
-                    .getValueAsBoolean();
+            boolean dropNS = PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB_NODESOURCES.getValueAsBoolean();
 
             if (logger.isInfoEnabled()) {
-                logger.info("Starting RM DB Manager " + "with drop DB = " + drop +
-                        " and drop nodesources = " + dropNS + " and configuration file = " +
-                        configFile.getAbsolutePath());
+                logger.info("Starting RM DB Manager " + "with drop DB = " + drop + " and drop nodesources = " + dropNS +
+                            " and configuration file = " + configFile.getAbsolutePath());
             }
 
             Configuration configuration = new Configuration();
@@ -123,7 +114,7 @@ public class RMDBManager {
         Configuration config = new Configuration();
         config.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbc.JDBCDriver");
         config.setProperty("hibernate.connection.url",
-                "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
+                           "jdbc:hsqldb:mem:" + System.currentTimeMillis() + ";hsqldb.tx=mvcc");
         config.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         return new RMDBManager(config, true, true);
     }
@@ -134,21 +125,20 @@ public class RMDBManager {
      */
     public RMDBManager(Configuration configuration, boolean drop, boolean dropNS) {
         try {
-            configuration.addAnnotatedClass(NodeSourceData.class);
-            configuration.addAnnotatedClass(NodeHistory.class);
-            configuration.addAnnotatedClass(UserHistory.class);
             configuration.addAnnotatedClass(Alive.class);
+            configuration.addAnnotatedClass(LockHistory.class);
+            configuration.addAnnotatedClass(NodeHistory.class);
+            configuration.addAnnotatedClass(NodeSourceData.class);
+            configuration.addAnnotatedClass(UserHistory.class);
             if (drop) {
                 configuration.setProperty("hibernate.hbm2ddl.auto", "create");
 
                 // dropping RRD database as well
-                File ddrDB =
-                        new File(
-                                PAResourceManagerProperties.RM_HOME.getValueAsString(),
-                                PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
+                File ddrDB = new File(PAResourceManagerProperties.RM_HOME.getValueAsString(),
+                                      PAResourceManagerProperties.RM_RRD_DATABASE_NAME.getValueAsString());
 
-                if (ddrDB.exists()) {
-                    ddrDB.delete();
+                if (ddrDB.exists() && !ddrDB.delete()) {
+                    logger.error("Dropping RRD database has failed: " + ddrDB);
                 }
             }
 
@@ -158,15 +148,16 @@ public class RMDBManager {
             sessionFactory = configuration.buildSessionFactory();
             transactionHelper = new TransactionHelper(sessionFactory);
 
-            List<?> lastAliveTime = sqlQuery("from Alive");
-            if (lastAliveTime == null || lastAliveTime.size() == 0) {
-                createRmAliveTime();
+            Alive lastAliveTimeResult = findRmLastAliveEntry();
+
+            if (lastAliveTimeResult == null) {
+                createRmAliveEntry();
             } else if (!drop) {
                 if (dropNS) {
                     removeNodeSources();
                 }
 
-                recover(((Alive) lastAliveTime.get(0)).getTime());
+                recover(lastAliveTimeResult.getTime());
             }
 
             int periodInMilliseconds = PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt();
@@ -185,18 +176,28 @@ public class RMDBManager {
         }
     }
 
+    public Alive findRmLastAliveEntry() {
+
+        List<?> lastAliveTimeResult = executeSqlQuery("from Alive");
+
+        if (lastAliveTimeResult == null || lastAliveTimeResult.isEmpty()) {
+            return null;
+        }
+
+        return (Alive) lastAliveTimeResult.get(0);
+    }
+
     private void recover(final long lastAliveTime) {
 
-        // updating node events with uncompleted end time        
+        // updating node events with uncompleted end time
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                int updated = session.createSQLQuery(
-                        "update NodeHistory set endTime = :endTime where endTime = 0").setParameter(
-                        "endTime", lastAliveTime).executeUpdate();
-                updated = +session.createSQLQuery(
-                        "update NodeHistory set endTime = startTime where endTime < startTime")
-                        .executeUpdate();
+                int updated = session.createSQLQuery("update NodeHistory set endTime = :endTime where endTime = 0")
+                                     .setParameter("endTime", lastAliveTime)
+                                     .executeUpdate();
+                updated = +session.createSQLQuery("update NodeHistory set endTime = startTime where endTime < startTime")
+                                  .executeUpdate();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("Restoring the node history: " + updated + " raws updated");
@@ -206,16 +207,15 @@ public class RMDBManager {
             }
         });
 
-        // updating user events with uncompleted end time        
+        // updating user events with uncompleted end time
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                int updated = session.createSQLQuery(
-                        "update UserHistory set endTime = :endTime where endTime = 0").setParameter(
-                        "endTime", lastAliveTime).executeUpdate();
-                updated = +session.createSQLQuery(
-                        "update UserHistory set endTime = startTime where endTime < startTime")
-                        .executeUpdate();
+                int updated = session.createSQLQuery("update UserHistory set endTime = :endTime where endTime = 0")
+                                     .setParameter("endTime", lastAliveTime)
+                                     .executeUpdate();
+                updated = +session.createSQLQuery("update UserHistory set endTime = startTime where endTime < startTime")
+                                  .executeUpdate();
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("Restoring the user history: " + updated + " raws updated");
@@ -272,7 +272,8 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while adding new node source '" + nodeSourceData.getName() + "'");
+            throw new RuntimeException("Exception occured while adding new node source '" + nodeSourceData.getName() +
+                                       "'");
         }
     }
 
@@ -281,8 +282,7 @@ public class RMDBManager {
             @Override
             public Void doInTransaction(Session session) {
                 logger.info("Removing the node source " + sourceName + " from the database");
-                session.getNamedQuery("deleteNodeSourceDataByName")
-                        .setParameter("name", sourceName).executeUpdate();
+                session.getNamedQuery("deleteNodeSourceDataByName").setParameter("name", sourceName).executeUpdate();
                 return null;
             }
         });
@@ -334,10 +334,10 @@ public class RMDBManager {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                session.createSQLQuery(
-                        "update NodeHistory set endTime=:endTime where nodeUrl=:nodeUrl and endTime=0")
-                        .setParameter("endTime", nodeHistory.getStartTime()).setParameter("nodeUrl",
-                        nodeHistory.getNodeUrl()).executeUpdate();
+                session.createSQLQuery("update NodeHistory set endTime=:endTime where nodeUrl=:nodeUrl and endTime=0")
+                       .setParameter("endTime", nodeHistory.getStartTime())
+                       .setParameter("nodeUrl", nodeHistory.getNodeUrl())
+                       .executeUpdate();
 
                 if (nodeHistory.isStoreInDataBase()) {
                     session.save(nodeHistory);
@@ -347,31 +347,139 @@ public class RMDBManager {
         });
     }
 
+    /**
+     * Removes all entries from LockHistory table.
+     */
+    public void clearLockHistory() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
+            @Override
+            public Void doInTransaction(Session session) {
+                int nbDeletes = session.createSQLQuery("delete from LockHistory").executeUpdate();
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug(nbDeletes + " delete(s) performed with success on LockHistory table.");
+                }
+
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Returns information about the nodes which have been locked on previous RM run.
+     * <p>
+     * The purpose of this method is to fetch the number of nodes locked per node source
+     * on the previous RM run.
+     *
+     * @return the number of nodes locked, per node source, on the previous RM run.
+     */
+    public Map<String, MutableInteger> findNodesLockedOnPreviousRun() {
+        List<LockHistory> lockHistoryResult = getLockHistories();
+        return entityToMap(lockHistoryResult);
+    }
+
+    List<LockHistory> getLockHistories() {
+        return (List<LockHistory>) executeSqlQuery("from LockHistory");
+    }
+
+    Map<String, MutableInteger> entityToMap(List<LockHistory> lockHistoryResult) {
+        if (lockHistoryResult == null || lockHistoryResult.isEmpty()) {
+            return Maps.newHashMap();
+        }
+
+        Map<String, MutableInteger> result = new HashMap<>(lockHistoryResult.size(), 1f);
+
+        for (Object entry : lockHistoryResult) {
+            LockHistory lockHistory = (LockHistory) entry;
+
+            int lockCount = lockHistory.getLockCount();
+            if (lockCount > 0) {
+                result.put(lockHistory.getNodeSource(), new MutableInteger(lockCount));
+            }
+        }
+
+        return result;
+    }
+
     protected void updateRmAliveTime() {
+        updateAliveTable("time", System.currentTimeMillis());
+    }
+
+    private void updateAliveTable(final String columnName, final Object value) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                long curMilliseconds = System.currentTimeMillis();
-                session.createSQLQuery("update Alive set time = :time").setParameter("time", curMilliseconds)
-                        .executeUpdate();
+                session.createSQLQuery("update Alive set " + columnName + " = :time")
+                       .setParameter("time", value)
+                       .executeUpdate();
                 return null;
             }
         });
     }
 
-    private void createRmAliveTime() {
+    public void createLockEntryOrUpdate(final String nodeSource, final NodeLockUpdateAction actionOnUpdate) {
+
+        if (!PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
+            return;
+        }
+
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
+                LockHistory lockHistory = session.get(LockHistory.class, nodeSource);
+
+                if (lockHistory == null) {
+                    lockHistory = new LockHistory(nodeSource, 1);
+                    session.save(lockHistory);
+                } else {
+                    switch (actionOnUpdate) {
+                        case DECREMENT:
+                            lockHistory.decrementLockCount();
+                            break;
+                        case INCREMENT:
+                            lockHistory.incrementLockCount();
+                            break;
+                        default:
+                            break;
+                    }
+
+                    int nbUpdates = session.createSQLQuery("update LockHistory set lockCount = :lockCount where nodeSource = :nodeSource")
+                                           .setParameter("lockCount", lockHistory.getLockCount())
+                                           .setParameter("nodeSource", lockHistory.getNodeSource())
+                                           .executeUpdate();
+
+                    if (nbUpdates <= 0) {
+                        logger.warn("Lock history update has failed for a node that belongs to Node source " +
+                                    nodeSource);
+                    }
+                }
+
+                return null;
+            }
+        });
+    }
+
+    public enum NodeLockUpdateAction {
+        DECREMENT,
+        INCREMENT
+    }
+
+    private void createRmAliveEntry() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
+            @Override
+            public Void doInTransaction(Session session) {
+                long now = System.currentTimeMillis();
+
                 Alive alive = new Alive();
-                alive.setTime(System.currentTimeMillis());
+                alive.setTime(now);
                 session.save(alive);
+
                 return null;
             }
         });
     }
 
-    public List<?> sqlQuery(final String queryStr) {
+    public List<?> executeSqlQuery(final String queryStr) {
         return executeReadTransaction(new SessionWork<List<?>>() {
             @Override
             @SuppressWarnings("unchecked")

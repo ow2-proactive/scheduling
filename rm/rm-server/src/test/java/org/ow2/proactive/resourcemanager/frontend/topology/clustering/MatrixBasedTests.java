@@ -1,40 +1,31 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.frontend.topology.clustering;
+
+import static org.junit.Assert.*;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -49,8 +40,6 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DistanceFunction;
 
-import static org.junit.Assert.*;
-
 
 /**
  * Class which holds the tests that read their input from a a visual description of a grid (a string)
@@ -60,8 +49,11 @@ import static org.junit.Assert.*;
 public class MatrixBasedTests {
 
     protected static HashMap<Node, HashMap<Node, Long>> distances = new HashMap<>();
+
     protected static DummyNode[][][] gridMatrix;
+
     protected static int gridWidth;
+
     protected static int gridHeight;
 
     private class LocalTopology implements Topology {
@@ -218,8 +210,7 @@ public class MatrixBasedTests {
      * @param cliqueSize needed nodes
      * @return string of the selection's matrix
      */
-    public String doHACTest(int width, int height, String matrix, String pivotMatrix, Long threshold,
-            int cliqueSize) {
+    public String doHACTest(int width, int height, String matrix, String pivotMatrix, Long threshold, int cliqueSize) {
 
         List<Node> pivots = initDistances(width, height, matrix, pivotMatrix);
 
@@ -247,16 +238,15 @@ public class MatrixBasedTests {
 
         String result1 = ".........." + "2........." + ".........." + ".........." + "..........";
 
-        assertTrue("The algorithm did not choose the closest nodes!", doHACTest(W, H, prob, pivot, infinity,
-                1).equals(result1));
+        assertTrue("The algorithm did not choose the closest nodes!",
+                   doHACTest(W, H, prob, pivot, infinity, 1).equals(result1));
 
         String result3 = "2........." + "2........." + ".........." + ".........." + "..........";
 
-        assertTrue("The algorithm did not choose the closest nodes!", doHACTest(W, H, prob, pivot, infinity,
-                3).equals(result3));
+        assertTrue("The algorithm did not choose the closest nodes!",
+                   doHACTest(W, H, prob, pivot, infinity, 3).equals(result3));
 
-        assertTrue("The algorithm did not fail when it had to!",
-                doHACTest(W, H, prob, pivot, (long) 100, 4) == null);
+        assertTrue("The algorithm did not fail when it had to!", doHACTest(W, H, prob, pivot, (long) 100, 4) == null);
 
         String probMany = "1.1.1.1.1." + "1.1.9.1.1." + ".........." + ".........." + "..........";
 
@@ -264,8 +254,8 @@ public class MatrixBasedTests {
 
         String resultMany = ".........." + "....9....." + ".........." + ".........." + "..........";
 
-        assertTrue("The algorithm did not choose the closest nodes!", doHACTest(W, H, probMany, noPivot,
-                infinity, 9).equals(resultMany));
+        assertTrue("The algorithm did not choose the closest nodes!",
+                   doHACTest(W, H, probMany, noPivot, infinity, 9).equals(resultMany));
 
         String probCorners = "9........." + ".........." + ".........." + ".........1" + "9.......1.";
 
@@ -273,8 +263,8 @@ public class MatrixBasedTests {
 
         String resultCorners = "9........." + ".........." + ".........." + ".........." + "1.......1.";
 
-        assertTrue("The algorithm did not deal well with far away pivots!", doHACTest(W, H, probCorners,
-                bipartPivot, infinity, 1).equals(resultCorners));
+        assertTrue("The algorithm did not deal well with far away pivots!",
+                   doHACTest(W, H, probCorners, bipartPivot, infinity, 1).equals(resultCorners));
     }
 
     @org.junit.Test
@@ -288,29 +278,29 @@ public class MatrixBasedTests {
 
         String resultSW = ".........." + "2........." + ".........." + ".........." + "..........";
 
-        assertTrue("The algorithm did not choose the closest nodes!", doHACTest(W, H, prob, pivotSW,
-                infinity, 1).equals(resultSW));
+        assertTrue("The algorithm did not choose the closest nodes!",
+                   doHACTest(W, H, prob, pivotSW, infinity, 1).equals(resultSW));
 
         String pivotNW = "10........" + "00........" + ".........." + ".........." + "..........";
 
         String resultNW = "2........." + ".........." + ".........." + ".........." + "..........";
 
-        assertTrue("The algorithm did not choose the closest nodes!", doHACTest(W, H, prob, pivotNW,
-                infinity, 1).equals(resultNW));
+        assertTrue("The algorithm did not choose the closest nodes!",
+                   doHACTest(W, H, prob, pivotNW, infinity, 1).equals(resultNW));
 
         String pivotNE = "01........" + "00........" + ".........." + ".........." + "..........";
 
         String resultNE = ".2........" + ".........." + ".........." + ".........." + "..........";
 
-        assertTrue("The algorithm did not choose the closest nodes!", doHACTest(W, H, prob, pivotNE,
-                infinity, 1).equals(resultNE));
+        assertTrue("The algorithm did not choose the closest nodes!",
+                   doHACTest(W, H, prob, pivotNE, infinity, 1).equals(resultNE));
 
         String pivotSE = "00........" + "01........" + ".........." + ".........." + "..........";
 
         String resultSE = ".........." + ".2........" + ".........." + ".........." + "..........";
 
-        assertTrue("The algorithm did not choose the closest nodes!", doHACTest(W, H, prob, pivotSE,
-                infinity, 1).equals(resultSE));
+        assertTrue("The algorithm did not choose the closest nodes!",
+                   doHACTest(W, H, prob, pivotSE, infinity, 1).equals(resultSE));
     }
 
     @org.junit.Test(timeout = 60000)
@@ -320,13 +310,11 @@ public class MatrixBasedTests {
         double density = 0.30;
 
         //made with w=20; h=20; density=0.3
-        String map = ".2..16............8." + "...7...7.963.....6.7" + "....4...87.7...6..1."
-            + ".9....677.1.75...9.." + "...4.....64.2.....7." + "5........9....4.2..2"
-            + ".................6.." + "........5....6.8...." + "...6....4.........23"
-            + ".3...8.9.......9...." + "...8..9..........5.3" + "..6......7295....1.."
-            + "9.8..4.29..55......." + "..6..7.......2......" + ".4..8...74.....5...."
-            + ".2.7.6.....7.7....8." + "1...637.....71..5..." + ".1...9.......6....38"
-            + "9.............9.914." + "....7..95.3...3..89.";
+        String map = ".2..16............8." + "...7...7.963.....6.7" + "....4...87.7...6..1." + ".9....677.1.75...9.." +
+                     "...4.....64.2.....7." + "5........9....4.2..2" + ".................6.." + "........5....6.8...." +
+                     "...6....4.........23" + ".3...8.9.......9...." + "...8..9..........5.3" + "..6......7295....1.." +
+                     "9.8..4.29..55......." + "..6..7.......2......" + ".4..8...74.....5...." + ".2.7.6.....7.7....8." +
+                     "1...637.....71..5..." + ".1...9.......6....38" + "9.............9.914." + "....7..95.3...3..89.";
 
         int onePercent = (int) Math.round((w * h * density * 5) / 100);
 
@@ -346,23 +334,21 @@ public class MatrixBasedTests {
         double density = 0.30;
 
         //made with w=20; h=20; density=0.3
-        String map = ".2..16............8." + "...7...7.963.....6.7" + "....4...87.7...6..1."
-            + ".9....677.1.75...9.." + "...4.....64.2.....7." + "5........9....4.2..2"
-            + ".................6.." + "........5....6.8...." + "...6....4.........23"
-            + ".3...8.9.......9...." + "...8..9..........5.3" + "..6......7295....1.."
-            + "9.8..4.29..55......." + "..6..7.......2......" + ".4..8...74.....5...."
-            + ".2.7.6.....7.7....8." + "1...637.....71..5..." + ".1...9.......6....38"
-            + "9.............9.914." + "....7..95.3...3..89.";
+        String map = ".2..16............8." + "...7...7.963.....6.7" + "....4...87.7...6..1." + ".9....677.1.75...9.." +
+                     "...4.....64.2.....7." + "5........9....4.2..2" + ".................6.." + "........5....6.8...." +
+                     "...6....4.........23" + ".3...8.9.......9...." + "...8..9..........5.3" + "..6......7295....1.." +
+                     "9.8..4.29..55......." + "..6..7.......2......" + ".4..8...74.....5...." + ".2.7.6.....7.7....8." +
+                     "1...637.....71..5..." + ".1...9.......6....38" + "9.............9.914." + "....7..95.3...3..89.";
 
         //this was made by putting a pivot on every
         // 5 node host
-        String pivot = ".0..00............0." + "...0...0.000.....0.0" + "....0...00.0...0..0."
-            + ".0....000.0.01...0.." + "...0.....00.0.....0." + "1........0....0.0..0"
-            + ".................0.." + "........1....0.0...." + "...0....0.........00"
-            + ".0...0.0.......0...." + "...0..0..........1.0" + "..0......0001....0.."
-            + "0.0..0.00..11......." + "..0..0.......0......" + ".0..0...00.....1...."
-            + ".0.0.0.....0.0....0." + "0...000.....00..1..." + ".0...0.......0....00"
-            + "0.............0.000." + "....0..01.0...0..00.";
+        String pivot = ".0..00............0." + "...0...0.000.....0.0" + "....0...00.0...0..0." +
+                       ".0....000.0.01...0.." + "...0.....00.0.....0." + "1........0....0.0..0" +
+                       ".................0.." + "........1....0.0...." + "...0....0.........00" +
+                       ".0...0.0.......0...." + "...0..0..........1.0" + "..0......0001....0.." +
+                       "0.0..0.00..11......." + "..0..0.......0......" + ".0..0...00.....1...." +
+                       ".0.0.0.....0.0....0." + "0...000.....00..1..." + ".0...0.......0....00" +
+                       "0.............0.000." + "....0..01.0...0..00.";
 
         int onePercent = (int) Math.round((w * h * density * 5) / 100);
 

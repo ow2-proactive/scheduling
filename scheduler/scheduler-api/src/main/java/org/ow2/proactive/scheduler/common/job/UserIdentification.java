@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.job;
 
@@ -55,20 +44,29 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
 
     /** Value for  */
     public static final int SORT_BY_NAME = 1;
+
     /**  */
     public static final int SORT_BY_SUBMIT = 3;
+
     /**  */
     public static final int SORT_BY_HOST = 4;
+
     /**  */
     public static final int SORT_BY_CONNECTION = 5;
+
     /**  */
     public static final int SORT_BY_LASTSUBMIT = 6;
+
     /**  */
     public static final int ASC_ORDER = 1;
+
     /**  */
     public static final int DESC_ORDER = 2;
+
     private static int currentSort = SORT_BY_NAME;
+
     private static int currentOrder = ASC_ORDER;
+
     protected boolean toRemove = false;
 
     /**
@@ -152,21 +150,20 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
     public int compareTo(UserIdentification user) {
         switch (currentSort) {
             case SORT_BY_SUBMIT:
-                return (currentOrder == ASC_ORDER) ? getSubmitNumber() - user.getSubmitNumber() : user
-                        .getSubmitNumber() -
-                    getSubmitNumber();
+                return (currentOrder == ASC_ORDER) ? getSubmitNumber() - user.getSubmitNumber()
+                                                   : user.getSubmitNumber() - getSubmitNumber();
             case SORT_BY_HOST:
-                return (currentOrder == ASC_ORDER) ? getHostName().compareTo(user.getHostName()) : user
-                        .getHostName().compareTo(getHostName());
+                return (currentOrder == ASC_ORDER) ? getHostName().compareTo(user.getHostName())
+                                                   : user.getHostName().compareTo(getHostName());
             case SORT_BY_CONNECTION:
                 return (currentOrder == ASC_ORDER) ? (int) (getConnectionTime() - user.getConnectionTime())
-                        : (int) (user.getConnectionTime() - getConnectionTime());
+                                                   : (int) (user.getConnectionTime() - getConnectionTime());
             case SORT_BY_LASTSUBMIT:
                 return (currentOrder == ASC_ORDER) ? (int) (getLastSubmitTime() - user.getLastSubmitTime())
-                        : (int) (user.getLastSubmitTime() - getLastSubmitTime());
+                                                   : (int) (user.getLastSubmitTime() - getLastSubmitTime());
             default:
-                return (currentOrder == ASC_ORDER) ? getHostName().compareTo(user.getHostName()) : user
-                        .getHostName().compareTo(getHostName());
+                return (currentOrder == ASC_ORDER) ? getHostName().compareTo(user.getHostName())
+                                                   : user.getHostName().compareTo(getHostName());
         }
     }
 

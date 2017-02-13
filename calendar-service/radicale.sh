@@ -9,7 +9,7 @@
 
 check_status() {
 
-  # Running ps with some arguments to check if the PID exists 
+  # Running ps with some arguments to check if the PID exists
   s=$(ps aux | grep 'radicale -d -S' | grep -v 'grep' | awk '{print $2}')
 
   # If somethig was returned by the ps command, this function returns the PID

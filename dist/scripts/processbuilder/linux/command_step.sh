@@ -1,7 +1,7 @@
 #! /bin/bash
 # last step of the command launching mechanism
 # will test if a command can or can not be launched by the current user
-# If everything seems OK it will signal the java process builder on stdout and 
+# If everything seems OK it will signal the java process builder on stdout and
 # stderr that it will proceed with executing the user command
 
 # parameters:
@@ -28,7 +28,7 @@ token=$1
 tmp=$2
 
 if [ ! -e $tmp ]; then
-  # if the temp file is not OK 
+  # if the temp file is not OK
   error="$OSPL_E_PREFIX ${OSLP_PACKAGE}FatalProcessBuilderException $OSPL_E_CAUSE Could not access temp file for storing the return value!";
   echo $error 1>&2;
   exit 1;
@@ -50,7 +50,7 @@ fi;
 #  source $tmp
 #fi;
 
-# working directory for the user command 
+# working directory for the user command
 workdir="$4"
 
 # losing the first four arguments, all that remains is the user command
@@ -62,7 +62,7 @@ umask 0000
 # check if the workdir is OK
 if [ -d "${workdir}" ]; then
   cd "$workdir"
-else 
+else
   error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such directory (${workdir}) ";
   echo $error 1>&2;
   exit 1;
@@ -85,8 +85,8 @@ if [ -e "$cmd_path" ]; then
     set -a
     source $tmpenv
     rm $tmpenv 2> /dev/null
-    
-    # let's tell the launcher that everything is OK 
+
+    # let's tell the launcher that everything is OK
     confirm="_OS_PROCESS_LAUNCH_INIT_FINISHED_"
     echo $confirm;
     echo $confirm 1>&2;
@@ -94,8 +94,8 @@ if [ -e "$cmd_path" ]; then
     export token=$token
     # execute it!
     (exec -a "$token" "$@")
-	
-	
+
+
     # write return value to the temp file
     error=$?
     echo $error > $tmp;
@@ -105,7 +105,7 @@ if [ -e "$cmd_path" ]; then
     echo $error 1>&2;
     exit 1;
   fi;
-else 
+else
   error="$OSPL_E_PREFIX java.io.IOException $OSPL_E_CAUSE error=2, No such file or directory ";
   echo $error 1>&2;
   exit 1;

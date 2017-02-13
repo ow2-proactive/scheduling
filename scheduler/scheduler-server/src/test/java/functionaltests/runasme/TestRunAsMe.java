@@ -25,9 +25,9 @@
  */
 package functionaltests.runasme;
 
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
-
 import static org.junit.Assume.assumeNotNull;
+
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 
 
 /**
