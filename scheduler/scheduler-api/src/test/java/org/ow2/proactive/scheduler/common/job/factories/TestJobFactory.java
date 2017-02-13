@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
@@ -72,10 +61,9 @@ import com.google.common.collect.ImmutableMap;
  */
 public class TestJobFactory {
 
-    private static URL jobTaskFlowDescriptor = TestJobFactory.class
-            .getResource("Job_TaskFlow.xml");
-    private static URL jobMultiNodesDescriptor = TestJobFactory.class
-            .getResource("Job_MultiNodes.xml");
+    private static URL jobTaskFlowDescriptor = TestJobFactory.class.getResource("Job_TaskFlow.xml");
+
+    private static URL jobMultiNodesDescriptor = TestJobFactory.class.getResource("Job_MultiNodes.xml");
 
     @Test
     public void testJobFactory() throws Throwable {
@@ -123,7 +111,9 @@ public class TestJobFactory {
         assertEquals("test1", task1.getSelectionScripts().get(1).getParameters()[0]);
         assertEquals("test2", task1.getSelectionScripts().get(1).getParameters()[1]);
         Assert.assertTrue(task1.getPreScript().getScript().contains("Beginning of Pre-Script"));
-        Assert.assertTrue(task1.getPostScript().getScript().contains("Content is equals to " + scriptFolder + "/unset.js"));
+        Assert.assertTrue(task1.getPostScript()
+                               .getScript()
+                               .contains("Content is equals to " + scriptFolder + "/unset.js"));
         assertNull(task1.getPostScript().getParameters());
         Assert.assertTrue(task1.getCleaningScript().getScript().contains("Beginning of clean script"));
         assertNull(task1.getCleaningScript().getParameters());
@@ -153,8 +143,7 @@ public class TestJobFactory {
         assertEquals(2, task2.getMaxNumberOfExecution());
         assertEquals("Parallel Tasks - Task 2", task2.getDescription());
         assertEquals(null, task2.getSelectionScripts());
-        Assert.assertTrue(task2.getPreScript().getScript().contains(
-                "Beginning of Pre-Script"));
+        Assert.assertTrue(task2.getPreScript().getScript().contains("Beginning of Pre-Script"));
         assertEquals(null, task2.getPostScript());
         assertEquals(null, task2.getCleaningScript());
         assertEquals(null, task2.getDependencesList());
@@ -162,30 +151,18 @@ public class TestJobFactory {
         assertEquals(0, task2.getWallTime());
         assertEquals(false, task2.isWallTimeSet());
         assertEquals(0, task2.getGenericInformation().size());
-        Assert.assertTrue(task2.getInputFilesList().get(0).getInputFiles()
-                .getIncludes().contains("tata*"));
-        Assert.assertTrue(task2.getInputFilesList().get(0).getInputFiles()
-                .getExcludes().contains("tata*1"));
-        assertEquals(InputAccessMode.TransferFromInputSpace,
-          task2.getInputFilesList().get(0).getMode());
-        Assert.assertTrue(task2.getInputFilesList().get(1).getInputFiles()
-                .getIncludes().contains("toto*.txt"));
-        Assert.assertTrue(task2.getInputFilesList().get(1).getInputFiles()
-                .getExcludes().contains("toto*2.txt"));
-        assertEquals(InputAccessMode.TransferFromOutputSpace,
-          task2.getInputFilesList().get(1).getMode());
-        Assert.assertTrue(task2.getOutputFilesList().get(0).getOutputFiles()
-                .getIncludes().contains("titi*"));
-        Assert.assertTrue(task2.getOutputFilesList().get(0).getOutputFiles()
-                .getExcludes().contains("titi*1"));
-        assertEquals(OutputAccessMode.TransferToOutputSpace,
-          task2.getOutputFilesList().get(0).getMode());
-        Assert.assertTrue(task2.getOutputFilesList().get(1).getOutputFiles()
-                .getIncludes().contains("titi*.txt"));
-        Assert.assertTrue(task2.getOutputFilesList().get(1).getOutputFiles()
-                .getExcludes().contains("titi*3.txt"));
-        assertEquals(OutputAccessMode.TransferToOutputSpace,
-          task2.getOutputFilesList().get(1).getMode());
+        Assert.assertTrue(task2.getInputFilesList().get(0).getInputFiles().getIncludes().contains("tata*"));
+        Assert.assertTrue(task2.getInputFilesList().get(0).getInputFiles().getExcludes().contains("tata*1"));
+        assertEquals(InputAccessMode.TransferFromInputSpace, task2.getInputFilesList().get(0).getMode());
+        Assert.assertTrue(task2.getInputFilesList().get(1).getInputFiles().getIncludes().contains("toto*.txt"));
+        Assert.assertTrue(task2.getInputFilesList().get(1).getInputFiles().getExcludes().contains("toto*2.txt"));
+        assertEquals(InputAccessMode.TransferFromOutputSpace, task2.getInputFilesList().get(1).getMode());
+        Assert.assertTrue(task2.getOutputFilesList().get(0).getOutputFiles().getIncludes().contains("titi*"));
+        Assert.assertTrue(task2.getOutputFilesList().get(0).getOutputFiles().getExcludes().contains("titi*1"));
+        assertEquals(OutputAccessMode.TransferToOutputSpace, task2.getOutputFilesList().get(0).getMode());
+        Assert.assertTrue(task2.getOutputFilesList().get(1).getOutputFiles().getIncludes().contains("titi*.txt"));
+        Assert.assertTrue(task2.getOutputFilesList().get(1).getOutputFiles().getExcludes().contains("titi*3.txt"));
+        assertEquals(OutputAccessMode.TransferToOutputSpace, task2.getOutputFilesList().get(1).getMode());
         assertEquals("12", ((JavaTask) task2).getArgument("sleepTime"));
         assertEquals("21", ((JavaTask) task2).getArgument("number"));
         assertEquals("/bin/java/jdk1.5", ((JavaTask) task2).getArgument("test"));
@@ -196,18 +173,14 @@ public class TestJobFactory {
         assertEquals("/bin/java/jdk1.5/toto", task2.getForkEnvironment().getWorkingDir());
         assertEquals("-dparam=12", task2.getForkEnvironment().getJVMArguments().get(0));
         assertEquals("-djhome=/bin/java/jdk1.5", task2.getForkEnvironment().getJVMArguments().get(1));
-        Map<String, String> props = task2.getForkEnvironment()
-                .getSystemEnvironment();
+        Map<String, String> props = task2.getForkEnvironment().getSystemEnvironment();
         assertEquals(2, props.size());
         assertEquals("ioi", props.get("toto"));
         assertEquals("456", props.get("tata"));
 
-        assertEquals("ioi",
-          task2.getForkEnvironment().getSystemEnvironmentVariable("toto"));
-        assertEquals("456",
-          task2.getForkEnvironment().getSystemEnvironmentVariable("tata"));
-        List<String> addcp = task2.getForkEnvironment()
-                .getAdditionalClasspath();
+        assertEquals("ioi", task2.getForkEnvironment().getSystemEnvironmentVariable("toto"));
+        assertEquals("456", task2.getForkEnvironment().getSystemEnvironmentVariable("tata"));
+        List<String> addcp = task2.getForkEnvironment().getAdditionalClasspath();
         assertEquals(2, addcp.size());
         assertEquals("a", addcp.get(0));
         assertEquals("b", addcp.get(1));
@@ -235,8 +208,7 @@ public class TestJobFactory {
         assertEquals("Dependent Tasks - Task 3", task3.getDescription());
         assertEquals(null, task3.getSelectionScripts());
         assertEquals(null, task3.getPreScript());
-        Assert.assertTrue(task3.getPostScript().getScript().contains(
-                "Unsetting system property user.property1"));
+        Assert.assertTrue(task3.getPostScript().getScript().contains("Unsetting system property user.property1"));
         assertNull(task3.getPostScript().getParameters());
         assertEquals(null, task3.getCleaningScript());
         assertEquals(2, task3.getDependencesList().size());
@@ -246,10 +218,8 @@ public class TestJobFactory {
         assertEquals(true, task3.isWallTimeSet());
         assertEquals(0, task3.getGenericInformation().size());
         assertEquals(1, task3.getInputFilesList().size());
-        Assert.assertTrue(task3.getInputFilesList().get(0).getInputFiles()
-                .getIncludes().contains("tata*"));
-        Assert.assertTrue(
-                task3.getInputFilesList().get(0).getInputFiles().getExcludes().isEmpty());
+        Assert.assertTrue(task3.getInputFilesList().get(0).getInputFiles().getIncludes().contains("tata*"));
+        Assert.assertTrue(task3.getInputFilesList().get(0).getInputFiles().getExcludes().isEmpty());
         assertEquals(InputAccessMode.none, task3.getInputFilesList().get(0).getMode());
         assertNull(task3.getOutputFilesList());
         assertEquals(5, ((NativeTask) task3).getCommandLine().length);
@@ -280,31 +250,20 @@ public class TestJobFactory {
         assertEquals("v22", task4.getGenericInformation().get("n22"));
         assertNull(task4.getInputFilesList());
         assertEquals(5, task4.getOutputFilesList().size());
-        Assert.assertTrue(task4.getOutputFilesList().get(0).getOutputFiles()
-                .getIncludes().contains("a"));
-        Assert.assertTrue(task4.getOutputFilesList().get(1).getOutputFiles()
-                .getIncludes().contains("b"));
-        Assert.assertTrue(task4.getOutputFilesList().get(2).getOutputFiles()
-                .getIncludes().contains("c"));
-        Assert.assertTrue(task4.getOutputFilesList().get(3).getOutputFiles()
-                .getIncludes().contains("d"));
-        Assert.assertTrue(task4.getOutputFilesList().get(4).getOutputFiles()
-                .getIncludes().contains("e"));
-        Assert.assertTrue(task4.getOutputFilesList().get(0).getOutputFiles()
-                .getExcludes().contains("f"));
-        Assert.assertTrue(task4.getOutputFilesList().get(1).getOutputFiles()
-                .getExcludes().contains("g"));
+        Assert.assertTrue(task4.getOutputFilesList().get(0).getOutputFiles().getIncludes().contains("a"));
+        Assert.assertTrue(task4.getOutputFilesList().get(1).getOutputFiles().getIncludes().contains("b"));
+        Assert.assertTrue(task4.getOutputFilesList().get(2).getOutputFiles().getIncludes().contains("c"));
+        Assert.assertTrue(task4.getOutputFilesList().get(3).getOutputFiles().getIncludes().contains("d"));
+        Assert.assertTrue(task4.getOutputFilesList().get(4).getOutputFiles().getIncludes().contains("e"));
+        Assert.assertTrue(task4.getOutputFilesList().get(0).getOutputFiles().getExcludes().contains("f"));
+        Assert.assertTrue(task4.getOutputFilesList().get(1).getOutputFiles().getExcludes().contains("g"));
         Assert.assertTrue(task4.getOutputFilesList().get(2).getOutputFiles().getExcludes().isEmpty());
-        Assert.assertTrue(task4.getOutputFilesList().get(3).getOutputFiles()
-                .getExcludes().contains("h"));
-        Assert.assertTrue(task4.getOutputFilesList().get(4).getOutputFiles()
-                .getExcludes().contains("i"));
-        assertEquals(OutputAccessMode.TransferToOutputSpace,
-          task4.getOutputFilesList().get(0).getMode());
+        Assert.assertTrue(task4.getOutputFilesList().get(3).getOutputFiles().getExcludes().contains("h"));
+        Assert.assertTrue(task4.getOutputFilesList().get(4).getOutputFiles().getExcludes().contains("i"));
+        assertEquals(OutputAccessMode.TransferToOutputSpace, task4.getOutputFilesList().get(0).getMode());
         assertEquals(OutputAccessMode.none, task4.getOutputFilesList().get(1).getMode());
         assertEquals(OutputAccessMode.none, task4.getOutputFilesList().get(2).getMode());
-        assertEquals(OutputAccessMode.TransferToOutputSpace,
-          task4.getOutputFilesList().get(3).getMode());
+        assertEquals(OutputAccessMode.TransferToOutputSpace, task4.getOutputFilesList().get(3).getMode());
         assertEquals(OutputAccessMode.none, task4.getOutputFilesList().get(4).getMode());
         assertEquals(null, ((NativeTask) task4).getWorkingDir());
         assertEquals(10, task4.getNumberOfNodesNeeded());
@@ -365,16 +324,16 @@ public class TestJobFactory {
         System.out.println("------------------------------ " + s);
     }
 
-    private TaskFlowJob getJob(URL jobDesc, String jobFacImpl, String scriptFolder) throws JobCreationException,
-            URISyntaxException {
-        return ScriptUpdateUtil.resolveScripts((TaskFlowJob) JobFactory.getFactory(jobFacImpl).createJob(
-                                                                                                         new File(jobDesc.toURI()).getAbsolutePath(),
-                                                                                                         ImmutableMap.of("scripts.folder",
-                                                                                                                         scriptFolder,
-                                                                                                                         "priority",
-                                                                                                                         "high",
-                                                                                                                         "nb.execution",
-                                                                                                                         "2")));
+    private TaskFlowJob getJob(URL jobDesc, String jobFacImpl, String scriptFolder)
+            throws JobCreationException, URISyntaxException {
+        return ScriptUpdateUtil.resolveScripts((TaskFlowJob) JobFactory.getFactory(jobFacImpl)
+                                                                       .createJob(new File(jobDesc.toURI()).getAbsolutePath(),
+                                                                                  ImmutableMap.of("scripts.folder",
+                                                                                                  scriptFolder,
+                                                                                                  "priority",
+                                                                                                  "high",
+                                                                                                  "nb.execution",
+                                                                                                  "2")));
     }
 
 }

@@ -1,41 +1,34 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
+import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,6 +37,10 @@ import java.util.Stack;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.codehaus.jackson.type.TypeReference;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
@@ -53,27 +50,17 @@ import org.ow2.proactive_grid_cloud_portal.cli.json.ErrorView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.codehaus.jackson.type.TypeReference;
-
-import static com.google.common.base.Throwables.getStackTraceAsString;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_IO_ERROR;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_UNAUTHORIZED_ACCESS;
-import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.FORBIDDEN;
 
 
 public abstract class AbstractCommand implements Command {
 
-    private static final String DEBUG_MODE_USAGE_MESSAGE_PREFIX =
-            System.lineSeparator() + "You can enable debug mode for getting more information using ";
+    private static final String DEBUG_MODE_USAGE_MESSAGE_PREFIX = System.lineSeparator() +
+                                                                  "You can enable debug mode for getting more information using ";
 
-    private static final String DEBUG_MODE_USAGE_INTERACTIVE_SUFFIX =
-            "command '" + CommandSet.DEBUG.jsCommand() + "'.";
+    private static final String DEBUG_MODE_USAGE_INTERACTIVE_SUFFIX = "command '" + CommandSet.DEBUG.jsCommand() + "'.";
 
-    private static final String DEBUG_MODE_USAGE_NON_INTERACTIVE_SUFFIX =
-            "-" + CommandSet.DEBUG.opt() + " or --" + CommandSet.DEBUG.longOpt() + " option.";
+    private static final String DEBUG_MODE_USAGE_NON_INTERACTIVE_SUFFIX = "-" + CommandSet.DEBUG.opt() + " or --" +
+                                                                          CommandSet.DEBUG.longOpt() + " option.";
 
     protected int statusCode(HttpResponseStatus status) {
         return status.statusCode();
@@ -83,8 +70,7 @@ public abstract class AbstractCommand implements Command {
         return response.getStatusCode();
     }
 
-    protected <T> T readValue(HttpResponseWrapper response, Class<T> valueType,
-            ApplicationContext currentContext) {
+    protected <T> T readValue(HttpResponseWrapper response, Class<T> valueType, ApplicationContext currentContext) {
         try {
             return currentContext.getObjectMapper().readValue(response.getContent(), valueType);
         } catch (IOException ioe) {
@@ -125,8 +111,9 @@ public abstract class AbstractCommand implements Command {
 
         } catch (SSLPeerUnverifiedException sslException) {
             throw new CLIException(CLIException.REASON_OTHER,
-                    "SSL error. Perhaps HTTPS certificate could not be validated, "
-                            + "you can try with -k or insecure() for insecure SSL connection.", sslException);
+                                   "SSL error. Perhaps HTTPS certificate could not be validated, " +
+                                                              "you can try with -k or insecure() for insecure SSL connection.",
+                                   sslException);
         } catch (Exception e) {
             throw new CLIException(CLIException.REASON_OTHER, e.getMessage(), e);
         } finally {
@@ -135,8 +122,7 @@ public abstract class AbstractCommand implements Command {
     }
 
     @SuppressWarnings("unchecked")
-    protected void handleError(String errorMessage, HttpResponseWrapper response,
-            ApplicationContext currentContext) {
+    protected void handleError(String errorMessage, HttpResponseWrapper response, ApplicationContext currentContext) {
         String responseContent = StringUtility.responseAsString(response);
         Stack resultStack = resultStack(currentContext);
         ErrorView errorView = errorView(responseContent, currentContext);
@@ -173,8 +159,7 @@ public abstract class AbstractCommand implements Command {
         writeLine(currentContext, "Error message: %s", message);
 
         if (isDebugModeEnabled(currentContext)) {
-            writeLine(currentContext, "Stack trace: %s",
-                    getStackTraceAsString((cause == null) ? error : cause));
+            writeLine(currentContext, "Stack trace: %s", getStackTraceAsString((cause == null) ? error : cause));
         } else {
             writeDebugModeUsage(currentContext);
         }
@@ -246,7 +231,6 @@ public abstract class AbstractCommand implements Command {
 
     private void writeError(String errorMsg, String responseContent, ApplicationContext currentContext) {
         writeLine(currentContext, errorMsg);
-
 
         HttpErrorView errorView = errorView(responseContent);
 
@@ -337,7 +321,9 @@ public abstract class AbstractCommand implements Command {
 
     private class HttpErrorView {
         private String errorCode;
+
         private String errorMessage;
+
         private String stackTrace;
     }
 }

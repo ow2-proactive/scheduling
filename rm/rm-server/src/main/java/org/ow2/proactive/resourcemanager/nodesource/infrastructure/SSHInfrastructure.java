@@ -1,40 +1,31 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
+
+import static com.google.common.base.Throwables.getStackTraceAsString;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +34,7 @@ import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
@@ -54,9 +46,6 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.apache.log4j.Logger;
-
-import static com.google.common.base.Throwables.getStackTraceAsString;
 
 
 /**
@@ -84,6 +73,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      */
     @Configurable(description = "Options for the ssh command\nto log in the remote hosts")
     protected String sshOptions;
+
     /**
      * Path to the Java executable on the remote hosts
      */
@@ -108,24 +98,30 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      */
     @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts")
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
+
     /**
      * The type of the OS on the remote machine, 'Linux', 'Windows' or 'Cygwin'
      */
     @Configurable(description = "Linux, Cygwin or Windows depending on\nthe operating system of the remote hosts")
     protected String targetOs = "Linux";
+
     protected OperatingSystem targetOSObj = null;
+
     /**
      * Additional java options to append to the command executed on the remote
      * host
      */
     @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
     protected String javaOptions;
+
     /**
      * Path to the credentials file user for RM authentication
      */
     @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File rmCredentialsPath;
+
     protected Credentials credentials = null;
+
     /**
      * Shutdown flag
      */
@@ -218,8 +214,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             cmdLine = clb.buildCommandLine(true);
             obfuscatedCmdLine = clb.buildCommandLine(false);
         } catch (IOException e2) {
-            throw new RMException(
-                "Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e2);
+            throw new RMException("Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e2);
         }
 
         // one escape the command to make it runnable through ssh
@@ -230,16 +225,20 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         // we create a new deploying node before ssh command ran
         final List<String> depNodeURLs = new ArrayList<>(nbNodes);
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
-        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, "Deploying nodes on host " + host, super.nodeTimeOut));
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
+                                                     obfuscatedCmdLine,
+                                                     "Deploying nodes on host " + host,
+                                                     super.nodeTimeOut));
         addTimeouts(depNodeURLs);
-
 
         Process p = null;
         try {
             p = Utils.runSSHCommand(host, cmdLine, sshOptions);
         } catch (IOException e1) {
-            multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + cmdLine + ", with ssh options: " +
-                    sshOptions + " -\n The following exception occutred:\n " + getStackTraceAsString(e1));
+            multipleDeclareDeployingNodeLost(depNodeURLs,
+                                             "Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions +
+                                                          " -\n The following exception occutred:\n " +
+                                                          getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions, e1);
         }
 
@@ -250,16 +249,15 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("SSH subprocess at " + host.getHostName() + " exited abnormally (" +
-                        exitCode + ").");
+                    logger.error("SSH subprocess at " + host.getHostName() + " exited abnormally (" + exitCode + ").");
                 } else {
                     logger.error("Launching node process has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
-                final String description = "SSH command failed to launch node on host " + host.getHostName() +
-                    lf + "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " +
-                    pOutPut;
+                final String description = "SSH command failed to launch node on host " + host.getHostName() + lf +
+                                           "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut +
+                                           "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkAllNodesAreAcquiredAndDo(createdNodeNames, null, new Runnable() {
                     public void run() {
@@ -269,8 +267,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                     return;
                 } else {
                     // there isn't any race regarding node registration
-                    throw new RMException(
-                        "SSH Node " + nodeName + " is not expected anymore because of an error.");
+                    throw new RMException("SSH Node " + nodeName + " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");
@@ -331,8 +328,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             if (parameters[index] != null) {
                 this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[index++].toString());
                 if (this.targetOSObj == null) {
-                    throw new IllegalArgumentException(
-                        "Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
+                    throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
                 }
             } else {
                 throw new IllegalArgumentException("Target OS parameter cannot be null");

@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.scheduler.common;
 
@@ -121,8 +110,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access to this particular job.
      */
-    JobResult getJobResult(JobId jobId)
-            throws NotConnectedException, PermissionException, UnknownJobException;
+    JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**
      * Get the result for the given task name and the given incarnation in the
@@ -380,8 +368,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws JobAlreadyFinishedException
      *             if you want to change the priority on a finished job.
      */
-    void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException;
+    void changeJobPriority(JobId jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException;
 
     /**
      * For administrator only, change the policy of the scheduler.
@@ -543,8 +531,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws JobCreationException
      *             if Their was a problem while creation the job
      */
-    JobId submit(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+    JobId submit(Job job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Get the result for the given jobId.<br>
@@ -568,8 +556,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access to this particular job.
      */
-    JobResult getJobResult(String jobId)
-            throws NotConnectedException, PermissionException, UnknownJobException;
+    JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException;
 
     /**
      * Get the result for the given task name in the given jobId. <br >
@@ -944,8 +931,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you can't access to this particular job.
      */
-    boolean restartAllInErrorTasks(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException;
+    boolean restartAllInErrorTasks(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
      * Resume the job represented by jobId.<br>
@@ -992,8 +978,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws JobAlreadyFinishedException
      *             if you want to change the priority on a finished job.
      */
-    void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException;
+    void changeJobPriority(String jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException;
 
     /**
      * Return the state of the given job.<br>
@@ -1278,8 +1264,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if you have not enough permission to access this method.
      */
     Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
-            List<SortParameter<JobSortParameter>> sortParameters)
-                    throws NotConnectedException, PermissionException;
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException;
 
     /**
      * Returns a list of connected users.
@@ -1322,9 +1307,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      * @throws PermissionException
      */
-    Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit)
-                    throws NotConnectedException, PermissionException;
+    Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending,
+            boolean finished, int offset, int limit) throws NotConnectedException, PermissionException;
 
     /**
      * Retrieve a taskstates list from the scheduler.
@@ -1356,9 +1340,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      * @throws PermissionException
      */
-    Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-                    throws NotConnectedException, PermissionException;
+    Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending,
+            boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
+            throws NotConnectedException, PermissionException;
 
     /**
      * Retrieve a job info by it id.
@@ -1402,8 +1386,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
-            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+    JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo) throws NotConnectedException,
+            UnknownJobException, PermissionException, SubmissionClosedException, JobCreationException;
 
 }

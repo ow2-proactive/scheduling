@@ -1,44 +1,32 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.authentication;
 
-import org.apache.log4j.Logger;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import java.util.Hashtable;
+import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -54,8 +42,10 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
-import java.util.Hashtable;
-import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 
 
 /**
@@ -76,6 +66,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
 
     /** LDAP configuration properties */
     private LDAPProperties ldapProperties = new LDAPProperties(getLDAPConfigFileName());
+
     /** default value for Context.SECURITY_AUTHENTICATION
      * that correspond to anonymous connection
     */
@@ -112,8 +103,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
      * Authentication method used to bind to LDAP: none, simple,
      * or one of the SASL authentication methods
      */
-    private final String AUTHENTICATION_METHOD = ldapProperties
-            .getProperty(LDAPProperties.LDAP_AUTHENTICATION_METHOD);
+    private final String AUTHENTICATION_METHOD = ldapProperties.getProperty(LDAPProperties.LDAP_AUTHENTICATION_METHOD);
 
     /** user name used to bind to LDAP (if authentication method is different from none) */
     private final String BIND_LOGIN = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_LOGIN);
@@ -122,12 +112,10 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     private String BIND_PASSWD = ldapProperties.getProperty(LDAPProperties.LDAP_BIND_PASSWD);
 
     /**fall back property, check user/password and group in files if user in not found in LDAP */
-    private boolean fallbackUserAuth = Boolean.valueOf(ldapProperties
-            .getProperty(LDAPProperties.FALLBACK_USER_AUTH));
+    private boolean fallbackUserAuth = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.FALLBACK_USER_AUTH));
 
     /**group fall back property, check user group membership group file if user in not found in corresponding LDAP group*/
-    private boolean fallbackGroupMembership = Boolean.valueOf(ldapProperties
-            .getProperty(LDAPProperties.FALLBACK_GROUP_MEMBERSHIP));
+    private boolean fallbackGroupMembership = Boolean.valueOf(ldapProperties.getProperty(LDAPProperties.FALLBACK_GROUP_MEMBERSHIP));
 
     /** authentication status */
     private boolean succeeded = false;
@@ -155,15 +143,15 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
 
         if ((keyStore != null) && (!alreadyDefined(SSL_KEYSTORE_PATH_PROPERTY, keyStore))) {
             System.setProperty(SSL_KEYSTORE_PATH_PROPERTY, keyStore);
-            System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY, ldapProperties
-                    .getProperty(LDAPProperties.LDAP_KEYSTORE_PASSWD));
+            System.setProperty(SSL_KEYSTORE_PASSWD_PROPERTY,
+                               ldapProperties.getProperty(LDAPProperties.LDAP_KEYSTORE_PASSWD));
         }
 
         String trustStore = ldapProperties.getProperty(LDAPProperties.LDAP_TRUSTSTORE_PATH);
         if ((trustStore != null) && (!alreadyDefined(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore))) {
             System.setProperty(SSL_TRUSTSTORE_PATH_PROPERTY, trustStore);
-            System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY, ldapProperties
-                    .getProperty(LDAPProperties.LDAP_TRUSTSTORE_PASSWD));
+            System.setProperty(SSL_TRUSTSTORE_PASSWD_PROPERTY,
+                               ldapProperties.getProperty(LDAPProperties.LDAP_TRUSTSTORE_PASSWD));
         }
     }
 
@@ -240,8 +228,8 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     public boolean login() throws LoginException {
         succeeded = false;
         if (callbackHandler == null) {
-            throw new LoginException("Error: no CallbackHandler available "
-                + "to garner authentication information from the user");
+            throw new LoginException("Error: no CallbackHandler available " +
+                                     "to garner authentication information from the user");
         }
 
         try {
@@ -269,7 +257,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             throw new LoginException(ioe.toString());
         } catch (UnsupportedCallbackException uce) {
             throw new LoginException("Error: " + uce.getCallback().toString() +
-                " not available to garner authentication information " + "from the user");
+                                     " not available to garner authentication information " + "from the user");
         }
     }
 
@@ -453,8 +441,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             ctx = this.connectAndGetContext();
             SearchControls sControl = new SearchControls();
             sControl.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String filter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_USER_FILTER),
-                    username);
+            String filter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_USER_FILTER), username);
             // looking for the user dn (distinguish name)
             NamingEnumeration<SearchResult> answer = ctx.search(USERS_DN, filter, sControl);
             if (answer.hasMoreElements()) {
@@ -466,14 +453,14 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
                 subject.getPrincipals().add(new UserNamePrincipal(username));
 
                 // looking for the user groups
-                String groupFilter = String.format(ldapProperties
-                        .getProperty(LDAPProperties.LDAP_GROUP_FILTER), userDN);
+                String groupFilter = String.format(ldapProperties.getProperty(LDAPProperties.LDAP_GROUP_FILTER),
+                                                   userDN);
 
                 NamingEnumeration<SearchResult> groupResults = ctx.search(GROUPS_DN, groupFilter, sControl);
                 while (groupResults.hasMoreElements()) {
                     SearchResult res = (SearchResult) groupResults.next();
-                    Attribute attr = res.getAttributes().get(
-                            ldapProperties.getProperty(LDAPProperties.LDAP_GROUPNAME_ATTR));
+                    Attribute attr = res.getAttributes()
+                                        .get(ldapProperties.getProperty(LDAPProperties.LDAP_GROUPNAME_ATTR));
                     if (attr != null) {
                         String groupName = attr.get().toString();
                         subject.getPrincipals().add(new GroupNamePrincipal(groupName));

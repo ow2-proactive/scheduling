@@ -1,7 +1,43 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package functionaltests.jmx;
 
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
-import functionaltests.utils.TestUsers;
+import static org.junit.Assert.assertEquals;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.management.JMX;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
@@ -21,17 +57,8 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBean;
 
-import javax.management.JMX;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -62,11 +89,18 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
         final SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
         final HashMap<String, Object> env = new HashMap<>(1);
         env.put(JMXConnector.CREDENTIALS, new Object[] { TestUsers.DEMO.username, TestUsers.DEMO.password });
-        JMXConnector adminJmxConnector = JMXConnectorFactory.connect(
-                new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
+        JMXConnector adminJmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI)),
+                                                                     env);
 
-        List<JobInfo> existingFinishedJobs = schedulerHelper.getSchedulerInterface().getJobs(0, 1000,
-                new JobFilterCriteria(false, false, true, true), null).getList();
+        List<JobInfo> existingFinishedJobs = schedulerHelper.getSchedulerInterface()
+                                                            .getJobs(0,
+                                                                     1000,
+                                                                     new JobFilterCriteria(false,
+                                                                                           false,
+                                                                                           true,
+                                                                                           true),
+                                                                     null)
+                                                            .getList();
 
         int nbFinishedTasks = 0;
         int nbTotalTasks = 0;
@@ -114,8 +148,8 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
         final SchedulerAuthenticationInterface auth = schedulerHelper.getSchedulerAuth();
         final HashMap<String, Object> env = new HashMap<>(1);
         env.put(JMXConnector.CREDENTIALS, new Object[] { TestUsers.USER.username, TestUsers.USER.password });
-        JMXConnector userJmxConnector = JMXConnectorFactory.connect(
-                new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI)), env);
+        JMXConnector userJmxConnector = JMXConnectorFactory.connect(new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI)),
+                                                                    env);
 
         try {
             MBeanServerConnection connection = userJmxConnector.getMBeanServerConnection();
@@ -131,10 +165,8 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
         JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
         long pendingTime = bean.getJobPendingTime(jobId.value());
         long runningTime = bean.getJobRunningTime(jobId.value());
-        assertEquals("Unexpected pending time", jobState.getStartTime() - jobState.getSubmittedTime(),
-                pendingTime);
-        assertEquals("Unexpected running time", jobState.getFinishedTime() - jobState.getStartTime(),
-                runningTime);
+        assertEquals("Unexpected pending time", jobState.getStartTime() - jobState.getSubmittedTime(), pendingTime);
+        assertEquals("Unexpected running time", jobState.getFinishedTime() - jobState.getStartTime(), runningTime);
         assertEquals("Unexpected nodes number", 1, bean.getTotalNumberOfNodesUsed(jobId.value()));
 
         bean.getMeanTaskPendingTime(jobId.value());
@@ -166,10 +198,10 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
         int finishedTasks = bean.getFinishedTasksCount();
         int totalTasks = bean.getTotalTasksCount();
 
-        System.out.println("Jobs: pending: " + pendingJobs + ", running: " + runningJobs + " " +
-            ", finished " + finishedJobs + ", total: " + totalJobs);
+        System.out.println("Jobs: pending: " + pendingJobs + ", running: " + runningJobs + " " + ", finished " +
+                           finishedJobs + ", total: " + totalJobs);
         System.out.println("Tasks: pending: " + pendingTasks + ", running: " + runningTasks + ", finished " +
-            finishedTasks + ", total " + totalTasks);
+                           finishedTasks + ", total " + totalTasks);
 
         SchedulerState state = scheduler.getState();
 
@@ -177,7 +209,7 @@ public class SchedulerRuntimeDataMBeanTest extends SchedulerFunctionalTestNoRest
         assertEquals(state.getRunningJobs().size(), bean.getRunningJobsCount());
         assertEquals(state.getFinishedJobs().size(), bean.getFinishedJobsCount());
         assertEquals(bean.getPendingJobsCount() + bean.getRunningJobsCount() + bean.getFinishedJobsCount(),
-                bean.getTotalJobsCount());
+                     bean.getTotalJobsCount());
 
         Assert.assertTrue("Invalid pending tasks: " + pendingTasks, pendingTasks >= 0);
         Assert.assertTrue("Invalid running tasks: " + runningTasks, runningTasks >= 0);

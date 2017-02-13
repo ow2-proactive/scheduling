@@ -1,53 +1,30 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closer;
-import org.apache.commons.vfs2.*;
-import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
-import org.ow2.proactive.scheduler.common.exception.PermissionException;
-import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
-
-import javax.ws.rs.core.HttpHeaders;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,11 +35,27 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.HttpHeaders;
+
+import org.apache.commons.vfs2.*;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closer;
+
 
 public class FileSystem {
 
     private FileSystemManager fsm;
+
     private String userspace;
+
     private String globalspace;
 
     private FileSystem(String userspace, String globalspace, FileSystemManager fsm) {
@@ -84,8 +77,8 @@ public class FileSystem {
     }
 
     public FileObject resolveFile(String dirPath, String pathname) throws FileSystemException {
-        FileObject answer = fsm
-                .resolveFile(dirPath + (dirPath.endsWith(File.separator) ? "" : File.separator) + pathname);
+        FileObject answer = fsm.resolveFile(dirPath + (dirPath.endsWith(File.separator) ? "" : File.separator) +
+                                            pathname);
         answer.refresh();
         return answer;
     }
@@ -99,7 +92,8 @@ public class FileSystem {
         return fo;
     }
 
-    public static ListFile list(FileObject fo, List<String> includes, List<String> excludes) throws FileSystemException {
+    public static ListFile list(FileObject fo, List<String> includes, List<String> excludes)
+            throws FileSystemException {
         fo.refresh();
         ListFile answer = new ListFile();
         List<String> dirList = Lists.newArrayList();
@@ -109,7 +103,8 @@ public class FileSystem {
         if (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) {
             fo.findFiles(Selectors.SELECT_CHILDREN, false, foundFileObjects);
         } else {
-            FileSelector selector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes, excludes);
+            FileSelector selector = new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes,
+                                                                                                                excludes);
             fo.findFiles(selector, false, foundFileObjects);
         }
 
@@ -158,14 +153,12 @@ public class FileSystem {
         return props;
     }
 
-    private static void fillDirProps(FileObject fo, Map<String, Object> properties)
-            throws FileSystemException {
+    private static void fillDirProps(FileObject fo, Map<String, Object> properties) throws FileSystemException {
         properties.put("x-proactive-ds-type", "DIRECTORY");
         properties.put("Last-Modified", new Date(fo.getContent().getLastModifiedTime()));
     }
 
-    private static void fillFileProps(FileObject fo, Map<String, Object> properties)
-            throws FileSystemException {
+    private static void fillFileProps(FileObject fo, Map<String, Object> properties) throws FileSystemException {
         properties.put("x-proactive-ds-type", "FILE");
         properties.put(HttpHeaders.LAST_MODIFIED, new Date(fo.getContent().getLastModifiedTime()));
         properties.put(HttpHeaders.CONTENT_TYPE, contentType(fo));
@@ -176,9 +169,10 @@ public class FileSystem {
             throws FileSystemException {
         root.refresh();
         List<FileObject> files = Lists.newArrayList();
-        FileSelector selector = (isNullOrEmpty(includes) && isNullOrEmpty(excludes)) ? new AllFilesSelector()
-                : new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes,
-                    excludes);
+        FileSelector selector = (isNullOrEmpty(includes) &&
+                                 isNullOrEmpty(excludes)) ? new AllFilesSelector()
+                                                          : new org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector(includes,
+                                                                                                                                        excludes);
         root.findFiles(selector, true, files);
         return files;
     }
@@ -235,7 +229,8 @@ public class FileSystem {
         public static FileSystem create(SchedulerProxyUserInterface schedulerProxy)
                 throws FileSystemException, NotConnectedException, PermissionException {
             return new FileSystem(schedulerProxy.getUserSpaceURIs().get(0),
-                schedulerProxy.getGlobalSpaceURIs().get(0), VFSFactory.createDefaultFileSystemManager());
+                                  schedulerProxy.getGlobalSpaceURIs().get(0),
+                                  VFSFactory.createDefaultFileSystemManager());
         }
     }
 

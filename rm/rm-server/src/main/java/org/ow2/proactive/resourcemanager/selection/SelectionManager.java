@@ -1,40 +1,35 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.selection;
+
+import java.io.File;
+import java.io.Serializable;
+import java.security.Permission;
+import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -58,12 +53,6 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
-
-import java.io.File;
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.*;
-import java.util.concurrent.*;
 
 
 /**
@@ -96,7 +85,7 @@ public abstract class SelectionManager {
     public SelectionManager(RMCore rmcore) {
         this.rmcore = rmcore;
         this.scriptExecutorThreadPool = Executors.newFixedThreadPool(PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt(),
-                new NamedThreadFactory("Selection manager threadpool"));
+                                                                     new NamedThreadFactory("Selection manager threadpool"));
         this.inProgress = Collections.synchronizedSet(new HashSet<String>());
 
         String policyClassName = PAResourceManagerProperties.RM_SELECTION_POLICY.getValueAsString();
@@ -217,7 +206,7 @@ public abstract class SelectionManager {
 
     private NodeSet doSelectNodes(Criteria criteria, Client client) {
         boolean hasScripts = criteria.getScripts() != null && criteria.getScripts().size() > 0;
-        if(logger.isInfoEnabled()){
+        if (logger.isInfoEnabled()) {
             logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
         }
         boolean loggerIsDebugEnabled = logger.isDebugEnabled();
@@ -254,8 +243,7 @@ public abstract class SelectionManager {
 
         // arranging nodes according to the selection policy
         // if could be shuffling or node source priorities
-        List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(criteria.getSize(), filteredNodes,
-                client);
+        List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(criteria.getSize(), filteredNodes, client);
 
         List<Node> matchedNodes;
         if (hasScripts) {
@@ -263,8 +251,7 @@ public abstract class SelectionManager {
             checkAuthorizedScripts(criteria.getScripts());
 
             // arranging nodes for script execution
-            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes,
-                    criteria.getScripts());
+            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
 
             if (criteria.getTopology().isTopologyBased()) {
                 // run scripts on all available nodes
@@ -287,7 +274,8 @@ public abstract class SelectionManager {
                     }
 
                     List<RMNode> subset = arrangedNodes.subList(0,
-                            Math.min(numberOfNodesForScriptExecution, arrangedNodes.size()));
+                                                                Math.min(numberOfNodesForScriptExecution,
+                                                                         arrangedNodes.size()));
                     matchedNodes.addAll(runScripts(subset, criteria));
                     // removing subset of arrangedNodes
                     subset.clear();
@@ -349,9 +337,12 @@ public abstract class SelectionManager {
         }
 
         if (logger.isInfoEnabled()) {
-            String extraNodes = selectedNodes.getExtraNodes() != null &&
-                selectedNodes.getExtraNodes().size() > 0 ? "and " + selectedNodes.getExtraNodes().size() +
-                " extra nodes" : "";
+            String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0
+                                                                                                                  ? "and " +
+                                                                                                                    selectedNodes.getExtraNodes()
+                                                                                                                                 .size() +
+                                                                                                                    " extra nodes"
+                                                                                                                  : "";
             logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
         }
 
@@ -375,7 +366,8 @@ public abstract class SelectionManager {
         for (SelectionScript script : scripts) {
             if (!authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()))) {
                 // unauthorized selection script
-                throw new SecurityException("Cannot execute unauthorized script: " + System.getProperty("line.separator") + script.getScript());
+                throw new SecurityException("Cannot execute unauthorized script: " +
+                                            System.getProperty("line.separator") + script.getScript());
             }
         }
     }
@@ -417,8 +409,8 @@ public abstract class SelectionManager {
         try {
             // launching
             Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
-                    PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt(),
-                    TimeUnit.MILLISECONDS);
+                                                                                       PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt(),
+                                                                                       TimeUnit.MILLISECONDS);
             int index = 0;
 
             // waiting for the results
@@ -440,8 +432,7 @@ public abstract class SelectionManager {
                     // no script result was obtained
                     logger.warn("Timeout on " + scriptExecutors.get(index));
                     // in this case scriptExecutionFinished may not be called
-                    scriptExecutionFinished(((ScriptExecutor) scriptExecutors.get(index)).getRMNode()
-                            .getNodeURL());
+                    scriptExecutionFinished(((ScriptExecutor) scriptExecutors.get(index)).getRMNode().getNodeURL());
                 }
                 index++;
             }
@@ -462,7 +453,7 @@ public abstract class SelectionManager {
         Set<String> inclusion = criteria.getAcceptableNodesUrls();
 
         boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
-            criteria.getNodeAccessToken().length() > 0;
+                                         criteria.getNodeAccessToken().length() > 0;
 
         TokenPrincipal tokenPrincipal = null;
         if (nodeWithTokenRequested) {
@@ -478,9 +469,9 @@ public abstract class SelectionManager {
             // checking the permission
             try {
                 if (!clientPermissions.contains(node.getUserPermission())) {
-                    client.checkPermission(node.getUserPermission(), client +
-                        " is not authorized to get the node " + node.getNodeURL() + " from " +
-                        node.getNodeSource().getName());
+                    client.checkPermission(node.getUserPermission(),
+                                           client + " is not authorized to get the node " + node.getNodeURL() +
+                                                                     " from " + node.getNodeSource().getName());
                     clientPermissions.add(node.getUserPermission());
                 }
             } catch (SecurityException e) {
@@ -502,8 +493,8 @@ public abstract class SelectionManager {
                 // checking explicitly that node has this token identity
                 if (!perm.hasPrincipal(tokenPrincipal)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(client + " does not have required token to get the node " +
-                            node.getNodeURL() + " from " + node.getNodeSource().getName());
+                        logger.debug(client + " does not have required token to get the node " + node.getNodeURL() +
+                                     " from " + node.getNodeSource().getName());
                     }
                     continue;
                 }
@@ -516,11 +507,11 @@ public abstract class SelectionManager {
         return filteredList;
     }
 
-    public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes, final Map<String, Serializable> bindings) {
+    public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes,
+            final Map<String, Serializable> bindings) {
         // TODO: add a specific timeout for script execution
         final int timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsInt();
-        final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(
-                nodes.size());
+        final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
 
         // Execute the script on each selected node
         for (final RMNode node : nodes) {
@@ -556,8 +547,7 @@ public abstract class SelectionManager {
         // Invoke all Callables and get the list of futures
         List<Future<ScriptResult<T>>> futures = null;
         try {
-            futures = this.scriptExecutorThreadPool
-                    .invokeAll(scriptExecutors, timeout, TimeUnit.MILLISECONDS);
+            futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors, timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             logger.warn("Interrupted while waiting, unable to execute all scripts", e);
             Thread.currentThread().interrupt();
@@ -574,15 +564,14 @@ public abstract class SelectionManager {
                 result = future.get();
             } catch (CancellationException e) {
                 result = new ScriptResult<>(new ScriptException("Cancelled due to timeout expiration when " +
-                        description, e));
+                                                                description, e));
             } catch (InterruptedException e) {
-                result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " +
-                        description));
+                result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " + description));
             } catch (ExecutionException e) {
                 // Unwrap the root exception 
                 Throwable rex = e.getCause();
-                result = new ScriptResult<>(new ScriptException("Exception occured in script call when " +
-                        description, rex));
+                result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description,
+                                                                rex));
             }
             results.add(result);
         }

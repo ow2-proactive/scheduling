@@ -1,44 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $ACTIVEEON_INITIAL_DEV$
  */
 package functionaltests.execremote;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,17 +50,16 @@ import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
-import static org.junit.Assert.*;
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 
 public final class TestExecRemote extends RMFunctionalTest {
     private static final String simpleScriptContent = "";
+
     private static final String erroneousSimpleScriptContent = "var a = null; a.toString();";
+
     private static final String selectionScriptContent = "selected = true; print(selected);";
 
     @Rule
@@ -75,8 +67,8 @@ public final class TestExecRemote extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
-        final String miscDir = System.getProperty("pa.rm.home") + File.separator + "samples" +
-            File.separator + "scripts" + File.separator + "misc" + File.separator;
+        final String miscDir = System.getProperty("pa.rm.home") + File.separator + "samples" + File.separator +
+                               "scripts" + File.separator + "misc" + File.separator;
         boolean isLinux = OperatingSystem.getOperatingSystem().equals(OperatingSystem.unix);
         final String valueToEcho = "111";
         String nsName = "TestExecRemote";
@@ -105,10 +97,10 @@ public final class TestExecRemote extends RMFunctionalTest {
         targets.add(nsName);
 
         List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
-                TargetType.NODESOURCE_NAME.toString(), targets);
+                                                                                         TargetType.NODESOURCE_NAME.toString(),
+                                                                                         targets);
 
-        assertEquals("The size of result list must equal to size of nodesource", nodesUrls.size(),
-                results.size());
+        assertEquals("The size of result list must equal to size of nodesource", nodesUrls.size(), results.size());
         for (ScriptResult<Object> res : results) {
             Throwable exception = res.getException();
             if (exception != null) {
@@ -123,14 +115,13 @@ public final class TestExecRemote extends RMFunctionalTest {
         RMTHelper.log("Test 1 - Execute SimpleScript");
         SimpleScript script = new SimpleScript(TestExecRemote.erroneousSimpleScriptContent, "javascript");
 
-        List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
-                TargetType.NODE_URL.toString(), nodesUrls);
+        List<ScriptResult<Object>> results = rmHelper.getResourceManager()
+                                                     .executeScript(script, TargetType.NODE_URL.toString(), nodesUrls);
 
         assertFalse("The results must not be empty", results.size() == 0);
         for (ScriptResult<Object> res : results) {
             Throwable exception = res.getException();
-            assertNotNull("There should be an exception since the script is deliberately erroneous",
-                    exception);
+            assertNotNull("There should be an exception since the script is deliberately erroneous", exception);
         }
     }
 
@@ -138,8 +129,8 @@ public final class TestExecRemote extends RMFunctionalTest {
         RMTHelper.log("Test 2 - Execute SelectionScript");
         SelectionScript script = new SelectionScript(TestExecRemote.selectionScriptContent, "javascript");
 
-        List<ScriptResult<Boolean>> results = rmHelper.getResourceManager().executeScript(script,
-                TargetType.NODE_URL.toString(), nodesUrls);
+        List<ScriptResult<Boolean>> results = rmHelper.getResourceManager()
+                                                      .executeScript(script, TargetType.NODE_URL.toString(), nodesUrls);
 
         assertFalse("The results must not be empty", results.size() == 0);
         for (ScriptResult<Boolean> res : results) {
@@ -149,17 +140,17 @@ public final class TestExecRemote extends RMFunctionalTest {
         }
     }
 
-    private void processBuilderScript(String miscDir, boolean isLinux, String valueToEcho,
-            HashSet<String> nodesUrls) throws Exception {
+    private void processBuilderScript(String miscDir, boolean isLinux, String valueToEcho, HashSet<String> nodesUrls)
+            throws Exception {
         File sFile = new File(miscDir + "processBuilder.groovy");
         RMTHelper.log("Test 4 - Test " + sFile);
 
-        String[] cmd = (isLinux) ? new String[] { "/bin/bash", "-c", "echo " + valueToEcho } : new String[] {
-                "cmd.exe", "/c", "@(echo " + valueToEcho + ")" };
+        String[] cmd = (isLinux) ? new String[] { "/bin/bash", "-c", "echo " + valueToEcho }
+                                 : new String[] { "cmd.exe", "/c", "@(echo " + valueToEcho + ")" };
         SimpleScript script = new SimpleScript(sFile, cmd);
 
-        List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
-                TargetType.NODE_URL.toString(), nodesUrls);
+        List<ScriptResult<Object>> results = rmHelper.getResourceManager()
+                                                     .executeScript(script, TargetType.NODE_URL.toString(), nodesUrls);
 
         assertFalse("The results must not be empty", results.size() == 0);
         for (ScriptResult<Object> res : results) {
@@ -185,12 +176,13 @@ public final class TestExecRemote extends RMFunctionalTest {
         try {
             // Start DS
             String dsurl = dsHelper.startDS(tempDir.getAbsolutePath());
-            String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/cat", testFilename } : new String[] {
-                    dsurl, "cmd.exe", "/c", "more", testFilename };
+            String[] cmd = (isLinux) ? new String[] { dsurl, "/bin/cat", testFilename }
+                                     : new String[] { dsurl, "cmd.exe", "/c", "more", testFilename };
             // Execute the script
             SimpleScript script = new SimpleScript(sFile, cmd);
             List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
-                    TargetType.NODE_URL.toString(), nodesUrls);
+                                                                                             TargetType.NODE_URL.toString(),
+                                                                                             nodesUrls);
 
             assertFalse("The results must not be empty", results.size() == 0);
             for (ScriptResult<Object> res : results) {
@@ -215,12 +207,11 @@ public final class TestExecRemote extends RMFunctionalTest {
         HashSet<String> targets = new HashSet<>(1);
         targets.add(hostname);
 
-        List<ScriptResult<Object>> results = rmHelper.getResourceManager().executeScript(script,
-                TargetType.HOSTNAME.toString(), targets);
+        List<ScriptResult<Object>> results = rmHelper.getResourceManager()
+                                                     .executeScript(script, TargetType.HOSTNAME.toString(), targets);
 
-        assertEquals(
-                "The size of result list must equal to 1, if a hostname is specified a single node must be "
-                    + "selected", results.size(), 1);
+        assertEquals("The size of result list must equal to 1, if a hostname is specified a single node must be " +
+                     "selected", results.size(), 1);
         for (ScriptResult<Object> res : results) {
             Throwable exception = res.getException();
             if (exception != null) {
@@ -233,6 +224,7 @@ public final class TestExecRemote extends RMFunctionalTest {
 
     private class DSHelper {
         private NamingServiceDeployer namingServiceDeployer;
+
         private FileSystemServerDeployer inputDataserverDeployer;
 
         public String startDS(final String rootDir) throws Exception {
@@ -241,9 +233,10 @@ public final class TestExecRemote extends RMFunctionalTest {
             NamingService localNamingService = this.namingServiceDeployer.getLocalNamingService();
             this.inputDataserverDeployer = new FileSystemServerDeployer("root", rootDir, true, true);
 
-            InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration
-                    .createOutputSpaceConfiguration(this.inputDataserverDeployer.getVFSRootURL(), null, null,
-                            PADataSpaces.DEFAULT_IN_OUT_NAME);
+            InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(this.inputDataserverDeployer.getVFSRootURL(),
+                                                                                                                null,
+                                                                                                                null,
+                                                                                                                PADataSpaces.DEFAULT_IN_OUT_NAME);
 
             SpaceInstanceInfo inSpaceInfo = new SpaceInstanceInfo(Long.toString(0xcafe), config);
             localNamingService.registerApplication(Long.toString(0xcafe), Collections.singleton(inSpaceInfo));

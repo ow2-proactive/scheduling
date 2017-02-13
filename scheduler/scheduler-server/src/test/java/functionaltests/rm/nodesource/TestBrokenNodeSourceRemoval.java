@@ -1,46 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.rm.nodesource;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestUsers;
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -59,17 +50,17 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestUsers;
 
 
 public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     protected int defaultDescriptorNodesNb = 1;
+
     private RMTHelper rmHelper;
 
     @BeforeClass
@@ -79,25 +70,28 @@ public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTestWithCust
     }
 
     protected void createDefaultNodeSource(String sourceName) throws Exception {
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
-                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        schedulerHelper.getResourceManager().createNodeSource(sourceName, LocalInfrastructure.class.getName(),
-          new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
-          ReleaseResourcesWhenSchedulerIdle.class.getName(), getPolicyParams());
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        schedulerHelper.getResourceManager().createNodeSource(sourceName,
+                                                              LocalInfrastructure.class.getName(),
+                                                              new Object[] { creds, defaultDescriptorNodesNb,
+                                                                             RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
+                                                              ReleaseResourcesWhenSchedulerIdle.class.getName(),
+                                                              getPolicyParams());
 
         schedulerHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }
 
     protected Object[] getPolicyParams() throws Exception {
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(SchedulerTHelper.getLocalUrl());
-        Credentials creds = Credentials.createCredentials(
-                new CredData(TestUsers.DEMO.username, TestUsers.DEMO.password), auth.getPublicKey());
+        Credentials creds = Credentials.createCredentials(new CredData(TestUsers.DEMO.username,
+                                                                       TestUsers.DEMO.password),
+                                                          auth.getPublicKey());
         return new Object[] { "ALL", "ME", SchedulerTHelper.getLocalUrl(), creds.getBase64(), "30000" };
     }
 
     private ResourceManager startRMPreservingDB() throws Exception {
-        String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource(
-          "/functionaltests/config/rm-with-db.ini").getFile())).getAbsolutePath();
+        String rmconf = new File(PAResourceManagerProperties.getAbsolutePath(getClass().getResource("/functionaltests/config/rm-with-db.ini")
+                                                                                       .getFile())).getAbsolutePath();
         rmHelper.startRM(rmconf);
         return rmHelper.getResourceManager();
     }

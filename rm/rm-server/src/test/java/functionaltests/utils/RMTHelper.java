@@ -1,43 +1,39 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.utils;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.ServerSocket;
+import java.rmi.AlreadyBoundException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -60,14 +56,8 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.ServerSocket;
-import java.rmi.AlreadyBoundException;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.monitor.RMMonitorsHandler;
 
 
 /**
@@ -129,7 +119,6 @@ public class RMTHelper {
         return RMTHelper.DEFAULT_NODES_NUMBER;
     }
 
-
     public void removeNodeSource(String name) throws Exception {
         try {
             getResourceManager().removeNodeSource(name, true).getBooleanValue();
@@ -149,19 +138,18 @@ public class RMTHelper {
     }
 
     public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
-                                        RMMonitorsHandler monitor) throws Exception {
+            RMMonitorsHandler monitor) throws Exception {
         RMFactory.setOsJavaProperty();
         log("Creating a node source " + name);
         //first emtpy im parameter is default rm url
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties
-                .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rm.createNodeSource(name, LocalInfrastructure.class.getName(),
-                new Object[]{
-                        creds,
-                        nodeNumber,
-                        RMTHelper.DEFAULT_NODES_TIMEOUT,
-                        vmOptions != null ? setup.listToString(vmOptions) : setup.getJvmParameters()},
-                StaticPolicy.class.getName(), null);
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        rm.createNodeSource(name,
+                            LocalInfrastructure.class.getName(),
+                            new Object[] { creds, nodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT,
+                                           vmOptions != null ? setup.listToString(vmOptions)
+                                                             : setup.getJvmParameters() },
+                            StaticPolicy.class.getName(),
+                            null);
         rm.setNodeSourcePingFrequency(5000, name);
 
         waitForNodeSourceCreation(name, nodeNumber, monitor);
@@ -170,8 +158,8 @@ public class RMTHelper {
     /**
      * Creates a Local node source with specified name
      */
-    public static void createNodeSource(String name, int nodeNumber, ResourceManager rm,
-                                        RMMonitorsHandler monitor) throws Exception {
+    public static void createNodeSource(String name, int nodeNumber, ResourceManager rm, RMMonitorsHandler monitor)
+            throws Exception {
         createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor);
     }
 
@@ -180,11 +168,14 @@ public class RMTHelper {
     }
 
     public List<TestNode> addNodesToDefaultNodeSource(int nodesNumber, List<String> vmOptions) throws Exception {
-        return addNodesToDefaultNodeSource(nodesNumber, vmOptions != null ? vmOptions : setup.getJvmParametersAsList(), getResourceManager(), getMonitorsHandler());
+        return addNodesToDefaultNodeSource(nodesNumber,
+                                           vmOptions != null ? vmOptions : setup.getJvmParametersAsList(),
+                                           getResourceManager(),
+                                           getMonitorsHandler());
     }
 
     public static List<TestNode> addNodesToDefaultNodeSource(int nodesNumber, List<String> vmOptions,
-                                                             ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
+            ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
 
         Map<String, String> map = new HashMap<>();
         List<TestNode> nodes = new ArrayList<>();
@@ -240,26 +231,25 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    public static TestNode createNode(String nodeName) throws IOException, NodeException,
-            InterruptedException {
+    public static TestNode createNode(String nodeName) throws IOException, NodeException, InterruptedException {
         return createNode(nodeName, new HashMap<String, String>());
     }
 
-    public static TestNode createNode(String nodeName, Map<String, String> vmParameters) throws IOException,
-            NodeException, InterruptedException {
+    public static TestNode createNode(String nodeName, Map<String, String> vmParameters)
+            throws IOException, NodeException, InterruptedException {
         return createNode(nodeName, vmParameters, null);
     }
 
-    public static TestNode createNode(String nodeName, int pnpPort) throws IOException, NodeException,
-            InterruptedException {
+    public static TestNode createNode(String nodeName, int pnpPort)
+            throws IOException, NodeException, InterruptedException {
         return createNode(nodeName, new HashMap<String, String>(), new ArrayList<String>(), pnpPort);
     }
 
     /**
      * Create several nodes on the same JVMProcess
      */
-    public List<TestNode> createNodes(final String nodeName, int number) throws IOException, NodeException,
-            ExecutionException, InterruptedException, AlreadyBoundException {
+    public List<TestNode> createNodes(final String nodeName, int number)
+            throws IOException, NodeException, ExecutionException, InterruptedException, AlreadyBoundException {
         if (number == 0) {
             throw new IllegalArgumentException("" + number);
         }
@@ -278,9 +268,6 @@ public class RMTHelper {
         return nodes;
     }
 
-
-
-
     static int findFreePort() throws IOException {
         ServerSocket server = new ServerSocket(0);
         int port = server.getLocalPort();
@@ -288,8 +275,8 @@ public class RMTHelper {
         return port;
     }
 
-    private static TestNode createNode(String nodeName, Map<String, String> vmParameters,
-            List<String> vmOptions) throws IOException, NodeException, InterruptedException {
+    private static TestNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions)
+            throws IOException, NodeException, InterruptedException {
         return createNode(nodeName, vmParameters, vmOptions, 0);
     }
 
@@ -305,8 +292,8 @@ public class RMTHelper {
      * @throws IOException if the external JVM cannot be created
      * @throws NodeException if lookup of the new node fails.
      */
-    private static TestNode createNode(String nodeName, Map<String, String> vmParameters,
-            List<String> vmOptions, int pnpPort) throws IOException, NodeException, InterruptedException {
+    private static TestNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions,
+            int pnpPort) throws IOException, NodeException, InterruptedException {
 
         if (pnpPort <= 0) {
             pnpPort = findFreePort();
@@ -314,7 +301,9 @@ public class RMTHelper {
         String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
         vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
         JVMProcessImpl nodeProcess = createJvmProcess(StartNode.class.getName(),
-                Collections.singletonList(nodeName), vmParameters, vmOptions);
+                                                      Collections.singletonList(nodeName),
+                                                      vmParameters,
+                                                      vmOptions);
         return createNode(nodeName, nodeUrl, nodeProcess);
 
     }
@@ -344,8 +333,7 @@ public class RMTHelper {
 
     public static JVMProcessImpl createJvmProcess(String className, List<String> parameters,
             Map<String, String> vmParameters, List<String> vmOptions) throws IOException {
-        JVMProcessImpl nodeProcess = new JVMProcessImpl(
-            new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
+        JVMProcessImpl nodeProcess = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setClassname(className);
 
         ArrayList<String> jvmParameters = new ArrayList<>();
@@ -357,11 +345,11 @@ public class RMTHelper {
         vmParameters.put(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getName(), "pnp");
         if (!vmParameters.containsKey(CentralPAPropertyRepository.PA_HOME.getName())) {
             vmParameters.put(CentralPAPropertyRepository.PA_HOME.getName(),
-                    CentralPAPropertyRepository.PA_HOME.getValue());
+                             CentralPAPropertyRepository.PA_HOME.getValue());
         }
         if (!vmParameters.containsKey(PAResourceManagerProperties.RM_HOME.getKey())) {
             vmParameters.put(PAResourceManagerProperties.RM_HOME.getKey(),
-                    PAResourceManagerProperties.RM_HOME.getValueAsString());
+                             PAResourceManagerProperties.RM_HOME.getValueAsString());
         }
 
         if (!vmParameters.containsKey(CentralPAPropertyRepository.LOG4J.getName())) {
@@ -424,7 +412,8 @@ public class RMTHelper {
      * @param nodeSourceEvent awaited event.
      * @param nodeSourceName corresponding node source name for which an event is awaited.
      */
-    public void waitForNodeSourceEvent(RMEventType nodeSourceEvent, String nodeSourceName) throws ProActiveTimeoutException {
+    public void waitForNodeSourceEvent(RMEventType nodeSourceEvent, String nodeSourceName)
+            throws ProActiveTimeoutException {
         waitForNodeSourceEvent(nodeSourceEvent, nodeSourceName, getMonitorsHandler());
     }
 
@@ -530,7 +519,8 @@ public class RMTHelper {
         }
     }
 
-    public static List<RMNodeEvent> waitForAnyMultipleNodeEvent(RMEventType eventType, int nbTimes, RMMonitorsHandler monitorsHandler) {
+    public static List<RMNodeEvent> waitForAnyMultipleNodeEvent(RMEventType eventType, int nbTimes,
+            RMMonitorsHandler monitorsHandler) {
         try {
             List<RMNodeEvent> answer = new ArrayList<>(nbTimes);
             for (int i = 0; i < nbTimes; i++) {
@@ -581,8 +571,7 @@ public class RMTHelper {
      * @return RMNodeEvent object received by event receiver.
      * @throws ProActiveTimeoutException if timeout is reached
      */
-    public RMNodeEvent waitForAnyNodeEvent(RMEventType eventType, long timeout)
-            throws ProActiveTimeoutException {
+    public RMNodeEvent waitForAnyNodeEvent(RMEventType eventType, long timeout) throws ProActiveTimeoutException {
         return waitForAnyNodeEvent(eventType, timeout, getMonitorsHandler());
     }
 

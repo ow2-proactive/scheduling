@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.utils;
 
@@ -49,8 +38,11 @@ import java.util.List;
 public class ObjectArrayFormatter {
 
     private List<String> title;
+
     private List<List<String>> lines = new ArrayList<>();
+
     private int spaces;
+
     private int maxColumnLength = 20;
 
     /**
@@ -120,8 +112,7 @@ public class ObjectArrayFormatter {
         //check that each lines has the same length
         for (List<String> l : lines) {
             if (l != null && l.size() != title.size()) {
-                throw new IllegalStateException(
-                    "One of the line is not as long as the other or the title array !");
+                throw new IllegalStateException("One of the line is not as long as the other or the title array !");
             }
         }
         //init length array with title length
@@ -151,8 +142,7 @@ public class ObjectArrayFormatter {
         //print title line
         sb.append("\t");
         for (int i = 0; i < title.size(); i++) {
-            sb.append(String
-                    .format(" %1$-" + columnLengths[i] + "s", cutNchar(title.get(i), maxColumnLength)));
+            sb.append(String.format(" %1$-" + columnLengths[i] + "s", cutNchar(title.get(i), maxColumnLength)));
         }
         sb.append(System.lineSeparator());
         for (List<String> l : lines) {
@@ -161,8 +151,7 @@ public class ObjectArrayFormatter {
             } else {
                 sb.append("\t");
                 for (int i = 0; i < l.size(); i++) {
-                    sb.append(String.format(" %1$-" + columnLengths[i] + "s", cutNchar(l.get(i),
-                            maxColumnLength)));
+                    sb.append(String.format(" %1$-" + columnLengths[i] + "s", cutNchar(l.get(i), maxColumnLength)));
                 }
                 sb.append(System.lineSeparator());
             }

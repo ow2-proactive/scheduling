@@ -14,13 +14,13 @@ if [ "$python3Installed" -ne 0 ] ; then
   sudo apt-get update
   sudo apt-get -y install python3
   sudo apt-get -y install python3-setuptools
-else  	
+else
   echo "Python3 is already installed"
 fi
 
 which radicale
 radicaleInstalled=$?
- 
+
 if [ "$radicaleInstalled" -ne 0 ] ; then
   ## Install radicale
   cd "$script_dir/radicale/linux"
@@ -30,7 +30,7 @@ if [ "$radicaleInstalled" -ne 0 ] ; then
   cd "$script_dir"
   sudo rm -rf "$script_dir/radicale/linux/Radicale-$radicale_version"
 else
-  echo "Radicale is already installed"  
+  echo "Radicale is already installed"
   source "$script_dir/radicale.sh" stop
   rm -rf "$localRadicale/"*
 fi
@@ -43,4 +43,3 @@ cp -f "$script_dir/radicale/linux/logging" "$localRadicale/logging"
 cp -f "$script_dir/radicale/linux/rights" "$localRadicale/rights"
 
 source "$script_dir/radicale.sh" start
-

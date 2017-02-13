@@ -1,42 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionaltests.dataspaces;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.io.*;
+import java.net.URI;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -54,12 +49,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import java.io.*;
-import java.net.URI;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
@@ -84,8 +74,10 @@ import static org.junit.Assert.assertTrue;
 public class TestGlobalSpace extends SchedulerFunctionalTestWithRestart {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
-            { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1", "one of the output files" },
-            { "res2", "second\noutput\nfile" }, { "__.res_3", "third\toutput\nfile\t&^%$$#@!\n" } };
+                                                { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1",
+                                                  "one of the output files" },
+                                                { "res2", "second\noutput\nfile" },
+                                                { "__.res_3", "third\toutput\nfile\t&^%$$#@!\n" } };
 
     private static String inFileArr = "";
     static {
@@ -100,45 +92,45 @@ public class TestGlobalSpace extends SchedulerFunctionalTestWithRestart {
     }
 
     private static final String scriptA = "" + //
-        "def out;                                              \n" + //
-        "def arr = " + inFileArr + ";                          \n" + //
-        "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = new File(arr[i]);         \n" + //
-        "  if (! input) continue;                              \n" + //
-        "  def br = input.newInputStream();       \n" + //
-        "  def ff = new File(                    \n" + //
-        "     arr[i] + \".glob.A\");\n                         \n" + //
-        "  out = ff.newOutputStream();            \n" + //
-        "  def c;                                              \n" + //
-        "  while ((c = br.read()) > 0) {                       \n" + //
-        "    out.write(c);                                     \n" + //
-        "  }                                                   \n" + //
-        "  out.close();                                        \n" + //
-        "}                                                     \n" + //
-        "                                                      \n" + //
-        "";
+                                          "def out;                                              \n" + //
+                                          "def arr = " + inFileArr + ";                          \n" + //
+                                          "for (def i=0; i < arr.size(); i++) {                  \n" + //
+                                          "  def input = new File(arr[i]);         \n" + //
+                                          "  if (! input) continue;                              \n" + //
+                                          "  def br = input.newInputStream();       \n" + //
+                                          "  def ff = new File(                    \n" + //
+                                          "     arr[i] + \".glob.A\");\n                         \n" + //
+                                          "  out = ff.newOutputStream();            \n" + //
+                                          "  def c;                                              \n" + //
+                                          "  while ((c = br.read()) > 0) {                       \n" + //
+                                          "    out.write(c);                                     \n" + //
+                                          "  }                                                   \n" + //
+                                          "  out.close();                                        \n" + //
+                                          "}                                                     \n" + //
+                                          "                                                      \n" + //
+                                          "";
 
     private static final String scriptB = "" + //
-        "def out;                                              \n" + //
-        "def arr = " + inFileArr + ";                          \n" + //
-        "for (def i=0; i < arr.size(); i++) {                  \n" + //
-        "  def input = new File(                 \n" + //
-        "      arr[i] + \".glob.A\");                          \n" + //
-        "  if (! input.exists()) {                             \n" + //
-        "    continue;                                         \n" + //
-        "  }                                                   \n" + //
-        "  def br = input.newInputStream();       \n" + //
-        "  def ff = new File(                    \n" + //
-        "     arr[i] + \".out\");\n                            \n" + //
-        "  out = ff.newOutputStream();            \n" + //
-        "  def c;                                              \n" + //
-        "  while ((c = br.read()) > 0) {                       \n" + //
-        "    out.write(c);                                     \n" + //
-        "  }                                                   \n" + //
-        "  out.close();                                        \n" + //
-        "}                                                     \n" + //
-        "                                                      \n" + //
-        "";
+                                          "def out;                                              \n" + //
+                                          "def arr = " + inFileArr + ";                          \n" + //
+                                          "for (def i=0; i < arr.size(); i++) {                  \n" + //
+                                          "  def input = new File(                 \n" + //
+                                          "      arr[i] + \".glob.A\");                          \n" + //
+                                          "  if (! input.exists()) {                             \n" + //
+                                          "    continue;                                         \n" + //
+                                          "  }                                                   \n" + //
+                                          "  def br = input.newInputStream();       \n" + //
+                                          "  def ff = new File(                    \n" + //
+                                          "     arr[i] + \".out\");\n                            \n" + //
+                                          "  out = ff.newOutputStream();            \n" + //
+                                          "  def c;                                              \n" + //
+                                          "  while ((c = br.read()) > 0) {                       \n" + //
+                                          "    out.write(c);                                     \n" + //
+                                          "  }                                                   \n" + //
+                                          "  out.close();                                        \n" + //
+                                          "}                                                     \n" + //
+                                          "                                                      \n" + //
+                                          "";
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -227,8 +219,7 @@ public class TestGlobalSpace extends SchedulerFunctionalTestWithRestart {
     private void writeFiles(String[][] files, String path) throws IOException {
         for (String[] file : files) {
             File f = new File(path + File.separator + file[0]);
-            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                f))));
+            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f))));
             out.print(file[1]);
             out.close();
         }

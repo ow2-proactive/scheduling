@@ -1,41 +1,29 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.task;
-
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -62,7 +50,7 @@ public final class TaskIdImpl implements TaskId {
 
     /** tag of the task */
     private String tag;
-    
+
     private JobId jobId;
 
     private TaskIdImpl(JobId jobId, long taskId) {
@@ -86,7 +74,7 @@ public final class TaskIdImpl implements TaskId {
     public static TaskId createTaskId(JobId jobId, String readableName, long taskId) {
         return new TaskIdImpl(jobId, readableName, taskId);
     }
-    
+
     /**
      * Create task id, and set task name + tag.
      *
@@ -112,15 +100,15 @@ public final class TaskIdImpl implements TaskId {
     public void setJobId(JobId jobId) {
         this.jobId = jobId;
     }
-    
+
     @Override
     public String getTag() {
         return this.tag;
     }
 
-    public void setTag(String tag){this.tag = tag;}
-
-    
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     /**
      * Return the human readable name associated to this id.
@@ -130,7 +118,6 @@ public final class TaskIdImpl implements TaskId {
     public String getReadableName() {
         return this.readableName;
     }
-
 
     /**
      * Set readable name of this TaskId.
@@ -151,8 +138,10 @@ public final class TaskIdImpl implements TaskId {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         TaskIdImpl taskId = (TaskIdImpl) o;
 

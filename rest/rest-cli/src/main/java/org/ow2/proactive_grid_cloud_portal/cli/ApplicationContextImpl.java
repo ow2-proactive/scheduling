@@ -1,4 +1,31 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive_grid_cloud_portal.cli;
+
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,33 +34,42 @@ import java.util.Stack;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
-
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_OTHER;
 
 
 public class ApplicationContextImpl implements ApplicationContext {
 
     private static final String DEVICE = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.deviceImpl";
+
     private static final String SCRIPT_ENGINE = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.scriptEngine";
+
     private static final String OBJECT_MAPPER = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.objectMapper";
+
     private static final String INFRASTRUCTURES = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.infrastructures";
+
     private static final String POLICIES = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.policies";
+
     private static final String RESULT_STACK = "org.ow2.proactive_grid_cloud_portal.cli.ApplicationContextImpl.resultStack";
 
     private static ApplicationContextHolder threadLocalContext = new ApplicationContextHolder();
 
     private String sessionId = "";
+
     private String restServerUrl;
+
     private boolean insecureAccess;
+
     private String resourceType;
+
     private boolean forced;
+
     private boolean silent = false;
+
     private Map<String, Object> properties = new HashMap<>();
 
     public static ApplicationContext currentContext() {
@@ -79,8 +115,12 @@ public class ApplicationContextImpl implements ApplicationContext {
 
     @Override
     public String getResourceUrl(String resource) {
-        return (new StringBuilder()).append(getRestServerUrl()).append('/').append(getResourceType()).append(
-                '/').append(resource).toString();
+        return (new StringBuilder()).append(getRestServerUrl())
+                                    .append('/')
+                                    .append(getResourceType())
+                                    .append('/')
+                                    .append(resource)
+                                    .toString();
     }
 
     @Override

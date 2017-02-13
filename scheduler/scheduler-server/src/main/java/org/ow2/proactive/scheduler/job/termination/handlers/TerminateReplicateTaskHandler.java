@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.job.termination.handlers;
 
 import java.text.SimpleDateFormat;
@@ -34,8 +59,8 @@ public class TerminateReplicateTaskHandler {
         this.internalJob = internalJob;
     }
 
-    public boolean terminateReplicateTask(FlowAction action, InternalTask initiator,
-            ChangedTasksInfo changesInfo, SchedulerStateUpdate frontend, TaskId taskId) {
+    public boolean terminateReplicateTask(FlowAction action, InternalTask initiator, ChangedTasksInfo changesInfo,
+            SchedulerStateUpdate frontend, TaskId taskId) {
         int runs = action.getDupNumber();
 
         logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
@@ -43,8 +68,8 @@ public class TerminateReplicateTaskHandler {
 
         // find the tasks that need to be replicated
         for (InternalTask internalTask : internalJob.getIHMTasks().values()) {
-            List<InternalTask> internalTaskDependencies = internalTask.getIDependences() == null
-                    ? new ArrayList<InternalTask>() : internalTask.getIDependences();
+            List<InternalTask> internalTaskDependencies = internalTask.getIDependences() == null ? new ArrayList<InternalTask>()
+                                                                                                 : internalTask.getIDependences();
             for (InternalTask internalTaskDependency : internalTaskDependencies) {
                 if (isTheInitiatorTask(initiator, toReplicate, internalTask, internalTaskDependency)) {
                     if (runs < 1) {
@@ -70,7 +95,7 @@ public class TerminateReplicateTaskHandler {
                 for (InternalTask internalTask : internalJob.getIHMTasks().values()) {
                     if (tg.equals(internalTask.getName()) &&
                         !(internalTask.getStatus().equals(TaskStatus.FINISHED) ||
-                            internalTask.getStatus().equals(TaskStatus.SKIPPED)) &&
+                          internalTask.getStatus().equals(TaskStatus.SKIPPED)) &&
                         internalTask.dependsOn(internalTaskToReplicate)) {
                         target = internalTask;
                         break;
@@ -93,17 +118,19 @@ public class TerminateReplicateTaskHandler {
                 Map<TaskId, InternalTask> tasksBetweenInitiatorAndTarget = new HashMap<>();
                 // replicate the tasks between the initiator and the target
                 try {
-                    target.replicateTree(tasksBetweenInitiatorAndTarget, internalTaskToReplicate.getId(),
-                            false, initiator.getReplicationIndex() * runs, 0);
+                    target.replicateTree(tasksBetweenInitiatorAndTarget,
+                                         internalTaskToReplicate.getId(),
+                                         false,
+                                         initiator.getReplicationIndex() * runs,
+                                         0);
 
                 } catch (Exception e) {
                     logger.error("REPLICATE: could not replicate tree", e);
                     break;
                 }
 
-                ((JobInfoImpl) internalJob.getJobInfo()).setNumberOfPendingTasks(
-                        ((JobInfoImpl) internalJob.getJobInfo()).getNumberOfPendingTasks() +
-                            tasksBetweenInitiatorAndTarget.size());
+                ((JobInfoImpl) internalJob.getJobInfo()).setNumberOfPendingTasks(((JobInfoImpl) internalJob.getJobInfo()).getNumberOfPendingTasks() +
+                                                                                 tasksBetweenInitiatorAndTarget.size());
 
                 // pointers to the new replicated tasks corresponding the begin
                 // and
@@ -114,9 +141,8 @@ public class TerminateReplicateTaskHandler {
                 // configure the new tasks
                 for (InternalTask internalTask : tasksBetweenInitiatorAndTarget.values()) {
                     internalTask.setJobInfo(((JobInfoImpl) internalJob.getJobInfo()));
-                    int dupIndex = getNextReplicationIndex(
-                            InternalTask.getInitialName(internalTask.getName()),
-                            internalTask.getIterationIndex());
+                    int dupIndex = getNextReplicationIndex(InternalTask.getInitialName(internalTask.getName()),
+                                                           internalTask.getIterationIndex());
                     internalJob.addTask(internalTask);
                     internalTask.setReplicationIndex(dupIndex);
                     assignReplicationTag(internalTask, initiator, false, action);
@@ -124,14 +150,12 @@ public class TerminateReplicateTaskHandler {
                 changesInfo.newTasksAdded(tasksBetweenInitiatorAndTarget.values());
 
                 // find the beginning and the ending of the replicated block
-                for (Entry<TaskId, InternalTask> tasksBetweenInitiatorAndTargetEntry : tasksBetweenInitiatorAndTarget
-                        .entrySet()) {
+                for (Entry<TaskId, InternalTask> tasksBetweenInitiatorAndTargetEntry : tasksBetweenInitiatorAndTarget.entrySet()) {
                     InternalTask internalBlockTask = tasksBetweenInitiatorAndTargetEntry.getValue();
 
                     // connect the first task of the replicated block to the
                     // initiator
-                    if (internalTaskToReplicate.getId()
-                            .equals(tasksBetweenInitiatorAndTargetEntry.getKey())) {
+                    if (internalTaskToReplicate.getId().equals(tasksBetweenInitiatorAndTargetEntry.getKey())) {
                         newTarget = internalBlockTask;
                         newTarget.addDependence(initiator);
                         // no need to add newTarget to modifiedTasks
@@ -163,8 +187,11 @@ public class TerminateReplicateTaskHandler {
                 }
 
                 // propagate the changes on the JobDescriptor
-                internalJob.getJobDescriptor().doReplicate(taskId, tasksBetweenInitiatorAndTarget, newTarget,
-                        target.getId(), newEnd.getId());
+                internalJob.getJobDescriptor().doReplicate(taskId,
+                                                           tasksBetweenInitiatorAndTarget,
+                                                           newTarget,
+                                                           target.getId(),
+                                                           newEnd.getId());
 
             }
         }
@@ -173,9 +200,9 @@ public class TerminateReplicateTaskHandler {
         ((JobInfoImpl) internalJob.getJobInfo()).setTasksChanges(changesInfo, internalJob);
         if (frontend != null) {
             frontend.jobStateUpdated(internalJob.getOwner(),
-                    new NotificationData<>(SchedulerEvent.TASK_REPLICATED, internalJob.getJobInfo()));
+                                     new NotificationData<>(SchedulerEvent.TASK_REPLICATED, internalJob.getJobInfo()));
             frontend.jobStateUpdated(internalJob.getOwner(),
-                    new NotificationData<>(SchedulerEvent.TASK_SKIPPED, internalJob.getJobInfo()));
+                                     new NotificationData<>(SchedulerEvent.TASK_SKIPPED, internalJob.getJobInfo()));
             frontend.jobUpdatedFullData(internalJob);
         }
         ((JobInfoImpl) internalJob.getJobInfo()).clearTasksChanges();
@@ -187,8 +214,7 @@ public class TerminateReplicateTaskHandler {
         return true;
     }
 
-    private void skipReplication(InternalTask initiator, ChangedTasksInfo changesInfo,
-            InternalTask internalTask) {
+    private void skipReplication(InternalTask initiator, ChangedTasksInfo changesInfo, InternalTask internalTask) {
         long finishedTime = initiator.getFinishedTime() + 1;
         if (internalTask.getFlowBlock().equals(FlowBlock.START)) {
             skipTasksUntilEndBlock(changesInfo, internalTask, finishedTime);
@@ -199,12 +225,10 @@ public class TerminateReplicateTaskHandler {
 
     private boolean isTheInitiatorTask(InternalTask initiator, List<InternalTask> toReplicate,
             InternalTask internalTask, InternalTask internalTaskDependency) {
-        return internalTaskDependency.getId().equals(initiator.getId()) &&
-            !toReplicate.contains(internalTask);
+        return internalTaskDependency.getId().equals(initiator.getId()) && !toReplicate.contains(internalTask);
     }
 
-    private void skipTasksUntilEndBlock(ChangedTasksInfo changesInfo, InternalTask blockTaskToSkip,
-            long finishedTime) {
+    private void skipTasksUntilEndBlock(ChangedTasksInfo changesInfo, InternalTask blockTaskToSkip, long finishedTime) {
         skipTask(changesInfo, blockTaskToSkip, finishedTime);
         if (!blockTaskToSkip.getFlowBlock().equals(FlowBlock.END)) {
             for (InternalTask nextBlockTask : getTaskChildren(blockTaskToSkip)) {

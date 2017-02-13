@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.workflow;
 
@@ -72,15 +61,15 @@ import functionaltests.job.multinodes.TestMultipleHostsRequest;
  */
 public class TestXMLTransformer {
 
-    private static URL jobDescriptorsFolder = TestXMLTransformer.class
-            .getResource("/functionaltests/descriptors/");
-
+    private static URL jobDescriptorsFolder = TestXMLTransformer.class.getResource("/functionaltests/descriptors/");
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
     private static final String executablePathPropertyName = "EXEC_PATH";
+
     private static final String workingDirPropName = "WDIR";
+
     private static final String cmdPropName = "WCOM";
 
     /**
@@ -89,8 +78,9 @@ public class TestXMLTransformer {
      * @throws URISyntaxException
      */
     private void setProperties() throws URISyntaxException {
-        System.setProperty(executablePathPropertyName, new File(TestMultipleHostsRequest.class.getResource(
-                "/functionaltests/executables/test_multiple_hosts_request.sh").toURI()).getAbsolutePath());
+        System.setProperty(executablePathPropertyName,
+                           new File(TestMultipleHostsRequest.class.getResource("/functionaltests/executables/test_multiple_hosts_request.sh")
+                                                                  .toURI()).getAbsolutePath());
         System.setProperty(workingDirPropName, folder.getRoot().getAbsolutePath());
         System.setProperty(cmdPropName, "echo");
     }
@@ -105,8 +95,8 @@ public class TestXMLTransformer {
         File folder = new File(jobDescriptorsFolder.toURI());
         Collection<File> testJobDescrFiles = FileUtils.listFiles(folder, new String[] { "xml" }, true);
 
-        File samplesJobDescrFiles = new File(System.getProperty("pa.scheduler.home") + File.separator +
-            "samples" + File.separator + "workflows");
+        File samplesJobDescrFiles = new File(System.getProperty("pa.scheduler.home") + File.separator + "samples" +
+                                             File.separator + "workflows");
 
         log(samplesJobDescrFiles.getAbsolutePath());
 
@@ -125,8 +115,7 @@ public class TestXMLTransformer {
                 transformAndCompare(file);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new Exception("An exception occured while treating the file " + file.getAbsolutePath(),
-                    e);
+                throw new Exception("An exception occured while treating the file " + file.getAbsolutePath(), e);
             }
 
         }
@@ -159,8 +148,7 @@ public class TestXMLTransformer {
         } catch (Exception e) {
             e.printStackTrace();
             String message = "Could not create Job object from generated xml. \n";
-            message += "Generated xml content was : \n ****** " + xmlFile2.getAbsolutePath() +
-                " ***********\n ";
+            message += "Generated xml content was : \n ****** " + xmlFile2.getAbsolutePath() + " ***********\n ";
             message += FileUtils.readFileToString(xmlFile2);
             message += "\n *************************** ";
             throw new Exception(message, e);
@@ -171,8 +159,7 @@ public class TestXMLTransformer {
         if (!comparator.isEqualJob(job1, job2)) {
             String message = "Jobs are not equal for file " + xmlFile + "\n";
             message += "Reason: " + comparator.getDifferenceMessage() + "\n";
-            message += "Generated xml content was : \n ****** " + xmlFile2.getAbsolutePath() +
-                " *********** \n ";
+            message += "Generated xml content was : \n ****** " + xmlFile2.getAbsolutePath() + " *********** \n ";
             message += FileUtils.readFileToString(xmlFile2);
             message += "\n *************************** ";
             Assert.fail(message);

@@ -30,6 +30,6 @@ done
 #  /usr/local/lsf/bin/lsgrun -p -m "$i" $CMD &
 #done
 
-# echo Copying files 
-#copyFiles.sh 
+# echo Copying files
+#copyFiles.sh
      # 2> /dev/null

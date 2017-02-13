@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.task;
 
 import static java.util.Collections.singletonMap;
@@ -56,8 +81,8 @@ public class TaskLauncherTest {
 
     @Test
     public void simpleTask() throws Throwable {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -69,18 +94,16 @@ public class TaskLauncherTest {
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertThat((String) taskResult.value(), is("hello"));
-        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("prehellopost%n")),
-                is(true));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("prehellopost%n")), is(true));
     }
 
     @Test
     public void javaTask() throws Throwable {
         HashMap<String, byte[]> args = new HashMap<>();
         args.put("number", Object2ByteConverter.convertObject2Byte(123));
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript(WaitAndPrint.class.getName(), "java", new Serializable[] {
-                        args
-                })));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript(WaitAndPrint.class.getName(),
+                                                                                                                      "java",
+                                                                                                                      new Serializable[] { args })));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -95,8 +118,8 @@ public class TaskLauncherTest {
 
     @Test
     public void failedTask() throws Throwable {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript("failing task'", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("failing task'",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -111,8 +134,8 @@ public class TaskLauncherTest {
 
     @Test
     public void thirdPartyCredentials() throws Throwable {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript("print(credentials.get('password'))", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print(credentials.get('password'))",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
@@ -121,12 +144,10 @@ public class TaskLauncherTest {
 
         CredData credData = new CredData("john", "pwd");
         credData.addThirdPartyCredential("password", "r00t");
-        Credentials thirdPartyCredentials =
-                Credentials.createCredentials(credData, taskLauncher.generatePublicKey());
+        Credentials thirdPartyCredentials = Credentials.createCredentials(credData, taskLauncher.generatePublicKey());
         executableContainer.setCredentials(thirdPartyCredentials);
 
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
-
 
         assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("r00t%n")), is(true));
     }
@@ -134,8 +155,8 @@ public class TaskLauncherTest {
     @Test
     public void nativeTask_WorkingDir() throws Throwable {
         String tempFolder = tmpFolder.newFolder().getCanonicalPath();
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript(pwdCommand(), "native")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript(pwdCommand(),
+                                                                                                                      "native")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setForkEnvironment(new ForkEnvironment(tempFolder));
@@ -145,16 +166,14 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-
-        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)),
-                is(true));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)), is(true));
     }
 
     @Test
     public void nativeTask_WorkingDir_WithVariableReplacement() throws Throwable {
         String tempFolder = tmpFolder.newFolder().getCanonicalPath();
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript(pwdCommand(), "native")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript(pwdCommand(),
+                                                                                                                      "native")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setJobVariables(singletonMap("folder", new JobVariable("folder", tempFolder)));
@@ -165,9 +184,7 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
-
-        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)),
-                is(true));
+        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)), is(true));
     }
 
     private String pwdCommand() {
@@ -180,8 +197,8 @@ public class TaskLauncherTest {
 
     @Test
     public void taskLogsAreCopiedToUserSpace() throws Exception {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -194,19 +211,20 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
+                    boolean isRunAsUser) {
                 return dataspacesMock;
             }
         });
         runTaskLauncher(taskLauncher, executableContainer);
 
-        verify(dataspacesMock, times(2)).copyScratchDataToOutput(Matchers.<List<OutputSelector>>any());
+        verify(dataspacesMock, times(2)).copyScratchDataToOutput(Matchers.<List<OutputSelector>> any());
     }
 
     @Test
     public void taskLogsAreNotCopiedToUserSpace_PreciousLogsDisabled() throws Exception {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
 
@@ -219,19 +237,20 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
+                    boolean isRunAsUser) {
                 return dataspacesMock;
             }
         });
         runTaskLauncher(taskLauncher, executableContainer);
 
-        verify(dataspacesMock, times(1)).copyScratchDataToOutput(Matchers.<List<OutputSelector>>any());
+        verify(dataspacesMock, times(1)).copyScratchDataToOutput(Matchers.<List<OutputSelector>> any());
     }
 
     @Test
     public void scratchDirDeletedAfterTaskCompleted() throws Throwable {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript("print('hello'); result='hello'", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
@@ -242,7 +261,8 @@ public class TaskLauncherTest {
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
 
             @Override
-            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService, boolean isRunAsUser) {
+            public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
+                    boolean isRunAsUser) {
                 return dataspacesMock;
             }
         });
@@ -255,12 +275,12 @@ public class TaskLauncherTest {
     public void testProgressFileReaderIntegration() throws Throwable {
         int nbIterations = 3;
 
-        String taskScript = CharStreams.toString(new InputStreamReader(
-                getClass().getResourceAsStream("/task-report-progress.py"), Charsets.UTF_8));
+        String taskScript = CharStreams.toString(new InputStreamReader(getClass().getResourceAsStream("/task-report-progress.py"),
+                                                                       Charsets.UTF_8));
 
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript(taskScript, "python",
-                        new String[] { Integer.toString(nbIterations) })));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript(taskScript,
+                                                                                                                      "python",
+                                                                                                                      new String[] { Integer.toString(nbIterations) })));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "job", 1000L));
@@ -275,8 +295,7 @@ public class TaskLauncherTest {
         }
     }
 
-    private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
-            ScriptExecutableContainer executableContainer) {
+    private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer) {
         TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
 
         taskLauncher.doTask(executableContainer, null, taskResult);

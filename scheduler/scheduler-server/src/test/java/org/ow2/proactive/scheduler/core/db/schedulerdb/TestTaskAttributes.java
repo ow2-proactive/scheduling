@@ -1,4 +1,35 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,32 +45,25 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 
 public class TestTaskAttributes extends BaseSchedulerDBTest {
 
     @Test
     public void testFlowBlock() throws Throwable {
-        TaskFlowJob jobToSubmit = (TaskFlowJob) JobFactory.getFactory().createJob(
-                new File(TestTaskAttributes.class.getResource(
-                        "/functionaltests/workflow/descriptors/flow_crash_int_2.xml").toURI())
-                        .getAbsolutePath());
+        TaskFlowJob jobToSubmit = (TaskFlowJob) JobFactory.getFactory()
+                                                          .createJob(new File(TestTaskAttributes.class.getResource("/functionaltests/workflow/descriptors/flow_crash_int_2.xml")
+                                                                                                      .toURI()).getAbsolutePath());
 
         InternalJob job = defaultSubmitJobAndLoadInternal(true, jobToSubmit);
 
         for (Task task : jobToSubmit.getTasks()) {
             int expectedDeps = task.getDependencesList() != null ? task.getDependencesList().size() : 0;
             InternalTask internalTask = job.getTask(task.getName());
-            int actualDeps = internalTask.getIDependences() != null ? internalTask.getIDependences().size()
-                    : 0;
+            int actualDeps = internalTask.getIDependences() != null ? internalTask.getIDependences().size() : 0;
             Assert.assertEquals("Wrong dependecies for " + task.getName(), expectedDeps, actualDeps);
-            Assert.assertEquals("Wrong flow block for " + task.getName(), task.getFlowBlock(), internalTask
-                    .getFlowBlock());
+            Assert.assertEquals("Wrong flow block for " + task.getName(),
+                                task.getFlowBlock(),
+                                internalTask.getFlowBlock());
         }
     }
 
@@ -48,8 +72,7 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         TaskFlowJob jobDef = new TaskFlowJob();
         JavaTask task1 = createDefaultTask("task1");
 
-        task1.addSelectionScript(new SelectionScript("selection1", "js", new String[] { "param1", "param2" },
-            true));
+        task1.addSelectionScript(new SelectionScript("selection1", "js", new String[] { "param1", "param2" }, true));
         task1.addSelectionScript(new SelectionScript("selection2", "js", new String[] { "param3" }, false));
         task1.addSelectionScript(new SelectionScript("selection3", "js"));
 
@@ -197,9 +220,10 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
         Assert.assertNull(taskData.getParallelEnvironment().getTopologyDescriptor());
 
         TopologyDescriptor[] descs = { TopologyDescriptor.ARBITRARY, TopologyDescriptor.BEST_PROXIMITY,
-                TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE, TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE,
-                TopologyDescriptor.SINGLE_HOST, TopologyDescriptor.SINGLE_HOST_EXCLUSIVE,
-                new ThresholdProximityDescriptor(123) };
+                                       TopologyDescriptor.DIFFERENT_HOSTS_EXCLUSIVE,
+                                       TopologyDescriptor.MULTIPLE_HOSTS_EXCLUSIVE, TopologyDescriptor.SINGLE_HOST,
+                                       TopologyDescriptor.SINGLE_HOST_EXCLUSIVE,
+                                       new ThresholdProximityDescriptor(123) };
 
         for (TopologyDescriptor desc : descs) {
             task = createDefaultTask("task");
@@ -207,11 +231,11 @@ public class TestTaskAttributes extends BaseSchedulerDBTest {
             task.setParallelEnvironment(env);
             taskData = saveSingleTask(task).getTask(task.getName());
             Assert.assertEquals(10, taskData.getParallelEnvironment().getNodesNumber());
-            Assert.assertEquals(taskData.getParallelEnvironment().getTopologyDescriptor().getClass(), desc
-                    .getClass());
+            Assert.assertEquals(taskData.getParallelEnvironment().getTopologyDescriptor().getClass(), desc.getClass());
             if (desc instanceof ThresholdProximityDescriptor) {
                 Assert.assertEquals(((ThresholdProximityDescriptor) taskData.getParallelEnvironment()
-                        .getTopologyDescriptor()).getThreshold(), 123);
+                                                                            .getTopologyDescriptor()).getThreshold(),
+                                    123);
             }
         }
     }

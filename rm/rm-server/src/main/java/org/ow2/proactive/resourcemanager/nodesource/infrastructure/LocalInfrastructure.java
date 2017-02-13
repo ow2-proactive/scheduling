@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.IOException;
@@ -18,6 +43,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 
@@ -25,19 +51,27 @@ import com.google.common.base.Throwables;
 public class LocalInfrastructure extends InfrastructureManager {
 
     public static final int DEFAULT_NODE_NUMBER = Math.max(2, Runtime.getRuntime().availableProcessors() - 1);
+
     public static final int DEFAULT_TIMEOUT = 30000;
 
     @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true)
     private Credentials credentials;
+
     @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")
     private int maxNodes = DEFAULT_NODE_NUMBER;
+
     // number of nodes which can still be acquired
     private AtomicInteger acquiredNodes;
+
     private AtomicInteger lostNodes;
+
     private AtomicInteger handledNodes;
+
     private AtomicBoolean commandLineStarted;
+
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     private int nodeTimeout = DEFAULT_TIMEOUT;
+
     @Configurable(description = "Additional ProActive properties")
     private String paProperties = "";
 
@@ -88,12 +122,12 @@ public class LocalInfrastructure extends InfrastructureManager {
         clb.setRmHome(rmHome);
         ArrayList<String> paPropList = new ArrayList<>();
         if (!this.paProperties.contains(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getName())) {
-            paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + rmHome + "config" +
-                os.fs + "security.java.policy-client");
+            paPropList.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + rmHome + "config" + os.fs +
+                           "security.java.policy-client");
         }
         if (!this.paProperties.contains(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName())) {
-            paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome +
-                "config" + os.fs + "network" + os.fs + "node.ini");
+            paPropList.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() + rmHome + "config" + os.fs +
+                           "network" + os.fs + "node.ini");
         }
         if (!this.paProperties.contains(PAResourceManagerProperties.RM_HOME.getKey())) {
             paPropList.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + rmHome);
@@ -127,7 +161,10 @@ public class LocalInfrastructure extends InfrastructureManager {
         List<String> depNodeURLs = new ArrayList<>(handledNodes.get());
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseNodeName, handledNodes.get());
         try {
-            depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmd, "Node launched locally", this.nodeTimeout));
+            depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
+                                                         obfuscatedCmd,
+                                                         "Node launched locally",
+                                                         this.nodeTimeout));
 
             // Deobfuscate the cred value
             Collections.replaceAll(cmd, CommandLineBuilder.OBFUSC, clb.getCredentialsValue());
@@ -216,8 +253,10 @@ public class LocalInfrastructure extends InfrastructureManager {
         for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
             String name = createdNodeNames.get(nodeIndex);
             String lf = System.lineSeparator();
-            String url = super.addDeployingNode(name, "deployed as daemon",
-                    "Deploying a local infrastructure node", this.nodeTimeout);
+            String url = super.addDeployingNode(name,
+                                                "deployed as daemon",
+                                                "Deploying a local infrastructure node",
+                                                this.nodeTimeout);
             String st = Throwables.getStackTraceAsString(e);
             super.declareDeployingNodeLost(url, message + lf + st);
         }
@@ -238,7 +277,6 @@ public class LocalInfrastructure extends InfrastructureManager {
             processExecutor = null;
         }
     }
-
 
     /**
      * args[0] = credentials args[1] = max nodes args[2] = timeout args[3] = pa
@@ -288,7 +326,8 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void removeNode(Node node) throws RMException {
-        logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " + this.getClass().getSimpleName());
+        logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " +
+                     this.getClass().getSimpleName());
 
         if (!this.nodeSource.getDownNodes().contains(node)) {
             // the node was manually removed

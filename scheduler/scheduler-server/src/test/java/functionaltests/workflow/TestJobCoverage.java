@@ -1,43 +1,36 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionaltests.workflow;
 
-import functionaltests.job.error.TestJobAborted;
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.net.URL;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,11 +45,8 @@ import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import java.io.File;
-import java.net.URL;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import functionaltests.job.error.TestJobAborted;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
@@ -93,8 +83,7 @@ import static org.junit.Assert.*;
  */
 public class TestJobCoverage extends SchedulerFunctionalTestWithRestart {
 
-    private static URL jobDescriptor = TestJobAborted.class
-            .getResource("/functionaltests/descriptors/Job_Coverage.xml");
+    private static URL jobDescriptor = TestJobAborted.class.getResource("/functionaltests/descriptors/Job_Coverage.xml");
 
     @Test
     public void testJobCoverage() throws Throwable {
@@ -110,8 +99,8 @@ public class TestJobCoverage extends SchedulerFunctionalTestWithRestart {
 
         //job submission
         log("Submitting job...");
-        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
-                new File(jobDescriptor.toURI()).getAbsolutePath());
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory()
+                                                      .createJob(new File(jobDescriptor.toURI()).getAbsolutePath());
         JobId id = schedulerHelper.submitJob(job);
 
         //checking all processes
@@ -266,10 +255,12 @@ public class TestJobCoverage extends SchedulerFunctionalTestWithRestart {
         assertNotNull(result.getPreciousResults().get("task6"));
 
         assertEquals("Working", result.getPreciousResults().get("task1").value());
-        assertTrue(StackTraceUtil.getStackTrace(result.getResult("task2").getException()).contains(
-                "WorkingAt3rd - Status : Number is 1"));
-        assertTrue(result.getResult("task3").value().toString()
-                .contains("WorkingAt3rd - Status : OK / File deleted :"));
+        assertTrue(StackTraceUtil.getStackTrace(result.getResult("task2").getException())
+                                 .contains("WorkingAt3rd - Status : Number is 1"));
+        assertTrue(result.getResult("task3")
+                         .value()
+                         .toString()
+                         .contains("WorkingAt3rd - Status : OK / File deleted :"));
         assertTrue(result.getResult("task4").getException().getCause().getMessage().contains("Throwing"));
         assertTrue(result.getResult("task5").getException().getCause().getMessage().contains("Throwing"));
         assertNotNull(result.getResult("task7").getException());

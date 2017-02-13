@@ -1,42 +1,38 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.workflow;
 
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import static org.junit.Assert.assertTrue;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.net.URL;
+import java.util.Map.Entry;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
@@ -49,13 +45,7 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.net.URL;
-import java.util.Map.Entry;
-
-import static org.junit.Assert.assertTrue;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 
 
 /**
@@ -67,27 +57,27 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRestart {
 
-    private static final URL java_job = TestWorkflowIterationAwareness.class
-            .getResource("/functionaltests/workflow/descriptors/flow_it_1.xml");
+    private static final URL java_job = TestWorkflowIterationAwareness.class.getResource("/functionaltests/workflow/descriptors/flow_it_1.xml");
 
-    private static final URL native_job = TestWorkflowIterationAwareness.class
-            .getResource("/functionaltests/workflow/descriptors/flow_it_2.xml");
+    private static final URL native_job = TestWorkflowIterationAwareness.class.getResource("/functionaltests/workflow/descriptors/flow_it_2.xml");
 
-    private static final URL java_job_Schema33 = TestWorkflowIterationAwareness.class
-            .getResource("/functionaltests/workflow/descriptors/flow_it_1_Schema33.xml");
+    private static final URL java_job_Schema33 = TestWorkflowIterationAwareness.class.getResource("/functionaltests/workflow/descriptors/flow_it_1_Schema33.xml");
 
-    private static final URL native_job_Schema33 = TestWorkflowIterationAwareness.class
-            .getResource("/functionaltests/workflow/descriptors/flow_it_2_Schema33.xml");
+    private static final URL native_job_Schema33 = TestWorkflowIterationAwareness.class.getResource("/functionaltests/workflow/descriptors/flow_it_2_Schema33.xml");
 
     private static final String tmpFolder = System.getProperty("java.io.tmpdir");
 
     private static final String preScript = //
-    "def f = new File(System.getProperty(\"java.io.tmpdir\")+\"" + "/PRE_" + "\"+ variables.get('PA_TASK_ITERATION') + \"" + "_" + "\"+ variables.get('PA_TASK_REPLICATION') +\"" + "\"); \n" + //
-        "f.createNewFile(); \n";
+                                          "def f = new File(System.getProperty(\"java.io.tmpdir\")+\"" + "/PRE_" +
+                                            "\"+ variables.get('PA_TASK_ITERATION') + \"" + "_" +
+                                            "\"+ variables.get('PA_TASK_REPLICATION') +\"" + "\"); \n" + //
+                                            "f.createNewFile(); \n";
 
     private static final String postScript = //
-      "def f = new File(System.getProperty(\"java.io.tmpdir\")+\"" + "/POST_" + "\"+ variables.get('PA_TASK_ITERATION') + \"" + "_" + "\"+ variables.get('PA_TASK_REPLICATION') +\"" + "\"); \n" + //
-        "f.createNewFile(); \n";
+                                           "def f = new File(System.getProperty(\"java.io.tmpdir\")+\"" + "/POST_" +
+                                             "\"+ variables.get('PA_TASK_ITERATION') + \"" + "_" +
+                                             "\"+ variables.get('PA_TASK_REPLICATION') +\"" + "\"); \n" + //
+                                             "f.createNewFile(); \n";
 
     /**
      * Checks Java and Native executables
@@ -120,8 +110,7 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRes
      */
     private void testJavaJob(String jobDescriptorPath) throws Throwable {
 
-        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
-                jobDescriptorPath);
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(jobDescriptorPath);
         ((JavaTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));
         ((JavaTask) job.getTask("T1")).setPostScript(new SimpleScript(postScript, "groovy"));
 
@@ -154,8 +143,7 @@ public class TestWorkflowIterationAwareness extends SchedulerFunctionalTestNoRes
      * native task through xml
      */
     private void testNativeJob(String jobDescriptorPath) throws Throwable {
-        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(
-                jobDescriptorPath);
+        TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(jobDescriptorPath);
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
                 ((NativeTask) job.getTask("T1")).setPreScript(new SimpleScript(preScript, "groovy"));

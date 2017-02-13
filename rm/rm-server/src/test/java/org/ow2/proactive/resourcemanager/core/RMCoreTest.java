@@ -1,9 +1,37 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.resourcemanager.core;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,22 +54,25 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNodeHelper;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImplTest;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 
 public class RMCoreTest {
@@ -61,7 +92,7 @@ public class RMCoreTest {
     private SelectionManager mockedSelectionManager;
 
     @Mock
-    private RMDBManager dataBaseManager;
+    private RMDBManager dbManager;
 
     @Mock
     private RMNode mockedRemovableNodeInDeploy;
@@ -80,6 +111,8 @@ public class RMCoreTest {
 
     @Mock
     private RMNode mockedFreeButLockedNode;
+
+    private NodesLockRestorationManager nodesLockRestorationManager;
 
     @Before
     public void setUp() {
@@ -169,6 +202,7 @@ public class RMCoreTest {
 
     /**
      * Set the private value maximumNumberOfNodes (Long) to a certain value.
+     *
      * @param newValue
      */
     private void setMaxNumberOfNodesTo(Long newValue) throws NoSuchFieldException, IllegalAccessException {
@@ -302,6 +336,35 @@ public class RMCoreTest {
     }
 
     @Test
+    public void testNodesRestorationManagerHandleInSetDeploying() {
+        verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class));
+        rmCore.setDeploying(mockedBusyNode);
+        verify(nodesLockRestorationManager).handle(Mockito.any(RMNode.class));
+    }
+
+    @Test
+    public void testGetNodeByUrlIncludingDeployingNodesKnownUrlDeployingNode() {
+        RMNode rmNodeFound = rmCore.getNodeByUrlIncludingDeployingNodes(mockedBusyNode.getNodeURL());
+        assertThat(rmNodeFound).isSameAs(mockedBusyNode);
+    }
+
+    @Test
+    public void testGetNodeByUrlIncludingDeployingNodesKnownUrlNonDeployingNode() {
+        RMNode rmNodeFound = rmCore.getNodeByUrlIncludingDeployingNodes(mockedRemovableNode.getNodeURL());
+        assertThat(rmNodeFound).isSameAs(mockedRemovableNode);
+    }
+
+    @Test
+    public void testGetNodeByUrlIncludingDeployingNodesUnknownNodeUrl() {
+        RMDeployingNode rmNode = new RMDeployingNode("node", mockedNodeSource, "command", new Client());
+
+        doReturn(rmNode).when(mockedNodeSource).getDeployingNode(rmNode.getNodeURL());
+
+        RMNode rmNodeFound = rmCore.getNodeByUrlIncludingDeployingNodes(rmNode.getNodeURL());
+        assertThat(rmNodeFound).isSameAs(rmNode);
+    }
+
+    @Test
     public void testGetAtMostNodes() {
         NodeSet nodeSet = rmCore.getAtMostNodes(1, TopologyDescriptor.ARBITRARY, null, null);
         assertEquals(0, nodeSet.size()); // we don't check nodeSet as its content is also tested in SelectionManagerTest
@@ -315,7 +378,7 @@ public class RMCoreTest {
         boolean result = rmCore.lockNodes(nodesToLock).getBooleanValue();
 
         assertThat(result).isTrue();
-        assertThat(getNumberOfFreeNodes()).isEqualTo(numberOfNodesEligibleForSchedulingBeforeLocking -1);
+        assertThat(getNumberOfFreeNodes()).isEqualTo(numberOfNodesEligibleForSchedulingBeforeLocking - 1);
         verify(mockedRemovableNode).lock(Mockito.any(Client.class));
     }
 
@@ -323,8 +386,8 @@ public class RMCoreTest {
     public void testLockNodes2() {
         int numberOfNodesEligibleForSchedulingBeforeLocking = getNumberOfFreeNodes();
 
-        Set<String> nodesToLock =
-                ImmutableSet.of(mockedRemovableNode.getNodeURL(), mockedRemovableNodeInDeploy.getNodeURL());
+        Set<String> nodesToLock = ImmutableSet.of(mockedRemovableNode.getNodeURL(),
+                                                  mockedRemovableNodeInDeploy.getNodeURL());
 
         boolean result = rmCore.lockNodes(nodesToLock).getBooleanValue();
 
@@ -409,7 +472,8 @@ public class RMCoreTest {
     public void testUnlockNodes4() {
         int numberOfNodesEligibleForSchedulingBeforeLocking = getNumberOfFreeNodes();
 
-        Set<String> nodesToUnlock = ImmutableSet.of(mockedRemovableNode.getNodeURL(), mockedFreeButLockedNode.getNodeURL());
+        Set<String> nodesToUnlock = ImmutableSet.of(mockedRemovableNode.getNodeURL(),
+                                                    mockedFreeButLockedNode.getNodeURL());
 
         boolean result = rmCore.unlockNodes(nodesToUnlock).getBooleanValue();
 
@@ -520,7 +584,7 @@ public class RMCoreTest {
     }
 
     private void testLockNodeState(NodeState nodeState) {
-        RMNodeImpl rmNode = Mockito.spy(RMNodeImplTest.createRmNode());
+        RMNodeImpl rmNode = Mockito.spy(RMNodeHelper.basicWithMockedInternals().getLeft());
         rmNode.setState(nodeState);
 
         HashMap<String, RMNode> allNodes = new HashMap<>();
@@ -528,11 +592,14 @@ public class RMCoreTest {
 
         ArrayList<RMNode> freeNodes = Lists.newArrayList((RMNode) rmNode);
 
-        RMCore rmCore = new RMCore(
-                new HashMap<String, NodeSource>(), new ArrayList<String>(), allNodes,
-                Mockito.mock(Client.class), Mockito.mock(RMMonitoringImpl.class),
-                Mockito.mock(SelectionManager.class),
-                freeNodes, Mockito.mock(RMDBManager.class));
+        RMCore rmCore = new RMCore(new HashMap<String, NodeSource>(),
+                                   new ArrayList<String>(),
+                                   allNodes,
+                                   Mockito.mock(Client.class),
+                                   Mockito.mock(RMMonitoringImpl.class),
+                                   Mockito.mock(SelectionManager.class),
+                                   freeNodes,
+                                   Mockito.mock(RMDBManager.class));
 
         BooleanWrapper lockResult = rmCore.lockNodes(ImmutableSet.of(rmNode.getNodeURL()));
 
@@ -540,6 +607,91 @@ public class RMCoreTest {
         assertThat(rmNode.getState()).isEqualTo(nodeState);
         assertThat(rmNode.isLocked()).isTrue();
         assertThat(freeNodes).isEmpty();
+    }
+
+    @Test
+    public void testInitNodesLockRestorationManagerDisabled() {
+        PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.updateProperty("false");
+        populateRMCore();
+
+        assertThat(nodesLockRestorationManager).isNotNull();
+        assertThat(nodesLockRestorationManager.isInitialized()).isFalse();
+
+        verify(nodesLockRestorationManager, never()).initialize();
+    }
+
+    @Test
+    public void testInitNodesLockRestorationManagerEnabled() {
+        PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.updateProperty("true");
+        populateRMCore();
+
+        assertThat(nodesLockRestorationManager).isNotNull();
+        assertThat(nodesLockRestorationManager.isInitialized()).isTrue();
+
+        verify(nodesLockRestorationManager).initialize();
+    }
+
+    @Test
+    public void testInternalLockNodeWithNodeNotLocked() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalLockNode(mockedRemovableNode);
+
+        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testInternalLockNodeWithNodeLocked() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalLockNode(mockedBusyNode);
+
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testInternalUnlockNodeWithNodeNotLocked() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalUnlockNode(mockedRemovableNode);
+
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testInternalUnlockNodeWithNodeLocked() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalUnlockNode(mockedBusyNode);
+
+        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testInternalSetToRemoveNodeWithNodeNotSetToRemoveNotLockedNode() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.internalSetToRemove(mockedRemovableNode, new Client());
+
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testRemoveNodeCreateLockEntryLockedNonDeployingNode() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.removeNode(mockedBusyNode.getNodeURL(), false, false);
+
+        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+    }
+
+    @Test
+    public void testRemoveNodeDoCreateLockEntryLockedNonDeployingNode() {
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
+
+        rmCore.removeNode(mockedBusyNode.getNodeURL(), false, true);
+
+        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
     }
 
     /**
@@ -593,12 +745,12 @@ public class RMCoreTest {
                                                    mockedBusyNode));
 
         configureRMNode(new MockedRMNodeParameters("mockedFreeButLockedNode",
-                true,
-                false,
-                true,
-                mockedNodeSource,
-                "NODESOURCE-test",
-                mockedFreeButLockedNode));
+                                                   true,
+                                                   false,
+                                                   true,
+                                                   mockedNodeSource,
+                                                   "NODESOURCE-test",
+                                                   mockedFreeButLockedNode));
 
         HashMap<String, RMNode> nodes = new HashMap<>(6);
         nodes.put(mockedRemovableNodeInDeploy.getNodeName(), mockedRemovableNodeInDeploy);
@@ -620,7 +772,25 @@ public class RMCoreTest {
                             mockedMonitoring,
                             mockedSelectionManager,
                             freeNodes,
-                            dataBaseManager);
+                            dbManager);
+
+        rmCore = Mockito.spy(rmCore);
+
+        nodesLockRestorationManager = null;
+
+        doReturn(new Function<RMCore, NodesLockRestorationManager>() {
+            @Override
+            public NodesLockRestorationManager apply(RMCore rmCore) {
+                nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
+                nodesLockRestorationManager = Mockito.spy(nodesLockRestorationManager);
+
+                doReturn(Maps.newHashMap()).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
+
+                return nodesLockRestorationManager;
+            }
+        }).when(rmCore).getNodesLockRestorationManagerBuilder();
+
+        rmCore.initNodesRestorationManager();
     }
 
     private void configureRMNode(MockedRMNodeParameters param) {
@@ -639,6 +809,7 @@ public class RMCoreTest {
         when(rmNode.getNodeSource()).thenReturn(param.getNodeSource());
         when(rmNode.getNodeSourceName()).thenReturn(param.getNodeSourceName());
         when(rmNode.getAdminPermission()).thenReturn(null);
+        when(rmNode.getProvider()).thenReturn(new Client());
 
         Client client = Mockito.mock(Client.class);
 

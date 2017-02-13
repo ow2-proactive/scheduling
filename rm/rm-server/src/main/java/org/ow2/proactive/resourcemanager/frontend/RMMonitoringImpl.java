@@ -1,40 +1,35 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.frontend;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -58,12 +53,6 @@ import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 
 /**
  * Active object designed for the Monitoring of the Resource Manager.
@@ -84,7 +73,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
     // Attributes
     private RMCore rmcore;
+
     private Map<UniqueID, EventDispatcher> dispatchers;
+
     private transient ExecutorService eventDispatcherThreadPool;
 
     /** Resource Manager's statistics */
@@ -111,12 +102,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(),
-                    RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
-            eventDispatcherThreadPool = Executors
-                    .newFixedThreadPool(PAResourceManagerProperties.RM_MONITORING_MAX_THREAD_NUMBER
-                            .getValueAsInt());
-
+            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
+            eventDispatcherThreadPool = Executors.newFixedThreadPool(PAResourceManagerProperties.RM_MONITORING_MAX_THREAD_NUMBER.getValueAsInt());
         } catch (ProActiveException e) {
             logger.debug("Cannot register RMMonitoring. Aborting...", e);
             PAActiveObject.terminateActiveObject(true);
@@ -150,11 +137,12 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         protected Client client;
 
         protected RMEventListener listener;
+
         protected LinkedList<RMEvent> events;
+
         protected List<RMEventType> eventTypes = null;
 
         protected AtomicBoolean inProcess = new AtomicBoolean(false);
-
 
         protected long counter = 0;
 
@@ -173,8 +161,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             int numberOfEventDelivered = 0;
             long timeStamp = System.currentTimeMillis();
             if (logger.isDebugEnabled()) {
-                logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
-                    client + "'");
+                logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" + client +
+                             "'");
             }
 
             while (true) {
@@ -197,9 +185,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Finishing delivery in " + Thread.currentThread() + " to client '" + client +
-                    "'. " + numberOfEventDelivered + " events were delivered in " +
-                    (System.currentTimeMillis() - timeStamp) + " ms");
+                logger.debug("Finishing delivery in " + Thread.currentThread() + " to client '" + client + "'. " +
+                             numberOfEventDelivered + " events were delivered in " +
+                             (System.currentTimeMillis() - timeStamp) + " ms");
             }
             inProcess.set(false);
         }
@@ -225,8 +213,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
                 long time = System.currentTimeMillis() - timeStamp;
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Event '" + event.toString() + "' has been delivered to client " + client +
-                        " in " + time + " ms");
+                    logger.debug("Event '" + event.toString() + "' has been delivered to client " + client + " in " +
+                                 time + " ms");
                 }
 
             } catch (Exception e) {
@@ -244,14 +232,14 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                 if (eventTypes == null || eventTypes.contains(event.getEventType())) {
                     try {
                         // clone event object to set a different counter for each client
-                        RMEvent cloneEvent = (RMEvent)event.clone();
+                        RMEvent cloneEvent = (RMEvent) event.clone();
                         cloneEvent.setCounter(++counter);
                         events.add(cloneEvent);
 
                         if (inProcess.get()) {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Communication to the client " + client +
-                                    " is in progress in one thread of the thread pool.");
+                                             " is in progress in one thread of the thread pool.");
                             }
                         } else {
                             inProcess.set(true);
@@ -275,8 +263,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
 
             long timeStamp = System.currentTimeMillis();
             if (logger.isDebugEnabled()) {
-                logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" +
-                    client + "'");
+                logger.debug("Initializing " + Thread.currentThread() + " for events delivery to client '" + client +
+                             "'");
             }
 
             while (true) {
@@ -296,9 +284,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                 if (toDeliver.size() > 0) {
                     if (deliverEvents(toDeliver)) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("Finishing delivery in " + Thread.currentThread() + " to client '" +
-                                client + "'. " + toDeliver.size() + " events were delivered in " +
-                                (System.currentTimeMillis() - timeStamp) + " ms");
+                            logger.debug("Finishing delivery in " + Thread.currentThread() + " to client '" + client +
+                                         "'. " + toDeliver.size() + " events were delivered in " +
+                                         (System.currentTimeMillis() - timeStamp) + " ms");
                         }
                     }
 
@@ -374,13 +362,22 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void removeRMEventListener() throws RMException {
         UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+
+        String shortId = id.shortString();
+        if (removeRMEventListener(id)) {
+            logger.debug("Removing the RM listener for " + shortId);
+        } else {
+            throw new RMException("Unknown listener found: " + shortId);
+        }
+    }
+
+    public boolean removeRMEventListener(UniqueID id) throws RMException {
+        if (dispatchers == null || dispatchers.isEmpty()) {
+            return false;
+        }
+
         synchronized (dispatchers) {
-            if (dispatchers.containsKey(id)) {
-                logger.debug("Removing the RM listner for " + id.shortString());
-                dispatchers.remove(id);
-            } else {
-                throw new RMException("Listener is unknown");
-            }
+            return dispatchers.remove(id) != null;
         }
     }
 

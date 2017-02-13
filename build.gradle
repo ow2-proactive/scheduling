@@ -4,6 +4,7 @@ buildscript {
 
         jcenter()
 
+        maven { url "https://plugins.gradle.org/m2/" }
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
         maven { url "http://nexus.qmino.com/content/repositories/miredot" }
     }
@@ -25,11 +26,13 @@ buildscript {
         }
 
         classpath 'com.qmino:miredot-plugin:2.0-RC3'
-    }
-}
 
-plugins {
-    id "org.sonarqube" version "1.2"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:1.2"
+        classpath "com.diffplug.gradle.spotless:spotless:2.4.0"
+        classpath "org.ow2.proactive:coding-rules:1.0.0"
+        delete "gradle/ext"
+        ant.unjar src: configurations.classpath.find { it.name.startsWith("coding-rules") }, dest: 'gradle/ext'
+    }
 }
 
 def isWindows = System.properties['os.name'].toLowerCase().contains('windows')
@@ -37,6 +40,8 @@ def isWindows = System.properties['os.name'].toLowerCase().contains('windows')
 def custom ={ "$rootDir/gradle/${it}.gradle"}
 
 apply plugin: 'java'
+apply plugin: 'org.sonarqube'
+apply from: "$rootDir/gradle/ext/coding-format.gradle"
 
 archivesBaseName = 'scheduling' // in case current folder is not named scheduling
 

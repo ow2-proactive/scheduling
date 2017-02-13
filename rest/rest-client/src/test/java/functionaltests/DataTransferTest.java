@@ -1,42 +1,42 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests;
 
-import com.google.common.io.Files;
+import static functionaltests.RestFuncTHelper.getRestServerUrl;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
+import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+import java.util.Random;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -49,35 +49,30 @@ import org.ow2.proactive.scheduler.rest.ds.*;
 import org.ow2.proactive_grid_cloud_portal.common.FileType;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-import java.util.Random;
-
-import static functionaltests.RestFuncTHelper.getRestServerUrl;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
+import com.google.common.io.Files;
 
 
 public class DataTransferTest extends AbstractRestFuncTestCase {
 
     private static final int FILE_SIZE = 100;
+
     public static final String TEMP_FILE_TXT_NAME = "tempFile.txt";
+
     public static final String TEMP_DIR_NAME = "tempDir";
+
     public static final String TEMP_DIR2_NAME = "tempDir2";
+
     public static final String TEMP_FILE_TMP_NAME = "tempFile.tmp";
+
     public static final String TEMP_FILE_ZIP_NAME = "test1.zip";
+
     public static final String TEMP_FILE_TGZ_NAME = "test1.tgz";
+
     public static final String TEMP_FILE_TMP_PATH = TEMP_DIR_NAME + "/" + TEMP_FILE_TMP_NAME;
 
-    static URL zipFileUrl = DataTransferTest.class
-            .getResource("/functionaltests/files/test1.zip");
+    static URL zipFileUrl = DataTransferTest.class.getResource("/functionaltests/files/test1.zip");
 
-    static URL tgzFileUrl = DataTransferTest.class
-            .getResource("/functionaltests/files/test2.tgz");
+    static URL tgzFileUrl = DataTransferTest.class.getResource("/functionaltests/files/test2.tgz");
 
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
@@ -114,15 +109,15 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         testUploadArchiveFile(TEMP_FILE_ZIP_NAME, zipFileUrl, "testUploadZipFile");
     }
 
-
     @Test
     public void testUploadZipFile() throws Exception {
         testUploadArchiveFile(TEMP_FILE_TGZ_NAME, tgzFileUrl, "testUploadTgzFile");
     }
 
-    private void testUploadArchiveFile(String archiveFileName, URL archiveFileSource, String testFolderName) throws Exception {
+    private void testUploadArchiveFile(String archiveFileName, URL archiveFileSource, String testFolderName)
+            throws Exception {
         File tmpZipFile = tmpDir.newFile(archiveFileName);
-        FileUtils.copyInputStreamToFile(archiveFileSource.openStream(),tmpZipFile);
+        FileUtils.copyInputStreamToFile(archiveFileSource.openStream(), tmpZipFile);
 
         // use standard client
         IDataSpaceClient client = clientInstance();
@@ -154,21 +149,18 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         assertTrue(client.upload(source, dest));
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        assertTrue(Files.equal(tempTextFile, new File(destRootUri,
-                "testUploadAllFilesInDirectory/" + TEMP_FILE_TXT_NAME)));
-        assertTrue(Files.equal(tempFile, new File(destRootUri,
-                "testUploadAllFilesInDirectory/" + TEMP_FILE_TMP_PATH)));
+        assertTrue(Files.equal(tempTextFile,
+                               new File(destRootUri, "testUploadAllFilesInDirectory/" + TEMP_FILE_TXT_NAME)));
+        assertTrue(Files.equal(tempFile, new File(destRootUri, "testUploadAllFilesInDirectory/" + TEMP_FILE_TMP_PATH)));
 
         // use RemoteSpace API
-        FileUtils.deleteDirectory(new File(destRootUri,
-                "testUploadAllFilesInDirectory"));
+        FileUtils.deleteDirectory(new File(destRootUri, "testUploadAllFilesInDirectory"));
 
         client.getUserSpace().pushFile(tmpDir.getRoot(), "testUploadAllFilesInDirectory");
 
-        assertTrue(Files.equal(tempTextFile, new File(destRootUri,
-                "testUploadAllFilesInDirectory/" + TEMP_FILE_TXT_NAME)));
-        assertTrue(Files.equal(tempFile, new File(destRootUri,
-                "testUploadAllFilesInDirectory/" + TEMP_FILE_TMP_PATH)));
+        assertTrue(Files.equal(tempTextFile,
+                               new File(destRootUri, "testUploadAllFilesInDirectory/" + TEMP_FILE_TXT_NAME)));
+        assertTrue(Files.equal(tempFile, new File(destRootUri, "testUploadAllFilesInDirectory/" + TEMP_FILE_TMP_PATH)));
 
     }
 
@@ -177,7 +169,6 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         TestFilesToUploadCreator testFiles = new TestFilesToUploadCreator().invoke();
         File tempTextFile = testFiles.getTempTextFile();
         File tempFile = testFiles.getTempFile();
-
 
         // use standard client
         IDataSpaceClient client = clientInstance();
@@ -192,8 +183,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertTrue(Files.equal(tempTextFile, destRootFiles[0]));
 
         // use RemoteSpace API
-        FileUtils.deleteDirectory(new File(destRootUri,
-                "testUploadSelectedFilesUsingGlobPattern"));
+        FileUtils.deleteDirectory(new File(destRootUri, "testUploadSelectedFilesUsingGlobPattern"));
         client.getUserSpace().pushFiles(tmpDir.getRoot(), "*.txt", "testUploadSelectedFilesUsingGlobPattern");
         destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingGlobPattern").listFiles();
         assertEquals(1, destRootFiles.length);
@@ -215,15 +205,15 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertTrue(client.upload(source, dest));
 
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        File[] destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingFilenames")
-                .listFiles();
+        File[] destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingFilenames").listFiles();
         assertEquals(1, destRootFiles.length);
         assertTrue(Files.equal(tempFile, destRootFiles[0]));
 
         // use RemoteSpace API
-        FileUtils.deleteDirectory(new File(destRootUri,
-                "testUploadSelectedFilesUsingFilenames"));
-        client.getUserSpace().pushFiles(tmpDir.getRoot(), "**/" + TEMP_FILE_TMP_NAME, "testUploadSelectedFilesUsingFilenames");
+        FileUtils.deleteDirectory(new File(destRootUri, "testUploadSelectedFilesUsingFilenames"));
+        client.getUserSpace().pushFiles(tmpDir.getRoot(),
+                                        "**/" + TEMP_FILE_TMP_NAME,
+                                        "testUploadSelectedFilesUsingFilenames");
         destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingFilenames").listFiles();
         assertEquals(1, destRootFiles.length);
         assertTrue(Files.equal(tempFile, destRootFiles[0]));
@@ -257,7 +247,6 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     }
 
-
     @Test
     public void testDownloadZipFile() throws Exception {
         testDownloadArchiveFile(TEMP_FILE_ZIP_NAME, zipFileUrl);
@@ -276,7 +265,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         if (srcFile.exists()) {
             assertTrue(srcFile.delete());
         }
-        FileUtils.copyInputStreamToFile(archiveSource.openStream(),srcFile);
+        FileUtils.copyInputStreamToFile(archiveSource.openStream(), srcFile);
 
         File tmpFile = tmpDir.newFile(archiveFileName);
         if (tmpFile.exists()) {
@@ -301,7 +290,8 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         String srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
         String dirName = "testDownloadAllFilesInDirectory";
 
-        TestFilesToDownloadCreator testFilesToDownloadCreator = new TestFilesToDownloadCreator(srcDirPath, dirName).invoke();
+        TestFilesToDownloadCreator testFilesToDownloadCreator = new TestFilesToDownloadCreator(srcDirPath,
+                                                                                               dirName).invoke();
         File srcTextFile = testFilesToDownloadCreator.getSrcTextFile();
         File srcTempFile = testFilesToDownloadCreator.getSrcTempFile();
 
@@ -332,7 +322,8 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         String dirName = "testDownloadSelectedFilesUsingGlobPattern";
 
-        TestFilesToDownloadCreator testFilesToDownloadCreator = new TestFilesToDownloadCreator(srcDirPath, dirName).invoke();
+        TestFilesToDownloadCreator testFilesToDownloadCreator = new TestFilesToDownloadCreator(srcDirPath,
+                                                                                               dirName).invoke();
         File srcTextFile = testFilesToDownloadCreator.getSrcTextFile();
         File srcTempFile = testFilesToDownloadCreator.getSrcTempFile();
 
@@ -383,15 +374,15 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals(1, files.size());
         assertEquals(TEMP_FILE_TXT_NAME, files.get(0));
 
-
         // use RemoteSpace API
         List<String> foundFiles = client.getUserSpace().listFiles("testListFilesNonRecursive", "*");
         System.out.println("Full : " + foundFiles);
         assertEquals(2, foundFiles.size());
-        assertArrayEquals(new String[]{TEMP_DIR_NAME, TEMP_FILE_TXT_NAME}, foundFiles.toArray(new String[0]));
+        assertArrayEquals(new String[] { TEMP_DIR_NAME, TEMP_FILE_TXT_NAME }, foundFiles.toArray(new String[0]));
     }
 
-    private void createFilesInUserSpace(String testListFilesNonRecursive) throws NotConnectedException, PermissionException, IOException {
+    private void createFilesInUserSpace(String testListFilesNonRecursive)
+            throws NotConnectedException, PermissionException, IOException {
         String srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
         new TestFilesToDownloadCreator(srcDirPath, testListFilesNonRecursive).invoke();
     }
@@ -419,12 +410,12 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals(TEMP_FILE_TMP_PATH, files.get(0));
         assertEquals(TEMP_FILE_TXT_NAME, files.get(1));
 
-
         // use RemoteSpace API
         List<String> foundFiles = client.getUserSpace().listFiles("testListFilesRecursive", "**");
         System.out.println("Full : " + foundFiles);
         assertEquals(3, foundFiles.size());
-        assertArrayEquals(new String[]{TEMP_DIR_NAME, TEMP_FILE_TMP_PATH, TEMP_FILE_TXT_NAME}, foundFiles.toArray(new String[0]));
+        assertArrayEquals(new String[] { TEMP_DIR_NAME, TEMP_FILE_TMP_PATH, TEMP_FILE_TXT_NAME },
+                          foundFiles.toArray(new String[0]));
     }
 
     @Test
@@ -448,12 +439,11 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals(1, files.size());
         assertEquals(TEMP_FILE_TMP_PATH, files.get(0));
 
-
         // use RemoteSpace API
         List<String> foundFiles = client.getUserSpace().listFiles("testListFilesRecursiveWithPattern", "**/*.tmp");
         System.out.println("Full : " + foundFiles);
         assertEquals(1, foundFiles.size());
-        assertArrayEquals(new String[]{TEMP_FILE_TMP_PATH}, foundFiles.toArray(new String[0]));
+        assertArrayEquals(new String[] { TEMP_FILE_TMP_PATH }, foundFiles.toArray(new String[0]));
     }
 
     @Test
@@ -538,6 +528,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     private class TestFilesToUploadCreator {
         private File tempTextFile;
+
         private File tempFile;
 
         public File getTempTextFile() {
@@ -562,8 +553,11 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     private class TestFilesToDownloadCreator {
         private String srcDirPath;
+
         private String dirName;
+
         private File srcTextFile;
+
         private File srcTempFile;
 
         public TestFilesToDownloadCreator(String srcDirPath, String dirName) {

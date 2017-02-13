@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
@@ -68,31 +57,40 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 
 @ActiveObject
-public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive,
-        RMEventListener {
+public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
 
     protected static Logger logger = Logger.getLogger(SchedulerLoadingPolicy.class);
 
     private Map<JobId, Integer> activeTasks;
+
     private int activeTask = 0;
 
     @Configurable(description = "refresh frequency (ms)")
     private int refreshTime = 1000;
+
     @Configurable
     private int minNodes = 0;
+
     @Configurable
     private int maxNodes = 10;
+
     @Configurable(description = "number of tasks per node")
     private int loadFactor = 10;
+
     @Configurable()
     protected int nodeDeploymentTimeout = 10000;
 
     // policy state
     private boolean active = false;
+
     private SchedulerLoadingPolicy thisStub;
+
     protected int nodesNumberInNodeSource = 0;
+
     private int nodesNumberInRM = 0;
+
     private String nodeSourceName = null;
+
     // positive when deploying, negative when removing, zero when idle 
     protected long timeStamp = 0;
 
@@ -183,7 +181,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     protected void updateNumberOfNodes() {
         logger.debug("Refreshing policy state: " + nodesNumberInNodeSource + " nodes in node source, " +
-            nodesNumberInRM + " nodes in RM");
+                     nodesNumberInRM + " nodes in RM");
 
         if (timeStamp > 0) {
             logger.debug("Pending node deployment request");
@@ -244,7 +242,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     @Override
     protected SchedulerEvent[] getEventsList() {
         return new SchedulerEvent[] { SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.JOB_SUBMITTED,
-                SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_FINISHED };
+                                      SchedulerEvent.TASK_RUNNING_TO_FINISHED, SchedulerEvent.JOB_PENDING_TO_FINISHED };
     }
 
     @Override
@@ -253,8 +251,9 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     protected void registerRMListener() {
-        RMInitialState state = nodeSource.getRMCore().getMonitoring().addRMEventListener(
-                (RMEventListener) PAActiveObject.getStubOnThis());
+        RMInitialState state = nodeSource.getRMCore()
+                                         .getMonitoring()
+                                         .addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
         for (RMNodeEvent event : state.getNodesEvents()) {
             //we only count "useable" nodes
             if (checkNodeStates(event)) {
@@ -273,7 +272,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     @Override
     public String toString() {
         return super.toString() + " [Max Nodes: " + maxNodes + " Min Nodes: " + minNodes + " Job Per Node: " +
-            loadFactor + " Refresh period " + refreshTime + "]";
+               loadFactor + " Refresh period " + refreshTime + "]";
     }
 
     /**
@@ -309,7 +308,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                     jobState = this.scheduler.getJobState(jid);
                 } catch (Exception e) {
                     logger.error("Cannot update the " + this.getClass().getSimpleName() +
-                        " state as an exception occured", e);
+                                 " state as an exception occured", e);
                     break;
                 }
                 int nodesForThisTask = this.computeRequiredNodesForRunningJob(jobState);
@@ -344,8 +343,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                         timeStamp = 0;
                     }
                     if (timeStamp < 0) {
-                        logger.debug("Waiting for node to be removed but new node arrived " +
-                            event.getNodeUrl());
+                        logger.debug("Waiting for node to be removed but new node arrived " + event.getNodeUrl());
                     }
                 }
                 break;
@@ -359,8 +357,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                     nodesNumberInNodeSource--;
 
                     if (timeStamp > 0) {
-                        logger.debug("Waiting for node to be acquired but the node " + event.getNodeUrl() +
-                            " removed");
+                        logger.debug("Waiting for node to be acquired but the node " + event.getNodeUrl() + " removed");
                     }
                     if (timeStamp < 0) {
                         logger.debug("Requested node removed " + event.getNodeUrl());
@@ -401,7 +398,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                         }
                     } catch (Exception e) {
                         logger.error("Cannot update " + this.getClass().getSimpleName() +
-                            "'s state because of an exception.", e);
+                                     "'s state because of an exception.", e);
                         break;
                     }
                     activeTasks.put(id, activeTasks.get(id) - nodesForThisTask);
@@ -439,8 +436,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     private int computeRequiredNodesForRunningJob(JobState jobState) {
         int nodesForThisJob = 0;
         for (TaskState taskState : jobState.getTasks()) {
-            if (TaskStatus.PENDING.equals(taskState.getStatus()) ||
-                TaskStatus.RUNNING.equals(taskState.getStatus())) {
+            if (TaskStatus.PENDING.equals(taskState.getStatus()) || TaskStatus.RUNNING.equals(taskState.getStatus())) {
                 if (taskState.isParallel()) {
                     nodesForThisJob += taskState.getParallelEnvironment().getNodesNumber();
                 } else {

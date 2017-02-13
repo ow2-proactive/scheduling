@@ -1,40 +1,36 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.service;
 
-import functionaltests.utils.Jobs;
+import static com.google.common.truth.Truth.assertThat;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.List;
+
 import org.hibernate.cfg.Configuration;
 import org.junit.After;
 import org.junit.Before;
@@ -51,11 +47,8 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.tests.ProActiveTest;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.List;
+import functionaltests.utils.Jobs;
 
-import static com.google.common.truth.Truth.assertThat;
 
 /**
  * The purpose of this class is to check that jobs' states are persisted in a database
@@ -69,7 +62,7 @@ import static com.google.common.truth.Truth.assertThat;
 public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
 
     @Rule
-    public TemporaryFolder dbFolder= new TemporaryFolder();
+    public TemporaryFolder dbFolder = new TemporaryFolder();
 
     private SchedulerDBManager dbManager;
 
@@ -125,7 +118,9 @@ public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
     }
 
     private InternalJob testJobRecovery(String workflowFilename) throws Exception {
-        Job job = Jobs.parseXml(this.getClass().getResource("/functionaltests/workflow/descriptors/" + workflowFilename).getPath());
+        Job job = Jobs.parseXml(this.getClass()
+                                    .getResource("/functionaltests/workflow/descriptors/" + workflowFilename)
+                                    .getPath());
 
         InternalJob submittedJob = Jobs.createJob(job);
         dbManager.newJobSubmitted(submittedJob);
@@ -205,11 +200,13 @@ public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
             configureFilename = "hibernate.cfg.xml";
         }
 
-        Configuration config =
-                new Configuration().configure(
-                        new File(this.getClass().getResource("/functionaltests/config/" + configureFilename).toURI()));
+        Configuration config = new Configuration().configure(new File(this.getClass()
+                                                                          .getResource("/functionaltests/config/" +
+                                                                                       configureFilename)
+                                                                          .toURI()));
 
-        String jdbcUrl = "jdbc:hsqldb:file:" + dbFolder.getRoot().getAbsolutePath() + ";create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false";
+        String jdbcUrl = "jdbc:hsqldb:file:" + dbFolder.getRoot().getAbsolutePath() +
+                         ";create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false";
 
         config.setProperty("hibernate.connection.url", jdbcUrl);
 

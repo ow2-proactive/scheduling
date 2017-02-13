@@ -1,41 +1,36 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.scripts;
 
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.Charset;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -54,11 +49,9 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.Charset;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+
 
 /**
  * This class tests the authorized script functionality.
@@ -70,19 +63,22 @@ public class TestUnauthorizedScripts extends SchedulerFunctionalTestWithCustomCo
     public static TemporaryFolder folder = new TemporaryFolder();
 
     private static File scriptsFolder;
+
     private static String authorizedForkScriptContent;
+
     private static String authorizedCleanScriptContent;
+
     private static String authorizedSelectionScriptContent;
+
     private static String unauthorizedForkScriptContent;
+
     private static String unauthorizedCleanScriptContent;
+
     private static String unauthorizedSelectionScriptContent;
 
+    static URL originalSchedulerConfigFile = TestUnauthorizedScripts.class.getResource("/functionaltests/scripts/schedulerPropertiesUnauthorizedScripts.ini");
 
-    static URL originalSchedulerConfigFile = TestUnauthorizedScripts.class
-            .getResource("/functionaltests/scripts/schedulerPropertiesUnauthorizedScripts.ini");
-
-    static URL originalRMConfigFile = TestUnauthorizedScripts.class
-            .getResource("/functionaltests/scripts/rmPropertiesUnauthorizedScripts.ini");
+    static URL originalRMConfigFile = TestUnauthorizedScripts.class.getResource("/functionaltests/scripts/rmPropertiesUnauthorizedScripts.ini");
 
     @BeforeClass
     public static void before() throws Throwable {
@@ -96,7 +92,8 @@ public class TestUnauthorizedScripts extends SchedulerFunctionalTestWithCustomCo
         String tempFolderPathEscaped = folder.getRoot().getAbsolutePath().replace("\\", "\\\\");
         authorizedForkScriptContent = "new File('" + tempFolderPathEscaped + "','fork_auth.out').write('ok')";
         authorizedCleanScriptContent = "new File('" + tempFolderPathEscaped + "','clean_auth.out').write('ok')";
-        authorizedSelectionScriptContent = "new File('" + tempFolderPathEscaped + "','selection_auth.out').write('ok'); selected=true";
+        authorizedSelectionScriptContent = "new File('" + tempFolderPathEscaped +
+                                           "','selection_auth.out').write('ok'); selected=true";
 
         File forkScript = new File(scriptsFolder, "forkScript");
         FileUtils.write(forkScript, authorizedForkScriptContent, Charset.defaultCharset(), false);
@@ -107,17 +104,23 @@ public class TestUnauthorizedScripts extends SchedulerFunctionalTestWithCustomCo
 
         unauthorizedForkScriptContent = "new File('" + tempFolderPathEscaped + "','fork.out').write('ko')";
         unauthorizedCleanScriptContent = "new File('" + tempFolderPathEscaped + "','clean.out').write('ko')";
-        unauthorizedSelectionScriptContent = "new File('" + tempFolderPathEscaped + "','selection.out').write('ko'); selected=true";
+        unauthorizedSelectionScriptContent = "new File('" + tempFolderPathEscaped +
+                                             "','selection.out').write('ko'); selected=true";
 
         // start the configured scheduler
-        schedulerHelper = new SchedulerTHelper(true, schedulerConfigFile.getAbsolutePath(), rmConfigFile.getAbsolutePath(), null);
+        schedulerHelper = new SchedulerTHelper(true,
+                                               schedulerConfigFile.getAbsolutePath(),
+                                               rmConfigFile.getAbsolutePath(),
+                                               null);
     }
 
     private static File generateConfigFile(URI originalConfigFile, String configFileName) throws IOException {
         File schedulerPropertiesfile = new File(originalConfigFile);
         String schedulerConfFileContent = FileUtils.readFileToString(schedulerPropertiesfile, Charset.defaultCharset());
 
-        schedulerConfFileContent = schedulerConfFileContent.replace("%PATH_TO_SCRIPT_DIR%", scriptsFolder.getAbsolutePath().replace("\\", "\\\\"));
+        schedulerConfFileContent = schedulerConfFileContent.replace("%PATH_TO_SCRIPT_DIR%",
+                                                                    scriptsFolder.getAbsolutePath().replace("\\",
+                                                                                                            "\\\\"));
         File newConfigFile = folder.newFile(configFileName);
         FileUtils.write(newConfigFile, schedulerConfFileContent, Charset.defaultCharset(), false);
         return newConfigFile;
@@ -133,7 +136,6 @@ public class TestUnauthorizedScripts extends SchedulerFunctionalTestWithCustomCo
         File cleanOut = new File(folder.getRoot().getAbsolutePath(), "clean_auth.out");
         Assert.assertTrue("File created by the authorized clean env script should exist", cleanOut.exists());
     }
-
 
     @Test
     public void testAuthorizedSelectionScripts() throws Exception {
@@ -170,7 +172,8 @@ public class TestUnauthorizedScripts extends SchedulerFunctionalTestWithCustomCo
         Assert.assertFalse("File created by the unauthorized clean env script should NOT exist", cleanOut.exists());
     }
 
-    public Job createJob(String forkScriptContent, String cleanScriptContent) throws InvalidScriptException, UserException {
+    public Job createJob(String forkScriptContent, String cleanScriptContent)
+            throws InvalidScriptException, UserException {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName() + "_forkAndClean");
         ScriptTask taskWithFork = new ScriptTask();
@@ -192,7 +195,8 @@ public class TestUnauthorizedScripts extends SchedulerFunctionalTestWithCustomCo
         job.setName(this.getClass().getSimpleName() + "_selection");
         ScriptTask taskWithSelection = new ScriptTask();
         taskWithSelection.setScript(new TaskScript(new SimpleScript("println 'Hello'", "groovy")));
-        taskWithSelection.addSelectionScript(new SelectionScript(new SimpleScript(selectionScriptContent, "groovy"), true));
+        taskWithSelection.addSelectionScript(new SelectionScript(new SimpleScript(selectionScriptContent, "groovy"),
+                                                                 true));
 
         job.addTask(taskWithSelection);
         return job;

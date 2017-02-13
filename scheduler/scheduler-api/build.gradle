@@ -6,7 +6,7 @@ dependencies {
     compile 'msv:isorelax:20050913'
     compile 'msv:msv:20050913'
     compile 'commons-io:commons-io:2.5'
-    
+
     compile project(':common:common-api')
 
     runtime 'com.fasterxml.woodstox:woodstox-core:5.0.1'

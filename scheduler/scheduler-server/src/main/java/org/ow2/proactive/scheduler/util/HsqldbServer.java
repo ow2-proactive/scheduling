@@ -1,36 +1,27 @@
 /*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2016 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.util;
 
@@ -151,8 +142,7 @@ public class HsqldbServer extends AbstractIdleService {
         addCatalog(catalogPath, catalogName, catalogUsername, catalogPassword);
     }
 
-    public void addCatalog(Path catalogLocation, String catalogName, String catalogUsername,
-            String catalogPassword) {
+    public void addCatalog(Path catalogLocation, String catalogName, String catalogUsername, String catalogPassword) {
 
         if (state() != State.NEW) {
             throw new IllegalStateException("Catalogs configuration must be done before starting the server");
@@ -163,7 +153,10 @@ public class HsqldbServer extends AbstractIdleService {
         // See documentation, Table 14.1:
         // http://hsqldb.org/doc/guide/listeners-chapt.html
         hsqlProperties.setProperty(PROP_HSQLDB_PREFIX_SERVER_DATABASE + "." + catalogIndexAsString,
-                createCatalogOptions(catalogLocation, catalogOptionLine, catalogUsername, catalogPassword));
+                                   createCatalogOptions(catalogLocation,
+                                                        catalogOptionLine,
+                                                        catalogUsername,
+                                                        catalogPassword));
         hsqlProperties.setProperty(PROP_HSQLDB_PREFIX_DBNAME + "." + catalogIndexAsString, catalogName);
 
         catalogIndex++;
@@ -172,8 +165,8 @@ public class HsqldbServer extends AbstractIdleService {
     @VisibleForTesting
     String createCatalogOptions(Path catalogPath, String catalogOptionLine, String catalogUsername,
             String catalogPassword) {
-        return "file:" + catalogPath.toString() + ";user=" + catalogUsername + ";password=" +
-            catalogPassword + ";" + catalogOptionLine;
+        return "file:" + catalogPath.toString() + ";user=" + catalogUsername + ";password=" + catalogPassword + ";" +
+               catalogOptionLine;
     }
 
     // See HSQLDB documentation, table 13.4 (Server Database URL) for input examples
@@ -184,7 +177,8 @@ public class HsqldbServer extends AbstractIdleService {
 
         if (chunks.length != 4 && chunks.length != 5) {
             throw new IllegalArgumentException("Invalid connection URL: " + connectionUrl +
-                ". Please look at the HSQLDB documentation: " + HSQLDB_DOCUMENTATION_URL);
+                                               ". Please look at the HSQLDB documentation: " +
+                                               HSQLDB_DOCUMENTATION_URL);
         }
 
         // discard connection options
@@ -236,11 +230,12 @@ public class HsqldbServer extends AbstractIdleService {
         server.stop();
     }
 
-    public static boolean isServerModeRequired(Path hibernateConfiguration, Path... others)
-            throws IOException {
+    public static boolean isServerModeRequired(Path hibernateConfiguration, Path... others) throws IOException {
 
-        List<Path> hibernateConfigurations = ImmutableList.<Path> builder().add(hibernateConfiguration)
-                .add(others).build();
+        List<Path> hibernateConfigurations = ImmutableList.<Path> builder()
+                                                          .add(hibernateConfiguration)
+                                                          .add(others)
+                                                          .build();
 
         boolean result = false;
 
@@ -268,8 +263,8 @@ public class HsqldbServer extends AbstractIdleService {
             return true;
         } else if (dbConnectionUrl.startsWith("jdbc:hsqldb:")) {
             String message = "Non server database URL detected. HSQLDB must be configured in server mode to " +
-                "work smoothly with ProActive Workflows and Scheduling. Please look at HSQLDB documentation: " +
-                HSQLDB_DOCUMENTATION_URL;
+                             "work smoothly with ProActive Workflows and Scheduling. Please look at HSQLDB documentation: " +
+                             HSQLDB_DOCUMENTATION_URL;
             logger.warn(message);
             return false;
         } else {

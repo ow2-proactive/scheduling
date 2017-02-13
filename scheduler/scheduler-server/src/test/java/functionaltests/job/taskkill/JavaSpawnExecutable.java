@@ -1,36 +1,27 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionaltests.job.taskkill;
 
@@ -49,6 +40,7 @@ import org.ow2.proactive.scheduler.task.utils.ThreadReader;
 import org.ow2.proactive.utils.OperatingSystem;
 import org.ow2.proactive.utils.OperatingSystemFamily;
 
+
 /**
  * JavaSpawnExecutable
  *
@@ -56,113 +48,117 @@ import org.ow2.proactive.utils.OperatingSystemFamily;
  */
 public class JavaSpawnExecutable extends JavaExecutable {
 
-	public static String launchersDir = "/functionaltests/executables/TestSleep.exe";
+    public static String launchersDir = "/functionaltests/executables/TestSleep.exe";
 
-	public static String nativeLinuxExecLauncher = "/functionaltests/executables/PTK_launcher.sh";
-	public static String nativeWindowsExecLauncher = "/functionaltests/executables/PTK_launcher.bat";
-	public static String nativeLinuxExecLauncher2 = "/functionaltests/executables/PTK_launcher2.sh";
-	public static String nativeWindowsExecLauncher2 = "/functionaltests/executables/PTK_launcher2.bat";
+    public static String nativeLinuxExecLauncher = "/functionaltests/executables/PTK_launcher.sh";
 
-	Integer sleep;
+    public static String nativeWindowsExecLauncher = "/functionaltests/executables/PTK_launcher.bat";
 
-	String tname;
+    public static String nativeLinuxExecLauncher2 = "/functionaltests/executables/PTK_launcher2.sh";
 
-	String tmpdir = System.getProperty("java.io.tmpdir");
+    public static String nativeWindowsExecLauncher2 = "/functionaltests/executables/PTK_launcher2.bat";
 
-	File killFile;
+    Integer sleep;
 
-	public String home;
+    String tname;
 
-	@Override
-	public void init(Map<String, Serializable> args) throws Exception {
-		super.init(args);
-		tname = (String) args.get("tname");
-		killFile = new File(tmpdir, tname + ".tmp");
-		if (killFile.exists()) {
-			killFile.delete();
-		}
-	}
+    String tmpdir = System.getProperty("java.io.tmpdir");
 
-	@Override
-	public Serializable execute(TaskResult... results) throws Throwable {
+    File killFile;
 
-		org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
-		Process process = null;
+    public String home;
 
-		process = Runtime.getRuntime().exec(getNativeExecLauncher(false), null,
-				getExecutablePath(launchersDir).getParentFile().getCanonicalFile());
+    @Override
+    public void init(Map<String, Serializable> args) throws Exception {
+        super.init(args);
+        tname = (String) args.get("tname");
+        killFile = new File(tmpdir, tname + ".tmp");
+        if (killFile.exists()) {
+            killFile.delete();
+        }
+    }
 
-		// redirect streams
-		BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
 
-		Thread tsout = new Thread(new ThreadReader(sout, System.out));
-		Thread tserr = new Thread(new ThreadReader(serr, System.err));
-		tsout.setDaemon(true);
-		tserr.setDaemon(true);
-		tsout.start();
-		tserr.start();
+        org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
+        Process process = null;
 
-		process.waitFor();
+        process = Runtime.getRuntime().exec(getNativeExecLauncher(false),
+                                            null,
+                                            getExecutablePath(launchersDir).getParentFile().getCanonicalFile());
 
-		Thread.sleep(sleep * 1000); // we sleep 2 sec
+        // redirect streams
+        BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-		return true;
-	}
+        Thread tsout = new Thread(new ThreadReader(sout, System.out));
+        Thread tserr = new Thread(new ThreadReader(serr, System.err));
+        tsout.setDaemon(true);
+        tserr.setDaemon(true);
+        tsout.start();
+        tserr.start();
 
-	/**
-	 * Returns the path to the native launcher script In case of Native
-	 * Executable normal termination test, we use a set of alternate scripts
-	 * which will not run a detached executable
-	 *
-	 * @param alternate
-	 *            to use alternate scripts
-	 */
-	public String[] getNativeExecLauncher(boolean alternate) throws Exception {
-		String osName = System.getProperty("os.name");
-		OperatingSystem operatingSystem = OperatingSystem.resolveOrError(osName);
-		OperatingSystemFamily family = operatingSystem.getFamily();
-		String[] nativeExecLauncher = null;
-		switch (family) {
-		case LINUX:
-		case UNIX:
-		case MAC:
-			String executable = null;
-			if (alternate) {
-				executable = getExecutablePath(nativeLinuxExecLauncher2).getName();
-			} else {
-				executable = getExecutablePath(nativeLinuxExecLauncher).getName();
-			}
-			// TODO runAsMe mode for this Test
-			nativeExecLauncher = new String[] { "/bin/sh", executable };
+        process.waitFor();
 
-			break;
-		case WINDOWS:
-			if (alternate) {
-				nativeExecLauncher = new String[] { "cmd.exe", "/C",
-						getExecutablePath(nativeWindowsExecLauncher2).getName() };
-			} else {
-				nativeExecLauncher = new String[] { "cmd.exe", "/C",
-						getExecutablePath(nativeWindowsExecLauncher).getName() };
+        Thread.sleep(sleep * 1000); // we sleep 2 sec
 
-			}
+        return true;
+    }
 
-		}
-		return nativeExecLauncher;
-	}
+    /**
+     * Returns the path to the native launcher script In case of Native
+     * Executable normal termination test, we use a set of alternate scripts
+     * which will not run a detached executable
+     *
+     * @param alternate
+     *            to use alternate scripts
+     */
+    public String[] getNativeExecLauncher(boolean alternate) throws Exception {
+        String osName = System.getProperty("os.name");
+        OperatingSystem operatingSystem = OperatingSystem.resolveOrError(osName);
+        OperatingSystemFamily family = operatingSystem.getFamily();
+        String[] nativeExecLauncher = null;
+        switch (family) {
+            case LINUX:
+            case UNIX:
+            case MAC:
+                String executable = null;
+                if (alternate) {
+                    executable = getExecutablePath(nativeLinuxExecLauncher2).getName();
+                } else {
+                    executable = getExecutablePath(nativeLinuxExecLauncher).getName();
+                }
+                // TODO runAsMe mode for this Test
+                nativeExecLauncher = new String[] { "/bin/sh", executable };
 
-	private File getExecutablePath(String launcherPath) throws URISyntaxException {
-		try {
-			return new File(new File(home, "scheduler/scheduler-server/src/test/resources"), launcherPath);
-		} catch (Exception e) {
-			File addonsFolder = new File(home, "addons");
-			return new File(addonsFolder, launcherPath);
-		}
-	}
+                break;
+            case WINDOWS:
+                if (alternate) {
+                    nativeExecLauncher = new String[] { "cmd.exe", "/C",
+                                                        getExecutablePath(nativeWindowsExecLauncher2).getName() };
+                } else {
+                    nativeExecLauncher = new String[] { "cmd.exe", "/C",
+                                                        getExecutablePath(nativeWindowsExecLauncher).getName() };
 
-	public static void main(String[] args) throws Throwable {
-		JavaSpawnExecutable jse = new JavaSpawnExecutable();
-		jse.sleep = 1;
-		jse.execute(new TaskResult[0]);
-	}
+                }
+
+        }
+        return nativeExecLauncher;
+    }
+
+    private File getExecutablePath(String launcherPath) throws URISyntaxException {
+        try {
+            return new File(new File(home, "scheduler/scheduler-server/src/test/resources"), launcherPath);
+        } catch (Exception e) {
+            File addonsFolder = new File(home, "addons");
+            return new File(addonsFolder, launcherPath);
+        }
+    }
+
+    public static void main(String[] args) throws Throwable {
+        JavaSpawnExecutable jse = new JavaSpawnExecutable();
+        jse.sleep = 1;
+        jse.execute(new TaskResult[0]);
+    }
 }

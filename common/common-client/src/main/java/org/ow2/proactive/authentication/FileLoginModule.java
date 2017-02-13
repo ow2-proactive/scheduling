@@ -1,53 +1,30 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.authentication;
 
-import org.apache.log4j.Logger;
-import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.FailedLoginException;
-import javax.security.auth.login.LoginException;
-import javax.security.auth.spi.LoginModule;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +35,19 @@ import java.security.KeyException;
 import java.security.PrivateKey;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.login.LoginException;
+import javax.security.auth.spi.LoginModule;
+
+import org.apache.log4j.Logger;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
+import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 
 
 /**
@@ -130,7 +120,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         //test login file existence
         if (!(new File(this.loginFile).exists())) {
             throw new RuntimeException("The file " + this.loginFile + " has not been found \n" +
-                "Unable to perform user authentication by file method");
+                                       "Unable to perform user authentication by file method");
         }
     }
 
@@ -138,7 +128,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         //test group file existence
         if (!(new File(this.groupFile).exists())) {
             throw new RuntimeException("The file " + this.groupFile + " has not been found \n" +
-                "Unable to perform user authentication by file method");
+                                       "Unable to perform user authentication by file method");
         }
     }
 
@@ -151,8 +141,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         succeeded = false;
         // prompt for a user name and password
         if (callbackHandler == null) {
-            throw new LoginException("Error: no CallbackHandler available "
-                + "to garner authentication information from the user");
+            throw new LoginException("Error: no CallbackHandler available " +
+                                     "to garner authentication information from the user");
         }
         try {
             Callback[] callbacks = new Callback[] { new NoCallback() };
@@ -180,7 +170,7 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         } catch (UnsupportedCallbackException uce) {
             logger.error("", uce);
             throw new LoginException("Error: " + uce.getCallback().toString() +
-                " not available to garner authentication information from the user");
+                                     " not available to garner authentication information from the user");
         }
     }
 
@@ -220,7 +210,6 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      */
     private boolean authenticateUserFromFile(String username, String password) throws LoginException {
 
-
         Properties props = new Properties();
         PrivateKey privateKey = null;
         try {
@@ -244,7 +233,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         } else {
             String encryptedPassword = (String) props.get(username);
             try {
-                if (!HybridEncryptionUtil.decryptBase64String(encryptedPassword, privateKey, ENCRYPTED_DATA_SEP).equals(password)) {
+                if (!HybridEncryptionUtil.decryptBase64String(encryptedPassword, privateKey, ENCRYPTED_DATA_SEP)
+                                         .equals(password)) {
                     return false;
                 }
             } catch (KeyException e) {

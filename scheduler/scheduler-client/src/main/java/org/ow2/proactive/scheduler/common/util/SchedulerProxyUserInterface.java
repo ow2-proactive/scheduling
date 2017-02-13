@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.util;
 
@@ -97,6 +86,7 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
 public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     protected Scheduler uischeduler;
+
     protected MBeanInfoViewer mbeaninfoviewer;
 
     public static final Logger logger = Logger.getLogger(SchedulerProxyUserInterface.class);
@@ -126,8 +116,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * @throws ActiveObjectCreationException
      */
 
-    public static SchedulerProxyUserInterface getActiveInstance()
-            throws ActiveObjectCreationException, NodeException {
+    public static SchedulerProxyUserInterface getActiveInstance() throws ActiveObjectCreationException, NodeException {
         if (activeInstance != null)
             return activeInstance;
 
@@ -194,9 +183,8 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * Subscribes a listener to the Scheduler
      */
     @Override
-    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            boolean getCurrentState, SchedulerEvent... events)
-            throws NotConnectedException, PermissionException {
+    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
+            SchedulerEvent... events) throws NotConnectedException, PermissionException {
         checkSchedulerConnection();
 
         return uischeduler.addEventListener(sel, myEventsOnly, true, events);
@@ -221,8 +209,8 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
                 return uischeduler.isConnected();
             } catch (Exception e) {
                 logger.error("Error when callling " + this.getClass().getCanonicalName() +
-                    " -> isConnected() method: " + e.getMessage() + ". The connection is considered lost. ",
-                        e);
+                             " -> isConnected() method: " + e.getMessage() + ". The connection is considered lost. ",
+                             e);
                 return false;
             }
     }
@@ -241,23 +229,22 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public JobId submit(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+    public JobId submit(Job job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         checkSchedulerConnection();
         return uischeduler.submit(job);
     }
 
     @Override
-    public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(JobId jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         checkSchedulerConnection();
         uischeduler.changeJobPriority(jobId, priority);
 
     }
 
     @Override
-    public JobResult getJobResult(String jobId)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
         return uischeduler.getJobResult(jobId);
     }
@@ -273,8 +260,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public JobResult getJobResult(JobId jobId)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         checkSchedulerConnection();
         return uischeduler.getJobResult(jobId);
     }
@@ -370,8 +356,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public boolean killJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.killJob(jobId);
     }
@@ -385,24 +370,21 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public boolean pauseJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.pauseJob(jobId);
 
     }
 
     @Override
-    public boolean removeJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.removeJob(jobId);
 
     }
 
     @Override
-    public boolean resumeJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.resumeJob(jobId);
     }
@@ -414,8 +396,8 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(String jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         uischeduler.changeJobPriority(jobId, priority);
 
     }
@@ -426,14 +408,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public boolean killJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.killJob(jobId);
     }
 
     @Override
-    public boolean pauseJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.pauseJob(jobId);
     }
 
@@ -444,14 +424,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public boolean removeJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.removeJob(jobId);
     }
 
     @Override
-    public boolean resumeJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.resumeJob(jobId);
     }
 
@@ -460,8 +438,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         uischeduler.addEventListener(sel, myEventsOnly, events);
     }
 
-    public JobState getJobState(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.getJobState(jobId);
     }
 
@@ -482,8 +459,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.freeze();
     }
 
-    public JobState getJobState(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.getJobState(jobId);
     }
 
@@ -560,8 +536,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public String getJobServerLogs(String id)
-            throws UnknownJobException, NotConnectedException, PermissionException {
+    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException, PermissionException {
         return uischeduler.getJobServerLogs(id);
     }
 
@@ -579,8 +554,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
 
     @Override
     public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria,
-            List<SortParameter<JobSortParameter>> sortParameters)
-            throws NotConnectedException, PermissionException {
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         return uischeduler.getJobs(index, range, filterCriteria, sortParameters);
     }
 
@@ -633,13 +607,20 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
             throws NotConnectedException, PermissionException {
-        return uischeduler.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset,
-                limit, sortParams);
+        return uischeduler.getTaskStates(taskTag,
+                                         from,
+                                         to,
+                                         mytasks,
+                                         running,
+                                         pending,
+                                         finished,
+                                         offset,
+                                         limit,
+                                         sortParams);
     }
 
     @Override
-    public JobInfo getJobInfo(String jobId)
-            throws UnknownJobException, NotConnectedException, PermissionException {
+    public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         return uischeduler.getJobInfo(jobId);
     }
 

@@ -1,44 +1,40 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.rm;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
-import functionaltests.utils.*;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.net.URI;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -59,15 +55,9 @@ import org.ow2.proactive.scheduler.core.rmproxies.SingleConnectionRMProxiesManag
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.net.URI;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.utils.*;
 
 
 public class TestRMProxyRebind extends MultipleRMTBase {
@@ -75,17 +65,29 @@ public class TestRMProxyRebind extends MultipleRMTBase {
     private static final int NODES_NUMBER = 3;
 
     private Credentials schedulerProxyCredentials;
+
     private TestRM helper1;
+
     private TestRM helper2;
+
     private int pnpPort1;
+
     private int jmxPort1;
+
     private int pnpPort2;
+
     private int jmxPort2;
+
     private ResourceManager rm1;
+
     private ResourceManager rm2;
+
     private List<RMMonitorEventReceiver> eventReceivers = new ArrayList<>();
+
     private RMMonitorsHandler monitorsHandler1;
+
     private RMMonitorsHandler monitorsHandler2;
+
     private List<TestNode> testNodes = new ArrayList<>();
 
     @BeforeClass
@@ -99,8 +101,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
 
     @Before
     public void createRMs() throws Exception {
-        schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
-                .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
+        schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
         helper1 = new TestRM();
         helper2 = new TestRM();
 
@@ -110,30 +111,38 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         pnpPort2 = CentralPAPropertyRepository.PA_RMI_PORT.getValue() + 2;
         jmxPort2 = PAResourceManagerProperties.RM_JMX_PORT.getValueAsInt() + 2;
 
-        helper1.start(config1.getAbsolutePath(), pnpPort1,
-                PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort1);
+        helper1.start(config1.getAbsolutePath(),
+                      pnpPort1,
+                      PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort1);
 
-        Credentials connectedUserCreds = Credentials.createCredentials(
-                new CredData(CredData.parseLogin(TestUsers.DEMO.username), CredData
-                        .parseDomain(TestUsers.DEMO.username), TestUsers.DEMO.password), helper1.getAuth()
-                        .getPublicKey());
+        Credentials connectedUserCreds = Credentials.createCredentials(new CredData(CredData.parseLogin(TestUsers.DEMO.username),
+                                                                                    CredData.parseDomain(TestUsers.DEMO.username),
+                                                                                    TestUsers.DEMO.password),
+                                                                       helper1.getAuth().getPublicKey());
 
         Map.Entry<RMMonitorsHandler, RMMonitorEventReceiver> entry1 = connectToRM(helper1.getUrl(), connectedUserCreds);
 
         monitorsHandler1 = entry1.getKey();
         rm1 = entry1.getValue();
 
-        testNodes.addAll(RMTHelper.addNodesToDefaultNodeSource(NODES_NUMBER, new ArrayList<String>(), rm1, monitorsHandler1));
+        testNodes.addAll(RMTHelper.addNodesToDefaultNodeSource(NODES_NUMBER,
+                                                               new ArrayList<String>(),
+                                                               rm1,
+                                                               monitorsHandler1));
 
-        helper2.start(config2.getAbsolutePath(), pnpPort2,
-                PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort2);
+        helper2.start(config2.getAbsolutePath(),
+                      pnpPort2,
+                      PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort2);
 
         Map.Entry<RMMonitorsHandler, RMMonitorEventReceiver> entry2 = connectToRM(helper2.getUrl(), connectedUserCreds);
 
         monitorsHandler2 = entry2.getKey();
         rm2 = entry2.getValue();
 
-        testNodes.addAll(RMTHelper.addNodesToDefaultNodeSource(NODES_NUMBER, new ArrayList<String>(), rm2, monitorsHandler2));
+        testNodes.addAll(RMTHelper.addNodesToDefaultNodeSource(NODES_NUMBER,
+                                                               new ArrayList<String>(),
+                                                               rm2,
+                                                               monitorsHandler2));
 
         checkFreeNodes(rm1, NODES_NUMBER);
         checkFreeNodes(rm2, NODES_NUMBER);
@@ -170,17 +179,26 @@ public class TestRMProxyRebind extends MultipleRMTBase {
     @Test
     public void testRMProxyRebindSingle() throws Exception {
         log("\n Test with single connection \n");
-        testRebind(new URI(helper1.getUrl()), new URI(helper2.getUrl()), rm1, rm2, monitorsHandler1,
-                monitorsHandler2, true);
+        testRebind(new URI(helper1.getUrl()),
+                   new URI(helper2.getUrl()),
+                   rm1,
+                   rm2,
+                   monitorsHandler1,
+                   monitorsHandler2,
+                   true);
     }
 
     @Test
     public void testRMProxyRebindPerUser() throws Exception {
         log("\n Test with per-user connection \n");
-        testRebind(new URI(helper1.getUrl()), new URI(helper2.getUrl()), rm1, rm2, monitorsHandler1,
-                monitorsHandler2, false);
+        testRebind(new URI(helper1.getUrl()),
+                   new URI(helper2.getUrl()),
+                   rm1,
+                   rm2,
+                   monitorsHandler1,
+                   monitorsHandler2,
+                   false);
     }
-
 
     private Map.Entry<RMMonitorsHandler, RMMonitorEventReceiver> connectToRM(String rmUrl, Credentials creds)
             throws Exception {
@@ -192,7 +210,8 @@ public class TestRMProxyRebind extends MultipleRMTBase {
         RMMonitorEventReceiver receiver = PAActiveObject.turnActive(passiveEventReceiver);
         eventReceivers.add(receiver);
         receiver.init(rmUrl, creds);
-        return new AbstractMap.SimpleImmutableEntry<RMMonitorsHandler, RMMonitorEventReceiver>(monitorsHandler1, receiver);
+        return new AbstractMap.SimpleImmutableEntry<RMMonitorsHandler, RMMonitorEventReceiver>(monitorsHandler1,
+                                                                                               receiver);
     }
 
     private void testRebind(URI rmUri1, URI rmUri2, ResourceManager rm1, ResourceManager rm2,
@@ -207,8 +226,8 @@ public class TestRMProxyRebind extends MultipleRMTBase {
             proxiesManager = new PerUserConnectionRMProxiesManager(rmUri1, schedulerProxyCredentials);
         }
 
-        Credentials user1Credentials = Credentials.createCredentials(new CredData("admin", "admin"), helper1
-                .getAuth().getPublicKey());
+        Credentials user1Credentials = Credentials.createCredentials(new CredData("admin", "admin"),
+                                                                     helper1.getAuth().getPublicKey());
 
         RMProxy proxy1 = proxiesManager.getUserRMProxy("admin", user1Credentials);
         log("Get one node with RM1");

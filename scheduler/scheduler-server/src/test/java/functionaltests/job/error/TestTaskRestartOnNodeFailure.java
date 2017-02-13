@@ -1,44 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.job.error;
 
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestNode;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.io.Serializable;
+import java.nio.file.Path;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -54,12 +47,9 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.util.FileLock;
 
-import java.io.File;
-import java.io.Serializable;
-import java.nio.file.Path;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestNode;
 
 
 /**
@@ -93,10 +83,11 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
      */
     @BeforeClass
     public static void startDedicatedScheduler() throws Exception {
-        schedulerHelper = new SchedulerTHelper(false, new File(SchedulerTHelper.class.getResource(
-                        "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath(),
-                null,
-                null);
+        schedulerHelper = new SchedulerTHelper(false,
+                                               new File(SchedulerTHelper.class.getResource("/functionaltests/config/scheduler-nonforkedscripttasks.ini")
+                                                                              .toURI()).getAbsolutePath(),
+                                               null,
+                                               null);
     }
 
     @Test
@@ -106,8 +97,7 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
         testTaskKillNode(fileLock, true);
     }
 
-    private void testTaskKillNode(FileLock fileLock,
-            boolean waitBeforeKill) throws Exception {
+    private void testTaskKillNode(FileLock fileLock, boolean waitBeforeKill) throws Exception {
         Path fileLockPath = fileLock.lock();
         TestNode nodeToKill = startNode();
 
@@ -144,11 +134,13 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
         log("Wait when job finish");
         schedulerHelper.waitForEventJobFinished(jobId, TIMEOUT);
 
-        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, newNode.getNode()
-                .getNodeInformation().getURL(), TIMEOUT);
+        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                 newNode.getNode().getNodeInformation().getURL(),
+                                                 TIMEOUT);
         assertEquals(NodeState.BUSY, event.getNodeState());
-        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, newNode.getNode()
-                .getNodeInformation().getURL(), TIMEOUT);
+        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                 newNode.getNode().getNodeInformation().getURL(),
+                                                 TIMEOUT);
         assertEquals(NodeState.FREE, event.getNodeState());
 
         log("Check job result");

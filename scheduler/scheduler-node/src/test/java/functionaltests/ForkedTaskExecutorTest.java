@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package functionaltests;
 
 import static org.junit.Assert.assertEquals;
@@ -41,6 +66,7 @@ import org.ow2.proactive.scripting.TaskScript;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
+
 /**
  * The ForkedTaskExecutorTest executes several scenarios on the ForkedTaskExecutor
  * As the ForkedTaskExecutor starts a separate JVM, this test is a functionalTest (to avoid leaving alive subprocesses when cancelled)
@@ -49,6 +75,7 @@ public class ForkedTaskExecutorTest {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
+
     private String oldJavaHome;
 
     @Test
@@ -60,17 +87,22 @@ public class ForkedTaskExecutorTest {
 
         ForkedTaskExecutor forkedTaskExecutor = new ForkedTaskExecutor(tmpFolder.newFolder());
 
-        TaskResultImpl result =
-                forkedTaskExecutor.execute(
-                        new TaskContext(
-                                new ScriptExecutableContainer(
-                                        new TaskScript(
-                                                new SimpleScript(
-                                                        "result=System.getProperty('"
-                                                                + PASchedulerProperties.TASK_FORK.getKey() + "')"
-                                                        , "groovy"))), initializer, null,
-                                new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
-                        taskOutput.outputStream, taskOutput.error);
+        TaskResultImpl result = forkedTaskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("result=System.getProperty('" +
+                                                                                                                                         PASchedulerProperties.TASK_FORK.getKey() +
+                                                                                                                                         "')",
+                                                                                                                                         "groovy"))),
+                                                                           initializer,
+                                                                           null,
+                                                                           new NodeDataSpacesURIs("",
+                                                                                                  "",
+                                                                                                  "",
+                                                                                                  "",
+                                                                                                  "",
+                                                                                                  ""),
+                                                                           "",
+                                                                           ""),
+                                                           taskOutput.outputStream,
+                                                           taskOutput.error);
 
         Assert.assertEquals("true", result.value());
     }
@@ -84,15 +116,19 @@ public class ForkedTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
-        TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
-                                "javascript"))), initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
-                taskOutput.outputStream, taskOutput.error);
+        TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); variables.put('var','foo'); result='hello'",
+                                                                                                                                   "javascript"))),
+                                                                     initializer,
+                                                                     null,
+                                                                     new NodeDataSpacesURIs("", "", "", "", "", ""),
+                                                                     "",
+                                                                     ""),
+                                                     taskOutput.outputStream,
+                                                     taskOutput.error);
 
         assertEquals(String.format("hello%n"), taskOutput.output());
         assertEquals("hello", result.value());
-        assertEquals("foo",
-                SerializationUtil.deserializeVariableMap(result.getPropagatedVariables()).get("var"));
+        assertEquals("foo", SerializationUtil.deserializeVariableMap(result.getPropagatedVariables()).get("var"));
     }
 
     @Test
@@ -105,10 +141,15 @@ public class ForkedTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
-        TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript("print('hello'); result='hello'", "javascript"))),
-                        initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
-                taskOutput.outputStream, taskOutput.error);
+        TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                                   "javascript"))),
+                                                                     initializer,
+                                                                     null,
+                                                                     new NodeDataSpacesURIs("", "", "", "", "", ""),
+                                                                     "",
+                                                                     ""),
+                                                     taskOutput.outputStream,
+                                                     taskOutput.error);
 
         assertNotNull(result.getException());
     }
@@ -124,13 +165,18 @@ public class ForkedTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
-        ScriptExecutableContainer container = new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-                "print('hello'); result='hello'", "javascript")));
+        ScriptExecutableContainer container = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                            "javascript")));
 
         container.setRunAsUser(true);
 
-        TaskContext taskContext = new TaskContext(container, initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", "",
-                decrypter);
+        TaskContext taskContext = new TaskContext(container,
+                                                  initializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs("", "", "", "", "", ""),
+                                                  "",
+                                                  "",
+                                                  decrypter);
 
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
@@ -145,9 +191,8 @@ public class ForkedTaskExecutorTest {
     @Test(timeout = 30000)
     public void nonDaemonThreadsForkedJVMExit() throws Exception {
 
-        String taskScript = CharStreams.toString(new InputStreamReader(
-                getClass().getResourceAsStream("/task-nondaemon-thread.groovy"), Charsets.UTF_8));
-
+        String taskScript = CharStreams.toString(new InputStreamReader(getClass().getResourceAsStream("/task-nondaemon-thread.groovy"),
+                                                                       Charsets.UTF_8));
 
         TestTaskOutput taskOutput = new TestTaskOutput();
 
@@ -158,11 +203,15 @@ public class ForkedTaskExecutorTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
-        TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript(taskScript, "groovy"))),
-                        initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
-                taskOutput.outputStream,
-                taskOutput.error);
+        TaskResultImpl result = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(taskScript,
+                                                                                                                                   "groovy"))),
+                                                                     initializer,
+                                                                     null,
+                                                                     new NodeDataSpacesURIs("", "", "", "", "", ""),
+                                                                     "",
+                                                                     ""),
+                                                     taskOutput.outputStream,
+                                                     taskOutput.error);
 
         Assert.assertFalse(result.hadException());
     }
@@ -183,14 +232,20 @@ public class ForkedTaskExecutorTest {
         forkEnvironment.addJVMArgument("-DjvmArg=jvmValue");
         initializer.setForkEnvironment(forkEnvironment);
 
-        taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-                        "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); " +
-                                "println new File('.').getCanonicalPath()", "groovy"))), initializer, null,
-                        new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""), taskOutput.outputStream,
-                taskOutput.error);
+        taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("println System.getenv('envVar'); " +
+                                                                                                           "println System.getProperty('jvmArg'); " +
+                                                                                                           "println new File('.').getCanonicalPath()",
+                                                                                                           "groovy"))),
+                                             initializer,
+                                             null,
+                                             new NodeDataSpacesURIs("", "", "", "", "", ""),
+                                             "",
+                                             ""),
+                             taskOutput.outputStream,
+                             taskOutput.error);
 
         assertEquals(String.format("envValue%njvmValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
-                taskOutput.output());
+                     taskOutput.output());
     }
 
     @Test
@@ -210,14 +265,20 @@ public class ForkedTaskExecutorTest {
         forkEnvironment.addJVMArgument("-DjvmArg=$aVar");
         initializer.setForkEnvironment(forkEnvironment);
 
-        taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-                        "println System.getenv('envVar'); " + "println System.getProperty('jvmArg'); "
-                                + "println new File('.').getCanonicalPath()", "groovy"))), initializer, null,
-                        new NodeDataSpacesURIs("", "", "", "", "", ""), "", ""),
-                taskOutput.outputStream, taskOutput.error);
+        taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("println System.getenv('envVar'); " +
+                                                                                                           "println System.getProperty('jvmArg'); " +
+                                                                                                           "println new File('.').getCanonicalPath()",
+                                                                                                           "groovy"))),
+                                             initializer,
+                                             null,
+                                             new NodeDataSpacesURIs("", "", "", "", "", ""),
+                                             "",
+                                             ""),
+                             taskOutput.outputStream,
+                             taskOutput.error);
 
         assertEquals(String.format("aValue%naValue%n%s%n", new File(workingDir, ".").getCanonicalPath()),
-                taskOutput.output());
+                     taskOutput.output());
     }
 
     @Test
@@ -235,10 +296,15 @@ public class ForkedTaskExecutorTest {
         forkEnvironment.setEnvScript(new SimpleScript("should fail execution", "groovy"));
         initializer.setForkEnvironment(forkEnvironment);
 
-        TaskResultImpl taskResult = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(
-                        new TaskScript(new SimpleScript("", "groovy"))), initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "",
-                        ""), taskOutput.outputStream,
-                taskOutput.error);
+        TaskResultImpl taskResult = taskExecutor.execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("",
+                                                                                                                                       "groovy"))),
+                                                                         initializer,
+                                                                         null,
+                                                                         new NodeDataSpacesURIs("", "", "", "", "", ""),
+                                                                         "",
+                                                                         ""),
+                                                         taskOutput.outputStream,
+                                                         taskOutput.error);
 
         assertTrue(taskResult.hadException());
     }

@@ -1,43 +1,49 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.rest.ds;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.*;
+
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -54,23 +60,8 @@ import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 
 
 public class DataSpaceClient implements IDataSpaceClient {
@@ -78,8 +69,11 @@ public class DataSpaceClient implements IDataSpaceClient {
     private static final Logger log = Logger.getLogger(DataSpaceClient.class);
 
     private String restDataspaceUrl;
+
     private String sessionId;
+
     private ClientHttpEngine httpEngine;
+
     private ISchedulerClient schedulerClient;
 
     public DataSpaceClient() {
@@ -91,9 +85,9 @@ public class DataSpaceClient implements IDataSpaceClient {
     }
 
     public void init(String restServerUrl, ISchedulerClient client) {
-        this.httpEngine =
-                new ApacheHttpClient4Engine(
-                        new HttpClientBuilder().disableContentCompression().useSystemProperties().build());
+        this.httpEngine = new ApacheHttpClient4Engine(new HttpClientBuilder().disableContentCompression()
+                                                                             .useSystemProperties()
+                                                                             .build());
         this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
         this.sessionId = client.getSession();
         this.schedulerClient = client;
@@ -113,21 +107,17 @@ public class DataSpaceClient implements IDataSpaceClient {
             log.debug("Uploading from " + source + " to " + destination);
         }
 
-        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
-                destination.getDataspace().value());
+        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(destination.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(destination.getPath());
         Response response = null;
         try {
-            response = target.request().header("sessionid", sessionId).put(
-                    Entity.entity(new StreamingOutput() {
-                        @Override
-                        public void write(OutputStream outputStream) throws IOException,
-                                WebApplicationException {
-                            source.writeTo(outputStream);
-                        }
-                    }, new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null, source
-                            .getEncoding())));
+            response = target.request().header("sessionid", sessionId).put(Entity.entity(new StreamingOutput() {
+                @Override
+                public void write(OutputStream outputStream) throws IOException, WebApplicationException {
+                    source.writeTo(outputStream);
+                }
+            }, new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE, (Locale) null, source.getEncoding())));
 
             if (response.getStatus() != HttpURLConnection.HTTP_CREATED) {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
@@ -157,12 +147,9 @@ public class DataSpaceClient implements IDataSpaceClient {
             log.debug("Trying to create file " + source);
         }
 
-        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
-                source.getDataspace().value());
+        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
-        ResteasyWebTarget target =
-                client.target(uriTmpl.toString())
-                        .path(source.getPath());
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
 
         Response response = null;
         try {
@@ -186,7 +173,7 @@ public class DataSpaceClient implements IDataSpaceClient {
             }
 
             return true;
-        } finally{
+        } finally {
 
             if (response != null) {
                 response.close();
@@ -201,8 +188,7 @@ public class DataSpaceClient implements IDataSpaceClient {
             log.debug("Downloading from " + source + " to " + destination);
         }
 
-        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
-                source.getDataspace().value());
+        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
 
@@ -217,14 +203,13 @@ public class DataSpaceClient implements IDataSpaceClient {
 
         Response response = null;
         try {
-            response = target.request().header("sessionid", sessionId).acceptEncoding("*", "gzip", "zip")
-                    .get();
+            response = target.request().header("sessionid", sessionId).acceptEncoding("*", "gzip", "zip").get();
             if (response.getStatus() != HttpURLConnection.HTTP_OK) {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
                     throw new RuntimeException(String.format("Cannot retrieve the file. Status code: %s",
-                            response.getStatus()));
+                                                             response.getStatus()));
                 }
             }
 
@@ -232,8 +217,9 @@ public class DataSpaceClient implements IDataSpaceClient {
                 InputStream is = response.readEntity(InputStream.class);
                 destination.readFrom(is, response.getHeaderString(HttpHeaders.CONTENT_ENCODING));
             } else {
-                throw new RuntimeException(String.format("%s in %s is empty.", source.getDataspace(), source
-                        .getPath()));
+                throw new RuntimeException(String.format("%s in %s is empty.",
+                                                         source.getDataspace(),
+                                                         source.getPath()));
             }
 
             if (log.isDebugEnabled()) {
@@ -262,11 +248,9 @@ public class DataSpaceClient implements IDataSpaceClient {
 
     @Override
     public ListFile list(IRemoteSource source) throws NotConnectedException, PermissionException {
-        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
-                source.getDataspace().value());
+        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
-        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath()).queryParam(
-                "comp", "list");
+        ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath()).queryParam("comp", "list");
 
         List<String> includes = source.getIncludes();
         if (includes != null && !includes.isEmpty()) {
@@ -283,8 +267,8 @@ public class DataSpaceClient implements IDataSpaceClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
-                    throw new RuntimeException(String.format("Cannot list the specified location: %s", source
-                            .getPath()));
+                    throw new RuntimeException(String.format("Cannot list the specified location: %s",
+                                                             source.getPath()));
                 }
             }
             return response.readEntity(ListFile.class);
@@ -301,8 +285,7 @@ public class DataSpaceClient implements IDataSpaceClient {
             log.debug("Trying to delete " + source);
         }
 
-        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
-                source.getDataspace().value());
+        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
 
@@ -325,7 +308,8 @@ public class DataSpaceClient implements IDataSpaceClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
-                    throw new RuntimeException("Cannot delete file(s). Status :" + response.getStatusInfo() + " Entity : " + response.getEntity());
+                    throw new RuntimeException("Cannot delete file(s). Status :" + response.getStatusInfo() +
+                                               " Entity : " + response.getEntity());
                 }
             } else {
                 noContent = true;
@@ -345,10 +329,8 @@ public class DataSpaceClient implements IDataSpaceClient {
     }
 
     @Override
-    public Map<String, String> metadata(IRemoteSource source) throws NotConnectedException,
-            PermissionException {
-        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(
-                source.getDataspace().value());
+    public Map<String, String> metadata(IRemoteSource source) throws NotConnectedException, PermissionException {
+        StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
         Response response = null;
@@ -358,16 +340,15 @@ public class DataSpaceClient implements IDataSpaceClient {
                 if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                     throw new NotConnectedException("User not authenticated or session timeout.");
                 } else {
-                    throw new RuntimeException(String.format(
-                            "Cannot get metadata from %s in '%s' dataspace.", source.getPath(), source
-                                    .getDataspace()));
+                    throw new RuntimeException(String.format("Cannot get metadata from %s in '%s' dataspace.",
+                                                             source.getPath(),
+                                                             source.getDataspace()));
                 }
             }
             MultivaluedMap<String, Object> headers = response.getHeaders();
             Map<String, String> metaMap = Maps.newHashMap();
             if (headers.containsKey(HttpHeaders.LAST_MODIFIED)) {
-                metaMap.put(HttpHeaders.LAST_MODIFIED, String.valueOf(headers
-                        .getFirst(HttpHeaders.LAST_MODIFIED)));
+                metaMap.put(HttpHeaders.LAST_MODIFIED, String.valueOf(headers.getFirst(HttpHeaders.LAST_MODIFIED)));
             }
             return metaMap;
         } finally {
@@ -378,8 +359,10 @@ public class DataSpaceClient implements IDataSpaceClient {
     }
 
     private String restDataspaceUrl(String restServerUrl) {
-        return (new StringBuffer()).append(restServerUrl).append((restServerUrl.endsWith("/") ? "" : "/"))
-                .append("data/").toString();
+        return (new StringBuffer()).append(restServerUrl)
+                                   .append((restServerUrl.endsWith("/") ? "" : "/"))
+                                   .append("data/")
+                                   .toString();
     }
 
     class RestRemoteSpace implements RemoteSpace {
@@ -428,7 +411,6 @@ public class DataSpaceClient implements IDataSpaceClient {
                 throw new FileSystemException(e);
             }
         }
-
 
         @Override
         public void pushFiles(File localDirectory, String pattern, String remotePath) throws FileSystemException {

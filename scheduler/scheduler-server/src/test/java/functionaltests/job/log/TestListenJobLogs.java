@@ -1,43 +1,36 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.job.log;
 
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
-import functionaltests.utils.SchedulerTHelper;
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
@@ -55,11 +48,8 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
 import org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider;
 
-import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
 
 
 /**
@@ -84,8 +74,9 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
 
     @BeforeClass
     public static void startDedicatedScheduler() throws Exception {
-        schedulerHelper = new SchedulerTHelper(true, new File(SchedulerTHelper.class.getResource(
-                "/functionaltests/config/scheduler-nonforkedscripttasks.ini").toURI()).getAbsolutePath());
+        schedulerHelper = new SchedulerTHelper(true,
+                                               new File(SchedulerTHelper.class.getResource("/functionaltests/config/scheduler-nonforkedscripttasks.ini")
+                                                                              .toURI()).getAbsolutePath());
 
     }
 
@@ -112,7 +103,7 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
             CommunicationObject communicationObject = PAActiveObject.lookupActive(CommunicationObject.class,
-                    communicationObjectUrl);
+                                                                                  communicationObjectUrl);
 
             while (true) {
                 String command = communicationObject.getCommand();
@@ -134,8 +125,7 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
 
     }
 
-    private TaskFlowJob createJob(String communicationObjectUrl1, String communicationObjectUrl2)
-            throws Exception {
+    private TaskFlowJob createJob(String communicationObjectUrl1, String communicationObjectUrl2) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
 
@@ -179,12 +169,10 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
     }
 
     public void testLogs() throws Exception {
-        CommunicationObject communicationObject1 = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+        CommunicationObject communicationObject1 = PAActiveObject.newActive(CommunicationObject.class, new Object[] {});
         String communicationObjectUrl1 = PAActiveObject.getUrl(communicationObject1);
 
-        CommunicationObject communicationObject2 = PAActiveObject.newActive(CommunicationObject.class,
-                new Object[] {});
+        CommunicationObject communicationObject2 = PAActiveObject.newActive(CommunicationObject.class, new Object[] {});
         String communicationObjectUrl2 = PAActiveObject.getUrl(communicationObject2);
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
@@ -217,7 +205,7 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
         communicationObject1.setCommand("output2");
 
         /*
-         * TODO: at the time of this writing there is no way to remove first log appender, 
+         * TODO: at the time of this writing there is no way to remove first log appender,
          * so this JVM receives two identical log events for running job
          */
         appender2.waitForLoggingEvent(LOG_EVENT_TIMEOUT, "output2", "output2");
@@ -232,8 +220,8 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
 
         communicationObject2.setCommand("output3");
         /*
-         * TODO: at the time of this writing there is no way to remove first log appender, 
-         * so this JVM receives two identical log events for running job  
+         * TODO: at the time of this writing there is no way to remove first log appender,
+         * so this JVM receives two identical log events for running job
          */
         appender2.waitForLoggingEvent(LOG_EVENT_TIMEOUT, "output3", "output3");
 
@@ -283,14 +271,12 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
             this.actualMessages = new ArrayList<>();
         }
 
-        synchronized void waitForLoggingEvent(long timeout, String... expectedMessages)
-                throws InterruptedException {
+        synchronized void waitForLoggingEvent(long timeout, String... expectedMessages) throws InterruptedException {
             List<String> expectedMessagesList = new ArrayList<>(expectedMessages.length);
 
             Collections.addAll(expectedMessagesList, expectedMessages);
 
-            System.out.println("Waiting for logging events with messages: " + expectedMessagesList + " (" +
-                    name + ")");
+            System.out.println("Waiting for logging events with messages: " + expectedMessagesList + " (" + name + ")");
 
             long endTime = System.currentTimeMillis() + timeout;
             while (!ListUtils.removeAll(expectedMessagesList, actualMessages).isEmpty()) {
@@ -302,9 +288,8 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
                 }
             }
 
-            Assert.assertTrue("Didn't receive expected events, expected: " + expectedMessagesList +
-                    ", actual: " + actualMessages, ListUtils.removeAll(expectedMessagesList, actualMessages)
-                    .isEmpty());
+            Assert.assertTrue("Didn't receive expected events, expected: " + expectedMessagesList + ", actual: " +
+                              actualMessages, ListUtils.removeAll(expectedMessagesList, actualMessages).isEmpty());
             actualMessages.clear();
         }
 

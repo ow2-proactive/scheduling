@@ -1,19 +1,43 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.resourcemanager.db;
 
 import java.util.List;
 
-import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.hibernate.cfg.Configuration;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
-public class TestNodeHistory {
+public class NodeHistoryTest {
 
     protected static RMDBManager dbManager;
 
@@ -46,7 +70,7 @@ public class TestNodeHistory {
 
         dbManager.saveNodeHistory(expected);
 
-        List<?> rows = dbManager.sqlQuery("from NodeHistory");
+        List<?> rows = dbManager.executeSqlQuery("from NodeHistory");
         Assert.assertEquals(1, rows.size());
 
         NodeHistory actual = (NodeHistory) rows.get(0);
@@ -61,7 +85,7 @@ public class TestNodeHistory {
 
         dbManager.saveNodeHistory(expected2);
 
-        List<?> rows = dbManager.sqlQuery("from NodeHistory");
+        List<?> rows = dbManager.executeSqlQuery("from NodeHistory");
         Assert.assertEquals(2, rows.size());
 
         assertEquals(expected1, (NodeHistory) rows.get(0));

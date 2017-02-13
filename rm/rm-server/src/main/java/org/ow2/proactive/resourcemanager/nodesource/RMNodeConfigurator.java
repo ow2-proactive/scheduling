@@ -1,41 +1,31 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
@@ -49,7 +39,6 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -59,6 +48,7 @@ import org.apache.log4j.Logger;
 public class RMNodeConfigurator implements RunActive {
     /** class' logger */
     private static final Logger logger = Logger.getLogger(RMNodeConfigurator.class);
+
     /** rmcore reference to be able to add the node to the core after the configuration went well */
     private RMCore rmcore;
 
@@ -90,15 +80,14 @@ public class RMNodeConfigurator implements RunActive {
                 logger.error("Cannot configure data spaces : " + dataSpaceStatus);
             } else {
                 // data space is configured
-                logger.debug("Data spaces is already configured for node " +
-                    nodeToAdd.getNodeInformation().getURL());
+                logger.debug("Data spaces is already configured for node " + nodeToAdd.getNodeInformation().getURL());
             }
 
             // setting node JMX connector urls
-            rmnodeToAdd.setJMXUrl(JMXTransportProtocol.RMI, nodeToAdd.getProperty(RMNodeStarter.JMX_URL +
-                JMXTransportProtocol.RMI));
-            rmnodeToAdd.setJMXUrl(JMXTransportProtocol.RO, nodeToAdd.getProperty(RMNodeStarter.JMX_URL +
-                JMXTransportProtocol.RO));
+            rmnodeToAdd.setJMXUrl(JMXTransportProtocol.RMI,
+                                  nodeToAdd.getProperty(RMNodeStarter.JMX_URL + JMXTransportProtocol.RMI));
+            rmnodeToAdd.setJMXUrl(JMXTransportProtocol.RO,
+                                  nodeToAdd.getProperty(RMNodeStarter.JMX_URL + JMXTransportProtocol.RO));
 
             // blocking call involving running ping process on the node
             if (PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
@@ -107,7 +96,7 @@ public class RMNodeConfigurator implements RunActive {
             rmcore.internalAddNodeToCore(rmnodeToAdd);
         } catch (Exception e) {
             logger.warn("Cannot properly configure the node " + nodeURL +
-                " because of an error during configuration phase", e);
+                        " because of an error during configuration phase", e);
             //if a problem occurs during the configuration step,
             //the node is set to down
             rmcore.setDownNode(nodeURL);

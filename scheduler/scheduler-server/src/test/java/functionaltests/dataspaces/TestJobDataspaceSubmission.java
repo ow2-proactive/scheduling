@@ -1,42 +1,36 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.dataspaces;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
@@ -49,11 +43,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.Map;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
@@ -66,30 +56,45 @@ import java.util.Map;
  */
 public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithRestart {
 
-    private static String IOSPACE =
-            System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" + File.separator;
+    private static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" +
+                                    File.separator;
 
     private static String IN = "input";
+
     private static String OUT = "output";
+
     private static String GLOB = "global";
+
     private static String USER = "user";
 
     private static String in1 = "ia.txt";
+
     private static String in2 = "ib.txt";
+
     private static String in3 = "ic.txt";
+
     private static String in4 = "id.txt";
+
     private static String out1 = "pa.txt";
+
     private static String out2 = "pb.txt";
+
     private static String out3 = "pc.txt";
+
     private static String out4 = "pd.txt";
 
     private static String out10 = "paa.txt";
+
     private static String out11 = "pbb.txt";
+
     private static String out12 = "pcc.txt";
 
     File inputDir;
+
     File outputDir;
+
     File globalDir;
+
     File userDir;
 
     /**
@@ -124,12 +129,10 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithResta
         t1.setName("native_java1");
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                t1.setCommandLine(new String[] { "cmd", "/C",
-                        "type " + in1 + " > " + out1 });
+                t1.setCommandLine(new String[] { "cmd", "/C", "type " + in1 + " > " + out1 });
                 break;
             case unix:
-                t1.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat " + in1 + " > " + out1 });
+                t1.setCommandLine(new String[] { "/bin/bash", "-c", "cat " + in1 + " > " + out1 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -143,12 +146,10 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithResta
         t2.setName("native_java2");
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                t2.setCommandLine(new String[] { "cmd", "/C",
-                        "type " + in2 + " > " + out2 });
+                t2.setCommandLine(new String[] { "cmd", "/C", "type " + in2 + " > " + out2 });
                 break;
             case unix:
-                t2.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat " + in2 + " > " + out2 });
+                t2.setCommandLine(new String[] { "/bin/bash", "-c", "cat " + in2 + " > " + out2 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -161,12 +162,10 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithResta
         t3.setName("native_java3");
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                t3.setCommandLine(new String[] { "cmd", "/C",
-                        "type " + in3 + " > " + out3 });
+                t3.setCommandLine(new String[] { "cmd", "/C", "type " + in3 + " > " + out3 });
                 break;
             case unix:
-                t3.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat " + in3 + " > " + out3 });
+                t3.setCommandLine(new String[] { "/bin/bash", "-c", "cat " + in3 + " > " + out3 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -179,12 +178,10 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithResta
         t4.setName("native_java4");
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                t4.setCommandLine(new String[] { "cmd", "/C",
-                        "type " + in4 + " > " + out4 });
+                t4.setCommandLine(new String[] { "cmd", "/C", "type " + in4 + " > " + out4 });
                 break;
             case unix:
-                t4.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat " + in4 + " > " + out4 });
+                t4.setCommandLine(new String[] { "/bin/bash", "-c", "cat " + in4 + " > " + out4 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -194,18 +191,15 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithResta
         NativeTask t10 = new NativeTask();
         t10.addDependence(t2);
         t10.addInputFiles(in1, InputAccessMode.TransferFromInputSpace);
-        t10.addInputFiles(new FileSelector("*b.txt"),
-                InputAccessMode.TransferFromOutputSpace);
+        t10.addInputFiles(new FileSelector("*b.txt"), InputAccessMode.TransferFromOutputSpace);
         t10.addOutputFiles("*aa.txt", OutputAccessMode.TransferToOutputSpace);
         t10.setName("native_java10");
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                t10.setCommandLine(new String[] { "cmd", "/C",
-                        "type " + in1 + " " + out2 + " > " + out10 });
+                t10.setCommandLine(new String[] { "cmd", "/C", "type " + in1 + " " + out2 + " > " + out10 });
                 break;
             case unix:
-                t10.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat " + in1 + " " + out2 + " > " + out10 });
+                t10.setCommandLine(new String[] { "/bin/bash", "-c", "cat " + in1 + " " + out2 + " > " + out10 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -215,18 +209,15 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithResta
         NativeTask t11 = new NativeTask();
         t11.addDependence(t3);
         t11.addInputFiles(in1, InputAccessMode.TransferFromInputSpace);
-        t11.addInputFiles(new FileSelector("*c.txt"),
-                InputAccessMode.TransferFromGlobalSpace);
+        t11.addInputFiles(new FileSelector("*c.txt"), InputAccessMode.TransferFromGlobalSpace);
         t11.addOutputFiles("*bb.txt", OutputAccessMode.TransferToGlobalSpace);
         t11.setName("native_java11");
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                t11.setCommandLine(new String[] { "cmd", "/C",
-                        "type " + in1 + " " + out3 + " > " + out11 });
+                t11.setCommandLine(new String[] { "cmd", "/C", "type " + in1 + " " + out3 + " > " + out11 });
                 break;
             case unix:
-                t11.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat " + in1 + " " + out3 + " > " + out11 });
+                t11.setCommandLine(new String[] { "/bin/bash", "-c", "cat " + in1 + " " + out3 + " > " + out11 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -241,12 +232,10 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithResta
         t12.setName("native_java7");
         switch (OperatingSystem.getOperatingSystem()) {
             case windows:
-                t12.setCommandLine(new String[] { "cmd", "/C",
-                        "type " + in1 + " " + out4 + " > " + out12 });
+                t12.setCommandLine(new String[] { "cmd", "/C", "type " + in1 + " " + out4 + " > " + out12 });
                 break;
             case unix:
-                t12.setCommandLine(new String[] { "/bin/bash", "-c",
-                        "cat " + in1 + " " + out4 + " > " + out12 });
+                t12.setCommandLine(new String[] { "/bin/bash", "-c", "cat " + in1 + " " + out4 + " > " + out12 });
                 break;
             default:
                 throw new IllegalStateException("Unsupported operating system");
@@ -283,12 +272,12 @@ public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithResta
         fout = new File(userDir.getAbsolutePath() + File.separator + out12);
         Assert.assertEquals(in1 + in4, getContent(fout));
 
-//        fout = new File(outputDir.getAbsolutePath() + File.separator + out20);
-//        Assert.assertEquals(in1 + in2, getContent(fout));
-//        fout = new File(globalDir.getAbsolutePath() + File.separator + out21);
-//        Assert.assertEquals(in1 + in3, getContent(fout));
-//        fout = new File(userDir.getAbsolutePath() + File.separator + out22);
-//        Assert.assertEquals(in1 + in4, getContent(fout));
+        //        fout = new File(outputDir.getAbsolutePath() + File.separator + out20);
+        //        Assert.assertEquals(in1 + in2, getContent(fout));
+        //        fout = new File(globalDir.getAbsolutePath() + File.separator + out21);
+        //        Assert.assertEquals(in1 + in3, getContent(fout));
+        //        fout = new File(userDir.getAbsolutePath() + File.separator + out22);
+        //        Assert.assertEquals(in1 + in4, getContent(fout));
 
         filesServerIn.terminate();
         filesServerOut.terminate();

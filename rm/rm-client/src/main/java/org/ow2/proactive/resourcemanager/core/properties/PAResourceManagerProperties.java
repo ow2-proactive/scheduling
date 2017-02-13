@@ -1,48 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.resourcemanager.core.properties;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
 /**
@@ -218,19 +207,33 @@ public enum PAResourceManagerProperties {
 
     RM_SELECTION_LOGS_MAX_SIZE("pa.rm.logs.selection.max.size", PropertyType.STRING),
 
-    RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER);
+    RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER),
+
+    /**
+     * Defines if the lock restoration feature is enabled on RM startup.
+     * <p>
+     * When set to {@code true}, the RM will try to lock per Node Source
+     * as many Nodes as there were on the previous run.
+     * <p>
+     * The approach is best effort and Node hostname is not considered.
+     * As a result, Nodes are not necessarily locked on the same host.
+     */
+    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     public static final String PA_RM_PROPERTIES_FILEPATH = "pa.rm.properties.filepath";
+
     public static final String PA_RM_PROPERTIES_RELATIVE_FILEPATH = "config/rm/settings.ini";
 
     /** memory entity of the properties file. */
     private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key,
-        PA_RM_PROPERTIES_FILEPATH, PA_RM_PROPERTIES_RELATIVE_FILEPATH);
+                                                                                        PA_RM_PROPERTIES_FILEPATH,
+                                                                                        PA_RM_PROPERTIES_RELATIVE_FILEPATH);
 
     /** Key of the specific instance. */
     private String key;
+
     /** value of the specific instance. */
     private PropertyType type;
 
@@ -252,8 +255,10 @@ public enum PAResourceManagerProperties {
      * @param filename the file containing the properties to be loaded.
      */
     protected static void loadProperties(String filename) {
-        propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key, PA_RM_PROPERTIES_FILEPATH,
-                PA_RM_PROPERTIES_RELATIVE_FILEPATH, filename);
+        propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key,
+                                                      PA_RM_PROPERTIES_FILEPATH,
+                                                      PA_RM_PROPERTIES_RELATIVE_FILEPATH,
+                                                      filename);
     }
 
     /**
@@ -345,7 +350,7 @@ public enum PAResourceManagerProperties {
                 return Integer.parseInt(valueS);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(key +
-                        " is not an integer property. getValueAsInt cannot be called on this property");
+                                                   " is not an integer property. getValueAsInt cannot be called on this property");
             }
         } else {
             return 0;
@@ -422,7 +427,9 @@ public enum PAResourceManagerProperties {
      * Supported types for PAResourceManagerProperties
      */
     public enum PropertyType {
-        STRING, BOOLEAN, INTEGER
+        STRING,
+        BOOLEAN,
+        INTEGER
     }
 
 }

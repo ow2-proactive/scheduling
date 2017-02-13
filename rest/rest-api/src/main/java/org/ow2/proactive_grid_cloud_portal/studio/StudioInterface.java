@@ -1,38 +1,32 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive_grid_cloud_portal.studio;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 
 import java.io.IOException;
 import java.security.KeyException;
@@ -53,6 +47,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
@@ -61,11 +57,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 
 
 @Path("/studio")
@@ -73,15 +64,14 @@ import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 public interface StudioInterface {
     @POST
     @Path("login")
-    String login(@FormParam("username")
-    String username, @FormParam("password")
-    String password) throws KeyException, LoginException, SchedulerRestException;
+    String login(@FormParam("username") String username, @FormParam("password") String password)
+            throws KeyException, LoginException, SchedulerRestException;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
-    String loginWithCredential(@MultipartForm
-    LoginForm multipart) throws IOException, KeyException, LoginException, SchedulerRestException;
+    String loginWithCredential(@MultipartForm LoginForm multipart)
+            throws IOException, KeyException, LoginException, SchedulerRestException;
 
     @PUT
     @Path("logout")
@@ -90,110 +80,99 @@ public interface StudioInterface {
 
     @GET
     @Path("connected")
-    boolean isConnected(@HeaderParam("sessionid")
-    String sessionId);
+    boolean isConnected(@HeaderParam("sessionid") String sessionId);
 
     @GET
     @Path("workflows")
-    List<Workflow> getWorkflows(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedRestException, IOException;
+    List<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException, IOException;
 
     @POST
     @Path("workflows")
     @Consumes(APPLICATION_JSON)
-    Workflow createWorkflow(@HeaderParam("sessionid")
-    String sessionId, Workflow workflow) throws NotConnectedRestException, IOException;
+    Workflow createWorkflow(@HeaderParam("sessionid") String sessionId, Workflow workflow)
+            throws NotConnectedRestException, IOException;
 
     @GET
     @Path("workflows/{id}")
     @Produces(APPLICATION_JSON)
-    Workflow getWorkflow(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id") String workflowId) throws NotConnectedRestException, IOException;
+    Workflow getWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId)
+            throws NotConnectedRestException, IOException;
 
     @GET
     @Path("workflows/{id}/xml")
     @Produces(APPLICATION_XML)
-    String getWorkflowXmlContent(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id") String workflowId) throws NotConnectedRestException, IOException;
+    String getWorkflowXmlContent(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId)
+            throws NotConnectedRestException, IOException;
 
     @PUT
     @Path("workflows/{id}")
     @Consumes(APPLICATION_JSON)
-    Workflow updateWorkflow(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String workflowId, Workflow workflow) throws NotConnectedRestException, IOException;
+    Workflow updateWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId,
+            Workflow workflow) throws NotConnectedRestException, IOException;
 
     @DELETE
     @Path("workflows/{id}")
-    void deleteWorkflow(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String workflowId) throws NotConnectedRestException, IOException;
+    void deleteWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId)
+            throws NotConnectedRestException, IOException;
 
     @GET
     @Path("templates")
-    List<Workflow> getTemplates(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedRestException, IOException;
+    List<Workflow> getTemplates(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException, IOException;
 
     @POST
     @Path("templates")
     @Consumes(APPLICATION_JSON)
-    Workflow createTemplate(@HeaderParam("sessionid")
-    String sessionId, Workflow template) throws NotConnectedRestException, IOException;
+    Workflow createTemplate(@HeaderParam("sessionid") String sessionId, Workflow template)
+            throws NotConnectedRestException, IOException;
 
     @GET
     @Path("templates/{id}")
     @Produces(APPLICATION_JSON)
-    Workflow getTemplate(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id") String templateId) throws NotConnectedRestException, IOException;
+    Workflow getTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
+            throws NotConnectedRestException, IOException;
 
     @GET
     @Path("templates/{id}/xml")
     @Produces(APPLICATION_XML)
-    String getTemplateXmlContent(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id") String templateId) throws NotConnectedRestException, IOException;
+    String getTemplateXmlContent(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
+            throws NotConnectedRestException, IOException;
 
     @PUT
     @Path("templates/{id}")
     @Consumes(APPLICATION_JSON)
-    Workflow updateTemplate(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String templateId, Workflow template) throws NotConnectedRestException, IOException;
+    Workflow updateTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId,
+            Workflow template) throws NotConnectedRestException, IOException;
 
     @DELETE
     @Path("templates/{id}")
-    void deleteTemplate(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String templateId) throws NotConnectedRestException, IOException;
+    void deleteTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
+            throws NotConnectedRestException, IOException;
 
     @GET
     @Path("scripts")
-    List<Script> getScripts(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedRestException, IOException;
+    List<Script> getScripts(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException, IOException;
 
     @POST
     @Path("scripts")
-    String createScript(@HeaderParam("sessionid")
-    String sessionId, @FormParam("name")
-    String name, @FormParam("content")
-    String content) throws NotConnectedRestException, IOException;
+    String createScript(@HeaderParam("sessionid") String sessionId, @FormParam("name") String name,
+            @FormParam("content") String content) throws NotConnectedRestException, IOException;
 
     @POST
     @Path("scripts/{name}")
-    String updateScript(@HeaderParam("sessionid")
-    String sessionId, @PathParam("name")
-    String name, @FormParam("content")
-    String content) throws NotConnectedRestException, IOException;
+    String updateScript(@HeaderParam("sessionid") String sessionId, @PathParam("name") String name,
+            @FormParam("content") String content) throws NotConnectedRestException, IOException;
 
     @GET
     @Path("classes")
-    ArrayList<String> getClasses(@HeaderParam("sessionid")
-    String sessionId) throws NotConnectedRestException;
+    ArrayList<String> getClasses(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException;
 
     @POST
     @Path("classes")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    String createClass(@HeaderParam("sessionid")
-    String sessionId, MultipartFormDataInput multipart) throws NotConnectedRestException, IOException;
+    String createClass(@HeaderParam("sessionid") String sessionId, MultipartFormDataInput multipart)
+            throws NotConnectedRestException, IOException;
 
     /**
      * Validates a job.
@@ -214,22 +193,18 @@ public interface StudioInterface {
     @POST
     @Path("{path:submit}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    JobIdData submit(@HeaderParam("sessionid")
-    String sessionId, @PathParam("path")
-    PathSegment pathSegment, MultipartFormDataInput multipart) throws JobCreationRestException,
-            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
+    JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
+            PermissionRestException, SubmissionClosedRestException, IOException;
 
     @GET
     @Path("visualizations/{id}")
-    String getVisualization(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String jobId) throws NotConnectedRestException, IOException;
+    String getVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId)
+            throws NotConnectedRestException, IOException;
 
     @POST
     @Path("visualizations/{id}")
-    boolean updateVisualization(@HeaderParam("sessionid")
-    String sessionId, @PathParam("id")
-    String jobId, @FormParam("visualization")
-    String visualization) throws NotConnectedRestException, IOException;
+    boolean updateVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId,
+            @FormParam("visualization") String visualization) throws NotConnectedRestException, IOException;
 
 }

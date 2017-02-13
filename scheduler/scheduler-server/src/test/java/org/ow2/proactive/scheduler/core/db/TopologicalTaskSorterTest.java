@@ -1,8 +1,32 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.ow2.proactive.scheduler.core.db.TopologicalTaskSorter.Entry;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,8 +34,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.ow2.proactive.scheduler.core.db.TopologicalTaskSorter.Entry;
 
 
 public class TopologicalTaskSorterTest {
@@ -19,6 +44,7 @@ public class TopologicalTaskSorterTest {
     static class TestEntry implements Entry {
 
         private final int id;
+
         List<Entry> parents = new ArrayList<>();
 
         public TestEntry(int i) {
@@ -41,8 +67,10 @@ public class TopologicalTaskSorterTest {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
 
             TestEntry testEntry = (TestEntry) o;
 
@@ -58,7 +86,7 @@ public class TopologicalTaskSorterTest {
 
     @Test
     public void testEmpty() throws Exception {
-        List<Entry> sorted = TopologicalTaskSorter.sort(Collections.<Entry>emptyList());
+        List<Entry> sorted = TopologicalTaskSorter.sort(Collections.<Entry> emptyList());
         assertEquals(0, sorted.size());
     }
 
@@ -72,7 +100,7 @@ public class TopologicalTaskSorterTest {
         TestEntry e1 = new TestEntry(1);
         TestEntry e2 = new TestEntry(2);
         TestEntry e3 = new TestEntry(3);
-        List<Entry> input = Arrays.<Entry>asList(e1, e2, e3);
+        List<Entry> input = Arrays.<Entry> asList(e1, e2, e3);
         e2.addParent(e1);
         e3.addParent(e2);
         e1.addParent(e3);
@@ -105,7 +133,7 @@ public class TopologicalTaskSorterTest {
         e6.addParent(e3);
         e7.addParent(e8);
         e4.addParent(e9);
-        List<Entry> input = Arrays.<Entry>asList(e1, e2, e3, e4, e5, e6, e7, e8, e9);
+        List<Entry> input = Arrays.<Entry> asList(e1, e2, e3, e4, e5, e6, e7, e8, e9);
         Collections.shuffle(input);
 
         List<Entry> sorted = TopologicalTaskSorter.sort(input);

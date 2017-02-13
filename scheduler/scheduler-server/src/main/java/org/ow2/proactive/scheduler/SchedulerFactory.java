@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler;
 
@@ -81,6 +70,7 @@ public class SchedulerFactory {
     public static final Logger logger = Logger.getLogger(SchedulerFactory.class);
 
     private static boolean allowNullInit = false;
+
     private static boolean schedulerStarted = false;
 
     /**
@@ -132,8 +122,8 @@ public class SchedulerFactory {
      *
      * @throws InternalSchedulerException If Scheduler cannot be created
      */
-    public static synchronized SchedulerAuthenticationInterface startLocal(URI rmURL,
-            SchedulerInitializer initializer) throws InternalSchedulerException {
+    public static synchronized SchedulerAuthenticationInterface startLocal(URI rmURL, SchedulerInitializer initializer)
+            throws InternalSchedulerException {
         if (!schedulerStarted) {
             if (!allowNullInit) {
                 if (initializer != null) {
@@ -179,8 +169,7 @@ public class SchedulerFactory {
         //scheduler properties
         s = initializer.getSchedulerPropertiesConfiguration();
         if (s == null) {
-            throw new IllegalArgumentException(
-                "Scheduler properties file is not set, cannot start Scheduler !");
+            throw new IllegalArgumentException("Scheduler properties file is not set, cannot start Scheduler !");
         }
         System.setProperty(PASchedulerProperties.PA_SCHEDULER_PROPERTIES_FILEPATH, s);
         //pa conf
@@ -239,8 +228,7 @@ public class SchedulerFactory {
             // creating the scheduler
             // if this fails then it will not continue.
             logger.debug("Creating scheduler frontend...");
-            PAActiveObject.newActive(SchedulerFrontend.class.getName(), new Object[] { rmURL,
-                    policyFullClassName });
+            PAActiveObject.newActive(SchedulerFrontend.class.getName(), new Object[] { rmURL, policyFullClassName });
 
             //ready
             logger.debug("Scheduler is now ready to be started!");

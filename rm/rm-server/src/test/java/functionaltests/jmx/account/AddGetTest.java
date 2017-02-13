@@ -1,43 +1,41 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.jmx.account;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestUsers;
+import java.security.PublicKey;
+import java.util.HashMap;
+
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.objectweb.proactive.core.node.Node;
@@ -52,15 +50,8 @@ import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import javax.management.Attribute;
-import javax.management.AttributeList;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-import java.security.PublicKey;
-import java.util.HashMap;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -96,11 +87,9 @@ public final class AddGetTest extends RMFunctionalTest {
         // All accounting values are checked through JMX
         final RMAuthentication auth = (RMAuthentication) rmHelper.getRMAuth();
         final PublicKey pubKey = auth.getPublicKey();
-        final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword),
-                pubKey);
+        final Credentials adminCreds = Credentials.createCredentials(new CredData(adminLogin, adminPassword), pubKey);
 
-        final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth
-                .getJMXConnectorURL(JMXTransportProtocol.RMI));
+        final JMXServiceURL jmxRmiServiceURL = new JMXServiceURL(auth.getJMXConnectorURL(JMXTransportProtocol.RMI));
         final HashMap<String, Object> env = new HashMap<>(1);
         env.put(JMXConnector.CREDENTIALS, new Object[] { adminLogin, adminCreds });
 
@@ -114,17 +103,16 @@ public final class AddGetTest extends RMFunctionalTest {
         //(nodeprovider=demo)                      
 
         // Ensure that no refreshes was done and all account values are correctly initialized        
-        AttributeList atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime",
-                "ProvidedNodeTime", "ProvidedNodesCount" });
+        AttributeList atts = conn.getAttributes(myAccountMBeanName,
+                                                new String[] { "UsedNodeTime", "ProvidedNodeTime",
+                                                               "ProvidedNodesCount" });
         long usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
         long providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
         int providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
 
-        Assert
-                .assertEquals(
-                        "The accounts must not be refreshed automatically therefore the LastRefreshDurationInMilliseconds must be 0",
-                        (Long) 0l, (Long) conn.getAttribute(managementMBeanName,
-                                "LastRefreshDurationInMilliseconds"));
+        Assert.assertEquals("The accounts must not be refreshed automatically therefore the LastRefreshDurationInMilliseconds must be 0",
+                            (Long) 0l,
+                            (Long) conn.getAttribute(managementMBeanName, "LastRefreshDurationInMilliseconds"));
         Assert.assertTrue("The usedNodeTime attribute must be 0", usedNodeTime == 0);
         Assert.assertTrue("The providedNodeTime attribute must be 0", providedNodeTime == 0);
         Assert.assertTrue("The providedNodesCount attribute must be 0", providedNodesCount == 0);
@@ -155,16 +143,16 @@ public final class AddGetTest extends RMFunctionalTest {
         final long getRefreshMaxDuration = currentTime - beforeGetTime;
 
         // Check account values validity                      
-        atts = conn.getAttributes(myAccountMBeanName, new String[] { "UsedNodeTime", "ProvidedNodeTime",
-                "ProvidedNodesCount" });
+        atts = conn.getAttributes(myAccountMBeanName,
+                                  new String[] { "UsedNodeTime", "ProvidedNodeTime", "ProvidedNodesCount" });
         usedNodeTime = (Long) ((Attribute) atts.get(0)).getValue();
         providedNodeTime = (Long) ((Attribute) atts.get(1)).getValue();
         providedNodesCount = (Integer) ((Attribute) atts.get(2)).getValue();
 
-        Assert.assertTrue("Invalid value of the usedNodeTime attribute", (usedNodeTime >= GR_DURATION) &&
-            (usedNodeTime <= addRefreshMaxDuration));
+        Assert.assertTrue("Invalid value of the usedNodeTime attribute",
+                          (usedNodeTime >= GR_DURATION) && (usedNodeTime <= addRefreshMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodeTime attribute",
-                (providedNodeTime >= usedNodeTime) && (providedNodeTime <= getRefreshMaxDuration));
+                          (providedNodeTime >= usedNodeTime) && (providedNodeTime <= getRefreshMaxDuration));
         Assert.assertTrue("Invalid value of the providedNodesCount attribute", (providedNodesCount == 1));
     }
 }

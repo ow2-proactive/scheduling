@@ -1,9 +1,46 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core;
 
-import java.util.Map;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
 import java.io.Serializable;
 import java.security.KeyException;
+import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -20,18 +57,6 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.util.SendMail;
 import org.ow2.tests.ProActiveTest;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 
 public class JobEmailNotificationTest extends ProActiveTest {
@@ -45,11 +70,17 @@ public class JobEmailNotificationTest extends ProActiveTest {
     }
 
     private static final String ADMIN_EMAIL = "admin@example.com";
+
     private static final String DEFAULT_USER_NAME = "admin";
+
     private static final String INCOMPLETE_EMAIL = "foo";
+
     private static final String JOB_NAME = "job name";
+
     private static final String MALFORMED_EMAIL = "$@";
+
     private static final String TASK_NAME = "task name";
+
     private static final String USER_EMAIL = "user@example.com";
 
     private static void disableEmailNotifications() {
@@ -116,8 +147,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
             sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, sender);
 
         } catch (JobEmailNotificationException e) {
-            Assert.assertThat("Wrong exception message", e.getMessage(),
-                    containsString("Error sending email"));
+            Assert.assertThat("Wrong exception message", e.getMessage(), containsString("Error sending email"));
             throw e;
         }
     }
@@ -134,8 +164,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
             sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, sender);
 
         } catch (JobEmailNotificationException e) {
-            Assert.assertThat("Wrong exception message", e.getMessage(),
-                    containsString("Error sending email"));
+            Assert.assertThat("Wrong exception message", e.getMessage(), containsString("Error sending email"));
             throw e;
         }
     }
@@ -153,8 +182,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
             sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, sender);
 
         } catch (JobEmailNotificationException e) {
-            Assert.assertThat("Wrong exception message", e.getMessage(),
-                    containsString("Error sending email"));
+            Assert.assertThat("Wrong exception message", e.getMessage(), containsString("Error sending email"));
             throw e;
         }
     }
@@ -171,8 +199,7 @@ public class JobEmailNotificationTest extends ProActiveTest {
             sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, sender);
 
         } catch (JobEmailNotificationException e) {
-            Assert.assertThat("Wrong exception message", e.getMessage(),
-                    containsString("Error sending email"));
+            Assert.assertThat("Wrong exception message", e.getMessage(), containsString("Error sending email"));
             throw e;
         }
     }
@@ -189,8 +216,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
             sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, sender);
 
         } catch (JobEmailNotificationException e) {
-            Assert.assertThat("Wrong exception message", e.getMessage(),
-                    containsString("Recipient address is not set in generic information"));
+            Assert.assertThat("Wrong exception message",
+                              e.getMessage(),
+                              containsString("Recipient address is not set in generic information"));
             throw e;
         }
     }
@@ -260,8 +288,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job running to finished"),
-                contains("Status: Finished"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job running to finished"),
+                                     contains("Status: Finished"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -277,8 +306,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RUNNING_TO_FINISHED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job running to finished"),
-                contains("Status: Killed"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job running to finished"),
+                                     contains("Status: Killed"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -294,8 +324,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_PENDING_TO_FINISHED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job pending to finished"),
-                contains("Status: Finished"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job pending to finished"),
+                                     contains("Status: Finished"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -311,8 +342,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_PAUSED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job paused"),
-                contains("Status: Paused"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job paused"),
+                                     contains("Status: Paused"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -328,8 +360,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RESUMED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job resumed"),
-                contains("Status: Pending"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job resumed"),
+                                     contains("Status: Pending"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -345,8 +378,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_IN_ERROR, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job In-Error"),
-                contains("Status: In-Error"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job In-Error"),
+                                     contains("Status: In-Error"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -362,8 +396,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_SUBMITTED, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job submitted"),
-                contains("Status: Pending"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job submitted"),
+                                     contains("Status: Pending"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -379,8 +414,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_PENDING_TO_RUNNING, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job pending to running"),
-                contains("Status: Pending"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job pending to running"),
+                                     contains("Status: Pending"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -396,8 +432,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_CHANGE_PRIORITY, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job change priority"),
-                contains("Status: Stalled"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job change priority"),
+                                     contains("Status: Stalled"));
         verifyNoMoreInteractions(stubbedSender);
     }
 
@@ -413,8 +450,9 @@ public class JobEmailNotificationTest extends ProActiveTest {
         boolean sent = sendNotification(job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR, stubbedSender);
 
         assertTrue(sent);
-        verify(stubbedSender).sender(eq(USER_EMAIL), contains("ProActive Job 123890 : Job restarted from error"),
-                contains("Status: Running"));
+        verify(stubbedSender).sender(eq(USER_EMAIL),
+                                     contains("ProActive Job 123890 : Job restarted from error"),
+                                     contains("Status: Running"));
         verifyNoMoreInteractions(stubbedSender);
     }
 }

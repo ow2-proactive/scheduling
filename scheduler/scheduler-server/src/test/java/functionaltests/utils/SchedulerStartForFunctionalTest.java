@@ -1,40 +1,32 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionaltests.utils;
+
+import java.io.Serializable;
+import java.net.URI;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
@@ -51,9 +43,6 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 import org.ow2.proactive.scheduler.util.SchedulerHsqldbStarter;
-
-import java.io.Serializable;
-import java.net.URI;
 
 
 /**
@@ -84,8 +73,7 @@ public class SchedulerStartForFunctionalTest implements Serializable {
      */
     public static void main(String[] args) throws Exception {
         if (args.length < 3) {
-            throw new IllegalArgumentException(
-                "Invalid number of parameters, exactly 3 parameters are expected: localNodes schedPropPath rmPropPath");
+            throw new IllegalArgumentException("Invalid number of parameters, exactly 3 parameters are expected: localNodes schedPropPath rmPropPath");
         }
 
         if (args.length == 4) {
@@ -118,21 +106,15 @@ public class SchedulerStartForFunctionalTest implements Serializable {
                     RMAuthentication rmAuth = RMConnection.waitAndJoin(schedulerUrl);
 
                     if (deployLocalNodes) {
-                        Credentials credentials =
-                                Credentials.getCredentials(PAResourceManagerProperties
-                                    .getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
+                        Credentials credentials = Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
 
                         ResourceManager rmAdmin = rmAuth.login(credentials);
-                        rmAdmin.createNodeSource(
-                                RM_NODE_NAME,
-                                LocalInfrastructure.class.getName(),
-                                new Object[] {
-                                        credentials.getBase64(),
-                                        RM_NODE_NUMBER,
-                                        RM_NODE_DEPLOYMENT_TIMEOUT,
-                                        getJavaPropertiesLine() },
-                                StaticPolicy.class.getName(),
-                                new Object[] { "ALL", "ALL" });
+                        rmAdmin.createNodeSource(RM_NODE_NAME,
+                                                 LocalInfrastructure.class.getName(),
+                                                 new Object[] { credentials.getBase64(), RM_NODE_NUMBER,
+                                                                RM_NODE_DEPLOYMENT_TIMEOUT, getJavaPropertiesLine() },
+                                                 StaticPolicy.class.getName(),
+                                                 new Object[] { "ALL", "ALL" });
                         rmAdmin.disconnect();
                     }
                 } catch (Exception e) {
@@ -144,7 +126,7 @@ public class SchedulerStartForFunctionalTest implements Serializable {
         schedulerUrl = "pnp://localhost:" + PNPConfig.PA_PNP_PORT.getValue() + "/";
 
         SchedulerFactory.createScheduler(new URI(schedulerUrl),
-                PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
+                                         PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
 
         SchedulerConnection.waitAndJoin(schedulerUrl);
     }
@@ -174,8 +156,8 @@ public class SchedulerStartForFunctionalTest implements Serializable {
 
         PASchedulerProperties.updateProperties(schedulerPropertiesPath);
 
-        SchedulerFactory.createScheduler(new URI(rmUrl), PASchedulerProperties.SCHEDULER_DEFAULT_POLICY
-                .getValueAsString());
+        SchedulerFactory.createScheduler(new URI(rmUrl),
+                                         PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString());
 
         SchedulerConnection.waitAndJoin(schedulerUrl);
     }

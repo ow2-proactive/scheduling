@@ -1,42 +1,35 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionaltests.dataspaces;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.io.*;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,10 +42,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.SimpleScript;
 
-import java.io.*;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
@@ -66,28 +56,29 @@ public class TestDataspaceScripts extends SchedulerFunctionalTestWithRestart {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
-    private static final String[] fileContent = new String[] { "This is", "the content", "of the",
-            "file line", "by line." };
+    private static final String[] fileContent = new String[] { "This is", "the content", "of the", "file line",
+                                                               "by line." };
 
     private static final String fileName = "test";
 
     private static final String typeMacro = "!TYPE";
+
     private static final String folderMacro = "!FOLDER";
 
     private static final String scriptContent = "" + "def spaces = ['input','output','global','user']; \n" +
-        "spaces.each { " +
-        "  def f = new File('test_' + it); \n" //
-        +
-        "  def br = new BufferedReader(new InputStreamReader(f.newInputStream())); \n" //
-        + "  def out = new PrintWriter(new BufferedWriter(new FileWriter(new File('res_" + typeMacro +
-        "' + f.name)))); \n" //
-        + "  def line; \n" //
-        + "  while ((line = br.readLine()) != null) { \n" //
-        + "    out.println(line); \n" //
-        + "   } \n" //
-        + "  out.close(); \n" //
-        + "} \n" //
-        + "loop=false;"; //
+                                                "spaces.each { " + "  def f = new File('test_' + it); \n" //
+                                                +
+                                                "  def br = new BufferedReader(new InputStreamReader(f.newInputStream())); \n" //
+                                                +
+                                                "  def out = new PrintWriter(new BufferedWriter(new FileWriter(new File('res_" +
+                                                typeMacro + "' + f.name)))); \n" //
+                                                + "  def line; \n" //
+                                                + "  while ((line = br.readLine()) != null) { \n" //
+                                                + "    out.println(line); \n" //
+                                                + "   } \n" //
+                                                + "  out.close(); \n" //
+                                                + "} \n" //
+                                                + "loop=false;"; //
 
     /**
      * Creates a task with a Pre/Post/Flow scripts that copy files from input files to output files
@@ -102,14 +93,18 @@ public class TestDataspaceScripts extends SchedulerFunctionalTestWithRestart {
         /**
          * creates the testfile in both input and output spaces
          */
-        BufferedOutputStream inout = new BufferedOutputStream(new FileOutputStream(new File(
-            input.getAbsolutePath() + File.separator + fileName + "_input")));
-        BufferedOutputStream outout = new BufferedOutputStream(new FileOutputStream(new File(
-            output.getAbsolutePath() + File.separator + fileName + "_output")));
-        BufferedOutputStream globout = new BufferedOutputStream(new FileOutputStream(new File(
-            global.getAbsolutePath() + File.separator + fileName + "_global")));
-        BufferedOutputStream userout = new BufferedOutputStream(new FileOutputStream(new File(
-            user.getAbsolutePath() + File.separator + fileName + "_user")));
+        BufferedOutputStream inout = new BufferedOutputStream(new FileOutputStream(new File(input.getAbsolutePath() +
+                                                                                            File.separator + fileName +
+                                                                                            "_input")));
+        BufferedOutputStream outout = new BufferedOutputStream(new FileOutputStream(new File(output.getAbsolutePath() +
+                                                                                             File.separator + fileName +
+                                                                                             "_output")));
+        BufferedOutputStream globout = new BufferedOutputStream(new FileOutputStream(new File(global.getAbsolutePath() +
+                                                                                              File.separator +
+                                                                                              fileName + "_global")));
+        BufferedOutputStream userout = new BufferedOutputStream(new FileOutputStream(new File(user.getAbsolutePath() +
+                                                                                              File.separator +
+                                                                                              fileName + "_user")));
         for (String line : fileContent) {
             inout.write((line + "\n").getBytes());
             outout.write((line + "\n").getBytes());
@@ -151,7 +146,8 @@ public class TestDataspaceScripts extends SchedulerFunctionalTestWithRestart {
         t.setPreScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "pre"), "groovy"));
         t.setPostScript(new SimpleScript(scriptContentFiltered.replaceAll(typeMacro, "post"), "groovy"));
         t.setFlowScript(FlowScript.createLoopFlowScript(scriptContentFiltered.replaceAll(typeMacro, "flow"),
-                "groovy", "T"));
+                                                        "groovy",
+                                                        "T"));
 
         t.setForkEnvironment(new ForkEnvironment());
 

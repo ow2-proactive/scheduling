@@ -1,43 +1,47 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive_grid_cloud_portal.dataspace;
 
-import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.vfs2.Selectors.SELECT_ALL;
+import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -53,28 +57,17 @@ import org.ow2.proactive_grid_cloud_portal.dataspace.util.VFSZipper;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static org.apache.commons.vfs2.Selectors.SELECT_ALL;
-import static org.apache.commons.vfs2.Selectors.SELECT_SELF;
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 
 
 @Path("/data/")
 public class RestDataspaceImpl {
 
     private static final Logger logger = Logger.getLogger(RestDataspaceImpl.class);
+
     public static final String USER = "user";
+
     public static final String GLOBAL = "global";
 
     private static SessionStore sessions = SharedSessionStore.getInstance();
@@ -103,11 +96,9 @@ public class RestDataspaceImpl {
      */
     @PUT
     @Path("/{dataspace}/{path-name:.*}")
-    public Response store(@HeaderParam("sessionid")
-    String sessionId, @HeaderParam("Content-Encoding")
-    String encoding, @PathParam("dataspace")
-    String dataspace, @PathParam("path-name")
-    String pathname, InputStream is) throws NotConnectedRestException, PermissionRestException {
+    public Response store(@HeaderParam("sessionid") String sessionId, @HeaderParam("Content-Encoding") String encoding,
+            @PathParam("dataspace") String dataspace, @PathParam("path-name") String pathname, InputStream is)
+            throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
@@ -162,14 +153,11 @@ public class RestDataspaceImpl {
      */
     @GET
     @Path("/{dataspace}/{path-name:.*}")
-    public Response retrieve(@HeaderParam("sessionid")
-    String sessionId, @HeaderParam("Accept-Encoding")
-    String encoding, @PathParam("dataspace")
-    String dataspace, @PathParam("path-name")
-    String pathname, @QueryParam("comp")
-    String component, @QueryParam("includes")
-    List<String> includes, @QueryParam("excludes")
-    List<String> excludes) throws NotConnectedRestException, PermissionRestException {
+    public Response retrieve(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("Accept-Encoding") String encoding, @PathParam("dataspace") String dataspace,
+            @PathParam("path-name") String pathname, @QueryParam("comp") String component,
+            @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes)
+            throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
@@ -185,8 +173,7 @@ public class RestDataspaceImpl {
                 if (VFSZipper.isZipFile(fo)) {
                     logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace));
                     return fileComponentResponse(fo);
-                } else if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") ||
-                    encoding.contains("gzip")) {
+                } else if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") || encoding.contains("gzip")) {
                     logger.debug(String.format("Retrieving file %s as gzip in %s", pathname, dataspace));
                     return gzipComponentResponse(pathname, fo);
                 } else if (encoding.contains("zip")) {
@@ -235,12 +222,9 @@ public class RestDataspaceImpl {
      */
     @DELETE
     @Path("/{dataspace}/{path-name:.*}")
-    public Response delete(@HeaderParam("sessionid")
-    String sessionId, @PathParam("dataspace")
-    String dataspace, @PathParam("path-name")
-    String pathname, @QueryParam("includes")
-    List<String> includes, @QueryParam("excludes")
-    List<String> excludes) throws NotConnectedRestException, PermissionRestException {
+    public Response delete(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspace,
+            @PathParam("path-name") String pathname, @QueryParam("includes") List<String> includes,
+            @QueryParam("excludes") List<String> excludes) throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
 
@@ -256,8 +240,7 @@ public class RestDataspaceImpl {
             } else {
                 logger.debug(String.format("Deleting file %s in %s", pathname, dataspace));
                 fo.close();
-                return fo.delete() ? noContentRes()
-                        : serverErrorRes("Cannot delete the file: %s", pathname);
+                return fo.delete() ? noContentRes() : serverErrorRes("Cannot delete the file: %s", pathname);
             }
         } catch (Throwable error) {
             logger.error(String.format("Cannot delete %s in %s.", pathname, dataspace), error);
@@ -277,10 +260,8 @@ public class RestDataspaceImpl {
      */
     @HEAD
     @Path("/{dataspace}/{path-name:.*}")
-    public Response metadata(@HeaderParam("sessionid")
-    String sessionId, @PathParam("dataspace")
-    String dataspacePath, @PathParam("path-name")
-    String pathname) throws NotConnectedRestException, PermissionRestException {
+    public Response metadata(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspacePath,
+            @PathParam("path-name") String pathname) throws NotConnectedRestException, PermissionRestException {
         checkPathParams(dataspacePath, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
@@ -289,8 +270,7 @@ public class RestDataspaceImpl {
                 return notFoundRes();
             }
             logger.debug(String.format("Retrieving metadata for %s in %s", pathname, dataspacePath));
-            MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>(FileSystem
-                    .metadata(fo));
+            MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>(FileSystem.metadata(fo));
             return Response.ok().replaceAll(headers).build();
         } catch (Throwable error) {
             logger.error(String.format("Cannot retrieve metadata for %s in %s.", pathname, dataspacePath), error);
@@ -300,11 +280,9 @@ public class RestDataspaceImpl {
 
     @POST
     @Path("/{dataspace}/{path-name:.*}")
-    public Response create(@HeaderParam("sessionid") String sessionId,
-                           @PathParam("dataspace") String dataspacePath,
-                           @PathParam("path-name") String pathname,
-                           @FormParam("mimetype") String mimeType)
-                                throws NotConnectedRestException, PermissionRestException {
+    public Response create(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspacePath,
+            @PathParam("path-name") String pathname, @FormParam("mimetype") String mimeType)
+            throws NotConnectedRestException, PermissionRestException {
 
         checkPathParams(dataspacePath, pathname);
         Session session = checkSessionValidity(sessionId);
@@ -331,18 +309,20 @@ public class RestDataspaceImpl {
         }
     }
 
-    private Response componentResponse(String type, FileObject fo, List<String> includes, List<String> excludes) throws FileSystemException {
+    private Response componentResponse(String type, FileObject fo, List<String> includes, List<String> excludes)
+            throws FileSystemException {
         switch (type) {
             case "list":
                 return Response.ok(FileSystem.list(fo, includes, excludes), MediaType.APPLICATION_JSON).build();
             default:
-                return Response.status(Response.Status.BAD_REQUEST).entity(
-                        String.format("Unknown query parameter: comp=%s", type)).build();
+                return Response.status(Response.Status.BAD_REQUEST)
+                               .entity(String.format("Unknown query parameter: comp=%s", type))
+                               .build();
         }
     }
 
-    private Response zipComponentResponse(final FileObject fo, final List<String> includes,
-            final List<String> excludes) throws FileSystemException {
+    private Response zipComponentResponse(final FileObject fo, final List<String> includes, final List<String> excludes)
+            throws FileSystemException {
         return Response.ok(new StreamingOutput() {
             @Override
             public void write(OutputStream outputStream) throws IOException, WebApplicationException {
@@ -352,12 +332,10 @@ public class RestDataspaceImpl {
                     throw new WebApplicationException(ioe, Response.Status.INTERNAL_SERVER_ERROR);
                 }
             }
-        }).header(HttpHeaders.CONTENT_TYPE, mediaType(fo)).header(HttpHeaders.CONTENT_ENCODING, "zip")
-                .build();
+        }).header(HttpHeaders.CONTENT_TYPE, mediaType(fo)).header(HttpHeaders.CONTENT_ENCODING, "zip").build();
     }
 
-    private Response gzipComponentResponse(final String pathname, final FileObject fo)
-            throws FileSystemException {
+    private Response gzipComponentResponse(final String pathname, final FileObject fo) throws FileSystemException {
         return Response.ok(new StreamingOutput() {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
@@ -367,8 +345,11 @@ public class RestDataspaceImpl {
                     throw new WebApplicationException(ioe, Response.Status.INTERNAL_SERVER_ERROR);
                 }
             }
-        }).header(HttpHeaders.CONTENT_TYPE, mediaType(fo)).header(HttpHeaders.CONTENT_ENCODING, "gzip")
-                .header("x-pds-pathname", pathname).build();
+        })
+                       .header(HttpHeaders.CONTENT_TYPE, mediaType(fo))
+                       .header(HttpHeaders.CONTENT_ENCODING, "gzip")
+                       .header("x-pds-pathname", pathname)
+                       .build();
     }
 
     private Response fileComponentResponse(final FileObject fo) throws FileSystemException {
@@ -381,12 +362,10 @@ public class RestDataspaceImpl {
                     throw new WebApplicationException(ioe, Response.Status.INTERNAL_SERVER_ERROR);
                 }
             }
-        }).header(HttpHeaders.CONTENT_TYPE, mediaType(fo)).header(HttpHeaders.CONTENT_ENCODING, "identity")
-                .build();
+        }).header(HttpHeaders.CONTENT_TYPE, mediaType(fo)).header(HttpHeaders.CONTENT_ENCODING, "identity").build();
     }
 
-    private Response deleteDir(FileObject fo, List<String> includes, List<String> excludes)
-            throws FileSystemException {
+    private Response deleteDir(FileObject fo, List<String> includes, List<String> excludes) throws FileSystemException {
         if ((includes == null || includes.isEmpty()) && (excludes == null || excludes.isEmpty())) {
             fo.delete(SELECT_ALL);
             fo.delete();
@@ -421,15 +400,18 @@ public class RestDataspaceImpl {
     }
 
     private Response serverErrorRes(String format, Object... args) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                (args == null || args.length == 0) ? format : String.format(format, args)).build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity((args == null || args.length == 0) ? format : String.format(format, args))
+                       .build();
     }
 
     public FileObject resolveFile(Session session, String dataspace, String pathname)
             throws FileSystemException, NotConnectedRestException, PermissionRestException {
         try {
-            return USER.equalsIgnoreCase(dataspace) || SchedulerConstants.USERSPACE_NAME.toString().equalsIgnoreCase(dataspace) ? fileSystem(session).resolveFileInUserspace(pathname) : fileSystem(
-                    session).resolveFileInGlobalspace(pathname);
+            return USER.equalsIgnoreCase(dataspace) ||
+                   SchedulerConstants.USERSPACE_NAME.toString()
+                                                    .equalsIgnoreCase(dataspace) ? fileSystem(session).resolveFileInUserspace(pathname)
+                                                                                 : fileSystem(session).resolveFileInGlobalspace(pathname);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -439,8 +421,11 @@ public class RestDataspaceImpl {
 
     private void checkPathParams(String dataspace, String pathname) {
         checkArgument(!Strings.isNullOrEmpty(dataspace), "Dataspace name cannot be null or empty.");
-        checkArgument(USER.equalsIgnoreCase(dataspace) || GLOBAL.equalsIgnoreCase(dataspace) || SchedulerConstants.USERSPACE_NAME.toString().equalsIgnoreCase(dataspace) || SchedulerConstants.GLOBALSPACE_NAME.toString().equalsIgnoreCase(dataspace),
-                "Invalid dataspace name: '%s'.", dataspace);
+        checkArgument(USER.equalsIgnoreCase(dataspace) || GLOBAL.equalsIgnoreCase(dataspace) ||
+                      SchedulerConstants.USERSPACE_NAME.toString().equalsIgnoreCase(dataspace) ||
+                      SchedulerConstants.GLOBALSPACE_NAME.toString().equalsIgnoreCase(dataspace),
+                      "Invalid dataspace name: '%s'.",
+                      dataspace);
         checkArgument(!Strings.isNullOrEmpty(pathname), "Pathname cannot be null or empty.");
     }
 
@@ -477,8 +462,8 @@ public class RestDataspaceImpl {
         }
     }
 
-    private FileSystem fileSystem(Session session) throws FileSystemException, NotConnectedException,
-            PermissionException {
+    private FileSystem fileSystem(Session session)
+            throws FileSystemException, NotConnectedException, PermissionException {
         FileSystem fs = session.fileSystem();
         if (fs == null) {
             synchronized (session) {

@@ -15,6 +15,8 @@ dependencies {
             project(':rm:rm-node'),
     )
 
+    compile 'com.google.guava:guava:19.0'
+
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     testCompile "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
     testCompile project(':common:common-api').sourceSets.test.output
@@ -66,14 +68,14 @@ task testJar(type: Jar) {
     from sourceSets.test.output
 }
 
-    
+
 task dist(type: Copy) {
     from testJar
     into file("$rootDir/dist/lib")
 }
 
 rootProject.dist.dependsOn testJar
-    
+
 artifacts {
     archives testJar
 }

@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.selection.statistics;
 
@@ -149,7 +138,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
             if (logger.isDebugEnabled()) {
                 logger.debug("The following nodes are selected for scripts execution (time is " +
-                    (System.currentTimeMillis() - startTime) + " ms) :");
+                             (System.currentTimeMillis() - startTime) + " ms) :");
                 if (res.size() > 0) {
                     for (RMNode rmnode : res) {
                         logger.debug(rmnode.getNodeURL() + " : probability " + intersectionMap.get(rmnode));
@@ -178,13 +167,11 @@ public class ProbablisticSelectionManager extends SelectionManager {
         String digest;
         try {
             digest = new String(script.digest());
-            if (probabilities.containsKey(digest) &&
-                probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
+            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
                 Probability p = probabilities.get(digest).get(rmnode.getNodeURL());
                 String scriptType = script.isDynamic() ? "dynamic" : "static";
                 if (logger.isDebugEnabled())
-                    logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " known " + scriptType +
-                        " script");
+                    logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " known " + scriptType + " script");
                 return p.value() == 1;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -206,16 +193,15 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @return whether node is selected
      */
     @Override
-    public synchronized boolean processScriptResult(SelectionScript script,
-            ScriptResult<Boolean> scriptResult, RMNode rmnode) {
+    public synchronized boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
+            RMNode rmnode) {
 
         boolean result = false;
 
         try {
             String digest = new String(script.digest());
             Probability probability = new Probability(Probability.defaultValue());
-            if (probabilities.containsKey(digest) &&
-                probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
+            if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
                 probability = probabilities.get(digest).get(rmnode.getNodeURL());
                 assert (probability.value() >= 0 && probability.value() <= 1);
             }
@@ -241,13 +227,12 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
             if (!probabilities.containsKey(digest)) {
                 // checking if the number of selection script does not exceeded the maximum
-                if (probabilities.size() >= PAResourceManagerProperties.RM_SELECT_SCRIPT_CACHE_SIZE
-                        .getValueAsInt()) {
+                if (probabilities.size() >= PAResourceManagerProperties.RM_SELECT_SCRIPT_CACHE_SIZE.getValueAsInt()) {
                     String oldest = digestQueue.poll();
                     probabilities.remove(oldest);
                     if (logger.isDebugEnabled()) {
                         logger.debug("Removing the script: " + script.hashCode() +
-                            " from the data base because the limit is reached");
+                                     " from the data base because the limit is reached");
                     }
                 }
                 // adding a new script record
@@ -257,8 +242,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug(rmnode.getNodeURL() + " : script " + script.hashCode() + ", probability " +
-                    probability);
+                logger.debug(rmnode.getNodeURL() + " : script " + script.hashCode() + ", probability " + probability);
             }
 
             probabilities.get(digest).put(rmnode.getNodeURL().intern(), probability);

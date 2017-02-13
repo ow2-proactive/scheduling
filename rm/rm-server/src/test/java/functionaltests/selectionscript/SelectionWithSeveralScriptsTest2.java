@@ -1,43 +1,38 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.selectionscript;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestNode;
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.NodeState;
@@ -49,13 +44,8 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.assertEquals;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestNode;
 
 
 /**
@@ -83,8 +73,12 @@ public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
         ResourceManager resourceManager = rmHelper.getResourceManager();
 
         String nodeSourceName = "SelectionWithSeveralScriptsTest2";
-        resourceManager.createNodeSource(nodeSourceName, DefaultInfrastructureManager.class.getName(), null,
-                StaticPolicy.class.getName(), new Object[] { "ALL", "ALL" }).getBooleanValue();
+        resourceManager.createNodeSource(nodeSourceName,
+                                         DefaultInfrastructureManager.class.getName(),
+                                         null,
+                                         StaticPolicy.class.getName(),
+                                         new Object[] { "ALL", "ALL" })
+                       .getBooleanValue();
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);
 
         String node1Name = "node-sel2-1";
@@ -121,8 +115,7 @@ public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
 
         TestNode node2 = rmHelper.createNode(node2Name, vmTwoProperties);
         testNodes.add(node2);
-        String node2URL = node2.getNode().getNodeInformation()
-                .getURL();
+        String node2URL = node2.getNode().getNodeInformation().getURL();
         resourceManager.addNode(node2URL, nodeSourceName);
 
         //wait node adding event
@@ -132,11 +125,13 @@ public class SelectionWithSeveralScriptsTest2 extends RMFunctionalTest {
 
         //create the static selection script object that check vm prop1
         SelectionScript sScript1 = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
-            new String[] { vmPropKey1, vmPropValue1 }, true);
+                                                       new String[] { vmPropKey1, vmPropValue1 },
+                                                       true);
 
         //create the static selection script object prop2
         SelectionScript sScript2 = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
-            new String[] { vmPropKey2, vmPropValue2 }, false);
+                                                       new String[] { vmPropKey2, vmPropValue2 },
+                                                       false);
 
         log("Test 1");
 
