@@ -37,6 +37,7 @@ import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 
 
 public class ModelFromURLParserValidatorTest {
@@ -64,7 +65,8 @@ public class ModelFromURLParserValidatorTest {
     private File generateModelFile(String listModelParameter) throws IOException {
         File tempFile = testFolder.newFile("model");
         FileUtils.writeStringToFile(tempFile,
-                                    lowerCaseAndAddSpaces(ListParserValidator.LIST_TYPE) + listModelParameter,
+                                    lowerCaseAndAddSpaces(ModelValidator.PREFIX + ListParserValidator.LIST_TYPE) +
+                                              listModelParameter,
                                     Charset.defaultCharset());
         return tempFile;
     }

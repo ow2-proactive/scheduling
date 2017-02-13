@@ -34,6 +34,7 @@ import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
@@ -50,12 +51,14 @@ public class DefaultModelJobValidatorServiceProviderTest {
 
     @Test
     public void testValidateJobWithJobModelVariableOK() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("true", BooleanParserValidator.BOOLEAN_TYPE));
+        factory.validateJob(createJobWithJobModelVariable("true",
+                                                          ModelValidator.PREFIX + BooleanParserValidator.BOOLEAN_TYPE));
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithJobModelVariableKO() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("blabla", BooleanParserValidator.BOOLEAN_TYPE));
+        factory.validateJob(createJobWithJobModelVariable("blabla",
+                                                          ModelValidator.PREFIX + BooleanParserValidator.BOOLEAN_TYPE));
     }
 
     @Test
@@ -68,14 +71,24 @@ public class DefaultModelJobValidatorServiceProviderTest {
         factory.validateJob(createJobWithJobModelVariable("blabla", "UNKNOWN"));
     }
 
+    @Test(expected = JobValidationException.class)
+    public void testValidateJobWithJobModelVariableValidPrefixButUnkownModel()
+            throws UserException, JobValidationException {
+        factory.validateJob(createJobWithJobModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"));
+    }
+
     @Test
     public void testValidateJobWithTaskModelVariableOK() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("true", BooleanParserValidator.BOOLEAN_TYPE));
+        factory.validateJob(createJobWithTaskModelVariable("true",
+                                                           ModelValidator.PREFIX +
+                                                                   BooleanParserValidator.BOOLEAN_TYPE));
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithTaskModelVariableKO() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("blabla", BooleanParserValidator.BOOLEAN_TYPE));
+        factory.validateJob(createJobWithTaskModelVariable("blabla",
+                                                           ModelValidator.PREFIX +
+                                                                     BooleanParserValidator.BOOLEAN_TYPE));
     }
 
     @Test
@@ -86,6 +99,12 @@ public class DefaultModelJobValidatorServiceProviderTest {
     @Test
     public void testValidateJobWithTaskModelVariableUnknownModel() throws UserException, JobValidationException {
         factory.validateJob(createJobWithTaskModelVariable("blabla", "UNKNOWN"));
+    }
+
+    @Test(expected = JobValidationException.class)
+    public void testValidateJobWithTaskModelVariableValidPrefixButUnkownModel()
+            throws UserException, JobValidationException {
+        factory.validateJob(createJobWithTaskModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"));
     }
 
     private TaskFlowJob createJobWithJobModelVariable(String value, String model) throws UserException {
