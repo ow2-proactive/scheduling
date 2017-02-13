@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
@@ -128,8 +117,8 @@ public class FlatJobFactory {
      * @return a job object representing created job and ready-to-schedule job.
      * @throws JobCreationException with a relevant error message if an error occurs.
      */
-    public Job createNativeJobFromCommandsFile(String commandFilePath, String jobName,
-            String selectionScriptPath, String userName) throws JobCreationException {
+    public Job createNativeJobFromCommandsFile(String commandFilePath, String jobName, String selectionScriptPath,
+            String userName) throws JobCreationException {
 
         if (jobName == null) {
             jobName = JOB_DEFAULT_NAME_PREFIX + userName;
@@ -143,7 +132,7 @@ public class FlatJobFactory {
             File commandFile = new File(commandFilePath);
             if (!commandFile.isFile()) {
                 throw new JobCreationException("Error occured during Job creation, " + "check that file " +
-                    commandFilePath + " exists and is a readable file");
+                                               commandFilePath + " exists and is a readable file");
             }
             String commandLine;
             int task_number = 0;
@@ -158,7 +147,7 @@ public class FlatJobFactory {
             }
             if (commandList.size() == 0) {
                 throw new JobCreationException("Error occured during Job creation, " +
-                    "No any valid command line has been built from" + commandFilePath + "");
+                                               "No any valid command line has been built from" + commandFilePath + "");
             }
 
             //compute padding for task number
@@ -168,8 +157,9 @@ public class FlatJobFactory {
             nf.setMinimumIntegerDigits(numberOfDigit);
 
             for (String command : commandList) {
-                NativeTask t = createNativeTaskFromCommandString(command, "task_" +
-                    (nf.format(++task_number)), selectionScriptPath);
+                NativeTask t = createNativeTaskFromCommandString(command,
+                                                                 "task_" + (nf.format(++task_number)),
+                                                                 selectionScriptPath);
                 t.setPreciousResult(true);
                 ((TaskFlowJob) nativeJob).addTask(t);
                 logger.debug("-> Task Name = " + t.getName());
@@ -195,8 +185,8 @@ public class FlatJobFactory {
      * @return a job object representing created job and ready-to-schedule job.
      * @throws JobCreationException with a relevant error message if an error occurs.
      */
-    public Job createNativeJobFromCommand(String command, String jobName, String selectionScriptPath,
-            String userName) throws JobCreationException {
+    public Job createNativeJobFromCommand(String command, String jobName, String selectionScriptPath, String userName)
+            throws JobCreationException {
         if (command == null || "".equalsIgnoreCase(command)) {
             throw new JobCreationException("Error, command cannot be null");
         }
@@ -228,15 +218,14 @@ public class FlatJobFactory {
      * @throws InvalidScriptException if an error occurs in definition of selection script
      * from file path specified.
      */
-    private NativeTask createNativeTaskFromCommandString(String command, String taskName,
-            String selectionScriptPath) throws InvalidScriptException {
+    private NativeTask createNativeTaskFromCommandString(String command, String taskName, String selectionScriptPath)
+            throws InvalidScriptException {
         NativeTask desc = new NativeTask();
         desc.setCommandLine(Tools.parseCommandLine(command));
         desc.setName(taskName);
 
         if (selectionScriptPath != null) {
-            SelectionScript script = new SelectionScript(
-                new SimpleScript(new File(selectionScriptPath), null), true);
+            SelectionScript script = new SelectionScript(new SimpleScript(new File(selectionScriptPath), null), true);
             desc.addSelectionScript(script);
         }
         return desc;

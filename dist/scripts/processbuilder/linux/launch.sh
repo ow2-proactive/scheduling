@@ -32,7 +32,7 @@ fi;
 cd $2;
 if [ "$?" != "0" ]; then
   # if not being able to access the scripts folder
-  echo "$OSPL_E_PREFIX ${OSLP_PACKAGE}FatalProcessBuilderException $OSPL_E_CAUSE Scripts folder can not be found at: $2!" 1>&2; 
+  echo "$OSPL_E_PREFIX ${OSLP_PACKAGE}FatalProcessBuilderException $OSPL_E_CAUSE Scripts folder can not be found at: $2!" 1>&2;
   exit 1;
 fi;
 
@@ -74,7 +74,7 @@ if [ "$crs" != "" ]; then
   rm $tmp;
   rm $tmpenv 2> /dev/null
   exit 1;
-else 
+else
   # If the username is not empty we proceed with the user_step
   if [ "$usr" != "" ]; then
     # we get rid of the first 5 parameters
@@ -88,7 +88,7 @@ else
     rm $tmpenv 2> /dev/null
     exit 1;
     fi;
-    
+
   else
   # If the username is empty, we just execute the command...
   # It is worth mentioning that in case neither the username nor the cores are set, one should just use Runtime.exec, and not these scripts.
@@ -102,9 +102,9 @@ else
     exit 1;
     fi;
   fi;
-  
+
   # now, if everything was ok, we should have a return value in the tmp file
-  
+
   exitv=`cat < $tmp` 2> /dev/null
   # maybe check if it exists etc. - may come in handy if we don't break on the first error coming from the scripts
   rm $tmp 2> /dev/null

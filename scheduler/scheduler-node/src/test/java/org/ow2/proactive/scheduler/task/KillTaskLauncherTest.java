@@ -1,4 +1,34 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.task;
+
+import static org.junit.Assert.assertEquals;
+
+import java.io.Serializable;
+import java.util.concurrent.Semaphore;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,16 +45,13 @@ import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.Repeat;
 import org.ow2.proactive.utils.RepeatRule;
 
-import java.io.Serializable;
-import java.util.concurrent.Semaphore;
-
-import static org.junit.Assert.assertEquals;
-
 
 public class KillTaskLauncherTest {
 
     static final int repetitions = 10;
+
     static final boolean parallel = true;
+
     static final long timeout = 10000;
 
     @Rule
@@ -39,8 +66,8 @@ public class KillTaskLauncherTest {
     @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_while_sleeping_in_task() throws Exception {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
-            new SimpleScript("java.lang.Thread.sleep(10000)", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("java.lang.Thread.sleep(10000)",
+                                                                                                                            "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
@@ -48,7 +75,7 @@ public class KillTaskLauncherTest {
         Semaphore taskRunning = new Semaphore(0);
 
         final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
-          new TestTaskLauncherFactory(taskRunning));
+                                                                   new TestTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         taskLauncherPA.doTask(executableContainer, null, null);
@@ -64,15 +91,15 @@ public class KillTaskLauncherTest {
     @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_while_looping_in_task() throws Exception {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
-            new SimpleScript("for(;;){}", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("for(;;){}",
+                                                                                                                            "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         Semaphore taskRunning = new Semaphore(0);
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
-          taskRunning));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
+                                                                   new TestTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         taskLauncherPA.doTask(executableContainer, null, null);
@@ -88,14 +115,14 @@ public class KillTaskLauncherTest {
     @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void finished_but_terminate_not_called_back() throws Throwable {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
-            new SimpleScript("result='done'", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("result='done'",
+                                                                                                                            "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
-            new Semaphore(0)));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
+                                                                   new TestTaskLauncherFactory(new Semaphore(0)));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
@@ -113,14 +140,14 @@ public class KillTaskLauncherTest {
     @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_when_finished() throws Throwable {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
-          new SimpleScript("result='done'", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("result='done'",
+                                                                                                                            "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory(
-          new Semaphore(0)));
+        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
+                                                                   new TestTaskLauncherFactory(new Semaphore(0)));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
@@ -144,15 +171,15 @@ public class KillTaskLauncherTest {
     @Repeat(value = repetitions, parallel = parallel, timeout = timeout)
     public void kill_when_copying() throws Throwable {
 
-        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(
-            new SimpleScript("result='done'", "javascript")));
+        final ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("result='done'",
+                                                                                                                            "javascript")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         Semaphore taskRunning = new Semaphore(0);
         final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
-                new SlowDataspacesTaskLauncherFactory(taskRunning));
+                                                                   new SlowDataspacesTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         taskLauncherPA.doTask(executableContainer, null, null);

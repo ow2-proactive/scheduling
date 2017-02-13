@@ -1,42 +1,39 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.job.log;
 
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -55,14 +52,7 @@ import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.SelectionScript;
 
-import java.io.File;
-import java.net.URL;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 
 
 /**
@@ -75,10 +65,11 @@ import static org.junit.Assert.fail;
 public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
     public final int TASKS_IN_SIMPLE_JOB = 2;
-    private static URL simpleJobDescriptor = TestJobServerLogs.class
-            .getResource("/functionaltests/descriptors/Job_simple.xml");
+
+    private static URL simpleJobDescriptor = TestJobServerLogs.class.getResource("/functionaltests/descriptors/Job_simple.xml");
 
     private final String SCRIPT_OUTPUT = "SCRIPT_OUTPUT_" + Math.random();
+
     private String logsLocation = ServerJobAndTaskLogs.getLogsLocation();
 
     private Job createPendingJob() throws Exception {
@@ -88,8 +79,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
         task.setExecutableClassName(WaitAndPrint.class.getName());
         task.addArgument("sleepTime", "1");
 
-        task.addSelectionScript(new SelectionScript("print('" + SCRIPT_OUTPUT + "'); selected = false;",
-            "javascript"));
+        task.addSelectionScript(new SelectionScript("print('" + SCRIPT_OUTPUT + "'); selected = false;", "javascript"));
         job.addTask(task);
 
         return job;
@@ -97,14 +87,12 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void test() throws Exception {
-        JobId simpleJobId = schedulerHelper.submitJob(new File(simpleJobDescriptor.toURI())
-                .getAbsolutePath());
+        JobId simpleJobId = schedulerHelper.submitJob(new File(simpleJobDescriptor.toURI()).getAbsolutePath());
 
         String taskName = "task1";
 
         TaskInfo ti = schedulerHelper.waitForEventTaskRunning(simpleJobId, taskName);
-        String taskLogs = schedulerHelper.getSchedulerInterface().getTaskServerLogs(simpleJobId.toString(),
-                taskName);
+        String taskLogs = schedulerHelper.getSchedulerInterface().getTaskServerLogs(simpleJobId.toString(), taskName);
 
         if (!taskLogs.contains("task " + ti.getTaskId() + " (" + ti.getTaskId().getReadableName() + ")" + " started")) {
             log("Incorrect task server logs:");
@@ -115,7 +103,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
         schedulerHelper.waitForEventJobFinished(simpleJobId);
         String jobLogs = schedulerHelper.getSchedulerInterface().getJobServerLogs(simpleJobId.toString());
         for (int i = 0; i < TASKS_IN_SIMPLE_JOB; i++) {
-            TaskId taskId = TaskIdImpl.createTaskId(simpleJobId, "task" + (i+1), i);
+            TaskId taskId = TaskIdImpl.createTaskId(simpleJobId, "task" + (i + 1), i);
             String taskIdString = taskId.toString();
             String taskIdStringQuoted = Pattern.quote(taskIdString);
 
@@ -180,8 +168,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
         }
     }
 
-    private void checkJobAndTaskLogFiles(JobId jobId, List<TaskState> tasks, boolean shouldExist)
-            throws Exception {
+    private void checkJobAndTaskLogFiles(JobId jobId, List<TaskState> tasks, boolean shouldExist) throws Exception {
         checkFile(shouldExist, new File(logsLocation, JobLogger.getJobLogRelativePath(jobId)));
         for (TaskState taskState : tasks) {
             checkFile(shouldExist, new File(logsLocation, TaskLogger.getTaskLogRelativePath(taskState.getId())));
@@ -189,8 +176,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
     }
 
     private void checkFile(boolean shouldExist, File jobLogFile) {
-        String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist"
-                : "not exist");
+        String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist" : "not exist");
         assertEquals(message, shouldExist, jobLogFile.exists());
     }
 

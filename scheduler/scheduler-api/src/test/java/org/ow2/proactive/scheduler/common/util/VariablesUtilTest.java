@@ -1,25 +1,55 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.common.util;
+
+import static java.util.Collections.singletonMap;
+import static org.junit.Assert.*;
+import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import org.junit.Test;
 
-import static java.util.Collections.singletonMap;
-import static org.junit.Assert.*;
-import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 
 public class VariablesUtilTest {
 
     private static final String testString = "A${foo.bar}C";
+
     private static final String testStringRecursive = "A_${foo.${suffix}}_C";
+
     private static final String testStringRecursive2 = "A_${myvar}_C";
+
     private static final String testStringRecursive3 = "A${expand}";
+
     private static final String testStringAlias1 = "A$FOO_BARC";
 
     @Test
@@ -33,7 +63,11 @@ public class VariablesUtilTest {
 
     @Test
     public void testFilterAndUpdateWithRecursiveDefinition() {
-        Map<String, String> variables = ImmutableMap.<String, String>builder().put("suffix", "bar").put("foo.bar", "B").put("myvar", "${foo.${suffix}}").build();
+        Map<String, String> variables = ImmutableMap.<String, String> builder()
+                                                    .put("suffix", "bar")
+                                                    .put("foo.bar", "B")
+                                                    .put("myvar", "${foo.${suffix}}")
+                                                    .build();
         String updated1 = filterAndUpdate(testStringRecursive, variables);
         String updated2 = filterAndUpdate(testStringRecursive2, variables);
         assertEquals("A_B_C", updated1);
@@ -42,7 +76,7 @@ public class VariablesUtilTest {
 
     @Test(timeout = 3000)
     public void testFilterAndUpdateInfiniteRecursion() {
-        Map<String, String> variables = ImmutableMap.<String, String>builder().put("expand", "A${expand}").build();
+        Map<String, String> variables = ImmutableMap.<String, String> builder().put("expand", "A${expand}").build();
         String updated1 = filterAndUpdate(testStringRecursive3, variables);
         assertEquals("AAAAAA${expand}", updated1);
     }
@@ -50,7 +84,7 @@ public class VariablesUtilTest {
     @Test
     public void testFilterAndUpdateWithUnknownVariable() {
         String notReplaced = VariableSubstitutor.filterAndUpdate(testString,
-                Collections.<Serializable, Serializable>emptyMap());
+                                                                 Collections.<Serializable, Serializable> emptyMap());
         assertEquals(testString, notReplaced);
     }
 
@@ -70,14 +104,14 @@ public class VariablesUtilTest {
 
     @Test
     public void double_occurrence() throws Exception {
-        assertEquals(
-                "barbar",
-                VariableSubstitutor.filterAndUpdate("$foo$foo",
-                        Collections.<String, Serializable>singletonMap("foo", "bar")));
+        assertEquals("barbar",
+                     VariableSubstitutor.filterAndUpdate("$foo$foo",
+                                                         Collections.<String, Serializable> singletonMap("foo",
+                                                                                                         "bar")));
 
-        assertEquals(
-                "barbar",
-                VariableSubstitutor.filterAndUpdate("${foo}${foo}",
-                        Collections.<String, Serializable>singletonMap("foo", "bar")));
+        assertEquals("barbar",
+                     VariableSubstitutor.filterAndUpdate("${foo}${foo}",
+                                                         Collections.<String, Serializable> singletonMap("foo",
+                                                                                                         "bar")));
     }
 }

@@ -1,36 +1,27 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.task.executors;
 
@@ -82,7 +73,9 @@ import com.google.common.base.Stopwatch;
 public class InProcessTaskExecutor implements TaskExecutor {
 
     private static final String NODES_FILE_DIRECTORY_NAME = ".pa_nodes";
+
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
+
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
     /**
@@ -99,16 +92,16 @@ public class InProcessTaskExecutor implements TaskExecutor {
             return "";
         } else {
             File directory;
-            if (taskContext.getNodeDataSpaceURIs().getScratchURI() == null || taskContext.getNodeDataSpaceURIs().getScratchURI().isEmpty()) {
+            if (taskContext.getNodeDataSpaceURIs().getScratchURI() == null ||
+                taskContext.getNodeDataSpaceURIs().getScratchURI().isEmpty()) {
                 directory = new File(".");
             } else {
                 directory = new File(taskContext.getNodeDataSpaceURIs().getScratchURI());
             }
             File nodesFile = new File(directory, NODES_FILE_DIRECTORY_NAME + "_" + taskContext.getTaskId());
 
-            Writer outputWriter = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(nodesFile),
-                    PAProperties.getFileEncoding()));
+            Writer outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(nodesFile),
+                                                                            PAProperties.getFileEncoding()));
             for (String nodeHost : nodesHosts) {
                 outputWriter.append(nodeHost).append(System.lineSeparator());
             }
@@ -137,37 +130,52 @@ public class InProcessTaskExecutor implements TaskExecutor {
             nodesFile = writeNodesFile(taskContext);
             VariablesMap variables = new VariablesMap();
             variables.setInheritedMap(taskContextVariableExtractor.extractVariables(taskContext, nodesFile, false));
-            variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(
-                    taskContext));
+            variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(taskContext));
             Map<String, String> resultMetadata = new HashMap<>();
-            Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(
-                    taskContext);
+            Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
-            userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.USER);
-            globalSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext, schedulerNodeClient, IDataSpaceClient.Dataspace.GLOBAL);
+            userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
+                                                                                   schedulerNodeClient,
+                                                                                   IDataSpaceClient.Dataspace.USER);
+            globalSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
+                                                                                     schedulerNodeClient,
+                                                                                     IDataSpaceClient.Dataspace.GLOBAL);
 
-            forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler, taskContext, variables,
-                    thirdPartyCredentials, schedulerNodeClient, userSpaceClient, globalSpaceClient, resultMetadata);
+            forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
+                                                                  taskContext,
+                                                                  variables,
+                                                                  thirdPartyCredentials,
+                                                                  schedulerNodeClient,
+                                                                  userSpaceClient,
+                                                                  globalSpaceClient,
+                                                                  resultMetadata);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
             try {
                 stopwatch.start();
-                Serializable result = execute(taskContext, output, error, scriptHandler,
-                        thirdPartyCredentials,
-                        variables);
+                Serializable result = execute(taskContext,
+                                              output,
+                                              error,
+                                              scriptHandler,
+                                              thirdPartyCredentials,
+                                              variables);
                 stopwatch.stop();
-                taskResult = new TaskResultImpl(
-                        taskContext.getTaskId(), result, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                taskResult = new TaskResultImpl(taskContext.getTaskId(),
+                                                result,
+                                                null,
+                                                stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 stopwatch.stop();
                 e.printStackTrace(error);
-                taskResult = new TaskResultImpl(
-                        taskContext.getTaskId(), e, null, stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                taskResult = new TaskResultImpl(taskContext.getTaskId(),
+                                                e,
+                                                null,
+                                                stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
 
             executeFlowScript(taskContext.getControlFlowScript(), scriptHandler, output, error, taskResult);
-            
+
             taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables.getPropagatedVariables()));
             taskResult.setMetadata(resultMetadata);
 
@@ -195,36 +203,36 @@ public class InProcessTaskExecutor implements TaskExecutor {
      * @throws Throwable
      */
     private Serializable execute(TaskContext taskContext, PrintStream output, PrintStream error,
-            ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials,
-            VariablesMap variables) throws Throwable {
+            ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, VariablesMap variables)
+            throws Throwable {
         if (taskContext.getPreScript() != null) {
             Script<?> script = taskContext.getPreScript();
-            forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, 
-                    error);
+            forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, error);
             ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
             if (preScriptResult.errorOccured()) {
-                throw new TaskException("Failed to execute pre script: " +
-                        preScriptResult.getException().getMessage(), preScriptResult.getException());
+                throw new TaskException("Failed to execute pre script: " + preScriptResult.getException().getMessage(),
+                                        preScriptResult.getException());
             }
         }
 
-        Script<Serializable> script = ((ScriptExecutableContainer) taskContext.getExecutableContainer())
-                .getScript();
+        Script<Serializable> script = ((ScriptExecutableContainer) taskContext.getExecutableContainer()).getScript();
         forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, error);
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
 
         if (scriptResult.errorOccured()) {
             throw new TaskException("Failed to execute task: " + scriptResult.getException().getMessage(),
-                    scriptResult.getException());
+                                    scriptResult.getException());
         }
 
         if (taskContext.getPostScript() != null) {
             forkedTaskVariablesManager.replaceScriptParameters(taskContext.getPostScript(),
-                    thirdPartyCredentials, variables, error);
+                                                               thirdPartyCredentials,
+                                                               variables,
+                                                               error);
             ScriptResult postScriptResult = scriptHandler.handle(taskContext.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute post script: " +
-                        postScriptResult.getException().getMessage(), postScriptResult.getException());
+                                        postScriptResult.getException().getMessage(), postScriptResult.getException());
             }
         }
         return scriptResult.getResult();

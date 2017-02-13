@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package scalabilityTests.framework;
 
@@ -50,6 +39,7 @@ import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+
 import scalabilityTests.framework.listeners.SchedulerListenerExposer;
 
 
@@ -75,9 +65,12 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<Scheduler, V>
 
     // Scheduler info
     private final String schedulerURL;
+
     private final Credentials userCreds;
+
     // Scheduler interaction internal state
     protected Scheduler scheduler = null;
+
     // Scheduler listener
     protected SchedulerListenerExposer slExposer = null;
 
@@ -92,8 +85,7 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<Scheduler, V>
         this.userCreds = userCreds;
     }
 
-    public AbstractSchedulerUser(Action<Scheduler, V> defaultAction, String schedulerURL,
-            Credentials userCreds) {
+    public AbstractSchedulerUser(Action<Scheduler, V> defaultAction, String schedulerURL, Credentials userCreds) {
         super(defaultAction);
         this.schedulerURL = schedulerURL;
         this.userCreds = userCreds;
@@ -102,16 +94,16 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<Scheduler, V>
     @Override
     public void doAction() {
         if (this.scheduler == null)
-            throw new IllegalStateException("The user is not connected to the Scheduler yet. "
-                + "Consider calling the connectToScheduler() method first");
+            throw new IllegalStateException("The user is not connected to the Scheduler yet. " +
+                                            "Consider calling the connectToScheduler() method first");
         super.doAction();
     }
 
     @Override
     public void doAction(Action<Scheduler, V> action) {
         if (this.scheduler == null)
-            throw new IllegalStateException("The user is not connected to the Scheduler yet. "
-                + "Consider calling the connectToScheduler() method first");
+            throw new IllegalStateException("The user is not connected to the Scheduler yet. " +
+                                            "Consider calling the connectToScheduler() method first");
         super.doAction(action);
     }
 
@@ -125,40 +117,45 @@ public abstract class AbstractSchedulerUser<V> extends ActiveActor<Scheduler, V>
             throws SchedulerException, ProActiveException {
         try {
             if (this.scheduler == null)
-                throw new IllegalStateException("The user is not connected to the Scheduler yet. "
-                    + "Consider calling the connectToScheduler() method first");
+                throw new IllegalStateException("The user is not connected to the Scheduler yet. " +
+                                                "Consider calling the connectToScheduler() method first");
             SchedulerEventListener schedulerListener = createEventListener(listenerClazzName);
             logger.trace("Trying to expose the listener as a remote object");
             slExposer = new SchedulerListenerExposer(schedulerListener);
             SchedulerEventListener schedulerListenerRemoteRef = slExposer.createRemoteReference();
             logger.trace("Trying to register the listener to the Scheduler");
             // for the moment, listens only to the Jobs-related events
-            SchedulerState initialState = scheduler.addEventListener(
-                    schedulerListenerRemoteRef,
-                    myEventsOnly,
-                    getInitialState,
-                    // job-related events
-                    SchedulerEvent.JOB_SUBMITTED, SchedulerEvent.JOB_PENDING_TO_RUNNING,
-                    SchedulerEvent.JOB_PENDING_TO_FINISHED,
-                    SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                    SchedulerEvent.JOB_PAUSED,
-                    SchedulerEvent.JOB_RESUMED,
-                    SchedulerEvent.JOB_RESTARTED_FROM_ERROR,
-                    SchedulerEvent.JOB_CHANGE_PRIORITY,
-                    // task-related events
-                    SchedulerEvent.TASK_PENDING_TO_RUNNING, SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-                    SchedulerEvent.TASK_WAITING_FOR_RESTART,
-                    SchedulerEvent.USERS_UPDATE,
-                    // Scheduler state related events
-                    SchedulerEvent.FROZEN, SchedulerEvent.RESUMED, SchedulerEvent.SHUTDOWN,
-                    SchedulerEvent.SHUTTING_DOWN, SchedulerEvent.STARTED, SchedulerEvent.STOPPED,
-                    SchedulerEvent.KILLED);
+            SchedulerState initialState = scheduler.addEventListener(schedulerListenerRemoteRef,
+                                                                     myEventsOnly,
+                                                                     getInitialState,
+                                                                     // job-related events
+                                                                     SchedulerEvent.JOB_SUBMITTED,
+                                                                     SchedulerEvent.JOB_PENDING_TO_RUNNING,
+                                                                     SchedulerEvent.JOB_PENDING_TO_FINISHED,
+                                                                     SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                                                                     SchedulerEvent.JOB_PAUSED,
+                                                                     SchedulerEvent.JOB_RESUMED,
+                                                                     SchedulerEvent.JOB_RESTARTED_FROM_ERROR,
+                                                                     SchedulerEvent.JOB_CHANGE_PRIORITY,
+                                                                     // task-related events
+                                                                     SchedulerEvent.TASK_PENDING_TO_RUNNING,
+                                                                     SchedulerEvent.TASK_RUNNING_TO_FINISHED,
+                                                                     SchedulerEvent.TASK_WAITING_FOR_RESTART,
+                                                                     SchedulerEvent.USERS_UPDATE,
+                                                                     // Scheduler state related events
+                                                                     SchedulerEvent.FROZEN,
+                                                                     SchedulerEvent.RESUMED,
+                                                                     SchedulerEvent.SHUTDOWN,
+                                                                     SchedulerEvent.SHUTTING_DOWN,
+                                                                     SchedulerEvent.STARTED,
+                                                                     SchedulerEvent.STOPPED,
+                                                                     SchedulerEvent.KILLED);
             if (getInitialState) {
                 logger.info("Initial state of the scheduler is: " + initialState);
             }
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Class " + listenerClazzName +
-                " is not available on this SchedulerUser's side", e);
+                                               " is not available on this SchedulerUser's side", e);
         } catch (InstantiationException e) {
             throw new IllegalArgumentException("Cannot instantiate listener of type " + listenerClazzName, e);
         } catch (IllegalAccessException e) {

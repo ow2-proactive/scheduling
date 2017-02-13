@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive_grid_cloud_portal.dataspace.util;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -136,11 +161,9 @@ public class VFSZipperZIPTest {
     }
 
     private void testZip(Path pathToZip) throws IOException {
-        List<FileObject> files = FileSystem.findFiles(fileSystemManager.resolveFile(pathToZip.toUri()), null,
-                null);
+        List<FileObject> files = FileSystem.findFiles(fileSystemManager.resolveFile(pathToZip.toUri()), null, null);
 
-        VFSZipper.ZIP.zip(fileSystemManager.resolveFile(pathToZip.toUri()), files,
-                Files.newOutputStream(archivePath));
+        VFSZipper.ZIP.zip(fileSystemManager.resolveFile(pathToZip.toUri()), files, Files.newOutputStream(archivePath));
     }
 
     private void assertZipWithFileHierarchy(Path archivePath) {
@@ -158,8 +181,7 @@ public class VFSZipperZIPTest {
     }
 
     private void testUnzip(Path resultPath) throws IOException {
-        VFSZipper.ZIP.unzip(Files.newInputStream(archivePath),
-                fileSystemManager.resolveFile(resultPath.toUri()));
+        VFSZipper.ZIP.unzip(Files.newInputStream(archivePath), fileSystemManager.resolveFile(resultPath.toUri()));
 
         assertUnzippedFileHierarchy(outputPath);
     }

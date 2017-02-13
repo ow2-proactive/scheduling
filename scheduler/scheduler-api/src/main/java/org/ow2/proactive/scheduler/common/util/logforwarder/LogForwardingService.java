@@ -1,44 +1,33 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.util.logforwarder;
 
-import org.apache.log4j.Appender;
-
 import java.net.URI;
+
+import org.apache.log4j.Appender;
 
 
 /**
@@ -49,13 +38,16 @@ import java.net.URI;
 public final class LogForwardingService {
 
     private final LoggingEventProcessor loggingEventProcessor;
+
     // connection to the server created by initialize()
     private URI serverConnection = null;
+
     // can be initialized only once
     private boolean initialized = false;
 
     // the protocol specific provider
     private String providerClassname;
+
     private LogForwardingProvider provider;
 
     /**
@@ -87,8 +79,7 @@ public final class LogForwardingService {
             if (!initialized) {
                 // load the provider
                 @SuppressWarnings("unchecked")
-                Class<? extends LogForwardingProvider> providerClass = (Class<? extends LogForwardingProvider>) Class
-                        .forName(providerClassname);
+                Class<? extends LogForwardingProvider> providerClass = (Class<? extends LogForwardingProvider>) Class.forName(providerClassname);
                 this.provider = providerClass.newInstance();
                 this.serverConnection = provider.createServer(loggingEventProcessor);
                 this.initialized = true;
@@ -102,8 +93,8 @@ public final class LogForwardingService {
         } catch (IllegalAccessException e) {
             throw new LogForwardingException("LogForwardingProvider cannot be instanciated.", e);
         } catch (ClassCastException e) {
-            throw new LogForwardingException(
-                "Class defined as LogForwardingProvider is not a LogForwardingProvider.", e);
+            throw new LogForwardingException("Class defined as LogForwardingProvider is not a LogForwardingProvider.",
+                                             e);
         }
     }
 
@@ -131,8 +122,7 @@ public final class LogForwardingService {
         if (initialized) {
             return provider.createAppenderProvider(this.serverConnection);
         } else {
-            throw new IllegalStateException(
-                "The service has not been initialized. Cannot create appender provider.");
+            throw new IllegalStateException("The service has not been initialized. Cannot create appender provider.");
         }
     }
 

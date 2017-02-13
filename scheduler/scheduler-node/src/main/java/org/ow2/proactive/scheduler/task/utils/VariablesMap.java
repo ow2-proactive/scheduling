@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.task.utils;
 
 import java.io.Serializable;
@@ -6,13 +31,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * A map managing variables for scripts use
  * 
  * @author ActiveEon Team
  *
  */
-public class VariablesMap implements Map<String, Serializable>, Serializable{
+public class VariablesMap implements Map<String, Serializable>, Serializable {
 
     /**
      * Map containing propagated variables (job and system variables)
@@ -28,11 +54,11 @@ public class VariablesMap implements Map<String, Serializable>, Serializable{
      * Map containing variables overriden into scripts
      */
     private Map<String, Serializable> scriptMap;
-    
+
     /**
      * Constructor
      */
-    public VariablesMap(){
+    public VariablesMap() {
         this.scriptMap = new HashMap<>();
         inheritedMap = new HashMap<>();
         scopeMap = new HashMap<>();
@@ -77,23 +103,23 @@ public class VariablesMap implements Map<String, Serializable>, Serializable{
     public Map<String, Serializable> getScriptMap() {
         return scriptMap;
     }
-    
+
     /**
      * Getter of the propagated variables: only inheritedMap and scriptMap variables are propagated.
      * scriptMap variables override inheritedMap variables
      * @return the variables which will be propagated
      */
-    public Map<String, Serializable> getPropagatedVariables(){
+    public Map<String, Serializable> getPropagatedVariables() {
         Map<String, Serializable> variables = new HashMap<>(inheritedMap);
         variables.putAll(scriptMap);
         return variables;
     }
-    
+
     /**
      * Getter of the merged variables map: scopeMap variables override inheritedMap variables and scriptMap variables override scopeMap variables
      * @return the merged variables map
      */
-    public Map<String, Serializable> getMergedMap(){
+    public Map<String, Serializable> getMergedMap() {
         Map<String, Serializable> variables = new HashMap<>(inheritedMap);
         variables.putAll(scopeMap);
         variables.putAll(scriptMap);
@@ -101,7 +127,7 @@ public class VariablesMap implements Map<String, Serializable>, Serializable{
     }
 
     @Override
-    public Serializable put(String key, Serializable value){
+    public Serializable put(String key, Serializable value) {
         return scriptMap.put(key, value);
     }
 
@@ -135,7 +161,7 @@ public class VariablesMap implements Map<String, Serializable>, Serializable{
         Serializable scriptValue = scriptMap.remove(key);
         Serializable scopeValue = scopeMap.remove(key);
         Serializable inheritedValue = inheritedMap.remove(key);
-        
+
         if (scriptValue != null)
             return scriptValue;
         if (scopeValue != null)
@@ -174,5 +200,5 @@ public class VariablesMap implements Map<String, Serializable>, Serializable{
     public String toString() {
         return getMergedMap().toString();
     }
-    
+
 }

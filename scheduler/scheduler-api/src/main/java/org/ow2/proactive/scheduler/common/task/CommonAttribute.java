@@ -1,52 +1,42 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.task;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
-import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 
 
 /**
@@ -69,16 +59,14 @@ public abstract class CommonAttribute implements Serializable {
      * <p>
      * You can override this property inside each task.
      */
-    protected UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(
-        RestartMode.ANYWHERE);
+    protected UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(RestartMode.ANYWHERE);
 
     /**
      * The maximum number of execution for a task (default 1).
      * <p>
      * You can override this property inside each task.
      */
-    protected UpdatableProperties<IntegerWrapper> maxNumberOfExecution = new UpdatableProperties<IntegerWrapper>(
-        new IntegerWrapper(1));
+    protected UpdatableProperties<IntegerWrapper> maxNumberOfExecution = new UpdatableProperties<IntegerWrapper>(new IntegerWrapper(1));
 
     /** Common user informations */
     protected Map<String, String> genericInformation = new HashMap<String, String>();
@@ -151,8 +139,7 @@ public abstract class CommonAttribute implements Serializable {
      */
     public void setMaxNumberOfExecution(int numberOfExecution) {
         if (numberOfExecution <= 0) {
-            throw new IllegalArgumentException(
-                "The number of execution must be a non negative integer (>0) !");
+            throw new IllegalArgumentException("The number of execution must be a non negative integer (>0) !");
         }
         this.maxNumberOfExecution.setValue(new IntegerWrapper(numberOfExecution));
     }
@@ -206,7 +193,8 @@ public abstract class CommonAttribute implements Serializable {
 
     }
 
-    protected static Map<String, String> applyReplacementsOnGenericInformation(Map<String, String> genericInformation, Map<String, Serializable> variables) {
+    protected static Map<String, String> applyReplacementsOnGenericInformation(Map<String, String> genericInformation,
+            Map<String, Serializable> variables) {
         return VariableSubstitutor.filterAndUpdate(genericInformation, variables);
     }
 

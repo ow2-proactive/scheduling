@@ -25,9 +25,15 @@
  */
 package functionaltests.runasme;
 
-import functionaltests.dataspaces.TestCacheSpaceCleaning;
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerTHelper;
+import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,14 +48,9 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assume.assumeNotNull;
-import static org.junit.Assume.assumeTrue;
+import functionaltests.dataspaces.TestCacheSpaceCleaning;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerTHelper;
 
 
 /**

@@ -1,40 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.nodesource.dataspace;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.Selectors;
@@ -48,14 +45,6 @@ import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
-
-import java.io.File;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -140,7 +129,6 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
      */
     private static transient ReentrantReadWriteLock cacheCleaningRWLock = new ReentrantReadWriteLock();
 
-
     /**
      * Create a new instance of DataSpaceNodeConfigurationAgent
      * Used by ProActive
@@ -154,10 +142,9 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
             logger.info("Start of dataspace configuration for node " + node);
             // configure node for Data Spaces
             String baseScratchDir = getBaseScratchDir();
-            final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(
-                    (String) null, baseScratchDir);
-            DataSpacesNodes.configureNode(node,
-                    scratchConf);
+            final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
+                                                                                                baseScratchDir);
+            DataSpacesNodes.configureNode(node, scratchConf);
             logger.info("Dataspace configuration for node " + node + " successful.");
         } catch (Throwable t) {
             logger.error("Cannot configure dataSpace", t);
@@ -218,7 +205,6 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
         return cacheSpaceConfiguration;
     }
 
-
     /**
      * Starts the Cache Space server
      *
@@ -231,7 +217,10 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
                 cacheServer = new FileSystemServerDeployer(CACHESPACE_NAME, cacheLocation, true, true);
                 logger.info("Cache server started at " + Arrays.toString(cacheServer.getVFSRootURLs()));
                 String hostname = InetAddress.getLocalHost().getHostName();
-                cacheSpaceConfiguration = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(Arrays.asList(cacheServer.getVFSRootURLs()), cacheLocation, hostname, CACHESPACE_NAME);
+                cacheSpaceConfiguration = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(Arrays.asList(cacheServer.getVFSRootURLs()),
+                                                                                                       cacheLocation,
+                                                                                                       hostname,
+                                                                                                       CACHESPACE_NAME);
                 fileSystemManager = VFSFactory.createDefaultFileSystemManager();
                 rootCacheUri = new File(cacheLocation).toURI().toURL().toExternalForm();
 
@@ -281,8 +270,7 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
 
             cleaningTimer.cancel();
 
-            DataSpacesNodes.closeNodeConfig(PAActiveObject
-                    .getActiveObjectNode(PAActiveObject.getStubOnThis()));
+            DataSpacesNodes.closeNodeConfig(PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis()));
         } catch (Throwable t) {
             logger.error("Cannot close dataSpace configuration !", t);
             throw new RuntimeException(t);

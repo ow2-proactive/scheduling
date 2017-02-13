@@ -1,43 +1,36 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.workflow;
 
-import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
-import functionaltests.utils.SchedulerTHelper;
+import static functionaltests.utils.SchedulerTHelper.log;
+
+import java.io.File;
+import java.util.*;
+import java.util.Map.Entry;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.ow2.proactive.scheduler.common.job.*;
@@ -45,11 +38,8 @@ import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
-import java.io.File;
-import java.util.*;
-import java.util.Map.Entry;
-
-import static functionaltests.utils.SchedulerTHelper.log;
+import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
+import functionaltests.utils.SchedulerTHelper;
 
 
 /**
@@ -134,7 +124,7 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
             }
 
             String path = new File(TWorkflowJobs.class.getResource(getJobPrefix() + (i + 1) + jobSuffix)
-                    .toURI()).getAbsolutePath();
+                                                      .toURI()).getAbsolutePath();
             log("Testing job: " + path);
             testJob(path, tasks, dependences);
         }
@@ -150,7 +140,8 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
      * @return
      * @throws Exception
      */
-    public static JobId testJobSubmission(SchedulerTHelper schedulerHelper, Job jobToSubmit, List<String> skip) throws Exception {
+    public static JobId testJobSubmission(SchedulerTHelper schedulerHelper, Job jobToSubmit, List<String> skip)
+            throws Exception {
         JobId id = schedulerHelper.submitJob(jobToSubmit);
 
         log("Job submitted, id " + id.toString());
@@ -206,8 +197,8 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
      * @param expectedDependences 
      * @throws Throwable
      */
-    public void testJob(String jobPath, Map<String, Long> expectedResults,
-            Map<String, Set<String>> expectedDependences) throws Throwable {
+    public void testJob(String jobPath, Map<String, Long> expectedResults, Map<String, Set<String>> expectedDependences)
+            throws Throwable {
 
         List<String> skip = new ArrayList<>();
         for (Entry<String, Long> er : expectedResults.entrySet()) {
@@ -230,22 +221,20 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
         schedulerHelper.waitForEventJobRemoved(id);
     }
 
-    public void compareResults(String prefix, Map<String, Long> expectedResults, JobResult jobResult)
-            throws Throwable {
+    public void compareResults(String prefix, Map<String, Long> expectedResults, JobResult jobResult) throws Throwable {
         for (Entry<String, TaskResult> result : jobResult.getAllResults().entrySet()) {
             Long expected = expectedResults.get(result.getKey());
 
-            Assert.assertNotNull(prefix + ": Not expecting result for task '" + result.getKey() + "'",
-                    expected);
-            Assert.assertTrue("Task " + result.getKey() + " should be skipped, but returned a result",
-                    expected >= 0);
+            Assert.assertNotNull(prefix + ": Not expecting result for task '" + result.getKey() + "'", expected);
+            Assert.assertTrue("Task " + result.getKey() + " should be skipped, but returned a result", expected >= 0);
             if (!(result.getValue().value() instanceof Long)) {
                 System.out.println(result.getValue().value() + " " + result.getValue().value().getClass());
             }
-            Assert.assertTrue(prefix + ": Result for task '" + result.getKey() + "' is not an Long", result
-                    .getValue().value() instanceof Long);
-            Assert.assertEquals(prefix + ": Invalid result for task '" + result.getKey() + "'", expected,
-                    (Long) result.getValue().value());
+            Assert.assertTrue(prefix + ": Result for task '" + result.getKey() + "' is not an Long",
+                              result.getValue().value() instanceof Long);
+            Assert.assertEquals(prefix + ": Invalid result for task '" + result.getKey() + "'",
+                                expected,
+                                (Long) result.getValue().value());
         }
 
         int skipped = 0;
@@ -254,13 +243,13 @@ public abstract class TWorkflowJobs extends SchedulerFunctionalTestNonForkedMode
         for (Entry<String, Long> expected : expectedResults.entrySet()) {
             if (expected.getValue() < 0) {
                 Assert.assertFalse("Task " + expected.getKey() + " should be skipped, but returned a result",
-                        jobResult.getAllResults().containsKey(expected.getKey()));
+                                   jobResult.getAllResults().containsKey(expected.getKey()));
                 skipped++;
             }
         }
 
-        Assert.assertEquals("Expected and actual result sets are not identical in " + prefix + " (skipped " +
-            skipped + "): ", expectedResults.size(), jobResult.getAllResults().size() + skipped);
+        Assert.assertEquals("Expected and actual result sets are not identical in " + prefix + " (skipped " + skipped +
+                            "): ", expectedResults.size(), jobResult.getAllResults().size() + skipped);
     }
 
     public void compareDependences(JobState js, Map<String, Set<String>> expectedDependences) {

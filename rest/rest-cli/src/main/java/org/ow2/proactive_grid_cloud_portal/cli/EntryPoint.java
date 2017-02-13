@@ -1,57 +1,29 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
-
 package org.ow2.proactive_grid_cloud_portal.cli;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
-import com.google.common.collect.ObjectArrays;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 import static org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -60,6 +32,23 @@ import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.DFLT_REST_SC
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand.writeDebugModeUsageWithBreakEndLine;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_PERSISTED_SESSION;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand.PROP_RENEW_SESSION;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
+
+import com.google.common.collect.ObjectArrays;
 
 
 public abstract class EntryPoint {
@@ -155,7 +144,8 @@ public abstract class EntryPoint {
         commandFactory = getCommandFactory();
         console = AbstractDevice.getConsole(AbstractDevice.JLINE);
         ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(),
-                CommandSet.INTERACTIVE_COMMANDS, CommandSet.Entry.class));
+                                                                CommandSet.INTERACTIVE_COMMANDS,
+                                                                CommandSet.Entry.class));
         currentContext.setDevice(console);
         return commandFactory;
     }
@@ -178,8 +168,7 @@ public abstract class EntryPoint {
         String longOption = "--" + CommandSet.DEBUG.longOpt();
 
         for (String arg : args) {
-            if (arg.equals(shortOption) ||
-                    arg.equals(longOption)) {
+            if (arg.equals(shortOption) || arg.equals(longOption)) {
                 return true;
             }
         }
@@ -187,8 +176,7 @@ public abstract class EntryPoint {
         return false;
     }
 
-    private void executeCommandList(List<Command> commandList, ApplicationContext currentContext)
-            throws CLIException {
+    private void executeCommandList(List<Command> commandList, ApplicationContext currentContext) throws CLIException {
         for (Command command : commandList) {
             command.execute(currentContext);
         }

@@ -29,7 +29,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
@@ -74,12 +73,16 @@ public class TerminateReplicateTaskHandlerTest {
 
     @Mock
     private InternalJob internalJob;
+
     @Mock
     private JobDescriptorImpl jobDescriptorImpl;
+
     @Mock
     private ChangedTasksInfo changesInfo;
+
     @Mock
     private SchedulerStateUpdate frontend;
+
     @Mock
     private JobInfoImpl jobInfoImpl;
 
@@ -105,13 +108,15 @@ public class TerminateReplicateTaskHandlerTest {
         tasks = genearteTaks();
         when(internalJob.getIHMTasks()).thenReturn(tasks);
         initiator = generateInitiatorTask();
-        boolean result = terminateReplicateTaskHandler.terminateReplicateTask(action, initiator, changesInfo,
-                frontend, initiator.getId());
+        boolean result = terminateReplicateTaskHandler.terminateReplicateTask(action,
+                                                                              initiator,
+                                                                              changesInfo,
+                                                                              frontend,
+                                                                              initiator.getId());
         assertThat(result, is(true));
         verify(jobInfoImpl).setTasksChanges(changesInfo, internalJob);
         assertThat(tasks.get(generateInternalTask(555L).getId()).getStatus(), is(TaskStatus.SKIPPED));
-        assertThat(tasks.get(generateInternalTask(MERGE_TASK_ID).getId()).getStatus(),
-                is(TaskStatus.PENDING));
+        assertThat(tasks.get(generateInternalTask(MERGE_TASK_ID).getId()).getStatus(), is(TaskStatus.PENDING));
 
     }
 
@@ -121,8 +126,11 @@ public class TerminateReplicateTaskHandlerTest {
         when(internalJob.getIHMTasks()).thenReturn(tasks);
 
         initiator = generateInitiatorTask();
-        boolean result = terminateReplicateTaskHandler.terminateReplicateTask(action, initiator, changesInfo,
-                frontend, initiator.getId());
+        boolean result = terminateReplicateTaskHandler.terminateReplicateTask(action,
+                                                                              initiator,
+                                                                              changesInfo,
+                                                                              frontend,
+                                                                              initiator.getId());
         assertThat(result, is(true));
         verify(jobInfoImpl).setTasksChanges(changesInfo, internalJob);
         assertThat(tasks.get(generateInternalTask(555L).getId()).getStatus(), is(TaskStatus.SKIPPED));
@@ -131,8 +139,7 @@ public class TerminateReplicateTaskHandlerTest {
         assertThat(tasks.get(generateInternalTask(888L).getId()).getStatus(), is(TaskStatus.SKIPPED));
         assertThat(tasks.get(generateInternalTask(999L).getId()).getStatus(), is(TaskStatus.SKIPPED));
 
-        assertThat(tasks.get(generateInternalTask(MERGE_TASK_ID).getId()).getStatus(),
-                is(TaskStatus.PENDING));
+        assertThat(tasks.get(generateInternalTask(MERGE_TASK_ID).getId()).getStatus(), is(TaskStatus.PENDING));
 
     }
 
@@ -162,8 +169,7 @@ public class TerminateReplicateTaskHandlerTest {
         InternalTask internalTask3 = generateInternalTask(888L);
         tempTasks.put(internalTask3.getId(), internalTask3);
         internalTask3.addDependence(startTask);
-        when(jobDescriptorImpl.getTaskChildren(startTask))
-                .thenReturn(Lists.newArrayList(internalTask2, internalTask3));
+        when(jobDescriptorImpl.getTaskChildren(startTask)).thenReturn(Lists.newArrayList(internalTask2, internalTask3));
 
         InternalTask endTask = generateInternalTask(999L);
         tempTasks.put(endTask.getId(), endTask);
@@ -187,8 +193,10 @@ public class TerminateReplicateTaskHandlerTest {
     }
 
     private InternalTask generateInternalTask(long id) {
-        InternalJob job = new InternalTaskFlowJob("test-name", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
-            "description");
+        InternalJob job = new InternalTaskFlowJob("test-name",
+                                                  JobPriority.NORMAL,
+                                                  OnTaskError.CANCEL_JOB,
+                                                  "description");
         InternalTask internalTask = new InternalScriptTask(job);
         internalTask.setId(TaskIdImpl.createTaskId(new JobIdImpl(666L, "JobName"), "readableName", id));
         internalTask.setStatus(TaskStatus.PENDING);
@@ -197,8 +205,10 @@ public class TerminateReplicateTaskHandlerTest {
     }
 
     private InternalTask generateInitiatorTask() {
-        InternalJob job = new InternalTaskFlowJob("initiator", JobPriority.NORMAL, OnTaskError.CANCEL_JOB,
-            "description");
+        InternalJob job = new InternalTaskFlowJob("initiator",
+                                                  JobPriority.NORMAL,
+                                                  OnTaskError.CANCEL_JOB,
+                                                  "description");
         InternalTask initiatorTask = new InternalScriptTask(job);
         initiatorTask.setId(TaskIdImpl.createTaskId(new JobIdImpl(666L, "JobName"), "readableName", 111L));
         initiatorTask.setReplicationIndex(1);

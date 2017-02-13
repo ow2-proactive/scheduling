@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.rest;
 
@@ -79,13 +68,19 @@ import com.google.common.collect.Lists;
 public class SchedulerEventReceiver {
 
     private static final String EVENTING_PATH = "scheduler/events";
+
     private static final Logger logger = Logger.getLogger(SchedulerEventReceiver.class);
 
     private String restServerUrl;
+
     private SchedulerEventListener eventListener;
+
     private boolean myEventsOnly;
+
     private SchedulerEvent[] events;
+
     private String sessionId;
+
     private Socket socket;
 
     private SchedulerEventReceiver() {
@@ -178,11 +173,9 @@ public class SchedulerEventReceiver {
 
         public SchedulerEventReceiver build() {
             checkState(!isNullOrEmpty(this.schedulerEventReceiver.restServerUrl),
-                    "REST Server URL cannot be null or empty");
-            checkState(this.schedulerEventReceiver.eventListener != null,
-                    "Scheduler Event Listener cannot be null.");
-            checkState(!isNullOrEmpty(this.schedulerEventReceiver.sessionId),
-                    "Sessiond id cannot be null or empty.");
+                       "REST Server URL cannot be null or empty");
+            checkState(this.schedulerEventReceiver.eventListener != null, "Scheduler Event Listener cannot be null.");
+            checkState(!isNullOrEmpty(this.schedulerEventReceiver.sessionId), "Sessiond id cannot be null or empty.");
             return this.schedulerEventReceiver;
         }
     }
@@ -197,7 +190,9 @@ public class SchedulerEventReceiver {
                     notification = EventCodecUtil.fromJsonString(message, EventNotification.class);
                 } catch (Exception e) {
                     logger.error(String.format("Cannot construct %s type object from: %n%s",
-                            EventNotification.class.getName(), message), e);
+                                               EventNotification.class.getName(),
+                                               message),
+                                 e);
                 }
             }
             return notification;
@@ -230,30 +225,24 @@ public class SchedulerEventReceiver {
                 case NONE:
                     break;
                 case SCHEDULER_STATE_UPDATED:
-                    eventListener.schedulerStateUpdatedEvent(
-                            SchedulerEvent.valueOf(eventData.getSchedulerEvent()));
+                    eventListener.schedulerStateUpdatedEvent(SchedulerEvent.valueOf(eventData.getSchedulerEvent()));
                     break;
                 case JOB_SUBMITTED:
-                    eventListener
-                            .jobSubmittedEvent(DataUtility.toJobState((JobStateData) eventData.getData()));
+                    eventListener.jobSubmittedEvent(DataUtility.toJobState((JobStateData) eventData.getData()));
                     break;
                 case JOB_STATE_UPDATED:
-                    eventListener.jobStateUpdatedEvent(
-                            new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
-                                DataUtility.toJobInfo((JobInfoData) eventData.getData())));
+                    eventListener.jobStateUpdatedEvent(new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
+                                                                              DataUtility.toJobInfo((JobInfoData) eventData.getData())));
                     break;
                 case JOB_FULL_DATA_UPDATED:
-                    eventListener.jobUpdatedFullDataEvent(
-                            DataUtility.toJobState((JobStateData) eventData.getData()));
+                    eventListener.jobUpdatedFullDataEvent(DataUtility.toJobState((JobStateData) eventData.getData()));
                     break;
                 case TASK_STATE_UPDATED:
-                    eventListener.taskStateUpdatedEvent(
-                            new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
-                                DataUtility.taskInfo((TaskInfoData) eventData.getData())));
+                    eventListener.taskStateUpdatedEvent(new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
+                                                                               DataUtility.taskInfo((TaskInfoData) eventData.getData())));
                     break;
                 case USERS_UPDATED:
-                    eventListener
-                            .usersUpdatedEvent((NotificationData<UserIdentification>) eventData.getData());
+                    eventListener.usersUpdatedEvent((NotificationData<UserIdentification>) eventData.getData());
                     break;
                 default:
                     throw new RuntimeException(String.format("Unknown action: %s", action));

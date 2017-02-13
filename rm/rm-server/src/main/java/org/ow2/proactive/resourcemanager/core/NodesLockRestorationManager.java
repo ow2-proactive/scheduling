@@ -25,16 +25,17 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import com.google.common.base.Stopwatch;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
 
 /**
@@ -78,8 +79,8 @@ public class NodesLockRestorationManager {
 
         if (log.isInfoEnabled()) {
             stopwatch.stop();
-            log.info("Identifying nodes locked on the previous run required " + stopwatch.elapsed(TimeUnit.MILLISECONDS) +
-                     " ms");
+            log.info("Identifying nodes locked on the previous run required " +
+                     stopwatch.elapsed(TimeUnit.MILLISECONDS) + " ms");
         }
 
         if (nodeLockedOnPreviousRun.isEmpty()) {
@@ -89,7 +90,7 @@ public class NodesLockRestorationManager {
 
             for (Map.Entry<String, MutableInteger> entry : nodeLockedOnPreviousRun.entrySet()) {
                 log.info("  - nodeSource=" + entry.getKey() + ", host=" + entry.getKey() + ", count=" +
-                        entry.getValue().getValue());
+                         entry.getValue().getValue());
             }
         }
 

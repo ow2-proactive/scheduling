@@ -1,40 +1,43 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.resourcemanager.common.util;
+
+import java.io.IOException;
+import java.security.KeyException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import javax.management.*;
+import javax.management.openmbean.CompositeData;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -53,19 +56,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import javax.management.*;
-import javax.management.openmbean.CompositeData;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-import javax.security.auth.login.LoginException;
-import java.io.IOException;
-import java.security.KeyException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 
 /**
  * This class adds a cache mechanism that maintains the {@link RMInitialState} state of the
@@ -79,14 +69,19 @@ public class RMListenerProxy extends RMGroupEventListener {
     protected Logger logger = ProActiveLogger.getLogger(RMListenerProxy.class);
 
     protected RMAuthentication rmAuth;
+
     protected RMInitialState rmInitialState;
+
     protected RMEventType RMstate;
+
     protected Credentials credentials;
 
     protected ResourceManager target;
+
     protected JMXClientHelper jmxClient;
 
     protected JMXConnector nodeConnector;
+
     protected String nodeConnectorUrl;
 
     protected long counter = 0;
@@ -125,8 +120,8 @@ public class RMListenerProxy extends RMGroupEventListener {
     }
 
     private void rebindListener() {
-        rmInitialState = this.target.getMonitoring().addRMEventListener(
-                (RMEventListener) PAActiveObject.getStubOnThis());
+        rmInitialState = this.target.getMonitoring()
+                                    .addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
     }
 
     private void checkCounter(RMEvent event) {
@@ -220,8 +215,8 @@ public class RMListenerProxy extends RMGroupEventListener {
      * @return mbean attributes values
      */
     public Object getNodeMBeanInfo(String nodeJmxUrl, String objectName, List<String> attrs)
-            throws IOException, InstanceNotFoundException, IntrospectionException,
-            MalformedObjectNameException, ReflectionException, NullPointerException {
+            throws IOException, InstanceNotFoundException, IntrospectionException, MalformedObjectNameException,
+            ReflectionException, NullPointerException {
 
         initNodeConnector(nodeJmxUrl);
 
@@ -232,8 +227,9 @@ public class RMListenerProxy extends RMGroupEventListener {
         } else {
 
             List<Object> result = new LinkedList<>();
-            AttributeList attributes = nodeConnector.getMBeanServerConnection().getAttributes(
-                    new ObjectName(objectName), attrs.toArray(new String[attrs.size()]));
+            AttributeList attributes = nodeConnector.getMBeanServerConnection()
+                                                    .getAttributes(new ObjectName(objectName),
+                                                                   attrs.toArray(new String[attrs.size()]));
 
             for (Object attrObj : attributes) {
                 if (attrObj instanceof Attribute) {
@@ -264,8 +260,8 @@ public class RMListenerProxy extends RMGroupEventListener {
     }
 
     public String getNodeMBeanHistory(String nodeJmxUrl, String objectName, List<String> attrs, String range)
-            throws IOException, MalformedObjectNameException, IntrospectionException,
-            InstanceNotFoundException, ReflectionException, MBeanException {
+            throws IOException, MalformedObjectNameException, IntrospectionException, InstanceNotFoundException,
+            ReflectionException, MBeanException {
 
         initNodeConnector(nodeJmxUrl);
 
@@ -273,8 +269,9 @@ public class RMListenerProxy extends RMGroupEventListener {
         Object[] params = new Object[] { objectName, attrs.toArray(new String[] {}), range };
 
         // use Processes mbean as the entry point
-        return nodeConnector.getMBeanServerConnection().invoke(new ObjectName("sigar:Type=Processes"),
-                "getAttributesHistory", params, signature).toString();
+        return nodeConnector.getMBeanServerConnection()
+                            .invoke(new ObjectName("sigar:Type=Processes"), "getAttributesHistory", params, signature)
+                            .toString();
     }
 
     /**
@@ -298,37 +295,33 @@ public class RMListenerProxy extends RMGroupEventListener {
      * @return mbean attributes values
      */
     public Object getNodeMBeansInfo(String nodeJmxUrl, String objectNames, List<String> attrs)
-            throws IOException, InstanceNotFoundException, IntrospectionException,
-            MalformedObjectNameException, ReflectionException, NullPointerException {
+            throws IOException, InstanceNotFoundException, IntrospectionException, MalformedObjectNameException,
+            ReflectionException, NullPointerException {
 
         initNodeConnector(nodeJmxUrl);
 
-        Set<ObjectName> beans = nodeConnector.getMBeanServerConnection().queryNames(
-                new ObjectName(objectNames), null);
+        Set<ObjectName> beans = nodeConnector.getMBeanServerConnection().queryNames(new ObjectName(objectNames), null);
 
         HashMap<String, Object> results = new HashMap<>();
         for (ObjectName bean : beans) {
-            results
-                    .put(bean.getCanonicalName(),
-                            getNodeMBeanInfo(nodeJmxUrl, bean.getCanonicalName(), attrs));
+            results.put(bean.getCanonicalName(), getNodeMBeanInfo(nodeJmxUrl, bean.getCanonicalName(), attrs));
         }
 
         return results;
     }
 
     public Object getNodeMBeansHistory(String nodeJmxUrl, String objectNames, List<String> attrs, String range)
-            throws IOException, MalformedObjectNameException, IntrospectionException,
-            InstanceNotFoundException, ReflectionException, MBeanException {
+            throws IOException, MalformedObjectNameException, IntrospectionException, InstanceNotFoundException,
+            ReflectionException, MBeanException {
 
         initNodeConnector(nodeJmxUrl);
 
-        Set<ObjectName> beans = nodeConnector.getMBeanServerConnection().queryNames(
-                new ObjectName(objectNames), null);
+        Set<ObjectName> beans = nodeConnector.getMBeanServerConnection().queryNames(new ObjectName(objectNames), null);
 
         HashMap<String, Object> results = new HashMap<>();
         for (ObjectName bean : beans) {
-            results.put(bean.getCanonicalName(), getNodeMBeanHistory(nodeJmxUrl, bean.getCanonicalName(),
-                    attrs, range));
+            results.put(bean.getCanonicalName(),
+                        getNodeMBeanHistory(nodeJmxUrl, bean.getCanonicalName(), attrs, range));
         }
 
         return results;
@@ -357,10 +350,8 @@ public class RMListenerProxy extends RMGroupEventListener {
             try {
                 nodeConnector.close();
             } catch (IOException e) {
-                logger
-                        .warn(
-                                "Could not properly close the previous mbean server connection (node might have been deleted)",
-                                e);
+                logger.warn("Could not properly close the previous mbean server connection (node might have been deleted)",
+                            e);
             }
             nodeConnector = null;
         }

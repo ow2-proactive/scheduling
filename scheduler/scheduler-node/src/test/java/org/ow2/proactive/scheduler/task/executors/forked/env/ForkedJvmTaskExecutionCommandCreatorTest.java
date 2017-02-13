@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -29,44 +54,54 @@ import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
+
 public class ForkedJvmTaskExecutionCommandCreatorTest {
     private String jobNameValue = "TestJobName";
+
     private String jobOwnerValue = "TestOwner";
+
     private String taskNameValue = "TestTaskName";
+
     private long taskIdValue = 20L;
+
     private long jobIdValue = 12L;
+
     private int iterationIndexValue = 40;
+
     private int taskReplicationValue = 20;
 
     private String testVariable1Key = "TestVariable1";
+
     private String testVariable1Value = "valueForTest1";
 
     private String[] testPreJaveCommandString = new String[] { "My", "Command" };
+
     private String[] forkEnvJvmArguments = new String[] { "Arg1", "Arg2" };
+
     private String serializedContextAbsolutePath = "/some/absolute/path.file";
+
     private String additionalClasspath = "additionalClasspath";
+
     private String forkenvironmentJavaHome = "java/home/from/fork/env";
 
     @Test
     public void testAllNullReturnsAnEmptyList() throws Exception {
         ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
-        List<String> containsJavaHome = forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(
-                null,
-                null,
-                null);
+        List<String> containsJavaHome = forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(null,
+                                                                                                                 null,
+                                                                                                                 null);
         assertThat(containsJavaHome.size(), is(0));
     }
 
     @Test
     public void testExecCommandUsesJavaHomeFromSystemProperties() throws Exception {
-        javaCommandContains(Arrays.asList(new String[] { System.getProperty("java.home") }),
-                createForkEnvironment());
+        javaCommandContains(Arrays.asList(new String[] { System.getProperty("java.home") }), createForkEnvironment());
     }
 
     @Test
     public void testExecCommandUsesClassPathSystemProperties() throws Exception {
         javaCommandContains(Arrays.asList(new String[] { "-cp", System.getProperty("java.class.path") }),
-                createForkEnvironment());
+                            createForkEnvironment());
     }
 
     @Test
@@ -96,23 +131,19 @@ public class ForkedJvmTaskExecutionCommandCreatorTest {
         javaCommandContains(Arrays.asList(forkenvironmentJavaHome), forkEnvironment);
     }
 
-
-    private void javaCommandContains(List<String> stringsContained,
-            ForkEnvironment forkEnvironment) throws Exception {
+    private void javaCommandContains(List<String> stringsContained, ForkEnvironment forkEnvironment) throws Exception {
         ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
         replaceJavaPrefixCommandCreatorWithMock(forkedJvmTaskExecutionCommandCreator);
 
         TaskContext taskContext = createTaskContext();
         taskContext.getInitializer().setForkEnvironment(forkEnvironment);
 
-        List<String> containsJavaHome = forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(
-                taskContext,
-                null,
-                serializedContextAbsolutePath);
+        List<String> containsJavaHome = forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(taskContext,
+                                                                                                                 null,
+                                                                                                                 serializedContextAbsolutePath);
 
         for (String insideJavaCommand : stringsContained) {
-            assertThatListHasAtLeastOneStringWhichContains(containsJavaHome,
-                    insideJavaCommand);
+            assertThatListHasAtLeastOneStringWhichContains(containsJavaHome, insideJavaCommand);
         }
     }
 
@@ -124,15 +155,14 @@ public class ForkedJvmTaskExecutionCommandCreatorTest {
      * @throws NoSuchFieldException
      */
     private void replaceJavaPrefixCommandCreatorWithMock(
-            ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator) throws IllegalAccessException, NoSuchFieldException {
+            ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator)
+            throws IllegalAccessException, NoSuchFieldException {
         JavaPrefixCommandExtractor javaPrefixCommandExtractor = mock(JavaPrefixCommandExtractor.class);
-        given(javaPrefixCommandExtractor.extractJavaPrefixCommandToCommandListFromScriptResult(any(
-                ScriptResult.class))).willReturn(Arrays.asList(testPreJaveCommandString));
+        given(javaPrefixCommandExtractor.extractJavaPrefixCommandToCommandListFromScriptResult(any(ScriptResult.class))).willReturn(Arrays.asList(testPreJaveCommandString));
 
-        setPrivateField(
-                ForkedJvmTaskExecutionCommandCreator.class.getDeclaredField("javaPrefixCommandExtractor"),
-                forkedJvmTaskExecutionCommandCreator,
-                javaPrefixCommandExtractor);
+        setPrivateField(ForkedJvmTaskExecutionCommandCreator.class.getDeclaredField("javaPrefixCommandExtractor"),
+                        forkedJvmTaskExecutionCommandCreator,
+                        javaPrefixCommandExtractor);
     }
 
     /**
@@ -149,8 +179,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest {
             }
         }
         assertThat("List did not contain string with: " + matching + ".\n But was: " + list,
-                hasOneStringContaining,
-                is(true));
+                   hasOneStringContaining,
+                   is(true));
     }
 
     /**
@@ -160,24 +190,25 @@ public class ForkedJvmTaskExecutionCommandCreatorTest {
      * @param target       Instance of class, in which to set the field.
      * @param value        Value to set the field to.
      */
-    private void setPrivateField(Field privateField, Object target,
-            Object value) throws IllegalAccessException {
+    private void setPrivateField(Field privateField, Object target, Object value) throws IllegalAccessException {
         privateField.setAccessible(true);
         privateField.set(target, value);
         privateField.setAccessible(false);
     }
 
     private TaskContext createTaskContext() throws InvalidScriptException, NodeException {
-        ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript(
-                        "print('hello'); result='hello'", "javascript")));
+        ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                  "javascript")));
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariableAndForkEnvironment();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer,
+                                                  taskLauncherInitializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs(null, null, null, null, null, null),
+                                                  null,
+                                                  null);
         return taskContext;
     }
-
 
     private TaskLauncherInitializer createTaskLauncherInitializer() {
         TaskLauncherInitializer taskLauncherInitializer = new TaskLauncherInitializer();
@@ -190,11 +221,9 @@ public class ForkedJvmTaskExecutionCommandCreatorTest {
         return taskLauncherInitializer;
     }
 
-
     private TaskId createTaskId() {
         return TaskIdImpl.createTaskId(new JobIdImpl(jobIdValue, jobNameValue), taskNameValue, taskIdValue);
     }
-
 
     private TaskLauncherInitializer getTaskLauncherInitializerWithWorkflowVariableAndForkEnvironment() {
         // Create and setup task launcher initializer

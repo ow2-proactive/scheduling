@@ -1,45 +1,29 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $ACTIVEEON_INITIAL_DEV$
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
-
-import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,11 +38,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.utils.FileToBytesConverter;
+
 
 /** Abstract infrastructure Manager implementation based on hosts list file. */
 public abstract class HostsFileBasedInfrastructureManager extends InfrastructureManager {
 
     public static final int DEFAULT_NODE_TIMEOUT = 60 * 1000;
+
     public static final int DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD = 5;
 
     @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts")
@@ -99,9 +89,9 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Override
     public void acquireAllNodes() {
 
-            while (freeHosts.size() > 0) {
-                acquireNode();
-            }
+        while (freeHosts.size() > 0) {
+            acquireNode();
+        }
 
     }
 
@@ -113,17 +103,16 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         final InetAddress tmpHost;
         final int nbNodes;
 
-            if (freeHosts.size() == 0) {
-                logger.info("Attempting to acquire nodes while all hosts are already deployed.");
-                return;
-            }
-            Iterator<Map.Entry<InetAddress, Integer>> iterator = freeHosts.entrySet().iterator();
-            final Map.Entry<InetAddress, Integer> tmpEntry = iterator.next();
-            iterator.remove();
-            tmpHost = tmpEntry.getKey();
-            nbNodes = tmpEntry.getValue();
-        logger.info("Acquiring a new node. #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size());
+        if (freeHosts.size() == 0) {
+            logger.info("Attempting to acquire nodes while all hosts are already deployed.");
+            return;
+        }
+        Iterator<Map.Entry<InetAddress, Integer>> iterator = freeHosts.entrySet().iterator();
+        final Map.Entry<InetAddress, Integer> tmpEntry = iterator.next();
+        iterator.remove();
+        tmpHost = tmpEntry.getKey();
+        nbNodes = tmpEntry.getValue();
+        logger.info("Acquiring a new node. #freeHosts:" + freeHosts.size() + " #registered: " + registeredNodes.size());
 
         this.nodeSource.executeInParallel(new Runnable() {
             public void run() {
@@ -133,7 +122,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                     //node acquisition went well for host so we update the threshold
 
                     logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
-                            registeredNodes.size());
+                                 registeredNodes.size());
                     hostsThresholds.put(tmpHost, maxDeploymentFailure);
 
                 } catch (Exception e) {
@@ -145,11 +134,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                         freeHosts.putIfAbsent(tmpHost, nbNodes);
                     } else {
                         logger.debug("Tries threshold reached for host " + tmpHost +
-                                ". This host is not part of the deployment process anymore.");
+                                     ". This host is not part of the deployment process anymore.");
                     }
                     String description = "Could not acquire node on host " + tmpHost +
-                            ". NS's state refreshed regarding last checked exception: #freeHosts:" +
-                            freeHosts.size() + " #registered: " + registeredNodes.size();
+                                         ". NS's state refreshed regarding last checked exception: #freeHosts:" +
+                                         freeHosts.size() + " #registered: " + registeredNodes.size();
                     logger.error(description, e);
                     return;
                 }
@@ -181,8 +170,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         try {
             this.nodeTimeOut = Integer.parseInt(parameters[index++].toString());
         } catch (NumberFormatException e) {
-            logger
-                    .warn("Number format exception occurred at ns configuration, default acq timeout value set: " +
+            logger.warn("Number format exception occurred at ns configuration, default acq timeout value set: " +
                         HostsFileBasedInfrastructureManager.DEFAULT_NODE_TIMEOUT + "ms");
             this.nodeTimeOut = HostsFileBasedInfrastructureManager.DEFAULT_NODE_TIMEOUT;
         }
@@ -191,7 +179,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             this.maxDeploymentFailure = Integer.parseInt(parameters[index++].toString());
         } catch (NumberFormatException e) {
             logger.warn("Number format exception occurred at ns configuration, default attemp value set: " +
-                HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD);
+                        HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD);
             this.maxDeploymentFailure = HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD;
         }
     }
@@ -263,7 +251,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         this.registeredNodes.put(nodeName, node.getVMInformation().getInetAddress());
         if (logger.isDebugEnabled()) {
             logger.debug("New expected node registered: #freeHosts:" + freeHosts.size() + " #registered: " +
-                    registeredNodes.size());
+                         registeredNodes.size());
         }
     }
 
@@ -275,7 +263,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         InetAddress host = null;
         String nodeName = node.getNodeInformation().getName();
         if ((host = registeredNodes.remove(nodeName)) != null) {
-            logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " + this.getClass().getSimpleName());
+            logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " +
+                         this.getClass().getSimpleName());
             // remember the node removed
             removedNodes.putIfAbsent(host, new AtomicInteger(0));
             removedNodes.get(host).incrementAndGet();
@@ -289,11 +278,10 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                 freeHosts.putIfAbsent(host, removedNodes.remove(host).intValue());
             }
             logger.info("Node " + nodeName + " removed. #freeHosts:" + freeHosts.size() + " #registered nodes: " +
-                    registeredNodes.size());
+                        registeredNodes.size());
 
         } else {
-            logger.error("Node " + nodeName +
-                    " is not known as a node belonging to this infrastructure manager");
+            logger.error("Node " + nodeName + " is not known as a node belonging to this infrastructure manager");
         }
     }
 

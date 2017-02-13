@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.task;
 
 import java.io.IOException;
@@ -34,8 +59,11 @@ import org.ow2.proactive.scripting.SelectionScript;
 public final class ClientTaskState extends TaskState {
 
     private TaskInfo taskInfo;
+
     private int maxNumberOfExecutionOnFailure;
+
     private List<TaskId> dependenceIds = new ArrayList<>();
+
     transient private List<TaskState> dependences = new ArrayList<>();
 
     private int maxNumberOfExecution;
@@ -126,8 +154,7 @@ public final class ClientTaskState extends TaskState {
      */
     @Override
     public List<InputSelector> getInputFilesList() {
-        throw new RuntimeException(
-            "Not implemented: the input files atttribute is not available on client side.");
+        throw new RuntimeException("Not implemented: the input files atttribute is not available on client side.");
     }
 
     /**
@@ -136,8 +163,7 @@ public final class ClientTaskState extends TaskState {
      */
     @Override
     public List<OutputSelector> getOutputFilesList() {
-        throw new RuntimeException(
-            "Not implemented: the output files atttribute is not available on client side.");
+        throw new RuntimeException("Not implemented: the output files atttribute is not available on client side.");
     }
 
     /**
@@ -146,8 +172,7 @@ public final class ClientTaskState extends TaskState {
      */
     @Override
     public Script<?> getPreScript() {
-        throw new RuntimeException(
-            "Not implemented: the PreScript atttribute is not available on client side.");
+        throw new RuntimeException("Not implemented: the PreScript atttribute is not available on client side.");
     }
 
     /**
@@ -156,8 +181,7 @@ public final class ClientTaskState extends TaskState {
      */
     @Override
     public Script<?> getPostScript() {
-        throw new RuntimeException(
-            "Not implemented: the PostScript atttribute is not available on client side.");
+        throw new RuntimeException("Not implemented: the PostScript atttribute is not available on client side.");
     }
 
     /**
@@ -166,8 +190,7 @@ public final class ClientTaskState extends TaskState {
      */
     @Override
     public List<SelectionScript> getSelectionScripts() {
-        throw new RuntimeException(
-            "Not implemented: the SelectionScript atttribute is not available on client side.");
+        throw new RuntimeException("Not implemented: the SelectionScript atttribute is not available on client side.");
     }
 
     /**
@@ -176,8 +199,7 @@ public final class ClientTaskState extends TaskState {
      */
     @Override
     public FlowScript getFlowScript() {
-        throw new RuntimeException(
-            "Not implemented: the FlowScript atttribute is not available on client side.");
+        throw new RuntimeException("Not implemented: the FlowScript atttribute is not available on client side.");
     }
 
     /**
@@ -186,8 +208,7 @@ public final class ClientTaskState extends TaskState {
      */
     @Override
     public RestartMode getRestartTaskOnError() {
-        throw new RuntimeException(
-            "Not implemented: the restart task on error property is not available on client side.");
+        throw new RuntimeException("Not implemented: the restart task on error property is not available on client side.");
     }
 
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {

@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $PROACTIVE_INITIAL_DEV$
  */
 package functionaltests;
 
@@ -78,8 +67,9 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
 
-        Iterable<JobState> jobs = Iterables.concat(state.getPendingJobs(), state.getRunningJobs(),
-                state.getFinishedJobs());
+        Iterable<JobState> jobs = Iterables.concat(state.getPendingJobs(),
+                                                   state.getRunningJobs(),
+                                                   state.getFinishedJobs());
 
         for (JobState jobState : jobs) {
             JobId jobId = jobState.getId();
@@ -98,8 +88,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
         String url = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(url);
-        StringEntity entity = new StringEntity(
-            "username=" + config.getLogin() + "&password=" + config.getPassword());
+        StringEntity entity = new StringEntity("username=" + config.getLogin() + "&password=" + config.getPassword());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
         HttpResponse response = executeUriRequest(httpPost);
@@ -110,12 +99,16 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     @Test
     public void testLoginWithCredentials() throws Exception {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
-        Credentials credentials = RestFuncTUtils.createCredentials(config.getLogin(), config.getPassword(),
-                RestFuncTHelper.getSchedulerPublicKey());
+        Credentials credentials = RestFuncTUtils.createCredentials(config.getLogin(),
+                                                                   config.getPassword(),
+                                                                   RestFuncTHelper.getSchedulerPublicKey());
         String schedulerUrl = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(schedulerUrl);
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("credential",
-                new ByteArrayBody(credentials.getBase64(), ContentType.APPLICATION_OCTET_STREAM, null));
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
+                                                                              .addPart("credential",
+                                                                                       new ByteArrayBody(credentials.getBase64(),
+                                                                                                         ContentType.APPLICATION_OCTET_STREAM,
+                                                                                                         null));
         httpPost.setEntity(multipartEntityBuilder.build());
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
@@ -128,8 +121,10 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         HttpPost httpPost = new HttpPost(schedulerUrl);
         setSessionHeader(httpPost);
         File jobFile = RestFuncTHelper.getDefaultJobXmlfile();
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("file",
-                new FileBody(jobFile, ContentType.APPLICATION_XML));
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
+                                                                              .addPart("file",
+                                                                                       new FileBody(jobFile,
+                                                                                                    ContentType.APPLICATION_XML));
         httpPost.setEntity(multipartEntityBuilder.build());
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
@@ -139,15 +134,16 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testUrlMatrixParamsShouldReplaceJobVariables() throws Exception {
-        File jobFile = new File(
-            RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml").toURI());
+        File jobFile = new File(RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml").toURI());
 
         String schedulerUrl = getResourceUrl("submit;var=matrix_param_val");
         HttpPost httpPost = new HttpPost(schedulerUrl);
         setSessionHeader(httpPost);
 
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create().addPart("file",
-                new FileBody(jobFile, ContentType.APPLICATION_XML));
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
+                                                                              .addPart("file",
+                                                                                       new FileBody(jobFile,
+                                                                                                    ContentType.APPLICATION_XML));
         httpPost.setEntity(multipartEntityBuilder.build());
 
         HttpResponse response = executeUriRequest(httpPost);

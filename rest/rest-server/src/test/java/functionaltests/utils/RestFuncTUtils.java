@@ -1,41 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * %$ACTIVEEON_INITIAL_DEV$
  */
-
 package functionaltests.utils;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.URI;
+import java.net.URL;
+import java.security.PublicKey;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -45,14 +41,6 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.URI;
-import java.net.URL;
-import java.security.PublicKey;
 
 
 public class RestFuncTUtils {
@@ -79,14 +67,19 @@ public class RestFuncTUtils {
     }
 
     public static final String getJavaPathFromSystemProperties() {
-        return (new StringBuilder()).append(System.getProperty("java.home")).append(File.separator).append(
-                "bin").append(File.separator).append("java").toString();
+        return (new StringBuilder()).append(System.getProperty("java.home"))
+                                    .append(File.separator)
+                                    .append("bin")
+                                    .append(File.separator)
+                                    .append("java")
+                                    .toString();
     }
 
-    public static Credentials createCredentials(String login, String password, PublicKey pubKey)
-            throws Exception {
-        return Credentials.createCredentials(new CredData(CredData.parseLogin(login), CredData
-                .parseDomain(login), password), pubKey);
+    public static Credentials createCredentials(String login, String password, PublicKey pubKey) throws Exception {
+        return Credentials.createCredentials(new CredData(CredData.parseLogin(login),
+                                                          CredData.parseDomain(login),
+                                                          password),
+                                             pubKey);
     }
 
     public static String buildJvmParameters() {
@@ -98,9 +91,11 @@ public class RestFuncTUtils {
 
     public static void cleanupRMActiveObjectRegistry() throws Exception {
         cleanupActiveObjectRegistry(PAResourceManagerProperties.RM_NODE_NAME.getValueAsString(),
-                RMConstants.NAME_ACTIVE_OBJECT_RMCORE, RMConstants.NAME_ACTIVE_OBJECT_RMADMIN,
-                RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION, RMConstants.NAME_ACTIVE_OBJECT_RMUSER,
-                RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
+                                    RMConstants.NAME_ACTIVE_OBJECT_RMCORE,
+                                    RMConstants.NAME_ACTIVE_OBJECT_RMADMIN,
+                                    RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION,
+                                    RMConstants.NAME_ACTIVE_OBJECT_RMUSER,
+                                    RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING);
     }
 
     public static void cleanupActiveObjectRegistry(String... namesToRemove) throws Exception {
@@ -119,8 +114,10 @@ public class RestFuncTUtils {
     }
 
     public static String getClassPath(Class<?> clazz) throws Exception {
-        String name = (new StringBuilder()).append('/').append(clazz.getName().replace('.', '/')).append(
-                ".class").toString();
+        String name = (new StringBuilder()).append('/')
+                                           .append(clazz.getName().replace('.', '/'))
+                                           .append(".class")
+                                           .toString();
         String osName = name.replace('/', File.separator.charAt(0));
         URL resource = clazz.getResource(name);
         String absolutePath = (new File(resource.toURI())).getAbsolutePath();

@@ -1,42 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.selectionscript;
 
-import functionaltests.utils.RMFunctionalTest;
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -44,12 +39,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-
-import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.assertEquals;
+import functionaltests.utils.RMFunctionalTest;
 
 
 /**
@@ -67,8 +57,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class SelectionScriptTimeOutTest extends RMFunctionalTest {
 
-    private URL selectionScriptWithtimeOutPath = this.getClass().getResource(
-            "selectionScriptWithtimeOut.groovy");
+    private URL selectionScriptWithtimeOutPath = this.getClass().getResource("selectionScriptWithtimeOut.groovy");
 
     @Test
     public void action() throws Exception {
@@ -81,7 +70,8 @@ public class SelectionScriptTimeOutTest extends RMFunctionalTest {
 
         //create the static selection script object
         SelectionScript script = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()),
-            new String[] { Integer.toString(scriptSleepingTime) }, false);
+                                                     new String[] { Integer.toString(scriptSleepingTime) },
+                                                     false);
 
         NodeSet nodes = resourceManager.getAtMostNodes(2, script);
 
@@ -106,8 +96,9 @@ public class SelectionScriptTimeOutTest extends RMFunctionalTest {
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
         // now we have nodesNumber + 1 nodes
-        script = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()), new String[] {
-                Integer.toString(scriptSleepingTime), nodeName }, false);
+        script = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()),
+                                     new String[] { Integer.toString(scriptSleepingTime), nodeName },
+                                     false);
 
         // selecting all nodes
         nodes = resourceManager.getAtMostNodes(nodesNumber + 1, script);

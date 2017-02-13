@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.jmx.provider.ro;
 
@@ -65,18 +54,25 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
  */
 public class ROConnector implements JMXConnector, NotificationListener, Serializable {
     private static final Logger LOGGER = Logger.getLogger(ROConnector.class);
+
     /** To know if this connector is closed (false by default) */
     private transient boolean closed;
+
     /** To know if this connector is already connected  (false by default) */
     private transient boolean connected;
+
     /** The stub on the RO server */
     private transient ROServerImpl roServerStub;
+
     /** The connection obtained from the RO server */
     private transient ROConnection connection;
+
     /** The cached connection id */
     private transient String connectiodId;
+
     /** The JMXServiceURL of the RO JMX Connector server to which this client connector will be connected */
     private final JMXServiceURL jmxServiceURL;
+
     /** The list of listeners */
     private final Vector<NotificationListener> listeners;
 
@@ -151,8 +147,7 @@ public class ROConnector implements JMXConnector, NotificationListener, Serializ
         try {
             final URI uri = JMXProviderUtils.extractURI(this.jmxServiceURL);
             // Obtain the correct factory from the protocol (uri's scheme)
-            final RemoteObjectFactory factory = AbstractRemoteObjectFactory.getRemoteObjectFactory(uri
-                    .getScheme());
+            final RemoteObjectFactory factory = AbstractRemoteObjectFactory.getRemoteObjectFactory(uri.getScheme());
             // Use the factory to lookup the remote object
             final RemoteObject<ROServerImpl> remoteObject = factory.lookup(uri);
             // Get the proxy from the remote object
@@ -166,7 +161,7 @@ public class ROConnector implements JMXConnector, NotificationListener, Serializ
             this.connectiodId = this.connection.getConnectionId();
         } catch (Exception e) {
             final String message = "Unable to establish a connection with the Remote Object JMX server at " +
-                this.jmxServiceURL;
+                                   this.jmxServiceURL;
             // Log the exception
             LOGGER.error(message, e);
             // Throw the IOException
@@ -187,8 +182,7 @@ public class ROConnector implements JMXConnector, NotificationListener, Serializ
     /**
      * @see javax.management.remote.JMXConnector#getMBeanServerConnection(javax.security.auth.Subject)
      */
-    public synchronized MBeanServerConnection getMBeanServerConnection(Subject delegationSubject)
-            throws IOException {
+    public synchronized MBeanServerConnection getMBeanServerConnection(Subject delegationSubject) throws IOException {
         if (this.closed) {
             throw new IOException("Connection closed");
         }
@@ -242,16 +236,15 @@ public class ROConnector implements JMXConnector, NotificationListener, Serializ
     /**
      * @see javax.management.remote.JMXConnector#removeConnectionNotificationListener(javax.management.NotificationListener)
      */
-    public void removeConnectionNotificationListener(NotificationListener listener)
-            throws ListenerNotFoundException {
+    public void removeConnectionNotificationListener(NotificationListener listener) throws ListenerNotFoundException {
         this.listeners.remove(listener);
     }
 
     /**
      * @see javax.management.remote.JMXConnector#removeConnectionNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
-    public void removeConnectionNotificationListener(NotificationListener listener,
-            NotificationFilter filter, Object handback) throws ListenerNotFoundException {
+    public void removeConnectionNotificationListener(NotificationListener listener, NotificationFilter filter,
+            Object handback) throws ListenerNotFoundException {
         this.listeners.remove(listener);
     }
 

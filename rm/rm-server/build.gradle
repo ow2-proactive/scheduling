@@ -68,14 +68,14 @@ task testJar(type: Jar) {
     from sourceSets.test.output
 }
 
-    
+
 task dist(type: Copy) {
     from testJar
     into file("$rootDir/dist/lib")
 }
 
 rootProject.dist.dependsOn testJar
-    
+
 artifacts {
     archives testJar
 }

@@ -1,6 +1,34 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db;
 
-import com.google.common.collect.ImmutableList;
+import static com.google.common.truth.Truth.assertThat;
+
+import java.util.Vector;
+
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -13,9 +41,8 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
-import java.util.Vector;
+import com.google.common.collect.ImmutableList;
 
-import static com.google.common.truth.Truth.assertThat;
 
 public class RecoveredSchedulerStateTest {
 
@@ -27,9 +54,7 @@ public class RecoveredSchedulerStateTest {
         Vector<InternalJob> runningJobs = createJobs(JobStatus.RUNNING, nbJobs);
         Vector<InternalJob> finishedJobs = createJobs(JobStatus.FINISHED, nbJobs);
 
-        RecoveredSchedulerState recoveredState =
-                new RecoveredSchedulerState(
-                        pendingJobs, runningJobs, finishedJobs);
+        RecoveredSchedulerState recoveredState = new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
 
         assertThat(recoveredState.getPendingJobs()).containsExactlyElementsIn(pendingJobs);
         assertThat(recoveredState.getRunningJobs()).containsExactlyElementsIn(runningJobs);
@@ -58,12 +83,14 @@ public class RecoveredSchedulerStateTest {
     }
 
     public InternalJob createJob(JobStatus jobStatus) {
-        InternalTaskFlowJob job =
-                new InternalTaskFlowJob("MyJob", JobPriority.HIGH, OnTaskError.CANCEL_JOB, "Description");
+        InternalTaskFlowJob job = new InternalTaskFlowJob("MyJob",
+                                                          JobPriority.HIGH,
+                                                          OnTaskError.CANCEL_JOB,
+                                                          "Description");
 
         InternalScriptTask internalScriptTask = new InternalScriptTask(job);
 
-        job.addTasks(ImmutableList.<InternalTask>of(internalScriptTask));
+        job.addTasks(ImmutableList.<InternalTask> of(internalScriptTask));
 
         JobInfoImpl jobInfo = (JobInfoImpl) job.getJobInfo();
         jobInfo.setStatus(jobStatus);

@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,417 +71,421 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.utils.ClasspathUtils;
 import org.ow2.tests.ProActiveTest;
 
+
 @Ignore
 public class BaseSchedulerDBTest extends ProActiveTest {
 
-	protected SchedulerDBManager dbManager;
+    protected SchedulerDBManager dbManager;
 
-	private static Credentials defaultCredentials;
+    private static Credentials defaultCredentials;
 
-	protected static final String DEFAULT_USER_NAME = "admin";
-
-	protected boolean inMemory = false;
-
-	public BaseSchedulerDBTest() {
-		this(false);
-	}
-
-	public BaseSchedulerDBTest(boolean inMemory) {
-		this.inMemory = inMemory;
-	}
-
-	public static class TestResult implements Serializable {
-
-		private int a;
-
-		private String b;
-
-		TestResult(int a, String b) {
-			this.a = a;
-			this.b = b;
-		}
-
-		public int getA() {
-			return a;
-		}
-
-		public String getB() {
-			return b;
-		}
-	}
+    protected static final String DEFAULT_USER_NAME = "admin";
 
-	public static class TestException extends Exception {
+    protected boolean inMemory = false;
 
-		private String data;
+    public BaseSchedulerDBTest() {
+        this(false);
+    }
 
-		public TestException(String message, String data) {
-			super(message);
-			this.data = data;
-		}
+    public BaseSchedulerDBTest(boolean inMemory) {
+        this.inMemory = inMemory;
+    }
 
-		public String getData() {
-			return data;
-		}
-	}
+    public static class TestResult implements Serializable {
 
-	static class StateMatcher extends TypeSafeMatcher<SchedulerState> {
+        private int a;
 
-		private final List<JobStateMatcher> pending = new ArrayList<>();
-		private final List<JobStateMatcher> running = new ArrayList<>();
-		private final List<JobStateMatcher> finished = new ArrayList<>();
+        private String b;
 
-		@Override
-		public void describeTo(Description description) {
-			description.appendText("State with jobs");
-			for (JobStateMatcher job : pending) {
-				description.appendDescriptionOf(job);
-			}
-			for (JobStateMatcher job : running) {
-				description.appendDescriptionOf(job);
-			}
-			for (JobStateMatcher job : finished) {
-				description.appendDescriptionOf(job);
-			}
-		}
+        TestResult(int a, String b) {
+            this.a = a;
+            this.b = b;
+        }
 
-		StateMatcher withPending(JobStateMatcher job) {
-			pending.add(job);
-			return this;
-		}
+        public int getA() {
+            return a;
+        }
 
-		StateMatcher withRunning(JobStateMatcher job) {
-			running.add(job);
-			return this;
-		}
+        public String getB() {
+            return b;
+        }
+    }
 
-		StateMatcher withFinished(JobStateMatcher job) {
-			finished.add(job);
-			return this;
-		}
+    public static class TestException extends Exception {
 
-		@Override
-		protected boolean matchesSafely(SchedulerState item) {
-			assertThat(item.getPendingJobs(), containsInAnyOrder(pending.toArray(new JobStateMatcher[] {})));
-			assertThat(item.getRunningJobs(), containsInAnyOrder(running.toArray(new JobStateMatcher[] {})));
-			assertThat(item.getFinishedJobs(), containsInAnyOrder(finished.toArray(new JobStateMatcher[] {})));
+        private String data;
 
-			return true;
-		}
+        public TestException(String message, String data) {
+            super(message);
+            this.data = data;
+        }
 
-	}
+        public String getData() {
+            return data;
+        }
+    }
 
-	public SchedulerDBManager getDbManager() {
-		return dbManager;
-	}
+    static class StateMatcher extends TypeSafeMatcher<SchedulerState> {
 
-	public static Credentials getDefaultCredentials() throws Exception {
-		if (defaultCredentials == null) {
-			defaultCredentials = Credentials.createCredentials(DEFAULT_USER_NAME, "admin",
-					new File(BaseSchedulerDBTest.class.getResource("/functionaltests/config/pub.key").toURI())
-							.getAbsolutePath());
-		}
-		return defaultCredentials;
-	}
+        private final List<JobStateMatcher> pending = new ArrayList<>();
 
-	protected RecoveredSchedulerState checkRecoveredState(
-			RecoveredSchedulerState state, StateMatcher stateMatcher) {
-		assertThat(state.getSchedulerState(), stateMatcher);
+        private final List<JobStateMatcher> running = new ArrayList<>();
 
-		assertThat(state.getPendingJobs(), containsInAnyOrder(stateMatcher.pending.toArray(new JobStateMatcher[] {})));
-		assertThat(state.getRunningJobs(), containsInAnyOrder(stateMatcher.running.toArray(new JobStateMatcher[] {})));
-		assertThat(state.getFinishedJobs(),
-				containsInAnyOrder(stateMatcher.finished.toArray(new JobStateMatcher[] {})));
-
-		return state;
-	}
+        private final List<JobStateMatcher> finished = new ArrayList<>();
 
-	static Set<JobStatus> finishedJobStatus = new HashSet<>();
-
-	static {
-		finishedJobStatus.add(JobStatus.CANCELED);
-		finishedJobStatus.add(JobStatus.FAILED);
-		finishedJobStatus.add(JobStatus.KILLED);
-		finishedJobStatus.add(JobStatus.FINISHED);
-	}
-
-	static class JobStateMatcher extends TypeSafeMatcher<JobState> {
-
-		private final JobId id;
-
-		private final List<TaskStateMatcher> pending = new ArrayList<>();
-
-		private final List<TaskStateMatcher> running = new ArrayList<>();
-
-		private final List<TaskStateMatcher> finished = new ArrayList<>();
-
-		private final Set<String> eligibleTasks = new HashSet<>();
-
-		private final JobStatus status;
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("State with jobs");
+            for (JobStateMatcher job : pending) {
+                description.appendDescriptionOf(job);
+            }
+            for (JobStateMatcher job : running) {
+                description.appendDescriptionOf(job);
+            }
+            for (JobStateMatcher job : finished) {
+                description.appendDescriptionOf(job);
+            }
+        }
 
-		private int finishedNumber;
+        StateMatcher withPending(JobStateMatcher job) {
+            pending.add(job);
+            return this;
+        }
 
-		private int pendingNumber;
+        StateMatcher withRunning(JobStateMatcher job) {
+            running.add(job);
+            return this;
+        }
 
-		private boolean checkFinished;
+        StateMatcher withFinished(JobStateMatcher job) {
+            finished.add(job);
+            return this;
+        }
 
-		static JobStateMatcher job(JobId id, JobStatus status) {
-			return new JobStateMatcher(id, status);
-		}
+        @Override
+        protected boolean matchesSafely(SchedulerState item) {
+            assertThat(item.getPendingJobs(), containsInAnyOrder(pending.toArray(new JobStateMatcher[] {})));
+            assertThat(item.getRunningJobs(), containsInAnyOrder(running.toArray(new JobStateMatcher[] {})));
+            assertThat(item.getFinishedJobs(), containsInAnyOrder(finished.toArray(new JobStateMatcher[] {})));
 
-		public JobStateMatcher(JobId id, JobStatus status) {
-			this.id = id;
-			this.status = status;
-		}
+            return true;
+        }
 
-		JobStateMatcher withEligible(String... tasks) {
-			eligibleTasks.addAll(Arrays.asList(tasks));
-			return this;
-		}
+    }
 
-		JobStateMatcher withPending(TaskStateMatcher task, boolean addToCount) {
-			pending.add(task);
-			if (addToCount) {
-				pendingNumber++;
-			}
-			return this;
-		}
+    public SchedulerDBManager getDbManager() {
+        return dbManager;
+    }
 
-		JobStateMatcher withRunning(TaskStateMatcher task) {
-			running.add(task);
-			return this;
-		}
+    public static Credentials getDefaultCredentials() throws Exception {
+        if (defaultCredentials == null) {
+            defaultCredentials = Credentials.createCredentials(DEFAULT_USER_NAME,
+                                                               "admin",
+                                                               new File(BaseSchedulerDBTest.class.getResource("/functionaltests/config/pub.key")
+                                                                                                 .toURI()).getAbsolutePath());
+        }
+        return defaultCredentials;
+    }
 
-		JobStateMatcher withFinished(TaskStateMatcher task) {
-			return withFinished(task, true);
-		}
+    protected RecoveredSchedulerState checkRecoveredState(RecoveredSchedulerState state, StateMatcher stateMatcher) {
+        assertThat(state.getSchedulerState(), stateMatcher);
 
-		JobStateMatcher withFinished(TaskStateMatcher task, boolean addToCount) {
-			finished.add(task);
-			if (addToCount) {
-				finishedNumber++;
-			}
-			return this;
-		}
+        assertThat(state.getPendingJobs(), containsInAnyOrder(stateMatcher.pending.toArray(new JobStateMatcher[] {})));
+        assertThat(state.getRunningJobs(), containsInAnyOrder(stateMatcher.running.toArray(new JobStateMatcher[] {})));
+        assertThat(state.getFinishedJobs(),
+                   containsInAnyOrder(stateMatcher.finished.toArray(new JobStateMatcher[] {})));
 
-		JobStateMatcher checkFinished() {
-			checkFinished = true;
-			return this;
-		}
+        return state;
+    }
 
-		@Override
-		public void describeTo(Description description) {
-			description.appendText("Job " + id);
-		}
+    static Set<JobStatus> finishedJobStatus = new HashSet<>();
 
-		@Override
-		protected boolean matchesSafely(JobState item) {
-			if (!id.equals(item.getId())) {
-				return false;
-			}
+    static {
+        finishedJobStatus.add(JobStatus.CANCELED);
+        finishedJobStatus.add(JobStatus.FAILED);
+        finishedJobStatus.add(JobStatus.KILLED);
+        finishedJobStatus.add(JobStatus.FINISHED);
+    }
 
-			Assert.assertEquals(status, item.getStatus());
+    static class JobStateMatcher extends TypeSafeMatcher<JobState> {
+
+        private final JobId id;
+
+        private final List<TaskStateMatcher> pending = new ArrayList<>();
+
+        private final List<TaskStateMatcher> running = new ArrayList<>();
+
+        private final List<TaskStateMatcher> finished = new ArrayList<>();
+
+        private final Set<String> eligibleTasks = new HashSet<>();
 
-			Assert.assertEquals("Pending tasks for " + id, pendingNumber, item.getNumberOfPendingTasks());
-			Assert.assertEquals("Running tasks for " + id, running.size(), item.getNumberOfRunningTasks());
-			Assert.assertEquals("Finished tasks for " + id, finishedNumber, item.getNumberOfFinishedTasks());
+        private final JobStatus status;
 
-			Collection<TaskStateMatcher> all = new ArrayList<>(pending.size() + running.size() + finished.size());
-			all.addAll(pending);
-			all.addAll(running);
-			all.addAll(finished);
-			assertThat("Tasks for " + id, item.getTasks(), containsInAnyOrder(all.toArray(new TaskStateMatcher[] {})));
-
-			assertThat("Submitted time for " + id, item.getSubmittedTime(), greaterThan(0L));
-
-			if (checkFinished) {
-				assertThat("Started time for " + id, item.getStartTime(), greaterThan(0L));
-				assertThat("Finished time for " + id, item.getFinishedTime(), greaterThan(0L));
-			}
-
-			if (item instanceof InternalJob) {
-				InternalJob internalJob = (InternalJob) item;
-
-				if (!finishedJobStatus.contains(status)) {
-					Set<String> actualEligible = new HashSet<>();
-					for (EligibleTaskDescriptor desc : internalJob.getJobDescriptor().getEligibleTasks()) {
-						actualEligible.add(desc.getTaskId().getReadableName());
-					}
-					Assert.assertEquals("Eligible tasks for " + id, eligibleTasks, actualEligible);
-				}
-			}
-
-			return true;
-		}
-
-	}
-
-	static class TaskStateMatcher extends TypeSafeMatcher<TaskState> {
-
-		private final String name;
-
-		private final TaskStatus status;
-
-		private boolean checkFinished;
-
-		public TaskStateMatcher(String name, TaskStatus status) {
-			this.name = name;
-			this.status = status;
-		}
-
-		public TaskStateMatcher checkFinished() {
-			checkFinished = true;
-			return this;
-		}
-
-		@Override
-		public void describeTo(Description desc) {
-			desc.appendText("Task " + name + ", " + status);
-		}
-
-		@Override
-		public boolean matchesSafely(TaskState item) {
-			if (!item.getName().equals(name)) {
-				return false;
-			}
-
-			Assert.assertEquals("Status for " + item.getName(), status, item.getStatus());
-
-			if (checkFinished) {
-				assertThat("Finished time for " + item.getName(), item.getFinishedTime(), greaterThan(0L));
-			} else {
-				assertThat("Finished time for " + item.getName(), item.getFinishedTime(), is(-1L));
-			}
-
-			return true;
-		}
-
-		boolean checkIfTheSame(TaskState task) {
-			if (!name.equals(task.getName())) {
-				return false;
-			}
-
-			Assert.assertEquals(status, task.getStatus());
-
-			return true;
-		}
-	}
-
-	static StateMatcher state() {
-		return new StateMatcher();
-	}
-
-	static TaskStateMatcher task(String name, TaskStatus status) {
-		return new TaskStateMatcher(name, status);
-	}
-
-	static JobStateMatcher job(JobId id, JobStatus status) {
-		return new JobStateMatcher(id, status);
-	}
-
-	@Before
-	public void initTest() throws Exception {
-		PASchedulerProperties.SCHEDULER_HOME.updateProperty(ClasspathUtils.findSchedulerHome());
-		PASchedulerProperties.TASK_FORK.updateProperty("true");
-		CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
-
-		if (inMemory) {
-			dbManager = SchedulerDBManager.createInMemorySchedulerDBManager();
-		} else {
-			Configuration config = new Configuration()
-					.configure(new File(this.getClass().getResource("/functionaltests/config/hibernate.cfg.xml").toURI()));
-			dbManager = new SchedulerDBManager(config, true);
-		}
-	}
-
-	@After
-	public void cleanup() {
-		if (dbManager != null) {
-			dbManager.close();
-		}
-	}
-
-	public static class TestDummyExecutable extends JavaExecutable {
-		@Override
-		public Serializable execute(TaskResult... results) throws Throwable {
-			return null;
-		}
-	}
-
-	public InternalJob defaultSubmitJob(TaskFlowJob job) throws Exception {
-		return defaultSubmitJob(job, DEFAULT_USER_NAME, -1);
-	}
-
-	public InternalJob defaultSubmitJob(TaskFlowJob job, String userName) throws Exception {
-		return defaultSubmitJob(job, userName, -1);
-	}
-
-	public InternalJob defaultSubmitJob(TaskFlowJob job, String userName, long submittedTime) throws Exception {
-		if (job.getTasks().isEmpty()) {
-			job.addTask(createDefaultTask("default test task"));
-		}
-		InternalJob internalJob = InternalJobFactory.createJob(job, getDefaultCredentials());
-		internalJob.setOwner(userName);
-		internalJob.submitAction();
-		if (submittedTime > 0) {
-			internalJob.setSubmittedTime(submittedTime);
-		}
-		dbManager.newJobSubmitted(internalJob);
-
-		return internalJob;
-	}
-
-	public InternalJob loadInternalJob(boolean fullState, JobId jobId) {
-		List<InternalJob> jobs = dbManager.loadJobs(fullState, jobId);
-		Assert.assertEquals(1, jobs.size());
-		return jobs.get(0);
-	}
-
-	public InternalJob defaultSubmitJobAndLoadInternal(boolean fullState, TaskFlowJob jobDef) throws Exception {
-		return defaultSubmitJobAndLoadInternal(fullState, jobDef, DEFAULT_USER_NAME);
-	}
-
-	public InternalJob defaultSubmitJobAndLoadInternal(boolean fullState, TaskFlowJob jobDef, String userName)
-			throws Exception {
-		InternalJob job = defaultSubmitJob(jobDef, userName);
-		return loadInternalJob(fullState, job.getId());
-	}
-
-	protected static JavaTask createDefaultTask(String taskName) {
-		JavaTask task = new JavaTask();
-		task.setName(taskName);
-		task.setExecutableClassName(TestDummyExecutable.class.getName());
-		return task;
-	}
-
-	public InternalJob saveSingleTask(Task task) throws Exception {
-		TaskFlowJob job = new TaskFlowJob();
-		job.addTask(task);
-		InternalJob jobData = defaultSubmitJobAndLoadInternal(true, job);
-		Assert.assertEquals(1, jobData.getTasks().size());
-		return jobData;
-	}
-
-	protected TaskState findTask(JobState jobState, String taskName) {
-		for (TaskState taskState : jobState.getTasks()) {
-			if (taskState.getName().equals(taskName)) {
-				return taskState;
-			}
-		}
-		Assert.fail("Didn't find task with name " + taskName);
-		return null;
-	}
-
-	protected InternalTask startTask(InternalJob internalJob, InternalTask internalTask) throws Exception {
-		internalTask.setExecuterInformation(new ExecuterInformation(null, NodeFactory.getDefaultNode()));
-		internalJob.startTask(internalTask);
-		return internalTask;
-	}
-
-	protected String createString(int length) {
-		StringBuilder string = new StringBuilder(length);
-		for (int i = 0; i < length; i++) {
-			string.append("a");
-		}
-		return string.toString();
-	}
+        private int finishedNumber;
+
+        private int pendingNumber;
+
+        private boolean checkFinished;
+
+        static JobStateMatcher job(JobId id, JobStatus status) {
+            return new JobStateMatcher(id, status);
+        }
+
+        public JobStateMatcher(JobId id, JobStatus status) {
+            this.id = id;
+            this.status = status;
+        }
+
+        JobStateMatcher withEligible(String... tasks) {
+            eligibleTasks.addAll(Arrays.asList(tasks));
+            return this;
+        }
+
+        JobStateMatcher withPending(TaskStateMatcher task, boolean addToCount) {
+            pending.add(task);
+            if (addToCount) {
+                pendingNumber++;
+            }
+            return this;
+        }
+
+        JobStateMatcher withRunning(TaskStateMatcher task) {
+            running.add(task);
+            return this;
+        }
+
+        JobStateMatcher withFinished(TaskStateMatcher task) {
+            return withFinished(task, true);
+        }
+
+        JobStateMatcher withFinished(TaskStateMatcher task, boolean addToCount) {
+            finished.add(task);
+            if (addToCount) {
+                finishedNumber++;
+            }
+            return this;
+        }
+
+        JobStateMatcher checkFinished() {
+            checkFinished = true;
+            return this;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("Job " + id);
+        }
+
+        @Override
+        protected boolean matchesSafely(JobState item) {
+            if (!id.equals(item.getId())) {
+                return false;
+            }
+
+            Assert.assertEquals(status, item.getStatus());
+
+            Assert.assertEquals("Pending tasks for " + id, pendingNumber, item.getNumberOfPendingTasks());
+            Assert.assertEquals("Running tasks for " + id, running.size(), item.getNumberOfRunningTasks());
+            Assert.assertEquals("Finished tasks for " + id, finishedNumber, item.getNumberOfFinishedTasks());
+
+            Collection<TaskStateMatcher> all = new ArrayList<>(pending.size() + running.size() + finished.size());
+            all.addAll(pending);
+            all.addAll(running);
+            all.addAll(finished);
+            assertThat("Tasks for " + id, item.getTasks(), containsInAnyOrder(all.toArray(new TaskStateMatcher[] {})));
+
+            assertThat("Submitted time for " + id, item.getSubmittedTime(), greaterThan(0L));
+
+            if (checkFinished) {
+                assertThat("Started time for " + id, item.getStartTime(), greaterThan(0L));
+                assertThat("Finished time for " + id, item.getFinishedTime(), greaterThan(0L));
+            }
+
+            if (item instanceof InternalJob) {
+                InternalJob internalJob = (InternalJob) item;
+
+                if (!finishedJobStatus.contains(status)) {
+                    Set<String> actualEligible = new HashSet<>();
+                    for (EligibleTaskDescriptor desc : internalJob.getJobDescriptor().getEligibleTasks()) {
+                        actualEligible.add(desc.getTaskId().getReadableName());
+                    }
+                    Assert.assertEquals("Eligible tasks for " + id, eligibleTasks, actualEligible);
+                }
+            }
+
+            return true;
+        }
+
+    }
+
+    static class TaskStateMatcher extends TypeSafeMatcher<TaskState> {
+
+        private final String name;
+
+        private final TaskStatus status;
+
+        private boolean checkFinished;
+
+        public TaskStateMatcher(String name, TaskStatus status) {
+            this.name = name;
+            this.status = status;
+        }
+
+        public TaskStateMatcher checkFinished() {
+            checkFinished = true;
+            return this;
+        }
+
+        @Override
+        public void describeTo(Description desc) {
+            desc.appendText("Task " + name + ", " + status);
+        }
+
+        @Override
+        public boolean matchesSafely(TaskState item) {
+            if (!item.getName().equals(name)) {
+                return false;
+            }
+
+            Assert.assertEquals("Status for " + item.getName(), status, item.getStatus());
+
+            if (checkFinished) {
+                assertThat("Finished time for " + item.getName(), item.getFinishedTime(), greaterThan(0L));
+            } else {
+                assertThat("Finished time for " + item.getName(), item.getFinishedTime(), is(-1L));
+            }
+
+            return true;
+        }
+
+        boolean checkIfTheSame(TaskState task) {
+            if (!name.equals(task.getName())) {
+                return false;
+            }
+
+            Assert.assertEquals(status, task.getStatus());
+
+            return true;
+        }
+    }
+
+    static StateMatcher state() {
+        return new StateMatcher();
+    }
+
+    static TaskStateMatcher task(String name, TaskStatus status) {
+        return new TaskStateMatcher(name, status);
+    }
+
+    static JobStateMatcher job(JobId id, JobStatus status) {
+        return new JobStateMatcher(id, status);
+    }
+
+    @Before
+    public void initTest() throws Exception {
+        PASchedulerProperties.SCHEDULER_HOME.updateProperty(ClasspathUtils.findSchedulerHome());
+        PASchedulerProperties.TASK_FORK.updateProperty("true");
+        CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.setValue(false);
+
+        if (inMemory) {
+            dbManager = SchedulerDBManager.createInMemorySchedulerDBManager();
+        } else {
+            Configuration config = new Configuration().configure(new File(this.getClass()
+                                                                              .getResource("/functionaltests/config/hibernate.cfg.xml")
+                                                                              .toURI()));
+            dbManager = new SchedulerDBManager(config, true);
+        }
+    }
+
+    @After
+    public void cleanup() {
+        if (dbManager != null) {
+            dbManager.close();
+        }
+    }
+
+    public static class TestDummyExecutable extends JavaExecutable {
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            return null;
+        }
+    }
+
+    public InternalJob defaultSubmitJob(TaskFlowJob job) throws Exception {
+        return defaultSubmitJob(job, DEFAULT_USER_NAME, -1);
+    }
+
+    public InternalJob defaultSubmitJob(TaskFlowJob job, String userName) throws Exception {
+        return defaultSubmitJob(job, userName, -1);
+    }
+
+    public InternalJob defaultSubmitJob(TaskFlowJob job, String userName, long submittedTime) throws Exception {
+        if (job.getTasks().isEmpty()) {
+            job.addTask(createDefaultTask("default test task"));
+        }
+        InternalJob internalJob = InternalJobFactory.createJob(job, getDefaultCredentials());
+        internalJob.setOwner(userName);
+        internalJob.submitAction();
+        if (submittedTime > 0) {
+            internalJob.setSubmittedTime(submittedTime);
+        }
+        dbManager.newJobSubmitted(internalJob);
+
+        return internalJob;
+    }
+
+    public InternalJob loadInternalJob(boolean fullState, JobId jobId) {
+        List<InternalJob> jobs = dbManager.loadJobs(fullState, jobId);
+        Assert.assertEquals(1, jobs.size());
+        return jobs.get(0);
+    }
+
+    public InternalJob defaultSubmitJobAndLoadInternal(boolean fullState, TaskFlowJob jobDef) throws Exception {
+        return defaultSubmitJobAndLoadInternal(fullState, jobDef, DEFAULT_USER_NAME);
+    }
+
+    public InternalJob defaultSubmitJobAndLoadInternal(boolean fullState, TaskFlowJob jobDef, String userName)
+            throws Exception {
+        InternalJob job = defaultSubmitJob(jobDef, userName);
+        return loadInternalJob(fullState, job.getId());
+    }
+
+    protected static JavaTask createDefaultTask(String taskName) {
+        JavaTask task = new JavaTask();
+        task.setName(taskName);
+        task.setExecutableClassName(TestDummyExecutable.class.getName());
+        return task;
+    }
+
+    public InternalJob saveSingleTask(Task task) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        job.addTask(task);
+        InternalJob jobData = defaultSubmitJobAndLoadInternal(true, job);
+        Assert.assertEquals(1, jobData.getTasks().size());
+        return jobData;
+    }
+
+    protected TaskState findTask(JobState jobState, String taskName) {
+        for (TaskState taskState : jobState.getTasks()) {
+            if (taskState.getName().equals(taskName)) {
+                return taskState;
+            }
+        }
+        Assert.fail("Didn't find task with name " + taskName);
+        return null;
+    }
+
+    protected InternalTask startTask(InternalJob internalJob, InternalTask internalTask) throws Exception {
+        internalTask.setExecuterInformation(new ExecuterInformation(null, NodeFactory.getDefaultNode()));
+        internalJob.startTask(internalTask);
+        return internalTask;
+    }
+
+    protected String createString(int length) {
+        StringBuilder string = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            string.append("a");
+        }
+        return string.toString();
+    }
 }

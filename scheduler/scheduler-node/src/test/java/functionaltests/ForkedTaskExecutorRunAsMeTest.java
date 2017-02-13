@@ -1,4 +1,34 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package functionaltests;
+
+import static org.junit.Assert.assertEquals;
+import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
+
+import java.security.*;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -19,11 +49,6 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
-import java.security.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
-
 
 /**
  * The ForkedTaskExecutorRunAsMeTest executes several scenarios on the ForkedTaskExecutor in RunAsMe mode
@@ -33,6 +58,7 @@ import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk
 public class ForkedTaskExecutorRunAsMeTest {
 
     private static final String USERNAME = "admin"; // need to be created manually on your system
+
     private static final String PASSWORD = "admin";
 
     @Rule
@@ -49,21 +75,26 @@ public class ForkedTaskExecutorRunAsMeTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId((TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L)));
 
-        ScriptExecutableContainer container = new ScriptExecutableContainer(new TaskScript(new SimpleScript(
-                "whoami", "native")));
+        ScriptExecutableContainer container = new ScriptExecutableContainer(new TaskScript(new SimpleScript("whoami",
+                                                                                                            "native")));
 
         container.setRunAsUser(true);
 
-        TaskContext taskContext = new TaskContext(container, initializer, null, new NodeDataSpacesURIs("", "", "", "", "", ""), "", "",
-                decrypter);
+        TaskContext taskContext = new TaskContext(container,
+                                                  initializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs("", "", "", "", "", ""),
+                                                  "",
+                                                  "",
+                                                  decrypter);
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
         assertTaskResultOk(result);
         assertEquals("admin\n", taskOutput.output());
     }
 
-    private Decrypter createCredentials(String username, String password) throws NoSuchAlgorithmException,
-            KeyException {
+    private Decrypter createCredentials(String username, String password)
+            throws NoSuchAlgorithmException, KeyException {
         CredData credData = new CredData(username, password);
         KeyPairGenerator keyGen;
         keyGen = KeyPairGenerator.getInstance("RSA");

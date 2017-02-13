@@ -1,36 +1,27 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive_grid_cloud_portal.cli.utils;
 
@@ -38,18 +29,20 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.TimeUnit;
 
-import org.ow2.proactive.http.HttpClientBuilder;
-import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
-import org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint;
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.ow2.proactive.http.HttpClientBuilder;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
+import org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint;
+
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
+
 
 public final class ProActiveVersionUtility {
 
@@ -87,20 +80,22 @@ public final class ProActiveVersionUtility {
     protected static String getProActiveServerVersion(ApplicationContext currentContext) {
         int timeout = (int) TimeUnit.SECONDS.toMillis(2);
 
-        RequestConfig config =
-                RequestConfig.custom()
-                        .setConnectTimeout(timeout)
-                        .setConnectionRequestTimeout(timeout)
-                        .setSocketTimeout(timeout).build();
+        RequestConfig config = RequestConfig.custom()
+                                            .setConnectTimeout(timeout)
+                                            .setConnectionRequestTimeout(timeout)
+                                            .setSocketTimeout(timeout)
+                                            .build();
 
-        try (CloseableHttpClient httpClient =
-                     new HttpClientBuilder().setDefaultRequestConfig(config).useSystemProperties().build()) {
+        try (CloseableHttpClient httpClient = new HttpClientBuilder().setDefaultRequestConfig(config)
+                                                                     .useSystemProperties()
+                                                                     .build()) {
 
             HttpGet getMethod = new HttpGet(currentContext.getResourceUrl("version"));
             HttpResponse response = httpClient.execute(getMethod);
 
             String jsonObject = handleResponse(response);
-            if (jsonObject != null) return jsonObject;
+            if (jsonObject != null)
+                return jsonObject;
         } catch (IOException ignore) {
             // ignore exception, default value will be used
         }

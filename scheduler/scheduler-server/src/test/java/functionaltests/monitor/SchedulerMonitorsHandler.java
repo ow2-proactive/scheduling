@@ -1,40 +1,35 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.monitor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Vector;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.utils.TimeoutAccounter;
@@ -46,12 +41,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.utils.TaskIdWrapper;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Vector;
 
 
 /**
@@ -168,8 +157,7 @@ public class SchedulerMonitorsHandler {
      * @return JobEvent associated to event (thrown by scheduler)
      * @throws ProActiveTimeoutException
      */
-    public JobInfo waitForEventJob(SchedulerEvent event, JobId id, long timeout)
-            throws ProActiveTimeoutException {
+    public JobInfo waitForEventJob(SchedulerEvent event, JobId id, long timeout) throws ProActiveTimeoutException {
         JobEventMonitor monitor = null;
         synchronized (this) {
             monitor = removeJobEvent(id, event);
@@ -213,8 +201,7 @@ public class SchedulerMonitorsHandler {
      * @param timeout in milliseconds
      * @throws ProActiveTimeoutException if timeout is reached
      */
-    public void waitForEventSchedulerState(SchedulerEvent event, long timeout)
-            throws ProActiveTimeoutException {
+    public void waitForEventSchedulerState(SchedulerEvent event, long timeout) throws ProActiveTimeoutException {
         EventMonitor monitor = null;
         synchronized (this) {
             if (schedulerStateEvents.contains(event)) {
@@ -329,9 +316,7 @@ public class SchedulerMonitorsHandler {
             TaskId taskId = entry.getKey().getTaskId();
             List<TaskEventMonitor> value = entry.getValue();
 
-            if (taskId.getJobId().equals(id)
-                    && taskId.getReadableName().equals(taskName)
-                    && value.contains(tmp)) {
+            if (taskId.getJobId().equals(id) && taskId.getReadableName().equals(taskName) && value.contains(tmp)) {
                 return value.remove(value.indexOf(tmp));
             }
         }

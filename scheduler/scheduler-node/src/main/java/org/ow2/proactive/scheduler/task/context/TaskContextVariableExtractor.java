@@ -1,36 +1,27 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.task.context;
 
@@ -49,20 +40,20 @@ import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
 
+
 public class TaskContextVariableExtractor implements Serializable {
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
 
-    public Map<String, String> extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(TaskContext taskContext) throws Exception {
+    public Map<String, String> extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(
+            TaskContext taskContext) throws Exception {
         ForkEnvironment forkEnvironment = taskContext.getInitializer().getForkEnvironment();
         Map<String, Serializable> variables = this.extractVariables(taskContext, true);
         Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
-        HashMap<String, Serializable> systemEnvironmentVariables = new HashMap<String, Serializable>(
-                System.getenv());
+        HashMap<String, Serializable> systemEnvironmentVariables = new HashMap<String, Serializable>(System.getenv());
         systemEnvironmentVariables.putAll(variables);
         systemEnvironmentVariables.putAll(thirdPartyCredentials);
 
-        return VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(),
-                systemEnvironmentVariables);
+        return VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(), systemEnvironmentVariables);
     }
 
     public Map<String, Serializable> extractVariables(TaskContext taskContext, boolean useTaskVariables)
@@ -71,8 +62,7 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     private Map<String, Serializable> extractVariables(TaskContext container, TaskResult taskResult, String nodesFile,
-            boolean useTaskVariables)
-            throws Exception {
+            boolean useTaskVariables) throws Exception {
         Map<String, Serializable> variables = extractVariables(container, taskResult, useTaskVariables);
 
         variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getOtherNodesURLs().size() + 1);
@@ -112,8 +102,7 @@ public class TaskContextVariableExtractor implements Serializable {
 
             // and from this task execution
             if (taskResult != null && taskResult.getPropagatedVariables() != null) {
-                variables.putAll(SerializationUtil.deserializeVariableMap(taskResult
-                        .getPropagatedVariables()));
+                variables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
             }
         } catch (Exception e) {
             throw new Exception("Could not deserialize variables", e);
@@ -130,16 +119,15 @@ public class TaskContextVariableExtractor implements Serializable {
         Map<String, Serializable> variables = new HashMap<>();
 
         // variables from task definition
-        if (taskContext.getInitializer().getTaskVariables() != null){
-            for (TaskVariable taskVariable: taskContext.getInitializer().getTaskVariables().values()){
-                if (!taskVariable.isJobInherited()){
+        if (taskContext.getInitializer().getTaskVariables() != null) {
+            for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
+                if (!taskVariable.isJobInherited()) {
                     variables.put(taskVariable.getName(), taskVariable.getValue());
                 }
             }
         }
         return variables;
     }
-
 
     public Map<String, Serializable> extractVariables(TaskContext container, String nodesFile, boolean useTaskVariables)
             throws Exception {
@@ -149,8 +137,7 @@ public class TaskContextVariableExtractor implements Serializable {
     public Map<String, Serializable> retrieveContextVariables(TaskLauncherInitializer initializer) {
         Map<String, Serializable> variables = new HashMap<>();
         variables.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
-        variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId()
-                .getReadableName());
+        variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId().getReadableName());
         variables.put(SchedulerVars.PA_TASK_ID.toString(), initializer.getTaskId().value());
         variables.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
         variables.put(SchedulerVars.PA_TASK_ITERATION.toString(), initializer.getIterationIndex());
@@ -165,8 +152,7 @@ public class TaskContextVariableExtractor implements Serializable {
         Map<String, Serializable> result = new HashMap<>();
         for (TaskResult previousTaskResult : container.getPreviousTasksResults()) {
             if (previousTaskResult.getPropagatedVariables() != null) {
-                result.putAll(SerializationUtil.deserializeVariableMap(
-                        previousTaskResult.getPropagatedVariables()));
+                result.putAll(SerializationUtil.deserializeVariableMap(previousTaskResult.getPropagatedVariables()));
             }
         }
         return result;

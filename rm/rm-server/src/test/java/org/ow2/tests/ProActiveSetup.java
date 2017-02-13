@@ -1,40 +1,34 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- * 				Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; version 3 of
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * If needed, contact us to obtain a release under GPL Version 2
- * or a different license than the GPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $ACTIVEEON_INITIAL_DEV$
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  */
 package org.ow2.tests;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -44,11 +38,6 @@ import org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFact
 import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.OperatingSystem;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -60,13 +49,16 @@ import java.util.List;
 public class ProActiveSetup {
     /** Name of the variable used in gcmd to set the os type. */
     static final private String VAR_OS = "os";
+
     /** Name of the variable used in gcma to set the java parameters */
     static final private String VAR_JVM_PARAMETERS = "JVM_PARAMETERS";
 
     /** The parameters to pass to the forked JVMs */
     final private List<String> jvmParameters;
+
     /** The variable contract to pass to GCMA. */
     final private VariableContractImpl vc;
+
     final private PAMRSetup pamrSetup;
 
     public ProActiveSetup() {
@@ -123,10 +115,10 @@ public class ProActiveSetup {
     private VariableContractImpl buildVariableContract(String jvmParameters) {
         VariableContractImpl vContract;
         vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
-                VariableContractType.DescriptorDefaultVariable);
-        vContract.setVariableFromProgram(VAR_JVM_PARAMETERS, jvmParameters,
-                VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OS,
+                                         OperatingSystem.getOperatingSystem().name(),
+                                         VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(VAR_JVM_PARAMETERS, jvmParameters, VariableContractType.ProgramVariable);
         return vContract;
     }
 
@@ -136,12 +128,10 @@ public class ProActiveSetup {
         jvmParameters.add("-Djava.awt.headless=true"); // for Mac builds
         jvmParameters.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false);
         jvmParameters.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() +
-            CentralPAPropertyRepository.PA_HOME.getValue());
-        jvmParameters.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() +
-            "pnp");
+                          CentralPAPropertyRepository.PA_HOME.getValue());
+        jvmParameters.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
 
-        if (PAMRRemoteObjectFactory.PROTOCOL_ID.equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
-                .getValue())) {
+        if (PAMRRemoteObjectFactory.PROTOCOL_ID.equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue())) {
             jvmParameters.add(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine() + this.pamrSetup.address);
             jvmParameters.add(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + this.pamrSetup.port);
         }
@@ -152,10 +142,13 @@ public class ProActiveSetup {
     static private class PAMRSetup {
         /** PAMR router when started or null. */
         volatile private Router router;
+
         /** Reversed port for PAMR router. */
         final int port;
+
         /** Reserve a port for the router if needed */
         volatile private ServerSocket reservedPort;
+
         /** Address of the PAMR router. */
         final String address;
 
@@ -193,8 +186,7 @@ public class ProActiveSetup {
                 this.reservedPort.close();
             }
 
-            if (PAMRRemoteObjectFactory.PROTOCOL_ID
-                    .equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue())) {
+            if (PAMRRemoteObjectFactory.PROTOCOL_ID.equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue())) {
                 RouterConfig config = new RouterConfig();
                 config.setPort(this.port);
                 router = Router.createAndStart(config);

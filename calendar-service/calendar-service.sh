@@ -12,7 +12,7 @@ cwd="$script_dir/.."
 
 check_status() {
 
-  # Running ps with some arguments to check if the PID exists 
+  # Running ps with some arguments to check if the PID exists
   s=$(ps aux | grep 'java.*calendar-service' | grep -v 'grep' | awk '{print $2}')
 
   # If somethig was returned by the ps command, this function returns the PID
@@ -58,7 +58,7 @@ stop() {
     # Kills the application process
     echo " *** Stopping Calendar service *** "
     kill -9 $pid
-    echo "OK" 
+    echo "OK"
   else
     echo "Calendar service is already stopped"
   fi
@@ -98,4 +98,3 @@ case "$1" in
     echo "Usage: $0 {start|stop|restart|status}"
     exit 1
 esac
-

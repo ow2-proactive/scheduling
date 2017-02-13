@@ -1,5 +1,32 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -7,8 +34,6 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.junit.Assert;
-import org.junit.Test;
 
 
 public class TestReportingQueries extends BaseSchedulerDBTest {
@@ -134,13 +159,12 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
     }
 
     private void checkNumberOfHosts(InternalJob job, int expected) {
-        Assert.assertEquals(expected, dbManager
-                .getTotalNumberOfHostsUsed(job.getJobInfo().getJobId().value()));
+        Assert.assertEquals(expected, dbManager.getTotalNumberOfHostsUsed(job.getJobInfo().getJobId().value()));
     }
 
     private void checkJobPendingTime(InternalJob job) {
-        Assert.assertEquals(job.getStartTime() - job.getSubmittedTime(), dbManager.getJobPendingTime(job
-                .getJobInfo().getJobId().value()));
+        Assert.assertEquals(job.getStartTime() - job.getSubmittedTime(),
+                            dbManager.getJobPendingTime(job.getJobInfo().getJobId().value()));
     }
 
     private void checkMeanTaskPendingTime(InternalJob job) {
@@ -158,8 +182,7 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
         } else {
             expected /= counter;
         }
-        Assert.assertEquals(expected, dbManager.getMeanTaskPendingTime(job.getJobInfo().getJobId().value()),
-                001);
+        Assert.assertEquals(expected, dbManager.getMeanTaskPendingTime(job.getJobInfo().getJobId().value()), 001);
     }
 
     private void checkMeanTaskRunningTime(InternalJob job) {
@@ -177,13 +200,12 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
         } else {
             expected /= counter;
         }
-        Assert.assertEquals(expected, dbManager.getMeanTaskRunningTime(job.getJobInfo().getJobId().value()),
-                001);
+        Assert.assertEquals(expected, dbManager.getMeanTaskRunningTime(job.getJobInfo().getJobId().value()), 001);
     }
 
     private void checkJobRunningTime(InternalJob job) {
-        Assert.assertEquals(job.getFinishedTime() - job.getStartTime(), dbManager.getJobRunningTime(job
-                .getJobInfo().getJobId().value()));
+        Assert.assertEquals(job.getFinishedTime() - job.getStartTime(),
+                            dbManager.getJobRunningTime(job.getJobInfo().getJobId().value()));
     }
 
     private void checkMeanSubmittingPeriod(InternalJob... jobs) {
@@ -221,8 +243,8 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
         Assert.assertEquals(expected, dbManager.getMeanJobExecutionTime(), 0.001);
     }
 
-    private void checkJobAndTasksNumbers(long pendingJobs, long runningJobs, long finishedJobs,
-            long totalJobs, long pendingTasks, long runningTasks, long finishedTasks, long totalTasks) {
+    private void checkJobAndTasksNumbers(long pendingJobs, long runningJobs, long finishedJobs, long totalJobs,
+            long pendingTasks, long runningTasks, long finishedTasks, long totalTasks) {
         Assert.assertEquals(pendingJobs, dbManager.getPendingJobsCount());
         Assert.assertEquals(runningJobs, dbManager.getRunningJobsCount());
         Assert.assertEquals(finishedJobs, dbManager.getFinishedJobsCount());

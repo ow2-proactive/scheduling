@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.task;
 
 import static java.util.Collections.singletonList;
@@ -45,14 +70,13 @@ public class TaskLauncherDataSpacesTest {
 
     @Test
     public void input_file_using_job_id_in_its_selector() throws Throwable {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("println new File('.').listFiles();", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("println new File('.').listFiles();",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
-        initializer.setTaskInputFiles(singletonList(
-          new InputSelector(new FileSelector("input_$PA_JOB_ID.txt"),
-            InputAccessMode.TransferFromInputSpace)));
+        initializer.setTaskInputFiles(singletonList(new InputSelector(new FileSelector("input_$PA_JOB_ID.txt"),
+                                                                      InputAccessMode.TransferFromInputSpace)));
 
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_1000.txt");
         assertTrue(inputFile.createNewFile());
@@ -66,42 +90,38 @@ public class TaskLauncherDataSpacesTest {
 
     @Test
     public void output_file_using_task_id_in_its_selector() throws Throwable {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript(
-                "new File('output_' + variables.get('PA_TASK_ID') + '.txt').text = 'hello'", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("new File('output_' + variables.get('PA_TASK_ID') + '.txt').text = 'hello'",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
-        initializer.setTaskOutputFiles(singletonList(
-          new OutputSelector(new FileSelector("output_${PA_TASK_ID}.txt"),
-            OutputAccessMode.TransferToGlobalSpace)));
+        initializer.setTaskOutputFiles(singletonList(new OutputSelector(new FileSelector("output_${PA_TASK_ID}.txt"),
+                                                                        OutputAccessMode.TransferToGlobalSpace)));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, taskLauncherFactory);
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
 
         assertTaskResultOk(taskResult);
-        assertTrue(new File(taskLauncherFactory.getDataSpaces().getGlobalURI(), "output_1000.txt")
-                .exists());
+        assertTrue(new File(taskLauncherFactory.getDataSpaces().getGlobalURI(), "output_1000.txt").exists());
     }
 
     @Test
     public void input_file_using_variable_in_its_selector() throws Throwable {
-        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript("println new File('.').listFiles();", "groovy")));
+        ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("println new File('.').listFiles();",
+                                                                                                                      "groovy")));
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
         initializer.setJobVariables(singletonMap("aVar", new JobVariable("aVar", "foo")));
-        initializer.setTaskInputFiles(singletonList(
-          new InputSelector(new FileSelector("input_${aVar}_${aResultVar}.txt"),
-            InputAccessMode.TransferFromInputSpace)));
+        initializer.setTaskInputFiles(singletonList(new InputSelector(new FileSelector("input_${aVar}_${aResultVar}.txt"),
+                                                                      InputAccessMode.TransferFromInputSpace)));
 
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_foo_bar.txt");
         assertTrue(inputFile.createNewFile());
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, taskLauncherFactory);
-        TaskResultImpl previousTaskResult = taskResult(Collections.<String, Serializable> singletonMap(
-                "aResultVar", "bar"));
+        TaskResultImpl previousTaskResult = taskResult(Collections.<String, Serializable> singletonMap("aResultVar",
+                                                                                                       "bar"));
         TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer, previousTaskResult);
 
         assertTaskResultOk(taskResult);
@@ -110,28 +130,24 @@ public class TaskLauncherDataSpacesTest {
 
     @Test
     public void output_file_using_variable_in_its_selector() throws Throwable {
-        ScriptExecutableContainer createAFileAndWriteVariable = new ScriptExecutableContainer(
-            new TaskScript(new SimpleScript(
-                "new File('output_foo_bar.txt').text = 'hello'; variables.put('aVar', 'foo')", "groovy")));
+        ScriptExecutableContainer createAFileAndWriteVariable = new ScriptExecutableContainer(new TaskScript(new SimpleScript("new File('output_foo_bar.txt').text = 'hello'; variables.put('aVar', 'foo')",
+                                                                                                                              "groovy")));
 
         TaskLauncherInitializer copyOutputFile = new TaskLauncherInitializer();
         copyOutputFile.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
-        copyOutputFile.setTaskOutputFiles(singletonList(
-          new OutputSelector(new FileSelector("output_${aVar}_${aResultVar}.txt"),
-            OutputAccessMode.TransferToGlobalSpace)));
+        copyOutputFile.setTaskOutputFiles(singletonList(new OutputSelector(new FileSelector("output_${aVar}_${aResultVar}.txt"),
+                                                                           OutputAccessMode.TransferToGlobalSpace)));
 
         TaskLauncher taskLauncher = TaskLauncherUtils.create(copyOutputFile, taskLauncherFactory);
-        TaskResultImpl previousTaskResult = taskResult(Collections.<String, Serializable> singletonMap(
-          "aResultVar", "bar"));
+        TaskResultImpl previousTaskResult = taskResult(Collections.<String, Serializable> singletonMap("aResultVar",
+                                                                                                       "bar"));
         TaskResult taskResult = runTaskLauncher(taskLauncher, createAFileAndWriteVariable, previousTaskResult);
 
         assertTaskResultOk(taskResult);
-        assertTrue(new File(taskLauncherFactory.getDataSpaces().getGlobalURI(), "output_foo_bar.txt")
-                .exists());
+        assertTrue(new File(taskLauncherFactory.getDataSpaces().getGlobalURI(), "output_foo_bar.txt").exists());
     }
 
-    private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
-            ScriptExecutableContainer executableContainer) {
+    private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer) {
         TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
 
         taskLauncher.doTask(executableContainer, null, taskResult);
@@ -139,8 +155,8 @@ public class TaskLauncherDataSpacesTest {
         return taskResult.result;
     }
 
-    private TaskResult runTaskLauncher(TaskLauncher taskLauncher,
-            ScriptExecutableContainer executableContainer, TaskResult... taskResults) {
+    private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer,
+            TaskResult... taskResults) {
         TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
 
         taskLauncher.doTask(executableContainer, taskResults, taskResult);
@@ -151,15 +167,19 @@ public class TaskLauncherDataSpacesTest {
     private static class TaskTerminateNotificationVerifier implements TaskTerminateNotification {
 
         TaskResult result;
+
         @Override
         public void terminate(TaskId taskId, TaskResult taskResult) {
             this.result = taskResult;
- }
+        }
 
     }
+
     private TaskResultImpl taskResult(Map<String, Serializable> variables) {
-        TaskResultImpl previousTaskResult = new TaskResultImpl(TaskIdImpl.createTaskId(
-          JobIdImpl.makeJobId("1001"), "job", 1000L), null);
+        TaskResultImpl previousTaskResult = new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1001"),
+                                                                                       "job",
+                                                                                       1000L),
+                                                               null);
         previousTaskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables));
         return previousTaskResult;
     }

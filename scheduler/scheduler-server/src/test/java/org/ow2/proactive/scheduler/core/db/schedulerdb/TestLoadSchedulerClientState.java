@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import java.util.HashMap;
@@ -7,7 +32,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -57,9 +81,11 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
 
         JobStateMatcher expectedJob;
 
-        expectedJob = job(job.getId(), JobStatus.STALLED).withFinished(
-                task("task1", TaskStatus.FINISHED).checkFinished()).withPending(
-                task("task2", TaskStatus.PENDING), true).withEligible("task2");
+        expectedJob = job(job.getId(), JobStatus.STALLED)
+                                                         .withFinished(task("task1", TaskStatus.FINISHED)
+                                                                                                         .checkFinished())
+                                                         .withPending(task("task2", TaskStatus.PENDING), true)
+                                                         .withEligible("task2");
 
         checkRecoveredState(recovered, state().withRunning(expectedJob));
 
@@ -69,9 +95,11 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         startTask(job, task2);
         dbManager.jobTaskStarted(job, task2, false);
 
-        expectedJob = job(job.getId(), JobStatus.STALLED).withFinished(
-                task("task1", TaskStatus.FINISHED).checkFinished()).withPending(
-                task("task2", TaskStatus.PENDING), true).withEligible("task2");
+        expectedJob = job(job.getId(), JobStatus.STALLED)
+                                                         .withFinished(task("task1", TaskStatus.FINISHED)
+                                                                                                         .checkFinished())
+                                                         .withPending(task("task2", TaskStatus.PENDING), true)
+                                                         .withEligible("task2");
         recovered = stateRecoverHelper.recover(-1);
         checkRecoveredState(recovered, state().withRunning(expectedJob));
 
@@ -83,9 +111,9 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         terminateTask(job, task2, result);
         dbManager.updateAfterTaskFinished(job, task2, result);
 
-        expectedJob = job(job.getId(), JobStatus.FINISHED).withFinished(
-                task("task1", TaskStatus.FINISHED).checkFinished()).withFinished(
-                task("task2", TaskStatus.FINISHED).checkFinished());
+        expectedJob = job(job.getId(),
+                          JobStatus.FINISHED).withFinished(task("task1", TaskStatus.FINISHED).checkFinished())
+                                             .withFinished(task("task2", TaskStatus.FINISHED).checkFinished());
         recovered = stateRecoverHelper.recover(-1);
         checkRecoveredState(recovered, state().withFinished(expectedJob));
     }
@@ -130,9 +158,13 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
 
         SchedulerStateRecoverHelper stateRecoverHelper = new SchedulerStateRecoverHelper(dbManager);
 
-        JobStateMatcher expectedJob = job(job.getId(), JobStatus.CANCELED).withFinished(
-                task("task1", TaskStatus.ABORTED).checkFinished(), false).withFinished(
-                task("task2", TaskStatus.FAULTY).checkFinished()).checkFinished();
+        JobStateMatcher expectedJob = job(job.getId(), JobStatus.CANCELED)
+                                                                          .withFinished(task("task1",
+                                                                                             TaskStatus.ABORTED).checkFinished(),
+                                                                                        false)
+                                                                          .withFinished(task("task2",
+                                                                                             TaskStatus.FAULTY).checkFinished())
+                                                                          .checkFinished();
 
         checkRecoveredState(stateRecoverHelper.recover(-1), state().withFinished(expectedJob));
     }
@@ -209,15 +241,15 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         Assert.assertEquals(expected.getName(), taskState.getName());
         Assert.assertEquals(expected.getDescription(), taskState.getDescription());
         Assert.assertEquals(expected.getName(), taskState.getTaskInfo().getTaskId().getReadableName());
-        Assert.assertEquals(expected.getOnTaskErrorProperty().getValue(), taskState.getOnTaskErrorProperty().getValue());
+        Assert.assertEquals(expected.getOnTaskErrorProperty().getValue(),
+                            taskState.getOnTaskErrorProperty().getValue());
         Assert.assertEquals(expected.getMaxNumberOfExecution(), taskState.getMaxNumberOfExecution());
         Assert.assertEquals(expected.isPreciousLogs(), taskState.isPreciousLogs());
         Assert.assertEquals(expected.isPreciousResult(), taskState.isPreciousResult());
         Assert.assertEquals(expected.isRunAsMe(), taskState.isRunAsMe());
         Assert.assertEquals(expected.getWallTime(), taskState.getWallTime());
 
-        Assert.assertEquals("Unexpected number of dependencies", dependences.length, taskState
-                .getDependences().size());
+        Assert.assertEquals("Unexpected number of dependencies", dependences.length, taskState.getDependences().size());
         Set<String> dependenciesSet = new HashSet<>();
         for (String dependecy : dependences) {
             dependenciesSet.add(dependecy);

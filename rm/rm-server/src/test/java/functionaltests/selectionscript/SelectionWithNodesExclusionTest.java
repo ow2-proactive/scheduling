@@ -1,43 +1,38 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.selectionscript;
 
-import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.TestNode;
+import static functionaltests.utils.RMTHelper.log;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
@@ -50,13 +45,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import static functionaltests.utils.RMTHelper.log;
-import static org.junit.Assert.assertEquals;
+import functionaltests.utils.RMFunctionalTest;
+import functionaltests.utils.TestNode;
 
 
 /**
@@ -102,7 +92,7 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
         PAFuture.waitFor(nodeSetWithNodeToExclude);
 
         assertEquals(1, nodeSetWithNodeToExclude.size());
-        assertEquals( initialNodesNumber - 1, resourceManager.getState().getFreeNodesNumber());
+        assertEquals(initialNodesNumber - 1, resourceManager.getState().getFreeNodesNumber());
 
         //wait for node busy event
         RMNodeEvent evt = rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
@@ -117,8 +107,9 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
         assertEquals(initialNodesNumber, resourceManager.getState().getFreeNodesNumber());
 
         //get nodes with the previous node excluded
-        NodeSet nodes = resourceManager.getAtMostNodes(initialNodesNumber, new ArrayList<SelectionScript>(),
-                nodeSetWithNodeToExclude);
+        NodeSet nodes = resourceManager.getAtMostNodes(initialNodesNumber,
+                                                       new ArrayList<SelectionScript>(),
+                                                       nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -147,11 +138,11 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
 
         //create the dynamic selection script object
         SelectionScript dummyDynamicScript = new SelectionScript(new File(dummySelectionScriptPath.toURI()),
-            new String[] {}, true);
+                                                                 new String[] {},
+                                                                 true);
 
         //get nodes with the previous node excluded
-        nodes = resourceManager.getAtMostNodes(initialNodesNumber, dummyDynamicScript,
-                nodeSetWithNodeToExclude);
+        nodes = resourceManager.getAtMostNodes(initialNodesNumber, dummyDynamicScript, nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -181,11 +172,11 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
 
         //create the static selection script object
         SelectionScript dummyStaticScript = new SelectionScript(new File(dummySelectionScriptPath.toURI()),
-            new String[] {}, false);
+                                                                new String[] {},
+                                                                false);
 
         //get nodes with the previous node excluded
-        nodes = resourceManager.getAtMostNodes(initialNodesNumber, dummyStaticScript,
-                nodeSetWithNodeToExclude);
+        nodes = resourceManager.getAtMostNodes(initialNodesNumber, dummyStaticScript, nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -243,16 +234,16 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
         assertEquals(initialNodesNumber + 2, resourceManager.getState().getFreeNodesNumber());
 
         //create the dynamic selection script object
-        SelectionScript checkPropDynamicSScript = new SelectionScript(new File(vmPropSelectionScriptpath
-                .toURI()), new String[] { vmPropKey, vmPropValue }, true);
+        SelectionScript checkPropDynamicSScript = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
+                                                                      new String[] { vmPropKey, vmPropValue },
+                                                                      true);
         Node node1ToExclude = NodeFactory.getNode(node1URL);
 
         nodeSetWithNodeToExclude = new NodeSet();
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = resourceManager.getAtMostNodes(initialNodesNumber, checkPropDynamicSScript,
-                nodeSetWithNodeToExclude);
+        nodes = resourceManager.getAtMostNodes(initialNodesNumber, checkPropDynamicSScript, nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -279,8 +270,9 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
         log("Test 5");
 
         //create the static selection script object
-        SelectionScript checkPropStaticSScript = new SelectionScript(new File(vmPropSelectionScriptpath
-                .toURI()), new String[] { vmPropKey, vmPropValue }, false);
+        SelectionScript checkPropStaticSScript = new SelectionScript(new File(vmPropSelectionScriptpath.toURI()),
+                                                                     new String[] { vmPropKey, vmPropValue },
+                                                                     false);
 
         Node node2ToExclude = NodeFactory.getNode(node2URL);
 
@@ -288,8 +280,7 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
         nodeSetWithNodeToExclude.add(node2ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = resourceManager.getAtMostNodes(initialNodesNumber, checkPropStaticSScript,
-                nodeSetWithNodeToExclude);
+        nodes = resourceManager.getAtMostNodes(initialNodesNumber, checkPropStaticSScript, nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);
@@ -319,8 +310,7 @@ public class SelectionWithNodesExclusionTest extends RMFunctionalTest {
         nodeSetWithNodeToExclude.add(node1ToExclude);
 
         //get nodes with the previous node1 excluded
-        nodes = resourceManager.getAtMostNodes(initialNodesNumber, checkPropStaticSScript,
-                nodeSetWithNodeToExclude);
+        nodes = resourceManager.getAtMostNodes(initialNodesNumber, checkPropStaticSScript, nodeSetWithNodeToExclude);
 
         //wait for node selection
         PAFuture.waitFor(nodes);

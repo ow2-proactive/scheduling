@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.common.task;
 
@@ -66,18 +55,31 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
 
     /** Sorting constant, this will allow the user to sort the descriptor. */
     public static final int SORT_BY_ID = 1;
+
     public static final int SORT_BY_NAME = 2;
+
     public static final int SORT_BY_STATUS = 3;
+
     public static final int SORT_BY_DESCRIPTION = 4;
+
     public static final int SORT_BY_EXECUTIONLEFT = 5;
+
     public static final int SORT_BY_EXECUTIONONFAILURELEFT = 6;
+
     public static final int SORT_BY_STARTED_TIME = 8;
+
     public static final int SORT_BY_FINISHED_TIME = 9;
+
     public static final int SORT_BY_HOST_NAME = 10;
+
     public static final int SORT_BY_EXEC_DURATION = 11;
+
     public static final int ASC_ORDER = 1;
+
     public static final int DESC_ORDER = 2;
+
     protected static int currentSort = SORT_BY_ID;
+
     protected static int currentOrder = ASC_ORDER;
 
     public static final Comparator<TaskState> COMPARE_BY_FINISHED_TIME_ASC = new Comparator<TaskState>() {
@@ -120,7 +122,7 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
     @XmlTransient
     public List<Task> getDependencesList() {
         throw new IllegalStateException("This method cannot be used on a submitted task;" + "use " +
-            this.getClass().getCanonicalName() + "#getDependences()");
+                                        this.getClass().getCanonicalName() + "#getDependences()");
     }
 
     /**
@@ -176,39 +178,37 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
         switch (currentSort) {
             case SORT_BY_DESCRIPTION:
                 return (currentOrder == ASC_ORDER) ? (description.compareTo(task.description))
-                        : (task.description.compareTo(description));
+                                                   : (task.description.compareTo(description));
             case SORT_BY_NAME:
-                return (currentOrder == ASC_ORDER) ? (name.compareTo(task.name))
-                        : (task.name.compareTo(name));
+                return (currentOrder == ASC_ORDER) ? (name.compareTo(task.name)) : (task.name.compareTo(name));
             case SORT_BY_STATUS:
-                return (currentOrder == ASC_ORDER) ? (getStatus().compareTo(task.getStatus())) : (task
-                        .getStatus().compareTo(getStatus()));
+                return (currentOrder == ASC_ORDER) ? (getStatus().compareTo(task.getStatus()))
+                                                   : (task.getStatus().compareTo(getStatus()));
             case SORT_BY_STARTED_TIME:
                 return (currentOrder == ASC_ORDER) ? ((int) (getStartTime() - task.getStartTime()))
-                        : ((int) (task.getStartTime() - getStartTime()));
+                                                   : ((int) (task.getStartTime() - getStartTime()));
             case SORT_BY_FINISHED_TIME:
                 return (currentOrder == ASC_ORDER) ? ((int) (getFinishedTime() - task.getFinishedTime()))
-                        : ((int) (task.getFinishedTime() - getFinishedTime()));
+                                                   : ((int) (task.getFinishedTime() - getFinishedTime()));
             case SORT_BY_EXECUTIONLEFT:
                 return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getNumberOfExecutionLeft())
-                        .compareTo(Integer.valueOf(task.getNumberOfExecutionLeft()))) : (Integer.valueOf(task
-                        .getNumberOfExecutionLeft()).compareTo(Integer.valueOf(getNumberOfExecutionLeft())));
+                                                             .compareTo(Integer.valueOf(task.getNumberOfExecutionLeft())))
+                                                   : (Integer.valueOf(task.getNumberOfExecutionLeft())
+                                                             .compareTo(Integer.valueOf(getNumberOfExecutionLeft())));
             case SORT_BY_EXECUTIONONFAILURELEFT:
                 return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getNumberOfExecutionOnFailureLeft())
-                        .compareTo(Integer.valueOf(task.getNumberOfExecutionOnFailureLeft()))) : (Integer
-                        .valueOf(task.getNumberOfExecutionOnFailureLeft()).compareTo(Integer
-                        .valueOf(getNumberOfExecutionOnFailureLeft())));
+                                                             .compareTo(Integer.valueOf(task.getNumberOfExecutionOnFailureLeft())))
+                                                   : (Integer.valueOf(task.getNumberOfExecutionOnFailureLeft())
+                                                             .compareTo(Integer.valueOf(getNumberOfExecutionOnFailureLeft())));
             case SORT_BY_HOST_NAME:
-                return (currentOrder == ASC_ORDER) ? (getExecutionHostName().compareTo(task
-                        .getExecutionHostName())) : (task.getExecutionHostName()
-                        .compareTo(getExecutionHostName()));
+                return (currentOrder == ASC_ORDER) ? (getExecutionHostName().compareTo(task.getExecutionHostName()))
+                                                   : (task.getExecutionHostName().compareTo(getExecutionHostName()));
             case SORT_BY_EXEC_DURATION:
-                return (currentOrder == ASC_ORDER) ? (int) (getExecutionDuration() - task
-                        .getExecutionDuration())
-                        : (int) (task.getExecutionDuration() - getExecutionDuration());
+                return (currentOrder == ASC_ORDER) ? (int) (getExecutionDuration() - task.getExecutionDuration())
+                                                   : (int) (task.getExecutionDuration() - getExecutionDuration());
             default:
-                return (currentOrder == ASC_ORDER) ? (getId().compareTo(task.getId())) : (task.getId()
-                        .compareTo(getId()));
+                return (currentOrder == ASC_ORDER) ? (getId().compareTo(task.getId()))
+                                                   : (task.getId().compareTo(getId()));
         }
     }
 
@@ -482,7 +482,8 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
         HashMap<String, String> gInfo = new HashMap<>();
 
         if (genericInformation != null) {
-            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(genericInformation, getRuntimeVariables());
+            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(genericInformation,
+                                                                                               getRuntimeVariables());
             gInfo.putAll(updatedTaskGenericInfo);
         }
 

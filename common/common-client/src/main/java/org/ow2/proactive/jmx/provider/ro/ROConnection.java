@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.jmx.provider.ro;
 
@@ -76,12 +65,16 @@ import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 public class ROConnection implements MBeanServerConnection, Serializable {
     /** The attached MBean server */
     private final transient MBeanServer mbs;
+
     /** The id of this connection */
     private final String connectionId;
+
     /** The local reference on the connection server */
     private final transient ROServerImpl server;
+
     /** The authenticated subject to be used for authorization */
     private final transient Subject subject;
+
     /** The access control context */
     private final transient AccessControlContext context;
 
@@ -121,18 +114,19 @@ public class ROConnection implements MBeanServerConnection, Serializable {
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName)
      */
     public ObjectInstance createMBean(final String className, final ObjectName name)
-            throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException,
-            MBeanException, NotCompliantMBeanException, IOException {
+            throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException,
+            NotCompliantMBeanException, IOException {
         if (this.subject == null) {
             return this.mbs.createMBean(className, name);
         }
         try {
             return (ObjectInstance) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<ObjectInstance>() {
-                        public final ObjectInstance run() throws Exception {
-                            return mbs.createMBean(className, name);
-                        }
-                    }, this.context);
+                                                           new PrivilegedExceptionAction<ObjectInstance>() {
+                                                               public final ObjectInstance run() throws Exception {
+                                                                   return mbs.createMBean(className, name);
+                                                               }
+                                                           },
+                                                           this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof ReflectionException)
@@ -154,20 +148,20 @@ public class ROConnection implements MBeanServerConnection, Serializable {
     /**
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, javax.management.ObjectName)
      */
-    public ObjectInstance createMBean(final String className, final ObjectName name,
-            final ObjectName loaderName) throws ReflectionException, InstanceAlreadyExistsException,
-            MBeanRegistrationException, MBeanException, NotCompliantMBeanException,
-            InstanceNotFoundException, IOException {
+    public ObjectInstance createMBean(final String className, final ObjectName name, final ObjectName loaderName)
+            throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException,
+            NotCompliantMBeanException, InstanceNotFoundException, IOException {
         if (this.subject == null) {
             return this.mbs.createMBean(className, name, loaderName);
         }
         try {
             return (ObjectInstance) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<ObjectInstance>() {
-                        public final ObjectInstance run() throws Exception {
-                            return mbs.createMBean(className, name, loaderName);
-                        }
-                    }, this.context);
+                                                           new PrivilegedExceptionAction<ObjectInstance>() {
+                                                               public final ObjectInstance run() throws Exception {
+                                                                   return mbs.createMBean(className, name, loaderName);
+                                                               }
+                                                           },
+                                                           this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof ReflectionException)
@@ -199,11 +193,15 @@ public class ROConnection implements MBeanServerConnection, Serializable {
         }
         try {
             return (ObjectInstance) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<ObjectInstance>() {
-                        public final ObjectInstance run() throws Exception {
-                            return mbs.createMBean(className, name, params, signature);
-                        }
-                    }, this.context);
+                                                           new PrivilegedExceptionAction<ObjectInstance>() {
+                                                               public final ObjectInstance run() throws Exception {
+                                                                   return mbs.createMBean(className,
+                                                                                          name,
+                                                                                          params,
+                                                                                          signature);
+                                                               }
+                                                           },
+                                                           this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof ReflectionException)
@@ -225,20 +223,25 @@ public class ROConnection implements MBeanServerConnection, Serializable {
     /**
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, javax.management.ObjectName, java.lang.Object[], java.lang.String[])
      */
-    public ObjectInstance createMBean(final String className, final ObjectName name,
-            final ObjectName loaderName, final Object[] params, final String[] signature)
-            throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException,
-            MBeanException, NotCompliantMBeanException, InstanceNotFoundException, IOException {
+    public ObjectInstance createMBean(final String className, final ObjectName name, final ObjectName loaderName,
+            final Object[] params, final String[] signature)
+            throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException,
+            NotCompliantMBeanException, InstanceNotFoundException, IOException {
         if (this.subject == null) {
             return this.mbs.createMBean(className, name, params, signature);
         }
         try {
             return (ObjectInstance) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<ObjectInstance>() {
-                        public final ObjectInstance run() throws Exception {
-                            return mbs.createMBean(className, name, loaderName, params, signature);
-                        }
-                    }, this.context);
+                                                           new PrivilegedExceptionAction<ObjectInstance>() {
+                                                               public final ObjectInstance run() throws Exception {
+                                                                   return mbs.createMBean(className,
+                                                                                          name,
+                                                                                          loaderName,
+                                                                                          params,
+                                                                                          signature);
+                                                               }
+                                                           },
+                                                           this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof ReflectionException)
@@ -260,8 +263,8 @@ public class ROConnection implements MBeanServerConnection, Serializable {
     /**
      * @see javax.management.MBeanServerConnection#unregisterMBean(javax.management.ObjectName)
      */
-    public void unregisterMBean(final ObjectName name) throws InstanceNotFoundException,
-            MBeanRegistrationException, IOException {
+    public void unregisterMBean(final ObjectName name)
+            throws InstanceNotFoundException, MBeanRegistrationException, IOException {
         if (this.context == null) {
             this.mbs.unregisterMBean(name);
             return;
@@ -288,18 +291,18 @@ public class ROConnection implements MBeanServerConnection, Serializable {
     /**
      * @see javax.management.MBeanServerConnection#getObjectInstance(javax.management.ObjectName)
      */
-    public ObjectInstance getObjectInstance(final ObjectName name) throws InstanceNotFoundException,
-            IOException {
+    public ObjectInstance getObjectInstance(final ObjectName name) throws InstanceNotFoundException, IOException {
         if (this.subject == null) {
             return this.mbs.getObjectInstance(name);
         }
         try {
             return (ObjectInstance) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<ObjectInstance>() {
-                        public final ObjectInstance run() throws Exception {
-                            return mbs.getObjectInstance(name);
-                        }
-                    }, this.context);
+                                                           new PrivilegedExceptionAction<ObjectInstance>() {
+                                                               public final ObjectInstance run() throws Exception {
+                                                                   return mbs.getObjectInstance(name);
+                                                               }
+                                                           },
+                                                           this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof InstanceNotFoundException)
@@ -320,11 +323,13 @@ public class ROConnection implements MBeanServerConnection, Serializable {
         }
         try {
             return (Set<ObjectInstance>) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<Set<ObjectInstance>>() {
-                        public final Set<ObjectInstance> run() throws Exception {
-                            return mbs.queryMBeans(name, query);
-                        }
-                    }, this.context);
+                                                                new PrivilegedExceptionAction<Set<ObjectInstance>>() {
+                                                                    public final Set<ObjectInstance> run()
+                                                                            throws Exception {
+                                                                        return mbs.queryMBeans(name, query);
+                                                                    }
+                                                                },
+                                                                this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof IOException)
@@ -343,11 +348,12 @@ public class ROConnection implements MBeanServerConnection, Serializable {
         }
         try {
             return (Set<ObjectName>) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<Set<ObjectName>>() {
-                        public final Set<ObjectName> run() throws Exception {
-                            return mbs.queryNames(name, query);
-                        }
-                    }, this.context);
+                                                            new PrivilegedExceptionAction<Set<ObjectName>>() {
+                                                                public final Set<ObjectName> run() throws Exception {
+                                                                    return mbs.queryNames(name, query);
+                                                                }
+                                                            },
+                                                            this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof IOException)
@@ -437,12 +443,11 @@ public class ROConnection implements MBeanServerConnection, Serializable {
             return this.mbs.getAttributes(name, attributes);
         }
         try {
-            return (AttributeList) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<AttributeList>() {
-                        public final AttributeList run() throws Exception {
-                            return mbs.getAttributes(name, attributes);
-                        }
-                    }, this.context);
+            return (AttributeList) Subject.doAsPrivileged(this.subject, new PrivilegedExceptionAction<AttributeList>() {
+                public final AttributeList run() throws Exception {
+                    return mbs.getAttributes(name, attributes);
+                }
+            }, this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof InstanceNotFoundException)
@@ -499,12 +504,11 @@ public class ROConnection implements MBeanServerConnection, Serializable {
             return this.mbs.setAttributes(name, attributes);
         }
         try {
-            return (AttributeList) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<AttributeList>() {
-                        public final AttributeList run() throws Exception {
-                            return mbs.setAttributes(name, attributes);
-                        }
-                    }, this.context);
+            return (AttributeList) Subject.doAsPrivileged(this.subject, new PrivilegedExceptionAction<AttributeList>() {
+                public final AttributeList run() throws Exception {
+                    return mbs.setAttributes(name, attributes);
+                }
+            }, this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof InstanceNotFoundException)
@@ -521,8 +525,8 @@ public class ROConnection implements MBeanServerConnection, Serializable {
      * @see javax.management.MBeanServerConnection#invoke(javax.management.ObjectName, java.lang.String, java.lang.Object[], java.lang.String[])
      */
     public Object invoke(final ObjectName name, final String operationName, final Object[] params,
-            final String[] signature) throws InstanceNotFoundException, MBeanException, ReflectionException,
-            IOException {
+            final String[] signature)
+            throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
         if (this.subject == null) {
             return this.mbs.invoke(name, operationName, params, signature);
         }
@@ -592,8 +596,7 @@ public class ROConnection implements MBeanServerConnection, Serializable {
      * @see javax.management.MBeanServerConnection#addNotificationListener(javax.management.ObjectName, javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     public void addNotificationListener(final ObjectName name, final NotificationListener listener,
-            final NotificationFilter filter, final Object handback) throws InstanceNotFoundException,
-            IOException {
+            final NotificationFilter filter, final Object handback) throws InstanceNotFoundException, IOException {
         if (this.subject == null) {
             this.mbs.addNotificationListener(name, listener, filter, handback);
         } else {
@@ -619,8 +622,7 @@ public class ROConnection implements MBeanServerConnection, Serializable {
      * @see javax.management.MBeanServerConnection#addNotificationListener(javax.management.ObjectName, javax.management.ObjectName, javax.management.NotificationFilter, java.lang.Object)
      */
     public void addNotificationListener(final ObjectName name, final ObjectName listener,
-            final NotificationFilter filter, final Object handback) throws InstanceNotFoundException,
-            IOException {
+            final NotificationFilter filter, final Object handback) throws InstanceNotFoundException, IOException {
         if (this.subject == null) {
             this.mbs.addNotificationListener(name, listener, filter, handback);
             return;
@@ -674,8 +676,8 @@ public class ROConnection implements MBeanServerConnection, Serializable {
      * @see javax.management.MBeanServerConnection#removeNotificationListener(javax.management.ObjectName, javax.management.ObjectName, javax.management.NotificationFilter, java.lang.Object)
      */
     public void removeNotificationListener(final ObjectName name, final ObjectName listener,
-            final NotificationFilter filter, final Object handback) throws InstanceNotFoundException,
-            ListenerNotFoundException, IOException {
+            final NotificationFilter filter, final Object handback)
+            throws InstanceNotFoundException, ListenerNotFoundException, IOException {
         if (this.subject == null) {
             this.mbs.removeNotificationListener(name, listener, filter, handback);
             return;
@@ -731,8 +733,8 @@ public class ROConnection implements MBeanServerConnection, Serializable {
      * @see javax.management.MBeanServerConnection#removeNotificationListener(javax.management.ObjectName, javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     public void removeNotificationListener(final ObjectName name, final NotificationListener listener,
-            final NotificationFilter filter, final Object handback) throws InstanceNotFoundException,
-            ListenerNotFoundException, IOException {
+            final NotificationFilter filter, final Object handback)
+            throws InstanceNotFoundException, ListenerNotFoundException, IOException {
         if (this.subject == null) {
             this.mbs.removeNotificationListener(name, listener, filter, handback);
         } else {
@@ -759,18 +761,17 @@ public class ROConnection implements MBeanServerConnection, Serializable {
     /**
      * @see javax.management.MBeanServerConnection#getMBeanInfo(javax.management.ObjectName)
      */
-    public MBeanInfo getMBeanInfo(final ObjectName name) throws InstanceNotFoundException,
-            IntrospectionException, ReflectionException, IOException {
+    public MBeanInfo getMBeanInfo(final ObjectName name)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
         if (this.subject == null) {
             return this.mbs.getMBeanInfo(name);
         }
         try {
-            return (MBeanInfo) Subject.doAsPrivileged(this.subject,
-                    new PrivilegedExceptionAction<MBeanInfo>() {
-                        public final MBeanInfo run() throws Exception {
-                            return mbs.getMBeanInfo(name);
-                        }
-                    }, this.context);
+            return (MBeanInfo) Subject.doAsPrivileged(this.subject, new PrivilegedExceptionAction<MBeanInfo>() {
+                public final MBeanInfo run() throws Exception {
+                    return mbs.getMBeanInfo(name);
+                }
+            }, this.context);
         } catch (final PrivilegedActionException pe) {
             final Exception e = JMXProviderUtils.extractException(pe);
             if (e instanceof InstanceNotFoundException)

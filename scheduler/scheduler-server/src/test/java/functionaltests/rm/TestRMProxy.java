@@ -1,44 +1,37 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package functionaltests.rm;
 
-import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestScheduler;
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.*;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.*;
 import org.objectweb.proactive.api.PAFuture;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -55,12 +48,9 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.tests.ProActiveTest;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import static functionaltests.utils.SchedulerTHelper.log;
-import static org.junit.Assert.*;
+import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestScheduler;
 
 
 public class TestRMProxy extends ProActiveTest {
@@ -86,15 +76,14 @@ public class TestRMProxy extends ProActiveTest {
         rmHelper = new RMTHelper();
         rmHelper.getResourceManager();
 
-        user1Credentials = Credentials.createCredentials(new CredData("admin", "admin"), rmHelper.getRMAuth()
-                .getPublicKey());
+        user1Credentials = Credentials.createCredentials(new CredData("admin", "admin"),
+                                                         rmHelper.getRMAuth().getPublicKey());
 
-        user2Credentials = Credentials.createCredentials(new CredData("demo", "demo"), rmHelper.getRMAuth()
-                .getPublicKey());
+        user2Credentials = Credentials.createCredentials(new CredData("demo", "demo"),
+                                                         rmHelper.getRMAuth().getPublicKey());
 
         rmHelper.createNodeSource(nsName, NODES_NUMBER);
     }
-
 
     @Test
     public void testProxiesManagerPerUser() throws Exception {
@@ -131,15 +120,13 @@ public class TestRMProxy extends ProActiveTest {
         rmHelper.shutdownRM();
     }
 
-
     private void testRMProxies(boolean singleUserConnection) throws Exception {
         ResourceManager rm = rmHelper.getResourceManager();
 
         assertEquals(NODES_NUMBER, rm.getState().getFreeNodesNumber());
 
         URI rmUri = new URI(RMTHelper.getLocalUrl());
-        Credentials schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties
-                .getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
+        Credentials schedulerProxyCredentials = Credentials.getCredentials(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.RESOURCE_MANAGER_CREDS.getValueAsString()));
 
         if (singleUserConnection) {
             proxiesManager = new SingleConnectionRMProxiesManager(rmUri, schedulerProxyCredentials);
@@ -148,12 +135,14 @@ public class TestRMProxy extends ProActiveTest {
         }
 
         RMProxy user1RMProxy = proxiesManager.getUserRMProxy("admin", user1Credentials);
-        assertSame("Proxy manager should return cached proxy instance", user1RMProxy,
-                proxiesManager.getUserRMProxy("admin", user1Credentials));
+        assertSame("Proxy manager should return cached proxy instance",
+                   user1RMProxy,
+                   proxiesManager.getUserRMProxy("admin", user1Credentials));
 
         RMProxy user2RMProxy = proxiesManager.getUserRMProxy("demo", user2Credentials);
-        assertSame("Proxy manager should return cached proxy instance", user2RMProxy,
-                proxiesManager.getUserRMProxy("demo", user2Credentials));
+        assertSame("Proxy manager should return cached proxy instance",
+                   user2RMProxy,
+                   proxiesManager.getUserRMProxy("demo", user2Credentials));
 
         requestReleaseOneNode(user1RMProxy, rm);
 

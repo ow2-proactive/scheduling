@@ -128,8 +128,7 @@ public class DoubleParserValidatorTest {
     public void testDoubleParserValidatorInvalidModelRangeMoreThanTwo()
             throws ModelSyntaxException, ValidationException, ConversionException {
         new DoubleParserValidator(DoubleParserValidator.DOUBLE_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                  VALID_LOWER_RANGE + "," +
-                                  VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
+                                  VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
                                   RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DOUBLE_STRING);
     }
 

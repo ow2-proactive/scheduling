@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.resourcemanager.frontend.topology.clustering;
 
@@ -120,8 +109,10 @@ public class HACTest {
         distances.get(n2).put(n3, (long) -1);
 
         HAC hac = new HAC(new LocalTopology(), null, BestProximityDescriptor.AVG, Long.MAX_VALUE);
-        HAC hacPivot = new HAC(new LocalTopology(), Collections.singletonList(n1),
-            BestProximityDescriptor.AVG, Long.MAX_VALUE);
+        HAC hacPivot = new HAC(new LocalTopology(),
+                               Collections.singletonList(n1),
+                               BestProximityDescriptor.AVG,
+                               Long.MAX_VALUE);
         log("Test 1: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3]");
         List<Node> result = hac.select(20, new LinkedList<>(distances.keySet()));
         assertTrue("Selection size is not 2", result.size() == 2);
@@ -170,17 +161,15 @@ public class HACTest {
         result = hac.select(4, new LinkedList<>(distances.keySet()));
         assertTrue("Selection size is not 4", result.size() == 4);
 
-        log(
-          "Test 8 - optimal: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(3)- 4]]");
+        log("Test 8 - optimal: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(3)- 4]]");
         result = hac.select(3, new LinkedList<>(distances.keySet()));
         assertTrue("Selection size is not 3", result.size() == 3);
-        if (!(result.contains(new DummyNode("1")) && result.contains(new DummyNode("2")) && result
-                .contains(new DummyNode("4")))) {
+        if (!(result.contains(new DummyNode("1")) && result.contains(new DummyNode("2")) &&
+              result.contains(new DummyNode("4")))) {
             fail("Selection is incorrect");
         }
 
-        log(
-          "Test 8: [pivot - node 1], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(3)- 4]]");
+        log("Test 8: [pivot - node 1], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(3)- 4]]");
         result = hacPivot.select(2, new LinkedList<>(distances.keySet()));
         assertTrue("Selection size is not 2", result.size() == 2);
         if (!(result.contains(new DummyNode("2")) && result.contains(new DummyNode("4")))) {
@@ -188,26 +177,26 @@ public class HACTest {
         }
 
         distances.get(n1).put(n4, (long) 30);
-        log(
-          "Test 9 - optimal: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(30)- 4]");
+        log("Test 9 - optimal: [no pivot], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(30)- 4]");
         result = hac.select(3, new LinkedList<>(distances.keySet()));
         assertTrue("Selection size is not 3", result.size() == 3);
-        if (!(result.contains(new DummyNode("2")) && result.contains(new DummyNode("3")) && result
-                .contains(new DummyNode("4")))) {
+        if (!(result.contains(new DummyNode("2")) && result.contains(new DummyNode("3")) &&
+              result.contains(new DummyNode("4")))) {
             assertTrue("Selection is incorrect", false);
         }
 
         Node n5 = new DummyNode("5");
         distances.put(n5, new HashMap<Node, Long>());
 
-        hacPivot = new HAC(new LocalTopology(), Collections.singletonList(n5), BestProximityDescriptor.AVG,
-            Long.MAX_VALUE);
+        hacPivot = new HAC(new LocalTopology(),
+                           Collections.singletonList(n5),
+                           BestProximityDescriptor.AVG,
+                           Long.MAX_VALUE);
         distances.get(n5).put(n1, (long) -1);
         distances.get(n5).put(n2, (long) -1);
         distances.get(n5).put(n3, (long) 10);
         distances.get(n5).put(n4, (long) 10);
-        log(
-          "Test 10: [pivot - node 5], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(30)- 4, 5 -(10)- 3, 5 -(10)- 4]");
+        log("Test 10: [pivot - node 5], graph [1 -(2)- 2 , 1 -(4)- 3, 2 -(10)- 3, 2 -(1)- 4, 3 -(3)- 4, 1 -(30)- 4, 5 -(10)- 3, 5 -(10)- 4]");
         result = hacPivot.select(4, new LinkedList<>(distances.keySet()));
         assertTrue("Selection size is not 2", result.size() == 2);
         if (!(result.contains(new DummyNode("3")) && result.contains(new DummyNode("4")))) {

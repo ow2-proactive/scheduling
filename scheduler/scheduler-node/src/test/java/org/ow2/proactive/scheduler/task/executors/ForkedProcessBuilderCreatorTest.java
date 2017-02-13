@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.task.executors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,24 +60,41 @@ import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
+
 public class ForkedProcessBuilderCreatorTest {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
+
     private String jobNameValue = "TestJobName";
+
     private String jobOwnerValue = "TestOwner";
+
     private String taskNameValue = "TestTaskName";
+
     private long taskIdValue = 20L;
+
     private long jobIdValue = 12L;
+
     private int iterationIndexValue = 40;
+
     private int taskReplicationValue = 20;
+
     private String testVariable1Key = "TestVariable1";
+
     private String testVariable1Value = "valueForTest1";
+
     private String[] forkEnvJvmArguments = new String[] { "Arg1", "Arg2" };
+
     private String[] forkEnJavaCommandString = new String[] { "My", "Command" };
+
     private Map<String, String> taskContextExtractedVariables;
+
     private String extractedVariable1Key = "extracted1Key";
+
     private String extractedVariable1Value = "extracted1Value";
+
     private String extractedVariable2Key = "extracted2Key";
+
     private String extractedVariable2Value = "extracted2Value";
 
     @Before
@@ -68,12 +110,11 @@ public class ForkedProcessBuilderCreatorTest {
 
         setMocks(forkedProcessBuilderCreator);
 
-        OSProcessBuilder processBuilder = forkedProcessBuilderCreator.createForkedProcessBuilder(
-                createTaskContext(),
-                tmpFolder.newFolder(),
-                System.out,
-                System.out,
-                tmpFolder.newFolder());
+        OSProcessBuilder processBuilder = forkedProcessBuilderCreator.createForkedProcessBuilder(createTaskContext(),
+                                                                                                 tmpFolder.newFolder(),
+                                                                                                 System.out,
+                                                                                                 System.out,
+                                                                                                 tmpFolder.newFolder());
 
         assertThat(processBuilder.command(), hasItems(forkEnJavaCommandString));
     }
@@ -83,21 +124,19 @@ public class ForkedProcessBuilderCreatorTest {
         ForkedProcessBuilderCreator forkedProcessBuilderCreator = new ForkedProcessBuilderCreator();
 
         TaskContextVariableExtractor taskContextVariableExtractor = mock(TaskContextVariableExtractor.class);
-        given(taskContextVariableExtractor.extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(
-                any(TaskContext.class)))
-                .willThrow(IllegalArgumentException.class);
+        given(taskContextVariableExtractor.extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(any(TaskContext.class))).willThrow(IllegalArgumentException.class);
 
         setPrivateField(ForkedProcessBuilderCreator.class.getDeclaredField("taskContextVariableExtractor"),
-                forkedProcessBuilderCreator,
-                taskContextVariableExtractor);
+                        forkedProcessBuilderCreator,
+                        taskContextVariableExtractor);
 
         TaskContext taskContext = createTaskContext();
 
         forkedProcessBuilderCreator.createForkedProcessBuilder(taskContext,
-                tmpFolder.newFolder(),
-                System.out,
-                System.out,
-                tmpFolder.newFolder());
+                                                               tmpFolder.newFolder(),
+                                                               System.out,
+                                                               System.out,
+                                                               tmpFolder.newFolder());
     }
 
     @Test
@@ -109,53 +148,49 @@ public class ForkedProcessBuilderCreatorTest {
         TaskContext taskContext = createTaskContext();
         taskContext.getExecutableContainer().setRunAsUser(true);
 
-        OSProcessBuilder processBuilder = forkedProcessBuilderCreator.createForkedProcessBuilder(
-                createTaskContext(),
-                tmpFolder.newFolder(),
-                System.out,
-                System.out,
-                tmpFolder.newFolder());
+        OSProcessBuilder processBuilder = forkedProcessBuilderCreator.createForkedProcessBuilder(createTaskContext(),
+                                                                                                 tmpFolder.newFolder(),
+                                                                                                 System.out,
+                                                                                                 System.out,
+                                                                                                 tmpFolder.newFolder());
 
         assertThat(processBuilder.command(), hasItems(forkEnJavaCommandString));
     }
 
     private void setMocks(ForkedProcessBuilderCreator forkedProcessBuilderCreator) throws Exception {
-        ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = mock(
-                ForkedJvmTaskExecutionCommandCreator.class);
+        ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = mock(ForkedJvmTaskExecutionCommandCreator.class);
         TaskContextVariableExtractor taskContextVariableExtractor = mock(TaskContextVariableExtractor.class);
-        ForkEnvironmentScriptExecutor forkEnvironmentScriptExecutor = mock(
-                ForkEnvironmentScriptExecutor.class);
+        ForkEnvironmentScriptExecutor forkEnvironmentScriptExecutor = mock(ForkEnvironmentScriptExecutor.class);
         given(forkedJvmTaskExecutionCommandCreator.createForkedJvmTaskExecutionCommand(any(TaskContext.class),
-                any(ScriptResult.class), any(String.class))).willReturn(
-                Arrays.asList(forkEnJavaCommandString));
-        given(taskContextVariableExtractor.extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(
-                any(TaskContext.class))).willReturn(
-                taskContextExtractedVariables);
+                                                                                       any(ScriptResult.class),
+                                                                                       any(String.class))).willReturn(Arrays.asList(forkEnJavaCommandString));
+        given(taskContextVariableExtractor.extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(any(TaskContext.class))).willReturn(taskContextExtractedVariables);
         given(forkEnvironmentScriptExecutor.executeForkEnvironmentScript(any(TaskContext.class),
-                any(PrintStream.class), any(
-                        PrintStream.class))).willReturn(
-                new ScriptResult<ForkEnvironmentScriptResult>(new ForkEnvironmentScriptResult()));
+                                                                         any(PrintStream.class),
+                                                                         any(PrintStream.class))).willReturn(new ScriptResult<ForkEnvironmentScriptResult>(new ForkEnvironmentScriptResult()));
 
-        setPrivateField(
-                ForkedProcessBuilderCreator.class.getDeclaredField("forkedJvmTaskExecutionCommandCreator"),
-                forkedProcessBuilderCreator,
-                forkedJvmTaskExecutionCommandCreator);
+        setPrivateField(ForkedProcessBuilderCreator.class.getDeclaredField("forkedJvmTaskExecutionCommandCreator"),
+                        forkedProcessBuilderCreator,
+                        forkedJvmTaskExecutionCommandCreator);
         setPrivateField(ForkedProcessBuilderCreator.class.getDeclaredField("taskContextVariableExtractor"),
-                forkedProcessBuilderCreator,
-                taskContextVariableExtractor);
+                        forkedProcessBuilderCreator,
+                        taskContextVariableExtractor);
         setPrivateField(ForkedProcessBuilderCreator.class.getDeclaredField("forkEnvironmentScriptExecutor"),
-                forkedProcessBuilderCreator,
-                forkEnvironmentScriptExecutor);
+                        forkedProcessBuilderCreator,
+                        forkEnvironmentScriptExecutor);
     }
 
     private TaskContext createTaskContext() throws InvalidScriptException, NodeException {
-        ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(
-                new TaskScript(new SimpleScript(
-                        "print('hello'); result='hello'", "javascript")));
+        ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                  "javascript")));
         TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariableAndForkEnvironment();
 
-        TaskContext taskContext = new TaskContext(scriptContainer, taskLauncherInitializer, null,
-                new NodeDataSpacesURIs(null, null, null, null, null, null), null, null);
+        TaskContext taskContext = new TaskContext(scriptContainer,
+                                                  taskLauncherInitializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs(null, null, null, null, null, null),
+                                                  null,
+                                                  null);
         return taskContext;
     }
 
@@ -191,7 +226,6 @@ public class ForkedProcessBuilderCreatorTest {
         return TaskIdImpl.createTaskId(new JobIdImpl(jobIdValue, jobNameValue), taskNameValue, taskIdValue);
     }
 
-
     /**
      * Sets a private field.
      *
@@ -199,8 +233,7 @@ public class ForkedProcessBuilderCreatorTest {
      * @param target       Instance of class, in which to set the field.
      * @param value        Value to set the field to.
      */
-    private void setPrivateField(Field privateField, Object target,
-            Object value) throws IllegalAccessException {
+    private void setPrivateField(Field privateField, Object target, Object value) throws IllegalAccessException {
         privateField.setAccessible(true);
         privateField.set(target, value);
         privateField.setAccessible(false);

@@ -1,44 +1,32 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
- *  Contributor(s):
- *
- * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package functionaltests.dataspaces;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
-import functionaltests.workflow.JobWorkflowDataspace;
-import functionaltests.workflow.TWorkflowJobs;
+import java.io.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -50,7 +38,9 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
-import java.io.*;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.workflow.JobWorkflowDataspace;
+import functionaltests.workflow.TWorkflowJobs;
 
 
 /**
@@ -115,11 +105,11 @@ public class TestWorkflowDataspace extends SchedulerFunctionalTestWithRestart {
         t2.setExecutableClassName("org.ow2.proactive.scheduler.examples.EmptyTask");
         t2.addDependence(t1);
         t2.setFlowScript(FlowScript.createLoopFlowScript(//
-                "if (variables.get('PA_TASK_ITERATION') < 2) {" + //
-                    "loop = true;" + //
-                    "} else {" + //
-                    "loop = false;" + //
-                    "}", "T"));
+                                                         "if (variables.get('PA_TASK_ITERATION') < 2) {" + //
+                                                         "loop = true;" + //
+                                                         "} else {" + //
+                                                         "loop = false;" + //
+                                                         "}", "T"));
         t2.setFlowBlock(FlowBlock.END);
         job.addTask(t2);
 
@@ -133,8 +123,7 @@ public class TestWorkflowDataspace extends SchedulerFunctionalTestWithRestart {
 
                 BufferedReader in = new BufferedReader(new FileReader(f));
                 String line = in.readLine();
-                Assert.assertTrue("Wrong content for " + f.getCanonicalPath(), line.equals("it " + it +
-                    " dup " + dup));
+                Assert.assertTrue("Wrong content for " + f.getCanonicalPath(), line.equals("it " + it + " dup " + dup));
             }
         }
     }

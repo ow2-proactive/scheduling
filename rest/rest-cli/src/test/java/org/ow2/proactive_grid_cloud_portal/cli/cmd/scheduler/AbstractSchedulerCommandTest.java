@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.scheduler;
 
 import static org.mockito.Matchers.any;
@@ -32,10 +57,17 @@ import objectFaker.propertyGenerator.PrefixPropertyGenerator;
 
 public abstract class AbstractSchedulerCommandTest {
 
-    @Mock ApplicationContextImpl context;
-    @Mock SchedulerRestClient restClient;
-    @Mock SchedulerRestInterface restApi;
-    @Mock Stack stack;
+    @Mock
+    ApplicationContextImpl context;
+
+    @Mock
+    SchedulerRestClient restClient;
+
+    @Mock
+    SchedulerRestInterface restApi;
+
+    @Mock
+    Stack stack;
 
     protected DataFaker<JobIdData> jobIdFaker;
 
@@ -45,8 +77,7 @@ public abstract class AbstractSchedulerCommandTest {
 
     protected ScriptEngine engine;
 
-
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         jobIdFaker = new DataFaker<JobIdData>(JobIdData.class);
         jobIdFaker.setGenerator("readableName", new PrefixPropertyGenerator("job", 1));
@@ -64,13 +95,11 @@ public abstract class AbstractSchedulerCommandTest {
 
         when(context.getProperty(eq(AbstractIModeCommand.TERMINATE), any(Class.class), anyBoolean())).thenReturn(false);
 
-       
         //Mockito.when(ApplicationContextImpl.currentContext()).thenReturn(context);
         ApplicationContextImpl.mockCurrentContext(context.newApplicationContextHolder());
     }
 
-
-    protected void configureDevice() throws IOException{
+    protected void configureDevice() throws IOException {
         InputStream in = new ByteArrayInputStream(userInput.toString().getBytes());
         PrintStream out = new PrintStream(capturedOutput);
         AbstractDevice device = new JLineDevice(in, out);
@@ -80,22 +109,19 @@ public abstract class AbstractSchedulerCommandTest {
         this.engine.getContext().setWriter(device.getWriter());
     }
 
-
-    protected void typeLine(String line){
+    protected void typeLine(String line) {
         userInput.append(line);
         userInput.append(System.lineSeparator());
     }
 
-
     protected abstract void executeCommandWithArgs(Object... args);
 
-
-    protected void executeTest(Object... args) throws  Exception{
+    protected void executeTest(Object... args) throws Exception {
         configureDevice();
         executeCommandWithArgs(args);
     }
 
-    protected void executeTestInteractive() throws Exception{
+    protected void executeTestInteractive() throws Exception {
         configureDevice();
         ImodeCommand interactiveCommand = new ImodeCommand();
         interactiveCommand.execute(context);

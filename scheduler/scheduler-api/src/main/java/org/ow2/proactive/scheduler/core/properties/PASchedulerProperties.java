@@ -1,44 +1,29 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s): ActiveEon Team - http://www.activeeon.com
- *
- * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.ow2.proactive.scheduler.core.properties;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.utils.PAProperties;
-import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,6 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.utils.PAProperties;
+import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
 /**
@@ -102,8 +91,7 @@ public enum PASchedulerProperties {
     SCHEDULER_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.scheduledpoolnbthreads", PropertyType.INTEGER),
 
     /** Number of threads used to handle scheduled operations related to housekeeping */
-    SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD(
-            "pa.scheduler.core.housekeeping.scheduledpoolnbthreads", PropertyType.INTEGER),
+    SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.housekeeping.scheduledpoolnbthreads", PropertyType.INTEGER),
 
     /** Name of the JMX MBean for the scheduler */
     SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PropertyType.STRING),
@@ -300,12 +288,10 @@ public enum PASchedulerProperties {
      * (If true)  the scheduler user will do the requests to rm
      * (If false) each Scheduler users have their own connection to RM using same credentials
      */
-    RESOURCE_MANAGER_SINGLE_CONNECTION("pa.scheduler.resourcemanager.authentication.single",
-            PropertyType.BOOLEAN),
+    RESOURCE_MANAGER_SINGLE_CONNECTION("pa.scheduler.resourcemanager.authentication.single", PropertyType.BOOLEAN),
 
     /** Set a timeout for initial connection to the RM connection (in ms) */
-    RESOURCE_MANAGER_CONNECTION_TIMEOUT("pa.scheduler.resourcemanager.connection.timeout",
-            PropertyType.INTEGER),
+    RESOURCE_MANAGER_CONNECTION_TIMEOUT("pa.scheduler.resourcemanager.connection.timeout", PropertyType.INTEGER),
 
     /* ***************************************************************** */
     /* ********************** HIBERNATE PROPERTIES ********************* */
@@ -351,14 +337,17 @@ public enum PASchedulerProperties {
     /* ***************************************************************************** */
     /* ***************************************************************************** */
     public static final String PA_SCHEDULER_PROPERTIES_FILEPATH = "pa.scheduler.properties.filepath";
+
     public static final String PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH = "config/scheduler/settings.ini";
 
     /** memory entity of the properties file. */
     private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key,
-        PA_SCHEDULER_PROPERTIES_FILEPATH, PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
+                                                                                        PA_SCHEDULER_PROPERTIES_FILEPATH,
+                                                                                        PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
 
     /** Key of the specific instance. */
     private String key;
+
     /** value of the specific instance. */
     private PropertyType type;
 
@@ -398,8 +387,10 @@ public enum PASchedulerProperties {
      * @param filename the file containing the properties to be loaded.
      */
     public static void loadProperties(String filename) {
-        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key, PA_SCHEDULER_PROPERTIES_FILEPATH,
-            PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH, filename);
+        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key,
+                                                      PA_SCHEDULER_PROPERTIES_FILEPATH,
+                                                      PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH,
+                                                      filename);
     }
 
     /**
@@ -463,7 +454,7 @@ public enum PASchedulerProperties {
                 return Integer.parseInt(valueS);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(key +
-                    " is not an integer property. getValueAsInt cannot be called on this property");
+                                                   " is not an integer property. getValueAsInt cannot be called on this property");
             }
         } else {
             return 0;
@@ -578,7 +569,10 @@ public enum PASchedulerProperties {
      * Supported types for PASchedulerProperties
      */
     public enum PropertyType {
-        STRING, BOOLEAN, INTEGER, LIST
+        STRING,
+        BOOLEAN,
+        INTEGER,
+        LIST
     }
 
 }

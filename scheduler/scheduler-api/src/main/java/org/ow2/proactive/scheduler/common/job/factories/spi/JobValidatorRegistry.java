@@ -68,6 +68,7 @@ public class JobValidatorRegistry {
         private LazyHolder() {
             //empty
         }
+
         private static final JobValidatorRegistry INSTANCE = new JobValidatorRegistry();
     }
 

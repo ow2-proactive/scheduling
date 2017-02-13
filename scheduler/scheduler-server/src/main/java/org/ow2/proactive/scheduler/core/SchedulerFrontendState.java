@@ -1,38 +1,27 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.core;
 
@@ -96,56 +85,94 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 class SchedulerFrontendState implements SchedulerStateUpdate {
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS = "You do not have permission to get the status !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER = "You do not have permission to add a listener !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB = "You do not have permission to change the priority of this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE = "You do not have permission to get the state !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK = "You do not have permission to get the state of this task !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB = "You do not have permission to get the state of this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB = "You do not have permission to get the task logs of this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK = "You do not have permission to restart this task !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK = "You do not have permission to preempt this task !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB = "You do not have permission to kill this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER = "You do not have permission to remove third-party credentials from the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK = "You do not have permission to kill this task !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB = "You do not have permission to submit a job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER = "You do not have permission to stop the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_START_THE_SCHEDULER = "You do not have permission to start the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_SHUTDOWN_THE_SCHEDULER = "You do not have permission to shutdown the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB = "You do not have permission to pause this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER = "You do not have permission to put third-party credentials in the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB = "You do not have permission to restart in error tasks in this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB = "You do not have permission to get the task result of this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB = "You do not have permission to remove this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB = "You do not have permission to resume this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB = "You do not have permission to listen the log of this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB = "You do not have permission to get the result of this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB = "You do not have permissions to get the logs of this job !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THE_SCHEDULER = "You do not have permission to pause the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THE_SCHEDULER = "You do not have permission to resume the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER = "You do not have permission to freeze the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_LIST_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER = "You do not have permission to list third-party credentials in the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_RELOAD_POLICY_CONFIGURATION = "You do not have permission to reload policy configuration !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER = "You do not have permission to kill the scheduler !";
+
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK = "You do not have permission to finish this task!";
 
     private static final String USERS_UPDATED_EVENT_METHOD = "usersUpdatedEvent";
+
     private static final String TASK_STATE_UPDATED_EVENT_METHOD = "taskStateUpdatedEvent";
+
     private static final String JOB_UPDATED_FULL_DATA_EVENT_METHOD = "jobUpdatedFullDataEvent";
+
     private static final String JOB_STATE_UPDATED_EVENT_METHOD = "jobStateUpdatedEvent";
+
     private static final String JOB_SUBMITTED_EVENT_METHOD = "jobSubmittedEvent";
+
     private static final String SCHEDULER_STATE_UPDATED_EVENT_METHOD = "schedulerStateUpdatedEvent";
+
     /** Scheduler logger */
     private static final Logger logger = Logger.getLogger(SchedulingService.class);
+
     private static final TaskLogger tlogger = TaskLogger.getInstance();
+
     private static final JobLogger jlogger = JobLogger.getInstance();
 
     /** A repeated warning message */
     private static final String ACCESS_DENIED = "Access denied! You are not connected or your session has expired!";
 
     /** Maximum duration of a session for a useless client */
-    private static final long USER_SESSION_DURATION = PASchedulerProperties.SCHEDULER_USER_SESSION_TIME
-            .getValueAsInt() *
-        1000;
+    private static final long USER_SESSION_DURATION = PASchedulerProperties.SCHEDULER_USER_SESSION_TIME.getValueAsInt() *
+                                                      1000;
 
     /** Stores methods that will be called on clients */
     private static final Map<String, Method> eventMethods;
@@ -207,12 +234,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         Vector<JobState> finishedJobs = sState.getFinishedJobs();
 
         // default state = started
-        Set<JobState> jobStates = new HashSet<>(
-            pendingJobs.size() + runningJobs.size() + finishedJobs.size());
+        Set<JobState> jobStates = new HashSet<>(pendingJobs.size() + runningJobs.size() + finishedJobs.size());
 
         if (logger.isInfoEnabled()) {
             logger.info("#Pending jobs: " + pendingJobs.size() + " #Running jobs: " + runningJobs.size() +
-                " #Finished jobs: " + finishedJobs.size());
+                        " #Finished jobs: " + finishedJobs.size());
         }
 
         for (JobState js : pendingJobs) {
@@ -314,13 +340,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return getState(false);
     }
 
-    synchronized SchedulerState getState(boolean myJobsOnly)
-            throws NotConnectedException, PermissionException {
+    synchronized SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         // checking permissions
         checkPermission("getState", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE);
 
-        ListeningUser ui = identifications
-                .get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID());
+        ListeningUser ui = identifications.get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID());
 
         return myJobsOnly ? sState.filterOnUser(ui.getUser().getUsername()) : sState;
 
@@ -338,23 +362,23 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @throws PermissionException
      *             if permission is denied
      */
-    synchronized void handleOnlyMyJobsPermission(boolean myOnly, UserIdentificationImpl ui,
-            String errorMessage) throws PermissionException {
-        ui.checkPermission(new HandleOnlyMyJobsPermission(myOnly), ui.getUsername() +
-            " does not have permissions to handle other users jobs (" + errorMessage + ")");
+    synchronized void handleOnlyMyJobsPermission(boolean myOnly, UserIdentificationImpl ui, String errorMessage)
+            throws PermissionException {
+        ui.checkPermission(new HandleOnlyMyJobsPermission(myOnly),
+                           ui.getUsername() + " does not have permissions to handle other users jobs (" + errorMessage +
+                                                                   ")");
     }
 
-    synchronized void addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            SchedulerEvent... events) throws NotConnectedException, PermissionException {
+    synchronized void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
+            throws NotConnectedException, PermissionException {
         addEventListener(sel, myEventsOnly, false, events);
     }
 
     synchronized SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            boolean getCurrentState, SchedulerEvent... events)
-                    throws NotConnectedException, PermissionException {
+            boolean getCurrentState, SchedulerEvent... events) throws NotConnectedException, PermissionException {
         // checking permissions
         ListeningUser uIdent = checkPermissionReturningListeningUser("addEventListener",
-                YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
+                                                                     YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
 
         // check if listener is not null
         if (sel == null) {
@@ -376,8 +400,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             currentState = getState(myEventsOnly);
         } else {
             // check get state permission
-            handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(),
-                    YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
+            handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
         }
         // prepare user for receiving events
         uIdent.getUser().setUserEvents(events);
@@ -413,8 +436,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized InternalJob createJob(Job userJob, UserIdentificationImpl ident)
-            throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         UniqueID id = checkAccess();
 
         // get the internal job.
@@ -423,7 +445,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         // setting job informations
         if (job.getTasks().size() == 0) {
             String msg = "Job " + job.getId().value() +
-                " contains no task. You need to insert at least one task before submitting job";
+                         " contains no task. You need to insert at least one task before submitting job";
             logger.info(msg);
             throw new JobCreationException(msg);
         }
@@ -432,7 +454,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         // job.
         try {
             ident.checkPermission(new ChangePriorityPermission(job.getPriority().ordinal()),
-                    ident.getUsername() + " does not have rights to set job priority " + job.getPriority());
+                                  ident.getUsername() + " does not have rights to set job priority " +
+                                                                                             job.getPriority());
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
@@ -444,16 +467,16 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized void jobSubmitted(InternalJob job, UserIdentificationImpl ident)
-            throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         // put the job inside the frontend management list
         jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
         // increase number of submit for this user
         ident.addSubmit();
         // send update user event
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
-        jlogger.info(job.getId(), "submitted: name '" + job.getName() + "', tasks '" +
-            job.getTotalNumberOfTasks() + "', owner '" + job.getOwner() + "'");
+        jlogger.info(job.getId(),
+                     "submitted: name '" + job.getName() + "', tasks '" + job.getTotalNumberOfTasks() + "', owner '" +
+                                  job.getOwner() + "'");
         try {
             jlogger.info(job.getId(), job.display());
         } catch (Exception e) {
@@ -512,9 +535,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             // log and send events
             String user = ident.getUser().getUsername();
             logger.info("User '" + user + "' has disconnect the scheduler !");
-            dispatchUsersUpdated(
-                    new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident.getUser()),
-                    false);
+            dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident.getUser()),
+                                 false);
         }
     }
 
@@ -547,18 +569,21 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     }
 
-    synchronized void checkChangeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    synchronized void checkChangeJobPriority(JobId jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
 
-        checkPermissions("changeJobPriority", getIdentifiedJob(jobId),
-                YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB);
+        checkPermissions("changeJobPriority",
+                         getIdentifiedJob(jobId),
+                         YOU_DO_NOT_HAVE_PERMISSION_TO_CHANGE_THE_PRIORITY_OF_THIS_JOB);
 
-        UserIdentificationImpl ui = identifications
-                .get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID()).getUser();
+        UserIdentificationImpl ui = identifications.get(PAActiveObject.getContext()
+                                                                      .getCurrentRequest()
+                                                                      .getSourceBodyID())
+                                                   .getUser();
 
         try {
             ui.checkPermission(new ChangePriorityPermission(priority.getPriority()),
-                    ui.getUsername() + " does not have permissions to set job priority to " + priority);
+                               ui.getUsername() + " does not have permissions to set job priority to " + priority);
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
@@ -605,15 +630,17 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     synchronized JobState getJobState(JobId jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        checkPermissions("getJobState", getIdentifiedJob(jobId),
-                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
+        checkPermissions("getJobState",
+                         getIdentifiedJob(jobId),
+                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         return jobsMap.get(jobId);
     }
 
     synchronized TaskState getTaskState(JobId jobId, TaskId taskId)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        checkPermissions("getJobState", getIdentifiedJob(jobId),
-                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
+        checkPermissions("getJobState",
+                         getIdentifiedJob(jobId),
+                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
@@ -627,8 +654,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized TaskState getTaskState(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
 
-        checkPermissions("getJobState", getIdentifiedJob(jobId),
-                YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
+        checkPermissions("getJobState",
+                         getIdentifiedJob(jobId),
+                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
 
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
@@ -649,8 +677,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return ts;
     }
 
-    synchronized TaskId getTaskId(JobId jobId, String taskName)
-            throws UnknownTaskException, UnknownJobException {
+    synchronized TaskId getTaskId(JobId jobId, String taskName) throws UnknownTaskException, UnknownJobException {
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
@@ -675,7 +702,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
         try {
             ident.checkPermission(new ChangePolicyPermission(),
-                    ident.getUsername() + " does not have permissions to change the policy of the scheduler");
+                                  ident.getUsername() + " does not have permissions to change the policy of the scheduler");
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
@@ -691,7 +718,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
         try {
             ident.checkPermission(new ConnectToResourceManagerPermission(),
-                    ident.getUsername() + " does not have permissions to change RM in the scheduler");
+                                  ident.getUsername() + " does not have permissions to change RM in the scheduler");
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
@@ -760,7 +787,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     if ((userId.getUser().getUserEvents() == null) ||
                         userId.getUser().getUserEvents().contains(eventType)) {
                         userId.getListener().addEvent(eventMethods.get(SCHEDULER_STATE_UPDATED_EVENT_METHOD),
-                                eventType);
+                                                      eventType);
                     }
                 }
             }
@@ -793,8 +820,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                            listeningUserId.getListener()
-                                    .addEvent(eventMethods.get(JOB_SUBMITTED_EVENT_METHOD), job);
+                            listeningUserId.getListener().addEvent(eventMethods.get(JOB_SUBMITTED_EVENT_METHOD), job);
                         }
                     }
 
@@ -821,11 +847,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 // file
                 // was already removed and it will create it again
                 if (notification.getEventType() == SchedulerEvent.JOB_REMOVE_FINISHED) {
-                    logger.debug("job " + notification.getData().getJobId() + " event [" +
-                        notification.getEventType() + "]");
+                    logger.debug("job " + notification.getData().getJobId() + " event [" + notification.getEventType() +
+                                 "]");
                 } else {
-                    jlogger.debug(notification.getData().getJobId(),
-                            " event [" + notification.getEventType() + "]");
+                    jlogger.debug(notification.getData().getJobId(), " event [" + notification.getEventType() + "]");
                 }
             }
             for (ListeningUser listeningUserId : identifications.values()) {
@@ -840,8 +865,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            listeningUserId.getListener()
-                                    .addEvent(eventMethods.get(JOB_STATE_UPDATED_EVENT_METHOD), notification);
+                            listeningUserId.getListener().addEvent(eventMethods.get(JOB_STATE_UPDATED_EVENT_METHOD),
+                                                                   notification);
                         }
                     }
                 }
@@ -877,8 +902,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(job.getOwner()))) {
-                            listeningUserId.getListener()
-                                    .addEvent(eventMethods.get(JOB_UPDATED_FULL_DATA_EVENT_METHOD), job);
+                            listeningUserId.getListener().addEvent(eventMethods.get(JOB_UPDATED_FULL_DATA_EVENT_METHOD),
+                                                                   job);
                         }
                     }
 
@@ -901,8 +926,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     private void dispatchTaskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         try {
             if (logger.isDebugEnabled()) {
-                tlogger.debug(notification.getData().getTaskId(),
-                        "event [" + notification.getEventType() + "]");
+                tlogger.debug(notification.getData().getTaskId(), "event [" + notification.getEventType() + "]");
             }
             for (ListeningUser listeningUserId : identifications.values()) {
                 // if this user has a listener
@@ -916,8 +940,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         // (myEventOnly=true and it is its event)
                         if (!userId.isMyEventsOnly() ||
                             (userId.isMyEventsOnly() && userId.getUsername().equals(owner))) {
-                            listeningUserId.getListener().addEvent(
-                                    eventMethods.get(TASK_STATE_UPDATED_EVENT_METHOD), notification);
+                            listeningUserId.getListener().addEvent(eventMethods.get(TASK_STATE_UPDATED_EVENT_METHOD),
+                                                                   notification);
                         }
                     }
                 }
@@ -934,8 +958,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @param notification
      *            the data to send to every client
      */
-    private void dispatchUsersUpdated(NotificationData<UserIdentification> notification,
-            boolean checkForDownUser) {
+    private void dispatchUsersUpdated(NotificationData<UserIdentification> notification, boolean checkForDownUser) {
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("event [" + notification.getEventType() + "]");
@@ -950,10 +973,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         userId.getUserEvents().contains(notification.getEventType())) {
                         // if this userId have the myEventOnly=false or
                         // (myEventOnly=true and it is its event)
-                        if (!userId.isMyEventsOnly() || (userId.isMyEventsOnly() &&
-                            userId.getUsername().equals(notification.getData().getUsername()))) {
-                            listeningUserId.getListener()
-                                    .addEvent(eventMethods.get(USERS_UPDATED_EVENT_METHOD), notification);
+                        if (!userId.isMyEventsOnly() ||
+                            (userId.isMyEventsOnly() &&
+                             userId.getUsername().equals(notification.getData().getUsername()))) {
+                            listeningUserId.getListener().addEvent(eventMethods.get(USERS_UPDATED_EVENT_METHOD),
+                                                                   notification);
                         }
                     }
                 }
@@ -1003,8 +1027,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case POLICY_CHANGED:
                 break;
             default:
-                logger.warn(
-                        "**WARNING** - Unconsistent update type received from Scheduler Core : " + eventType);
+                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " + eventType);
                 return;
         }
         // send the event for all case, except default
@@ -1057,7 +1080,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 break;
             default:
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                    notification.getEventType());
+                            notification.getEventType());
                 return;
         }
         dispatchJobStateUpdated(owner, notification);
@@ -1091,7 +1114,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 break;
             default:
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                    notification.getEventType());
+                            notification.getEventType());
         }
     }
 
@@ -1103,7 +1126,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 break;
             default:
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                    notification.getEventType());
+                            notification.getEventType());
         }
     }
 
@@ -1111,8 +1134,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         List<SchedulerUserInfo> users = new ArrayList<>(identifications.size());
         for (ListeningUser listeningUser : identifications.values()) {
             UserIdentificationImpl user = listeningUser.getUser();
-            users.add(new SchedulerUserInfo(user.getHostName(), user.getUsername(), user.getConnectionTime(),
-                user.getLastSubmitTime(), user.getSubmitNumber()));
+            users.add(new SchedulerUserInfo(user.getHostName(),
+                                            user.getUsername(),
+                                            user.getConnectionTime(),
+                                            user.getLastSubmitTime(),
+                                            user.getSubmitNumber()));
         }
         return users;
     }

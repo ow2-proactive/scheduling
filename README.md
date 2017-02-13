@@ -41,4 +41,3 @@ This will produce the following archives:
 http://doc.activeeon.com
 
 Enjoy ProActive Workflows & Scheduling!
-

@@ -1,3 +1,28 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive.scheduler.core;
 
 import java.net.URI;
@@ -41,16 +66,16 @@ import org.ow2.proactive.utils.NodeSet;
 public class SchedulingService {
 
     static final Logger logger = Logger.getLogger(SchedulingService.class);
+
     static final TaskLogger tlogger = TaskLogger.getInstance();
+
     static final JobLogger jlogger = JobLogger.getInstance();
 
-    static final long SCHEDULER_AUTO_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY
-            .getValueAsInt() *
-        1000;
+    static final long SCHEDULER_AUTO_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY.getValueAsInt() *
+                                                         1000;
 
-    static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY
-            .getValueAsInt() *
-        1000;
+    static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() *
+                                                    1000;
 
     final SchedulingInfrastructure infrastructure;
 
@@ -75,7 +100,7 @@ public class SchedulingService {
 
     public SchedulingService(SchedulingInfrastructure infrastructure, SchedulerStateUpdate listener,
             RecoveredSchedulerState recoveredState, String policyClassName, SchedulingMethod schedulingMethod)
-                    throws Exception {
+            throws Exception {
         this.infrastructure = infrastructure;
         this.listener = listener;
         this.jobs = new LiveJobs(infrastructure.getDBManager(), listener);
@@ -219,8 +244,8 @@ public class SchedulingService {
             }
             try {
                 infrastructure.getRMProxiesManager()
-                        .getUserRMProxy(taskData.getUser(), taskData.getCredentials())
-                        .releaseNodes(nodes, taskData.getTask().getCleaningScript());
+                              .getUserRMProxy(taskData.getUser(), taskData.getCredentials())
+                              .releaseNodes(nodes, taskData.getTask().getCleaningScript());
             } catch (Throwable t) {
                 logger.error("Failed to release nodes", t);
             }
@@ -240,8 +265,7 @@ public class SchedulingService {
 
     public boolean reloadPolicyConfiguration() {
         if (status.isShuttingDown()) {
-            logger.warn("Policy configuration can only be reloaded when Scheduler is up, current state : " +
-                status);
+            logger.warn("Policy configuration can only be reloaded when Scheduler is up, current state : " + status);
             return false;
         }
         return policy.reloadConfig();
@@ -322,8 +346,7 @@ public class SchedulingService {
     /*
      * Should be called only by scheduling method impl while it holds job lock
      */
-    public void simulateJobStartAndCancelIt(final List<EligibleTaskDescriptor> tasksToSchedule,
-            final String errorMsg) {
+    public void simulateJobStartAndCancelIt(final List<EligibleTaskDescriptor> tasksToSchedule, final String errorMsg) {
         infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
             public void run() {
                 TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
@@ -428,8 +451,7 @@ public class SchedulingService {
 
     public boolean removeJob(JobId jobId) {
         try {
-            return infrastructure.getClientOperationsThreadPool().submit(new JobRemoveHandler(this, jobId))
-                    .get();
+            return infrastructure.getClientOperationsThreadPool().submit(new JobRemoveHandler(this, jobId)).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
@@ -499,13 +521,11 @@ public class SchedulingService {
 
     void submitTerminationDataHandler(TerminationData terminationData) {
         if (!terminationData.isEmpty()) {
-            getInfrastructure().getInternalOperationsThreadPool()
-                    .submit(new TerminationDataHandler(terminationData));
+            getInfrastructure().getInternalOperationsThreadPool().submit(new TerminationDataHandler(terminationData));
         }
     }
 
-    public boolean killTask(final JobId jobId, final String taskName)
-            throws UnknownJobException, UnknownTaskException {
+    public boolean killTask(final JobId jobId, final String taskName) throws UnknownJobException, UnknownTaskException {
         try {
             if (status.isUnusable()) {
                 return false;
@@ -654,8 +674,7 @@ public class SchedulingService {
         }
     }
 
-    public void listenJobLogs(final JobId jobId, final AppenderProvider appenderProvider)
-            throws UnknownJobException {
+    public void listenJobLogs(final JobId jobId, final AppenderProvider appenderProvider) throws UnknownJobException {
         try {
             infrastructure.getClientOperationsThreadPool().submit(new Callable<Void>() {
                 @Override
@@ -681,7 +700,7 @@ public class SchedulingService {
             public void run() {
                 try {
                     TerminationData terminationData = jobs.taskTerminatedWithResult(taskId,
-                            (TaskResultImpl) taskResult);
+                                                                                    (TaskResultImpl) taskResult);
                     terminationData.handleTermination(SchedulingService.this);
                     wakeUpSchedulingThread();
                 } catch (Throwable e) {
@@ -692,9 +711,7 @@ public class SchedulingService {
     }
 
     void handleException(Throwable t) {
-        logger.error(
-                "Unexpected exception in the scheduling thread - checking the connection to resource manager",
-                t);
+        logger.error("Unexpected exception in the scheduling thread - checking the connection to resource manager", t);
         try {
             // check if the connection to RM is still active
             // if not reactivate it for all the proxies
@@ -718,16 +735,16 @@ public class SchedulingService {
         boolean alive = false;
 
         // Checks if the option is enabled (false by default)
-        boolean autoReconnectRM = PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.isSet()
-                ? PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.getValueAsBoolean() : false;
+        boolean autoReconnectRM = PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.isSet() ? PASchedulerProperties.SCHEDULER_RMCONNECTION_AUTO_CONNECT.getValueAsBoolean()
+                                                                                                    : false;
 
         // Delay (in ms) between each connection attempts (5s by default)
-        int timespan = PASchedulerProperties.SCHEDULER_RMCONNECTION_TIMESPAN.isSet()
-                ? PASchedulerProperties.SCHEDULER_RMCONNECTION_TIMESPAN.getValueAsInt() : 5000;
+        int timespan = PASchedulerProperties.SCHEDULER_RMCONNECTION_TIMESPAN.isSet() ? PASchedulerProperties.SCHEDULER_RMCONNECTION_TIMESPAN.getValueAsInt()
+                                                                                     : 5000;
 
         // Maximum number of attempts (10 by default)
-        int maxAttempts = PASchedulerProperties.SCHEDULER_RMCONNECTION_ATTEMPTS.isSet()
-                ? PASchedulerProperties.SCHEDULER_RMCONNECTION_ATTEMPTS.getValueAsInt() : 10;
+        int maxAttempts = PASchedulerProperties.SCHEDULER_RMCONNECTION_ATTEMPTS.isSet() ? PASchedulerProperties.SCHEDULER_RMCONNECTION_ATTEMPTS.getValueAsInt()
+                                                                                        : 10;
 
         // If the options is disabled or the number of attempts is wrong, it is set to 1
         if (!autoReconnectRM || maxAttempts <= 0)
@@ -771,13 +788,12 @@ public class SchedulingService {
             // Disconnect proxies and freeze the scheduler.
             clearProxiesAndFreeze();
 
-            logger.fatal(
-                    "\n*****************************************************************************************************************\n" +
-                        "* Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n" +
-                        "* Scheduler is in critical state and its functionalities are reduced : \n" +
-                        "* \t-> use the linkrm(\"" + rmURL +
-                        "\") command in scheduler-client to reconnect a new one.\n" +
-                        "*****************************************************************************************************************");
+            logger.fatal("\n*****************************************************************************************************************\n" +
+                         "* Resource Manager is no more available, Scheduler has been paused waiting for a resource manager to be reconnect\n" +
+                         "* Scheduler is in critical state and its functionalities are reduced : \n" +
+                         "* \t-> use the linkrm(\"" + rmURL +
+                         "\") command in scheduler-client to reconnect a new one.\n" +
+                         "*****************************************************************************************************************");
 
             listener.schedulerStateUpdated(SchedulerEvent.RM_DOWN);
         }
@@ -853,16 +869,17 @@ public class SchedulingService {
                 //re-set job removed delay (if job result has been sent to user)
                 long toWait = 0;
                 if (job.isToBeRemoved()) {
-                    toWait = SCHEDULER_REMOVED_JOB_DELAY * SCHEDULER_AUTO_REMOVED_JOB_DELAY == 0
-                            ? SCHEDULER_REMOVED_JOB_DELAY + SCHEDULER_AUTO_REMOVED_JOB_DELAY
-                            : Math.min(SCHEDULER_REMOVED_JOB_DELAY, SCHEDULER_AUTO_REMOVED_JOB_DELAY);
+                    toWait = SCHEDULER_REMOVED_JOB_DELAY *
+                             SCHEDULER_AUTO_REMOVED_JOB_DELAY == 0 ? SCHEDULER_REMOVED_JOB_DELAY +
+                                                                     SCHEDULER_AUTO_REMOVED_JOB_DELAY
+                                                                   : Math.min(SCHEDULER_REMOVED_JOB_DELAY,
+                                                                              SCHEDULER_AUTO_REMOVED_JOB_DELAY);
                 } else {
                     toWait = SCHEDULER_AUTO_REMOVED_JOB_DELAY;
                 }
                 if (toWait > 0) {
                     scheduleJobRemove(job.getId(), toWait);
-                    jlogger.debug(job.getId(),
-                            "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+                    jlogger.debug(job.getId(), "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
                 }
             }
         }
@@ -889,7 +906,7 @@ public class SchedulingService {
 
             if (faultyTasksCount != job.getNumberOfFaultyTasks()) {
                 logger.warn("Number of faulty tasks saved in DB for Job " + job.getId() +
-                    " does not match the one computed using task statuses");
+                            " does not match the one computed using task statuses");
             }
 
             if (restoreInErrorTasks) {
@@ -934,8 +951,9 @@ public class SchedulingService {
             if (progress != task.getProgress()) {
                 task.setProgress(progress);//(1)
                 //if progress != previously set progress (0 by default) -> update
-                listener.taskStateUpdated(taskData.getUser(), new NotificationData<TaskInfo>(
-                    SchedulerEvent.TASK_PROGRESS, new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+                listener.taskStateUpdated(taskData.getUser(),
+                                          new NotificationData<TaskInfo>(SchedulerEvent.TASK_PROGRESS,
+                                                                         new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             }
         } catch (NullPointerException e) {
             //should not happened, but avoid restart if execInfo or launcher is null

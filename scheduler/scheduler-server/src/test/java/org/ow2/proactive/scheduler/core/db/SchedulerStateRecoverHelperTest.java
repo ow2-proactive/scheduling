@@ -1,41 +1,35 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import static com.google.common.truth.Truth.assertThat;
+
+import java.security.KeyException;
+import java.util.*;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -50,10 +44,9 @@ import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
-import java.security.KeyException;
-import java.util.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
-import static com.google.common.truth.Truth.assertThat;
 
 /**
  * Functional tests related to {@link SchedulerStateRecoverHelper}.
@@ -70,7 +63,7 @@ public class SchedulerStateRecoverHelperTest {
 
     @Test
     public void testRecoverWithNoJobToLoad() throws Exception {
-        new Scenario(ImmutableList.<InternalJob>of()).execute();
+        new Scenario(ImmutableList.<InternalJob> of()).execute();
     }
 
     @Test
@@ -78,11 +71,12 @@ public class SchedulerStateRecoverHelperTest {
         InternalJob job = createJob(JobStatus.CANCELED);
         changeTasksState(job, TaskStatus.PENDING);
 
-        ImmutableMap<String, TaskStatus> tasksStatus =
-                ImmutableMap.of(
-                        "Ta", TaskStatus.FINISHED,
-                        "Tb", TaskStatus.FAILED,
-                        "Tc", TaskStatus.NOT_STARTED);
+        ImmutableMap<String, TaskStatus> tasksStatus = ImmutableMap.of("Ta",
+                                                                       TaskStatus.FINISHED,
+                                                                       "Tb",
+                                                                       TaskStatus.FAILED,
+                                                                       "Tc",
+                                                                       TaskStatus.NOT_STARTED);
         changeTasksState(job, tasksStatus);
 
         RecoveredSchedulerState recoveredState = new Scenario(job).execute();
@@ -140,11 +134,12 @@ public class SchedulerStateRecoverHelperTest {
         InternalJob job = createJob(JobStatus.KILLED);
         changeTasksState(job, TaskStatus.FINISHED);
 
-        ImmutableMap<String, TaskStatus> tasksStatus =
-                ImmutableMap.of(
-                        "Ta", TaskStatus.FINISHED,
-                        "Tb", TaskStatus.ABORTED,
-                        "Tc", TaskStatus.PENDING);
+        ImmutableMap<String, TaskStatus> tasksStatus = ImmutableMap.of("Ta",
+                                                                       TaskStatus.FINISHED,
+                                                                       "Tb",
+                                                                       TaskStatus.ABORTED,
+                                                                       "Tc",
+                                                                       TaskStatus.PENDING);
         changeTasksState(job, tasksStatus);
 
         RecoveredSchedulerState recoveredState = new Scenario(job).execute();
@@ -158,11 +153,12 @@ public class SchedulerStateRecoverHelperTest {
         InternalJob job = createJob(JobStatus.PAUSED);
         changeTasksState(job, TaskStatus.PAUSED);
 
-        ImmutableMap<String, TaskStatus> tasksStatus =
-                ImmutableMap.of(
-                        "Ta", TaskStatus.FINISHED,
-                        "Tb", TaskStatus.PAUSED,
-                        "Tc", TaskStatus.PENDING);
+        ImmutableMap<String, TaskStatus> tasksStatus = ImmutableMap.of("Ta",
+                                                                       TaskStatus.FINISHED,
+                                                                       "Tb",
+                                                                       TaskStatus.PAUSED,
+                                                                       "Tc",
+                                                                       TaskStatus.PENDING);
         changeTasksState(job, tasksStatus);
 
         RecoveredSchedulerState recoveredState = new Scenario(job).execute();
@@ -170,10 +166,7 @@ public class SchedulerStateRecoverHelperTest {
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.PAUSED);
         assertTasksStatus(job,
-                ImmutableMap.of(
-                        "Ta", TaskStatus.FINISHED,
-                        "Tb", TaskStatus.PAUSED,
-                        "Tc", TaskStatus.PAUSED));
+                          ImmutableMap.of("Ta", TaskStatus.FINISHED, "Tb", TaskStatus.PAUSED, "Tc", TaskStatus.PAUSED));
     }
 
     @Test
@@ -193,11 +186,12 @@ public class SchedulerStateRecoverHelperTest {
         InternalJob job = createJob(JobStatus.RUNNING);
         changeTasksState(job, TaskStatus.RUNNING);
 
-        ImmutableMap<String, TaskStatus> tasksStatus =
-                ImmutableMap.of(
-                        "Ta", TaskStatus.ABORTED,
-                        "Tb", TaskStatus.FAULTY,
-                        "Tc", TaskStatus.PENDING);
+        ImmutableMap<String, TaskStatus> tasksStatus = ImmutableMap.of("Ta",
+                                                                       TaskStatus.ABORTED,
+                                                                       "Tb",
+                                                                       TaskStatus.FAULTY,
+                                                                       "Tc",
+                                                                       TaskStatus.PENDING);
         changeTasksState(job, tasksStatus);
 
         RecoveredSchedulerState recoveredState = new Scenario(job).execute();
@@ -233,11 +227,12 @@ public class SchedulerStateRecoverHelperTest {
         InternalJob job = createJob(JobStatus.STALLED);
         changeTasksState(job, TaskStatus.PENDING);
 
-        ImmutableMap<String, TaskStatus> taskStatus =
-                ImmutableMap.of(
-                        "Ta", TaskStatus.FINISHED,
-                        "Tb", TaskStatus.SKIPPED,
-                        "Tc", TaskStatus.PENDING);
+        ImmutableMap<String, TaskStatus> taskStatus = ImmutableMap.of("Ta",
+                                                                      TaskStatus.FINISHED,
+                                                                      "Tb",
+                                                                      TaskStatus.SKIPPED,
+                                                                      "Tc",
+                                                                      TaskStatus.PENDING);
         changeTasksState(job, taskStatus);
 
         RecoveredSchedulerState recoveredState = new Scenario(job).execute();
@@ -249,27 +244,23 @@ public class SchedulerStateRecoverHelperTest {
 
     @Test
     public void testRecoverWithMixedJobs() throws Exception {
-        ImmutableList<JobStatus> jobStatuses =
-                ImmutableList.of(
-                        JobStatus.CANCELED,
-                        JobStatus.FAILED,
-                        JobStatus.FINISHED,
-                        JobStatus.KILLED,
-                        JobStatus.PAUSED,
-                        JobStatus.PENDING,
-                        JobStatus.RUNNING,
-                        JobStatus.STALLED);
+        ImmutableList<JobStatus> jobStatuses = ImmutableList.of(JobStatus.CANCELED,
+                                                                JobStatus.FAILED,
+                                                                JobStatus.FINISHED,
+                                                                JobStatus.KILLED,
+                                                                JobStatus.PAUSED,
+                                                                JobStatus.PENDING,
+                                                                JobStatus.RUNNING,
+                                                                JobStatus.STALLED);
 
-        ImmutableList<TaskStatus> taskStatuses =
-                ImmutableList.of(
-                        TaskStatus.ABORTED,
-                        TaskStatus.FAILED,
-                        TaskStatus.FINISHED,
-                        TaskStatus.ABORTED,
-                        TaskStatus.PAUSED,
-                        TaskStatus.PENDING,
-                        TaskStatus.RUNNING,
-                        TaskStatus.SUBMITTED);
+        ImmutableList<TaskStatus> taskStatuses = ImmutableList.of(TaskStatus.ABORTED,
+                                                                  TaskStatus.FAILED,
+                                                                  TaskStatus.FINISHED,
+                                                                  TaskStatus.ABORTED,
+                                                                  TaskStatus.PAUSED,
+                                                                  TaskStatus.PENDING,
+                                                                  TaskStatus.RUNNING,
+                                                                  TaskStatus.SUBMITTED);
 
         List<InternalJob> jobs = new ArrayList<>(jobStatuses.size());
 
@@ -288,18 +279,17 @@ public class SchedulerStateRecoverHelperTest {
 
     @Test
     public void testRecoverWithCopyAndSortThrowingRuntimeException() throws KeyException, JobCreationException {
-        RecoveredSchedulerState recoveredState =
-                new Scenario(createJob(JobStatus.RUNNING)).execute(new SchedulerStateRecoverHelperSupplier() {
+        RecoveredSchedulerState recoveredState = new Scenario(createJob(JobStatus.RUNNING)).execute(new SchedulerStateRecoverHelperSupplier() {
+            @Override
+            public SchedulerStateRecoverHelper get(SchedulerDBManager dbManager) {
+                return new SchedulerStateRecoverHelper(dbManager) {
                     @Override
-                    public SchedulerStateRecoverHelper get(SchedulerDBManager dbManager) {
-                        return new SchedulerStateRecoverHelper(dbManager) {
-                            @Override
-                            protected List<InternalTask> copyAndSort(List<InternalTask> tasks) {
-                                throw new RuntimeException("bouh!");
-                            }
-                        };
+                    protected List<InternalTask> copyAndSort(List<InternalTask> tasks) {
+                        throw new RuntimeException("bouh!");
                     }
-                }, false);
+                };
+            }
+        }, false);
 
         assertThat(recoveredState.getFinishedJobs()).hasSize(1);
         assertThat(recoveredState.getPendingJobs()).hasSize(0);
@@ -350,7 +340,8 @@ public class SchedulerStateRecoverHelperTest {
         assertTasksStatus(job, getStringTaskStatusMap(job, expectedTasksStatus));
     }
 
-    private void assertTasksStatus(Iterable<? extends InternalJob> iterable, Map<String, TaskStatus> expectedTasksStatus) {
+    private void assertTasksStatus(Iterable<? extends InternalJob> iterable,
+            Map<String, TaskStatus> expectedTasksStatus) {
         Iterator<? extends InternalJob> iterator = iterable.iterator();
         while (iterator.hasNext()) {
             assertTasksStatus(iterator.next(), expectedTasksStatus);
@@ -431,9 +422,11 @@ public class SchedulerStateRecoverHelperTest {
             }
         }
 
-        private void checkBasics(List<InternalJob> finishedJobs, List<InternalJob> notFinishedJobs, RecoveredSchedulerState recoveredState) {
+        private void checkBasics(List<InternalJob> finishedJobs, List<InternalJob> notFinishedJobs,
+                RecoveredSchedulerState recoveredState) {
             assertThat(recoveredState.getFinishedJobs()).hasSize(finishedJobs.size());
-            assertThat(notFinishedJobs).hasSize(recoveredState.getPendingJobs().size() + recoveredState.getRunningJobs().size());
+            assertThat(notFinishedJobs).hasSize(recoveredState.getPendingJobs().size() +
+                                                recoveredState.getRunningJobs().size());
 
             for (InternalJob job : recoveredState.getFinishedJobs()) {
                 assertThat(job.getStatus()).isIn(SchedulerDBManager.FINISHED_JOB_STATUSES);
@@ -456,10 +449,11 @@ public class SchedulerStateRecoverHelperTest {
         return createJob(DEFAULT_WORKFLOW_DESCRIPTOR_NAME, jobStatus);
     }
 
-    private InternalJob createJob(String workflowDescriptor, JobStatus jobStatus) throws JobCreationException, KeyException {
-        Job job = JOB_FACTORY.createJob(
-                this.getClass().getResource(
-                        "/workflow/descriptors/" + workflowDescriptor).getPath());
+    private InternalJob createJob(String workflowDescriptor, JobStatus jobStatus)
+            throws JobCreationException, KeyException {
+        Job job = JOB_FACTORY.createJob(this.getClass()
+                                            .getResource("/workflow/descriptors/" + workflowDescriptor)
+                                            .getPath());
 
         InternalJob internalJob = InternalJobFactory.createJob(job, null);
         internalJob.setStatus(jobStatus);

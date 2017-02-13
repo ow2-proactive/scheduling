@@ -1,9 +1,37 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package functionaltests;
 
-import functionaltests.monitor.EventMonitor;
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestUsers;
+import static org.junit.Assume.assumeTrue;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,12 +52,10 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.smartproxy.SmartProxyImpl;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
-import static org.junit.Assume.assumeTrue;
+import functionaltests.monitor.EventMonitor;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestUsers;
 
 
 /**
@@ -42,26 +68,30 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
      * output data is to be downloaded
      */
     public static final String workFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
-            "testDS_LocalFolder";
+                                                "testDS_LocalFolder";
 
     /**
      * Intermediary folder accessible (via file transfer protocol supported by
      * VFS) both from client side and from computing node side
      */
     public static final String dataServerFolderPath = System.getProperty("java.io.tmpdir") + File.separator +
-            "testDS_remoteFolder";
+                                                      "testDS_remoteFolder";
 
     public static long TIMEOUT = 120000;
 
     public static int NB_TASKS = 4;
 
     protected File inputLocalFolder;
+
     protected File outputLocalFolder;
+
     private File workLocalFolder;
+
     // private DataServerProvider dataProvider;
     protected String dataServerURI;
 
     protected String push_url;
+
     protected String pull_url;
 
     protected static final String TEST_SESSION_NAME = "TestDSSupport";
@@ -69,12 +99,16 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
     protected static final String TASK_NAME = "TestJavaTask";
 
     public final static String inputFileBaseName = "input";
+
     public final static String inputFileExt = ".in";
+
     public final static String outputFileBaseName = "output";
+
     public final static String outputFileExt = ".out";
 
     // the proxy to be tested
     protected SmartProxyImpl schedProxy;
+
     protected MyEventListener eventListener;
 
     public TestSmartProxy() throws MalformedURLException, URISyntaxException {
@@ -153,7 +187,7 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
             testTask.addInputFiles("DUMMY", InputAccessMode.TransferFromInputSpace);
             testTask.addInputFiles(inputFile.getName(), InputAccessMode.TransferFromInputSpace);
             if (isolateOutputs) {
-                testTask.addOutputFiles("*"+outputFileExt, OutputAccessMode.TransferToOutputSpace);
+                testTask.addOutputFiles("*" + outputFileExt, OutputAccessMode.TransferToOutputSpace);
             } else {
                 testTask.addOutputFiles(outputFileName, OutputAccessMode.TransferToOutputSpace);
             }
@@ -173,18 +207,13 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
     protected String getClasspath(Job job) {
         String appClassPath = "";
         try {
-            File appMainFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation()
-                    .toURI());
+            File appMainFolder = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
 
             return appMainFolder.getAbsolutePath();
         } catch (URISyntaxException e1) {
-            functionaltests.utils.SchedulerTHelper
-                    .log(
-                            "Preview of the partial results will not be possible as some resources could not be " +
-                                    "found by the system. \nThis will not alterate your results in any way. ");
-            functionaltests.utils.SchedulerTHelper
-                    .log(
-                            "JobCreator: The bin folder of the project is null. It is needed to set the job environment. ");
+            functionaltests.utils.SchedulerTHelper.log("Preview of the partial results will not be possible as some resources could not be " +
+                                                       "found by the system. \nThis will not alterate your results in any way. ");
+            functionaltests.utils.SchedulerTHelper.log("JobCreator: The bin folder of the project is null. It is needed to set the job environment. ");
             functionaltests.utils.SchedulerTHelper.log(e1);
         }
         return appClassPath;
@@ -218,57 +247,40 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
             return;
         }
 
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "***************************************************************************************************");
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "********************** Testing isolateTaskOutputs = false automaticTransfer = false " +
-                                "***************");
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "***************************************************************************************************");
-        submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(), outputLocalFolder
-                .getAbsolutePath(), false, false);
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "***************************************************************************************************");
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "********************** Testing isolateTaskOutputs = true automaticTransfer = false ****************");
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "***************************************************************************************************");
-        submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(), outputLocalFolder
-                .getAbsolutePath(), true, false);
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "***************************************************************************************************");
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "********************** Testing isolateTaskOutputs = false automaticTransfer = true ****************");
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "***************************************************************************************************");
-        submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(), outputLocalFolder
-                .getAbsolutePath(), false, true);
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "***************************************************************************************************");
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "********************** Testing isolateTaskOutputs = true automaticTransfer = true *****************");
-        functionaltests.utils.SchedulerTHelper
-                .log(
-                        "***************************************************************************************************");
-        submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(), outputLocalFolder
-                .getAbsolutePath(), true, true);
+        functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper.log("********************** Testing isolateTaskOutputs = false automaticTransfer = false " +
+                                                   "***************");
+        functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
+        submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(),
+                                         outputLocalFolder.getAbsolutePath(),
+                                         false,
+                                         false);
+        functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper.log("********************** Testing isolateTaskOutputs = true automaticTransfer = false ****************");
+        functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
+        submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(),
+                                         outputLocalFolder.getAbsolutePath(),
+                                         true,
+                                         false);
+        functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper.log("********************** Testing isolateTaskOutputs = false automaticTransfer = true ****************");
+        functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
+        submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(),
+                                         outputLocalFolder.getAbsolutePath(),
+                                         false,
+                                         true);
+        functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
+        functionaltests.utils.SchedulerTHelper.log("********************** Testing isolateTaskOutputs = true automaticTransfer = true *****************");
+        functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
+        submitJobWithDataAndWaitToFinish(inputLocalFolder.getAbsolutePath(),
+                                         outputLocalFolder.getAbsolutePath(),
+                                         true,
+                                         true);
 
     }
 
-    protected void submitJobWithDataAndWaitToFinish(String localInputFolderPath,
-                                                    String localOutputFolderPath, boolean isolateTaskOutputs, boolean automaticTransfer)
-            throws Exception {
+    protected void submitJobWithDataAndWaitToFinish(String localInputFolderPath, String localOutputFolderPath,
+            boolean isolateTaskOutputs, boolean automaticTransfer) throws Exception {
 
         TaskFlowJob job = createTestJob(isolateTaskOutputs);
         EventMonitor em = new EventMonitor(null);
@@ -288,8 +300,13 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
         eventListener.setSynchronous(!automaticTransfer);
         eventListener.setMonitor(em);
 
-        JobId id = schedProxy.submit(job, localInputFolderPath, push_url, localOutputFolderPath, pull_url,
-                isolateTaskOutputs, automaticTransfer);
+        JobId id = schedProxy.submit(job,
+                                     localInputFolderPath,
+                                     push_url,
+                                     localOutputFolderPath,
+                                     pull_url,
+                                     isolateTaskOutputs,
+                                     automaticTransfer);
 
         eventListener.setJobID(id);
 
@@ -307,11 +324,11 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
             }
         }
 
-
         // check the presence of output files
         for (int i = 0; i < NB_TASKS; i++) {
-            functionaltests.utils.SchedulerTHelper
-                    .log(schedProxy.getTaskResult(id.toString(), TASK_NAME + i).getOutput().getAllLogs(true));
+            functionaltests.utils.SchedulerTHelper.log(schedProxy.getTaskResult(id.toString(), TASK_NAME + i)
+                                                                 .getOutput()
+                                                                 .getAllLogs(true));
             String outputFileName = outputFileBaseName + "_" + i + outputFileExt;
             File outputFile = new File(outputLocalFolder, outputFileName);
             SchedulerTHelper.log("Checking file exists : " + outputFile);

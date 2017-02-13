@@ -1,44 +1,46 @@
 /*
- * ################################################################
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
- *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $PROACTIVE_INITIAL_DEV$
  */
 package functionaltests;
 
-import com.jayway.awaitility.Duration;
-import functionaltests.utils.ProcessStreamReader;
-import functionaltests.utils.RestFuncTUtils;
+import static com.jayway.awaitility.Awaitility.await;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -60,42 +62,34 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
+import com.jayway.awaitility.Duration;
 
-import static com.jayway.awaitility.Awaitility.await;
+import functionaltests.utils.ProcessStreamReader;
+import functionaltests.utils.RestFuncTUtils;
 
 
 public class RestFuncTHelper {
 
     final static URL defaultJobXml = AbstractRestFuncTestCase.class.getResource("config/test-job.xml");
 
-    final static URL serverJavaPolicy = RestFuncTHelper.class
-            .getResource("config/server-java.security.policy");
+    final static URL serverJavaPolicy = RestFuncTHelper.class.getResource("config/server-java.security.policy");
 
     final static URL rmHibernateConfig = RestFuncTHelper.class.getResource("config/rmHibernateConfig.xml");
 
-    final static URL schedHibernateConfig = RestFuncTHelper.class
-            .getResource("config/schedHibernateConfig.xml");
+    final static URL schedHibernateConfig = RestFuncTHelper.class.getResource("config/schedHibernateConfig.xml");
 
     public final static int DEFAULT_NUMBER_OF_NODES = 1;
 
     private static String restServerUrl;
+
     private static String restfulSchedulerUrl;
+
     private static Process schedProcess;
+
     private static Scheduler scheduler;
+
     private static ResourceManager rm;
+
     private static PublicKey schedulerPublicKey;
 
     private RestFuncTHelper() {
@@ -117,13 +111,12 @@ public class RestFuncTHelper {
         cmd.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + getRmHome());
 
         cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() +
-            System.getProperty("rm.deploy.dropDB", "true"));
+                System.getProperty("rm.deploy.dropDB", "true"));
         cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(rmHibernateConfig));
 
         cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getCmdLine() +
-            System.getProperty("scheduler.deploy.dropDB", "true"));
-        cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() +
-            toPath(schedHibernateConfig));
+                System.getProperty("scheduler.deploy.dropDB", "true"));
+        cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(schedHibernateConfig));
 
         cmd.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
         cmd.add(PNPConfig.PA_PNP_PORT.getCmdLine() + "1200");
@@ -138,8 +131,7 @@ public class RestFuncTHelper {
         processBuilder.redirectErrorStream(true);
         schedProcess = processBuilder.start();
 
-        ProcessStreamReader out = new ProcessStreamReader("scheduler-output: ",
-            schedProcess.getInputStream());
+        ProcessStreamReader out = new ProcessStreamReader("scheduler-output: ", schedProcess.getInputStream());
         out.start();
 
         // RM and scheduler are on the same url
@@ -147,8 +139,8 @@ public class RestFuncTHelper {
         String url = "pnp://localhost:" + port + "/";
 
         // Connect a scheduler client
-        SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url, TimeUnit.SECONDS
-                .toMillis(60));
+        SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url,
+                                                                                     TimeUnit.SECONDS.toMillis(60));
         schedulerPublicKey = schedAuth.getPublicKey();
         Credentials schedCred = RestFuncTUtils.createCredentials("admin", "admin", schedulerPublicKey);
         scheduler = schedAuth.login(schedCred);
@@ -256,8 +248,8 @@ public class RestFuncTHelper {
 
     private static String getClassPath() throws Exception {
         return (getRmHome() + File.separator + "dist" + File.separator + "lib" + File.separator + "*") +
-            File.pathSeparatorChar + getRmHome() + File.separator + "addons" + File.separator + "*" +
-            File.pathSeparatorChar + System.getProperty("java.class.path");
+               File.pathSeparatorChar + getRmHome() + File.separator + "addons" + File.separator + "*" +
+               File.pathSeparatorChar + System.getProperty("java.class.path");
     }
 
     public static String getRestServerUrl() {

@@ -1,41 +1,36 @@
 /*
- *  *
- * ProActive Parallel Suite(TM): The Java(TM) library for
- *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
  *
- * Copyright (C) 1997-2015 INRIA/University of
- *                 Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org or contact@activeeon.com
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; version 3 of
+ * as published by the Free Software Foundation: version 3 of
  * the License.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- *  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -47,12 +42,9 @@ import org.ow2.proactive.scheduler.core.db.DBTaskDataParameters;
 import org.ow2.proactive.scheduler.core.db.TaskDBUtils;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.junit.Before;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.google.common.truth.Truth.assertThat;
 
 /**
  * Functional tests related to {@link TaskDBUtils}.
@@ -90,13 +82,13 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
          * Start time and finished time are set respectively
          * as follows per task:
          *
-         * t-2    t-1
-         * t-3    t-2
-         * t-4    t-3
-         *      .
-         *      .
-         *      .
-         * t-n-1  t-n
+         * t-2 t-1
+         * t-3 t-2
+         * t-4 t-3
+         * .
+         * .
+         * .
+         * t-n-1 t-n
          */
         for (int jobCount = 1; jobCount <= NB_JOBS; jobCount++) {
             String user = DEFAULT_USER_NAME;
@@ -118,20 +110,16 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
             long startTime = getTimeRelativeToReference(-jobCount - 1);
             long endTime = getTimeRelativeToReference(-jobCount);
 
-            dbManager.updateStartTime(
-                    job.getId().longValue(), task.getId().longValue(), startTime);
+            dbManager.updateStartTime(job.getId().longValue(), task.getId().longValue(), startTime);
 
-            dbManager.updateFinishedTime(
-                    job.getId().longValue(), task.getId().longValue(),endTime);
+            dbManager.updateFinishedTime(job.getId().longValue(), task.getId().longValue(), endTime);
 
             if (jobCount == JOB_TO_BE_CROND) {
-                dbManager.updateScheduledTime(
-                        job.getId().longValue(), task.getId().longValue(), SCHEDULED_TIME);
+                dbManager.updateScheduledTime(job.getId().longValue(), task.getId().longValue(), SCHEDULED_TIME);
             }
 
-            log.info("Job " + job.getId() + " with task " + task.getId()
-                    + " has startTime=" + startTime
-                    + " and finishedTime=" + endTime);
+            log.info("Job " + job.getId() + " with task " + task.getId() + " has startTime=" + startTime +
+                     " and finishedTime=" + endTime);
         }
     }
 
@@ -246,8 +234,7 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
         builder.setOffset(2);
         builder.setLimit(NB_JOBS - 1);
 
-        SessionWork<List<TaskInfo>> taskInfoSessionWork =
-                TaskDBUtils.taskInfoSessionWork(builder.build());
+        SessionWork<List<TaskInfo>> taskInfoSessionWork = TaskDBUtils.taskInfoSessionWork(builder.build());
 
         List<TaskInfo> result = run(taskInfoSessionWork);
         assertThat(result).hasSize(NB_JOBS - 2);
@@ -259,8 +246,7 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
         builder.setOffset(2);
         builder.setLimit(NB_JOBS - 1);
 
-        SessionWork<List<TaskState>> taskStateSessionWork =
-                TaskDBUtils.taskStateSessionWork(builder.build());
+        SessionWork<List<TaskState>> taskStateSessionWork = TaskDBUtils.taskStateSessionWork(builder.build());
 
         List<TaskState> result = run(taskStateSessionWork);
         assertThat(result).hasSize(NB_JOBS - 2);
@@ -271,15 +257,13 @@ public class TaskDBUtilsTest extends BaseSchedulerDBTest {
         DBTaskDataParameters.Builder builder = DBTaskDataParameters.Builder.create();
         builder.setFrom(SCHEDULED_TIME);
         builder.setTo(SCHEDULED_TIME);
-        SessionWork<List<TaskState>> taskStateSessionWork =
-                TaskDBUtils.taskStateSessionWork(builder.build());
+        SessionWork<List<TaskState>> taskStateSessionWork = TaskDBUtils.taskStateSessionWork(builder.build());
         List<TaskState> result = run(taskStateSessionWork);
         assertThat(result).hasSize(1);
     }
 
     private void assertTotalNumberOfTasks(DBTaskDataParameters parameters, int expectedNumberOfTasks) {
-        SessionWork<Integer> totalNumberOfTasks =
-                TaskDBUtils.getTotalNumberOfTasks(parameters);
+        SessionWork<Integer> totalNumberOfTasks = TaskDBUtils.getTotalNumberOfTasks(parameters);
 
         assertThat(run(totalNumberOfTasks)).isEqualTo(expectedNumberOfTasks);
     }

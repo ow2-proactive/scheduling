@@ -17,4 +17,3 @@ echo JID $PA_JOB_ID
 echo JIN $PA_JOB_NAME
 
 exit 0;
-
