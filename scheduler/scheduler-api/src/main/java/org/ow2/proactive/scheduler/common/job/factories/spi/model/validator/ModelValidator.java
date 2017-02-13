@@ -48,7 +48,7 @@ public class ModelValidator implements Validator<String> {
 
     private String model;
 
-    public static String PREFIX = "PA:";
+    public static final String PREFIX = "PA:";
 
     public ModelValidator(String model) {
         if (Strings.isNullOrEmpty(model)) {
@@ -80,31 +80,31 @@ public class ModelValidator implements Validator<String> {
     protected ParserValidator createParserValidator() throws ModelSyntaxException {
         String uppercaseModel = model.toUpperCase();
         if (uppercaseModel.startsWith(PREFIX)) {
-            uppercaseModel = replacePrefix(uppercaseModel);
+            uppercaseModel = removePrefix(uppercaseModel);
             if (uppercaseModel.startsWith(IntegerParserValidator.INTEGER_TYPE)) {
-                return new IntegerParserValidator(replacePrefix(model));
+                return new IntegerParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(LongParserValidator.LONG_TYPE)) {
-                return new LongParserValidator(replacePrefix(model));
+                return new LongParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(DoubleParserValidator.DOUBLE_TYPE)) {
-                return new DoubleParserValidator(replacePrefix(model));
+                return new DoubleParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(FloatParserValidator.FLOAT_TYPE)) {
-                return new FloatParserValidator(replacePrefix(model));
+                return new FloatParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(ShortParserValidator.SHORT_TYPE)) {
-                return new ShortParserValidator(replacePrefix(model));
+                return new ShortParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(BooleanParserValidator.BOOLEAN_TYPE)) {
-                return new BooleanParserValidator(replacePrefix(model));
+                return new BooleanParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(URLParserValidator.URL_TYPE)) {
-                return new URLParserValidator(replacePrefix(model));
+                return new URLParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(URIParserValidator.URI_TYPE)) {
-                return new URIParserValidator(replacePrefix(model));
+                return new URIParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(DateTimeParserValidator.DATETIME_TYPE)) {
-                return new DateTimeParserValidator(replacePrefix(model));
+                return new DateTimeParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(ListParserValidator.LIST_TYPE)) {
-                return new ListParserValidator(replacePrefix(model));
+                return new ListParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(RegexpParserValidator.REGEXP_TYPE)) {
-                return new RegexpParserValidator(replacePrefix(model));
+                return new RegexpParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE)) {
-                return new ModelFromURLParserValidator(replacePrefix(model));
+                return new ModelFromURLParserValidator(removePrefix(model));
             } else {
                 throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
             }
@@ -113,7 +113,7 @@ public class ModelValidator implements Validator<String> {
         }
     }
 
-    private String replacePrefix(String model) {
+    private String removePrefix(String model) {
         return model.substring(PREFIX.length());
     }
 }
