@@ -41,6 +41,10 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 
 
 @Entity

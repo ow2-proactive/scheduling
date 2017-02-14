@@ -82,6 +82,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
+import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -100,7 +101,10 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
+import it.sauronsoftware.cron4j.Scheduler;
 
+
+@SuppressWarnings("JpaQueryApiInspection")
 public class SchedulerDBManager {
 
     private static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
@@ -145,6 +149,8 @@ public class SchedulerDBManager {
 
     private final TransactionHelper transactionHelper;
 
+    private Scheduler tableSizeMonitorScheduler;
+
     public static SchedulerDBManager createUsingProperties() {
         if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
             return createInMemorySchedulerDBManager();
@@ -160,8 +166,13 @@ public class SchedulerDBManager {
             boolean drop = PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getValueAsBoolean();
 
             if (logger.isInfoEnabled()) {
+<<<<<<< HEAD
                 logger.info("Starting Scheduler DB Manager " + "with drop DB = " + drop + " and configuration file = " +
                             configFile.getAbsolutePath());
+=======
+                logger.info("Starting Scheduler DB Manager " + "with drop DB = " + drop +
+                        " and configuration file = " + configFile.getAbsolutePath());
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
             }
 
             return new SchedulerDBManager(configuration, drop);
@@ -201,19 +212,40 @@ public class SchedulerDBManager {
                                                                                   .build();
             sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             transactionHelper = new TransactionHelper(sessionFactory);
+
+            if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING.getValueAsBoolean()) {
+                setupTableSizeMonitoring();
+            }
+
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed", ex);
         }
     }
 
+    public void setupTableSizeMonitoring() {
+        if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.isSet()) {
+            tableSizeMonitorScheduler = new Scheduler();
+            tableSizeMonitorScheduler.schedule(
+                    PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.getValueAsString(),
+                    new TableSizeMonitorRunner(transactionHelper, logger));
+            tableSizeMonitorScheduler.start();
+        }
+    }
+
     public Page<JobInfo> getJobs(final int offset, final int limit, final String user, final boolean pending,
+<<<<<<< HEAD
             final boolean running, final boolean finished, final List<SortParameter<JobSortParameter>> sortParameters) {
+=======
+                                 final boolean running, final boolean finished,
+                                 final List<SortParameter<JobSortParameter>> sortParameters) {
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
 
         if (!pending && !running && !finished) {
             return new Page<>(new ArrayList<JobInfo>(0), 0);
         }
 
+<<<<<<< HEAD
         DBJobDataParameters params = new DBJobDataParameters(offset,
                                                              limit,
                                                              user,
@@ -221,6 +253,10 @@ public class SchedulerDBManager {
                                                              running,
                                                              finished,
                                                              sortParameters);
+=======
+        DBJobDataParameters params = new DBJobDataParameters(offset, limit, user, pending, running, finished,
+                sortParameters);
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
         int totalNbJobs = getTotalNumberOfJobs(params);
         final Set<JobStatus> jobStatuses = params.getStatuses();
         List<JobInfo> lJobs = executeReadOnlyTransaction(new SessionWork<List<JobInfo>>() {
@@ -264,8 +300,13 @@ public class SchedulerDBManager {
                                 sortOrder = new GroupByStatusSortOrder(param.getSortOrder(), "status");
                                 break;
                             default:
+<<<<<<< HEAD
                                 throw new IllegalArgumentException("Unsupported sort paramter: " +
                                                                    param.getParameter());
+=======
+                                throw new IllegalArgumentException(
+                                        "Unsupported sort paramter: " + param.getParameter());
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
                         }
                         criteria.addOrder(sortOrder);
                     }
@@ -287,6 +328,7 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag, final int offset,
+<<<<<<< HEAD
             final int limit, final String user, final boolean pending, final boolean running, final boolean finished,
             SortSpecifierContainer sortParams) {
 
@@ -300,12 +342,20 @@ public class SchedulerDBManager {
                                                                    running,
                                                                    finished,
                                                                    sortParams);
+=======
+                                         final int limit, final String user, final boolean pending, final boolean running,
+                                         final boolean finished, SortSpecifierContainer sortParams) {
+
+        DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
+                pending, running, finished, sortParams);
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskState> lTasks = executeReadOnlyTransaction(TaskDBUtils.taskStateSessionWork(parameters));
 
         return new Page<>(lTasks, totalNbTasks);
     }
 
+<<<<<<< HEAD
     public Page<TaskInfo> getTasks(final long from, final long to, final String tag, final int offset, final int limit,
             final String user, final boolean pending, final boolean running, final boolean finished) {
 
@@ -319,6 +369,14 @@ public class SchedulerDBManager {
                                                                    running,
                                                                    finished,
                                                                    SortSpecifierContainer.EMPTY_CONTAINER);
+=======
+    public Page<TaskInfo> getTasks(final long from, final long to, final String tag, final int offset,
+                                   final int limit, final String user, final boolean pending, final boolean running,
+                                   final boolean finished) {
+
+        DBTaskDataParameters parameters = new DBTaskDataParameters(tag, from, to, offset, limit, user,
+                pending, running, finished, SortSpecifierContainer.EMPTY_CONTAINER);
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskInfo> lTaskInfo = executeReadOnlyTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
 
@@ -346,7 +404,12 @@ public class SchedulerDBManager {
 
                     boolean hasUser = params.getUser() != null && "".compareTo(params.getUser()) != 0;
 
+<<<<<<< HEAD
                     StringBuilder queryString = new StringBuilder("select count(*) from JobData where removedTime = -1 ");
+=======
+                    StringBuilder queryString = new StringBuilder(
+                            "select count(*) from JobData where removedTime = -1 ");
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
 
                     if (hasUser) {
                         queryString.append("and owner = :user ");
@@ -719,6 +782,12 @@ public class SchedulerDBManager {
         session.getNamedQuery("deleteSelectionScriptData").setParameter("jobId", jobId).executeUpdate();
     }
 
+    private void removeJobScriptsInBulk(Session session, List<Long> jobIdList) {
+        session.getNamedQuery("updateTaskDataJobScriptsInBulk").setParameter("jobIdList", jobIdList).executeUpdate();
+        session.getNamedQuery("deleteScriptDataInBulk").setParameter("jobIdList", jobIdList).executeUpdate();
+        session.getNamedQuery("deleteSelectionScriptDataInBulk").setParameter("jobIdList", jobIdList).executeUpdate();
+    }
+
     private void removeJobRuntimeData(Session session, long jobId) {
         removeJobScripts(session, jobId);
 
@@ -727,6 +796,52 @@ public class SchedulerDBManager {
         session.getNamedQuery("deleteTaskDataVariable").setParameter("jobId", jobId).executeUpdate();
 
         session.getNamedQuery("deleteSelectorData").setParameter("jobId", jobId).executeUpdate();
+    }
+
+    public void executeHousekeeping(final List<Long> jobIdList) {
+        logger.info("HOUSEKEEPING will remove the following jobs: " + jobIdList);
+        executeReadWriteTransaction(new SessionWork<Void>() {
+            @Override
+            public Void doInTransaction(Session session) {
+
+                session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                session.getNamedQuery("deleteTaskDataVariableInBulk")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                session.getNamedQuery("deleteSelectorDataInBulk")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in :jobIdList")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in :jobIdList")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+
+                session.getNamedQuery("updateTaskDataJobScriptsInBulk")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                session.getNamedQuery("deleteScriptDataInBulk")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                session.getNamedQuery("deleteSelectionScriptDataInBulk")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                // TaskResultData
+                session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID in :jobIdList")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                // TaskData
+                session.getNamedQuery("deleteTaskDataInBulk")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+
+                session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in :jobIdList")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                session.getNamedQuery("deleteJobDataInBulk")
+                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+
+                // TODO: revoir les requetes suivantes
+                // on cherche les TASK_DATA qui ont un JOB_ID qui n'existe plus dans JOB_DATA
+                session.createSQLQuery("delete from TASK_DATA where JOB_ID = null");
+                session.createSQLQuery("delete from TASK_RESULT_DATA where TASK_ID = null");
+                session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID = null");
+
+                return null;
+            }
+        });
     }
 
     public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
@@ -771,7 +886,12 @@ public class SchedulerDBManager {
         return loadJobs(fullState, FINISHED_JOB_STATUSES, period);
     }
 
+<<<<<<< HEAD
     private List<InternalJob> loadJobs(final boolean fullState, final Collection<JobStatus> status, final long period) {
+=======
+    private List<InternalJob> loadJobs(final boolean fullState, final Collection<JobStatus> status,
+                                       final long period) {
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
         return executeReadOnlyTransaction(new SessionWork<List<InternalJob>>() {
             @Override
             @SuppressWarnings("unchecked")
@@ -882,7 +1002,7 @@ public class SchedulerDBManager {
 
     // Executed in a transaction from the caller
     private void batchLoadJobs(Session session, boolean fullState, Query jobQuery, List<Long> ids,
-            Collection<InternalJob> jobs) {
+                               Collection<InternalJob> jobs) {
         Map<Long, List<TaskData>> tasksMap = loadJobsTasks(session, ids);
 
         jobQuery.setParameterList("ids", ids);
@@ -897,7 +1017,7 @@ public class SchedulerDBManager {
     }
 
     private Collection<InternalTask> toInternalTasks(boolean loadFullState, InternalJob internalJob,
-            List<TaskData> taskRuntimeDataList) {
+                                                     List<TaskData> taskRuntimeDataList) {
         Map<DBTaskId, InternalTask> tasks = new HashMap<>(taskRuntimeDataList.size());
 
         try {
@@ -977,7 +1097,12 @@ public class SchedulerDBManager {
         });
     }
 
+<<<<<<< HEAD
     public void jobTaskStarted(final InternalJob job, final InternalTask task, final boolean taskStatusToPending) {
+=======
+    public void jobTaskStarted(final InternalJob job, final InternalTask task,
+                               final boolean taskStatusToPending) {
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -1062,7 +1187,7 @@ public class SchedulerDBManager {
 
     @SuppressWarnings("unchecked")
     public void updateAfterWorkflowTaskFinished(final InternalJob job, final ChangedTasksInfo changesInfo,
-            final TaskResultImpl result) {
+                                                final TaskResultImpl result) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -1086,8 +1211,13 @@ public class SchedulerDBManager {
 
                 JobData jobRuntimeData = session.load(JobData.class, jobId);
 
+<<<<<<< HEAD
                 List<DBTaskId> taskIds = new ArrayList<>(changesInfo.getSkippedTasks().size() +
                                                          changesInfo.getUpdatedTasks().size());
+=======
+                List<DBTaskId> taskIds = new ArrayList<>(
+                        changesInfo.getSkippedTasks().size() + changesInfo.getUpdatedTasks().size());
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
                 for (TaskId id : changesInfo.getSkippedTasks()) {
                     taskIds.add(taskId(id));
                 }
@@ -1151,7 +1281,7 @@ public class SchedulerDBManager {
     }
 
     public void updateAfterJobFailed(InternalJob job, InternalTask finishedTask, TaskResultImpl result,
-            Set<TaskId> tasksToUpdate) {
+                                     Set<TaskId> tasksToUpdate) {
         updateAfterTaskFinished(job, finishedTask, result, tasksToUpdate);
     }
 
@@ -1237,16 +1367,24 @@ public class SchedulerDBManager {
     }
 
     private void updateStartOrEndOrScheduledTime(final long jobId, final long taskId, final String fieldName,
-            final long time) {
+                                                 final long time) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
 
+<<<<<<< HEAD
                 Query query = session.createQuery("update TaskData task set task." + fieldName + " = :newTime " + // NOSONAR
                                                   "where task.id.jobId = :jobId and task.id.taskId= :taskId")
                                      .setParameter("newTime", time)
                                      .setParameter("jobId", jobId)
                                      .setParameter("taskId", taskId);
+=======
+                Query query = session
+                        .createQuery("update TaskData task set task." + fieldName + " = :newTime " + // NOSONAR
+                                "where task.id.jobId = :jobId and task.id.taskId= :taskId")
+                        .setParameter("newTime", time).setParameter("jobId", jobId)
+                        .setParameter("taskId", taskId);
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
 
                 query.executeUpdate();
 
@@ -1256,12 +1394,12 @@ public class SchedulerDBManager {
     }
 
     public void updateAfterTaskFinished(final InternalJob job, final InternalTask finishedTask,
-            final TaskResultImpl result) {
+                                        final TaskResultImpl result) {
         updateAfterTaskFinished(job, finishedTask, result, new HashSet<TaskId>(1));
     }
 
     private void updateAfterTaskFinished(final InternalJob job, final InternalTask finishedTask,
-            final TaskResultImpl result, final Set<TaskId> tasksToUpdate) {
+                                         final TaskResultImpl result, final Set<TaskId> tasksToUpdate) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -1372,8 +1510,13 @@ public class SchedulerDBManager {
 
                 JobResultImpl jobResult = loadJobResult(session, query, job, jobId);
                 if (jobResult == null) {
+<<<<<<< HEAD
                     throw new DatabaseManagerException("Failed to load result for tasks " + taskIds + " (job: " +
                                                        jobId + ")");
+=======
+                    throw new DatabaseManagerException(
+                            "Failed to load result for tasks " + taskIds + " (job: " + jobId + ")");
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
                 }
 
                 Map<TaskId, TaskResult> resultsMap = new HashMap<>(taskIds.size());
@@ -1386,16 +1529,26 @@ public class SchedulerDBManager {
                         }
                     }
                     if (taskResult == null) {
+<<<<<<< HEAD
                         throw new DatabaseManagerException("Failed to load result for task " + taskId + " (job: " +
                                                            jobId + ")");
+=======
+                        throw new DatabaseManagerException(
+                                "Failed to load result for task " + taskId + " (job: " + jobId + ")");
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
                     } else {
                         resultsMap.put(taskId, taskResult);
                     }
                 }
 
                 if (jobResult.getAllResults().size() != taskIds.size()) {
+<<<<<<< HEAD
                     throw new DatabaseManagerException("Results: " + jobResult.getAllResults().size() + " " +
                                                        taskIds.size());
+=======
+                    throw new DatabaseManagerException(
+                            "Results: " + jobResult.getAllResults().size() + " " + taskIds.size());
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
                 }
 
                 return resultsMap;
@@ -1478,8 +1631,13 @@ public class SchedulerDBManager {
                                                               .uniqueResult();
 
                 if (taskSearchResult == null) {
+<<<<<<< HEAD
                     throw new DatabaseManagerException("Failed to load result for task '" + taskName + ", job: " +
                                                        jobId);
+=======
+                    throw new DatabaseManagerException(
+                            "Failed to load result for task '" + taskName + ", job: " + jobId);
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
                 }
 
                 DBTaskId dbTaskId = (DBTaskId) taskSearchResult[0];
@@ -1564,7 +1722,12 @@ public class SchedulerDBManager {
         return session.get(TaskData.class, taskId(task));
     }
 
+<<<<<<< HEAD
     private void saveTaskDependencies(Session session, List<InternalTask> tasks, List<TaskData> taskRuntimeDataList) {
+=======
+    private void saveTaskDependencies(Session session, List<InternalTask> tasks,
+                                      List<TaskData> taskRuntimeDataList) {
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
         for (int i = 0; i < tasks.size(); i++) {
             InternalTask task = tasks.get(i);
             TaskData taskRuntimeData = taskRuntimeDataList.get(i);
@@ -1575,7 +1738,7 @@ public class SchedulerDBManager {
                 }
                 taskRuntimeData.setDependentTasks(dependencies);
             } else {
-                taskRuntimeData.setDependentTasks(Collections.<DBTaskId> emptyList());
+                taskRuntimeData.setDependentTasks(Collections.<DBTaskId>emptyList());
             }
             if (task.getIfBranch() != null) {
                 InternalTask ifBranch = task.getIfBranch();
@@ -1590,7 +1753,7 @@ public class SchedulerDBManager {
                 }
                 taskRuntimeData.setJoinedBranches(joinedBranches);
             } else {
-                taskRuntimeData.setJoinedBranches(Collections.<DBTaskId> emptyList());
+                taskRuntimeData.setJoinedBranches(Collections.<DBTaskId>emptyList());
             }
         }
     }
@@ -1632,7 +1795,11 @@ public class SchedulerDBManager {
 
     private boolean isScriptTask(InternalTask task) {
         return task.getClass().equals(InternalForkedScriptTask.class) ||
+<<<<<<< HEAD
                task.getClass().equals(InternalScriptTask.class);
+=======
+                task.getClass().equals(InternalScriptTask.class);
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
     }
 
     private TaskData queryScriptTaskData(Session session, InternalTask task) {
@@ -1658,11 +1825,17 @@ public class SchedulerDBManager {
                 List<SchedulerUserInfo> users = new ArrayList<>(list.size());
                 for (Object obj : list) {
                     Object[] nameAndCount = (Object[]) obj;
+<<<<<<< HEAD
                     users.add(new SchedulerUserInfo(null,
                                                     nameAndCount[0].toString(),
                                                     0,
                                                     Long.parseLong(nameAndCount[2].toString()),
                                                     Integer.parseInt(nameAndCount[1].toString())));
+=======
+                    users.add(new SchedulerUserInfo(null, nameAndCount[0].toString(), 0,
+                            Long.parseLong(nameAndCount[2].toString()),
+                            Integer.parseInt(nameAndCount[1].toString())));
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
                 }
                 return users;
             }
@@ -1700,7 +1873,12 @@ public class SchedulerDBManager {
         return jobId.longValue();
     }
 
+<<<<<<< HEAD
     private static Configuration createConfiguration(File configFile, Map<String, String> propertiesToReplace) {
+=======
+    private static Configuration createConfiguration(File configFile,
+                                                     Map<String, String> propertiesToReplace) {
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
         try {
             String configContent = new String(FileToBytesConverter.convertFileToByteArray(configFile));
 
@@ -1736,14 +1914,19 @@ public class SchedulerDBManager {
     }
 
     public void putThirdPartyCredential(final String username, final String key,
-            final HybridEncryptedData encryptedCredential) {
+                                        final HybridEncryptedData encryptedCredential) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
+<<<<<<< HEAD
                 session.saveOrUpdate(new ThirdPartyCredentialData(username,
                                                                   key,
                                                                   encryptedCredential.getEncryptedSymmetricKey(),
                                                                   encryptedCredential.getEncryptedData()));
+=======
+                session.saveOrUpdate(new ThirdPartyCredentialData(username, key,
+                        encryptedCredential.getEncryptedSymmetricKey(), encryptedCredential.getEncryptedData()));
+>>>>>>> Modify the housekeeping mechanism to use bulk operations and add logging info of DB tables size
                 return null;
             }
         });

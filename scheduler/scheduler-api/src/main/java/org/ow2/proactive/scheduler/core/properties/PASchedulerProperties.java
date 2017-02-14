@@ -169,6 +169,9 @@ public enum PASchedulerProperties {
     /** Delay to wait between a job is terminated and removing the it from Scheduler (0 = infinite) */
     SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY("pa.scheduler.core.automaticremovejobdelay", PropertyType.INTEGER),
 
+    /** Cron expression to automatically remove finished jobs */
+    SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR("pa.scheduler.core.automaticremovejobexpression", PropertyType.STRING),
+
     /** Remove job in dataBase when removing it from scheduler. */
     JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PropertyType.BOOLEAN),
 
@@ -267,6 +270,12 @@ public enum PASchedulerProperties {
 
     // Define the logging format pattern of tasks on the scheduler
     SCHEDULER_JOB_LOGS_PATTERN("pa.scheduler.job.task.output.logs.pattern", PropertyType.STRING),
+
+    SCHEDULER_DB_SIZE_MONITORING("pa.scheduler.db.size.monitoring", PropertyType.BOOLEAN),
+
+    SCHEDULER_DB_SIZE_MONITORING_FREQ("pa.scheduler.db.size.monitoring.freq", PropertyType.STRING),
+
+    SCHEDULER_DB_SIZE_MONITORING_TS_PATTERN("pa.scheduler.db.size.monitoring.timestamp.pattern", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */

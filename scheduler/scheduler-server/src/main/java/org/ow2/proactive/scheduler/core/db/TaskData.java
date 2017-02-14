@@ -101,57 +101,61 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "getFinishedTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1"),
-                @NamedQuery(name = "getMeanTaskPendingTime", query = "select avg(startTime - :jobSubmittedTime) from TaskData task where task.jobData.id = :id and task.startTime > 0"),
-                @NamedQuery(name = "getMeanTaskRunningTime", query = "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.jobData.id = :id"),
-                @NamedQuery(name = "getPendingTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
-                @NamedQuery(name = "getRunningTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) " +
-                                                                   "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
-                @NamedQuery(name = "findTaskData", query = "from TaskData where id in (:ids)"),
-                @NamedQuery(name = "findTaskDataById", query = "from TaskData td where td.id = :taskId"),
-                @NamedQuery(name = "getTotalNumberOfHostsUsed", query = "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id"),
-                @NamedQuery(name = "getTotalTasksCount", query = "select count(*) from TaskData task where task.jobData.removedTime = -1"),
-                @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task left outer join fetch task.dependentTasks where task.id.jobId in (:ids)"),
-                @NamedQuery(name = "readAccountTasks", query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
-                                                               "where task.finishedTime > 0 and task.jobData.owner = :username"),
-                @NamedQuery(name = "updateTaskData", query = "update TaskData task set task.taskStatus = :taskStatus, " +
-                                                             "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
-                                                             "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
-                                                             "task.inErrorTime = :inErrorTime " +
-                                                             "where task.id = :taskId"),
-                @NamedQuery(name = "updateTaskDataAfterJobFinished", query = "update TaskData task set task.taskStatus = :taskStatus, " +
-                                                                             "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
-                                                                             "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
-                                                                             "task.finishedTime = :finishedTime, " +
-                                                                             "task.executionDuration = :executionDuration " +
-                                                                             "where task.id = :taskId"),
-                @NamedQuery(name = "updateTaskDataJobScripts", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
-                                                                       "cleanScript = null  where id.jobId = :jobId"),
-                @NamedQuery(name = "updateTaskDataStatusToPending", query = "update TaskData task set task.taskStatus = :taskStatus " +
-                                                                            "where task.jobData = :job"),
-                @NamedQuery(name = "updateTaskDataTaskRestarted", query = "update TaskData set taskStatus = :taskStatus, " +
-                                                                          "numberOfExecutionLeft = :numberOfExecutionLeft," +
-                                                                          "numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft" +
-                                                                          " where id = :taskId"),
-                @NamedQuery(name = "updateTaskDataTaskStarted", query = "update TaskData task set task.taskStatus = :taskStatus, " +
-                                                                        "task.startTime = :startTime, task.finishedTime = :finishedTime, " +
-                                                                        "task.executionHostName = :executionHostName where task.id = :taskId"), })
-@Table(name = "TASK_DATA", indexes = { @Index(name = "TASK_DATA_CLEAN_SCRIPT_ID", columnList = "CLEAN_SCRIPT_ID"),
-                                       @Index(name = "TASK_DATA_ENV_SCRIPT_ID", columnList = "ENV_SCRIPT_ID"),
-                                       @Index(name = "TASK_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
-                                       @Index(name = "TASK_DATA_FLOW_SCRIPT_ID", columnList = "FLOW_SCRIPT_ID"),
-                                       @Index(name = "TASK_DATA_IFBRANCH_JOB_ID", columnList = "IFBRANCH_TASK_ID_JOB"),
-                                       @Index(name = "TASK_DATA_IFBRANCH_TASK_ID", columnList = "IFBRANCH_TASK_ID_TASK"),
-                                       @Index(name = "TASK_DATA_JOB_ID", columnList = "JOB_ID"),
-                                       @Index(name = "TASK_DATA_POST_SCRIPT_ID", columnList = "POST_SCRIPT_ID"),
-                                       @Index(name = "TASK_DATA_PRE_SCRIPT_ID", columnList = "PRE_SCRIPT_ID"),
-                                       @Index(name = "TASK_DATA_SCRIPT_ID", columnList = "SCRIPT_ID"),
-                                       @Index(name = "TASK_DATA_START_TIME", columnList = "START_TIME"),
-                                       @Index(name = "TASK_DATA_STATUS", columnList = "STATUS"),
-                                       @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
-                                       @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
-                                       @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
-                                       @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME") })
+@NamedQueries({
+        @NamedQuery(name = "deleteTaskDataInBulk", query = "delete from TaskData where jobData.id in :jobIdList"),
+        @NamedQuery(name = "countTaskData", query = "select count (*) from TaskData"),
+        @NamedQuery(name = "countTaskDataNotFinished", query = "select count (*) from TaskData where taskStatus <> 11"),
+        @NamedQuery(name = "getFinishedTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1"),
+        @NamedQuery(name = "getMeanTaskPendingTime", query = "select avg(startTime - :jobSubmittedTime) from TaskData task where task.jobData.id = :id and task.startTime > 0"),
+        @NamedQuery(name = "getMeanTaskRunningTime", query = "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.jobData.id = :id"),
+        @NamedQuery(name = "getPendingTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
+        @NamedQuery(name = "getRunningTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) " +
+                "and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
+        @NamedQuery(name = "findTaskData", query = "from TaskData where id in (:ids)"),
+        @NamedQuery(name = "findTaskDataById", query = "from TaskData td where td.id = :taskId"),
+        @NamedQuery(name = "getTotalNumberOfHostsUsed", query = "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id"),
+        @NamedQuery(name = "getTotalTasksCount", query = "select count(*) from TaskData task where task.jobData.removedTime = -1"),
+        @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task left outer join fetch task.dependentTasks where task.id.jobId in (:ids)"),
+        @NamedQuery(name = "readAccountTasks", query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
+                "where task.finishedTime > 0 and task.jobData.owner = :username"),
+        @NamedQuery(name = "updateTaskData", query = "update TaskData task set task.taskStatus = :taskStatus, " +
+                "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
+                "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
+                "task.inErrorTime = :inErrorTime " + "where task.id = :taskId"),
+        @NamedQuery(name = "updateTaskDataAfterJobFinished", query = "update TaskData task set task.taskStatus = :taskStatus, " +
+                "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
+                "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
+                "task.finishedTime = :finishedTime, " + "task.executionDuration = :executionDuration " +
+                "where task.id = :taskId"),
+        @NamedQuery(name = "updateTaskDataJobScripts", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
+                "cleanScript = null  where id.jobId = :jobId"),
+        @NamedQuery(name = "updateTaskDataJobScriptsInBulk", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
+                "cleanScript = null  where id.jobId in :jobIdList"),
+        @NamedQuery(name = "updateTaskDataStatusToPending", query = "update TaskData task set task.taskStatus = :taskStatus " +
+                "where task.jobData = :job"),
+        @NamedQuery(name = "updateTaskDataTaskRestarted", query = "update TaskData set taskStatus = :taskStatus, " +
+                "numberOfExecutionLeft = :numberOfExecutionLeft," +
+                "numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft" + " where id = :taskId"),
+        @NamedQuery(name = "updateTaskDataTaskStarted", query = "update TaskData task set task.taskStatus = :taskStatus, " +
+                "task.startTime = :startTime, task.finishedTime = :finishedTime, " +
+                "task.executionHostName = :executionHostName where task.id = :taskId"), })
+@Table(name = "TASK_DATA", indexes = {
+        @Index(name = "TASK_DATA_CLEAN_SCRIPT_ID", columnList = "CLEAN_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_ENV_SCRIPT_ID", columnList = "ENV_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
+        @Index(name = "TASK_DATA_FLOW_SCRIPT_ID", columnList = "FLOW_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_IFBRANCH_JOB_ID", columnList = "IFBRANCH_TASK_ID_JOB"),
+        @Index(name = "TASK_DATA_IFBRANCH_TASK_ID", columnList = "IFBRANCH_TASK_ID_TASK"),
+        @Index(name = "TASK_DATA_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "TASK_DATA_POST_SCRIPT_ID", columnList = "POST_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_PRE_SCRIPT_ID", columnList = "PRE_SCRIPT_ID"),
+        @Index(name = "TASK_DATA_SCRIPT_ID", columnList = "SCRIPT_ID"),
+        @Index(name = "TASK_DATA_START_TIME", columnList = "START_TIME"),
+        @Index(name = "TASK_DATA_STATUS", columnList = "STATUS"),
+        @Index(name = "TASK_DATA_TAG", columnList = "TAG"),
+        @Index(name = "TASK_DATA_TASK_ID_JOB", columnList = "TASK_ID_JOB"),
+        @Index(name = "TASK_DATA_TASK_ID_TASK", columnList = "TASK_ID_TASK"),
+        @Index(name = "TASK_DATA_TASK_NAME", columnList = "TASK_NAME") })
 public class TaskData {
 
     private static final String SCRIPT_TASK = "SCRIPT_TASK";
