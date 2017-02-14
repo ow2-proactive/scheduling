@@ -26,12 +26,14 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
@@ -61,6 +63,8 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
+
+import it.sauronsoftware.cron4j.Scheduler;
 
 
 public class SchedulingService {
@@ -93,6 +97,10 @@ public class SchedulingService {
 
     private Thread pinger;
 
+    public ConcurrentLinkedQueue<JobId> jobsToDeleteFromDB;
+
+    private Scheduler houseKeepingScheduler;
+
     /**
      * Url used to store the last url of the RM (used to try to reconnect to the rm when it is down)
      */
@@ -105,6 +113,7 @@ public class SchedulingService {
         this.listener = listener;
         this.jobs = new LiveJobs(infrastructure.getDBManager(), listener);
         this.listenJobLogsSupport = ListenJobLogsSupport.newInstance(infrastructure.getDBManager(), jobs);
+        this.jobsToDeleteFromDB = new ConcurrentLinkedQueue<JobId>();
         if (recoveredState != null) {
             recover(recoveredState);
         }
@@ -128,6 +137,34 @@ public class SchedulingService {
 
         pinger = new NodePingThread(this);
         pinger.start();
+
+        if (PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY.getValueAsInt() > 0) {
+            startHouseKeeping(this.jobsToDeleteFromDB, this.infrastructure);
+        }
+    }
+
+    public void startHouseKeeping(final ConcurrentLinkedQueue<JobId> jobsQueue, final SchedulingInfrastructure infrastructure) {
+        houseKeepingScheduler = new Scheduler();
+        String cronExpr = "* * * * *";
+        if (PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR.isSet()) {
+            cronExpr = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR.getValueAsString();
+        }
+        houseKeepingScheduler.schedule(cronExpr, new Runnable() {
+            @Override
+            public void run() {
+                logger.info("HOUSEKEEPING triggered");
+                if (!jobsQueue.isEmpty()) {
+                    ArrayList<Long> jobIdList = new ArrayList<>();
+                    JobId jobId = jobsQueue.poll();
+                    while (jobId != null) {
+                        jobIdList.add(jobId.longValue());
+                        jobId = jobsQueue.poll();
+                    }
+                    infrastructure.getDBManager().executeHousekeeping(jobIdList);
+                }
+            }
+        });
+        houseKeepingScheduler.start();
     }
 
     public Policy getPolicy() {

@@ -53,12 +53,15 @@ import org.ow2.proactive.scheduler.util.ByteCompressionUtils;
 
 /**
  * JobContent Entity class, store workflow content to database
- * 
+ *
  * @author ActiveEon team
  *
  */
 @Entity
-@NamedQueries({ @NamedQuery(name = "loadJobContent", query = "from JobContent as content where content.jobId = :id") })
+@NamedQueries({
+		@NamedQuery(name = "deleteJobContentInBulk", query = "delete from JobContent where id in :jobIdList"),
+		@NamedQuery(name = "loadJobContent", query = "from JobContent as content where content.jobId = :id"),
+		@NamedQuery(name = "countJobContent", query = "select count (*) from JobContent")})
 @Table(name = "JOB_CONTENT", indexes = { @Index(name = "INITIAL_JOB_INDEX", columnList = "JOB_ID") })
 public class JobContent implements Serializable {
 

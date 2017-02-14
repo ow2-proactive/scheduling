@@ -25,17 +25,32 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import java.io.Serializable;
-
 import javax.persistence.*;
+
+import java.io.Serializable;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteThirdPartyCredentialsKeySetByUsernameAndKey", query = "delete from ThirdPartyCredentialData where username = :username and key = :key"),
-                @NamedQuery(name = "findThirdPartyCredentialsKeySetByUsername", query = "select key from ThirdPartyCredentialData where username = :username"),
-                @NamedQuery(name = "findThirdPartyCredentialsMapByUsername", query = "select key, encryptedSymmetricKey, encryptedValue " +
-                                                                                     "from ThirdPartyCredentialData " + "where username = :username"),
-                @NamedQuery(name = "hasThirdPartyCredentials", query = "select count(*) from ThirdPartyCredentialData where username = :username") })
+@NamedQueries( {
+        @NamedQuery(
+                name = "deleteThirdPartyCredentialsKeySetByUsernameAndKey",
+                query = "delete from ThirdPartyCredentialData where username = :username and key = :key"
+        ),
+        @NamedQuery(
+                name = "findThirdPartyCredentialsKeySetByUsername",
+                query = "select key from ThirdPartyCredentialData where username = :username"
+        ),
+        @NamedQuery(
+                name = "findThirdPartyCredentialsMapByUsername",
+                query = "select key, encryptedSymmetricKey, encryptedValue " +
+                        "from ThirdPartyCredentialData " + "where username = :username"
+        ),
+        @NamedQuery(
+                name = "hasThirdPartyCredentials",
+                query = "select count(*) from ThirdPartyCredentialData where username = :username"
+        ),
+        @NamedQuery(name = "countThirdPartyCredentialData", query = "select count (*) from ThirdPartyCredentialData")
+})
 @Table(name = "THIRD_PARTY_CREDENTIAL_DATA")
 public class ThirdPartyCredentialData implements Serializable {
 

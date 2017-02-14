@@ -74,7 +74,11 @@ public class JobRemoveHandler implements Callable<Boolean> {
         job.setRemovedTime(System.currentTimeMillis());
 
         boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
-        dbManager.removeJob(jobId, job.getRemovedTime(), removeFromDb);
+
+        logger.info("HOUSEKEEPING# Job" + jobId + " set for deletion");
+        //dbManager.removeJob(jobId, job.getRemovedTime(), removeFromDb);
+        this.service.jobsToDeleteFromDB.offer(this.jobId);
+
 
         if (logger.isInfoEnabled()) {
             logger.info("Job " + jobId + " removed in " + (System.currentTimeMillis() - start) + "ms");

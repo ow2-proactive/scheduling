@@ -31,9 +31,21 @@ import org.ow2.proactive.scheduler.common.task.PropertyModifier;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteEnvironmentModifierData", query = "delete from EnvironmentModifierData where taskData.id.jobId = :jobId"), })
-@Table(name = "ENVIRONMENT_MODIFIER_DATA", indexes = { @Index(name = "ENV_MODIFIER_DATA_JOB_ID", columnList = "JOB_ID"),
-                                                       @Index(name = "ENV_MODIFIER_DATA_TASK_ID", columnList = "TASK_ID") })
+@NamedQueries( {
+        @NamedQuery(
+                name = "deleteEnvironmentModifierData",
+                query = "delete from EnvironmentModifierData where taskData.id.jobId = :jobId"
+        ),
+        @NamedQuery(
+                name = "deleteEnvironmentModifierDataInBulk",
+                query = "delete from EnvironmentModifierData where taskData.id.jobId in :jobIdList"
+        ),
+        @NamedQuery(name = "countEnvironmentModifierData", query = "select count (*) from EnvironmentModifierData")
+})
+@Table(name = "ENVIRONMENT_MODIFIER_DATA", indexes = {
+        @Index(name = "ENV_MODIFIER_DATA_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "ENV_MODIFIER_DATA_TASK_ID", columnList = "TASK_ID")
+})
 public class EnvironmentModifierData {
 
     private long id;
@@ -94,3 +106,4 @@ public class EnvironmentModifierData {
     }
 
 }
+
