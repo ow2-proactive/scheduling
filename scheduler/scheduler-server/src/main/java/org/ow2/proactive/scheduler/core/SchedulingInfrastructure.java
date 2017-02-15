@@ -70,11 +70,11 @@ public interface SchedulingInfrastructure {
      * dedicated to housekeeping operations. This last is different
      * from the one used by other schedule methods.
      *
-     * @param jobRemoveHandler the job removal action to execute.
+     * @param housekeepingHandler the job removal action to execute.
      * @param delay            the minimum delay to wait in milliseconds
      *                         before executing the action.
      */
-    void scheduleHousekeeping(JobRemoveHandler jobRemoveHandler, long delay);
+    void scheduleHousekeeping(HousekeepingHandler housekeepingHandler, long delay);
 
     DataSpaceServiceStarter getDataSpaceServiceStarter();
 

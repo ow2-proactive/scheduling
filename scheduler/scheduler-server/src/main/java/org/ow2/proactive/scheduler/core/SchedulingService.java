@@ -495,7 +495,7 @@ public class SchedulingService {
     }
 
     public void scheduleJobRemove(JobId jobId, long delay) {
-        infrastructure.scheduleHousekeeping(new JobRemoveHandler(this, jobId), delay);
+        infrastructure.scheduleHousekeeping(new HousekeepingHandler(this, jobId), delay);
     }
 
     public void restartTaskOnNodeFailure(final InternalTask task) {

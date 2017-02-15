@@ -25,17 +25,14 @@
  */
 package org.ow2.proactive.scheduler.core.helpers;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.db.TransactionHelper;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 /**
  * TableSizeMonitorRunner will poll the DB for table counts for debugging purpose and display them in the logs.
@@ -45,10 +42,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  */
 public class TableSizeMonitorRunner implements Runnable {
 
-    private static final String LOG_FLAG = "TABLE-SIZE-MONITOR#";
-    private static String TS_PATTERN = "yyyy.MM.dd.HH.mm.ss";
     private static TransactionHelper transactionHelper;
-    private static Logger logger;
+    private static final Logger logger = Logger.getLogger(TableSizeMonitorRunner.class);
     private HashMap<String, Long> counts = new HashMap<String, Long>();
     private final ArrayList<String> tableNames = new ArrayList<String>(
             Arrays.asList("JobData (All)", "JobData (Finished)", "JobContent",
@@ -57,12 +52,8 @@ public class TableSizeMonitorRunner implements Runnable {
                     "TaskDataVariable", "TaskResultData",
                     "ThirdPartyCredentialData"));
 
-    public TableSizeMonitorRunner(TransactionHelper transactionHelper, Logger logger) {
+    public TableSizeMonitorRunner(TransactionHelper transactionHelper) {
         this.transactionHelper = transactionHelper;
-        this.logger = logger;
-        if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_TS_PATTERN.isSet()) {
-            TS_PATTERN = PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_TS_PATTERN.getValueAsString();
-        }
     }
 
     private Long getCount(final String queryName) {
@@ -75,23 +66,17 @@ public class TableSizeMonitorRunner implements Runnable {
         });
     }
 
-    private void logCounts(String date) {
+    private void logCounts() {
         StringBuilder sb = new StringBuilder();
-        sb.append(LOG_FLAG + date);
         for (String key : tableNames) {
-            sb.append(";" + counts.get(key));
+            sb.append(key + ": " + counts.get(key) + ", ");
         }
-        logger.info(sb.toString());
+        String monitorLine = sb.toString();
+        // Remove the last `, ` occurence from the line
+        logger.debug(monitorLine.substring(0, monitorLine.length() - 2));
     }
 
-    @Override
-    public void run() {
-//        final StringBuilder names = new StringBuilder();
-//        names.append(LOG_FLAG + "timestamp");
-//        for (String name : tableNames) {
-//            names.append(";" + name);
-//        }
-//        logger.info(names.toString());
+    private void monitorTables() {
         counts.put("JobData (All)", getCount("countJobData"));
         counts.put("JobData (Finished)", getCount("countJobDataFinished"));
         counts.put("JobContent", getCount("countJobContent"));
@@ -104,6 +89,13 @@ public class TableSizeMonitorRunner implements Runnable {
         counts.put("TaskDataVariable", getCount("countTaskDataVariable"));
         counts.put("TaskResultData", getCount("countTaskResultData"));
         counts.put("ThirdPartyCredentialData", getCount("countThirdPartyCredentialData"));
-        logCounts(new SimpleDateFormat(TS_PATTERN).format(new Date()));
+        logCounts();
+    }
+
+    @Override
+    public void run() {
+        if (logger.isDebugEnabled()) {
+            monitorTables();
+        }
     }
 }
