@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -213,10 +216,7 @@ public class SchedulerDBManager {
             sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             transactionHelper = new TransactionHelper(sessionFactory);
 
-            if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING.getValueAsBoolean()) {
-                setupTableSizeMonitoring();
-            }
-
+            setupTableSizeMonitoring();
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed", ex);
@@ -228,7 +228,7 @@ public class SchedulerDBManager {
             tableSizeMonitorScheduler = new Scheduler();
             tableSizeMonitorScheduler.schedule(
                     PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.getValueAsString(),
-                    new TableSizeMonitorRunner(transactionHelper, logger));
+                    new TableSizeMonitorRunner(transactionHelper));
             tableSizeMonitorScheduler.start();
         }
     }
@@ -783,9 +783,12 @@ public class SchedulerDBManager {
     }
 
     private void removeJobScriptsInBulk(Session session, List<Long> jobIdList) {
-        session.getNamedQuery("updateTaskDataJobScriptsInBulk").setParameter("jobIdList", jobIdList).executeUpdate();
-        session.getNamedQuery("deleteScriptDataInBulk").setParameter("jobIdList", jobIdList).executeUpdate();
-        session.getNamedQuery("deleteSelectionScriptDataInBulk").setParameter("jobIdList", jobIdList).executeUpdate();
+        session.getNamedQuery("updateTaskDataJobScriptsInBulk").setParameterList("jobIdList", jobIdList)
+                .executeUpdate();
+        session.getNamedQuery("deleteScriptDataInBulk").setParameterList("jobIdList", jobIdList)
+                .executeUpdate();
+        session.getNamedQuery("deleteSelectionScriptDataInBulk").setParameterList("jobIdList", jobIdList)
+                .executeUpdate();
     }
 
     private void removeJobRuntimeData(Session session, long jobId) {
@@ -798,12 +801,50 @@ public class SchedulerDBManager {
         session.getNamedQuery("deleteSelectorData").setParameter("jobId", jobId).executeUpdate();
     }
 
+    private void deleteInconsistentData(Session session) {
+        session.createSQLQuery("delete from TASK_DATA where JOB_ID = null");
+        session.createSQLQuery("delete from TASK_RESULT_DATA where TASK_ID = null");
+        session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID = null");
+        session.createSQLQuery(
+                "delete from TASK_DATA where JOB_ID not in (select ID from JOB_DATA)");
+        session.createSQLQuery(
+                "delete from TASK_RESULT_DATA where TASK_ID not in (select TASK_ID_TASK from TASK_DATA)");
+        session.createSQLQuery(
+                "delete from TASK_RESULT_DATA where JOB_ID not in (select ID from JOB_DATA)");
+    }
+
     public void executeHousekeeping(final List<Long> jobIdList) {
+
+        // jobs that are old enough to be deleted after a restart
+        int autoRemoveJobDelay = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY.getValueAsInt();
+        if (autoRemoveJobDelay > 0) {
+            final long timeLimit = System.currentTimeMillis() - (autoRemoveJobDelay * 1000);
+            List<Long> oldJobIds = executeReadOnlyTransaction(new SessionWork<List<Long>>() {
+                @Override
+                public List<Long> doInTransaction(Session session) {
+                    List<Long> oldJobsToRemove = new ArrayList<Long>();
+                    Query query = session.createSQLQuery(
+                            "select ID from JOB_DATA where " +
+                                    "FINISH_TIME < :finishTime and FINISH_TIME <> -1 and " +
+                                    "ID not in :jobIdList")
+                            .setParameter("finishTime", timeLimit)
+                            .setParameterList("jobIdList", jobIdList);
+                    Iterator jobIdIterator = query.list().iterator();
+                    while (jobIdIterator.hasNext()) {
+                        oldJobsToRemove.add(((BigInteger) jobIdIterator.next()).longValue());
+                    }
+                    return oldJobsToRemove;
+                }
+            });
+            logger.info("HOUSEKEEPING Will add the old jobs for removal: " + oldJobIds);
+            jobIdList.addAll(oldJobIds);
+        }
+
+
         logger.info("HOUSEKEEPING will remove the following jobs: " + jobIdList);
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-
                 session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
                         .setParameterList("jobIdList", jobIdList).executeUpdate();
                 session.getNamedQuery("deleteTaskDataVariableInBulk")
@@ -814,31 +855,18 @@ public class SchedulerDBManager {
                         .setParameterList("jobIdList", jobIdList).executeUpdate();
                 session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in :jobIdList")
                         .setParameterList("jobIdList", jobIdList).executeUpdate();
-
-                session.getNamedQuery("updateTaskDataJobScriptsInBulk")
-                        .setParameterList("jobIdList", jobIdList).executeUpdate();
-                session.getNamedQuery("deleteScriptDataInBulk")
-                        .setParameterList("jobIdList", jobIdList).executeUpdate();
+                removeJobScriptsInBulk(session, jobIdList);
                 session.getNamedQuery("deleteSelectionScriptDataInBulk")
                         .setParameterList("jobIdList", jobIdList).executeUpdate();
-                // TaskResultData
                 session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID in :jobIdList")
                         .setParameterList("jobIdList", jobIdList).executeUpdate();
-                // TaskData
                 session.getNamedQuery("deleteTaskDataInBulk")
                         .setParameterList("jobIdList", jobIdList).executeUpdate();
-
                 session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in :jobIdList")
                         .setParameterList("jobIdList", jobIdList).executeUpdate();
                 session.getNamedQuery("deleteJobDataInBulk")
                         .setParameterList("jobIdList", jobIdList).executeUpdate();
-
-                // TODO: revoir les requetes suivantes
-                // on cherche les TASK_DATA qui ont un JOB_ID qui n'existe plus dans JOB_DATA
-                session.createSQLQuery("delete from TASK_DATA where JOB_ID = null");
-                session.createSQLQuery("delete from TASK_RESULT_DATA where TASK_ID = null");
-                session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID = null");
-
+                deleteInconsistentData(session);
                 return null;
             }
         });
