@@ -311,7 +311,7 @@ public class SchedulingServiceTest {
     public void testScheduleJobRemoveShouldUseHousekeepingThreadPool() {
         schedulingService.scheduleJobRemove(JobIdImpl.makeJobId("42"), 42);
 
-        Mockito.verify(infrastructure).scheduleHousekeeping(Mockito.any(JobRemoveHandler.class), Mockito.anyLong());
+        Mockito.verify(infrastructure).scheduleHousekeeping(Mockito.any(HousekeepingHandler.class), Mockito.anyLong());
     }
 
     @Test

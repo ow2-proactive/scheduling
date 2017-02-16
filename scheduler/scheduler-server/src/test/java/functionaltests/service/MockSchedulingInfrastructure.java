@@ -48,6 +48,7 @@ import org.mockito.stubbing.Answer;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
+import org.ow2.proactive.scheduler.core.HousekeepingHandler;
 import org.ow2.proactive.scheduler.core.JobRemoveHandler;
 import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.SchedulingInfrastructure;
@@ -207,9 +208,9 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     }
 
     @Override
-    public void scheduleHousekeeping(JobRemoveHandler jobRemoveHandler, long delay) {
-        System.out.println("Requested to schedule jobRemoveHandler " + jobRemoveHandler + ", delay: " + delay);
-        ScheduledFuture<?> future = scheduledExecutorService.schedule(jobRemoveHandler, 1, TimeUnit.MILLISECONDS);
+    public void scheduleHousekeeping(HousekeepingHandler housekeepingHandler, long delay) {
+        System.out.println("Requested to schedule jobRemoveHandler " + housekeepingHandler + ", delay: " + delay);
+        ScheduledFuture<?> future = scheduledExecutorService.schedule(housekeepingHandler, 1, TimeUnit.MILLISECONDS);
         try {
             future.get();
         } catch (Exception e) {
