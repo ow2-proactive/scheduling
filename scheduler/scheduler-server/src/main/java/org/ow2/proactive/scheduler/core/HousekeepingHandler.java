@@ -65,20 +65,20 @@ public class HousekeepingHandler implements Callable<Boolean> {
             logger.info("HOUSEKEEPING Scheduling job " + jobId + " for removal");
         }
 
-        SchedulerDBManager dbManager = service.infrastructure.getDBManager();
+        SchedulerDBManager dbManager = service.getInfrastructure().getDBManager();
         InternalJob job = dbManager.loadJobWithTasksIfNotRemoved(jobId);
         if (job == null) {
             return false;
         }
         job.setRemovedTime(System.currentTimeMillis());
-        this.service.jobsToDeleteFromDB.offer(this.jobId);
+        this.service.getJobsToDeleteFromDB().offer(this.jobId);
 
         if (logger.isInfoEnabled()) {
             logger.info("HOUSEKEEPING Job " + jobId + " scheduled for removal " +
                     "in " + (System.currentTimeMillis() - start) + "ms");
         }
 
-        service.listener.jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
+        service.getListener().jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
                 SchedulerEvent.JOB_REMOVE_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
         return true;
