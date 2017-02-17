@@ -48,6 +48,8 @@ public class ModelValidator implements Validator<String> {
 
     private String model;
 
+    public static final String PREFIX = "PA:";
+
     public ModelValidator(String model) {
         if (Strings.isNullOrEmpty(model)) {
             throw new IllegalArgumentException("Model cannot be empty");
@@ -77,32 +79,41 @@ public class ModelValidator implements Validator<String> {
      */
     protected ParserValidator createParserValidator() throws ModelSyntaxException {
         String uppercaseModel = model.toUpperCase();
-        if (uppercaseModel.startsWith(IntegerParserValidator.INTEGER_TYPE)) {
-            return new IntegerParserValidator(model);
-        } else if (uppercaseModel.startsWith(LongParserValidator.LONG_TYPE)) {
-            return new LongParserValidator(model);
-        } else if (uppercaseModel.startsWith(DoubleParserValidator.DOUBLE_TYPE)) {
-            return new DoubleParserValidator(model);
-        } else if (uppercaseModel.startsWith(FloatParserValidator.FLOAT_TYPE)) {
-            return new FloatParserValidator(model);
-        } else if (uppercaseModel.startsWith(ShortParserValidator.SHORT_TYPE)) {
-            return new ShortParserValidator(model);
-        } else if (uppercaseModel.startsWith(BooleanParserValidator.BOOLEAN_TYPE)) {
-            return new BooleanParserValidator(model);
-        } else if (uppercaseModel.startsWith(URLParserValidator.URL_TYPE)) {
-            return new URLParserValidator(model);
-        } else if (uppercaseModel.startsWith(URIParserValidator.URI_TYPE)) {
-            return new URIParserValidator(model);
-        } else if (uppercaseModel.startsWith(DateTimeParserValidator.DATETIME_TYPE)) {
-            return new DateTimeParserValidator(model);
-        } else if (uppercaseModel.startsWith(ListParserValidator.LIST_TYPE)) {
-            return new ListParserValidator(model);
-        } else if (uppercaseModel.startsWith(RegexpParserValidator.REGEXP_TYPE)) {
-            return new RegexpParserValidator(model);
-        } else if (uppercaseModel.startsWith(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE)) {
-            return new ModelFromURLParserValidator(model);
+        if (uppercaseModel.startsWith(PREFIX)) {
+            uppercaseModel = removePrefix(uppercaseModel);
+            if (uppercaseModel.startsWith(IntegerParserValidator.INTEGER_TYPE)) {
+                return new IntegerParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(LongParserValidator.LONG_TYPE)) {
+                return new LongParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(DoubleParserValidator.DOUBLE_TYPE)) {
+                return new DoubleParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(FloatParserValidator.FLOAT_TYPE)) {
+                return new FloatParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(ShortParserValidator.SHORT_TYPE)) {
+                return new ShortParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(BooleanParserValidator.BOOLEAN_TYPE)) {
+                return new BooleanParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(URLParserValidator.URL_TYPE)) {
+                return new URLParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(URIParserValidator.URI_TYPE)) {
+                return new URIParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(DateTimeParserValidator.DATETIME_TYPE)) {
+                return new DateTimeParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(ListParserValidator.LIST_TYPE)) {
+                return new ListParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(RegexpParserValidator.REGEXP_TYPE)) {
+                return new RegexpParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE)) {
+                return new ModelFromURLParserValidator(removePrefix(model));
+            } else {
+                throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
+            }
         } else {
             return null;
         }
+    }
+
+    private String removePrefix(String model) {
+        return model.substring(PREFIX.length());
     }
 }
