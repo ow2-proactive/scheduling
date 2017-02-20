@@ -169,8 +169,9 @@ public class RMProxyActiveObject {
                     handleCleaningScript(node, cleaningScript, variables, genericInformation, taskId);
                 }
             } else {
-                TaskLogger.getInstance().error(taskId, "Unauthorized clean script: " +
-                    System.getProperty("line.separator") + cleaningScript.getScript());
+                TaskLogger.getInstance().error(taskId,
+                                               "Unauthorized clean script: " + System.getProperty("line.separator") +
+                                                       cleaningScript.getScript());
                 releaseNodes(nodes);
             }
         }
@@ -190,17 +191,15 @@ public class RMProxyActiveObject {
             this.nodesTaskId.put(node, taskId);
             ScriptHandler handler = ScriptLoader.createHandler(node);
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
-            handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME,
-                    (Serializable) genericInformation);
+            handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
             ScriptResult<?> future = handler.handle(cleaningScript);
             try {
                 PAEventProgramming.addActionOnFuture(future, "cleanCallBack");
             } catch (IllegalArgumentException e) {
                 //TODO - linked to PROACTIVE-936 -> IllegalArgumentException is raised if method name is unknown
                 //should be replaced by checked exception
-                logger.error(
-                        "ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
-                        e);
+                logger.error("ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
+                             e);
             }
             this.nodeScriptResult.put(node, future);
             logger.info("Cleaning Script started on node" + node.getNodeInformation().getURL());
@@ -231,8 +230,7 @@ public class RMProxyActiveObject {
                 try {
                     sResult = future.get();
                 } catch (Exception e) {
-                    logger.error(
-                            "Exception occurred while executing cleaning script on node " + nodeUrl + ":", e);
+                    logger.error("Exception occurred while executing cleaning script on node " + nodeUrl + ":", e);
                 }
                 printCleaningScriptInformations(nodeUrl, sResult, taskId);
                 ns.add(entry.getKey());
@@ -248,8 +246,7 @@ public class RMProxyActiveObject {
         if (logger.isInfoEnabled()) {
             TaskLogger instance = TaskLogger.getInstance();
             if (sResult.errorOccured()) {
-                instance.error(taskId, "Exception while running cleaning script on " + nodeUrl,
-                        sResult.getException());
+                instance.error(taskId, "Exception while running cleaning script on " + nodeUrl, sResult.getException());
             } else {
                 instance.info(taskId, "Cleaning script successful, node freed : " + nodeUrl);
             }
