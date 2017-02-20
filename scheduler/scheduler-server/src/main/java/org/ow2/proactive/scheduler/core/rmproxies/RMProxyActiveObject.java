@@ -27,11 +27,11 @@ package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 import javax.security.auth.login.LoginException;
@@ -71,9 +71,9 @@ public class RMProxyActiveObject {
     /**
      * list of nodes and clean script being executed
      */
-    private Map<Node, ScriptResult<?>> nodeScriptResult = new HashMap<>();
+    private Map<Node, ScriptResult<?>> nodeScriptResult = new ConcurrentHashMap<>();
 
-    private Map<Node, TaskId> nodesTaskId = new HashMap<>();
+    private Map<Node, TaskId> nodesTaskId = new ConcurrentHashMap<>();
 
     public RMProxyActiveObject() {
     }
