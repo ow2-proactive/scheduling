@@ -9,7 +9,7 @@
      maxNumberOfExecution="2">
   <variables>
     <variable name="INPUT_FILES_FOLDER" value="/tmp" />
-    <variable name="WORKFLOW_URL" value="https://try.activeeon.com/workflow-catalog/buckets/1/workflows/39?alt=xml" />
+    <variable name="WORKFLOW_URL" value="https://try.activeeon.com/workflow-catalog/buckets/1/workflows/19?alt=xml" />
   </variables>
   <description>
     <![CDATA[ Trigger a job execution whenever a file is created in a specified folder. ]]>
