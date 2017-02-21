@@ -36,6 +36,7 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 
+
 /**
  * Handles the immediate deletion of the Job in the memory context and
  * schedules the Job for deletion by the Housekeeping mechanism.
@@ -74,12 +75,14 @@ public class HousekeepingHandler implements Callable<Boolean> {
         this.service.getJobsToDeleteFromDB().offer(this.jobId);
 
         if (logger.isInfoEnabled()) {
-            logger.info("HOUSEKEEPING Job " + jobId + " scheduled for removal " +
-                    "in " + (System.currentTimeMillis() - start) + "ms");
+            logger.info("HOUSEKEEPING Job " + jobId + " scheduled for removal " + "in " +
+                        (System.currentTimeMillis() - start) + "ms");
         }
 
-        service.getListener().jobStateUpdated(job.getOwner(), new NotificationData<JobInfo>(
-                SchedulerEvent.JOB_REMOVE_FINISHED, new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+        service.getListener()
+               .jobStateUpdated(job.getOwner(),
+                                new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
+                                                              new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
         return true;
     }

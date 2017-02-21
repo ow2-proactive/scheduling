@@ -28,11 +28,13 @@ package org.ow2.proactive.scheduler.core.helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.db.TransactionHelper;
+
 
 /**
  * TableSizeMonitorRunner will poll the DB for table counts for debugging purpose and display them in the logs.
@@ -43,14 +45,23 @@ import org.ow2.proactive.db.TransactionHelper;
 public class TableSizeMonitorRunner implements Runnable {
 
     private static TransactionHelper transactionHelper;
+
     private static final Logger logger = Logger.getLogger(TableSizeMonitorRunner.class);
+
     private HashMap<String, Long> counts = new HashMap<String, Long>();
-    private final ArrayList<String> tableNames = new ArrayList<String>(
-            Arrays.asList("JobData (All)", "JobData (Finished)", "JobContent",
-                    "TaskData", "TaskDataNotFinished", "SelectorData",
-                    "EnvironmentModifierData", "ScriptData", "SelectionScriptData",
-                    "TaskDataVariable", "TaskResultData",
-                    "ThirdPartyCredentialData"));
+
+    private final ArrayList<String> tableNames = new ArrayList<String>(Arrays.asList("JobData (All)",
+                                                                                     "JobData (Finished)",
+                                                                                     "JobContent",
+                                                                                     "TaskData",
+                                                                                     "TaskDataNotFinished",
+                                                                                     "SelectorData",
+                                                                                     "EnvironmentModifierData",
+                                                                                     "ScriptData",
+                                                                                     "SelectionScriptData",
+                                                                                     "TaskDataVariable",
+                                                                                     "TaskResultData",
+                                                                                     "ThirdPartyCredentialData"));
 
     public TableSizeMonitorRunner(TransactionHelper transactionHelper) {
         this.transactionHelper = transactionHelper;

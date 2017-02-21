@@ -25,6 +25,10 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.util.Set;
+
+import javax.persistence.*;
+
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
@@ -34,27 +38,13 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.core.db.types.PatternType;
 
-import javax.persistence.*;
-
-import java.util.Set;
-
 
 @Entity
-@NamedQueries( {
-        @NamedQuery(
-                name = "deleteSelectorData",
-                query = "delete from SelectorData where taskData.id.jobId = :jobId"
-        ),
-        @NamedQuery(
-                name = "deleteSelectorDataInBulk",
-                query = "delete from SelectorData where taskData.id.jobId in :jobIdList"
-        ),
-        @NamedQuery(name = "countSelectorData", query = "select count (*) from SelectorData")
-})
-@Table(name = "DS_SELECTOR_DATA", indexes = {
-        @Index(name = "DS_SELECTOR_DATA_JOB_ID", columnList = "JOB_ID"),
-        @Index(name = "DS_SELECTOR_DATA_TASK_ID", columnList = "TASK_ID")
-})
+@NamedQueries({ @NamedQuery(name = "deleteSelectorData", query = "delete from SelectorData where taskData.id.jobId = :jobId"),
+                @NamedQuery(name = "deleteSelectorDataInBulk", query = "delete from SelectorData where taskData.id.jobId in :jobIdList"),
+                @NamedQuery(name = "countSelectorData", query = "select count (*) from SelectorData") })
+@Table(name = "DS_SELECTOR_DATA", indexes = { @Index(name = "DS_SELECTOR_DATA_JOB_ID", columnList = "JOB_ID"),
+                                              @Index(name = "DS_SELECTOR_DATA_TASK_ID", columnList = "TASK_ID") })
 public class SelectorData {
 
     private static final String INPUT_TYPE = "input";
