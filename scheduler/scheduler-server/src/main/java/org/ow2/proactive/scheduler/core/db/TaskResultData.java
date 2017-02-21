@@ -29,48 +29,27 @@ import java.util.Map;
 
 import javax.persistence.*;
 
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskLogs;
-import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
-import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskLogs;
+import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
 @Entity
-@NamedQueries({
-        @NamedQuery(
-                name = "deleteTaskResultDataInBulk",
-                query = "delete from TaskResultData where taskRuntimeData.jobData.id in :jobIdList"
-        ),
-        @NamedQuery(
-                name = "loadJobResult",
-                query = "select taskResult, " + "task.id, " + "task.taskName, " +
-                        "task.preciousResult from TaskResultData as taskResult left outer join taskResult.taskRuntimeData as task " +
-                        "where task.jobData = :job order by task.id, taskResult.resultTime desc"
-        ),
-        @NamedQuery(
-                name = "loadTasksResultByJobAndTaskName",
-                query = "select id, taskName from TaskData where taskName = :taskName and jobData = :job"
-        ),
-        @NamedQuery(
-                name = "loadTasksResultByTask",
-                query = "from TaskResultData result where result.taskRuntimeData = :task order by result.resultTime desc"
-        ),
-        @NamedQuery(
-                name = "loadTasksResults",
-                query = "select taskResult, " + "task.id, " + "task.taskName, " +
-                        "task.preciousResult from TaskResultData as taskResult join taskResult.taskRuntimeData as task " +
-                        "where task.id in (:tasksIds) order by task.id, taskResult.resultTime desc"
-        ),
-        @NamedQuery(name = "countTaskResultData", query = "select count (*) from TaskResultData")
-})
-@Table(name = "TASK_RESULT_DATA", indexes = {
-        @Index(name = "TASK_RESULT_DATA_RUNTIME_DATA", columnList = "JOB_ID,TASK_ID")
-})
+@NamedQueries({ @NamedQuery(name = "deleteTaskResultDataInBulk", query = "delete from TaskResultData where taskRuntimeData.jobData.id in :jobIdList"),
+                @NamedQuery(name = "loadJobResult", query = "select taskResult, " + "task.id, " + "task.taskName, " +
+                                                            "task.preciousResult from TaskResultData as taskResult left outer join taskResult.taskRuntimeData as task " + "where task.jobData = :job order by task.id, taskResult.resultTime desc"),
+                @NamedQuery(name = "loadTasksResultByJobAndTaskName", query = "select id, taskName from TaskData where taskName = :taskName and jobData = :job"),
+                @NamedQuery(name = "loadTasksResultByTask", query = "from TaskResultData result where result.taskRuntimeData = :task order by result.resultTime desc"),
+                @NamedQuery(name = "loadTasksResults", query = "select taskResult, " + "task.id, " + "task.taskName, " +
+                                                               "task.preciousResult from TaskResultData as taskResult join taskResult.taskRuntimeData as task " + "where task.id in (:tasksIds) order by task.id, taskResult.resultTime desc"),
+                @NamedQuery(name = "countTaskResultData", query = "select count (*) from TaskResultData") })
+@Table(name = "TASK_RESULT_DATA", indexes = { @Index(name = "TASK_RESULT_DATA_RUNTIME_DATA", columnList = "JOB_ID,TASK_ID") })
 public class TaskResultData {
 
     private long id;
