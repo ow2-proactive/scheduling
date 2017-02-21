@@ -27,6 +27,11 @@ package org.ow2.proactive.scheduler.core;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
@@ -39,6 +44,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
@@ -47,6 +53,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -71,16 +78,21 @@ public class SchedulingServiceTest {
     @Mock
     private RMProxiesManager rmProxiesManager;
 
+    @Mock
+    private SchedulerDBManager schedulerDBManager;
+
     private final String policyClassName = DefaultPolicy.class.getName();
 
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
+
         Mockito.when(recoveredState.getPendingJobs()).thenReturn(new Vector<InternalJob>());
         Mockito.when(recoveredState.getRunningJobs()).thenReturn(new Vector<InternalJob>());
         Mockito.when(recoveredState.getFinishedJobs()).thenReturn(new Vector<InternalJob>());
 
         Mockito.when(infrastructure.getRMProxiesManager()).thenReturn(rmProxiesManager);
+        Mockito.when(infrastructure.getDBManager()).thenReturn(schedulerDBManager);
         Mockito.when(rmProxiesManager.getRmUrl()).thenReturn(null);
 
         schedulingService = new SchedulingService(infrastructure,
@@ -239,8 +251,7 @@ public class SchedulingServiceTest {
         schedulingService.status = schedulingService.status.STARTED;
         assertThat(schedulingService.shutdown(), is(true));
         assertThat(schedulingService.status, is(schedulingService.status.SHUTTING_DOWN));
-        Mockito.verify(infrastructure, Mockito.times(1)).schedule(org.mockito.Matchers.any(Runnable.class),
-                                                                  org.mockito.Matchers.anyLong());
+        Mockito.verify(infrastructure, Mockito.times(1)).schedule(any(Runnable.class), org.mockito.Matchers.anyLong());
     }
 
     @Test
@@ -304,14 +315,31 @@ public class SchedulingServiceTest {
         ExecutorService executorService = Mockito.mock(ExecutorService.class);
         Mockito.when(infrastructure.getInternalOperationsThreadPool()).thenReturn(executorService);
         schedulingService.restartTaskOnNodeFailure(task);
-        Mockito.verify(executorService, Mockito.times(1)).submit(org.mockito.Matchers.any(Runnable.class));
+        Mockito.verify(executorService, Mockito.times(1)).submit(any(Runnable.class));
     }
 
     @Test
-    public void testScheduleJobRemoveShouldUseHousekeepingThreadPool() {
-        schedulingService.scheduleJobRemove(JobIdImpl.makeJobId("42"), 42);
+    public void testScheduleJobRemoveShouldUseHousekeepingButAlreadyRemoved() {
+        Mockito.when(schedulerDBManager.loadJobWithTasksIfNotRemoved(any(JobId.class))).thenReturn(null);
 
-        Mockito.verify(infrastructure).scheduleHousekeeping(Mockito.any(HousekeepingHandler.class), Mockito.anyLong());
+        JobId jobId = JobIdImpl.makeJobId("42");
+        schedulingService.scheduleJobRemove(jobId, 42);
+
+        Mockito.verify(schedulerDBManager).loadJobWithTasksIfNotRemoved(jobId);
+    }
+
+    @Test
+    public void testScheduleJobRemoveShouldUseHousekeeping() {
+        JobId jobId = JobIdImpl.makeJobId("42");
+        InternalJob mockedInternalJob = createMockedInternalJob(jobId);
+        Mockito.when(schedulerDBManager.loadJobWithTasksIfNotRemoved(any(JobId.class))).thenReturn(mockedInternalJob);
+
+        schedulingService.scheduleJobRemove(jobId, 42);
+
+        // second case: the job is not null
+        Mockito.verify(schedulerDBManager).loadJobWithTasksIfNotRemoved(jobId);
+        Mockito.verify(schedulerDBManager).scheduleJobForRemoval(eq(jobId), eq(42L), anyBoolean());
+
     }
 
     @Test
@@ -322,6 +350,15 @@ public class SchedulingServiceTest {
 
         schedulingService.removeJob(JobIdImpl.makeJobId("43"));
         Mockito.verify(infrastructure).getClientOperationsThreadPool();
+    }
+
+    private InternalJob createMockedInternalJob(JobId jobId) {
+        JobInfo jobInfo = Mockito.mock(JobInfoImpl.class);
+        InternalJob internalJob = Mockito.mock(InternalJob.class);
+        Mockito.when(jobInfo.getJobId()).thenReturn(jobId);
+        Mockito.when(internalJob.getJobInfo()).thenReturn(jobInfo);
+        Mockito.when(internalJob.getOwner()).thenReturn("MOCKED OWNER");
+        return internalJob;
     }
 
 }
