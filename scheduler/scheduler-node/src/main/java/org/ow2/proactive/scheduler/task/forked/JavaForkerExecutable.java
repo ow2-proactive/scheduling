@@ -122,11 +122,13 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
     /** Forked JVM logs directory property name */
     public static final String FORKED_PARENT_NODE = "pa.forker.node";
 
-    /** Check start timeout : timeout to check if the process has failed */
-    private static final long CHECKSTART_TIMEOUT = 2000;
+    public static final String FORKED_JVM_TIMEOUT_PROPNAME = "pa.forked.jvm.timeout";
+
+    /** Check start timeout : interval to check if the process has failed */
+    private static long CHECKSTART_INTERVAL = 2000;
 
     /** Total times we wait for the start */
-    private static final long START_TIMEOUT = 60 * 1000;
+    private static final long DEFAULT_START_TIMEOUT = 60 * 1000;
 
     /** Size of the log buffer on forked side ; logs are buffered on forker side */
     private static final int FORKED_LOG_BUFFER_SIZE = 0;
@@ -581,6 +583,19 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
         command.add(forkedNodeName);
     }
 
+    private long computeStartTimeout() {
+        if (System.getProperty(FORKED_JVM_TIMEOUT_PROPNAME) != null) {
+            try {
+                return Long.parseLong(System.getProperty(FORKED_JVM_TIMEOUT_PROPNAME));
+            } catch (NumberFormatException e) {
+                logger.error("Illegal format of property " + FORKED_JVM_TIMEOUT_PROPNAME + ", use default value", e);
+                return DEFAULT_START_TIMEOUT;
+            }
+        } else {
+            return DEFAULT_START_TIMEOUT;
+        }
+    }
+
     /**
      * wait until the child runtime callback at the current JVM
      * in case it fails to register (because of any reason), we don't start the task at all exiting with an exception
@@ -591,10 +606,10 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             InterruptedException {
         int numberOfTrials = 0;
 
-        long waitEndTime = System.currentTimeMillis() + START_TIMEOUT;
+        long waitEndTime = System.currentTimeMillis() + computeStartTimeout();
 
         while (System.currentTimeMillis() < waitEndTime) {
-            this.wait(CHECKSTART_TIMEOUT);
+            this.wait(CHECKSTART_INTERVAL);
 
             if (processStarted) {
                 //process is started : OK unlock return to unlock this method
@@ -608,11 +623,11 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
             } catch (IllegalThreadStateException e) {
                 //thrown by process.exitValue() if process is not finished
                 logger.debug("Process not terminated, continue launching Forked VM (try number " +
-                    numberOfTrials + ")");
+                        (numberOfTrials++) + ")");
             }
         }
         throw startProcessException(String.format("Separate java process didn't start after %dms.",
-                START_TIMEOUT), ospb);
+                computeStartTimeout()), ospb);
     }
 
     private StartForkedProcessException startProcessException(String message, OSProcessBuilder ospb) {
