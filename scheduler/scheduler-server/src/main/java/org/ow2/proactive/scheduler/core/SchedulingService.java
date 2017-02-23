@@ -35,6 +35,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -56,7 +57,6 @@ import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -939,7 +939,7 @@ public class SchedulingService {
         }
     }
 
-    void pingTaskNode(RunningTaskData taskData) {
+    void getProgressAndPingTaskNode(RunningTaskData taskData) {
         if (!jobs.canPingTask(taskData)) {
             return;
         }
@@ -955,34 +955,36 @@ public class SchedulingService {
                                           new NotificationData<TaskInfo>(SchedulerEvent.TASK_PROGRESS,
                                                                          new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             }
-        } catch (NullPointerException e) {
-            //should not happened, but avoid restart if execInfo or launcher is null
-            //nothing to do
-            if (tlogger.isDebugEnabled()) {
-                tlogger.debug(task.getId(), "getProgress failed", e);
-            }
-        } catch (IllegalArgumentException e) {
-            //thrown by (1)
-            //avoid setting bad value, no event if bad
-            if (tlogger.isDebugEnabled()) {
-                tlogger.debug(task.getId(), "getProgress failed", e);
-            }
-        } catch (ForkedJvmProcessException e) {
-            //thrown by when user has overridden getProgress method and the method throws an exception
-            // * if forked JVM process is dead
-            //nothing to do in any case
-            if (tlogger.isTraceEnabled()) {
-                tlogger.trace(task.getId(), "getProgress failed", e);
-            }
         } catch (Throwable t) {
-            RunningTaskData runningTask = jobs.getRunningTask(task.getId());
-            if (runningTask != null) {
+            tlogger.debug(task.getId(), "TaskLauncher is not accessible, checking if the node can be reached.", t);
+            pingTaskNodeAndInitiateRestart(task);
+        }
+    }
+
+    private void pingTaskNodeAndInitiateRestart(InternalTask task) {
+
+        RunningTaskData runningTask = jobs.getRunningTask(task.getId());
+        if (runningTask != null) {
+            // We try to ping the node where the task is running to make sure the exception raised is due to a node failure.
+            // We don't consider here other nodes reserved for the task,
+            // as it is the responsibility of the task itself to manage extra nodes lifecycle
+            // in case of complex multinodes task deployment.
+            Node nodeUsedToExecuteTask = runningTask.getNodeExecutor();
+
+            try {
+                nodeUsedToExecuteTask.getNumberOfActiveObjects();
+
+            } catch (Exception e) {
                 int attempts = runningTask.increaseAndGetPingAttempts();
+                String nodeUrl = nodeUsedToExecuteTask.getNodeInformation().getURL();
                 if (attempts > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
-                    tlogger.info(task.getId(), "node failed", t);
+                    tlogger.error(task.getId(), "node failed " + nodeUrl + ", initiate task restart.", e);
                     restartTaskOnNodeFailure(task);
                 } else {
-                    tlogger.debug(task.getId(), "node failed - waiting while it comes back");
+                    tlogger.warn(task.getId(),
+                                 "cannot contact node " + nodeUrl + " - waiting while it comes back, attempt " +
+                                               attempts,
+                                 e);
                 }
             }
         }

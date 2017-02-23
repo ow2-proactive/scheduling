@@ -269,6 +269,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             ExecutorService internalThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
                                                                               new NamedThreadFactory("InternalOperationsThreadPool"));
 
+            ExecutorService taskPingerThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_TASK_PINGER_POOL_NBTHREAD.getValueAsInt(),
+                                                                                new NamedThreadFactory("TaskPingerThreadPool"));
+
             ScheduledExecutorService scheduledThreadPool = new ScheduledThreadPoolExecutor(PASchedulerProperties.SCHEDULER_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
                                                                                            new NamedThreadFactory("SchedulingServiceTimerThread"));
 
@@ -301,6 +304,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                                                                        dsServiceStarter,
                                                                                        clientThreadPool,
                                                                                        internalThreadPool,
+                                                                                       taskPingerThreadPool,
                                                                                        scheduledThreadPool);
 
             this.spacesSupport = infrastructure.getSpacesSupport();
