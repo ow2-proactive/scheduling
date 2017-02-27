@@ -9,7 +9,7 @@
      maxNumberOfExecution="2"
 >
   <variables>
-    <variable name="FOLDER_TO_MONITOR" value="/tmp" model=""/>
+    <variable name="FOLDER_TO_MONITOR" value="/tmp" />
     <variable name="WORKFLOW_URL" value="https://try.activeeon.com/workflow-catalog/buckets/1/workflows/19?alt=xml" model="PA:URL"/>
   </variables>
   <description>
@@ -21,8 +21,8 @@
         <![CDATA[ The simplest task, ran by a groovy engine. ]]>
       </description>
       <variables>
-        <variable name="FOLDER_TO_MONITOR" value="/tmp" inherited="false" model=""/>
-        <variable name="WORKFLOW_URL" value="https://try.activeeon.com/workflow-catalog/buckets/1/workflows/19?alt=xml" inherited="false" model="PA:URL"/>
+        <variable name="FOLDER_TO_MONITOR" value="/tmp" inherited="true"  model=""/>
+        <variable name="WORKFLOW_URL" value="https://try.activeeon.com/workflow-catalog/buckets/1/workflows/19?alt=xml" inherited="true"  model="PA:URL"/>
       </variables>
       <scriptExecutable>
         <script>
