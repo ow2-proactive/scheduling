@@ -36,6 +36,19 @@
  */
 package org.ow2.proactive.resourcemanager.common.util;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MBeanInfo;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -53,12 +66,6 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
-
-import javax.management.*;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -182,9 +189,13 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return target.nodeIsAvailable(arg0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
     @Override
-    public BooleanWrapper setNodeAvailable(String nodeUrl) {
-        return target.setNodeAvailable(nodeUrl);
+    public Set<String> setNodesAvailable(Set<String> nodeUrls) {
+        return target.setNodesAvailable(nodeUrls);
     }
 
     /**

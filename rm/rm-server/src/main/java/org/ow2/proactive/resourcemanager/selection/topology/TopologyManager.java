@@ -197,8 +197,9 @@ public class TopologyManager {
                             .warn("Topology info does not exist for node " +
                                 node.getNodeInformation().getURL());
                 } else {
-                    nodesOnHost.get(host).remove(node);
-                    if (nodesOnHost.get(host).isEmpty()) {
+                    Set<Node> nodes = nodesOnHost.get(host);
+                    nodes.remove(node);
+                    if (nodes.isEmpty()) {
                         // no more nodes on the host
                         topology.removeHostTopology(node.getVMInformation().getHostName(), host);
                         nodesOnHost.remove(host);
