@@ -689,6 +689,7 @@ public class NodeSource implements InitActive, RunActive {
                 RMCore.topologyManager.removeNode(downNode);
                 infrastructureManager.internalRemoveNode(downNode);
             } catch (RMException e) {
+                logger.error("Error while removing down node", e);
             }
         }
 
@@ -720,12 +721,15 @@ public class NodeSource implements InitActive, RunActive {
     public void pingNode(final Node node) {
         executeInParallel(new Runnable() {
             public void run() {
+                String nodeUrl = node.getNodeInformation().getURL();
+
                 try {
                     node.getNumberOfActiveObjects();
-                    if (logger.isDebugEnabled())
-                        logger.debug("Node " + node.getNodeInformation().getURL() + " is alive");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Node " + nodeUrl + " is alive");
+                    }
                 } catch (Throwable t) {
-                    stub.detectedPingedDownNode(node.getNodeInformation().getURL());
+                    stub.detectedPingedDownNode(nodeUrl);
                 }
             }
         });

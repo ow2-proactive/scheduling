@@ -122,6 +122,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 
 
 /**
@@ -198,14 +199,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private ArrayList<String> brokenNodeSources;
 
     /** HashMaps of nodes known by the RMCore */
-    private HashMap<String, RMNode> allNodes;
+    private volatile HashMap<String, RMNode> allNodes;
 
     /**
      * List of nodes that are eligible for Scheduling.
      * It corresponds to nodes that are in the `FREE` state and not locked.
      * Nodes which are locked are not part of this list.
      **/
-    private ArrayList<RMNode> eligibleNodes;
+    private List<RMNode> eligibleNodes;
 
     private SelectionManager selectionManager;
 
@@ -272,7 +273,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         nodeSources = new HashMap<>();
         brokenNodeSources = new ArrayList<>();
         allNodes = new HashMap<>();
-        eligibleNodes = new ArrayList<>();
+        eligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
 
         this.accountsManager = new RMAccountsManager();
         this.jmxHelper = new RMJMXHelper(this.accountsManager);
@@ -956,25 +957,69 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(node != null && !node.isDown());
     }
 
+    /**
+     * This method is called periodically by ProActive Nodes to inform the
+     * Resource Manager of a possible reconnection. The method is also used by
+     * ProActive Nodes to know if they are still known by the Resource Manager.
+     * For instance a Node which has been removed by a user from the
+     * Resource Manager is no longer known.
+     * <p>
+     * The method is defined as Immediate Service. This way it is executed in
+     * a dedicated Thread. It is essential in order to allow other methods to
+     * be executed immediately even if incoming connection to the Nodes is stopped
+     * or filtered while a timeout occurs when this method tries to send back a reply.
+     * <p>
+     * The {@code allNodes} data-structure is written by a single Thread only
+     * but read by multiple Threads. The data-structure is marked as volatile
+     * to ensure visibility.
+     * <p>
+     * Parallel executions of this method must involves different {@code nodeUrl}s.
+     * <p>
+     * The underlying calls to {@code setBusyNode} and {@code internalSetFree}
+     * are writing to the {@code freeNodes} data-structure. It explains why this last
+     * is synchronized (thread-safe).
+     *
+     * @param nodeUrls the URLs of the workers associated to the node that publishes the update.
+     *
+     * @return The set of worker node URLs that are unknown to the Resource Manager
+     * (i.e. have been removed by a user).
+     */
+    @ImmediateService
     @Override
-    public BooleanWrapper setNodeAvailable(String nodeUrl) {
-        final RMNode node = this.allNodes.get(nodeUrl);
-
-        if (node == null) {
-            logger.warn(String.format("Cannot set node as available, node %s is unknown", nodeUrl));
-            return new BooleanWrapper(false);
+    public Set<String> setNodesAvailable(Set<String> nodeUrls) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("Received availability for the following workers: " + nodeUrls);
         }
 
-        if (node.isDown()) {
-            // down node came back, restore it's status
-            NodeState previousNodeState = node.getLastEvent().getPreviousNodeState();
-            if (previousNodeState == NodeState.BUSY) {
-                setBusyNode(nodeUrl, node.getOwner());
+        ImmutableSet.Builder<String> nodeUrlsNotKnownByTheRM = new ImmutableSet.Builder<>();
+
+        for (String nodeUrl : nodeUrls) {
+            RMNode node = this.allNodes.get(nodeUrl);
+
+            if (node == null) {
+                logger.warn("Cannot set node as available, the node is unknown: " + nodeUrl);
+                nodeUrlsNotKnownByTheRM.add(nodeUrl);
+            } else if (node.isDown()) {
+                restoreNodeState(nodeUrl, node);
             } else {
-                internalSetFree(node);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The node identified by " + nodeUrl + " is known but not DOWN, no action performed");
+                }
             }
         }
-        return new BooleanWrapper(!node.isDown());
+        return nodeUrlsNotKnownByTheRM.build();
+    }
+
+    private void restoreNodeState(String nodeUrl, RMNode node) {
+        NodeState previousNodeState = node.getLastEvent().getPreviousNodeState();
+
+        if (previousNodeState == NodeState.BUSY) {
+            logger.info("Restoring DOWN node to BUSY: " + nodeUrl);
+            setBusyNode(nodeUrl, node.getOwner());
+        } else {
+            logger.info("Restoring DOWN node to FREE: " + nodeUrl);
+            internalSetFree(node);
+        }
     }
 
     public NodeState getNodeState(String nodeUrl) {
@@ -1476,7 +1521,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    public ArrayList<RMNode> getFreeNodes() {
+    public List<RMNode> getFreeNodes() {
         return eligibleNodes;
     }
 
