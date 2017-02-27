@@ -438,7 +438,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         if (!result.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
             // remember that this job is to be removed
             dbManager.jobSetToBeRemoved(jobId);
-            schedulingService.scheduleJobRemove(jobId, SCHEDULER_REMOVED_JOB_DELAY);
+            schedulingService.scheduleJobRemove(jobId, System.currentTimeMillis() + SCHEDULER_REMOVED_JOB_DELAY);
             jlogger.info(jobId, "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
         }
 

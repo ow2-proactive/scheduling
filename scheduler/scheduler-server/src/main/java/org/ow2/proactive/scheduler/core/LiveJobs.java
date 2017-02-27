@@ -874,7 +874,6 @@ class LiveJobs {
             //terminating job
             job.terminate();
             jlogger.debug(job.getId(), "terminated");
-            jobs.remove(job.getId());
             terminationData.addJobToTerminate(job.getId());
         }
 
@@ -903,18 +902,26 @@ class LiveJobs {
         }
     }
 
-    TerminationData killJob(JobId jobId) {
+    private TerminationData terminateJob(JobId jobId, JobStatus jobStatus) {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
             return emptyData(jobId);
         }
         try {
             TerminationData terminationData = TerminationData.newTerminationData();
-            endJob(jobData, terminationData, null, null, "", JobStatus.KILLED);
+            endJob(jobData, terminationData, null, null, "", jobStatus);
             return terminationData;
         } finally {
             jobData.unlock();
         }
+    }
+
+    public TerminationData killJob(JobId jobId) {
+        return terminateJob(jobId, JobStatus.KILLED);
+    }
+
+    public TerminationData removeJob(JobId jobId) {
+        return terminateJob(jobId, JobStatus.FINISHED);
     }
 
     private void endJob(JobData jobData, TerminationData terminationData, InternalTask task, TaskResultImpl taskResult,
@@ -956,20 +963,22 @@ class LiveJobs {
             updateTasksInSchedulerState(job, tasksToUpdate);
 
         } else {
-            //if not killed
-            Set<TaskId> tasksToUpdate = job.failed(task.getId(), jobStatus);
+            // any job status except the regular finishing
+            if (jobStatus != JobStatus.FINISHED) {
+                Set<TaskId> tasksToUpdate = job.failed(task.getId(), jobStatus);
 
-            //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
-            boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
-            if (jobStatus == JobStatus.FAILED || noResult) {
-                taskResult = new TaskResultImpl(task.getId(),
-                                                new Exception(errorMsg),
-                                                new SimpleTaskLogs("", errorMsg),
-                                                -1);
+                //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
+                boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
+                if (jobStatus == JobStatus.FAILED || noResult) {
+                    taskResult = new TaskResultImpl(task.getId(),
+                                                    new Exception(errorMsg),
+                                                    new SimpleTaskLogs("", errorMsg),
+                                                    -1);
+                }
+
+                dbManager.updateAfterJobFailed(job, task, taskResult, tasksToUpdate);
+                updateTasksInSchedulerState(job, tasksToUpdate);
             }
-
-            dbManager.updateAfterJobFailed(job, task, taskResult, tasksToUpdate);
-            updateTasksInSchedulerState(job, tasksToUpdate);
         }
 
         //update job and tasks events list and send it to front-end
@@ -1037,7 +1046,6 @@ class LiveJobs {
         } catch (UnknownTaskException e) {
             logger.error(e);
         }
-
     }
 
 }
