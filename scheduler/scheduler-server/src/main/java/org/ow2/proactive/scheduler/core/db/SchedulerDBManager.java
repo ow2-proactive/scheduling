@@ -739,7 +739,7 @@ public class SchedulerDBManager {
         session.getNamedQuery("deleteSelectionScriptData").setParameter("jobId", jobId).executeUpdate();
     }
 
-    private void removeJobScriptsInBulk(Session session, List<JobId> jobIdList) {
+    private void removeJobScriptsInBulk(Session session, List<Long> jobIdList) {
         session.getNamedQuery("updateTaskDataJobScriptsInBulk")
                .setParameterList("jobIdList", jobIdList)
                .executeUpdate();
@@ -773,10 +773,10 @@ public class SchedulerDBManager {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
-                       .setParameter("", timeForRemoval)
-                       .setParameter("", shouldRemoveFromDb)
-                       .setParameter("", jobId)
+                session.getNamedQuery("setJobForRemoval")
+                       .setParameter("timeForRemoval", timeForRemoval)
+                       .setParameter("toBeRemoved", shouldRemoveFromDb)
+                       .setParameter("jobId", jobId.longValue())
                        .executeUpdate();
                 return null;
             }
@@ -789,8 +789,9 @@ public class SchedulerDBManager {
             public List<JobId> doInTransaction(Session session) {
                 List<JobId> jobsToRemove = new ArrayList<JobId>();
                 Query query = session.createSQLQuery("select ID from JOB_DATA where " +
-                                                     "SCHEDULED_TIME_FOR_REMOVAL >= :scheduledTimeForRemoval")
-                                     .setParameter("scheduledTimeForRemoval", time);
+                                                     "SCHEDULED_TIME_FOR_REMOVAL <> 0 and " +
+                                                     "SCHEDULED_TIME_FOR_REMOVAL < :timeLimit")
+                                     .setParameter("timeLimit", time);
                 Iterator jobIdIterator = query.list().iterator();
                 while (jobIdIterator.hasNext()) {
                     jobsToRemove.add(JobIdImpl.makeJobId((jobIdIterator.next()).toString()));
@@ -801,10 +802,11 @@ public class SchedulerDBManager {
         return jobIdsList;
     }
 
-    public void executeHousekeepingInDB(final List<JobId> jobIdList, boolean shouldRemoveFromDb) {
+    public void executeHousekeepingInDB(final List<Long> jobIdList, final boolean shouldRemoveFromDb) {
+
         executeReadWriteTransaction(new SessionWork<Void>() {
-            @Override
-            public Void doInTransaction(Session session) {
+
+            private void removeFromDb(Session session) {
                 session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
                        .setParameterList("jobIdList", jobIdList)
                        .executeUpdate();
@@ -833,6 +835,23 @@ public class SchedulerDBManager {
                        .executeUpdate();
                 session.getNamedQuery("deleteJobDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
                 deleteInconsistentData(session);
+            }
+
+            private void updateAsRemoved(Session session) {
+                session.getNamedQuery("updateJobDataRemovedTimeInBulk")
+                       .setParameter("removedTime", System.currentTimeMillis())
+                       .setParameter("lastUpdatedTime", new Date().getTime())
+                       .setParameterList("jobIdList", jobIdList)
+                       .executeUpdate();
+            }
+
+            @Override
+            public Void doInTransaction(Session session) {
+                if (shouldRemoveFromDb) {
+                    removeFromDb(session);
+                } else {
+                    updateAsRemoved(session);
+                }
                 return null;
             }
         });
@@ -865,7 +884,6 @@ public class SchedulerDBManager {
                            .setParameter("jobId", id)
                            .executeUpdate();
                 }
-
                 return null;
             }
 

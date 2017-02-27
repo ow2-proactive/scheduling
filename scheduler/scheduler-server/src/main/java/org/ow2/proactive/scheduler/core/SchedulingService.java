@@ -156,28 +156,39 @@ public class SchedulingService {
         houseKeepingScheduler.schedule(cronExpr, new Runnable() {
             @Override
             public void run() {
-                logger.info("HOUSEKEEPING triggered");
                 long timeNow = System.currentTimeMillis();
                 List<JobId> jobIdList = infrastructure.getDBManager().getJobsToRemove(timeNow);
+                List<Long> longJobIdList = new ArrayList<Long>(jobIdList.size());
 
                 // remove from the memory context
+                long inMemoryTimeStart = System.currentTimeMillis();
                 for (JobId jobId : jobIdList) {
-                    TerminationData terminationData = jobs.killJob(jobId); // because it's not only killing but also calling the task killer guy
+                    TerminationData terminationData = jobs.removeJob(jobId);
                     submitTerminationDataHandler(terminationData);
                     InternalJob job = getInfrastructure().getDBManager().loadJobWithTasksIfNotRemoved(jobId);
                     if (job != null) {
+                        job.setRemovedTime(System.currentTimeMillis());
                         ServerJobAndTaskLogs.remove(jobId);
                         getListener().jobStateUpdated(job.getOwner(),
                                                       new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
                                                                                     new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
                         wakeUpSchedulingThread();
                     }
+                    longJobIdList.add(jobId.longValue());
                 }
+                long inMemoryTimeStop = System.currentTimeMillis();
 
                 // set the removedTime and also remove if required by the JOB_REMOVE_FROM_DB setting
-                infrastructure.getDBManager()
-                              .executeHousekeepingInDB(jobIdList,
-                                                       PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean());
+                long dbTimeStart = System.currentTimeMillis();
+                if (!longJobIdList.isEmpty()) {
+                    infrastructure.getDBManager()
+                                  .executeHousekeepingInDB(longJobIdList,
+                                                           PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean());
+                }
+                long dbTimeStop = System.currentTimeMillis();
+                logger.debug("HOUSEKEEPING " + timeNow + " finished ! " + "(Hibernate context removal took " +
+                             (inMemoryTimeStop - inMemoryTimeStart) + " ms" + " and db removal took " +
+                             (dbTimeStop - dbTimeStart) + " ms)");
             }
         });
         houseKeepingScheduler.start();
@@ -522,20 +533,12 @@ public class SchedulingService {
         }
     }
 
-    // when this is called, SchedulerFrontend has already set the job to toBeRemoved if required by
-    // the PASchedulerProperties.JOB_REMOVE_FROM_DB
-    // we only need to set the ScheduledTimeForRemoval
-    // The removedTime shall be set during the housekeeping
     public void scheduleJobRemove(JobId jobId, long at) {
-
         InternalJob job = infrastructure.getDBManager().loadJobWithTasksIfNotRemoved(jobId);
         boolean shouldRemoveFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
 
         if (job != null) {
             infrastructure.getDBManager().scheduleJobForRemoval(job.getJobInfo().getJobId(), at, shouldRemoveFromDb);
-            getListener().jobStateUpdated(job.getOwner(),
-                                          new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
-                                                                        new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
         }
     }
 
@@ -915,6 +918,7 @@ public class SchedulingService {
 
     void terminateJobHandling(final JobId jobId) {
         try {
+            //logger.info("HOUSEKEEPING from [terminateJobHandling]: " + jobId);
             listenJobLogsSupport.cleanLoggers(jobId);
 
             // auto remove
@@ -957,6 +961,7 @@ public class SchedulingService {
                     toWait = SCHEDULER_AUTO_REMOVED_JOB_DELAY;
                 }
                 if (toWait > 0) {
+                    //logger.info("HOUSEKEEPING from [recover]: " + job.getId());
                     scheduleJobRemove(job.getId(), System.currentTimeMillis() + toWait);
                     jlogger.debug(job.getId(), "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
                 }
