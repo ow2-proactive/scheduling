@@ -287,7 +287,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    public void removeNode(Node node) throws RMException {
+    public void removeNode(Node node, boolean dueToDownNode) throws RMException {
         logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " + this.getClass().getSimpleName());
 
         if (!this.nodeSource.getDownNodes().contains(node)) {

@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.utils.FileToBytesConverter;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -53,6 +48,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /** Abstract infrastructure Manager implementation based on hosts list file. */
@@ -271,7 +271,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(Node node) {
+    public void removeNode(Node node, boolean dueToDownNode) {
         InetAddress host = null;
         String nodeName = node.getNodeInformation().getName();
         if ((host = registeredNodes.remove(nodeName)) != null) {
