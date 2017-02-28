@@ -188,22 +188,24 @@ public abstract class InfrastructureManager implements Serializable {
         }
     }
 
-    /**
-     * Performs some cleanup ( essentially removal of the cached node ) and call
-     * removeNodeImpl
-     *
-     * @param node
-     *            the node to be removed
-     * @throws RMException
-     */
-    public final void internalRemoveNode(Node node) throws RMException {
-        try {
-            this.acquiredNodes.remove(node.getNodeInformation().getName());
-        } catch (Exception e) {
-            logger.warn("Exception occurred while removing node " + node);
-        }
-        this.removeNode(node);
-    }
+	/**
+	 * Performs some cleanup ( essentially removal of the cached node ) and call
+	 * removeNodeImpl
+	 * 
+	 * @param node
+	 *            the node to be removed
+	 * @param dueToDownNode
+	 * 		      says whether the removal was due to a node detected as down or not.
+	 * @throws RMException
+	 */
+	public final void internalRemoveNode(Node node, boolean dueToDownNode) throws RMException {
+		try {
+			this.acquiredNodes.remove(node.getNodeInformation().getName());
+		} catch (Exception e) {
+			logger.warn("Exception occurred while removing node " + node);
+		}
+		this.removeNode(node, dueToDownNode);
+	}
 
     /**
      * This method is called by the RMCore to notify the InfrastructureManager
@@ -371,15 +373,17 @@ public abstract class InfrastructureManager implements Serializable {
         throw new UnsupportedOperationException("Node configuration is not implemented for this infrastructure manager.");
     }
 
-    /**
-     * Removes the node from the resource manager.
-     *
-     * @param node
-     *            node to release
-     * @throws RMException
-     *             if any problems occurred
-     */
-    public abstract void removeNode(Node node) throws RMException;
+	/**
+	 * Removes the node from the resource manager.
+	 * 
+	 * @param node
+	 *            the node to release.
+	 * @param dueToDownNode
+	 * 		      says whether the removal was due to a node detected as down or not.
+	 * @throws RMException
+	 *             if any problems occurred.
+	 */
+	public abstract void removeNode(Node node, boolean dueToDownNode) throws RMException;
 
     /**
      * Notifies the user that the deploying node was lost or removed (because of

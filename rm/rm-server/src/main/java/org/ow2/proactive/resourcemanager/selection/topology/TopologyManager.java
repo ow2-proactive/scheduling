@@ -59,6 +59,8 @@ import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
+import com.google.common.annotations.VisibleForTesting;
+
 
 /**
  * Class is responsible for collecting the topology information, keeping it up to date and taking it into
@@ -84,11 +86,17 @@ public class TopologyManager {
 
     /**
      * Constructs new instance of the topology descriptor.
-     * @throws ClassNotFoundException when pinger class specified 
+     * @throws ClassNotFoundException when the pinger class specified
      * in the RM configuration file is not found
      */
     @SuppressWarnings(value = "unchecked")
     public TopologyManager() throws ClassNotFoundException {
+        this((Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER.getValueAsString()));
+    }
+
+    @VisibleForTesting
+    public TopologyManager(Class<? extends Pinger> pingerClass) {
+        this.pingerClass = pingerClass;
         handlers.put(ArbitraryTopologyDescriptor.class, new ArbitraryTopologyHandler());
         handlers.put(BestProximityDescriptor.class, new BestProximityHandler());
         handlers.put(ThresholdProximityDescriptor.class, new TresholdProximityHandler());
@@ -96,8 +104,6 @@ public class TopologyManager {
         handlers.put(SingleHostExclusiveDescriptor.class, new SingleHostExclusiveHandler());
         handlers.put(MultipleHostsExclusiveDescriptor.class, new MultipleHostsExclusiveHandler());
         handlers.put(DifferentHostsExclusiveDescriptor.class, new DifferentHostsExclusiveHandler());
-
-        pingerClass = (Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER.getValueAsString());
     }
 
     /**

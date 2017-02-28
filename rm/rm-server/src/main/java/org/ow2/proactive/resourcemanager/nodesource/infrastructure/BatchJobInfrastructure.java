@@ -569,7 +569,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(Node node) throws RMException {
+    public void removeNode(Node node, boolean dueToDownNode) throws RMException {
         String deleteCmd = getDeleteJobCommand();
         String jobID = null;
         String nodeName = node.getNodeInformation().getName();
@@ -589,7 +589,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             }
         } else {
             logger.error("Node " + nodeName + " is not known as a Node belonging to this " +
-                         PBSInfrastructure.class.getSimpleName());
+                getClass().getSimpleName());
         }
     }
 

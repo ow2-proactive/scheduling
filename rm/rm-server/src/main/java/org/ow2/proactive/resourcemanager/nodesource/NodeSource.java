@@ -70,6 +70,8 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
+import com.google.common.annotations.VisibleForTesting;
+
 
 /**
  * Abstract class designed to manage a NodeSource. A NodeSource active object is
@@ -256,17 +258,17 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Updates internal node source structures.
      */
-    private RMDeployingNode internalAddNode(Node node) throws RMException {
+    @VisibleForTesting
+    RMDeployingNode internalAddNode(Node node) throws RMException {
         String nodeUrl = node.getNodeInformation().getURL();
         if (this.nodes.containsKey(nodeUrl)) {
             throw new RMException("The node " + nodeUrl + " already added to the node source " + name);
         }
 
         logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
-        RMDeployingNode deployingNode = infrastructureManager.internalRegisterAcquiredNode(node);
+        RMDeployingNode rmDeployingNode = infrastructureManager.internalRegisterAcquiredNode(node);
         nodes.put(nodeUrl, node);
-
-        return deployingNode;
+        return rmDeployingNode;
     }
 
     /**
@@ -497,7 +499,7 @@ public class NodeSource implements InitActive, RunActive {
             Node node = nodes.remove(nodeUrl);
             RMCore.topologyManager.removeNode(node);
             try {
-                infrastructureManager.internalRemoveNode(node);
+                infrastructureManager.internalRemoveNode(node, false);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage(), e);
             }
@@ -681,15 +683,15 @@ public class NodeSource implements InitActive, RunActive {
             return;
         }
 
-        logger.info("[" + name + "] Detected down node " + nodeUrl);
+        logger.info("[" + name + "] Detected down node: " + nodeUrl);
         Node downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
             downNodes.put(nodeUrl, downNode);
             try {
                 RMCore.topologyManager.removeNode(downNode);
-                infrastructureManager.internalRemoveNode(downNode);
+                infrastructureManager.internalRemoveNode(downNode, true);
             } catch (RMException e) {
-                logger.error("Error while removing down node", e);
+                logger.error("Error while removing down node: " + nodeUrl, e);
             }
         }
 
