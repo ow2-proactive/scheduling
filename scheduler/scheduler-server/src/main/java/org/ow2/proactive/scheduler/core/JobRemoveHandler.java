@@ -63,7 +63,7 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
         SchedulerDBManager dbManager = service.getInfrastructure().getDBManager();
 
-        TerminationData terminationData = service.getJobs().killJob(jobId);
+        TerminationData terminationData = service.getJobs().removeJob(jobId);
         service.submitTerminationDataHandler(terminationData);
         InternalJob job = dbManager.loadJobWithTasksIfNotRemoved(jobId);
 

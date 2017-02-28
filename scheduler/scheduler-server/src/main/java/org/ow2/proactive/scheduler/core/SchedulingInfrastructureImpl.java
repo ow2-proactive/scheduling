@@ -120,11 +120,6 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
     }
 
     @Override
-    public void scheduleHousekeeping(HousekeepingHandler housekeepingHandler, long delay) {
-        HousekeepingScheduledExecutorLazyHolder.INSTANCE.schedule(housekeepingHandler, delay, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
     public DataSpaceServiceStarter getDataSpaceServiceStarter() {
         return dsStarter;
     }
