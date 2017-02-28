@@ -226,7 +226,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * It is statically used due to drawbacks in the client pinger functionality
      * @see Client
      */
-    public static Map<UniqueID, Client> clients =
+    public static final Map<UniqueID, Client> clients =
             Collections.synchronizedMap(new HashMap<UniqueID, Client>());
 
     /** nodes topology */

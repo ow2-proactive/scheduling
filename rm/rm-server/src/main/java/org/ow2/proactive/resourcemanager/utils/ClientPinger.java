@@ -36,7 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -52,6 +51,8 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.ImmutableList;
+
 
 /**
  * Periodically pings connected clients of the resource manager
@@ -61,7 +62,7 @@ public class ClientPinger implements InitActive, RunActive {
 
     private static final Logger logger = Logger.getLogger(ClientPinger.class);
 
-    private AtomicBoolean active = new AtomicBoolean(true);
+    private final AtomicBoolean active = new AtomicBoolean(true);
     private RMCore rmcore;
 
     public ClientPinger() {
@@ -90,10 +91,13 @@ public class ClientPinger implements InitActive, RunActive {
 
             // copy all the clients from core to local list
             // in order not to hold the lock while iterating
-            List<Client> clients = new LinkedList<>();
+            List<Client> clients;
             synchronized (RMCore.clients) {
-                logger.debug("Number of registered clients " + RMCore.clients.size());
-                clients.addAll(RMCore.clients.values());
+                clients = ImmutableList.copyOf(RMCore.clients.values());
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Number of registered clients " + clients.size());
             }
 
             int numberOfPingedClients = 0;
