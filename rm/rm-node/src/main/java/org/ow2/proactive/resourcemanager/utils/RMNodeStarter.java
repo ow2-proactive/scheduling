@@ -507,9 +507,6 @@ public class RMNodeStarter {
                     } catch (ProActiveRuntimeException e) {
                         logger.warn("Node disconnected from the Resource Manager, reconnection in progress");
                         rm = reconnectToResourceManager();
-                    } catch (IllegalStateException e) {
-                        logger.error(ExitStatus.RMNODE_ILLEGAL_STATE.description);
-                        System.exit(ExitStatus.RMNODE_ILLEGAL_STATE.exitCode);
                     } catch (Throwable e) {
                         logger.error(ExitStatus.RM_NO_PING.description, e);
                     } finally {
@@ -601,10 +598,6 @@ public class RMNodeStarter {
 
         if (logger.isDebugEnabled()) {
             logger.debug("Node count is equal to " + nodeCount);
-        }
-
-        if (nodeCount == 0) {
-            throw new IllegalStateException("Cannot have zero nodes");
         }
 
         return true;
@@ -1361,10 +1354,9 @@ public class RMNodeStarter {
                 "Problem encountered while parsing " + RMNodeStarter.class.getName() + " command line."),
         RMNODE_EXIT_FORCED(
                 305,
-                "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."),
-        RMNODE_ILLEGAL_STATE(306, "Illegal state of RMNode (no nodes left)."),
-        FAILED_TO_LAUNCH(-1, RMNodeStarter.class.getSimpleName() + " process hasn't been started at all."),
-        UNKNOWN(-2, "Cannot determine exit status.");
+                "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."), FAILED_TO_LAUNCH(-1, RMNodeStarter.class
+                .getSimpleName() +
+            " process hasn't been started at all."), UNKNOWN(-2, "Cannot determine exit status.");
         public final int exitCode;
 
         public final String description;
