@@ -473,7 +473,9 @@ public class RMNodeStarter {
 
                             numberOfReconnectionAttemptsLeft--;
 
-                            Thread.sleep(PING_DELAY_IN_MS);
+                            if (numberOfReconnectionAttemptsLeft != 0) {
+                                Thread.sleep(PING_DELAY_IN_MS);
+                            }
                         } catch (InterruptedException ignored) {
                             logger.debug("Ignored interrupted exception", ignored);
                         }
