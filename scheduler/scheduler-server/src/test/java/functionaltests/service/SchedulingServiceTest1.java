@@ -115,7 +115,10 @@ public class SchedulingServiceTest1 extends BaseServiceTest {
         service.taskTerminatedWithResult(taskId, new TaskResultImpl(taskId, "Result", null, 0));
 
         jobsMap = service.lockJobsToSchedule();
-        assertEquals(0, jobsMap.size());
+
+        // when a job finishes, it isn't removed from the hibernate context unless
+        // the housekeeping mechanism is enabled
+        assertEquals(1, jobsMap.size());
 
         listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING,
                               SchedulerEvent.JOB_UPDATED,
