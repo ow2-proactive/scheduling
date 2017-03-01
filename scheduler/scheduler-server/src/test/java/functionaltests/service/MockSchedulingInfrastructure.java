@@ -31,7 +31,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.AbstractExecutorService;
@@ -56,7 +55,6 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
-import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -173,6 +171,11 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
 
     @Override
     public ExecutorService getInternalOperationsThreadPool() {
+        return executorService;
+    }
+
+    @Override
+    public ExecutorService getTaskPingerThreadPool() {
         return executorService;
     }
 

@@ -42,6 +42,8 @@ public interface SchedulingInfrastructure {
 
     ExecutorService getInternalOperationsThreadPool();
 
+    ExecutorService getTaskPingerThreadPool();
+
     /**
      * Delay the execution of the specified {@code runnable}
      * by the given {@code delay}.
