@@ -271,11 +271,8 @@ public enum PASchedulerProperties {
     // Define the logging format pattern of tasks on the scheduler
     SCHEDULER_JOB_LOGS_PATTERN("pa.scheduler.job.task.output.logs.pattern", PropertyType.STRING),
 
-    SCHEDULER_DB_SIZE_MONITORING("pa.scheduler.db.size.monitoring", PropertyType.BOOLEAN),
-
+    /** Defines the cron expression for the db sizes polling */
     SCHEDULER_DB_SIZE_MONITORING_FREQ("pa.scheduler.db.size.monitoring.freq", PropertyType.STRING),
-
-    SCHEDULER_DB_SIZE_MONITORING_TS_PATTERN("pa.scheduler.db.size.monitoring.timestamp.pattern", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */
