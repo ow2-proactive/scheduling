@@ -31,6 +31,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.ow2.proactive.db.SessionWork;
 
+
 /**
  * Handles the Housekeeping in the database.
  *
@@ -40,6 +41,7 @@ import org.ow2.proactive.db.SessionWork;
 public class HousekeepingSessionWork implements SessionWork<Void> {
 
     private static List<Long> jobIdList;
+
     private static boolean shouldRemoveFromDb;
 
     public HousekeepingSessionWork(List<Long> jobIdList, boolean shouldRemoveFromDb) {
@@ -58,51 +60,47 @@ public class HousekeepingSessionWork implements SessionWork<Void> {
 
     private void removeJobScriptsInBulk(Session session, List<Long> jobIdList) {
         session.getNamedQuery("updateTaskDataJobScriptsInBulk")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
         session.getNamedQuery("deleteScriptDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
         session.getNamedQuery("deleteSelectionScriptDataInBulk")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
     }
 
     private void removeFromDb(Session session) {
         session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
-        session.getNamedQuery("deleteTaskDataVariableInBulk")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
-        session.getNamedQuery("deleteSelectorDataInBulk")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
+        session.getNamedQuery("deleteTaskDataVariableInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
+        session.getNamedQuery("deleteSelectorDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
         session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in :jobIdList")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
         session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in :jobIdList")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
         removeJobScriptsInBulk(session, jobIdList);
         session.getNamedQuery("deleteSelectionScriptDataInBulk")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
         session.createSQLQuery("delete from TASK_RESULT_DATA where JOB_ID in :jobIdList")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
         session.getNamedQuery("deleteTaskDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
         session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in :jobIdList")
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
         session.getNamedQuery("deleteJobDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
         deleteInconsistentData(session);
     }
 
     private void updateAsRemoved(Session session) {
         session.getNamedQuery("updateJobDataRemovedTimeInBulk")
-                .setParameter("removedTime", System.currentTimeMillis())
-                .setParameter("lastUpdatedTime", new Date().getTime())
-                .setParameterList("jobIdList", jobIdList)
-                .executeUpdate();
+               .setParameter("removedTime", System.currentTimeMillis())
+               .setParameter("lastUpdatedTime", new Date().getTime())
+               .setParameterList("jobIdList", jobIdList)
+               .executeUpdate();
     }
 
     @Override
