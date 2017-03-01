@@ -963,7 +963,7 @@ class LiveJobs {
             updateTasksInSchedulerState(job, tasksToUpdate);
 
         } else {
-            // any job status except the regular finishing
+            // don't tamper the original job status if it's already in a finished state (failed/canceled)
             if (jobStatus != JobStatus.FINISHED) {
                 Set<TaskId> tasksToUpdate = job.failed(task.getId(), jobStatus);
 
@@ -975,7 +975,6 @@ class LiveJobs {
                                                     new SimpleTaskLogs("", errorMsg),
                                                     -1);
                 }
-
                 dbManager.updateAfterJobFailed(job, task, taskResult, tasksToUpdate);
                 updateTasksInSchedulerState(job, tasksToUpdate);
             }
