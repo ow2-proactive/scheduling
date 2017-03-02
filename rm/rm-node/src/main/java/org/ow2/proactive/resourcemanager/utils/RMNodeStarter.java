@@ -119,7 +119,6 @@ public class RMNodeStarter {
     }
 
     static final Logger logger = Logger.getLogger(RMNodeStarter.class);
-
     /** Prefix for temp files that store nodes URL */
     private static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
 
@@ -138,6 +137,12 @@ public class RMNodeStarter {
      *
      */
     public static final String NODE_ACCESS_TOKEN = "proactive.node.access.token";
+
+    /**
+     * The maximum time to wait in milliseconds for retrieving the answer
+     * for the node availability report that is pushed periodically.
+     */
+    public static int NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY = 5000; // in ms
 
     /**
      * The starter will try to connect to the Resource Manager before killing
@@ -234,6 +239,8 @@ public class RMNodeStarter {
     static final char OPTION_SOURCE_NAME = 's';
 
     private static final char OPTION_PING_DELAY = 'p';
+
+    private static final String OPTION_AVAILABILITY_REPORT_TIMEOUT = "art";
 
     private static final char OPTION_ADD_NODE_ATTEMPTS = 'a';
 
@@ -372,6 +379,15 @@ public class RMNodeStarter {
         workers.setRequired(false);
         workers.setOptionalArg(true);
         options.addOption(workers);
+
+        final Option availabilityReportTimeout = new Option(
+                OPTION_AVAILABILITY_REPORT_TIMEOUT,
+                "availabilityReportTimeout",
+                true,
+                "The maximum time to wait in milliseconds for retrieving the answer for the node availability report that is pushed periodically.");
+        availabilityReportTimeout.setRequired(false);
+        availabilityReportTimeout.setArgName("timeInMilliseconds");
+        options.addOption(availabilityReportTimeout);
 
         // Displays the help
         final Option help = new Option(Character.toString(OPTION_HELP), "help", false, "to display this help");
@@ -588,7 +604,8 @@ public class RMNodeStarter {
 
         Set<String> unknownNodeUrls =
                     PAFuture.getFutureValue(
-                            rm.setNodesAvailable(ImmutableSet.copyOf(nodes.keySet())), 5000);
+                            rm.setNodesAvailable(ImmutableSet.copyOf(nodes.keySet())),
+                            NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY);
 
         for (String unknownNodeUrl : unknownNodeUrls) {
             killWorkerNodeIfRemovedByUser(nodes, unknownNodeUrl);
@@ -851,6 +868,15 @@ public class RMNodeStarter {
             if (cl.hasOption(OPTION_ADD_NODE_ATTEMPTS_DELAY)) {
                 RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS = Integer.valueOf(cl.getOptionValue(OPTION_ADD_NODE_ATTEMPTS_DELAY));
                 RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED = true;
+            }
+
+            if (cl.hasOption(OPTION_AVAILABILITY_REPORT_TIMEOUT)) {
+                NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY =
+                        Integer.valueOf(cl.getOptionValue(OPTION_AVAILABILITY_REPORT_TIMEOUT));
+            }
+
+            if (logger.isTraceEnabled()) {
+                logger.trace("Node availability report timeout delay set to " + NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY + " ms.");
             }
 
             // Discovery
