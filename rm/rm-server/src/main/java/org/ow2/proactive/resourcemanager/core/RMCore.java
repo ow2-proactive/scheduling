@@ -1024,6 +1024,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.info("Restoring DOWN node to FREE: " + nodeUrl);
             internalSetFree(node);
         }
+
+        node.getNodeSource().setNodeAvailable(node);
     }
 
     public NodeState getNodeState(String nodeUrl) {
