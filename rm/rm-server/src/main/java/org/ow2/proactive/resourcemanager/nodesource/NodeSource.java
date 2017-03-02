@@ -407,6 +407,21 @@ public class NodeSource implements InitActive, RunActive {
         return rmnode;
     }
 
+    public boolean setNodeAvailable(RMNode node) {
+        Node proactiveProgrammingNode = node.getNode();
+        String proactiveProgrammingNodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
+        Node downNode = downNodes.remove(proactiveProgrammingNodeUrl);
+
+        if (downNode != null) {
+            logger.info("Setting node as available: " + proactiveProgrammingNodeUrl);
+            nodes.put(proactiveProgrammingNodeUrl, proactiveProgrammingNode);
+            return true;
+        } else {
+            logger.info("Node state not changed since it is unknown: " + proactiveProgrammingNodeUrl);
+            return false;
+        }
+    }
+
     /**
      * Looks up the node
      */
@@ -669,6 +684,8 @@ public class NodeSource implements InitActive, RunActive {
         }
         rmcore.setDownNode(nodeUrl);
     }
+
+
 
     /**
      * Gets resource manager core. Used by policies.
