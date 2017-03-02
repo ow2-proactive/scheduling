@@ -206,17 +206,6 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
         }
     }
 
-    @Override
-    public void scheduleHousekeeping(JobRemoveHandler jobRemoveHandler, long delay) {
-        System.out.println("Requested to schedule jobRemoveHandler " + jobRemoveHandler + ", delay: " + delay);
-        ScheduledFuture<?> future = scheduledExecutorService.schedule(jobRemoveHandler, 1, TimeUnit.MILLISECONDS);
-        try {
-            future.get();
-        } catch (Exception e) {
-            Assert.fail("Unexpected exception");
-        }
-    }
-
     void assertRequests(int releaseNodes) {
         Assert.assertEquals("Relase node request", releaseNodes, releaseNodeCounter.intValue());
         releaseNodeCounter.set(0);
