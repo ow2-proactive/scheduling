@@ -138,11 +138,11 @@ public class SchedulingService {
         pinger.start();
 
         if (PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY.getValueAsInt() > 0) {
-            startHouseKeeping(this.infrastructure);
+            startHouseKeeping();
         }
     }
 
-    public void startHouseKeeping(final SchedulingInfrastructure infrastructure) {
+    public void startHouseKeeping() {
         houseKeepingScheduler = new Scheduler();
         String cronExpr = "* * * * *";
         if (PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR.isSet()) {
