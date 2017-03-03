@@ -97,6 +97,11 @@ public class ModelValidatorTest {
     }
 
     @Test
+    public void testModelValidatorCRON() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + CRONParserValidator.CRON_TYPE, CRONParserValidator.class);
+    }
+
+    @Test
     public void testModelValidatorDatetime() throws ModelSyntaxException {
         createAndCheckValidator(ModelValidator.PREFIX + DateTimeParserValidator.DATETIME_TYPE,
                                 DateTimeParserValidator.class);
