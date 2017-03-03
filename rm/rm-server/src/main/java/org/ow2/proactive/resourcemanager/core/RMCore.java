@@ -120,6 +120,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
@@ -194,12 +195,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private RMAuthenticationImpl authentication;
 
     /** HashMap of NodeSource active objects */
-    private HashMap<String, NodeSource> nodeSources;
+    private Map<String, NodeSource> nodeSources;
 
-    private ArrayList<String> brokenNodeSources;
+    private List<String> brokenNodeSources;
 
     /** HashMaps of nodes known by the RMCore */
-    private volatile HashMap<String, RMNode> allNodes;
+    private volatile Map<String, RMNode> allNodes;
 
     /**
      * List of nodes that are eligible for Scheduling.
@@ -279,9 +280,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.jmxHelper = new RMJMXHelper(this.accountsManager);
     }
 
-    public RMCore(HashMap<String, NodeSource> nodeSources, ArrayList<String> brokenNodeSources,
-            HashMap<String, RMNode> allNodes, Client caller, RMMonitoringImpl monitoring, SelectionManager manager,
-            ArrayList<RMNode> freeNodesList, RMDBManager newDataBaseManager) {
+    public RMCore(Map<String, NodeSource> nodeSources, List<String> brokenNodeSources,
+                  Map<String, RMNode> allNodes, Client caller, RMMonitoringImpl monitoring,
+                  SelectionManager manager, List<RMNode> freeNodesList, RMDBManager newDataBaseManager) {
         this.nodeSources = nodeSources;
         this.brokenNodeSources = brokenNodeSources;
         this.allNodes = allNodes;
@@ -429,7 +430,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         };
     }
 
-    public boolean restoreNodeSources() {
+    @VisibleForTesting
+    boolean restoreNodeSources() {
         Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
 
         for (NodeSourceData nodeSourceData : nodeSources) {
@@ -524,6 +526,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param rmNode node to set free.
      * @return true if the node successfully set as free, false if it was down before.
      */
+    @VisibleForTesting
     BooleanWrapper internalSetFree(final RMNode rmNode) {
         if (logger.isDebugEnabled()) {
             logger.debug("Current node state " + rmNode.getState() + " " + rmNode.getNodeURL());
@@ -1010,7 +1013,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return nodeUrlsNotKnownByTheRM.build();
     }
 
-    private void restoreNodeState(String nodeUrl, RMNode node) {
+    @VisibleForTesting
+    void restoreNodeState(String nodeUrl, RMNode node) {
         NodeState previousNodeState = node.getLastEvent().getPreviousNodeState();
 
         if (previousNodeState == NodeState.BUSY) {
