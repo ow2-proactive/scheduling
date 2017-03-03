@@ -35,12 +35,12 @@ public class CRONValidatorTest {
     @Test
     public void testCRONOK() throws ValidationException {
         String value = "* * * * *";
-        Assert.assertEquals(value, new CRONValidator().validate(value));
+        Assert.assertEquals(value, new CRONValidator().validate(value, null));
     }
 
     @Test(expected = ValidationException.class)
     public void testCRONKO() throws ValidationException {
         String value = " * * * *";
-        new CRONValidator().validate(value);
+        new CRONValidator().validate(value, null);
     }
 }

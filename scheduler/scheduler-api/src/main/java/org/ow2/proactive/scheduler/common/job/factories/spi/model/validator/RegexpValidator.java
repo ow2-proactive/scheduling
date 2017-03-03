@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import java.util.regex.Pattern;
 
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
@@ -39,7 +40,7 @@ public class RegexpValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
 
         if (!pattern.matcher(parameterValue).matches()) {
             throw new ValidationException("Expected value should match regular expression " + pattern.pattern() +

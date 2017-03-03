@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
@@ -35,8 +36,9 @@ public interface Validator<T> {
      * checked exception that contains the cause is thrown.
      *
      * @param parameterValue the value to check.
+     * @param context a context object, if needed by the validator
      * @return the unmodified parameterValue if validation is successful
      * @throws ValidationException if the parameter value is invalid.
      */
-    T validate(T parameterValue) throws ValidationException;
+    T validate(T parameterValue, ModelValidatorContext context) throws ValidationException;
 }
