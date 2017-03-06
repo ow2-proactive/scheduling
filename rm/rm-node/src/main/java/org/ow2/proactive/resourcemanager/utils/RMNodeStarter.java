@@ -142,6 +142,7 @@ public class RMNodeStarter {
      * The maximum time to wait in milliseconds for retrieving the answer
      * for the node availability report that is pushed periodically.
      */
+    @SuppressWarnings("squid:S1444")
     public static int NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY = 5000; // in ms
 
     /**
