@@ -1624,11 +1624,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return true if the parameter is a deploying node's url, false otherwise
      */
     private boolean isDeployingNodeURL(String url) {
-        if (url != null && url.startsWith(RMDeployingNode.PROTOCOL_ID + "://")) {
-            return true;
-        } else {
-            return false;
-        }
+        return url != null && url.startsWith(RMDeployingNode.PROTOCOL_ID + "://");
     }
 
     /**
