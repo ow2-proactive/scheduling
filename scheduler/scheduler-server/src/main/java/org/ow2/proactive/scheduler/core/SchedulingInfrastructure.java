@@ -64,18 +64,6 @@ public interface SchedulingInfrastructure {
      */
     void schedule(Callable<?> callable, long delay);
 
-    /**
-     * Delay the execution of the specified {@code jobRemoveHandler}
-     * by the given {@code delay}. This method uses a thread pool
-     * dedicated to housekeeping operations. This last is different
-     * from the one used by other schedule methods.
-     *
-     * @param jobRemoveHandler the job removal action to execute.
-     * @param delay            the minimum delay to wait in milliseconds
-     *                         before executing the action.
-     */
-    void scheduleHousekeeping(JobRemoveHandler jobRemoveHandler, long delay);
-
     DataSpaceServiceStarter getDataSpaceServiceStarter();
 
     SchedulerSpacesSupport getSpacesSupport();

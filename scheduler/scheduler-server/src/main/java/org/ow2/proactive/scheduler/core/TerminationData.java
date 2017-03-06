@@ -192,7 +192,7 @@ final class TerminationData {
         for (final TaskRestartData restartData : tasksToRestart.values()) {
             service.getInfrastructure().schedule(new Runnable() {
                 public void run() {
-                    service.jobs.restartWaitingTask(restartData.taskId);
+                    service.getJobs().restartWaitingTask(restartData.taskId);
                 }
             }, restartData.waitTime);
         }

@@ -23,34 +23,24 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.core;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.job.InternalJob;
+import org.junit.Assert;
+import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-class SubmitHandler implements Runnable {
+public class CRONValidatorTest {
 
-    static final Logger logger = Logger.getLogger(SchedulingService.class);
-
-    private final InternalJob job;
-
-    private final SchedulingService service;
-
-    SubmitHandler(SchedulingService service, InternalJob job) {
-        this.service = service;
-        this.job = job;
+    @Test
+    public void testCRONOK() throws ValidationException {
+        String value = "* * * * *";
+        Assert.assertEquals(value, new CRONValidator().validate(value));
     }
 
-    @Override
-    public void run() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Submitting a new job '" + job.getName() + "'");
-        }
-
-        service.getJobs().jobSubmitted(job);
-
-        service.wakeUpSchedulingThread();
+    @Test(expected = ValidationException.class)
+    public void testCRONKO() throws ValidationException {
+        String value = " * * * *";
+        new CRONValidator().validate(value);
     }
-
 }

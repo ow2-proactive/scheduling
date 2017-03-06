@@ -25,9 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
@@ -35,25 +32,22 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class URLParserValidatorTest {
+public class CRONParserValidatorTest {
 
     @Test
-    public void testURLParserValidatorOK()
-            throws ModelSyntaxException, ValidationException, ConversionException, MalformedURLException {
-        String value = "file://mysite";
-        Assert.assertEquals(new URL(value).toExternalForm(),
-                            new URLParserValidator(URLParserValidator.URL_TYPE).parseAndValidate(value)
-                                                                               .toExternalForm());
+    public void testCRONParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
+        String value = "* * * * *";
+        Assert.assertEquals(value, new CRONParserValidator(CRONParserValidator.CRON_TYPE).parseAndValidate(value));
     }
 
-    @Test(expected = ConversionException.class)
-    public void testURIParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new URLParserValidator(URLParserValidator.URL_TYPE).parseAndValidate("unknown://protocol");
+    @Test(expected = ValidationException.class)
+    public void testCRONParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
+        new CRONParserValidator(CRONParserValidator.CRON_TYPE).parseAndValidate("* * * *");
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testURLParserValidatorInvalidModel()
+    public void testCRONParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new URLParserValidator("URLL").parseAndValidate("blabla");
+        new CRONParserValidator("CRONN").parseAndValidate("blabla");
     }
 }

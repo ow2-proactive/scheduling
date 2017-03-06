@@ -23,34 +23,29 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.core;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
+
+import it.sauronsoftware.cron4j.InvalidPatternException;
+import it.sauronsoftware.cron4j.Predictor;
 
 
-class SubmitHandler implements Runnable {
+public class CRONValidator implements Validator<String> {
 
-    static final Logger logger = Logger.getLogger(SchedulingService.class);
+    public CRONValidator() {
 
-    private final InternalJob job;
-
-    private final SchedulingService service;
-
-    SubmitHandler(SchedulingService service, InternalJob job) {
-        this.service = service;
-        this.job = job;
     }
 
     @Override
-    public void run() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Submitting a new job '" + job.getName() + "'");
+    public String validate(String parameterValue) throws ValidationException {
+        try {
+            (new Predictor(parameterValue)).nextMatchingDate();
+        } catch (InvalidPatternException e) {
+            throw new ValidationException("Expected value should be a valid cron expression, received '" +
+                                          parameterValue + "', error: " + e.getMessage(), e);
         }
 
-        service.getJobs().jobSubmitted(job);
-
-        service.wakeUpSchedulingThread();
+        return parameterValue;
     }
-
 }
