@@ -1718,6 +1718,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanWrapper lockNodes(Set<String> urls) {
         boolean result = true;
         for (String url : urls) {
@@ -1756,6 +1757,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanWrapper unlockNodes(Set<String> urls) {
         boolean result = true;
         for (String url : urls) {
