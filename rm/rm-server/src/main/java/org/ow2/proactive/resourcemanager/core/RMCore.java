@@ -1721,6 +1721,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
+     * Returns true if the given parameter is the representation of
+     * a deploying node ( starts with deploying://nsName/nodeName )
+     * @param url
+     * @return true if the parameter is a deploying node's url, false otherwise
+     */
+    private boolean isDeployingNodeURL(String url) {
+        return url != null && url.startsWith(RMDeployingNode.PROTOCOL_ID + "://");
+    }
+
+    /**
      * To handle the deploying node removal
      * @param url the url of the deploying node to remove
      * @return true if successful, false otherwise
