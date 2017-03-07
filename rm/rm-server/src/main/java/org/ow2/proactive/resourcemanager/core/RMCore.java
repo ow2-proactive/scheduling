@@ -127,6 +127,7 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 
 
@@ -849,16 +850,75 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodeSourceName a name of the node source
      * @param preemptive if true remove nodes immediately without waiting while they will be freed
      */
-    public void removeAllNodes(String nodeSourceName, boolean preemptive) {
+    public void removeAllNodes(String nodeSourceName, final boolean preemptive) {
 
-        for (RMDeployingNode pn : nodeSources.get(nodeSourceName).getDeployingNodes()) {
-            removeNode(pn.getNodeURL(), preemptive);
+        removeAllNodes(nodeSourceName, "deploying nodes", new Function<NodeSource, Void>() {
+            @Override
+            public Void apply(NodeSource nodeSource) {
+                for (RMDeployingNode pn : nodeSource.getDeployingNodes()) {
+                    removeNode(pn.getNodeURL(), preemptive);
+                }
+                return null;
+            }
+        });
+
+        removeAllNodes(nodeSourceName, "alive nodes", new RemoveAllNodes(new Function<NodeSource, LinkedList<Node>>() {
+            @Override
+            public LinkedList<Node> apply(NodeSource nodeSource) {
+                return nodeSource.getAliveNodes();
+            }
+        }, preemptive));
+
+        removeAllNodes(nodeSourceName, "down nodes", new RemoveAllNodes(new Function<NodeSource, LinkedList<Node>>() {
+            @Override
+            public LinkedList<Node> apply(NodeSource nodeSource) {
+                return nodeSource.getDownNodes();
+            }
+        }, preemptive));
+    }
+
+
+    private final class RemoveAllNodes implements Function<NodeSource, Void> {
+
+        private final Function<NodeSource, LinkedList<Node>> nodeExtractorFunction;
+
+        private final boolean preemptive;
+
+        private RemoveAllNodes(Function<NodeSource, LinkedList<Node>> nodeExtractorFunction, boolean preemptive) {
+            this.nodeExtractorFunction = nodeExtractorFunction;
+            this.preemptive = preemptive;
         }
-        for (Node node : nodeSources.get(nodeSourceName).getAliveNodes()) {
-            removeNode(node.getNodeInformation().getURL(), preemptive);
+
+        @Override
+        public Void apply(NodeSource nodeSource) {
+            LinkedList<Node> nodes = nodeExtractorFunction.apply(nodeSource);
+
+            if (nodes != null) {
+                for (Node node : nodes) {
+                    removeNode(node.getNodeInformation().getURL(), preemptive);
+                }
+            }
+
+            return null;
         }
-        for (Node node : nodeSources.get(nodeSourceName).getDownNodes()) {
-            removeNode(node.getNodeInformation().getURL(), preemptive);
+
+    }
+
+    /**
+     * Wraps the access to the node source to perform a defensive check preventing NPE.
+     *
+     * @param nodeSourceName the name of the node source to retrieve.
+     * @param collectionName the name of the collection to iterate in the node source.
+     * @param function a function that extracts the collection to iterate from the node source.
+     */
+    private void removeAllNodes(String nodeSourceName, String collectionName, Function<NodeSource, Void> function) {
+        NodeSource nodeSource = nodeSources.get(nodeSourceName);
+
+        if (nodeSource != null) {
+            function.apply(nodeSource);
+        } else {
+            logger.warn("Trying to remove  " + collectionName
+                    + " from a node source that is no longer known: " + nodeSourceName);
         }
     }
 
