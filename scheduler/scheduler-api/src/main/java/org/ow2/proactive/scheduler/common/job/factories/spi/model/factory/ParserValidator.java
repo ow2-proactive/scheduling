@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
@@ -41,5 +42,17 @@ public interface ParserValidator<T> {
      * @throws ValidationException if an error occurred during the validation
      */
     T parseAndValidate(String parameterValue) throws ConversionException, ValidationException, ModelSyntaxException;
+
+    /**
+     * Parses/converts and validate the given value
+     *
+     * @param parameterValue value to parse and validate
+     * @param context a context for this validation
+     * @return a converted value
+     * @throws ConversionException if an error occurred during the conversion
+     * @throws ValidationException if an error occurred during the validation
+     */
+    T parseAndValidate(String parameterValue, ModelValidatorContext context)
+            throws ConversionException, ValidationException, ModelSyntaxException;
 
 }

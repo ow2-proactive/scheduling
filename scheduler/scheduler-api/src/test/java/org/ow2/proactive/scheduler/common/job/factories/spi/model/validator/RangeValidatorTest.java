@@ -42,22 +42,22 @@ public class RangeValidatorTest {
     public void testRangeAny() throws Exception {
         int value = 10;
         RangeValidator<Integer> validator = new RangeValidator<>();
-        Assert.assertEquals(value, (int) validator.validate(value));
+        Assert.assertEquals(value, (int) validator.validate(value, null));
     }
 
     @Test
     public void testRangeGreaterThanOK() throws Exception {
         int value = 10;
         RangeValidator<Integer> validator = new RangeValidator<>(value);
-        Assert.assertEquals(value + 1, (int) validator.validate(value + 1));
-        Assert.assertEquals(value, (int) validator.validate(value));
+        Assert.assertEquals(value + 1, (int) validator.validate(value + 1, null));
+        Assert.assertEquals(value, (int) validator.validate(value, null));
     }
 
     @Test(expected = ValidationException.class)
     public void testRangeGreaterThanKO() throws Exception {
         int value = 10;
         RangeValidator<Integer> validator = new RangeValidator<>(value);
-        validator.validate(value - 1);
+        validator.validate(value - 1, null);
     }
 
     @Test
@@ -65,10 +65,10 @@ public class RangeValidatorTest {
         int minValue = 10;
         int maxValue = 20;
         RangeValidator<Integer> validator = new RangeValidator<>(minValue, maxValue);
-        Assert.assertEquals(minValue, (int) validator.validate(minValue));
-        Assert.assertEquals(maxValue, (int) validator.validate(maxValue));
-        Assert.assertEquals(minValue + 1, (int) validator.validate(minValue + 1));
-        Assert.assertEquals(maxValue - 1, (int) validator.validate(maxValue - 1));
+        Assert.assertEquals(minValue, (int) validator.validate(minValue, null));
+        Assert.assertEquals(maxValue, (int) validator.validate(maxValue, null));
+        Assert.assertEquals(minValue + 1, (int) validator.validate(minValue + 1, null));
+        Assert.assertEquals(maxValue - 1, (int) validator.validate(maxValue - 1, null));
     }
 
     @Test(expected = ValidationException.class)
@@ -76,10 +76,10 @@ public class RangeValidatorTest {
         int minValue = 10;
         int maxValue = 20;
         RangeValidator<Integer> validator = new RangeValidator<>(minValue, maxValue);
-        validator.validate(minValue - 1);
-        Assert.assertEquals(maxValue, (int) validator.validate(maxValue));
-        Assert.assertEquals(minValue + 1, (int) validator.validate(minValue + 1));
-        Assert.assertEquals(maxValue - 1, (int) validator.validate(minValue - 1));
+        validator.validate(minValue - 1, null);
+        Assert.assertEquals(maxValue, (int) validator.validate(maxValue, null));
+        Assert.assertEquals(minValue + 1, (int) validator.validate(minValue + 1, null));
+        Assert.assertEquals(maxValue - 1, (int) validator.validate(minValue - 1, null));
     }
 
     @Test(expected = ValidationException.class)
@@ -87,6 +87,6 @@ public class RangeValidatorTest {
         int minValue = 10;
         int maxValue = 20;
         RangeValidator<Integer> validator = new RangeValidator<>(minValue, maxValue);
-        validator.validate(maxValue + 1);
+        validator.validate(maxValue + 1, null);
     }
 }

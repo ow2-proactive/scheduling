@@ -27,35 +27,34 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
+import org.springframework.expression.EvaluationException;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import com.google.common.collect.Range;
 
+public class SpelValidator implements Validator<String> {
 
-public class RangeValidator<T extends Comparable<T>> implements Validator<T> {
+    ExpressionParser parser = new SpelExpressionParser();
 
-    private final Range<T> range;
+    Expression spelExpression;
 
-    public RangeValidator() {
-        this.range = Range.all();
-    }
-
-    public RangeValidator(T minValue) {
-        this.range = Range.atLeast(minValue);
-    }
-
-    public RangeValidator(T minValue, T maxValue) {
-        this.range = Range.closed(minValue, maxValue);
-    }
-
-    public RangeValidator(Range range) {
-        this.range = range;
+    public SpelValidator(String spelExpression) {
+        this.spelExpression = parser.parseExpression(spelExpression);
     }
 
     @Override
-    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
-        if (!range.contains(parameterValue)) {
-            throw new ValidationException("Expected value should be in range " + range.toString() + ", received " +
-                                          parameterValue);
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+        try {
+            context.getSpELContext().setVariable("value", parameterValue);
+            boolean evaluationResult = (Boolean) spelExpression.getValue(context.getSpELContext());
+            if (!evaluationResult) {
+                throw new ValidationException("SPEL expression '" + spelExpression.getExpressionString() +
+                                              "' returned false, received " + parameterValue);
+            }
+        } catch (EvaluationException e) {
+            throw new ValidationException("SPEL expression '" + spelExpression + "' raised an error: " + e.getMessage(),
+                                          e);
         }
         return parameterValue;
     }

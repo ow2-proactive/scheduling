@@ -38,14 +38,14 @@ public class ModelValidatorTest {
     public void testModelValidatorNotHandled() throws ModelSyntaxException, ValidationException {
         ModelValidator validator = new ModelValidator("Unknown");
         String parameterValue = "Any Value";
-        Assert.assertEquals(parameterValue, validator.validate(parameterValue));
+        Assert.assertEquals(parameterValue, validator.validate(parameterValue, null));
     }
 
     @Test(expected = ValidationException.class)
     public void testModelValidatorValidPrefixButUnknownType() throws ModelSyntaxException, ValidationException {
         ModelValidator validator = new ModelValidator(ModelValidator.PREFIX + "Unknown");
         String parameterValue = "Any Value";
-        validator.validate(parameterValue);
+        validator.validate(parameterValue, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -115,6 +115,11 @@ public class ModelValidatorTest {
     @Test
     public void testModelValidatorRegexp() throws ModelSyntaxException {
         createAndCheckValidator(ModelValidator.PREFIX + RegexpParserValidator.REGEXP_TYPE, RegexpParserValidator.class);
+    }
+
+    @Test
+    public void testSpelValidatorRegexp() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + SPELParserValidator.SPEL_TYPE, SPELParserValidator.class);
     }
 
     @Test

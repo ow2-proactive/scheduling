@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.util.Map;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -37,6 +39,8 @@ public class JobValidationData {
     private String errorMessage;
 
     private String stackTrace;
+
+    private Map<String, String> updatedVariables;
 
     public JobValidationData() {
     }
@@ -71,5 +75,13 @@ public class JobValidationData {
 
     public void setStackTrace(String stackTrace) {
         this.stackTrace = stackTrace;
+    }
+
+    public Map<String, String> getUpdatedVariables() {
+        return updatedVariables;
+    }
+
+    public void setUpdatedVariables(Map<String, String> updatedVariables) {
+        this.updatedVariables = updatedVariables;
     }
 }
