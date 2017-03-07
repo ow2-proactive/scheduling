@@ -35,6 +35,6 @@ public class AcceptAllValidatorTest {
     @Test
     public void testAcceptAll() throws ValidationException {
         String value = "my value";
-        Assert.assertEquals(value, new AcceptAllValidator<String>().validate(value));
+        Assert.assertEquals(value, new AcceptAllValidator<String>().validate(value, null));
     }
 }

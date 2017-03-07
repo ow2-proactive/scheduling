@@ -39,27 +39,27 @@ public class ListValidatorTest {
     @Test
     public void testListOK() throws Exception {
         ListValidator validator = new ListValidator(listMembers);
-        Assert.assertEquals("1", validator.validate("1"));
-        Assert.assertEquals("2", validator.validate("2"));
-        Assert.assertEquals("3", validator.validate("3"));
+        Assert.assertEquals("1", validator.validate("1", null));
+        Assert.assertEquals("2", validator.validate("2", null));
+        Assert.assertEquals("3", validator.validate("3", null));
     }
 
     @Test(expected = ValidationException.class)
     public void testListWrongValue() throws Exception {
         ListValidator validator = new ListValidator(listMembers);
-        validator.validate("4");
+        validator.validate("4", null);
     }
 
     @Test(expected = ValidationException.class)
     public void testListEmptyValue() throws Exception {
         ListValidator validator = new ListValidator(listMembers);
-        validator.validate("");
+        validator.validate("", null);
     }
 
     @Test(expected = ValidationException.class)
     public void testListNullValue() throws Exception {
         ListValidator validator = new ListValidator(listMembers);
-        validator.validate(null);
+        validator.validate(null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)

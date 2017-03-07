@@ -72,7 +72,7 @@ public class DefaultModelJobValidatorServiceProviderTest {
     }
 
     @Test(expected = JobValidationException.class)
-    public void testValidateJobWithJobModelVariableValidPrefixButUnkownModel()
+    public void testValidateJobWithJobModelVariableValidPrefixButUnknownModel()
             throws UserException, JobValidationException {
         factory.validateJob(createJobWithJobModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"));
     }
@@ -102,7 +102,7 @@ public class DefaultModelJobValidatorServiceProviderTest {
     }
 
     @Test(expected = JobValidationException.class)
-    public void testValidateJobWithTaskModelVariableValidPrefixButUnkownModel()
+    public void testValidateJobWithTaskModelVariableValidPrefixButUnknownModel()
             throws UserException, JobValidationException {
         factory.validateJob(createJobWithTaskModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"));
     }

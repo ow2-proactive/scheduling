@@ -25,38 +25,22 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
+import org.junit.Assert;
+import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
-import com.google.common.collect.Range;
 
+public class CRONValidatorTest {
 
-public class RangeValidator<T extends Comparable<T>> implements Validator<T> {
-
-    private final Range<T> range;
-
-    public RangeValidator() {
-        this.range = Range.all();
+    @Test
+    public void testCRONOK() throws ValidationException {
+        String value = "* * * * *";
+        Assert.assertEquals(value, new CRONValidator().validate(value, null));
     }
 
-    public RangeValidator(T minValue) {
-        this.range = Range.atLeast(minValue);
-    }
-
-    public RangeValidator(T minValue, T maxValue) {
-        this.range = Range.closed(minValue, maxValue);
-    }
-
-    public RangeValidator(Range range) {
-        this.range = range;
-    }
-
-    @Override
-    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
-        if (!range.contains(parameterValue)) {
-            throw new ValidationException("Expected value should be in range " + range.toString() + ", received " +
-                                          parameterValue);
-        }
-        return parameterValue;
+    @Test(expected = ValidationException.class)
+    public void testCRONKO() throws ValidationException {
+        String value = " * * * *";
+        new CRONValidator().validate(value, null);
     }
 }
