@@ -122,6 +122,8 @@ public class RMCoreTest {
 
     private NodesLockRestorationManager nodesLockRestorationManager;
 
+    private HashMap<String, NodeSource> nodeSources;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -775,6 +777,12 @@ public class RMCoreTest {
         verify(rmCore).internalSetFree(mockedRemovableNode);
     }
 
+    @Test
+    public void testRemoveAllNodesWithUnknownNodeSource() {
+        nodeSources.clear();
+        rmCore.removeAllNodes(mockedNodeSource.getName(), false);
+    }
+
     private void configureNodeForStateChange(RMNode mockedRmNode, NodeState previousNodeState) {
         RMNodeEvent rmNodeEvent = createRmNodeEvent(previousNodeState);
         when(mockedRmNode.getLastEvent()).thenReturn(rmNodeEvent);
@@ -806,7 +814,7 @@ public class RMCoreTest {
         when(mockedSelectionManager.selectNodes(any(Criteria.class),
                                                 any(Client.class))).thenReturn(new NodeSet());
 
-        HashMap<String, NodeSource> nodeSources = new HashMap<String, NodeSource>(1);
+        nodeSources = new HashMap<String, NodeSource>(1);
         configureNodeSource(mockedNodeSource, "NODESOURCE-test");
         nodeSources.put(mockedNodeSource.getName(), mockedNodeSource);
 

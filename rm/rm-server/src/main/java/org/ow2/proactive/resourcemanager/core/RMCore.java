@@ -935,16 +935,85 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         removeAllNodes(nodeSourceName, preemptive, false);
     }
 
-    public void removeAllNodes(String nodeSourceName, boolean preemptive, boolean isTriggeredFromShutdownHook) {
+    /**
+     * Removes all nodes from the specified node source.
+     *
+     * @param nodeSourceName a name of the node source
+     * @param preemptive if true remove nodes immediately without waiting while they will be freed
+     * @param  isTriggeredFromShutdownHook boolean saying if the calling is performed from a shutdown hook.
+     */
+    public void removeAllNodes(String nodeSourceName, final boolean preemptive, final boolean isTriggeredFromShutdownHook) {
 
-        for (RMDeployingNode pn : nodeSources.get(nodeSourceName).getDeployingNodes()) {
-            removeNode(pn.getNodeURL(), preemptive, isTriggeredFromShutdownHook);
+        removeAllNodes(nodeSourceName, "deploying nodes", new Function<NodeSource, Void>() {
+            @Override
+            public Void apply(NodeSource nodeSource) {
+                for (RMDeployingNode pn : nodeSource.getDeployingNodes()) {
+                    removeNode(pn.getNodeURL(), preemptive, isTriggeredFromShutdownHook);
+                }
+                return null;
+            }
+        });
+
+        removeAllNodes(nodeSourceName, "alive nodes", new RemoveAllNodes(new Function<NodeSource, LinkedList<Node>>() {
+            @Override
+            public LinkedList<Node> apply(NodeSource nodeSource) {
+                return nodeSource.getAliveNodes();
+            }
+        }, preemptive, isTriggeredFromShutdownHook));
+
+        removeAllNodes(nodeSourceName, "down nodes", new RemoveAllNodes(new Function<NodeSource, LinkedList<Node>>() {
+            @Override
+            public LinkedList<Node> apply(NodeSource nodeSource) {
+                return nodeSource.getDownNodes();
+            }
+        }, preemptive, isTriggeredFromShutdownHook));
+    }
+
+
+    private final class RemoveAllNodes implements Function<NodeSource, Void> {
+
+        private final Function<NodeSource, LinkedList<Node>> nodeExtractorFunction;
+
+        private final boolean preemptive;
+
+        private final boolean isTriggeredFromShutdownHook;
+
+        private RemoveAllNodes(Function<NodeSource, LinkedList<Node>> nodeExtractorFunction, boolean preemptive, boolean isTriggeredFromShutdownHook) {
+            this.nodeExtractorFunction = nodeExtractorFunction;
+            this.preemptive = preemptive;
+            this.isTriggeredFromShutdownHook = isTriggeredFromShutdownHook;
         }
-        for (Node node : nodeSources.get(nodeSourceName).getAliveNodes()) {
-            removeNode(node.getNodeInformation().getURL(), preemptive, isTriggeredFromShutdownHook);
+
+        @Override
+        public Void apply(NodeSource nodeSource) {
+            LinkedList<Node> nodes = nodeExtractorFunction.apply(nodeSource);
+
+            if (nodes != null) {
+                for (Node node : nodes) {
+                    removeNode(node.getNodeInformation().getURL(), preemptive, isTriggeredFromShutdownHook);
+                }
+            }
+
+            return null;
         }
-        for (Node node : nodeSources.get(nodeSourceName).getDownNodes()) {
-            removeNode(node.getNodeInformation().getURL(), preemptive, isTriggeredFromShutdownHook);
+
+    }
+
+    /**
+     * Wraps the access to the node source to perform a defensive check preventing NPE.
+     *
+     * @param nodeSourceName the name of the node source to retrieve.
+     * @param collectionName the name of the collection to iterate in the node source.
+     * @param function a function that extracts the collection to iterate from the node source.
+     */
+    private void removeAllNodes(String nodeSourceName, String collectionName, Function<NodeSource, Void> function) {
+        NodeSource nodeSource = nodeSources.get(nodeSourceName);
+
+        if (nodeSource != null) {
+            function.apply(nodeSource);
+        } else {
+            logger.warn("Trying to remove  " + collectionName
+                    + " from a node source that is no longer known: " + nodeSourceName);
         }
     }
 
