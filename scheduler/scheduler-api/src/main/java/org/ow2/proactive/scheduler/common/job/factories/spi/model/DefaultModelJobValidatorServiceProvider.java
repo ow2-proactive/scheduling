@@ -46,28 +46,37 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
     }
 
     @Override
-    public void validateJob(File jobFile) throws JobValidationException {
+    public File validateJob(File jobFile) throws JobValidationException {
         // validate any job
+        return jobFile;
     }
 
     @Override
-    public void validateJob(TaskFlowJob job) throws JobValidationException {
+    public TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException {
+
+        ModelValidatorContext context = new ModelValidatorContext(job);
+
         for (JobVariable jobVariable : job.getVariables().values()) {
-            checkVariableFormat(null, jobVariable);
+            checkVariableFormat(null, jobVariable, context);
+            context.updateJobWithContext(job);
         }
         for (Task task : job.getTasks()) {
             for (TaskVariable taskVariable : task.getVariables().values()) {
-                checkVariableFormat(task, taskVariable);
+                checkVariableFormat(task, taskVariable, context);
+                context.updateJobWithContext(job);
             }
         }
+
+        return job;
     }
 
-    protected void checkVariableFormat(Task task, JobVariable variable) throws JobValidationException {
+    protected void checkVariableFormat(Task task, JobVariable variable, ModelValidatorContext context)
+            throws JobValidationException {
         if (variable.getModel() != null && !variable.getModel().trim().isEmpty()) {
             String model = variable.getModel().trim();
 
             try {
-                new ModelValidator(model).validate(variable.getValue());
+                new ModelValidator(model).validate(variable.getValue(), context);
             } catch (Exception e) {
                 throw new JobValidationException((task != null ? "Task '" + task.getName() + "': " : "") +
                                                  "Variable '" + variable.getName() + "': Model " + variable.getModel() +

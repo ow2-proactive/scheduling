@@ -25,9 +25,11 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CRONParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DateTimeParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DoubleParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.FloatParserValidator;
@@ -37,6 +39,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.LongPa
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelFromURLParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.RegexpParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.SPELParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ShortParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.URIParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.URLParserValidator;
@@ -58,11 +61,11 @@ public class ModelValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         try {
             ParserValidator validator = createParserValidator();
             if (validator != null) {
-                validator.parseAndValidate(parameterValue);
+                validator.parseAndValidate(parameterValue, context);
             }
             return parameterValue;
         } catch (Exception e) {
@@ -105,6 +108,10 @@ public class ModelValidator implements Validator<String> {
                 return new RegexpParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE)) {
                 return new ModelFromURLParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(CRONParserValidator.CRON_TYPE)) {
+                return new CRONParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(SPELParserValidator.SPEL_TYPE)) {
+                return new SPELParserValidator(removePrefix(model));
             } else {
                 throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
             }

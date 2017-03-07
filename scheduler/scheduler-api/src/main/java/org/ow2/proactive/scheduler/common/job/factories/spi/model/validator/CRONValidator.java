@@ -28,35 +28,25 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
-import com.google.common.collect.Range;
+import it.sauronsoftware.cron4j.InvalidPatternException;
+import it.sauronsoftware.cron4j.Predictor;
 
 
-public class RangeValidator<T extends Comparable<T>> implements Validator<T> {
+public class CRONValidator implements Validator<String> {
 
-    private final Range<T> range;
+    public CRONValidator() {
 
-    public RangeValidator() {
-        this.range = Range.all();
-    }
-
-    public RangeValidator(T minValue) {
-        this.range = Range.atLeast(minValue);
-    }
-
-    public RangeValidator(T minValue, T maxValue) {
-        this.range = Range.closed(minValue, maxValue);
-    }
-
-    public RangeValidator(Range range) {
-        this.range = range;
     }
 
     @Override
-    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
-        if (!range.contains(parameterValue)) {
-            throw new ValidationException("Expected value should be in range " + range.toString() + ", received " +
-                                          parameterValue);
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+        try {
+            (new Predictor(parameterValue)).nextMatchingDate();
+        } catch (InvalidPatternException e) {
+            throw new ValidationException("Expected value should be a valid cron expression, received '" +
+                                          parameterValue + "', error: " + e.getMessage(), e);
         }
+
         return parameterValue;
     }
 }
