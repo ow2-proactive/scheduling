@@ -150,8 +150,8 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
 
         try {
             service.killTask(jobDesc.getJobId(), "javaTask");
-            Assert.fail();
         } catch (UnknownJobException e) {
+            Assert.fail("The job should still exist in the memory context as the auto Job removal feature isn't enabled");
         }
     }
 

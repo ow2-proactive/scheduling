@@ -101,7 +101,10 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "getFinishedTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1"),
+@NamedQueries({ @NamedQuery(name = "deleteTaskDataInBulk", query = "delete from TaskData where jobData.id in :jobIdList"),
+                @NamedQuery(name = "countTaskData", query = "select count (*) from TaskData"),
+                @NamedQuery(name = "countTaskDataNotFinished", query = "select count (*) from TaskData where taskStatus <> org.ow2.proactive.scheduler.common.task.TaskStatus.FINISHED"),
+                @NamedQuery(name = "getFinishedTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.removedTime = -1"),
                 @NamedQuery(name = "getMeanTaskPendingTime", query = "select avg(startTime - :jobSubmittedTime) from TaskData task where task.jobData.id = :id and task.startTime > 0"),
                 @NamedQuery(name = "getMeanTaskRunningTime", query = "select avg(task.finishedTime - task.startTime) from TaskData task where task.startTime > 0 and task.finishedTime > 0 and task.jobData.id = :id"),
                 @NamedQuery(name = "getPendingTasksCount", query = "select count(*) from TaskData task where taskStatus in (:taskStatus) and task.jobData.status in (:jobStatus) and task.jobData.removedTime = -1"),
@@ -127,6 +130,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                                              "where task.id = :taskId"),
                 @NamedQuery(name = "updateTaskDataJobScripts", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
                                                                        "cleanScript = null  where id.jobId = :jobId"),
+                @NamedQuery(name = "updateTaskDataJobScriptsInBulk", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
+                                                                             "cleanScript = null  where id.jobId in :jobIdList"),
                 @NamedQuery(name = "updateTaskDataStatusToPending", query = "update TaskData task set task.taskStatus = :taskStatus " +
                                                                             "where task.jobData = :job"),
                 @NamedQuery(name = "updateTaskDataTaskRestarted", query = "update TaskData set taskStatus = :taskStatus, " +

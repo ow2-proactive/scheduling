@@ -31,7 +31,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.AbstractExecutorService;
@@ -56,7 +55,6 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
-import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -177,6 +175,11 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     }
 
     @Override
+    public ExecutorService getTaskPingerThreadPool() {
+        return executorService;
+    }
+
+    @Override
     public SchedulerSpacesSupport getSpacesSupport() {
         return null;
     }
@@ -196,17 +199,6 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
     public void schedule(Callable<?> task, long delay) {
         System.out.println("Requested to schedule " + task + ", delay: " + delay);
         ScheduledFuture<?> future = scheduledExecutorService.schedule(task, 1, TimeUnit.MILLISECONDS);
-        try {
-            future.get();
-        } catch (Exception e) {
-            Assert.fail("Unexpected exception");
-        }
-    }
-
-    @Override
-    public void scheduleHousekeeping(JobRemoveHandler jobRemoveHandler, long delay) {
-        System.out.println("Requested to schedule jobRemoveHandler " + jobRemoveHandler + ", delay: " + delay);
-        ScheduledFuture<?> future = scheduledExecutorService.schedule(jobRemoveHandler, 1, TimeUnit.MILLISECONDS);
         try {
             future.get();
         } catch (Exception e) {

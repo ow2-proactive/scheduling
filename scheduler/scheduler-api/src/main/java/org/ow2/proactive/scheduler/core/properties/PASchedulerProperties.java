@@ -78,7 +78,8 @@ public enum PASchedulerProperties {
     /** Scheduler node ping frequency in s. */
     SCHEDULER_NODE_PING_FREQUENCY("pa.scheduler.core.nodepingfrequency", PropertyType.INTEGER),
 
-    /** Scheduler node ping number before restarting the task. */
+    /** Scheduler number of node ping attempts before restarting the task. This value corresponds to the number of
+     * tolerated failed attempts to ping a node, before the scheduler decides to restart the task running on it */
     SCHEDULER_NODE_PING_ATTEMPTS("pa.scheduler.core.node.ping.attempts", PropertyType.INTEGER),
 
     /** Number of threads used to execute client requests  */
@@ -86,6 +87,9 @@ public enum PASchedulerProperties {
 
     /** Number of threads used to execute internal scheduling operations */
     SCHEDULER_INTERNAL_POOL_NBTHREAD("pa.scheduler.core.internalpoolnbthreads", PropertyType.INTEGER),
+
+    /** Number of threads used to ping tasks */
+    SCHEDULER_TASK_PINGER_POOL_NBTHREAD("pa.scheduler.core.taskpingerpoolnbthreads", PropertyType.INTEGER),
 
     /** Number of threads used to handle scheduled operations other than housekeeping operations */
     SCHEDULER_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.scheduledpoolnbthreads", PropertyType.INTEGER),
@@ -164,6 +168,9 @@ public enum PASchedulerProperties {
 
     /** Delay to wait between a job is terminated and removing the it from Scheduler (0 = infinite) */
     SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY("pa.scheduler.core.automaticremovejobdelay", PropertyType.INTEGER),
+
+    /** Cron expression to automatically remove finished jobs */
+    SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR("pa.scheduler.core.automaticremovejobexpression", PropertyType.STRING),
 
     /** Remove job in dataBase when removing it from scheduler. */
     JOB_REMOVE_FROM_DB("pa.scheduler.job.removeFromDataBase", PropertyType.BOOLEAN),
@@ -263,6 +270,9 @@ public enum PASchedulerProperties {
 
     // Define the logging format pattern of tasks on the scheduler
     SCHEDULER_JOB_LOGS_PATTERN("pa.scheduler.job.task.output.logs.pattern", PropertyType.STRING),
+
+    /** Defines the cron expression for the db sizes polling */
+    SCHEDULER_DB_SIZE_MONITORING_FREQ("pa.scheduler.db.size.monitoring.freq", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */
