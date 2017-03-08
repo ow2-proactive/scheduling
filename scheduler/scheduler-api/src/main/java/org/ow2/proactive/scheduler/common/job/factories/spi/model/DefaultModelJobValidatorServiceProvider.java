@@ -61,9 +61,10 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
             context.updateJobWithContext(job);
         }
         for (Task task : job.getTasks()) {
+            context = new ModelValidatorContext(task);
             for (TaskVariable taskVariable : task.getVariables().values()) {
                 checkVariableFormat(task, taskVariable, context);
-                context.updateJobWithContext(job);
+                context.updateTaskWithContext(task);
             }
         }
 
