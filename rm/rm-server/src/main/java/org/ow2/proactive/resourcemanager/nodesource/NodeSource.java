@@ -422,6 +422,8 @@ public class NodeSource implements InitActive, RunActive {
         if (downNode != null) {
             logger.info("Setting node as available: " + proactiveProgrammingNodeUrl);
             nodes.put(proactiveProgrammingNodeUrl, proactiveProgrammingNode);
+            infrastructureManager.onDownNodeReconnection(proactiveProgrammingNode);
+
             return true;
         } else {
             logger.info("Node state not changed since it is unknown: " + proactiveProgrammingNodeUrl);

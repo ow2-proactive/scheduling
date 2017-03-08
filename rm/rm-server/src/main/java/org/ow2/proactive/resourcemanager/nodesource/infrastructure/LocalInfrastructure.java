@@ -341,6 +341,11 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     @Override
+    public void onDownNodeReconnection(Node node) {
+        acquiredNodes.incrementAndGet();
+    }
+
+    @Override
     public void shutDown() {
         if (processExecutor != null) {
             processExecutor.killProcess();

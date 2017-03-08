@@ -727,6 +727,16 @@ public abstract class InfrastructureManager implements Serializable {
         return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
     }
 
+	/**
+	 * Called by the system every time a node that is DOWN reconnects
+	 * and changes its status to FREE or BUSY.
+	 *
+	 * @param node the node that has reconnected.
+	 */
+	public void onDownNodeReconnection(Node node) {
+		// to be overridden by children
+	}
+
     /**
      * Updates a deploying node.
      * <p>
@@ -764,12 +774,12 @@ public abstract class InfrastructureManager implements Serializable {
         return lostNodes;
     }
 
-    /**
-     * Helper nested class. Used not to expose methods that should be package
-     * private of the {@link RMDeployingNode} object.
-     */
-    public static abstract class RMDeployingNodeAccessor implements Serializable {
-        private static volatile RMDeployingNodeAccessor DEFAULT;
+	/**
+	 * Helper nested class. Used not to expose methods that should be package
+	 * private of the {@link RMDeployingNode} object.
+	 */
+	public static abstract class RMDeployingNodeAccessor implements Serializable {
+		private static volatile RMDeployingNodeAccessor DEFAULT;
 
         public static void setDefault(RMDeployingNodeAccessor d) {
             RMDeployingNodeAccessor.DEFAULT = d;
