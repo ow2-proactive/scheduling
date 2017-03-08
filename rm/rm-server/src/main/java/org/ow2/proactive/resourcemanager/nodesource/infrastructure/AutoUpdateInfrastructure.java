@@ -30,7 +30,6 @@ import static com.google.common.base.Throwables.getStackTraceAsString;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -71,8 +70,8 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     @Override
     public void configure(Object... parameters) {
         super.configure(parameters);
-        if (parameters != null && parameters.length >= 3) {
-            this.command = parameters[3].toString();
+        if (parameters != null && parameters.length >= 4) {
+            this.command = parameters[4].toString();
         }
     }
 
@@ -87,7 +86,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
      * @throws org.ow2.proactive.resourcemanager.exception.RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
 
         final String nodeName = this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
 
@@ -109,7 +108,6 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         String filledCommand = replaceProperties(command, localProperties);
         filledCommand = replaceProperties(filledCommand, System.getProperties());
 
-        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      filledCommand,

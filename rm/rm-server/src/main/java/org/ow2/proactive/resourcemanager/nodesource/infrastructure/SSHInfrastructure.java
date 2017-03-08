@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -138,7 +137,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
         String fs = this.targetOSObj.fs;
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
         // we take care of spaces in java path
@@ -223,7 +222,6 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         }
 
         // we create a new deploying node before ssh command ran
-        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      obfuscatedCmdLine,
@@ -305,19 +303,19 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * Configures the Infrastructure
      *
      * @param parameters
-     *            parameters[3] : ssh Options, see {@link SSHClient}
-     *            parameters[4] : java path on the remote machines parameters[5]
-     *            : Scheduling path on remote machines parameters[6] : target
-     *            OS' type (Linux, Windows or Cygwin) parameters[7] : extra java
-     *            options parameters[8] : rm cred
+     *            parameters[4] : ssh Options, see {@link SSHClient}
+     *            parameters[5] : java path on the remote machines parameters[6]
+     *            : Scheduling path on remote machines parameters[7] : target
+     *            OS' type (Linux, Windows or Cygwin) parameters[8] : extra java
+     *            options parameters[9] : rm cred
      * @throws IllegalArgumentException
      *             configuration failed
      */
     @Override
     public void configure(Object... parameters) {
         super.configure(parameters);
-        int index = 3;
-        if (parameters != null && parameters.length >= 9) {
+        int index = 4;
+        if (parameters != null && parameters.length >= 10) {
             this.sshOptions = parameters[index++].toString();
             this.javaPath = parameters[index++].toString();
             if (this.javaPath == null || this.javaPath.equals("")) {
