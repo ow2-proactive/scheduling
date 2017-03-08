@@ -297,6 +297,22 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         }
     }
 
+    @Override
+    public void onDownNodeReconnection(Node node) {
+        InetAddress host = node.getNodeInformation().getVMInformation().getInetAddress();
+
+        // Yes, this method may experience race conditions
+        // like most of the other methods of this class...
+        // See https://github.com/ow2-proactive/scheduling/issues/2811
+
+        AtomicInteger nbNodesRemoved = removedNodes.get(host);
+
+        if (nbNodesRemoved != null) {
+            nbNodesRemoved.decrementAndGet();
+            registeredNodes.put(node.getNodeInformation().getName(), host);
+        }
+    }
+
     protected boolean anyTimedOut(List<String> nodesUrl) {
         for (String nodeUrl : nodesUrl) {
             if (pnTimeout.get(nodeUrl)) {
