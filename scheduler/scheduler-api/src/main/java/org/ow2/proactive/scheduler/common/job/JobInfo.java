@@ -27,7 +27,6 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -190,6 +189,14 @@ public interface JobInfo extends Serializable {
      * is marked for removal or not.
      */
     boolean isToBeRemoved();
+
+    /**
+     * Returns the scheduled time for removal.
+     * If none is set, returns 0.
+     *
+     * @return the time at which the Job is to be removed.
+     */
+    long getScheduledTimeForRemoval();
 
     /**
      * Returns the generic information Map
