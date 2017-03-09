@@ -65,7 +65,7 @@ public class SpelValidatorTest {
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
         Assert.assertEquals(value, validator.validate(value, context));
-        Assert.assertEquals("toto1", context.getSpELJobAndTaskVariables().getVariables().get("var1"));
+        Assert.assertEquals("toto1", context.getSpELVariables().getVariables().get("var1"));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class SpelValidatorTest {
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ValidationException);
         }
-        Assert.assertEquals("value1", context.getSpELJobAndTaskVariables().getVariables().get("var1"));
+        Assert.assertEquals("value1", context.getSpELVariables().getVariables().get("var1"));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class SpelValidatorTest {
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
         Assert.assertEquals(value, validator.validate(value, context));
-        Assert.assertEquals("toto1", context.getSpELJobAndTaskVariables().getVariables().get("var4"));
+        Assert.assertEquals("toto1", context.getSpELVariables().getVariables().get("var4"));
     }
 
     @Test
@@ -97,32 +97,30 @@ public class SpelValidatorTest {
         String value = "MyString";
         ModelValidatorContext context = new ModelValidatorContext(createJob());
         Assert.assertEquals(value, validator.validate(value, context));
-        Assert.assertEquals("value2", context.getSpELJobAndTaskVariables().getVariables().get("var2"));
+        Assert.assertEquals("value2", context.getSpELVariables().getVariables().get("var2"));
     }
 
     @Test
     public void testSpelOKUpdateTaskVariable() throws ValidationException, UserException {
-        SpelValidator validator = new SpelValidator("#value == 'MyString'?(tasks['task1'].variables['var1'] = 'toto1') instanceof T(String) : false");
+        SpelValidator validator = new SpelValidator("#value == 'MyString'?(variables['var1'] = 'toto1') instanceof T(String) : false");
         String value = "MyString";
-        ModelValidatorContext context = new ModelValidatorContext(createJob());
+        ModelValidatorContext context = new ModelValidatorContext(createTask());
         Assert.assertEquals(value, validator.validate(value, context));
-        Assert.assertEquals("toto1",
-                            context.getSpELJobAndTaskVariables().getTasks().get("task1").getVariables().get("var1"));
+        Assert.assertEquals("toto1", context.getSpELVariables().getVariables().get("var1"));
     }
 
     @Test
     public void testSpelKOUpdateTaskVariable() throws ValidationException, UserException {
-        SpelValidator validator = new SpelValidator("#value == 'MyString'?(tasks['task1'].variables['var1'] = 'toto1') instanceof T(String) : false");
+        SpelValidator validator = new SpelValidator("#value == 'MyString'?(variables['var1'] = 'toto1') instanceof T(String) : false");
         String value = "MyString123";
-        ModelValidatorContext context = new ModelValidatorContext(createJob());
+        ModelValidatorContext context = new ModelValidatorContext(createTask());
         try {
             validator.validate(value, context);
             Assert.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof ValidationException);
         }
-        Assert.assertEquals("value1",
-                            context.getSpELJobAndTaskVariables().getTasks().get("task1").getVariables().get("var1"));
+        Assert.assertEquals("value1", context.getSpELVariables().getVariables().get("var1"));
     }
 
     @Test(expected = PatternSyntaxException.class)
@@ -142,6 +140,11 @@ public class SpelValidatorTest {
                                          "var4",
                                          new JobVariable("var4", null)));
 
+        return job;
+    }
+
+    private Task createTask() throws UserException {
+
         Task task = new JavaTask();
 
         task.setVariables(ImmutableMap.of("var1",
@@ -155,8 +158,6 @@ public class SpelValidatorTest {
 
         task.setName("task1");
 
-        job.addTask(task);
-
-        return job;
+        return task;
     }
 }

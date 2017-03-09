@@ -34,13 +34,21 @@ import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.SPELParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 
+import com.google.common.collect.ImmutableMap;
+
 
 public class DefaultModelJobValidatorServiceProviderTest {
+
+    public static final String SPEL_LEFT = ModelValidator.PREFIX + SPELParserValidator.SPEL_TYPE +
+                                           SPELParserValidator.LEFT_DELIMITER;
+
+    public static final String SPEL_RIGHT = SPELParserValidator.RIGHT_DELIMITER;
 
     DefaultModelJobValidatorServiceProvider factory;
 
@@ -75,6 +83,16 @@ public class DefaultModelJobValidatorServiceProviderTest {
     public void testValidateJobWithJobModelVariableValidPrefixButUnknownModel()
             throws UserException, JobValidationException {
         factory.validateJob(createJobWithJobModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"));
+    }
+
+    @Test
+    public void testValidateJobWithSpelModelVariablesOK() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithSpelJobModelVariablesOK());
+    }
+
+    @Test(expected = JobValidationException.class)
+    public void testValidateJobWithSpelModelVariablesKO() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithSpelJobModelVariablesKO());
     }
 
     @Test
@@ -121,6 +139,32 @@ public class DefaultModelJobValidatorServiceProviderTest {
         task.setName("ModelTask");
         task.setVariables(Collections.singletonMap(variable.getName(), variable));
         job.addTask(task);
+        return job;
+    }
+
+    private TaskFlowJob createJobWithSpelJobModelVariablesOK() throws UserException {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setVariables(ImmutableMap.of("var1",
+                                         new JobVariable("var1",
+                                                         "value1",
+                                                         SPEL_LEFT +
+                                                                   "#value == 'value1' ? (variables['var2'] == '' ? (variables['var2'] = 'toto1') instanceof T(String) : true) : false" +
+                                                                   SPEL_RIGHT),
+                                         "var2",
+                                         new JobVariable("var2", "", SPEL_LEFT + "#value == 'toto1'" + SPEL_RIGHT)));
+        return job;
+    }
+
+    private TaskFlowJob createJobWithSpelJobModelVariablesKO() throws UserException {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setVariables(ImmutableMap.of("var1",
+                                         new JobVariable("var1",
+                                                         "value1",
+                                                         SPEL_LEFT +
+                                                                   "#value == 'value1' ? (variables['var2'] == '' ? (variables['var2'] = 'toto1') instanceof T(String) : true) : false" +
+                                                                   SPEL_RIGHT),
+                                         "var2",
+                                         new JobVariable("var2", "", SPEL_LEFT + "#value == 'toto2'" + SPEL_RIGHT)));
         return job;
     }
 
