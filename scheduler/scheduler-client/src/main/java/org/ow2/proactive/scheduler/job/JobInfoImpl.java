@@ -420,6 +420,7 @@ public class JobInfoImpl implements JobInfo {
         this.scheduledTimeForRemoval = scheduledTimeForRemoval;
     }
 
+    @Override
     public long getScheduledTimeForRemoval() {
         return scheduledTimeForRemoval;
     }
