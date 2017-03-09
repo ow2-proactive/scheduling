@@ -104,6 +104,7 @@ import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfi
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Tools;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -149,12 +150,15 @@ public class RMNodeStarter {
      */
     public static final String NODE_ACCESS_TOKEN = "proactive.node.access.token";
 
+    private static final int DEFAULT_NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY = 5000; // in ms
+
+    public final static String NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY_PROP_NAME = "proactive.node.availability.reporting.timeout";
+
     /**
      * The maximum time to wait in milliseconds for retrieving the answer
      * for the node availability report that is pushed periodically.
      */
-    @SuppressWarnings("squid:S1444")
-    public static int NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY = 5000; // in ms
+    private int nodeAvailabilityReportTimeoutDelay = DEFAULT_NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY;
 
     /**
      * The starter will try to connect to the Resource Manager before killing
@@ -561,7 +565,7 @@ public class RMNodeStarter {
         Set<String> unknownNodeUrls =
                     PAFuture.getFutureValue(
                             rm.setNodesAvailable(ImmutableSet.copyOf(nodes.keySet())),
-                            NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY);
+                            nodeAvailabilityReportTimeoutDelay);
 
         for (String unknownNodeUrl : unknownNodeUrls) {
             killWorkerNodeIfRemovedByUser(nodes, unknownNodeUrl);
@@ -831,14 +835,7 @@ public class RMNodeStarter {
                 RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED = true;
             }
 
-            if (cl.hasOption(OPTION_AVAILABILITY_REPORT_TIMEOUT)) {
-                NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY =
-                        Integer.valueOf(cl.getOptionValue(OPTION_AVAILABILITY_REPORT_TIMEOUT));
-            }
-
-            if (logger.isTraceEnabled()) {
-                logger.trace("Node availability report timeout delay set to " + NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY + " ms.");
-            }
+            setNodeAvailabilityReportTimeoutDelay(cl);
 
             // Discovery
             if (cl.hasOption(OPTION_DISCOVERY_PORT)) {
@@ -881,6 +878,33 @@ public class RMNodeStarter {
             }
         }
         return null;
+    }
+
+    @VisibleForTesting
+    int getNodeAvailabilityReportTimeoutDelay() {
+        return nodeAvailabilityReportTimeoutDelay;
+    }
+
+    @VisibleForTesting
+    void setNodeAvailabilityReportTimeoutDelay(CommandLine cl) {
+        String property = System.getProperty(NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY_PROP_NAME);
+
+        if (property != null) {
+            try {
+                nodeAvailabilityReportTimeoutDelay = Integer.parseInt(property);
+            } catch (NumberFormatException e) {
+                nodeAvailabilityReportTimeoutDelay = DEFAULT_NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY;
+            }
+        }
+
+        if (cl.hasOption(OPTION_AVAILABILITY_REPORT_TIMEOUT)) {
+            nodeAvailabilityReportTimeoutDelay =
+                    Integer.valueOf(cl.getOptionValue(OPTION_AVAILABILITY_REPORT_TIMEOUT));
+        }
+        
+        if (logger.isTraceEnabled()) {
+            logger.trace("Node availability report timeout delay set to " + nodeAvailabilityReportTimeoutDelay + " ms.");
+        }
     }
 
     // positive integer, empty (number of available cores or 1 (default if nothing specified)
