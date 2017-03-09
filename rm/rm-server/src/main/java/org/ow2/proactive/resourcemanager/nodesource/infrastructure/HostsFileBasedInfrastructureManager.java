@@ -317,7 +317,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             startNodeImpl(host, nbNodes, depNodeURLs);
         } catch (Exception e) {
             logger.warn("Failed nodes deployment in host : " + host + ", retries left : " + retries);
-            if (isInfiniteRetries(retries) || retries > 1) {
+            if (isInfiniteRetries(retries) || retries > 0) {
                 removeNodes(depNodeURLs);
                 waitPeriodBeforeRetry();
                 startNodeImplWithRetries(host, nbNodes, getRetriesLeft(retries));
@@ -336,13 +336,16 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     private void waitPeriodBeforeRetry() {
         try {
+
             Thread.sleep(waitBetweenDeploymentFailures);
         } catch (InterruptedException e1) {
+            Thread.currentThread().interrupt();
         }
     }
 
     private int getRetriesLeft(int retries) {
-        return (retries > 0) ? --retries : retries;
+        int retriesLeft = (retries > 0) ? --retries : retries;
+        return retriesLeft;
     }
 
     /**

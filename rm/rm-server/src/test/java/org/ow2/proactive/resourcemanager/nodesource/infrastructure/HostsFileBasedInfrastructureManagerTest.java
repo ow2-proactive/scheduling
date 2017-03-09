@@ -66,12 +66,9 @@ public class HostsFileBasedInfrastructureManagerTest {
         } catch (Exception e) {
         }
 
-        assertThat(retryCounter, is(retries));
+        assertThat(retryCounter, is(retries + 1));
     }
 
-    /**
-     * @return
-     */
     private HostsFileBasedInfrastructureManager createTestClass() {
 
         return new HostsFileBasedInfrastructureManager() {
