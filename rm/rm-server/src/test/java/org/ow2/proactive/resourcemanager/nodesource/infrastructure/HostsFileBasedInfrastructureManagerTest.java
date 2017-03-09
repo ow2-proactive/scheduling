@@ -103,8 +103,7 @@ public class HostsFileBasedInfrastructureManagerTest {
             }
 
             @Override
-            protected void startNodeImpl(InetAddress host, int nbNodes, List<String> depNodeURLs)
-                    throws RMException {
+            protected void startNodeImpl(InetAddress host, int nbNodes, List<String> depNodeURLs) throws RMException {
                 retryCounter++;
                 throw new RMException("RM exception");
 
@@ -130,7 +129,8 @@ public class HostsFileBasedInfrastructureManagerTest {
             try {
                 int nbnodes = 1;
                 hostsFileBasedInfrastructureManager.startNodeImplWithRetries(InetAddress.getLocalHost(),
-                        nbnodes, retries);
+                                                                             nbnodes,
+                                                                             retries);
             } catch (Exception e) {
             }
             return retries;

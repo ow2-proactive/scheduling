@@ -138,8 +138,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs)
-            throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
         String fs = this.targetOSObj.fs;
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
         // we take care of spaces in java path
@@ -215,8 +214,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             cmdLine = clb.buildCommandLine(true);
             obfuscatedCmdLine = clb.buildCommandLine(false);
         } catch (IOException e2) {
-            throw new RMException(
-                "Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e2);
+            throw new RMException("Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e2);
         }
 
         // one escape the command to make it runnable through ssh
@@ -226,8 +224,10 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
         // we create a new deploying node before ssh command ran
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
-        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine,
-                "Deploying nodes on host " + host, super.nodeTimeOut));
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
+                                                     obfuscatedCmdLine,
+                                                     "Deploying nodes on host " + host,
+                                                     super.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
         Process p = null;
@@ -235,8 +235,9 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             p = Utils.runSSHCommand(host, cmdLine, sshOptions);
         } catch (IOException e1) {
             multipleDeclareDeployingNodeLost(depNodeURLs,
-                    "Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions +
-                        " -\n The following exception occutred:\n " + getStackTraceAsString(e1));
+                                             "Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions +
+                                                          " -\n The following exception occutred:\n " +
+                                                          getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions, e1);
         }
 
@@ -247,16 +248,15 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("SSH subprocess at " + host.getHostName() + " exited abnormally (" +
-                        exitCode + ").");
+                    logger.error("SSH subprocess at " + host.getHostName() + " exited abnormally (" + exitCode + ").");
                 } else {
                     logger.error("Launching node process has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
-                final String description = "SSH command failed to launch node on host " + host.getHostName() +
-                    lf + "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " +
-                    pOutPut;
+                final String description = "SSH command failed to launch node on host " + host.getHostName() + lf +
+                                           "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut +
+                                           "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkAllNodesAreAcquiredAndDo(createdNodeNames, null, new Runnable() {
                     public void run() {
@@ -266,8 +266,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                     return;
                 } else {
                     // there isn't any race regarding node registration
-                    throw new RMException(
-                        "SSH Node " + nodeName + " is not expected anymore because of an error.");
+                    throw new RMException("SSH Node " + nodeName + " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");
@@ -328,8 +327,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             if (parameters[index] != null) {
                 this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[index++].toString());
                 if (this.targetOSObj == null) {
-                    throw new IllegalArgumentException(
-                        "Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
+                    throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
                 }
             } else {
                 throw new IllegalArgumentException("Target OS parameter cannot be null");

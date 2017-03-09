@@ -115,8 +115,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         iterator.remove();
         tmpHost = tmpEntry.getKey();
         nbNodes = tmpEntry.getValue();
-        logger.info("Acquiring a new node. #freeHosts:" + freeHosts.size() + " #registered: " +
-            registeredNodes.size());
+        logger.info("Acquiring a new node. #freeHosts:" + freeHosts.size() + " #registered: " + registeredNodes.size());
 
         this.nodeSource.executeInParallel(new Runnable() {
             public void run() {
@@ -125,13 +124,13 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
                     //node acquisition went well for host so we update the threshold
                     logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
-                        registeredNodes.size());
+                                 registeredNodes.size());
 
                 } catch (Exception e) {
 
                     String description = "Could not acquire node on host " + tmpHost +
-                        ". NS's state refreshed regarding last checked exception: #freeHosts:" +
-                        freeHosts.size() + " #registered: " + registeredNodes.size();
+                                         ". NS's state refreshed regarding last checked exception: #freeHosts:" +
+                                         freeHosts.size() + " #registered: " + registeredNodes.size();
                     logger.error(description, e);
                     return;
                 }
@@ -164,8 +163,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         try {
             this.nodeTimeOut = Integer.parseInt(parameters[index++].toString());
         } catch (NumberFormatException e) {
-            logger.warn(
-                    "Number format exception occurred at ns configuration, default acq timeout value set: " +
+            logger.warn("Number format exception occurred at ns configuration, default acq timeout value set: " +
                         HostsFileBasedInfrastructureManager.DEFAULT_NODE_TIMEOUT + "ms");
             this.nodeTimeOut = HostsFileBasedInfrastructureManager.DEFAULT_NODE_TIMEOUT;
         }
@@ -174,15 +172,14 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             this.maxDeploymentFailure = Integer.parseInt(parameters[index++].toString());
         } catch (NumberFormatException e) {
             logger.warn("Number format exception occurred at ns configuration, default attemp value set: " +
-                HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD);
+                        HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD);
             this.maxDeploymentFailure = HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD;
         }
 
         try {
             this.waitBetweenDeploymentFailures = Integer.parseInt(parameters[index++].toString());
         } catch (NumberFormatException e) {
-            logger.warn(
-                    "Number format exception occurred at ns configuration, default wait time between failures value set: " +
+            logger.warn("Number format exception occurred at ns configuration, default wait time between failures value set: " +
                         HostsFileBasedInfrastructureManager.DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES);
             this.waitBetweenDeploymentFailures = HostsFileBasedInfrastructureManager.DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES;
         }
@@ -254,7 +251,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         this.registeredNodes.put(nodeName, node.getVMInformation().getInetAddress());
         if (logger.isDebugEnabled()) {
             logger.debug("New expected node registered: #freeHosts:" + freeHosts.size() + " #registered: " +
-                registeredNodes.size());
+                         registeredNodes.size());
         }
     }
 
@@ -267,7 +264,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         String nodeName = node.getNodeInformation().getName();
         if ((host = registeredNodes.remove(nodeName)) != null) {
             logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " +
-                this.getClass().getSimpleName());
+                         this.getClass().getSimpleName());
             // remember the node removed
             removedNodes.putIfAbsent(host, new AtomicInteger(0));
             removedNodes.get(host).incrementAndGet();
@@ -280,12 +277,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                 // in case all nodes relative to this host were removed kill the JVM
                 freeHosts.putIfAbsent(host, removedNodes.remove(host).intValue());
             }
-            logger.info("Node " + nodeName + " removed. #freeHosts:" + freeHosts.size() +
-                " #registered nodes: " + registeredNodes.size());
+            logger.info("Node " + nodeName + " removed. #freeHosts:" + freeHosts.size() + " #registered nodes: " +
+                        registeredNodes.size());
 
         } else {
-            logger.error(
-                    "Node " + nodeName + " is not known as a node belonging to this infrastructure manager");
+            logger.error("Node " + nodeName + " is not known as a node belonging to this infrastructure manager");
         }
     }
 
@@ -310,8 +306,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         }
     }
 
-    protected void startNodeImplWithRetries(final InetAddress host, final int nbNodes, int retries)
-            throws RMException {
+    protected void startNodeImplWithRetries(final InetAddress host, final int nbNodes, int retries) throws RMException {
         while (true) {
             final List<String> depNodeURLs = new ArrayList<>(nbNodes);
             try {
@@ -325,7 +320,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                     retries = getRetriesLeft(retries);
                 } else {
                     logger.error("Tries threshold reached for host " + host +
-                        ". This host is not part of the deployment process anymore.");
+                                 ". This host is not part of the deployment process anymore.");
 
                     throw e;
                 }
@@ -370,8 +365,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * @throws RMException If the node hasn't been started. Very important to take care of that
      * in implementations to keep the infrastructure in a coherent state.
      */
-    protected abstract void startNodeImpl(InetAddress host, int nbNodes, List<String> depNodeURLs)
-            throws RMException;
+    protected abstract void startNodeImpl(InetAddress host, int nbNodes, List<String> depNodeURLs) throws RMException;
 
     /**
      * Kills the node passed as parameter
