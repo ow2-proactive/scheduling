@@ -76,12 +76,16 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     }
 
     /**
-     * Launch the node on the host passed as parameter
+     * Internal node acquisition method
+     * <p>
+     * Starts a PA runtime on remote host using a custom script, register it
+     * manually in the nodesource.
+     *
      * @param host The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
-     * @param depNodeURLs list of deploying or lost nodes urls created 
-     * @throws RMException If the node hasn't been started. Very important to take care of that
-     * in implementations to keep the infrastructure in a coherent state.
+     * @param depNodeURLs list of deploying or lost nodes urls created      
+     * @throws org.ow2.proactive.resourcemanager.exception.RMException
+     *             acquisition failed
      */
     protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
 
