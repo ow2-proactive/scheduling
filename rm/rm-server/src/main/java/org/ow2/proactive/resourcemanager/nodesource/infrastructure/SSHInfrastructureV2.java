@@ -118,8 +118,9 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using SSH, register it manually in the
      * nodesource.
      * 
-     * @param host
-     *            hostname of the node on which a node should be started
+     * @param host The host on which one the node will be started
+     * @param nbNodes number of nodes to deploy
+     * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws RMException
      *             acquisition failed
      */
@@ -193,7 +194,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             cmdLine = clb.buildCommandLine(true);
             obfuscatedCmdLine = clb.buildCommandLine(false);
         } catch (IOException e) {
-            throw new RMException("Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e);
+            throw new RMException(
+                "Cannot build the " + RMNodeStarter.class.getSimpleName() + "'s command line.", e);
         }
 
         // one escape the command to make it runnable through ssh
@@ -214,7 +216,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         final String msg = "deploy on " + host;
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
-        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, msg, super.nodeTimeOut));
+        depNodeURLs.addAll(
+                addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, msg, super.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
         Session session;
@@ -228,7 +231,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             session.setConfig(this.sshOptions);
             session.connect(shorterTimeout);
         } catch (JSchException e) {
-            multipleDeclareDeployingNodeLost(depNodeURLs, "unable to " + msg + "\n" + getStackTraceAsString(e));
+            multipleDeclareDeployingNodeLost(depNodeURLs,
+                    "unable to " + msg + "\n" + getStackTraceAsString(e));
             throw new RMException("unable to " + msg, e);
         }
 
@@ -244,7 +248,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                 channel.setErrStream(baos);
                 channel.connect();
             } catch (JSchException e) {
-                multipleDeclareDeployingNodeLost(depNodeURLs, "unable to " + msg + "\n" + getStackTraceAsString(e));
+                multipleDeclareDeployingNodeLost(depNodeURLs,
+                        "unable to " + msg + "\n" + getStackTraceAsString(e));
                 throw new RMException("unable to " + msg, e);
             }
             final ChannelExec chan = channel;
@@ -256,8 +261,9 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }
                         if (chan.getExitStatus() != -1) { // -1 means process is
-                                                              // still running
-                            throw new IllegalStateException("The jvm process of the node has exited prematurely");
+                                                          // still running
+                            throw new IllegalStateException(
+                                "The jvm process of the node has exited prematurely");
                         }
                         try {
                             Thread.sleep(1000);
@@ -272,10 +278,12 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             try {
                 deployResult.get(shorterTimeout, TimeUnit.MILLISECONDS);
             } catch (ExecutionException e) {
-                declareLostAndThrow("Unable to " + msg + " due to " + e.getCause(), depNodeURLs, channel, baos, e);
+                declareLostAndThrow("Unable to " + msg + " due to " + e.getCause(), depNodeURLs, channel,
+                        baos, e);
             } catch (InterruptedException e) {
                 deployResult.cancel(true);
-                declareLostAndThrow("Unable to " + msg + " due to an interruption", depNodeURLs, channel, baos, e);
+                declareLostAndThrow("Unable to " + msg + " due to an interruption", depNodeURLs, channel,
+                        baos, e);
             } catch (TimeoutException e) {
                 deployResult.cancel(true);
                 declareLostAndThrow("Unable to " + msg + " due to timeout", depNodeURLs, channel, baos, e);
@@ -289,8 +297,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         }
     }
 
-    private void declareLostAndThrow(String errMsg, List<String> nodesUrl, ChannelExec chan, ByteArrayOutputStream baos,
-            Exception e) throws RMException {
+    private void declareLostAndThrow(String errMsg, List<String> nodesUrl, ChannelExec chan,
+            ByteArrayOutputStream baos, Exception e) throws RMException {
         String lf = System.lineSeparator();
         StringBuilder sb = new StringBuilder(errMsg);
         sb.append(lf).append(" > Process exit code: ").append(chan.getExitStatus());
@@ -368,7 +376,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         }
         this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[index++].toString());
         if (this.targetOSObj == null) {
-            throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
+            throw new IllegalArgumentException(
+                "Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
         }
 
         this.javaOptions = parameters[index++].toString();

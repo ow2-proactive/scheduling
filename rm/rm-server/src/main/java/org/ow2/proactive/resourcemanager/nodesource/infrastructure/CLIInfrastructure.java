@@ -118,22 +118,23 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using a custom script, register it
      * manually in the nodesource.
      *
-     * @param host
-     *            hostname of the node on which a node should be started
+     * @param host The host on which one the node will be started
+     * @param nbNodes number of nodes to deploy
+     * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs)
+            throws RMException {
 
         final String nodeName = "SCR-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
-        final String commandLine = interpreter + " " + deploymentScript.getAbsolutePath() + " " + host.getHostName() +
-                                   " " + nodeName + " " + this.nodeSource.getName() + " " + rmUrl + " " + nbNodes;
+        final String commandLine = interpreter + " " + deploymentScript.getAbsolutePath() + " " +
+            host.getHostName() + " " + nodeName + " " + this.nodeSource.getName() + " " + rmUrl + " " +
+            nbNodes;
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
-        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
-                                                     commandLine,
-                                                     "Deploying node on host " + host,
-                                                     this.nodeTimeOut));
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, commandLine,
+                "Deploying node on host " + host, this.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
         Process p;
@@ -141,10 +142,8 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             logger.debug("Launching the command: " + commandLine);
             p = Runtime.getRuntime().exec(commandLine);
         } catch (IOException e1) {
-            multipleDeclareDeployingNodeLost(depNodeURLs,
-                                             "Cannot run command: " + commandLine +
-                                                          " - \n The following exception occured: " +
-                                                          getStackTraceAsString(e1));
+            multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + commandLine +
+                " - \n The following exception occured: " + getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + commandLine, e1);
         }
 
@@ -155,15 +154,16 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("Child process at " + host.getHostName() + " exited abnormally (" + exitCode + ").");
+                    logger.error("Child process at " + host.getHostName() + " exited abnormally (" +
+                        exitCode + ").");
                 } else {
                     logger.error("Launching node script has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
-                final String description = "Script failed to launch a node on host " + host.getHostName() + lf +
-                                           "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut +
-                                           "   >Output: " + pOutPut;
+                final String description = "Script failed to launch a node on host " + host.getHostName() +
+                    lf + "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " +
+                    pOutPut;
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
@@ -173,7 +173,8 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                     return;
                 } else {
                     // there isn't any race regarding node registration
-                    throw new RMException("A node " + nodeName + " is not expected anymore because of an error.");
+                    throw new RMException(
+                        "A node " + nodeName + " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");
@@ -220,7 +221,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             public void run() {
                 try {
                     final String commandLine = interpreter + " " + removalScript.getAbsolutePath() + " " +
-                                               host.getHostName() + " " + n.getNodeInformation().getURL();
+                        host.getHostName() + " " + n.getNodeInformation().getURL();
                     Process p;
                     try {
                         logger.debug("Launching the command: " + commandLine);
@@ -230,15 +231,15 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                         String pOutPut = Utils.extractProcessOutput(p);
                         String pErrPut = Utils.extractProcessErrput(p);
                         String lf = System.lineSeparator();
-                        final String description = "Removal script ouput" + lf + "   >Error code: " + exitCode + lf +
-                                                   "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
+                        final String description = "Removal script ouput" + lf + "   >Error code: " +
+                            exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
                         if (exitCode != 0) {
-                            logger.error("Child process at " + host.getHostName() + " exited abnormally (" + exitCode +
-                                         ").");
+                            logger.error("Child process at " + host.getHostName() + " exited abnormally (" +
+                                exitCode + ").");
                             logger.error(description);
                         } else {
                             logger.info("Removal node process has exited normally for " +
-                                        n.getNodeInformation().getURL());
+                                n.getNodeInformation().getURL());
                             logger.debug(description);
                         }
                     } catch (IOException e1) {

@@ -312,22 +312,26 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     protected void startNodeImplWithRetries(final InetAddress host, final int nbNodes, int retries)
             throws RMException {
-        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
-        try {
-            startNodeImpl(host, nbNodes, depNodeURLs);
-        } catch (Exception e) {
-            logger.warn("Failed nodes deployment in host : " + host + ", retries left : " + retries);
-            if (isInfiniteRetries(retries) || retries > 0) {
-                removeNodes(depNodeURLs);
-                waitPeriodBeforeRetry();
-                startNodeImplWithRetries(host, nbNodes, getRetriesLeft(retries));
-            } else {
-                logger.error("Tries threshold reached for host " + host +
-                    ". This host is not part of the deployment process anymore.");
+        while (true) {
+            final List<String> depNodeURLs = new ArrayList<>(nbNodes);
+            try {
+                startNodeImpl(host, nbNodes, depNodeURLs);
+                return;
+            } catch (Exception e) {
+                logger.warn("Failed nodes deployment in host : " + host + ", retries left : " + retries);
+                if (isInfiniteRetries(retries) || retries > 0) {
+                    removeNodes(depNodeURLs);
+                    waitPeriodBeforeRetry();
+                    retries = getRetriesLeft(retries);
+                } else {
+                    logger.error("Tries threshold reached for host " + host +
+                        ". This host is not part of the deployment process anymore.");
 
-                throw e;
+                    throw e;
+                }
             }
         }
+
     }
 
     private boolean isInfiniteRetries(int retries) {
@@ -362,6 +366,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * Launch the node on the host passed as parameter
      * @param host The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
+     * @param depNodeURLs list of deploying or lost nodes urls created 
      * @throws RMException If the node hasn't been started. Very important to take care of that
      * in implementations to keep the infrastructure in a coherent state.
      */

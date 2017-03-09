@@ -26,10 +26,16 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,17 +62,35 @@ public class HostsFileBasedInfrastructureManagerTest {
     }
 
     @Test
-    public void testRetry() throws Exception {
-        int retries = 10;
-        hostsFileBasedInfrastructureManager.waitBetweenDeploymentFailures = 10;
-        try {
-            int nbnodes = 1;
-            hostsFileBasedInfrastructureManager.startNodeImplWithRetries(InetAddress.getLocalHost(), nbnodes,
-                    retries);
-        } catch (Exception e) {
-        }
+    public void testRetryOverMaximumStack() throws Exception {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        int retries = 15000;
+        executor.invokeAll(Arrays.asList(new StartNodeThread(retries)));
+        executor.shutdown();
 
         assertThat(retryCounter, is(retries + 1));
+    }
+
+    @Test
+    public void test0Retry() throws Exception {
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        int retries = 0;
+        executor.invokeAll(Arrays.asList(new StartNodeThread(retries)));
+        executor.shutdown();
+
+        assertThat(retryCounter, is(retries + 1));
+    }
+
+    @Test
+    public void testInfiniteRetry() throws Exception {
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        int retries = -1;
+        executor.invokeAll(Arrays.asList(new StartNodeThread(retries)), 100, TimeUnit.MILLISECONDS);
+        executor.shutdown();
+
+        assertThat(retryCounter, greaterThan(1));
     }
 
     private HostsFileBasedInfrastructureManager createTestClass() {
@@ -90,6 +114,29 @@ public class HostsFileBasedInfrastructureManagerTest {
             protected void killNodeImpl(Node node, InetAddress host) throws RMException {
             }
         };
+    }
+
+    class StartNodeThread implements Callable<Integer> {
+
+        int retries;
+
+        public StartNodeThread(int retries) {
+            this.retries = retries;
+        }
+
+        @Override
+        public Integer call() {
+            hostsFileBasedInfrastructureManager.waitBetweenDeploymentFailures = 0;
+            try {
+                int nbnodes = 1;
+                hostsFileBasedInfrastructureManager.startNodeImplWithRetries(InetAddress.getLocalHost(),
+                        nbnodes, retries);
+            } catch (Exception e) {
+            }
+            return retries;
+
+        }
+
     }
 
 }

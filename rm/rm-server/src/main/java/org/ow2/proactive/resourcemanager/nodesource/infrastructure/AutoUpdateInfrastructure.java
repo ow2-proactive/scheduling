@@ -63,9 +63,9 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
 
     @Configurable(description = "Command that will be launched for every host")
     protected String command = "scp -o StrictHostKeyChecking=no ${pa.rm.home}/dist/war/rest/node.jar ${host.name}:/tmp/${node.name}.jar && " +
-                               "ssh -o StrictHostKeyChecking=no ${host.name} " +
-                               "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -w ${nb.nodes} -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +
-                               "1>>/tmp/${node.name}.log 2>&1\"";
+        "ssh -o StrictHostKeyChecking=no ${host.name} " +
+        "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -w ${nb.nodes} -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +
+        "1>>/tmp/${node.name}.log 2>&1\"";
 
     @Override
     public void configure(Object... parameters) {
@@ -76,17 +76,15 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     }
 
     /**
-     * Internal node acquisition method
-     * <p>
-     * Starts a PA runtime on remote host using a custom script, register it
-     * manually in the nodesource.
-     *
-     * @param host
-     *            hostname of the node on which a node should be started
-     * @throws org.ow2.proactive.resourcemanager.exception.RMException
-     *             acquisition failed
+     * Launch the node on the host passed as parameter
+     * @param host The host on which one the node will be started
+     * @param nbNodes number of nodes to deploy
+     * @param depNodeURLs list of deploying or lost nodes urls created 
+     * @throws RMException If the node hasn't been started. Very important to take care of that
+     * in implementations to keep the infrastructure in a coherent state.
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs)
+            throws RMException {
 
         final String nodeName = this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
 
@@ -109,10 +107,8 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         filledCommand = replaceProperties(filledCommand, System.getProperties());
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
-        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
-                                                     filledCommand,
-                                                     "Deploying node on host " + host,
-                                                     this.nodeTimeOut));
+        depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, filledCommand,
+                "Deploying node on host " + host, this.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
         Process p;
@@ -121,10 +117,8 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             logger.debug("Launching the command: " + filledCommand);
             p = Runtime.getRuntime().exec(new String[] { "bash", "-c", filledCommand });
         } catch (IOException e1) {
-            multipleDeclareDeployingNodeLost(depNodeURLs,
-                                             "Cannot run command: " + filledCommand +
-                                                          " - \n The following exception occurred: " +
-                                                          getStackTraceAsString(e1));
+            multipleDeclareDeployingNodeLost(depNodeURLs, "Cannot run command: " + filledCommand +
+                " - \n The following exception occurred: " + getStackTraceAsString(e1));
             throw new RMException("Cannot run command: " + filledCommand, e1);
         }
 
@@ -135,15 +129,16 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("Child process at " + host.getHostName() + " exited abnormally (" + exitCode + ").");
+                    logger.error("Child process at " + host.getHostName() + " exited abnormally (" +
+                        exitCode + ").");
                 } else {
                     logger.error("Launching node script has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
-                final String description = "Script failed to launch a node on host " + host.getHostName() + lf +
-                                           "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut +
-                                           "   >Output: " + pOutPut;
+                final String description = "Script failed to launch a node on host " + host.getHostName() +
+                    lf + "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " +
+                    pOutPut;
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
@@ -153,7 +148,8 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
                     return;
                 } else {
                     // there isn't any race regarding node registration
-                    throw new RMException("A node " + nodeName + " is not expected anymore because of an error.");
+                    throw new RMException(
+                        "A node " + nodeName + " is not expected anymore because of an error.");
                 }
             } catch (IllegalThreadStateException e) {
                 logger.trace("IllegalThreadStateException while waiting for " + nodeName + " registration");

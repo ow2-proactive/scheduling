@@ -27,8 +27,6 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
@@ -140,7 +138,8 @@ public class InfrastructureManagerTest {
         assertThat(oldRmNode).isSameAs(rmNode);
         assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesDeployingState().get(rmNode2.getNodeURL())).isSameAs(rmNode2);
+        assertThat(infrastructureManager.getDeployingNodesDeployingState().get(rmNode2.getNodeURL()))
+                .isSameAs(rmNode2);
     }
 
     @Test
@@ -162,8 +161,10 @@ public class InfrastructureManagerTest {
         assertThat(oldRmNode).isSameAs(lostNode);
         assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode.getNodeURL())).isSameAs(lostNode2);
-        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode2.getNodeURL())).isSameAs(lostNode2);
+        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode.getNodeURL()))
+                .isSameAs(lostNode2);
+        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode2.getNodeURL()))
+                .isSameAs(lostNode2);
     }
 
     @Test
@@ -186,8 +187,10 @@ public class InfrastructureManagerTest {
         assertThat(oldRmNode).isNotSameAs(deployingNode);
         assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode.getNodeURL())).isSameAs(lostNode2);
-        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode2.getNodeURL())).isSameAs(lostNode2);
+        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode.getNodeURL()))
+                .isSameAs(lostNode2);
+        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode2.getNodeURL()))
+                .isSameAs(lostNode2);
     }
 
     private static final class TestingInfrastructureManager extends InfrastructureManager {
