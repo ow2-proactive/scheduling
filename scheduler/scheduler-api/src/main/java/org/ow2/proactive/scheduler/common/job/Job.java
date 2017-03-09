@@ -25,9 +25,10 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
@@ -77,7 +78,7 @@ public abstract class Job extends CommonAttribute {
     protected String userSpace = null;
 
     /** A map to holds job descriptor variables */
-    protected ConcurrentHashMap<String, JobVariable> variables = new ConcurrentHashMap<>();
+    protected Map<String, JobVariable> variables = Collections.synchronizedMap(new LinkedHashMap());
 
     /** ProActive Empty Constructor */
     public Job() {
@@ -238,7 +239,7 @@ public abstract class Job extends CommonAttribute {
      */
     public void setVariables(Map<String, JobVariable> variables) {
         verifyVariableMap(variables);
-        this.variables = new ConcurrentHashMap<>(variables);
+        this.variables = Collections.synchronizedMap(new LinkedHashMap(variables));
     }
 
     public static void verifyVariableMap(Map<String, ? extends JobVariable> variables) {
@@ -266,7 +267,7 @@ public abstract class Job extends CommonAttribute {
      * @return a variable map
      */
     public Map<String, String> getVariablesAsReplacementMap() {
-        HashMap<String, String> replacementVariables = new HashMap<>(variables.size());
+        HashMap<String, String> replacementVariables = new LinkedHashMap<>(variables.size());
         for (JobVariable variable : variables.values()) {
             replacementVariables.put(variable.getName(), variable.getValue());
         }

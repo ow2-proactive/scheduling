@@ -44,11 +44,22 @@ public class ModelValidatorContext {
     private final StandardEvaluationContext spelContext;
 
     // container for job and task variables
-    private SpELJobAndTaskVariables spELJobAndTaskVariables;
+    private SpELVariables spELVariables;
 
     public ModelValidatorContext(StandardEvaluationContext context) {
         this.spelContext = context;
 
+    }
+
+    public ModelValidatorContext(Task task) {
+        Map<String, Serializable> taskVariablesValues = new LinkedHashMap<>();
+
+        for (TaskVariable taskVariable : task.getVariables().values()) {
+            taskVariablesValues.put(taskVariable.getName(), taskVariable.getValue());
+        }
+
+        spELVariables = new SpELVariables(taskVariablesValues);
+        spelContext = new StandardEvaluationContext(spELVariables);
     }
 
     public ModelValidatorContext(TaskFlowJob job) {
@@ -59,27 +70,16 @@ public class ModelValidatorContext {
             jobVariablesValues.put(jobVariable.getName(), jobVariable.getValue());
         }
 
-        Map<String, SPELTaskVariables> tasks = new LinkedHashMap<>(job.getTasks().size());
-
-        for (Task task : job.getTasks()) {
-            Map<String, Serializable> taskVariablesValues = new LinkedHashMap<>();
-            for (TaskVariable taskVariable : task.getVariables().values()) {
-                taskVariablesValues.put(taskVariable.getName(), taskVariable.getValue());
-            }
-            tasks.put(task.getName(), new SPELTaskVariables(taskVariablesValues));
-        }
-
-        spELJobAndTaskVariables = new SpELJobAndTaskVariables(jobVariablesValues, tasks);
-
-        spelContext = new StandardEvaluationContext(spELJobAndTaskVariables);
+        spELVariables = new SpELVariables(jobVariablesValues);
+        spelContext = new StandardEvaluationContext(spELVariables);
     }
 
     public StandardEvaluationContext getSpELContext() {
         return spelContext;
     }
 
-    public SpELJobAndTaskVariables getSpELJobAndTaskVariables() {
-        return spELJobAndTaskVariables;
+    public SpELVariables getSpELVariables() {
+        return spELVariables;
     }
 
     /**
@@ -87,49 +87,24 @@ public class ModelValidatorContext {
      */
     public void updateJobWithContext(TaskFlowJob job) {
         for (JobVariable jobVariable : job.getVariables().values()) {
-            jobVariable.setValue(spELJobAndTaskVariables.getVariables().get(jobVariable.getName()).toString());
-        }
-        for (Task task : job.getTasks()) {
-            SPELTaskVariables spelTaskVariables = spELJobAndTaskVariables.getTasks().get(task.getName());
-            for (TaskVariable taskVariable : task.getVariables().values()) {
-                taskVariable.setValue(spelTaskVariables.getVariables().get(taskVariable.getName()).toString());
-            }
+            jobVariable.setValue(spELVariables.getVariables().get(jobVariable.getName()).toString());
         }
     }
 
-    public class SpELJobAndTaskVariables {
-
-        private Map<String, Serializable> variables;
-
-        private Map<String, SPELTaskVariables> tasks;
-
-        public SpELJobAndTaskVariables(Map<String, Serializable> variables, Map<String, SPELTaskVariables> tasks) {
-            this.variables = variables;
-            this.tasks = tasks;
-        }
-
-        public Map<String, Serializable> getVariables() {
-            return variables;
-        }
-
-        public void setVariables(Map<String, Serializable> variables) {
-            this.variables = variables;
-        }
-
-        public Map<String, SPELTaskVariables> getTasks() {
-            return tasks;
-        }
-
-        public void setTasks(Map<String, SPELTaskVariables> tasks) {
-            this.tasks = tasks;
+    /**
+     * updates the given task with the current context
+     */
+    public void updateTaskWithContext(Task task) {
+        for (TaskVariable taskVariable : task.getVariables().values()) {
+            taskVariable.setValue(spELVariables.getVariables().get(taskVariable.getName()).toString());
         }
     }
 
-    public class SPELTaskVariables {
+    public class SpELVariables {
 
         private Map<String, Serializable> variables;
 
-        public SPELTaskVariables(Map<String, Serializable> variables) {
+        public SpELVariables(Map<String, Serializable> variables) {
             this.variables = variables;
         }
 
