@@ -47,14 +47,16 @@ public class SpelValidator implements Validator<String> {
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         try {
             context.getSpELContext().setVariable("value", parameterValue);
-            boolean evaluationResult = (Boolean) spelExpression.getValue(context.getSpELContext());
+            Object untypedResult = spelExpression.getValue(context.getSpELContext());
+            if (!(untypedResult instanceof Boolean)) {
+                throw new ValidationException("SPEL expression did not return a boolean value.");
+            }
+            boolean evaluationResult = (Boolean) untypedResult;
             if (!evaluationResult) {
-                throw new ValidationException("SPEL expression '" + spelExpression.getExpressionString() +
-                                              "' returned false, received " + parameterValue);
+                throw new ValidationException("SPEL expression returned false, received " + parameterValue);
             }
         } catch (EvaluationException e) {
-            throw new ValidationException("SPEL expression '" + spelExpression + "' raised an error: " + e.getMessage(),
-                                          e);
+            throw new ValidationException("SPEL expression raised an error: " + e.getMessage(), e);
         }
         return parameterValue;
     }
