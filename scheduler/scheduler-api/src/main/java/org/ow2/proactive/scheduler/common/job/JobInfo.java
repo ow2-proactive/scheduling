@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -190,4 +191,9 @@ public interface JobInfo extends Serializable {
      */
     boolean isToBeRemoved();
 
+    /**
+     * Returns the generic information Map
+     * @return generic information Map
+     */
+    Map<String, String> getGenericInformation();
 }
