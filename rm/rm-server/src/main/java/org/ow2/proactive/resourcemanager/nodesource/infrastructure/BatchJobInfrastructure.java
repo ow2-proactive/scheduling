@@ -559,7 +559,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(Node node, boolean dueToDownNode) throws RMException {
+    public void removeNode(Node node) throws RMException {
         String deleteCmd = getDeleteJobCommand();
         String jobID = null;
         String nodeName = node.getNodeInformation().getName();

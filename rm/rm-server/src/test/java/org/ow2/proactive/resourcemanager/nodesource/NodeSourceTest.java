@@ -71,7 +71,7 @@ public class NodeSourceTest {
 
         nodeSource.detectedPingedDownNode(node.getNodeInformation().getURL());
 
-        verify(infrastructureManager).internalRemoveNode(any(Node.class), eq(true));
+        verify(infrastructureManager).internalNotifyDownNode(any(Node.class));
     }
 
     @Test
