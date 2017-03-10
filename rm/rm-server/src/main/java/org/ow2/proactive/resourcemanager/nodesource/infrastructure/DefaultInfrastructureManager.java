@@ -81,12 +81,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(Node node, boolean dueToDownNode) throws RMException {
-        if (dueToDownNode) {
-            logger.info("[" + getClass().getSimpleName() + "] Node removal skipped because node is down");
-            return;
-        }
-
+    public void removeNode(Node node) throws RMException {
         try {
             logger.info("Terminating the node " + node.getNodeInformation().getName());
 
@@ -161,6 +156,16 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
+    public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
+        logger.info("[" + getClass().getSimpleName() + "] Node removal skipped because the node is down: " +
+                proactiveProgrammingNode.getNodeInformation().getURL());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void shutDown() {
     }
+    
 }

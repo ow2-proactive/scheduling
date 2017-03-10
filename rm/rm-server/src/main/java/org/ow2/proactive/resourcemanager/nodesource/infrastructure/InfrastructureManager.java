@@ -194,18 +194,38 @@ public abstract class InfrastructureManager implements Serializable {
 	 * 
 	 * @param node
 	 *            the node to be removed
-	 * @param dueToDownNode
-	 * 		      says whether the removal was due to a node detected as down or not.
 	 * @throws RMException
 	 */
-	public final void internalRemoveNode(Node node, boolean dueToDownNode) throws RMException {
+	public final void internalRemoveNode(Node node) throws RMException {
 		try {
 			this.acquiredNodes.remove(node.getNodeInformation().getName());
 		} catch (Exception e) {
 			logger.warn("Exception occurred while removing node " + node);
 		}
-		this.removeNode(node, dueToDownNode);
+		this.removeNode(node);
 	}
+
+    /**
+     * This method is called by the system when a Node is detected as DOWN.
+     *
+     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
+     *
+     * @throws RMException if any problems occurred.
+     */
+    public void internalNotifyDownNode(Node proactiveProgrammingNode) throws RMException {
+        notifyDownNode(proactiveProgrammingNode);
+    }
+
+    /**
+     * The default behavior is to remove the node from the infrastructure manager.
+     *
+     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
+     *
+     * @throws RMException if any problems occurred.
+     */
+    public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
+        internalRemoveNode(proactiveProgrammingNode);
+    }
 
     /**
      * This method is called by the RMCore to notify the InfrastructureManager
@@ -378,12 +398,10 @@ public abstract class InfrastructureManager implements Serializable {
 	 * 
 	 * @param node
 	 *            the node to release.
-	 * @param dueToDownNode
-	 * 		      says whether the removal was due to a node detected as down or not.
 	 * @throws RMException
 	 *             if any problems occurred.
 	 */
-	public abstract void removeNode(Node node, boolean dueToDownNode) throws RMException;
+	public abstract void removeNode(Node node) throws RMException;
 
     /**
      * Notifies the user that the deploying node was lost or removed (because of

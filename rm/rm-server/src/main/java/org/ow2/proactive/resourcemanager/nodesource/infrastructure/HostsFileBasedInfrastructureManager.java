@@ -259,7 +259,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(Node node, boolean dueToDownNode) {
+    public void removeNode(Node node) {
         InetAddress host = null;
         String nodeName = node.getNodeInformation().getName();
         if ((host = registeredNodes.remove(nodeName)) != null) {

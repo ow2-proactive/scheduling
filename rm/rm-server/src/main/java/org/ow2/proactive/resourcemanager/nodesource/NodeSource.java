@@ -516,7 +516,7 @@ public class NodeSource implements InitActive, RunActive {
             Node node = nodes.remove(nodeUrl);
             RMCore.topologyManager.removeNode(node);
             try {
-                infrastructureManager.internalRemoveNode(node, false);
+                infrastructureManager.internalRemoveNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage(), e);
             }
@@ -706,7 +706,7 @@ public class NodeSource implements InitActive, RunActive {
             downNodes.put(nodeUrl, downNode);
             try {
                 RMCore.topologyManager.removeNode(downNode);
-                infrastructureManager.internalRemoveNode(downNode, true);
+                infrastructureManager.internalNotifyDownNode(downNode);
             } catch (RMException e) {
                 logger.error("Error while removing down node: " + nodeUrl, e);
             }

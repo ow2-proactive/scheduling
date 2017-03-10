@@ -211,7 +211,7 @@ public class InfrastructureManagerTest {
         }
 
         @Override
-        public void removeNode(Node node, boolean dueToDownNode) throws RMException {
+        public void removeNode(Node node) throws RMException {
 
         }
 
