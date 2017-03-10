@@ -31,6 +31,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +52,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     public static final int DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD = 5;
 
+    public static final long DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES = 5000;
+
     @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts")
     protected File hostsList;
 
@@ -60,13 +63,13 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Configurable(description = "Maximum number of failed attempt to deploy on \na host before discarding it")
     protected int maxDeploymentFailure = HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD;
 
+    @Configurable(description = "Milliseconds to wait after each failed attempt to deploy on \na host")
+    protected long waitBetweenDeploymentFailures = HostsFileBasedInfrastructureManager.DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES;
+
     /**
      * map of free hosts with the number of nodes to deploy on each host
      */
     private ConcurrentHashMap<InetAddress, Integer> freeHosts = new ConcurrentHashMap<>();
-
-    /** Maintains tresholds per hosts to be able to know if the deployment fails and to retry a given number of time */
-    private Hashtable<InetAddress, Integer> hostsThresholds = new Hashtable<>();
 
     /**
      * The set of nodes for which one the registerAcquiredNode has been run.
@@ -117,25 +120,14 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         this.nodeSource.executeInParallel(new Runnable() {
             public void run() {
                 try {
-                    startNodeImpl(tmpHost, nbNodes);
+                    startNodeImplWithRetries(tmpHost, nbNodes, maxDeploymentFailure);
 
                     //node acquisition went well for host so we update the threshold
-
                     logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
                                  registeredNodes.size());
-                    hostsThresholds.put(tmpHost, maxDeploymentFailure);
 
                 } catch (Exception e) {
 
-                    Integer tries = hostsThresholds.get(tmpHost);
-                    tries--;
-                    if (tries > 0) {
-                        hostsThresholds.put(tmpHost, tries);
-                        freeHosts.putIfAbsent(tmpHost, nbNodes);
-                    } else {
-                        logger.debug("Tries threshold reached for host " + tmpHost +
-                                     ". This host is not part of the deployment process anymore.");
-                    }
                     String description = "Could not acquire node on host " + tmpHost +
                                          ". NS's state refreshed regarding last checked exception: #freeHosts:" +
                                          freeHosts.size() + " #registered: " + registeredNodes.size();
@@ -151,10 +143,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * 	parameters[0] = hosts list file content
      * 	parameters[1] = timeout of the node deployment
      * 	parameters[2] = max deployment failure
+     *  parameters[3] = wait time between failures
      */
     @Override
     protected void configure(Object... parameters) {
-        if (parameters == null || parameters.length < 3) {
+        if (parameters == null || parameters.length < 4) {
             throw new IllegalArgumentException("Not enough parameter provided to the infrastructure.");
         }
         int index = 0;
@@ -181,6 +174,14 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             logger.warn("Number format exception occurred at ns configuration, default attemp value set: " +
                         HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD);
             this.maxDeploymentFailure = HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD;
+        }
+
+        try {
+            this.waitBetweenDeploymentFailures = Integer.parseInt(parameters[index++].toString());
+        } catch (NumberFormatException e) {
+            logger.warn("Number format exception occurred at ns configuration, default wait time between failures value set: " +
+                        HostsFileBasedInfrastructureManager.DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES);
+            this.waitBetweenDeploymentFailures = HostsFileBasedInfrastructureManager.DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES;
         }
     }
 
@@ -225,7 +226,6 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
                 this.freeHosts.putIfAbsent(addr, num);
 
-                hostsThresholds.put(addr, maxDeploymentFailure);
             } catch (UnknownHostException ex) {
                 throw new RuntimeException("Unknown host: " + host, ex);
             }
@@ -306,14 +306,66 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         }
     }
 
+    protected void startNodeImplWithRetries(final InetAddress host, final int nbNodes, int retries) throws RMException {
+        while (true) {
+            final List<String> depNodeURLs = new ArrayList<>(nbNodes);
+            try {
+                startNodeImpl(host, nbNodes, depNodeURLs);
+                return;
+            } catch (Exception e) {
+                logger.warn("Failed nodes deployment in host : " + host + ", retries left : " + retries);
+                if (isInfiniteRetries(retries) || retries > 0) {
+                    removeNodes(depNodeURLs);
+                    waitPeriodBeforeRetry();
+                    retries = getRetriesLeft(retries);
+                } else {
+                    logger.error("Tries threshold reached for host " + host +
+                                 ". This host is not part of the deployment process anymore.");
+
+                    throw e;
+                }
+            }
+        }
+
+    }
+
+    private boolean isInfiniteRetries(int retries) {
+        return retries == -1;
+    }
+
+    private void waitPeriodBeforeRetry() {
+        try {
+
+            Thread.sleep(waitBetweenDeploymentFailures);
+        } catch (InterruptedException e1) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private int getRetriesLeft(int retries) {
+        int retriesLeft = (retries > 0) ? --retries : retries;
+        return retriesLeft;
+    }
+
+    /**
+     * @param depNodeURLs
+     */
+    private void removeNodes(List<String> depNodeURLs) {
+        for (String node : depNodeURLs) {
+            internalRemoveDeployingNode(node);
+        }
+
+    }
+
     /**
      * Launch the node on the host passed as parameter
      * @param host The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
+     * @param depNodeURLs list of deploying or lost nodes urls created 
      * @throws RMException If the node hasn't been started. Very important to take care of that
      * in implementations to keep the infrastructure in a coherent state.
      */
-    protected abstract void startNodeImpl(InetAddress host, int nbNodes) throws RMException;
+    protected abstract void startNodeImpl(InetAddress host, int nbNodes, List<String> depNodeURLs) throws RMException;
 
     /**
      * Kills the node passed as parameter
