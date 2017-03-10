@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.job;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -120,6 +121,8 @@ public class JobInfoImpl implements JobInfo {
 
     private List<ClientTaskState> modifiedTasks;
 
+    private Map<String, String> genericInformation;
+
     public JobInfoImpl() {
     }
 
@@ -152,6 +155,7 @@ public class JobInfoImpl implements JobInfo {
         if (jobInfo.getModifiedTasks() != null) {
             this.modifiedTasks = new ArrayList<>(jobInfo.getModifiedTasks());
         }
+        this.genericInformation = jobInfo.getGenericInformation();
     }
 
     /**
@@ -406,6 +410,20 @@ public class JobInfoImpl implements JobInfo {
      */
     public Set<TaskId> getTasksSkipped() {
         return this.tasksSkipped;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getGenericInformation()
+     */
+    @Override
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = genericInformation;
     }
 
 }

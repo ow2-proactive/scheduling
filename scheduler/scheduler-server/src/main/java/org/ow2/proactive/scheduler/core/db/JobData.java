@@ -220,6 +220,7 @@ public class JobData implements Serializable {
         if (isToBeRemoved()) {
             jobInfo.setToBeRemoved();
         }
+        jobInfo.setGenericInformation(getGenericInformation());
         return jobInfo;
     }
 
