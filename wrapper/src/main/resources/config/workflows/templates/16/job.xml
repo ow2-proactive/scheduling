@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.8"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.8 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.8/schedulerjob.xsd"
+    name="File Trigger" projectName="1. Basic Workflows"
+    priority="normal"
+    onTaskError="cancelJob"
+     maxNumberOfExecution="2">
+  <variables>
+    <variable name="INPUT_FILES_FOLDER" value="/tmp" />
+    <variable name="WORKFLOW_URL" value="https://try.activeeon.com/workflow-catalog/buckets/1/workflows/19?alt=xml" />
+  </variables>
+  <description>
+    <![CDATA[ Trigger a job execution whenever a file is created in a specified folder. ]]>
+  </description>
+  <taskFlow>
+    <task name="FileTrigger">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+inputFilesFolder = variables.get("INPUT_FILES_FOLDER");
+processedFilesfolder = inputFilesFolder + "/.filetrigger";
+println("Monitoring " + inputFilesFolder)
+
+workflowURL = new URL(variables.get("WORKFLOW_URL")); // https://try.activeeon.com/workflow-catalog/buckets/1/workflows/26?alt=xml
+//workflow = new File("workflow.xml") // an alternative way...
+
+new File(processedFilesfolder).mkdirs();
+schedulerapi.connect();
+
+for ( ; ; ) {
+	new File(inputFilesFolder).eachFile() { file->  
+	if (!file.isDirectory()){
+		File f = new File(processedFilesfolder + "/" + file.getName() );
+		if(!f.exists()) { 
+			variables = new HashMap()
+			variables.put("file", file.getName())
+			jobid = schedulerapi.submit(workflowURL, variables);
+			f.createNewFile();
+			println "Triggered job " + jobid + " to process " + file.getName();
+		}
+	}}
+	sleep(3000)
+}
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>

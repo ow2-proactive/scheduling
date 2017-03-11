@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.5"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+    name="Hadoop" projectName="3. Big Data Workflows"
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2">
+  <variables>
+    <variable name="spark_master_url" value="spark://sparkContainerMaster:7077"/>
+    <variable name="hdfs_directory" value="hdfs://hdfsContainerNamenode:9000/persons"/>
+    <variable name="network" value="my-net"/>
+  </variables>
+  <description>
+    <![CDATA[ A workflow to submit a Spark job from a docker container, to write and read Persons from/to HDFS ]]>
+  </description>
+  <taskFlow>
+    <task name="submit_write_read_persons_HDFS">
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
+container_id="$(docker run --net=$variables_network -di activeeon/hdfs-spark:latest /bin/sh -c 'bash')"
+docker exec $container_id /bin/sh -c 'spark-submit --deploy-mode client --class jobs.MapR_fs_job --deploy-mode client --num-executors 1 --driver-memory 50m --executor-cores 2 --queue default --master '$variables_spark_master_url' $USR_HOME/MapR_fs_job-0.0.1-SNAPSHOT.jar '$variables_hdfs_directory
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>
