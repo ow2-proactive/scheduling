@@ -69,6 +69,8 @@ public class JobInfoImpl implements JobInfo {
 
     private JobStatus jobStatus = JobStatus.PENDING;
 
+    private long scheduledTimeForRemoval;
+
     private boolean toBeRemoved;
 
     private Map<String, String> genericInformation;
@@ -233,6 +235,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setToBeRemoved() {
         this.toBeRemoved = true;
+    }
+
+    @Override
+    public long getScheduledTimeForRemoval() {
+        return scheduledTimeForRemoval;
+    }
+
+    public void setScheduledTimeForRemoval(long scheduledTimeForRemoval) {
+        this.scheduledTimeForRemoval = scheduledTimeForRemoval;
     }
 
     @Override

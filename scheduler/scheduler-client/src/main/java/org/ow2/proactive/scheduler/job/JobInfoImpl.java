@@ -83,6 +83,10 @@ public class JobInfoImpl implements JobInfo {
     //DEFAULT MUST BE -1
     private long removedTime = -1;
 
+    /** job scheduled time for removal (for the housekeeping) */
+    // DEFAULT MUST BE 0 IF NOT SCHEDULED FOR REMOVAL
+    private long scheduledTimeForRemoval = 0;
+
     /** last updated time on the job*/
     private long lastUpdatedTime = -1;
 
@@ -410,6 +414,15 @@ public class JobInfoImpl implements JobInfo {
      */
     public Set<TaskId> getTasksSkipped() {
         return this.tasksSkipped;
+    }
+
+    public void setScheduledTimeForRemoval(long scheduledTimeForRemoval) {
+        this.scheduledTimeForRemoval = scheduledTimeForRemoval;
+    }
+
+    @Override
+    public long getScheduledTimeForRemoval() {
+        return scheduledTimeForRemoval;
     }
 
     /*
