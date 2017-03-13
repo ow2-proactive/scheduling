@@ -84,6 +84,7 @@ public class DataUtility {
         impl.setSubmittedTime(d.getSubmittedTime());
         impl.setTotalNumberOfTasks(d.getTotalNumberOfTasks());
         impl.setGenericInformation(d.getGenericInformation());
+        impl.setVariables(d.getVariables());
         return impl;
     }
 

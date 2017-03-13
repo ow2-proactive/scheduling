@@ -123,6 +123,8 @@ public class JobInfoImpl implements JobInfo {
 
     private Map<String, String> genericInformation;
 
+    private Map<String, String> variables;
+
     public JobInfoImpl() {
     }
 
@@ -156,6 +158,7 @@ public class JobInfoImpl implements JobInfo {
             this.modifiedTasks = new ArrayList<>(jobInfo.getModifiedTasks());
         }
         this.genericInformation = jobInfo.getGenericInformation();
+        this.variables = jobInfo.getVariables();
     }
 
     /**
@@ -424,6 +427,15 @@ public class JobInfoImpl implements JobInfo {
 
     public void setGenericInformation(Map<String, String> genericInformation) {
         this.genericInformation = genericInformation;
+    }
+
+    @Override
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 
 }

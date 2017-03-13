@@ -196,4 +196,10 @@ public interface JobInfo extends Serializable {
      * @return generic information Map
      */
     Map<String, String> getGenericInformation();
+
+    /**
+     * Returns the variables Map
+     * @return variables Map
+     */
+    Map<String, String> getVariables();
 }
