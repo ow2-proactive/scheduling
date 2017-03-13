@@ -1,49 +1,61 @@
 /*
- * ProActive Parallel Suite(TM):
- * The Open Source library for parallel and distributed
- * Workflows & Scheduling, Orchestration, Cloud Automation
- * and Big Data Analysis on Enterprise Grids & Clouds.
+ * ################################################################
  *
- * Copyright (c) 2007 - 2017 ActiveEon
- * Contact: contact@activeeon.com
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * This library is free software: you can redistribute it and/or
+ * Copyright (C) 1997-2015 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation: version 3 of
+ * as published by the Free Software Foundation; version 3 of
  * the License.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
  *
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $PROACTIVE_INITIAL_DEV$
  */
-package functionaltests;
+package functionaltests.investigations;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
+import functionaltests.RestSchedulerJobTaskTest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -55,10 +67,12 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 import com.google.common.collect.Iterables;
 
+import functionaltests.AbstractRestFuncTestCase;
+import functionaltests.RestFuncTHelper;
+import functionaltests.RestFuncTestConfig;
 import functionaltests.utils.RestFuncTUtils;
 
-
-public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
+public class Test2 extends AbstractRestFuncTestCase {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -70,9 +84,9 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
 
-        Iterable<JobState> jobs = Iterables.concat(state.getPendingJobs(),
-                                                   state.getRunningJobs(),
-                                                   state.getFinishedJobs());
+        Iterable<JobState> jobs =
+                Iterables.concat(
+                        state.getPendingJobs(), state.getRunningJobs(), state.getFinishedJobs());
 
         for (JobState jobState : jobs) {
             JobId jobId = jobState.getId();
@@ -81,12 +95,48 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         }
     }
 
+    @After
+    public void tearDown() {
+        RestFuncTHelper.stopRestfulSchedulerWebapp();
+    }
+
     @Test
+    public void test() throws Exception {
+        for (int i = 0; i < 100; i++) {
+            System.out.println("Test2.test starting iteration " + i);
+
+            testGetJobTaskIds();
+            setUp();
+            testGetNoJob();
+            setUp();
+            testLogin();
+            setUp();
+            testKillJob();
+            setUp();
+            testJobResultValue();
+            setUp();
+            urlMatrixParams_shouldReplace_jobVariabls();
+            setUp();
+            testJobTaskStates();
+            setUp();
+            testSubmit();
+            setUp();
+            testJobResult();
+            setUp();
+            testLoginWithCredentials();
+            setUp();
+            testListJobs();
+
+            System.out.println("Test2.test end iteration " + i);
+        }
+    }
+
     public void testLogin() throws Exception {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
         String url = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(url);
-        StringEntity entity = new StringEntity("username=" + config.getLogin() + "&password=" + config.getPassword());
+        StringEntity entity = new StringEntity("username=" + config.getLogin() + "&password=" +
+            config.getPassword());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
         HttpResponse response = executeUriRequest(httpPost);
@@ -94,55 +144,45 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertContentNotEmpty(response);
     }
 
-    @Test
     public void testLoginWithCredentials() throws Exception {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
-        Credentials credentials = RestFuncTUtils.createCredentials(config.getLogin(),
-                                                                   config.getPassword(),
-                                                                   RestFuncTHelper.getSchedulerPublicKey());
+        Credentials credentials = RestFuncTUtils.createCredentials(config.getLogin(), config.getPassword(),
+                RestFuncTHelper.getSchedulerPublicKey());
         String schedulerUrl = getResourceUrl("login");
         HttpPost httpPost = new HttpPost(schedulerUrl);
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
-                                                                              .addPart("credential",
-                                                                                       new ByteArrayBody(credentials.getBase64(),
-                                                                                                         ContentType.APPLICATION_OCTET_STREAM,
-                                                                                                         null));
-        httpPost.setEntity(multipartEntityBuilder.build());
+        MultipartEntity multipartEntity = new MultipartEntity();
+        multipartEntity.addPart("credential", new ByteArrayBody(credentials.getBase64(),
+            MediaType.APPLICATION_OCTET_STREAM, null));
+        httpPost.setEntity(multipartEntity);
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
         assertContentNotEmpty(response);
     }
 
-    @Test
     public void testSubmit() throws Exception {
         String schedulerUrl = getResourceUrl("submit");
         HttpPost httpPost = new HttpPost(schedulerUrl);
         setSessionHeader(httpPost);
         File jobFile = RestFuncTHelper.getDefaultJobXmlfile();
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
-                                                                              .addPart("file",
-                                                                                       new FileBody(jobFile,
-                                                                                                    ContentType.APPLICATION_XML));
-        httpPost.setEntity(multipartEntityBuilder.build());
+        MultipartEntity multipartEntity = new MultipartEntity();
+        multipartEntity.addPart("", new FileBody(jobFile, MediaType.APPLICATION_XML));
+        httpPost.setEntity(multipartEntity);
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
         JSONObject jsonObj = toJsonObject(response);
         assertNotNull(jsonObj.get("id").toString());
     }
 
-    @Test
-    public void testUrlMatrixParamsShouldReplaceJobVariables() throws Exception {
-        File jobFile = new File(RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml").toURI());
+    public void urlMatrixParams_shouldReplace_jobVariabls() throws Exception {
+        File jobFile = new File(RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml")
+                .toURI());
 
         String schedulerUrl = getResourceUrl("submit;var=matrix_param_val");
         HttpPost httpPost = new HttpPost(schedulerUrl);
         setSessionHeader(httpPost);
-
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
-                                                                              .addPart("file",
-                                                                                       new FileBody(jobFile,
-                                                                                                    ContentType.APPLICATION_XML));
-        httpPost.setEntity(multipartEntityBuilder.build());
+        MultipartEntity multipartEntity = new MultipartEntity();
+        multipartEntity.addPart("", new FileBody(jobFile, MediaType.APPLICATION_XML));
+        httpPost.setEntity(multipartEntity);
 
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
@@ -153,7 +193,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         waitJobState(jobId, JobStatus.FINISHED, TimeUnit.MINUTES.toMillis(1));
     }
 
-    @Test
     public void testListJobs() throws Exception {
         String jobId = submitDefaultJob().value();
         String schedulerUrl = getResourceUrl("jobs/" + jobId);
@@ -165,7 +204,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertJobId(jobId, jsonObject);
     }
 
-    @Test
     public void testJobResult() throws Exception {
         String jobId = submitFinishedJob();
         String resource = "jobs/" + jobId + "/result";
@@ -179,7 +217,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertNotNull(taskResult);
     }
 
-    @Test
     public void testGetNoJob() throws Exception {
         String resourceUrl = getResourceUrl("jobs");
         HttpGet httpGet = new HttpGet(resourceUrl);
@@ -191,7 +228,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertTrue(jsonArray.isEmpty());
     }
 
-    @Test
     public void testJobResultValue() throws Exception {
         String jobId = submitFinishedJob();
         String resource = getResourceUrl("jobs/" + jobId + "/result/value");
@@ -203,7 +239,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertEquals("TEST-JOB", jsonObject.get(getDefaultTaskName()).toString());
     }
 
-    @Test(expected = UnknownJobException.class)
+    // expect exception
     public void testRemoveJob() throws Exception {
         String jobId = submitDefaultJob().value();
         String resource = "jobs/" + jobId;
@@ -217,7 +253,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         fail("UnknownJobException should be thrown");
     }
 
-    @Test
     public void testKillJob() throws Exception {
         String jobId = submitPendingJobId();
         String resource = "jobs/" + jobId + "/kill";
@@ -230,7 +265,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertEquals(JobStatus.KILLED, jobState.getStatus());
     }
 
-    @Test
     public void testGetJobTaskIds() throws Exception {
         String jobId = submitDefaultJob().value();
         String resource = "jobs/" + jobId + "/tasks";
@@ -244,7 +278,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertEquals(getDefaultTaskName(), jsonArray.get(0).toString());
     }
 
-    @Test
     public void testJobTaskStates() throws Exception {
         String jobId = submitDefaultJob().value();
         String resource = "jobs/" + jobId + "/taskstates";
