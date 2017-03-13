@@ -1262,4 +1262,12 @@ public abstract class InternalJob extends JobState {
         this.taskFlowJob = taskFlowJob;
     }
 
+    public long getScheduledTimeForRemoval() {
+        return this.jobInfo.getScheduledTimeForRemoval();
+    }
+
+    public void setScheduledTimeForRemoval(long scheduledTimeForRemoval) {
+        this.jobInfo.setScheduledTimeForRemoval(scheduledTimeForRemoval);
+    }
+
 }
