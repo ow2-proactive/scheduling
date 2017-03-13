@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
 import java.util.Map;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
