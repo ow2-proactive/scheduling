@@ -188,22 +188,22 @@ public abstract class InfrastructureManager implements Serializable {
         }
     }
 
-	/**
-	 * Performs some cleanup ( essentially removal of the cached node ) and call
-	 * removeNodeImpl
-	 * 
-	 * @param node
-	 *            the node to be removed
-	 * @throws RMException
-	 */
-	public final void internalRemoveNode(Node node) throws RMException {
-		try {
-			this.acquiredNodes.remove(node.getNodeInformation().getName());
-		} catch (Exception e) {
-			logger.warn("Exception occurred while removing node " + node);
-		}
-		this.removeNode(node);
-	}
+    /**
+     * Performs some cleanup ( essentially removal of the cached node ) and call
+     * removeNodeImpl
+     * 
+     * @param node
+     *            the node to be removed
+     * @throws RMException
+     */
+    public final void internalRemoveNode(Node node) throws RMException {
+        try {
+            this.acquiredNodes.remove(node.getNodeInformation().getName());
+        } catch (Exception e) {
+            logger.warn("Exception occurred while removing node " + node);
+        }
+        this.removeNode(node);
+    }
 
     /**
      * This method is called by the system when a Node is detected as DOWN.
@@ -393,15 +393,15 @@ public abstract class InfrastructureManager implements Serializable {
         throw new UnsupportedOperationException("Node configuration is not implemented for this infrastructure manager.");
     }
 
-	/**
-	 * Removes the node from the resource manager.
-	 * 
-	 * @param node
-	 *            the node to release.
-	 * @throws RMException
-	 *             if any problems occurred.
-	 */
-	public abstract void removeNode(Node node) throws RMException;
+    /**
+     * Removes the node from the resource manager.
+     * 
+     * @param node
+     *            the node to release.
+     * @throws RMException
+     *             if any problems occurred.
+     */
+    public abstract void removeNode(Node node) throws RMException;
 
     /**
      * Notifies the user that the deploying node was lost or removed (because of
@@ -745,15 +745,15 @@ public abstract class InfrastructureManager implements Serializable {
         return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
     }
 
-	/**
-	 * Called by the system every time a node that is DOWN reconnects
-	 * and changes its status to FREE or BUSY.
-	 *
-	 * @param node the node that has reconnected.
-	 */
-	public void onDownNodeReconnection(Node node) {
-		// to be overridden by children
-	}
+    /**
+     * Called by the system every time a node that is DOWN reconnects
+     * and changes its status to FREE or BUSY.
+     *
+     * @param node the node that has reconnected.
+     */
+    public void onDownNodeReconnection(Node node) {
+        // to be overridden by children
+    }
 
     /**
      * Updates a deploying node.
@@ -792,12 +792,12 @@ public abstract class InfrastructureManager implements Serializable {
         return lostNodes;
     }
 
-	/**
-	 * Helper nested class. Used not to expose methods that should be package
-	 * private of the {@link RMDeployingNode} object.
-	 */
-	public static abstract class RMDeployingNodeAccessor implements Serializable {
-		private static volatile RMDeployingNodeAccessor DEFAULT;
+    /**
+     * Helper nested class. Used not to expose methods that should be package
+     * private of the {@link RMDeployingNode} object.
+     */
+    public static abstract class RMDeployingNodeAccessor implements Serializable {
+        private static volatile RMDeployingNodeAccessor DEFAULT;
 
         public static void setDefault(RMDeployingNodeAccessor d) {
             RMDeployingNodeAccessor.DEFAULT = d;

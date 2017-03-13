@@ -52,6 +52,7 @@ public class ClientPinger implements InitActive, RunActive {
     private static final Logger logger = Logger.getLogger(ClientPinger.class);
 
     private final AtomicBoolean active = new AtomicBoolean(true);
+
     private RMCore rmcore;
 
     public ClientPinger() {

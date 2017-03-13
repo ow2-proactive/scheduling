@@ -280,9 +280,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.jmxHelper = new RMJMXHelper(this.accountsManager);
     }
 
-    public RMCore(Map<String, NodeSource> nodeSources, List<String> brokenNodeSources,
-                  Map<String, RMNode> allNodes, Client caller, RMMonitoringImpl monitoring,
-                  SelectionManager manager, List<RMNode> freeNodesList, RMDBManager newDataBaseManager) {
+    public RMCore(Map<String, NodeSource> nodeSources, List<String> brokenNodeSources, Map<String, RMNode> allNodes,
+            Client caller, RMMonitoringImpl monitoring, SelectionManager manager, List<RMNode> freeNodesList,
+            RMDBManager newDataBaseManager) {
         this.nodeSources = nodeSources;
         this.brokenNodeSources = brokenNodeSources;
         this.allNodes = allNodes;
@@ -942,7 +942,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param preemptive if true remove nodes immediately without waiting while they will be freed
      * @param  isTriggeredFromShutdownHook boolean saying if the calling is performed from a shutdown hook.
      */
-    public void removeAllNodes(String nodeSourceName, final boolean preemptive, final boolean isTriggeredFromShutdownHook) {
+    public void removeAllNodes(String nodeSourceName, final boolean preemptive,
+            final boolean isTriggeredFromShutdownHook) {
 
         removeAllNodes(nodeSourceName, "deploying nodes", new Function<NodeSource, Void>() {
             @Override
@@ -969,7 +970,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, preemptive, isTriggeredFromShutdownHook));
     }
 
-
     private final class RemoveAllNodes implements Function<NodeSource, Void> {
 
         private final Function<NodeSource, LinkedList<Node>> nodeExtractorFunction;
@@ -978,7 +978,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         private final boolean isTriggeredFromShutdownHook;
 
-        private RemoveAllNodes(Function<NodeSource, LinkedList<Node>> nodeExtractorFunction, boolean preemptive, boolean isTriggeredFromShutdownHook) {
+        private RemoveAllNodes(Function<NodeSource, LinkedList<Node>> nodeExtractorFunction, boolean preemptive,
+                boolean isTriggeredFromShutdownHook) {
             this.nodeExtractorFunction = nodeExtractorFunction;
             this.preemptive = preemptive;
             this.isTriggeredFromShutdownHook = isTriggeredFromShutdownHook;
@@ -1012,8 +1013,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (nodeSource != null) {
             function.apply(nodeSource);
         } else {
-            logger.warn("Trying to remove  " + collectionName
-                    + " from a node source that is no longer known: " + nodeSourceName);
+            logger.warn("Trying to remove  " + collectionName + " from a node source that is no longer known: " +
+                        nodeSourceName);
         }
     }
 

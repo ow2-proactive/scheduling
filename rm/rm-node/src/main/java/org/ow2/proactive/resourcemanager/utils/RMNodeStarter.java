@@ -96,6 +96,7 @@ import org.ow2.proactive.utils.Tools;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 
+
 /**
  * This class is responsible for creating a local node. You can define different settings to
  * register the node to an appropriate Resource Manager, ping it...
@@ -120,6 +121,7 @@ public class RMNodeStarter {
     }
 
     static final Logger logger = Logger.getLogger(RMNodeStarter.class);
+
     /** Prefix for temp files that store nodes URL */
     private static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
 
@@ -385,11 +387,10 @@ public class RMNodeStarter {
         workers.setOptionalArg(true);
         options.addOption(workers);
 
-        final Option availabilityReportTimeout = new Option(
-                OPTION_AVAILABILITY_REPORT_TIMEOUT,
-                "availabilityReportTimeout",
-                true,
-                "The maximum time to wait in milliseconds for retrieving the answer for the node availability report that is pushed periodically.");
+        final Option availabilityReportTimeout = new Option(OPTION_AVAILABILITY_REPORT_TIMEOUT,
+                                                            "availabilityReportTimeout",
+                                                            true,
+                                                            "The maximum time to wait in milliseconds for retrieving the answer for the node availability report that is pushed periodically.");
         availabilityReportTimeout.setRequired(false);
         availabilityReportTimeout.setArgName("timeInMilliseconds");
         options.addOption(availabilityReportTimeout);
@@ -607,10 +608,8 @@ public class RMNodeStarter {
             throw new NotConnectedException("No connection to RM");
         }
 
-        Set<String> unknownNodeUrls =
-                    PAFuture.getFutureValue(
-                            rm.setNodesAvailable(ImmutableSet.copyOf(nodes.keySet())),
-                            nodeAvailabilityReportTimeoutDelay);
+        Set<String> unknownNodeUrls = PAFuture.getFutureValue(rm.setNodesAvailable(ImmutableSet.copyOf(nodes.keySet())),
+                                                              nodeAvailabilityReportTimeoutDelay);
 
         for (String unknownNodeUrl : unknownNodeUrls) {
             killWorkerNodeIfRemovedByUser(nodes, unknownNodeUrl);
@@ -938,12 +937,12 @@ public class RMNodeStarter {
         }
 
         if (cl.hasOption(OPTION_AVAILABILITY_REPORT_TIMEOUT)) {
-            nodeAvailabilityReportTimeoutDelay =
-                    Integer.valueOf(cl.getOptionValue(OPTION_AVAILABILITY_REPORT_TIMEOUT));
+            nodeAvailabilityReportTimeoutDelay = Integer.valueOf(cl.getOptionValue(OPTION_AVAILABILITY_REPORT_TIMEOUT));
         }
-        
+
         if (logger.isTraceEnabled()) {
-            logger.trace("Node availability report timeout delay set to " + nodeAvailabilityReportTimeoutDelay + " ms.");
+            logger.trace("Node availability report timeout delay set to " + nodeAvailabilityReportTimeoutDelay +
+                         " ms.");
         }
     }
 
@@ -1180,8 +1179,8 @@ public class RMNodeStarter {
      * at the given URL, logs with provided credentials and adds the local node to
      * the Resource Manager. Handles all errors/exceptions.
      */
-    protected ResourceManager registerInRM(final Credentials credentials, final String rmURL,
-            final String nodeName, final Collection<Node> nodes) {
+    protected ResourceManager registerInRM(final Credentials credentials, final String rmURL, final String nodeName,
+            final Collection<Node> nodes) {
 
         RMAuthentication auth = joinResourceManager(rmURL);
         final ResourceManager rm = loginToResourceManager(credentials, auth);
@@ -1201,7 +1200,7 @@ public class RMNodeStarter {
                             return true;
 
                         boolean isAdmin = rm.isNodeAdmin(nodes.iterator().next().getNodeInformation().getURL())
-                                .getBooleanValue();
+                                            .getBooleanValue();
                         if (!isAdmin) {
                             throw new SecurityException("Permission denied");
                         }
@@ -1405,9 +1404,9 @@ public class RMNodeStarter {
                 "Problem encountered while parsing " + RMNodeStarter.class.getName() + " command line."),
         RMNODE_EXIT_FORCED(
                 305,
-                "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."), FAILED_TO_LAUNCH(-1, RMNodeStarter.class
-                .getSimpleName() +
-            " process hasn't been started at all."), UNKNOWN(-2, "Cannot determine exit status.");
+                "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."),
+        FAILED_TO_LAUNCH(-1, RMNodeStarter.class.getSimpleName() + " process hasn't been started at all."),
+        UNKNOWN(-2, "Cannot determine exit status.");
         public final int exitCode;
 
         public final String description;

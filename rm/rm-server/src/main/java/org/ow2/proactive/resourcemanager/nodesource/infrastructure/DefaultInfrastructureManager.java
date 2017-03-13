@@ -158,7 +158,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     @Override
     public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
         logger.info("[" + getClass().getSimpleName() + "] Node removal skipped because the node is down: " +
-                proactiveProgrammingNode.getNodeInformation().getURL());
+                    proactiveProgrammingNode.getNodeInformation().getURL());
     }
 
     /**
@@ -167,5 +167,5 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     @Override
     public void shutDown() {
     }
-    
+
 }

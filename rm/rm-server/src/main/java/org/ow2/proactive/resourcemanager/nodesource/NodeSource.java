@@ -715,8 +715,6 @@ public class NodeSource implements InitActive, RunActive {
         rmcore.setDownNode(nodeUrl);
     }
 
-
-
     /**
      * Gets resource manager core. Used by policies.
      * @return {@link RMCore} instance.

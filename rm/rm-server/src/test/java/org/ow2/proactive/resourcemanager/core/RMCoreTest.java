@@ -83,6 +83,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+
 public class RMCoreTest {
 
     private RMCore rmCore;
@@ -706,7 +707,7 @@ public class RMCoreTest {
 
     @Test
     public void testSetNodesAvailableEmptyInput() {
-        Set<String> unknownNodeUrls = rmCore.setNodesAvailable(ImmutableSet.<String>of());
+        Set<String> unknownNodeUrls = rmCore.setNodesAvailable(ImmutableSet.<String> of());
         assertThat(unknownNodeUrls).isEmpty();
     }
 
@@ -795,14 +796,11 @@ public class RMCoreTest {
         RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
         rmNodeDescriptor.setState(NodeState.DOWN);
 
-        return new RMNodeEvent(
-                rmNodeDescriptor, RMEventType.NODE_STATE_CHANGED, previousNodeState, "initiator");
+        return new RMNodeEvent(rmNodeDescriptor, RMEventType.NODE_STATE_CHANGED, previousNodeState, "initiator");
     }
 
     private RMCore createRmCore(ImmutableMap<String, RMNode> allNodes, List<RMNode> freeNodes) {
-        return new RMCore(
-                null, null, allNodes, null,
-                Mockito.mock(RMMonitoringImpl.class), null, freeNodes, null);
+        return new RMCore(null, null, allNodes, null, Mockito.mock(RMMonitoringImpl.class), null, freeNodes, null);
     }
 
     /**
@@ -811,8 +809,7 @@ public class RMCoreTest {
     private void populateRMCore() {
 
         when(mockedCaller.checkPermission(any(Permission.class), any(String.class))).thenReturn(true);
-        when(mockedSelectionManager.selectNodes(any(Criteria.class),
-                                                any(Client.class))).thenReturn(new NodeSet());
+        when(mockedSelectionManager.selectNodes(any(Criteria.class), any(Client.class))).thenReturn(new NodeSet());
 
         nodeSources = new HashMap<String, NodeSource>(1);
         configureNodeSource(mockedNodeSource, "NODESOURCE-test");
@@ -933,10 +930,8 @@ public class RMCoreTest {
 
     private void configureNodeSource(NodeSource nodeSource, String nodeSourceName) {
         when(nodeSource.getName()).thenReturn(nodeSourceName);
-        when(nodeSource.acquireNode(any(String.class), any(Client.class)))
-                .thenReturn(new BooleanWrapper(true));
-        when(nodeSource.acquireNode(any(String.class),
-                                    any(Client.class))).thenReturn(new BooleanWrapper(true));
+        when(nodeSource.acquireNode(any(String.class), any(Client.class))).thenReturn(new BooleanWrapper(true));
+        when(nodeSource.acquireNode(any(String.class), any(Client.class))).thenReturn(new BooleanWrapper(true));
     }
 
     private class MockedRMNodeParameters {

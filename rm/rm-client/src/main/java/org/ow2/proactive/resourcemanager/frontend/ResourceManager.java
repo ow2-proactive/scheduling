@@ -206,7 +206,7 @@ public interface ResourceManager {
      * @return The set of worker node URLs that are unknown to the Resource Manager
      * (i.e. have been removed by a user).
      */
-     Set<String> setNodesAvailable(Set<String> nodeUrls);
+    Set<String> setNodesAvailable(Set<String> nodeUrls);
 
     /**
      * Returns true if the resource manager is operational and a client is connected.
