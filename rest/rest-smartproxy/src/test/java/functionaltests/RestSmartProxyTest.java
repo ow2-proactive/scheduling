@@ -200,7 +200,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
                 TaskStatus status = notification.getData().getStatus();
                 System.out.println("RestSmartProxyTest.taskStateUpdatedEvent, taskStatus=" + status);
 
-                if (status == TaskStatus.IN_ERROR) {
+                if (status == TaskStatus.WAITING_ON_ERROR || status == TaskStatus.IN_ERROR) { // IN_ERROR previously
                     taskHasBeenInError.setTrue();
                 }
             }
@@ -247,14 +247,9 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         System.out.println("Restarting all In-Error tasks");
         restSmartProxy.restartAllInErrorTasks(jobIdAsString);
 
-        JobState jobState = waitForJobFinishState(jobIdAsString);
-
-        assertThat(JobStatus.FINISHED).isEqualTo(jobState.getStatus());
         assertThat(restartedFromErrorEventReceived.booleanValue()).isTrue();
         assertThat(taskHasBeenInError.booleanValue()).isTrue();
 
-        TaskStatus taskStatus = jobState.getTasks().get(0).getStatus();
-        assertThat(taskStatus).isEqualTo(TaskStatus.FAULTY);
     }
 
     private JobState waitForJobFinishState(String jobIdAsString)
