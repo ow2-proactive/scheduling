@@ -36,6 +36,16 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import java.security.Permission;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -70,11 +80,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
-import java.security.Permission;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import com.google.common.annotations.VisibleForTesting;
 
 
 /**
@@ -247,7 +253,8 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Updates internal node source structures.
      */
-    private void internalAddNode(Node node) throws RMException {
+    @VisibleForTesting
+    void internalAddNode(Node node) throws RMException {
         String nodeUrl = node.getNodeInformation().getURL();
         if (this.nodes.containsKey(nodeUrl)) {
             throw new RMException("The node " + nodeUrl + " already added to the node source " + name);
@@ -398,6 +405,23 @@ public class NodeSource implements InitActive, RunActive {
 
         rmnode.setProtectedByToken(tokenInNode || tokenInNodeSource);
         return rmnode;
+    }
+
+    public boolean setNodeAvailable(RMNode node) {
+        Node proactiveProgrammingNode = node.getNode();
+        String proactiveProgrammingNodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
+        Node downNode = downNodes.remove(proactiveProgrammingNodeUrl);
+
+        if (downNode != null) {
+            logger.info("Setting node as available: " + proactiveProgrammingNodeUrl);
+            nodes.put(proactiveProgrammingNodeUrl, proactiveProgrammingNode);
+            infrastructureManager.onDownNodeReconnection(proactiveProgrammingNode);
+
+            return true;
+        } else {
+            logger.info("Node state not changed since it is unknown: " + proactiveProgrammingNodeUrl);
+            return false;
+        }
     }
 
     /**
@@ -649,18 +673,21 @@ public class NodeSource implements InitActive, RunActive {
             return;
         }
 
-        logger.info("[" + name + "] Detected down node " + nodeUrl);
+        logger.info("[" + name + "] Detected down node: " + nodeUrl);
         Node downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
             downNodes.put(nodeUrl, downNode);
             try {
                 RMCore.topologyManager.removeNode(downNode);
-                infrastructureManager.internalRemoveNode(downNode);
+                infrastructureManager.internalNotifyDownNode(downNode);
             } catch (RMException e) {
+                logger.error("Error while removing down node: " + nodeUrl, e);
             }
         }
         rmcore.setDownNode(nodeUrl);
     }
+
+
 
     /**
      * Gets resource manager core. Used by policies.
@@ -687,12 +714,15 @@ public class NodeSource implements InitActive, RunActive {
     public void pingNode(final Node node) {
         executeInParallel(new Runnable() {
             public void run() {
+                String nodeUrl = node.getNodeInformation().getURL();
+
                 try {
                     node.getNumberOfActiveObjects();
-                    if (logger.isDebugEnabled())
-                        logger.debug("Node " + node.getNodeInformation().getURL() + " is alive");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Node " + nodeUrl + " is alive");
+                    }
                 } catch (Throwable t) {
-                    stub.detectedPingedDownNode(node.getNodeInformation().getURL());
+                    stub.detectedPingedDownNode(nodeUrl);
                 }
             }
         });

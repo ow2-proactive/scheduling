@@ -36,6 +36,19 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -49,13 +62,6 @@ import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -191,6 +197,28 @@ public abstract class InfrastructureManager implements Serializable {
 		}
 		this.removeNode(node);
 	}
+
+    /**
+     * This method is called by the system when a Node is detected as DOWN.
+     *
+     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
+     *
+     * @throws RMException if any problems occurred.
+     */
+    public void internalNotifyDownNode(Node proactiveProgrammingNode) throws RMException {
+        notifyDownNode(proactiveProgrammingNode);
+    }
+
+    /**
+     * The default behavior is to remove the node from the infrastructure manager.
+     *
+     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
+     *
+     * @throws RMException if any problems occurred.
+     */
+    public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
+        internalRemoveNode(proactiveProgrammingNode);
+    }
 
 	/**
 	 * This method is called by the RMCore to notify the InfrastructureManager
@@ -360,9 +388,9 @@ public abstract class InfrastructureManager implements Serializable {
 	 * Removes the node from the resource manager.
 	 * 
 	 * @param node
-	 *            node to release
+	 *            the node to release.
 	 * @throws RMException
-	 *             if any problems occurred
+	 *             if any problems occurred.
 	 */
 	public abstract void removeNode(Node node) throws RMException;
 
@@ -678,6 +706,16 @@ public abstract class InfrastructureManager implements Serializable {
 	 */
 	private String buildDeployingNodeURL(String pnName) {
 		return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
+	}
+
+	/**
+	 * Called by the system every time a node that is DOWN reconnects
+	 * and changes its status to FREE or BUSY.
+	 *
+	 * @param node the node that has reconnected.
+	 */
+	public void onDownNodeReconnection(Node node) {
+		// to be overridden by children
 	}
 
 	/**

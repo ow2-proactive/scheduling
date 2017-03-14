@@ -36,9 +36,44 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import org.apache.commons.cli.*;
+import static com.google.common.base.Throwables.getStackTraceAsString;
+import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyException;
+import java.security.Policy;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.security.auth.login.LoginException;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.*;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarLoader;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -69,24 +104,8 @@ import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfi
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Tools;
 
-import javax.security.auth.login.LoginException;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyException;
-import java.security.Policy;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import static com.google.common.base.Throwables.getStackTraceAsString;
-import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * This class is responsible for creating a local node. You can define different settings to
@@ -97,7 +116,9 @@ import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 public class RMNodeStarter {
 
     protected Credentials credentials = null;
+
     protected String rmURL = null;
+
     protected String nodeSourceName = null;
 
     // While logger is not configured and it not set with sys properties, use Console logger
@@ -108,8 +129,8 @@ public class RMNodeStarter {
             Logger.getRootLogger().setLevel(Level.INFO);
         }
     }
-    static final Logger logger = Logger.getLogger(RMNodeStarter.class);
 
+    static final Logger logger = Logger.getLogger(RMNodeStarter.class);
     /** Prefix for temp files that store nodes URL */
     private static final String URL_TMPFILE_PREFIX = "PA-AGENT_URL";
 
@@ -128,6 +149,16 @@ public class RMNodeStarter {
      *
      */
     public static final String NODE_ACCESS_TOKEN = "proactive.node.access.token";
+
+    private static final int DEFAULT_NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY = 5000; // in ms
+
+    public final static String NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY_PROP_NAME = "proactive.node.availability.reporting.timeout";
+
+    /**
+     * The maximum time to wait in milliseconds for retrieving the answer
+     * for the node availability report that is pushed periodically.
+     */
+    private int nodeAvailabilityReportTimeoutDelay = DEFAULT_NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY;
 
     /**
      * The starter will try to connect to the Resource Manager before killing
@@ -199,6 +230,7 @@ public class RMNodeStarter {
     static final char OPTION_NODE_NAME = 'n';
     static final char OPTION_SOURCE_NAME = 's';
     private static final char OPTION_PING_DELAY = 'p';
+    private static final String OPTION_AVAILABILITY_REPORT_TIMEOUT = "art";
     private static final char OPTION_ADD_NODE_ATTEMPTS = 'a';
     private static final char OPTION_ADD_NODE_ATTEMPTS_DELAY = 'd';
     private static final String OPTION_WAIT_AND_JOIN_TIMEOUT = "wt";
@@ -309,6 +341,15 @@ public class RMNodeStarter {
         workers.setOptionalArg(true);
         options.addOption(workers);
 
+        final Option availabilityReportTimeout = new Option(
+                OPTION_AVAILABILITY_REPORT_TIMEOUT,
+                "availabilityReportTimeout",
+                true,
+                "The maximum time to wait in milliseconds for retrieving the answer for the node availability report that is pushed periodically.");
+        availabilityReportTimeout.setRequired(false);
+        availabilityReportTimeout.setArgName("timeInMilliseconds");
+        options.addOption(availabilityReportTimeout);
+
         // Displays the help
         final Option help = new Option(Character.toString(OPTION_HELP), "help", false, "to display this help");
         help.setRequired(false);
@@ -330,11 +371,8 @@ public class RMNodeStarter {
             CookieBasedProcessTreeKiller.registerKillChildProcessesOnShutdown("node");
             RMNodeStarter passiveStarter = new RMNodeStarter();
             String baseNodeName = passiveStarter.configure(args);
-            // The RMNodeStarter object is turned to an active object for cleaner identification to the resource manager
-            RMNodeStarter starter = PAActiveObject.turnActive(passiveStarter);
 
-            starter.createNodesAndConnect(baseNodeName);
-
+            passiveStarter.createNodesAndConnect(baseNodeName);
         } catch (Throwable t) {
             System.err
                     .println("A major problem occurred when trying to start a node and register it into the Resource Manager, see the stacktrace below");
@@ -369,7 +407,7 @@ public class RMNodeStarter {
 
     public boolean createNodesAndConnect(final String nodeName) {
 
-        List<Node> nodes = createNodes(nodeName);
+        Map<String, Node> nodes = createNodes(nodeName);
 
         Tools.logAvailableScriptEngines(logger);
 
@@ -399,14 +437,15 @@ public class RMNodeStarter {
         return createdNodeNames;
     }
 
-    private List<Node> createNodes(String nodeName) {
-        List<Node> nodes = new ArrayList<>(workers);
+    private Map<String, Node> createNodes(String nodeName) {
+        Map<String, Node> nodes = new HashMap<>(workers);
         List<String> createdNodeNames = getWorkersNodeNames(nodeName, workers);
         for (int nodeIndex = 0; nodeIndex < workers; nodeIndex++) {
             Node node = createLocalNode(createdNodeNames.get(nodeIndex));
             configureForDataSpace(node);
-            nodes.add(node);
-            logger.info("URL of node " + nodeIndex + " " + node.getNodeInformation().getURL());
+            String nodeUrl = node.getNodeInformation().getURL();
+            nodes.put(nodeUrl, node);
+            logger.info("URL of node " + nodeIndex + " " + nodeUrl);
         }
         return nodes;
     }
@@ -422,13 +461,13 @@ public class RMNodeStarter {
         }
     }
 
-    private void connectToResourceManager(String nodeName, List<Node> nodes) {
-        ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodes);
+    private void connectToResourceManager(String nodeName, Map<String, Node> nodes) {
+        ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodes.values());
         resetReconnectionAttemptsLeft();
         pingAllNodes(nodes, rm);
     }
 
-    private void pingAllNodes(List<Node> nodes, ResourceManager rm) {
+    private void pingAllNodes(Map<String, Node> nodes, ResourceManager rm) {
         if (rm != null) {
             logger.info("Connected to the resource manager at " + rmURL);
 
@@ -439,23 +478,26 @@ public class RMNodeStarter {
                     try {
                         pingAllNodesIndefinitely(nodes, rm);
                     } catch (NotConnectedException e) {
+                        logger.warn("Authentication issue, reconnecting to the Resource Manager");
                         rm = reconnectToResourceManager();
                     } catch (ProActiveRuntimeException e) {
+                        logger.warn("Node disconnected from the Resource Manager, reconnection in progress");
                         rm = reconnectToResourceManager();
-                    } catch (IllegalStateException e) {
-                        logger.error(ExitStatus.RMNODE_ILLEGAL_STATE.description);
-                        System.exit(ExitStatus.RMNODE_ILLEGAL_STATE.exitCode);
                     } catch (Throwable e) {
                         logger.error(ExitStatus.RM_NO_PING.description, e);
                     } finally {
                         try {
                             logger.warn("Disconnected from the resource manager");
                             logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
-                            logger.warn("Number of attempts left " + numberOfReconnectionAttemptsLeft);
+                            logger.warn("Number of attempts left is " + numberOfReconnectionAttemptsLeft);
 
                             numberOfReconnectionAttemptsLeft--;
-                            Thread.sleep(PING_DELAY_IN_MS);
+
+                            if (numberOfReconnectionAttemptsLeft != 0) {
+                                Thread.sleep(PING_DELAY_IN_MS);
+                            }
                         } catch (InterruptedException ignored) {
+                            logger.debug("Ignored interrupted exception", ignored);
                         }
                     }
                 }
@@ -492,10 +534,11 @@ public class RMNodeStarter {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
+
         return null;
     }
 
-    private void pingAllNodesIndefinitely(List<Node> nodes, ResourceManager rm) {
+    private void pingAllNodesIndefinitely(Map<String, Node> nodes, ResourceManager rm) {
         while (allNodesAreAvailable(nodes, rm)) {
             try {
                 if (numberOfReconnectionAttemptsLeft < NB_OF_RECONNECTION_ATTEMPTS) {
@@ -514,36 +557,49 @@ public class RMNodeStarter {
         numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
     }
 
-    private boolean allNodesAreAvailable(List<Node> nodes, ResourceManager rm) {
-        if (rm == null)
+    private boolean allNodesAreAvailable(Map<String, Node> nodes, ResourceManager rm) {
+        if (rm == null) {
             throw new NotConnectedException("No connection to RM");
-
-        for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
-            Node node = iterator.next();
-            String url = node.getNodeInformation().getURL();
-            if (!rm.setNodeAvailable(url).getBooleanValue()) {
-                if (!rm.nodeIsAvailable(url).getBooleanValue()) {
-                    logger.info("Node " + url + " removed");
-                    // node removed manually by user
-                    // kill the local worker node
-                    String nodeName = null;
-                    try {
-                        nodeName = node.getNodeInformation().getName();
-                        node.getProActiveRuntime().killNode(nodeName);
-                    } catch (Exception e) {
-                        logger.warn("An exception occurred when killing the local node : " + nodeName);
-                    }
-                    iterator.remove();
-                } else {
-                    return false;
-                }
-            }
         }
 
-        if (nodes.size() == 0)
-            throw new IllegalStateException("Cannot have zero nodes");
+        Set<String> unknownNodeUrls =
+                    PAFuture.getFutureValue(
+                            rm.setNodesAvailable(ImmutableSet.copyOf(nodes.keySet())),
+                            nodeAvailabilityReportTimeoutDelay);
+
+        for (String unknownNodeUrl : unknownNodeUrls) {
+            killWorkerNodeIfRemovedByUser(nodes, unknownNodeUrl);
+        }
+
+        int nodeCount = nodes.size();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Node count is equal to " + nodeCount);
+        }
 
         return true;
+    }
+
+    private void killWorkerNodeIfRemovedByUser(Map<String, Node> nodes, String unknownNodeUrl) {
+        Node node = nodes.get(unknownNodeUrl);
+
+        if (node == null) {
+            logger.warn("The RM has sent back an URL that was not published by the Node: " + unknownNodeUrl);
+        } else {
+            // The node URL which has been published to the RMCore is unknown.
+            // It means the node has been removed by a user
+            String nodeName = node.getNodeInformation().getName();
+
+            try {
+                // Kill the local worker node
+                node.getProActiveRuntime().killNode(nodeName);
+            } catch (Exception e) {
+                logger.warn("Killing the local node has failed: " + nodeName, e);
+            } finally {
+                nodes.remove(unknownNodeUrl);
+                logger.info("Node " + unknownNodeUrl + " has been removed ");
+            }
+        }
     }
 
     private void configureRMAndProActiveHomes() {
@@ -779,6 +835,8 @@ public class RMNodeStarter {
                 RMNodeStarter.ADD_NODE_ATTEMPTS_DELAY_IN_MS_USER_SUPPLIED = true;
             }
 
+            setNodeAvailabilityReportTimeoutDelay(cl);
+
             // Discovery
             if (cl.hasOption(OPTION_DISCOVERY_PORT)) {
                 discoveryPort = Integer.valueOf(cl.getOptionValue(OPTION_DISCOVERY_PORT));
@@ -820,6 +878,33 @@ public class RMNodeStarter {
             }
         }
         return null;
+    }
+
+    @VisibleForTesting
+    int getNodeAvailabilityReportTimeoutDelay() {
+        return nodeAvailabilityReportTimeoutDelay;
+    }
+
+    @VisibleForTesting
+    void setNodeAvailabilityReportTimeoutDelay(CommandLine cl) {
+        String property = System.getProperty(NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY_PROP_NAME);
+
+        if (property != null) {
+            try {
+                nodeAvailabilityReportTimeoutDelay = Integer.parseInt(property);
+            } catch (NumberFormatException e) {
+                nodeAvailabilityReportTimeoutDelay = DEFAULT_NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY;
+            }
+        }
+
+        if (cl.hasOption(OPTION_AVAILABILITY_REPORT_TIMEOUT)) {
+            nodeAvailabilityReportTimeoutDelay =
+                    Integer.valueOf(cl.getOptionValue(OPTION_AVAILABILITY_REPORT_TIMEOUT));
+        }
+        
+        if (logger.isTraceEnabled()) {
+            logger.trace("Node availability report timeout delay set to " + nodeAvailabilityReportTimeoutDelay + " ms.");
+        }
     }
 
     // positive integer, empty (number of available cores or 1 (default if nothing specified)
@@ -1066,7 +1151,7 @@ public class RMNodeStarter {
      * the Resource Manager. Handles all errors/exceptions.
      */
     protected ResourceManager registerInRM(final Credentials credentials, final String rmURL,
-            final String nodeName, final List<Node> nodes) {
+            final String nodeName, final Collection<Node> nodes) {
 
         RMAuthentication auth = joinResourceManager(rmURL);
         final ResourceManager rm = loginToResourceManager(credentials, auth);
@@ -1085,7 +1170,7 @@ public class RMNodeStarter {
                         if (NB_OF_ADD_NODE_ATTEMPTS == 0)
                             return true;
 
-                        boolean isAdmin = rm.isNodeAdmin(nodes.get(0).getNodeInformation().getURL())
+                        boolean isAdmin = rm.isNodeAdmin(nodes.iterator().next().getNodeInformation().getURL())
                                 .getBooleanValue();
                         if (!isAdmin) {
                             throw new SecurityException("Permission denied");
@@ -1289,8 +1374,7 @@ public class RMNodeStarter {
                 303, "Was not able to add RMNode to the Resource Manager."), RMNODE_PARSE_ERROR(304,
                 "Problem encountered while parsing " + RMNodeStarter.class.getName() + " command line."), RMNODE_EXIT_FORCED(
                 305,
-                "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."), RMNODE_ILLEGAL_STATE(
-                306, "Illegal state of RMNode (no nodes left)."), FAILED_TO_LAUNCH(-1, RMNodeStarter.class
+                "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."), FAILED_TO_LAUNCH(-1, RMNodeStarter.class
                 .getSimpleName() +
             " process hasn't been started at all."), UNKNOWN(-2, "Cannot determine exit status.");
         public final int exitCode;

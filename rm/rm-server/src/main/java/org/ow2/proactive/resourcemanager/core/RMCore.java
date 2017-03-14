@@ -36,8 +36,28 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.*;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -62,7 +82,11 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.RMStateNodeUrls;
-import org.ow2.proactive.resourcemanager.common.event.*;
+import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
@@ -92,18 +116,19 @@ import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelect
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.resourcemanager.utils.ClientPinger;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
-import org.ow2.proactive.scripting.*;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.Script;
+import org.ow2.proactive.scripting.ScriptException;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.Permission;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
 
 
 /**
@@ -175,15 +200,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private RMAuthenticationImpl authentication;
 
     /** HashMap of NodeSource active objects */
-    private HashMap<String, NodeSource> nodeSources;
+    private Map<String, NodeSource> nodeSources;
 
-    private ArrayList<String> brokenNodeSources;
+    private List<String> brokenNodeSources;
 
     /** HashMaps of nodes known by the RMCore */
-    private HashMap<String, RMNode> allNodes;
+    private volatile Map<String, RMNode> allNodes;
 
     /** list of all free nodes */
-    private ArrayList<RMNode> freeNodes;
+    private List<RMNode> freeNodes;
 
     private SelectionManager selectionManager;
 
@@ -202,7 +227,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * It is statically used due to drawbacks in the client pinger functionality
      * @see Client
      */
-    public static Map<UniqueID, Client> clients =
+    public static final Map<UniqueID, Client> clients =
             Collections.synchronizedMap(new HashMap<UniqueID, Client>());
 
     /** nodes topology */
@@ -231,7 +256,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     /**
      * Creates the RMCore object.
-     * 
+     *
      * @param id
      *            Name for RMCOre.
      * @param nodeRM
@@ -249,15 +274,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         nodeSources = new HashMap<>();
         brokenNodeSources = new ArrayList<>();
         allNodes = new HashMap<>();
-        freeNodes = new ArrayList<>();
+        freeNodes = Collections.synchronizedList(new ArrayList<RMNode>());
 
         this.accountsManager = new RMAccountsManager();
         this.jmxHelper = new RMJMXHelper(this.accountsManager);
     }
 
-    public RMCore(HashMap<String, NodeSource> nodeSources, ArrayList<String> brokenNodeSources,
-                  HashMap<String, RMNode> allNodes, Client caller, RMMonitoringImpl monitoring,
-                  SelectionManager manager, ArrayList<RMNode> freeNodesList, RMDBManager newDataBaseManager) {
+    public RMCore(Map<String, NodeSource> nodeSources, List<String> brokenNodeSources,
+                  Map<String, RMNode> allNodes, Client caller, RMMonitoringImpl monitoring,
+                  SelectionManager manager, List<RMNode> freeNodesList, RMDBManager newDataBaseManager) {
         this.nodeSources = nodeSources;
         this.brokenNodeSources = brokenNodeSources;
         this.allNodes = allNodes;
@@ -273,7 +298,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Create RM's active objects and the default static Node Source named
      * {@link RMConstants#DEFAULT_STATIC_SOURCE_NAME}. Finally, it throws the RM
      * started event.
-     * 
+     *
      * @param body
      *            the active object's body.
      */
@@ -376,7 +401,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    private void restoreNodeSources() {
+    @VisibleForTesting
+    void restoreNodeSources() {
         Collection<NodeSourceData> nodeSources = dataBaseManager.getNodeSources();
         for (NodeSourceData nsd : nodeSources) {
             if (NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nsd.getName())) {
@@ -430,7 +456,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     /**
      * Returns a node object to a corresponding URL.
-     * 
+     *
      * @param url
      *            url of the node asked.
      * @return RMNode object containing the node.
@@ -444,11 +470,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Set a node's state to free, after a completed task by it. Set the to free
      * and move the node to the internal free nodes list. An event informing the
      * node state's change is thrown to RMMonitoring.
-     * 
+     *
      * @param rmNode node to set free.
      * @return true if the node successfully set as free, false if it was down before.
      */
-    private BooleanWrapper internalSetFree(final RMNode rmNode) {
+    @VisibleForTesting
+    BooleanWrapper internalSetFree(final RMNode rmNode) {
         // If the node is already free no need to go further
         logger.debug("Current node state " + rmNode.getState() + " " + rmNode.getNodeURL());
         logger.debug("Setting node state to free " + rmNode.getNodeURL());
@@ -490,7 +517,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     /**
      * Mark node to be removed after releasing.
-     * 
+     *
      * @param rmNode
      *            node to be removed after node is released.
      */
@@ -514,7 +541,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Performs an RMNode release from the Core At this point the node is at
      * free or 'to be released' state. do the release, and confirm to NodeSource
      * the removal.
-     * 
+     *
      * @param rmnode
      *            the node to release
      */
@@ -530,7 +557,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Internal operations to remove the node from Core. RMNode object is
      * removed from {@link RMCore#allNodes}, removal Node event is thrown to
      * RMMonitoring Active object.
-     * 
+     *
      * @param rmnode
      *            the node to remove.
      */
@@ -549,7 +576,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Internal operation of registering a new node in the Core
      * This step is done after node configuration ran by {@link RMNodeConfigurator} active object.
-     * 
+     *
      * @param configuredNode the node that is going to be added.
      */
     public void internalAddNodeToCore(RMNode configuredNode) {
@@ -823,16 +850,75 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param nodeSourceName a name of the node source
      * @param preemptive if true remove nodes immediately without waiting while they will be freed
      */
-    public void removeAllNodes(String nodeSourceName, boolean preemptive) {
+    public void removeAllNodes(String nodeSourceName, final boolean preemptive) {
 
-        for (RMDeployingNode pn : nodeSources.get(nodeSourceName).getDeployingNodes()) {
-            removeNode(pn.getNodeURL(), preemptive);
+        removeAllNodes(nodeSourceName, "deploying nodes", new Function<NodeSource, Void>() {
+            @Override
+            public Void apply(NodeSource nodeSource) {
+                for (RMDeployingNode pn : nodeSource.getDeployingNodes()) {
+                    removeNode(pn.getNodeURL(), preemptive);
+                }
+                return null;
+            }
+        });
+
+        removeAllNodes(nodeSourceName, "alive nodes", new RemoveAllNodes(new Function<NodeSource, LinkedList<Node>>() {
+            @Override
+            public LinkedList<Node> apply(NodeSource nodeSource) {
+                return nodeSource.getAliveNodes();
+            }
+        }, preemptive));
+
+        removeAllNodes(nodeSourceName, "down nodes", new RemoveAllNodes(new Function<NodeSource, LinkedList<Node>>() {
+            @Override
+            public LinkedList<Node> apply(NodeSource nodeSource) {
+                return nodeSource.getDownNodes();
+            }
+        }, preemptive));
+    }
+
+
+    private final class RemoveAllNodes implements Function<NodeSource, Void> {
+
+        private final Function<NodeSource, LinkedList<Node>> nodeExtractorFunction;
+
+        private final boolean preemptive;
+
+        private RemoveAllNodes(Function<NodeSource, LinkedList<Node>> nodeExtractorFunction, boolean preemptive) {
+            this.nodeExtractorFunction = nodeExtractorFunction;
+            this.preemptive = preemptive;
         }
-        for (Node node : nodeSources.get(nodeSourceName).getAliveNodes()) {
-            removeNode(node.getNodeInformation().getURL(), preemptive);
+
+        @Override
+        public Void apply(NodeSource nodeSource) {
+            LinkedList<Node> nodes = nodeExtractorFunction.apply(nodeSource);
+
+            if (nodes != null) {
+                for (Node node : nodes) {
+                    removeNode(node.getNodeInformation().getURL(), preemptive);
+                }
+            }
+
+            return null;
         }
-        for (Node node : nodeSources.get(nodeSourceName).getDownNodes()) {
-            removeNode(node.getNodeInformation().getURL(), preemptive);
+
+    }
+
+    /**
+     * Wraps the access to the node source to perform a defensive check preventing NPE.
+     *
+     * @param nodeSourceName the name of the node source to retrieve.
+     * @param collectionName the name of the collection to iterate in the node source.
+     * @param function a function that extracts the collection to iterate from the node source.
+     */
+    private void removeAllNodes(String nodeSourceName, String collectionName, Function<NodeSource, Void> function) {
+        NodeSource nodeSource = nodeSources.get(nodeSourceName);
+
+        if (nodeSource != null) {
+            function.apply(nodeSource);
+        } else {
+            logger.warn("Trying to remove  " + collectionName
+                    + " from a node source that is no longer known: " + nodeSourceName);
         }
     }
 
@@ -848,25 +934,72 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(node != null && !node.isDown());
     }
 
+    /**
+     * This method is called periodically by ProActive Nodes to inform the
+     * Resource Manager of a possible reconnection. The method is also used by
+     * ProActive Nodes to know if they are still known by the Resource Manager.
+     * For instance a Node which has been removed by a user from the
+     * Resource Manager is no longer known.
+     * <p>
+     * The method is defined as Immediate Service. This way it is executed in
+     * a dedicated Thread. It is essential in order to allow other methods to
+     * be executed immediately even if incoming connection to the Nodes is stopped
+     * or filtered while a timeout occurs when this method tries to send back a reply.
+     * <p>
+     * The {@code allNodes} data-structure is written by a single Thread only
+     * but read by multiple Threads. The data-structure is marked as volatile
+     * to ensure visibility.
+     * <p>
+     * Parallel executions of this method must involves different {@code nodeUrl}s.
+     * <p>
+     * The underlying calls to {@code setBusyNode} and {@code internalSetFree}
+     * are writing to the {@code freeNodes} data-structure. It explains why this last
+     * is synchronized (thread-safe).
+     *
+     * @param nodeUrls the URLs of the workers associated to the node that publishes the update.
+     *
+     * @return The set of worker node URLs that are unknown to the Resource Manager
+     * (i.e. have been removed by a user).
+     */
+    @ImmediateService
     @Override
-    public BooleanWrapper setNodeAvailable(String nodeUrl) {
-        final RMNode node = this.allNodes.get(nodeUrl);
-
-        if (node == null) {
-            logger.warn(String.format("Cannot set node as available, node %s is unknown", nodeUrl));
-            return new BooleanWrapper(false);
+    public Set<String> setNodesAvailable(Set<String> nodeUrls) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("Received availability for the following workers: " + nodeUrls);
         }
 
-        if (node.isDown()) {
-            // down node came back, restore it's status
-            NodeState previousNodeState = node.getLastEvent().getPreviousNodeState();
-            if (previousNodeState == NodeState.BUSY) {
-                setBusyNode(nodeUrl, node.getOwner());
+        ImmutableSet.Builder<String> nodeUrlsNotKnownByTheRM = new ImmutableSet.Builder<>();
+
+        for (String nodeUrl : nodeUrls) {
+            RMNode node = this.allNodes.get(nodeUrl);
+
+            if (node == null) {
+                logger.warn("Cannot set node as available, the node is unknown: " + nodeUrl);
+                nodeUrlsNotKnownByTheRM.add(nodeUrl);
+            } else if (node.isDown()) {
+                restoreNodeState(nodeUrl, node);
             } else {
-                internalSetFree(node);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The node identified by " + nodeUrl + " is known but not DOWN, no action performed");
+                }
             }
         }
-        return new BooleanWrapper(!node.isDown());
+        return nodeUrlsNotKnownByTheRM.build();
+    }
+
+    @VisibleForTesting
+    void restoreNodeState(String nodeUrl, RMNode node) {
+        NodeState previousNodeState = node.getLastEvent().getPreviousNodeState();
+
+        if (previousNodeState == NodeState.BUSY) {
+            logger.info("Restoring DOWN node to BUSY: " + nodeUrl);
+            setBusyNode(nodeUrl, node.getOwner());
+        } else {
+            logger.info("Restoring DOWN node to FREE: " + nodeUrl);
+            internalSetFree(node);
+        }
+
+        node.getNodeSource().setNodeAvailable(node);
     }
 
     public NodeState getNodeState(String nodeUrl) {
@@ -1156,7 +1289,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * must be understood as a new Monitor point of view. A new monitor start to
      * receive RMCore events, so must be informed of the current state of the
      * Core at the beginning of monitoring.
-     * 
+     *
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState() {
@@ -1353,7 +1486,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    public ArrayList<RMNode> getFreeNodes() {
+    public List<RMNode> getFreeNodes() {
         return freeNodes;
     }
 
@@ -1463,7 +1596,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             List<RMNode> nodesToRelease = new LinkedList<>();
             // expensive but relatively rare operation
             for (RMNode rmnode : new ArrayList<>(allNodes.values())) {
-                // checking that it is not only the same client but also 
+                // checking that it is not only the same client but also
                 // the same connection
                 if (client.equals(rmnode.getOwner()) && clientId.equals(rmnode.getOwner().getId())) {
                     if (rmnode.isToRemove()) {
@@ -1551,11 +1684,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return true if the parameter is a deploying node's url, false otherwise
      */
     private boolean isDeployingNodeURL(String url) {
-        if (url != null && url.startsWith(RMDeployingNode.PROTOCOL_ID + "://")) {
-            return true;
-        } else {
-            return false;
-        }
+        return url != null && url.startsWith(RMDeployingNode.PROTOCOL_ID + "://");
     }
 
     /**
@@ -1645,6 +1774,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanWrapper lockNodes(Set<String> urls) {
         boolean result = true;
         for (String url : urls) {
@@ -1683,6 +1813,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanWrapper unlockNodes(Set<String> urls) {
         boolean result = true;
         for (String url : urls) {

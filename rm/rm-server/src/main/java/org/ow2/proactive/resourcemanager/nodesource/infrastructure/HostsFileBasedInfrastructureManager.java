@@ -36,11 +36,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.utils.FileToBytesConverter;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -53,6 +48,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
 
 /** Abstract infrastructure Manager implementation based on hosts list file. */
@@ -294,6 +294,22 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         } else {
             logger.error("Node " + nodeName +
                     " is not known as a node belonging to this infrastructure manager");
+        }
+    }
+
+    @Override
+    public void onDownNodeReconnection(Node node) {
+        InetAddress host = node.getNodeInformation().getVMInformation().getInetAddress();
+
+        // Yes, this method may experience race conditions
+        // like most of the other methods of this class...
+        // See https://github.com/ow2-proactive/scheduling/issues/2811
+
+        AtomicInteger nbNodesRemoved = removedNodes.get(host);
+
+        if (nbNodesRemoved != null) {
+            nbNodesRemoved.decrementAndGet();
+            registeredNodes.put(node.getNodeInformation().getName(), host);
         }
     }
 

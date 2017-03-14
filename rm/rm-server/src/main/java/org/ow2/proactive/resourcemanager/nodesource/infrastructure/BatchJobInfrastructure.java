@@ -162,7 +162,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * Nodes currently up and running, nodeName -&gt; jobID
      */
-    private Hashtable<String, String> currentNodes = new Hashtable<>();
+    private final Hashtable<String, String> currentNodes = new Hashtable<>();
     /**
      * The number of pending nodes
      */
@@ -580,7 +580,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             }
         } else {
             logger.error("Node " + nodeName + " is not known as a Node belonging to this " +
-                PBSInfrastructure.class.getSimpleName());
+                getClass().getSimpleName());
         }
     }
 
