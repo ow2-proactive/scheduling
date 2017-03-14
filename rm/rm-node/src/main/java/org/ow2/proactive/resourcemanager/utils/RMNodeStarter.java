@@ -143,7 +143,7 @@ public class RMNodeStarter {
 
     private static final int DEFAULT_NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY = 5000; // in ms
 
-    public final static String NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY_PROP_NAME = "proactive.node.availability.reporting.timeout";
+    private static final String NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY_PROP_NAME = "proactive.node.availability.reporting.timeout";
 
     /**
      * The maximum time to wait in milliseconds for retrieving the answer
