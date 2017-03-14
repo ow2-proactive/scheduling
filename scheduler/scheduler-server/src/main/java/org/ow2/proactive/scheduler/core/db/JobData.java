@@ -260,7 +260,7 @@ public class JobData implements Serializable {
         internalJob.setUserSpace(getGlobalSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
-
+        internalJob.setScheduledTimeForRemoval(getScheduledTimeForRemoval());
         return internalJob;
     }
 
@@ -274,6 +274,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setInErrorTime(job.getInErrorTime());
         jobRuntimeData.setFinishedTime(job.getFinishedTime());
         jobRuntimeData.setRemovedTime(job.getRemovedTime());
+        jobRuntimeData.setScheduledTimeForRemoval(job.getScheduledTimeForRemoval());
         jobRuntimeData.setJobName(job.getName());
         jobRuntimeData.setDescription(job.getDescription());
         jobRuntimeData.setProjectName(job.getProjectName());
@@ -472,7 +473,7 @@ public class JobData implements Serializable {
         this.removedTime = removedTime;
     }
 
-    @Column(name = "SCHEDULED_TIME_FOR_REMOVAL")
+    @Column(name = "SCHEDULED_TIME_FOR_REMOVAL", nullable = false)
     public long getScheduledTimeForRemoval() {
         return scheduledTimeForRemoval;
     }

@@ -192,6 +192,14 @@ public interface JobInfo extends Serializable {
     boolean isToBeRemoved();
 
     /**
+     * Returns the scheduled time for removal.
+     * If none is set, returns 0.
+     *
+     * @return the time at which the Job is to be removed.
+     */
+    long getScheduledTimeForRemoval();
+
+    /**
      * Returns the generic information Map
      * @return generic information Map
      */
