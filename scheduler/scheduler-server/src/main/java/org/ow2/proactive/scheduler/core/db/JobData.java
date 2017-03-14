@@ -227,12 +227,12 @@ public class JobData implements Serializable {
     }
 
     private Map<String, String> createVariablesStringMap() {
-        Map<String, JobVariable> variables = getVariables();
-        Map<String, String> variablesString = new HashMap<>(variables.size());
+        Map<String, JobVariable> jobDataVariablesMap = getVariables();
+        Map<String, String> stringVariablesMap = new HashMap<>(jobDataVariablesMap.size());
         for (JobVariable variable : getVariables().values()) {
-            variablesString.put(variable.getName(), variable.getValue());
+            stringVariablesMap.put(variable.getName(), variable.getValue());
         }
-        return variablesString;
+        return stringVariablesMap;
     }
 
     JobInfo toJobInfo() {
