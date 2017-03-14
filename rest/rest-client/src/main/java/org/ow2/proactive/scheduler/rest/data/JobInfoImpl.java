@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
+import java.util.Map;
+
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
@@ -67,7 +69,11 @@ public class JobInfoImpl implements JobInfo {
 
     private JobStatus jobStatus = JobStatus.PENDING;
 
+    private long scheduledTimeForRemoval;
+
     private boolean toBeRemoved;
+
+    private Map<String, String> genericInformation;
 
     public void setFinishedTime(long finishedTime) {
         this.finishedTime = finishedTime;
@@ -229,6 +235,24 @@ public class JobInfoImpl implements JobInfo {
 
     public void setToBeRemoved() {
         this.toBeRemoved = true;
+    }
+
+    @Override
+    public long getScheduledTimeForRemoval() {
+        return scheduledTimeForRemoval;
+    }
+
+    public void setScheduledTimeForRemoval(long scheduledTimeForRemoval) {
+        this.scheduledTimeForRemoval = scheduledTimeForRemoval;
+    }
+
+    @Override
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = genericInformation;
     }
 
 }
