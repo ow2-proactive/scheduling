@@ -1077,6 +1077,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         if (jobInfoData.isToBeRemoved())
             jobInfoImpl.setToBeRemoved();
         jobInfoImpl.setGenericInformation(jobInfoData.getGenericInformation());
+        jobInfoImpl.setVariables(jobInfoData.getVariables());
         return jobInfoImpl;
     }
 
