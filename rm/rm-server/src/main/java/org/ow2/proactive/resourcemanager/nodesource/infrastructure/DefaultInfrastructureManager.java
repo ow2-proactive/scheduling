@@ -78,18 +78,13 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     }
 
     /**
-     * Remove the node from underlying infrastructure. Terminates proactive
-     * runtime if there is no more nodes.
-     * 
-     * @param node
-     *            node to release
-     * @throws RMException
-     *             if any problems occurred
+     * {@inheritDoc}
      */
     @Override
     public void removeNode(Node node) throws RMException {
         try {
             logger.info("Terminating the node " + node.getNodeInformation().getName());
+
             if (!isThereNodesInSameJVM(node)) {
                 final Node n = node;
                 nodeSource.executeInParallel(new Runnable() {
@@ -161,6 +156,16 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
+    public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
+        logger.info("[" + getClass().getSimpleName() + "] Node removal skipped because the node is down: " +
+                    proactiveProgrammingNode.getNodeInformation().getURL());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void shutDown() {
     }
+
 }

@@ -191,7 +191,7 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Performs some cleanup ( essentially removal of the cached node ) and call
      * removeNodeImpl
-     *
+     * 
      * @param node
      *            the node to be removed
      * @throws RMException
@@ -203,6 +203,28 @@ public abstract class InfrastructureManager implements Serializable {
             logger.warn("Exception occurred while removing node " + node);
         }
         this.removeNode(node);
+    }
+
+    /**
+     * This method is called by the system when a Node is detected as DOWN.
+     *
+     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
+     *
+     * @throws RMException if any problems occurred.
+     */
+    public void internalNotifyDownNode(Node proactiveProgrammingNode) throws RMException {
+        notifyDownNode(proactiveProgrammingNode);
+    }
+
+    /**
+     * The default behavior is to remove the node from the infrastructure manager.
+     *
+     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
+     *
+     * @throws RMException if any problems occurred.
+     */
+    public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
+        internalRemoveNode(proactiveProgrammingNode);
     }
 
     /**
@@ -373,11 +395,11 @@ public abstract class InfrastructureManager implements Serializable {
 
     /**
      * Removes the node from the resource manager.
-     *
+     * 
      * @param node
-     *            node to release
+     *            the node to release.
      * @throws RMException
-     *             if any problems occurred
+     *             if any problems occurred.
      */
     public abstract void removeNode(Node node) throws RMException;
 
@@ -721,6 +743,16 @@ public abstract class InfrastructureManager implements Serializable {
      */
     private String buildDeployingNodeURL(String pnName) {
         return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
+    }
+
+    /**
+     * Called by the system every time a node that is DOWN reconnects
+     * and changes its status to FREE or BUSY.
+     *
+     * @param node the node that has reconnected.
+     */
+    public void onDownNodeReconnection(Node node) {
+        // to be overridden by children
     }
 
     /**
