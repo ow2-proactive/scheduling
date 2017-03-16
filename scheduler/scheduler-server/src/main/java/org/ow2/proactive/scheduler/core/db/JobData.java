@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -220,7 +221,18 @@ public class JobData implements Serializable {
         if (isToBeRemoved()) {
             jobInfo.setToBeRemoved();
         }
+        jobInfo.setGenericInformation(getGenericInformation());
+        jobInfo.setVariables(createVariablesStringMap());
         return jobInfo;
+    }
+
+    private Map<String, String> createVariablesStringMap() {
+        Map<String, JobVariable> jobDataVariablesMap = getVariables();
+        Map<String, String> stringVariablesMap = new HashMap<>(jobDataVariablesMap.size());
+        for (JobVariable variable : getVariables().values()) {
+            stringVariablesMap.put(variable.getName(), variable.getValue());
+        }
+        return stringVariablesMap;
     }
 
     JobInfo toJobInfo() {
@@ -248,7 +260,7 @@ public class JobData implements Serializable {
         internalJob.setUserSpace(getGlobalSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
-
+        internalJob.setScheduledTimeForRemoval(getScheduledTimeForRemoval());
         return internalJob;
     }
 
@@ -262,6 +274,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setInErrorTime(job.getInErrorTime());
         jobRuntimeData.setFinishedTime(job.getFinishedTime());
         jobRuntimeData.setRemovedTime(job.getRemovedTime());
+        jobRuntimeData.setScheduledTimeForRemoval(job.getScheduledTimeForRemoval());
         jobRuntimeData.setJobName(job.getName());
         jobRuntimeData.setDescription(job.getDescription());
         jobRuntimeData.setProjectName(job.getProjectName());
@@ -460,7 +473,7 @@ public class JobData implements Serializable {
         this.removedTime = removedTime;
     }
 
-    @Column(name = "SCHEDULED_TIME_FOR_REMOVAL")
+    @Column(name = "SCHEDULED_TIME_FOR_REMOVAL", nullable = false)
     public long getScheduledTimeForRemoval() {
         return scheduledTimeForRemoval;
     }

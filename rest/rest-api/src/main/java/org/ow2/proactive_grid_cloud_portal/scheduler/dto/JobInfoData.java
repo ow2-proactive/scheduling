@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.util.Map;
+
+
 public class JobInfoData implements java.io.Serializable {
 
     private long startTime;
@@ -60,6 +63,10 @@ public class JobInfoData implements java.io.Serializable {
     private String jobOwner;
 
     private boolean toBeRemoved = false;
+
+    private Map<String, String> genericInformation;
+
+    private Map<String, String> variables;
 
     public void setToBeRemoved() {
         toBeRemoved = true;
@@ -197,6 +204,22 @@ public class JobInfoData implements java.io.Serializable {
         this.priority = priority;
     }
 
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = genericInformation;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
@@ -205,7 +228,8 @@ public class JobInfoData implements java.io.Serializable {
                ", numberOfRunningTasks=" + numberOfRunningTasks + ", numberOfFinishedTasks=" + numberOfFinishedTasks +
                ", numberOfFailedTasks=" + numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks +
                ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
-               '\'' + ", toBeRemoved=" + toBeRemoved + '}';
+               '\'' + ", toBeRemoved=" + toBeRemoved + ", genericInformation=" + genericInformation + ", variables=" +
+               variables + '}';
     }
 
 }

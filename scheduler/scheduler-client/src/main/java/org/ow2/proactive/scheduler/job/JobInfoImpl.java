@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.job;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -82,6 +83,10 @@ public class JobInfoImpl implements JobInfo {
     //DEFAULT MUST BE -1
     private long removedTime = -1;
 
+    /** job scheduled time for removal (for the housekeeping) */
+    // DEFAULT MUST BE 0 IF NOT SCHEDULED FOR REMOVAL
+    private long scheduledTimeForRemoval = 0;
+
     /** last updated time on the job*/
     private long lastUpdatedTime = -1;
 
@@ -120,6 +125,10 @@ public class JobInfoImpl implements JobInfo {
 
     private List<ClientTaskState> modifiedTasks;
 
+    private Map<String, String> genericInformation;
+
+    private Map<String, String> variables;
+
     public JobInfoImpl() {
     }
 
@@ -152,6 +161,8 @@ public class JobInfoImpl implements JobInfo {
         if (jobInfo.getModifiedTasks() != null) {
             this.modifiedTasks = new ArrayList<>(jobInfo.getModifiedTasks());
         }
+        this.genericInformation = jobInfo.getGenericInformation();
+        this.variables = jobInfo.getVariables();
     }
 
     /**
@@ -406,6 +417,38 @@ public class JobInfoImpl implements JobInfo {
      */
     public Set<TaskId> getTasksSkipped() {
         return this.tasksSkipped;
+    }
+
+    public void setScheduledTimeForRemoval(long scheduledTimeForRemoval) {
+        this.scheduledTimeForRemoval = scheduledTimeForRemoval;
+    }
+
+    @Override
+    public long getScheduledTimeForRemoval() {
+        return scheduledTimeForRemoval;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ow2.proactive.scheduler.common.job.JobInfo#getGenericInformation()
+     */
+    @Override
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        this.genericInformation = genericInformation;
+    }
+
+    @Override
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
     }
 
 }

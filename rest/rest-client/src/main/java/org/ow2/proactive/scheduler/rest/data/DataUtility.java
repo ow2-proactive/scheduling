@@ -83,6 +83,8 @@ public class DataUtility {
         impl.setJobStatus(jobStatus(d.getStatus()));
         impl.setSubmittedTime(d.getSubmittedTime());
         impl.setTotalNumberOfTasks(d.getTotalNumberOfTasks());
+        impl.setGenericInformation(d.getGenericInformation());
+        impl.setVariables(d.getVariables());
         return impl;
     }
 
