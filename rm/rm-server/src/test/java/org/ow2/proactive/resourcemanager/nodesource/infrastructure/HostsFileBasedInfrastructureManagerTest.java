@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Semaphore;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +48,8 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
  * @since 8 Mar 2017
  */
 public class HostsFileBasedInfrastructureManagerTest {
+
+    public Semaphore semaphore = new Semaphore(0);
 
     public int retryCounter = 0;
 
@@ -85,12 +87,17 @@ public class HostsFileBasedInfrastructureManagerTest {
     @Test
     public void testInfiniteRetry() throws Exception {
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        int retries = -1;
-        executor.invokeAll(Arrays.asList(new StartNodeThread(retries)), 100, TimeUnit.MILLISECONDS);
-        executor.shutdown();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new StartNodeThread(-1).call();
+            }
+        });
+        thread.start();
 
-        assertThat(retryCounter, greaterThan(1));
+        semaphore.acquire();
+
+        assertThat(retryCounter, greaterThan(3));
     }
 
     private HostsFileBasedInfrastructureManager createTestClass() {
@@ -105,6 +112,11 @@ public class HostsFileBasedInfrastructureManagerTest {
             @Override
             protected void startNodeImpl(InetAddress host, int nbNodes, List<String> depNodeURLs) throws RMException {
                 retryCounter++;
+
+                if (retryCounter > 3) {
+                    semaphore.release();
+                }
+
                 throw new RMException("RM exception");
 
             }
