@@ -25,18 +25,19 @@
  */
 package org.ow2.proactive.wrapper;
 
-import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.rmi.AlreadyBoundException;
+import java.security.AccessController;
 import java.security.KeyException;
+import java.security.PrivilegedAction;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
@@ -76,15 +77,11 @@ import org.ow2.proactive.utils.Tools;
  */
 public class WrapperStarter {
 
-    // public static void main(String[] args) {
-    //     SchedulerStarter.main(args);
-    // }
-
-    private static Logger logger = Logger.getLogger(SchedulerStarter.class);
-
     private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
 
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
+
+    private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
     private static BroadcastDiscovery discoveryService;
 
@@ -93,6 +90,12 @@ public class WrapperStarter {
     /**
      * Start the scheduler creation process.
      */
+
+    public static void main(String[] args) {
+
+        launchProactiveServer();
+
+    }
 
     public static void launchProactiveServer() {
 
@@ -104,51 +107,19 @@ public class WrapperStarter {
         configureDerby();
 
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
+        System.out.println(ArrayUtils.toString(args));
 
         Options options = getOptions();
 
         try {
-            CommandLine commandLine = getCommandLine(args, options);
-            if (commandLine.hasOption("h")) {
-                displayHelp(options);
-            } else {
-                start(commandLine);
-            }
+            start(getCommandLine(args, options));
+
         } catch (Exception e) {
             logger.error("Error when starting the scheduler", e);
             displayHelp(options);
             System.exit(6);
         }
 
-    }
-
-    public static void main(String[] args) {
-
-        launchProactiveServer();
-
-        /*
-         * configureSchedulerAndRMAndPAHomes();
-         * configureSecurityManager();
-         * configureLogging();
-         * configureDerby();
-         * 
-         * args = JVMPropertiesPreloader.overrideJVMProperties(args);
-         * 
-         * Options options = getOptions();
-         * 
-         * try {
-         * CommandLine commandLine = getCommandLine(args, options);
-         * if (commandLine.hasOption("h")) {
-         * displayHelp(options);
-         * } else {
-         * start(commandLine);
-         * }
-         * } catch (Exception e) {
-         * logger.error("Error when starting the scheduler", e);
-         * displayHelp(options);
-         * System.exit(6);
-         * }
-         */
     }
 
     private static CommandLine getCommandLine(String[] args, Options options) throws ParseException {
@@ -499,10 +470,24 @@ public class WrapperStarter {
 
     private static void configureSchedulerAndRMAndPAHomes() {
 
-        //String schedHome = WrapperStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        //String schedHome = WrapperStarter.class.getProtectionDomain().getCodeSource().getLocation().getPath() + ".";
+        //String schedHome = findSchedulerHome();
 
-        setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), findSchedulerHome());
-        String schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
+        final String[] home = { null };
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                home[0] = getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+                return null;
+            }
+        });
+        String schedHome = home[0].replace("file:", "") + ".";
+
+        System.out.println("Proactive Home: " + schedHome);
+
+        setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
+        schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
+
+        setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
         setPropIfNotAlreadySet(PAResourceManagerProperties.RM_HOME.getKey(), schedHome);
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),

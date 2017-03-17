@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <display-name>Scheduler's Rest API</display-name>
+
+    <context-param>
+        <param-name>resteasy.scan.providers</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>resteasy.scan.resources</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>resteasy.resources</param-name>
+        <param-value>
+            org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest,org.ow2.proactive_grid_cloud_portal.studio.StudioRest,org.ow2.proactive_grid_cloud_portal.rm.RMRest,org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl
+        </param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.ow2.proactive_grid_cloud_portal.webapp.MyResteasyBootstrap</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.ow2.proactive_grid_cloud_portal.webapp.NoVncBootstrap</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.atmosphere.cpr.SessionSupport</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>atmosphere</servlet-name>
+        <servlet-class>org.atmosphere.cpr.AtmosphereServlet</servlet-class>
+
+        <init-param>
+            <param-name>org.atmosphere.cpr.sessionSupport</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.websocket.messageContentType</param-name>
+            <param-value>application/json</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.websocket.bufferSize</param-name>
+            <!-- Maximum value allowed by Jetty -->
+            <!-- See class org.eclipse.jetty.websocket.api.WebSocketPolicy.setInputBufferSize -->
+            <param-value>32768</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.websocket.maxTextMessageSize</param-name>
+            <param-value>102400</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.cpr.asyncSupport</param-name>
+            <param-value>org.atmosphere.container.Jetty9AsyncSupportWithWebSocket</param-value>
+        </init-param>
+        <init-param>
+            <!-- https://github.com/Atmosphere/atmosphere/wiki/Understanding-BroadcasterCache -->
+            <param-name>org.atmosphere.cpr.broadcasterCacheClass</param-name>
+            <param-value>org.atmosphere.cache.UUIDBroadcasterCache</param-value>
+        </init-param>
+
+        <load-on-startup>0</load-on-startup>
+        <async-supported>true</async-supported>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>atmosphere</servlet-name>
+        <url-pattern>/scheduler/events/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>resteasy-servlet</servlet-name>
+        <servlet-class>
+            org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
+        </servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>doc-servlet</servlet-name>
+        <servlet-class>
+            org.eclipse.jetty.servlet.DefaultServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>resteasy-servlet</servlet-name>
+        <url-pattern>/scheduler/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>resteasy-servlet</servlet-name>
+        <url-pattern>/rm/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>resteasy-servlet</servlet-name>
+        <url-pattern>/studio/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>resteasy-servlet</servlet-name>
+        <url-pattern>/data/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>doc-servlet</servlet-name>
+        <url-pattern>/doc/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+</web-app>

@@ -5,8 +5,6 @@ apply plugin: 'ear'
 apply plugin: 'java'
 apply plugin: 'war'
 
-sourceCompatibility = 1.7
-
 repositories {
     mavenCentral()
 }
@@ -17,19 +15,31 @@ configurations {
     all*.exclude group: 'com.zaxxer', module: 'HikariCP-java6'
 }
 
-
-task deleteFiles(type: Delete){
+task deleteConfigFiles(type: Delete){
     delete 'src/main/resources/config'
 }
 
-task copyFiles(type: Copy) {
+task copyConfigFiles(type: Copy) {
     from project(':').files('config', '*')
     into 'src/main/resources/config'
 }
 
-copyFiles.dependsOn deleteFiles
+task deleteDistFiles(type: Delete){
+    delete 'src/main/resources/dist'
+}
 
-ear.dependsOn copyFiles
+task copyDistFiles(type: Copy) {
+    from project(':').files('dist/war', '*')
+    into 'src/main/resources/dist/war'
+}
+
+copyConfigFiles.dependsOn deleteConfigFiles
+
+copyDistFiles.dependsOn deleteDistFiles
+
+war.dependsOn copyConfigFiles, copyDistFiles
+
+ear.dependsOn war
 
 dependencies {
     // The following dependencies will be the ear modules and
@@ -43,12 +53,16 @@ dependencies {
     compile project(':scheduler:scheduler-server')
     earlib project(':scheduler:scheduler-server')
 
+    compile group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
     earlib group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
 }
 
+war {
+    archiveName "proactive-server-${schedulingVersion}.war"
+}
 
 ear {
     appDirName 'src/main/app'  // use application metadata found in this folder
@@ -64,8 +78,8 @@ ear {
         // defaults to project.description if not set
 //      description = "My customized EAR for the Gradle documentation"
 //      libraryDirectory = "APP-INF/lib"  // not needed, above libDirName setting does this
-//      module("my.jar", "java")  // won't deploy as my.jar isn't deploy dependency
-//      webModule("my.war", "/")  // won't deploy as my.war isn't deploy dependency
+//      module("proactive-wrapper.jar", "java")  // won't deploy as my.jar isn't deploy dependency
+//      webModule("proactive-server-${schedulingVersion}.war", "/")  // won't deploy as my.war isn't deploy dependency
 //      securityRole "admin"
 //      securityRole "superadmin"
     }

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="ProActive">
+    <link rel="shortcut icon" href="assets/image/favicon.ico">
+
+    <title>Get started with ProActive</title>
+
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="assets/js/html5shiv.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="container">
+    <div class="container">
+        <div class="text-center">
+            <h1><img src="assets/image/proactive-arrow-150.png"/>&nbsp;<b>ProActive Workflows & Scheduling</b>
+            </h1>
+        </div>
+
+        <hr>
+        <p class="lead">Access Web applications </p>
+
+        <div class="row text-center" style="padding: 0">
+            <div class="col-xs-4">
+                <a href="/studio" title="ProActive Studio"><img src="assets/image/pps-workflow.png"></a>
+
+                <p><b>Build</b> your workflows with <i>ProActive Studio</i></p>
+            </div>
+            <div class="col-xs-4" style="padding: 0">
+                <a href="/scheduler" title="ProActive Scheduler"><img src="assets/image/pps-run.png"></a>
+
+                <p><b>Run</b> your jobs with <i>ProActive Scheduler</i></p>
+            </div>
+            <div class="col-xs-4" style="padding: 0">
+                <a href="/rm" title="ProActive Resource Manager"><img src="assets/image/pps-deploy.png"></a>
+
+                <p><b>Deploy</b> your workload with <i>ProActive Resource Manager</i></p>
+            </div>
+        </div>
+        <br>
+        <hr>
+        <p class="lead">Use the command line client via the <a id="restUrlLink" href=""
+                                                               title="ProActive REST API">REST API</a>
+        </p>
+        <pre>$> ./bin/proactive-client -u <span id="restUrlCli"></span> -l $USER</pre>
+        <br>
+        <hr>
+        <p class="lead">Check out online resources to get started</p>
+
+        <div class="row text-center">
+            <div class="col-xs-4 col-md-offset-2">
+                <a href="http://doc.activeeon.com/"><img src="assets/image/book.png"></a>
+
+                <p>Documentation</p>
+            </div>
+            <div class="col-xs-4">
+                <a href="http://try.activeeon.com/"><img src="assets/image/hat.png"></a>
+
+                <p>Tutorials</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <small>&copy; 1997-<script>document.write(new Date().getFullYear())</script> ActiveEon/INRIA/University of Nice-Sophia Antipolis</small>
+    </div>
+</div>
+<script>
+    var url = document.location.href;
+    url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
+    url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
+    url = url.substring(0, url.lastIndexOf("/") + 1);
+    var restApiWebPage = url + "rest";
+    var restApiEndpoint = url + "rest";
+    document.getElementById('restUrlCli').innerHTML = restApiEndpoint;
+    document.getElementById('restUrlLink').href = restApiWebPage;
+</script>
+</body>
+</html>
