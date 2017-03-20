@@ -247,7 +247,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         infraParams = new Object[] { ("localhost " + NB_NODES + "\n").getBytes(), //hosts
                                      60000, //timeout
-                                     1, //attempts
+                                     0, //attempts
                                      10, //wait between failures
                                      port, //ssh server port
                                      "toto", //ssh username
