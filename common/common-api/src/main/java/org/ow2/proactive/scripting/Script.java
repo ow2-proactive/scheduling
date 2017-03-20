@@ -346,7 +346,7 @@ public abstract class Script<E> implements Serializable {
             }
             for (String ext : factory.getExtensions()) {
                 String scriptEngineLookupLowercase = scriptEngineLookup.toLowerCase();
-                if (scriptEngineLookupLowercase.endsWith(ext.toLowerCase())) {
+                if (scriptEngineLookupLowercase.equalsIgnoreCase(ext.toLowerCase())) {
                     return factory.getScriptEngine();
                 }
             }
