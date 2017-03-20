@@ -812,4 +812,9 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         return schedulerProxy.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
     }
 
+    @Override
+    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+        return schedulerProxy.getPortalConfiguration();
+    }
+
 }

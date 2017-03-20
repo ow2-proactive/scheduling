@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -1105,6 +1106,17 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throwNCEOrPEOrSCEOrJCE(e);
         }
         return null;
+    }
+
+    @Override
+    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+        try {
+            return restApi().getPortalConfiguration(sid);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
     }
 
 }

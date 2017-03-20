@@ -31,6 +31,7 @@ import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.security.auth.login.LoginException;
@@ -635,6 +636,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
             throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
             JobCreationException {
         return uischeduler.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+    }
+
+    @Override
+    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+        return uischeduler.getPortalConfiguration();
     }
 
 }

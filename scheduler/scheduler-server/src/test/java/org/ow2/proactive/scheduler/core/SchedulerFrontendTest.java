@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
@@ -41,6 +42,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB;
 
 import java.security.KeyException;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +59,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
+import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 
 
 public class SchedulerFrontendTest {
@@ -74,6 +77,9 @@ public class SchedulerFrontendTest {
 
     @Mock
     private JobState jobstate;
+
+    @Mock
+    private SchedulerPortalConfiguration portalConfiguration;
 
     private JobId jobId;
 
@@ -413,5 +419,14 @@ public class SchedulerFrontendTest {
                .checkPermissions("getTaskServerLogsByTag",
                                  ij,
                                  YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
+    }
+
+    @Test
+    public void testGetPortalConfiguration() {
+
+        Properties properties = new Properties();
+        Mockito.when(portalConfiguration.getProperties()).thenReturn(properties);
+
+        assertEquals(properties, schedulerFrontend.getPortalConfiguration());
     }
 }

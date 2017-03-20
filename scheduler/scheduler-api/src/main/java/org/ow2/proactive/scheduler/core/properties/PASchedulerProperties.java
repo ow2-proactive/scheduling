@@ -342,7 +342,13 @@ public enum PASchedulerProperties {
 
     EMAIL_NOTIFICATIONS_ENABLED("pa.scheduler.notifications.email.enabled", PropertyType.BOOLEAN),
 
-    EMAIL_NOTIFICATIONS_SENDER_ADDRESS("pa.scheduler.notifications.email.from", PropertyType.STRING);
+    EMAIL_NOTIFICATIONS_SENDER_ADDRESS("pa.scheduler.notifications.email.from", PropertyType.STRING),
+
+    /* ***************************************************************** */
+    /* ******************* PORTAL DISPLAY PROPERTIES ******************* */
+    /* ***************************************************************** */
+
+    SCHEDULER_PORTAL_CONFIGURATION("pa.scheduler.portal.configuration", PropertyType.STRING);
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
