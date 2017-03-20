@@ -66,6 +66,8 @@ public class JobInfoData implements java.io.Serializable {
 
     private Map<String, String> genericInformation;
 
+    private Map<String, String> variables;
+
     public void setToBeRemoved() {
         toBeRemoved = true;
     }
@@ -210,6 +212,14 @@ public class JobInfoData implements java.io.Serializable {
         this.genericInformation = genericInformation;
     }
 
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, String> variables) {
+        this.variables = variables;
+    }
+
     @Override
     public String toString() {
         return "JobInfoData{" + "startTime=" + startTime + ", finishedTime=" + finishedTime + ", submittedTime=" +
@@ -218,7 +228,8 @@ public class JobInfoData implements java.io.Serializable {
                ", numberOfRunningTasks=" + numberOfRunningTasks + ", numberOfFinishedTasks=" + numberOfFinishedTasks +
                ", numberOfFailedTasks=" + numberOfFailedTasks + ", numberOfFaultyTasks=" + numberOfFaultyTasks +
                ", numberOfInErrorTasks=" + numberOfInErrorTasks + ", priority=" + priority + ", jobOwner='" + jobOwner +
-               '\'' + ", toBeRemoved=" + toBeRemoved + ", genericInformation=" + genericInformation + '}';
+               '\'' + ", toBeRemoved=" + toBeRemoved + ", genericInformation=" + genericInformation + ", variables=" +
+               variables + '}';
     }
 
 }
