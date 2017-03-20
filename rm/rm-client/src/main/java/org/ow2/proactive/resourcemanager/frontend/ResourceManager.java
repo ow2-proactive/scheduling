@@ -195,12 +195,18 @@ public interface ResourceManager {
     BooleanWrapper nodeIsAvailable(String nodeUrl);
 
     /**
-     * Mark node as available is the resource manager.
+     * This method is called periodically by ProActive Nodes to inform the
+     * Resource Manager of a possible reconnection. The method is also used by
+     * ProActive Nodes to know if they are still known by the Resource Manager.
+     * For instance a Node which has been removed by a user from the
+     * Resource Manager is no longer known.
      *
-     * @param nodeUrl of a node.
-     * @return true successfully set as available.
+     * @param nodeUrls the URLs of the workers associated to the node that publishes the update.
+     *
+     * @return The set of worker node URLs that are unknown to the Resource Manager
+     * (i.e. have been removed by a user).
      */
-    BooleanWrapper setNodeAvailable(String nodeUrl);
+    Set<String> setNodesAvailable(Set<String> nodeUrls);
 
     /**
      * Returns true if the resource manager is operational and a client is connected.
