@@ -31,29 +31,37 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
@@ -70,6 +78,7 @@ import org.ow2.proactive.utils.NodeSet;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -113,6 +122,8 @@ public class RMCoreTest {
     private RMNode mockedFreeButLockedNode;
 
     private NodesLockRestorationManager nodesLockRestorationManager;
+
+    private HashMap<String, NodeSource> nodeSources;
 
     @Before
     public void setUp() {
@@ -584,7 +595,7 @@ public class RMCoreTest {
     }
 
     private void testLockNodeState(NodeState nodeState) {
-        RMNodeImpl rmNode = Mockito.spy(RMNodeHelper.basicWithMockedInternals().getLeft());
+        RMNodeImpl rmNode = spy(RMNodeHelper.basicWithMockedInternals().getLeft());
         rmNode.setState(nodeState);
 
         HashMap<String, RMNode> allNodes = new HashMap<>();
@@ -694,16 +705,113 @@ public class RMCoreTest {
         verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
     }
 
+    @Test
+    public void testSetNodesAvailableEmptyInput() {
+        Set<String> unknownNodeUrls = rmCore.setNodesAvailable(ImmutableSet.<String> of());
+        assertThat(unknownNodeUrls).isEmpty();
+    }
+
+    @Test
+    public void testSetNodesAvailableKnownNodeUrl() throws ActiveObjectCreationException, NodeException {
+        ImmutableMap<String, RMNode> allNodes = ImmutableMap.of(mockedBusyNode.getNodeURL(), mockedBusyNode);
+
+        List<RMNode> freeNodes = Collections.emptyList();
+
+        RMCore rmCore = createRmCore(allNodes, freeNodes);
+
+        assertThat(rmCore.setNodesAvailable(ImmutableSet.of(mockedBusyNode.getNodeURL()))).isEmpty();
+    }
+
+    @Test
+    public void testSetNodesAvailableUnknownNodeUrl() throws ActiveObjectCreationException, NodeException {
+        ImmutableMap<String, RMNode> allNodes = ImmutableMap.of(mockedBusyNode.getNodeURL(), mockedBusyNode);
+
+        List<RMNode> freeNodes = Collections.emptyList();
+
+        RMCore rmCore = createRmCore(allNodes, freeNodes);
+
+        String unknownNodeUrl = mockedRemovableNode.getNodeURL();
+        Set<String> unknownNodeUrls = rmCore.setNodesAvailable(ImmutableSet.of(unknownNodeUrl));
+        assertThat(unknownNodeUrls).hasSize(1);
+        assertThat(unknownNodeUrls).contains(unknownNodeUrl);
+    }
+
+    @Test
+    public void testSetNodesAvailableKnownNodeUrlDown() throws ActiveObjectCreationException, NodeException {
+        ImmutableMap<String, RMNode> allNodes = ImmutableMap.of(mockedRemovableNode.getNodeURL(), mockedRemovableNode);
+
+        List<RMNode> freeNodes = Collections.emptyList();
+
+        RMCore rmCore = spy(createRmCore(allNodes, freeNodes));
+
+        configureNodeForStateChange(mockedRemovableNode, NodeState.BUSY);
+
+        String unknownNodeUrl = mockedRemovableNode.getNodeURL();
+
+        verify(rmCore, never()).restoreNodeState(mockedRemovableNode.getNodeURL(), mockedRemovableNode);
+
+        Set<String> unknownNodeUrls = rmCore.setNodesAvailable(ImmutableSet.of(unknownNodeUrl));
+        assertThat(unknownNodeUrls).isEmpty();
+
+        verify(rmCore).restoreNodeState(mockedRemovableNode.getNodeURL(), mockedRemovableNode);
+    }
+
+    @Test
+    public void testRestoreNodeStateWithPreviousNodeStateBusy() {
+        configureNodeForStateChange(mockedRemovableNode, NodeState.BUSY);
+
+        verify(rmCore, never()).setBusyNode(anyString(), any(Client.class));
+
+        rmCore.restoreNodeState(mockedRemovableNode.getNodeURL(), mockedRemovableNode);
+
+        verify(rmCore).setBusyNode(eq(mockedRemovableNode.getNodeURL()), any(Client.class));
+    }
+
+    @Test
+    public void testRestoreNodeStateWithPreviousNodeStateDown() {
+        configureNodeForStateChange(mockedRemovableNode, NodeState.DOWN);
+
+        verify(rmCore, never()).internalSetFree(any(RMNode.class));
+
+        rmCore.restoreNodeState(mockedRemovableNode.getNodeURL(), mockedRemovableNode);
+
+        verify(rmCore).internalSetFree(mockedRemovableNode);
+    }
+
+    @Test
+    public void testRemoveAllNodesWithUnknownNodeSource() {
+        nodeSources.clear();
+        rmCore.removeAllNodes(mockedNodeSource.getName(), false);
+    }
+
+    private void configureNodeForStateChange(RMNode mockedRmNode, NodeState previousNodeState) {
+        RMNodeEvent rmNodeEvent = createRmNodeEvent(previousNodeState);
+        when(mockedRmNode.getLastEvent()).thenReturn(rmNodeEvent);
+        when(mockedRmNode.getOwner()).thenReturn(new Client(null, false));
+
+        RMCore.clients.put(mockedRmNode.getOwner().getId(), mockedRmNode.getOwner());
+    }
+
+    private RMNodeEvent createRmNodeEvent(NodeState previousNodeState) {
+        RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
+        rmNodeDescriptor.setState(NodeState.DOWN);
+
+        return new RMNodeEvent(rmNodeDescriptor, RMEventType.NODE_STATE_CHANGED, previousNodeState, "initiator");
+    }
+
+    private RMCore createRmCore(ImmutableMap<String, RMNode> allNodes, List<RMNode> freeNodes) {
+        return new RMCore(null, null, allNodes, null, Mockito.mock(RMMonitoringImpl.class), null, freeNodes, null);
+    }
+
     /**
      * 6 nodes (same nodesource).
      */
     private void populateRMCore() {
 
-        when(mockedCaller.checkPermission(Matchers.any(Permission.class), Matchers.any(String.class))).thenReturn(true);
-        when(mockedSelectionManager.selectNodes(Matchers.any(Criteria.class),
-                                                Matchers.any(Client.class))).thenReturn(new NodeSet());
+        when(mockedCaller.checkPermission(any(Permission.class), any(String.class))).thenReturn(true);
+        when(mockedSelectionManager.selectNodes(any(Criteria.class), any(Client.class))).thenReturn(new NodeSet());
 
-        HashMap<String, NodeSource> nodeSources = new HashMap<String, NodeSource>(1);
+        nodeSources = new HashMap<String, NodeSource>(1);
         configureNodeSource(mockedNodeSource, "NODESOURCE-test");
         nodeSources.put(mockedNodeSource.getName(), mockedNodeSource);
 
@@ -774,7 +882,7 @@ public class RMCoreTest {
                             freeNodes,
                             dbManager);
 
-        rmCore = Mockito.spy(rmCore);
+        rmCore = spy(rmCore);
 
         nodesLockRestorationManager = null;
 
@@ -782,7 +890,7 @@ public class RMCoreTest {
             @Override
             public NodesLockRestorationManager apply(RMCore rmCore) {
                 nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
-                nodesLockRestorationManager = Mockito.spy(nodesLockRestorationManager);
+                nodesLockRestorationManager = spy(nodesLockRestorationManager);
 
                 doReturn(Maps.newHashMap()).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
@@ -801,6 +909,7 @@ public class RMCoreTest {
         when(mockedNode.getNodeInformation()).thenReturn(mockedNodeInformation);
         when(rmNode.getNode()).thenReturn(mockedNode);
         when(rmNode.getNodeName()).thenReturn(param.getUrl());
+        when(rmNode.getNodeURL()).thenReturn(param.getUrl());
         when(rmNode.isDown()).thenReturn(param.isDown());
         when(rmNode.isFree()).thenReturn(param.isFree());
         when(rmNode.isLocked()).thenReturn(param.isLocked());
@@ -821,8 +930,8 @@ public class RMCoreTest {
 
     private void configureNodeSource(NodeSource nodeSource, String nodeSourceName) {
         when(nodeSource.getName()).thenReturn(nodeSourceName);
-        when(nodeSource.acquireNode(Matchers.any(String.class),
-                                    Matchers.any(Client.class))).thenReturn(new BooleanWrapper(true));
+        when(nodeSource.acquireNode(any(String.class), any(Client.class))).thenReturn(new BooleanWrapper(true));
+        when(nodeSource.acquireNode(any(String.class), any(Client.class))).thenReturn(new BooleanWrapper(true));
     }
 
     private class MockedRMNodeParameters {

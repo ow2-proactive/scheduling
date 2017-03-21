@@ -215,7 +215,11 @@ final class TerminationData {
         if (!taskToTerminate.normalTermination || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();
             if (iDependences != null) {
-                Set<TaskId> parentIds = internalTaskParentFinder.getFirstNotSkippedParentTaskIds(taskData.getTask());
+                Set<TaskId> parentIds = new HashSet<>(iDependences.size());
+                for (InternalTask parentTask : iDependences) {
+                    parentIds.addAll(InternalTaskParentFinder.getInstance()
+                                                             .getFirstNotSkippedParentTaskIds(parentTask));
+                }
 
                 Map<TaskId, TaskResult> taskResults = service.getInfrastructure()
                                                              .getDBManager()
