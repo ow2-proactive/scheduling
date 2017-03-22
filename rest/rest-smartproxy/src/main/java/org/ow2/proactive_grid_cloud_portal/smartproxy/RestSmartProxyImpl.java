@@ -32,7 +32,6 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
@@ -595,7 +594,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
 
     @Override
     public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
-        return ((ISchedulerClient) _getScheduler()).getPortalConfiguration();
+        return _getScheduler().getPortalConfiguration();
     }
 
 }

@@ -39,7 +39,7 @@ public class SchedulerPortalConfiguration {
 
     private static SchedulerPortalConfiguration configuration;
 
-    private static Logger logger = Logger.getLogger(SchedulerPortalConfiguration.class);
+    private static final Logger logger = Logger.getLogger(SchedulerPortalConfiguration.class);
 
     private SchedulerPortalConfiguration() {
     }
