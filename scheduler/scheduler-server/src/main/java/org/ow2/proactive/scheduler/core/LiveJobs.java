@@ -230,7 +230,7 @@ class LiveJobs {
             Set<TaskId> updatedTasks = job.setUnPause();
 
             if (updatedTasks.size() > 0) {
-                jlogger.debug(jobId, "has just been resumed !");
+                jlogger.info(jobId, "has just been resumed.");
                 dbManager.updateJobAndTasksState(job);
                 updateTasksInSchedulerState(job, updatedTasks);
             }
@@ -255,7 +255,7 @@ class LiveJobs {
             Set<TaskId> updatedTasks = job.setPaused();
 
             if (updatedTasks.size() > 0) {
-                jlogger.debug(jobId, "has just been paused !");
+                jlogger.info(jobId, "has just been paused.");
                 dbManager.updateJobAndTasksState(job);
                 updateTasksInSchedulerState(job, updatedTasks);
             }
@@ -358,7 +358,7 @@ class LiveJobs {
         try {
             InternalTask task = jobData.job.getTask(taskId);
             if (!task.getStatus().isTaskAlive()) {
-                tlogger.info(taskId, "task to be restarted isn't alive " + task.getStatus());
+                tlogger.warn(taskId, "task to be restarted isn't alive " + task.getStatus());
                 return;
             }
             jobData.job.reStartTask(task);
@@ -408,7 +408,7 @@ class LiveJobs {
 
             RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(taskId));
             if (taskData == null) {
-                throw new IllegalStateException("No information for: " + taskId);
+                throw new IllegalStateException("Task " + task.getId() + " is not running.");
             }
 
             TerminationData result = TerminationData.newTerminationData();
@@ -426,7 +426,7 @@ class LiveJobs {
             long waitTime, TerminationData terminationData) {
         InternalJob job = jobData.job;
 
-        logger.info("Node Exclusion : restart mode is '" + task.getRestartTaskOnError() + "'");
+        tlogger.info(task.getId(), "node Exclusion : restart mode is '" + task.getRestartTaskOnError() + "'");
         if (task.getRestartTaskOnError().equals(RestartMode.ELSEWHERE)) {
             task.setNodeExclusion(task.getExecuterInformation().getNodes());
         }
@@ -470,6 +470,8 @@ class LiveJobs {
         if (runningTasksData.containsKey(TaskIdWrapper.wrap(task.getId()))) {
             throw new IllegalStateException("Task is already started");
         }
+
+        tlogger.info(task.getId(), "task started " + task.getId());
 
         runningTasksData.put(TaskIdWrapper.wrap(task.getId()),
                              new RunningTaskData(task, job.getOwner(), job.getCredentials(), launcher));
@@ -549,7 +551,7 @@ class LiveJobs {
             tlogger.info(taskId, "finished with" + (errorOccurred ? "" : "out") + " errors");
 
             if (errorOccurred) {
-                logger.info("Task has terminated with an error ");
+                tlogger.info(taskId, "task has terminated with an error ");
                 task.decreaseNumberOfExecutionLeft();
 
                 boolean requiresPauseJobOnError = onErrorPolicyInterpreter.requiresPauseJobOnError(task);
@@ -557,7 +559,7 @@ class LiveJobs {
                 int numberOfExecutionLeft = task.getNumberOfExecutionLeft();
 
                 if (numberOfExecutionLeft <= 0 && onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
-                    logger.info("No retry left and task is tagged with cancel job on error");
+                    tlogger.info(taskId, "no retry left and task is tagged with cancel job on error");
 
                     jobData.job.increaseNumberOfFaultyTasks(taskId);
                     endJob(jobData,
@@ -568,23 +570,23 @@ class LiveJobs {
                                    "You also ask to cancel the job in such a situation!",
                            JobStatus.CANCELED);
 
-                    logger.info("Job has been canceled");
+                    jlogger.info(taskId.getJobId(), "job has been canceled");
 
                     return terminationData;
                 } else if (numberOfExecutionLeft > 0) {
-                    logger.info("Number of execution left is " + numberOfExecutionLeft);
+                    tlogger.info(taskId, "number of execution left is " + numberOfExecutionLeft);
 
                     if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration());
 
-                        logger.info("Task is paused on error");
+                        tlogger.info(taskId, "task is paused on error");
 
                         return terminationData;
                     } else if (requiresPauseJobOnError) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration());
                         pauseJob(task.getJobId());
 
-                        logger.info("Job is paused on error");
+                        jlogger.info(taskId.getJobId(), "job is paused on error");
 
                         return terminationData;
                     } else {
@@ -599,7 +601,7 @@ class LiveJobs {
                                            waitTime,
                                            terminationData);
 
-                        logger.info("New restart is scheduled");
+                        tlogger.info(taskId, "new restart is scheduled");
 
                         return terminationData;
                     }
@@ -724,7 +726,9 @@ class LiveJobs {
     void restartInErrorTask(JobId jobId, String taskName) throws UnknownTaskException {
         JobData jobData = lockJob(jobId);
         try {
-            jobData.job.restartInErrorTask(jobData.job.getTask(taskName));
+            InternalTask task = jobData.job.getTask(taskName);
+            tlogger.info(task.getId(), "restarting in-error task " + task.getId());
+            jobData.job.restartInErrorTask(task);
             dbManager.updateJobAndTasksState(jobData.job);
             updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
         } finally {
@@ -740,15 +744,16 @@ class LiveJobs {
         }
         try {
             InternalTask task = jobData.job.getTask(taskName);
+            tlogger.info(task.getId(), "restarting task " + task.getId());
             if (!task.getStatus().isTaskAlive()) {
-                tlogger.info(task.getId(), "task isn't alive: " + task.getStatus());
+                tlogger.warn(task.getId(), "task isn't alive: " + task.getStatus());
                 return emptyResult(task.getId());
             }
 
             TaskIdWrapper taskIdWrapper = TaskIdWrapper.wrap(task.getId());
             RunningTaskData taskData = runningTasksData.remove(taskIdWrapper);
             if (taskData == null) {
-                throw new IllegalStateException("No information for: " + task.getId());
+                throw new IllegalStateException("Task " + task.getId() + " is not running.");
             }
 
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager,
@@ -791,13 +796,14 @@ class LiveJobs {
         }
         try {
             InternalTask task = jobData.job.getTask(taskName);
+            tlogger.info(task.getId(), "preempting task " + task.getId());
             if (!task.getStatus().isTaskAlive()) {
                 tlogger.info(task.getId(), "task isn't alive: " + task.getStatus());
                 return emptyResult(task.getId());
             }
             RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(task.getId()));
             if (taskData == null) {
-                throw new IllegalStateException("No information for: " + task.getId());
+                throw new IllegalStateException("Task " + task.getId() + " is not running.");
             }
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager,
                                                                         jobData.job,
@@ -823,20 +829,23 @@ class LiveJobs {
         }
         try {
             InternalTask task = jobData.job.getTask(taskName);
+            tlogger.info(task.getId(), "killing task " + task.getId());
             if (!task.getStatus().isTaskAlive()) {
-                tlogger.info(task.getId(), "task isn't alive: " + task.getStatus());
+                tlogger.warn(task.getId(), "task isn't alive: " + task.getStatus());
                 return emptyResult(task.getId());
             }
             RunningTaskData taskData = runningTasksData.remove(TaskIdWrapper.wrap(task.getId()));
             if (taskData == null) {
-                throw new IllegalStateException("No information for: " + task.getId());
+                // the task is not in running state
+                taskData = new RunningTaskData(task, jobData.job.getOwner(), jobData.job.getCredentials(), null);
             }
 
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager,
                                                                         jobData.job,
                                                                         task,
-                                                                        new TaskAbortedException("Aborted by user"),
-                                                                        new SimpleTaskLogs("", "Aborted by user"));
+                                                                        new TaskAbortedException("The task has been manually killed."),
+                                                                        new SimpleTaskLogs("",
+                                                                                           "The task has been manually killed."));
 
             TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job, false);
 
@@ -917,6 +926,7 @@ class LiveJobs {
     }
 
     public TerminationData killJob(JobId jobId) {
+        jlogger.info(jobId, "killing job");
         return terminateJob(jobId, JobStatus.KILLED);
     }
 
