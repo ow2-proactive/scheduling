@@ -42,7 +42,6 @@ public class SchedulerPortalConfiguration {
     private static Logger logger = Logger.getLogger(SchedulerPortalConfiguration.class);
 
     private SchedulerPortalConfiguration() {
-        path = PASchedulerProperties.SCHEDULER_PORTAL_CONFIGURATION.getValueAsString();
     }
 
     public static synchronized SchedulerPortalConfiguration getConfiguration() {
@@ -53,8 +52,8 @@ public class SchedulerPortalConfiguration {
     }
 
     public String getPath() {
-        if (path != null && path.length() > 0) {
-            path = PASchedulerProperties.getAbsolutePath(path);
+        if (path == null) {
+            path = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_PORTAL_CONFIGURATION.getValueAsString());
         }
         return path;
     }

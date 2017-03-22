@@ -45,6 +45,7 @@ import java.security.KeyException;
 import java.util.Properties;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -56,6 +57,7 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
@@ -79,9 +81,15 @@ public class SchedulerFrontendTest {
     private JobState jobstate;
 
     @Mock
-    private SchedulerPortalConfiguration portalConfiguration;
+    private SchedulerPortalConfiguration schedulerPortalConfiguration;
 
     private JobId jobId;
+
+    @BeforeClass
+    public static void setup() {
+        String path = SchedulerFrontendTest.class.getResource("/config/scheduler-portal-display.conf").getPath();
+        PASchedulerProperties.SCHEDULER_PORTAL_CONFIGURATION.updateProperty(path);
+    }
 
     @Before
     public void init() {
@@ -89,7 +97,6 @@ public class SchedulerFrontendTest {
         this.schedulerFrontend = new SchedulerFrontend(frontendState, spacesSupport);
 
         this.jobId = new JobIdImpl(123L, "readableName");
-
     }
 
     /**
@@ -423,10 +430,7 @@ public class SchedulerFrontendTest {
 
     @Test
     public void testGetPortalConfiguration() {
-
-        Properties properties = new Properties();
-        Mockito.when(portalConfiguration.getProperties()).thenReturn(properties);
-
-        assertEquals(properties, schedulerFrontend.getPortalConfiguration());
+        Properties properties = SchedulerPortalConfiguration.getConfiguration().getProperties();
+        assertEquals("[properties]", properties.getProperty("execution-list-extra-columns"));
     }
 }
