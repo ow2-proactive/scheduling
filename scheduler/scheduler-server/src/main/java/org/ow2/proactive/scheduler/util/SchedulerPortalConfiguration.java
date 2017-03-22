@@ -35,13 +35,14 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class SchedulerPortalConfiguration {
-    private String path;
+    private final String path;
 
     private static SchedulerPortalConfiguration configuration;
 
     private static final Logger logger = Logger.getLogger(SchedulerPortalConfiguration.class);
 
     private SchedulerPortalConfiguration() {
+        path = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_PORTAL_CONFIGURATION.getValueAsString());
     }
 
     public static synchronized SchedulerPortalConfiguration getConfiguration() {
@@ -51,20 +52,13 @@ public class SchedulerPortalConfiguration {
         return configuration;
     }
 
-    public String getPath() {
-        if (path == null) {
-            path = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_PORTAL_CONFIGURATION.getValueAsString());
-        }
-        return path;
-    }
-
     public Properties getProperties() {
         Properties props = new Properties();
         try {
-            InputStream fis = new FileInputStream(getPath());
+            InputStream fis = new FileInputStream(path);
             props.load(fis);
         } catch (IOException e) {
-            logger.warn("Scheduler Portal Configuration file: " + getPath() + " not found!", e);
+            logger.warn("Scheduler Portal Configuration file: " + path + " not found!", e);
         }
         return props;
     }
