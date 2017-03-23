@@ -32,7 +32,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
  * TaskId wrapper mainly used to return an implementation that
  * takes into account job id + task id for hashcode ans equals.
  */
-public final class TaskIdWrapper {
+public final class TaskIdWrapper implements Comparable<TaskIdWrapper> {
 
     // TODO: this class could probably be removed once next issue is fixed
     // https://github.com/ow2-proactive/scheduling/issues/2306
@@ -73,4 +73,12 @@ public final class TaskIdWrapper {
         return result;
     }
 
+    @Override
+    public int compareTo(TaskIdWrapper o) {
+        int jobCompareTo = taskId.getJobId().compareTo(o.getTaskId().getJobId());
+        if (jobCompareTo != 0) {
+            return jobCompareTo;
+        }
+        return (new Long(taskId.longValue())).compareTo(o.getTaskId().longValue());
+    }
 }
