@@ -11,7 +11,7 @@
     <![CDATA[ START_AT generic information is defined for Job Computing PI according to MonteCarlo method. ]]>
   </description>
   <genericInformation>
-    <info name="START_AT" value="2017-04-01T12:00:00+01:00"/>
+    <info name="START_AT" value="2199-01-01T12:00:00+01:00"/>
   </genericInformation>
   <taskFlow>
     <task name="Computation1">
