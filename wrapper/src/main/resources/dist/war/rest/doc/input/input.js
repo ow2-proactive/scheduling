@@ -6,8 +6,8 @@ var com = {
 };
 com.qmino.miredot.restApiSource = {
 	"projectName":"rest-server",
-	"projectVersion":"7.25.0-SNAPSHOT",
-	"projectTitle":"ProActive Workflows & Scheduling - REST API v7.25.0-SNAPSHOT",
+	"projectVersion":"7.26.0-SNAPSHOT",
+	"projectTitle":"ProActive Workflows & Scheduling - REST API v7.26.0-SNAPSHOT",
 	"buildSystem":"gradle",
 	"miredotVersion":"2.0-RC3",
 	"miredotRevision":"0829427a0bf5+",
@@ -16,7 +16,7 @@ com.qmino.miredot.restApiSource = {
 	"singlePage":false,
 	"hideLogoOnTop":false,
 	"initialCollapseLevel":2,
-	"dateOfGeneration":"2017-03-17 14:29:34",
+	"dateOfGeneration":"2017-03-26 20:12:39",
 	"validLicense":true,
 	"licenseErrorMessage":[
 		
@@ -1247,25 +1247,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_eventing_EventSubscription_out"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskInfoData_in"].content = [
 	{
-		"name":"jobId",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobIdData_in"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"startTime",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"inErrorTime",
 		"comment":null,
 		"fullComment":null,
@@ -1278,6 +1259,25 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 	},
 	{
 		"name":"finishedTime",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"jobId",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobIdData_in"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"startTime",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -1582,6 +1582,17 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_SessionCookieConfig_in"].orde
 com.qmino.miredot.restApiSource.tos["javax_servlet_SessionCookieConfig_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["javax_servlet_SessionCookieConfig_out"].content = [
 	{
+		"name":"httpOnly",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"comment",
 		"comment":null,
 		"fullComment":null,
@@ -1621,17 +1632,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_SessionCookieConfig_out"].con
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"httpOnly",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
 		},
 		"deprecated":false,
 		"required":false,
@@ -1750,7 +1750,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_nodesourc
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_nodesource_common_ConfigurableField_out"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_studio_Script_in"].content = [
 	{
-		"name":"absolutePath",
+		"name":"content",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -1761,7 +1761,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_studio_
 		"required":false,
 	},
 	{
-		"name":"content",
+		"name":"absolutePath",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -1883,6 +1883,17 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_NewCookie_out"].content = 
 		"required":false,
 	},
 	{
+		"name":"httpOnly",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"comment",
 		"comment":null,
 		"fullComment":null,
@@ -1922,17 +1933,6 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_NewCookie_out"].content = 
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"date string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"httpOnly",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
 		},
 		"deprecated":false,
 		"required":false,
@@ -2097,10 +2097,13 @@ com.qmino.miredot.restApiSource.tos["org_jboss_resteasy_plugins_providers_multip
 		"required":false,
 	},
 	{
-		"name":"mediaType",
+		"name":"contentTypeFromMessage",
 		"comment":null,
 		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_MediaType_out"],
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
 		"deprecated":false,
 		"required":false,
 	},
@@ -2116,13 +2119,10 @@ com.qmino.miredot.restApiSource.tos["org_jboss_resteasy_plugins_providers_multip
 		"required":false,
 	},
 	{
-		"name":"contentTypeFromMessage",
+		"name":"mediaType",
 		"comment":null,
 		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
-		},
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_MediaType_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -2277,6 +2277,14 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_ev
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_event_RMNodeEvent_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_event_RMNodeEvent_out"].content = [
 	{
+		"name":"eventType",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_resourcemanager_common_event_RMEventType"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"timeStamp",
 		"comment":null,
 		"fullComment":null,
@@ -2295,14 +2303,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_ev
 			"type":"simple",
 			"typeValue":"number",
 		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"eventType",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_resourcemanager_common_event_RMEventType"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -2336,6 +2336,36 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_ev
 			"type":"simple",
 			"typeValue":"boolean",
 		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"nodeSource",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"nodeUrl",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"previousNodeState",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_resourcemanager_common_NodeState"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -2374,14 +2404,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_ev
 	},
 	{
 		"name":"nodeState",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_resourcemanager_common_NodeState"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"previousNodeState",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_resourcemanager_common_NodeState"],
@@ -2433,17 +2455,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_ev
 		"required":false,
 	},
 	{
-		"name":"proactiveJMXUrl",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"lockTime",
 		"comment":null,
 		"fullComment":null,
@@ -2466,18 +2477,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_ev
 		"required":false,
 	},
 	{
-		"name":"nodeSource",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"nodeUrl",
+		"name":"proactiveJMXUrl",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -2565,17 +2565,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpSession_out"].conten
 		"required":false,
 	},
 	{
-		"name":"attributeNames",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.util.Enumeration<java.lang.String>",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"new",
 		"comment":null,
 		"fullComment":null,
@@ -2587,12 +2576,12 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpSession_out"].conten
 		"required":false,
 	},
 	{
-		"name":"maxInactiveInterval",
+		"name":"attributeNames",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"number",
+			"typeValue":"java.util.Enumeration<java.lang.String>",
 		},
 		"deprecated":false,
 		"required":false,
@@ -2607,6 +2596,17 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpSession_out"].conten
 	},
 	{
 		"name":"lastAccessedTime",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"maxInactiveInterval",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -2644,53 +2644,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_RM
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_RMState_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_RMState_out"].content = [
 	{
-		"name":"maxNumberOfNodes",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"allNodes",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"collection",
-			"typeValue":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"totalNodesNumber",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"freeNodesNumber",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"freeNodes",
 		"comment":null,
 		"fullComment":null,
@@ -2725,6 +2678,53 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_RM
 				"type":"simple",
 				"typeValue":"string",
 			},
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"totalNodesNumber",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"allNodes",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"collection",
+			"typeValue":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"freeNodesNumber",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"maxNumberOfNodes",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
@@ -3003,6 +3003,21 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response_in"].ordered = fa
 com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response_out"].content = [
 	{
+		"name":"cookies",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"map",
+			"typeKey":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+			"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_NewCookie_out"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"lastModified",
 		"comment":null,
 		"fullComment":null,
@@ -3046,6 +3061,39 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response_out"].content = [
 		"required":false,
 	},
 	{
+		"name":"status",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"entity",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"object",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"links",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"collection",
+			"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Link_out"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"metadata",
 		"comment":null,
 		"fullComment":null,
@@ -3067,88 +3115,10 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response_out"].content = [
 		"required":false,
 	},
 	{
-		"name":"status",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"links",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"collection",
-			"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Link_out"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"cookies",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"map",
-			"typeKey":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-			"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_NewCookie_out"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"statusInfo",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response$StatusType_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"allowedMethods",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"collection",
-			"typeValue":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"entity",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"object",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"mediaType",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_MediaType_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"entityTag",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_EntityTag_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -3170,6 +3140,36 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response_out"].content = [
 				},
 			},
 		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"entityTag",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_EntityTag_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"allowedMethods",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"collection",
+			"typeValue":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"mediaType",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_MediaType_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -3211,6 +3211,17 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response_out"].ordered = f
 com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Response_out"].comment = null;
 com.qmino.miredot.restApiSource.tos["javax_servlet_ServletResponse_in"].content = [
 	{
+		"name":"locale",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"java.util.Locale",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"contentType",
 		"comment":null,
 		"fullComment":null,
@@ -3233,29 +3244,7 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletResponse_in"].content 
 		"required":false,
 	},
 	{
-		"name":"locale",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.util.Locale",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"bufferSize",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"contentLengthLong",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -3276,10 +3265,32 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletResponse_in"].content 
 		"deprecated":false,
 		"required":false,
 	},
+	{
+		"name":"contentLengthLong",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
 ];
 com.qmino.miredot.restApiSource.tos["javax_servlet_ServletResponse_in"].ordered = false;
 com.qmino.miredot.restApiSource.tos["javax_servlet_ServletResponse_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["javax_servlet_ServletResponse_out"].content = [
+	{
+		"name":"writer",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"java.io.PrintWriter",
+		},
+		"deprecated":false,
+		"required":false,
+	},
 	{
 		"name":"contentType",
 		"comment":null,
@@ -3296,17 +3307,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletResponse_out"].content
 		"comment":null,
 		"fullComment":null,
 		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_ServletOutputStream_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"writer",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.io.PrintWriter",
-		},
 		"deprecated":false,
 		"required":false,
 	},
@@ -3664,6 +3664,25 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Link_out"].content = [
 		"required":false,
 	},
 	{
+		"name":"title",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"uriBuilder",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_UriBuilder_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"rel",
 		"comment":null,
 		"fullComment":null,
@@ -3685,25 +3704,6 @@ com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_Link_out"].content = [
 				"typeValue":"string",
 			},
 		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"title",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"uriBuilder",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_ws_rs_core_UriBuilder_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -3749,6 +3749,14 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_ev
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_event_RMNodeSourceEvent_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_event_RMNodeSourceEvent_out"].content = [
 	{
+		"name":"eventType",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_resourcemanager_common_event_RMEventType"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"timeStamp",
 		"comment":null,
 		"fullComment":null,
@@ -3767,14 +3775,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_resourcemanager_common_ev
 			"type":"simple",
 			"typeValue":"number",
 		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"eventType",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_resourcemanager_common_event_RMEventType"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -3849,6 +3849,28 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
+		"name":"project",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"jobId",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"jobName",
 		"comment":null,
 		"fullComment":null,
@@ -3877,28 +3899,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"typeValue":{
 			"type":"collection",
 			"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskUsageData_in"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"project",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"jobId",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -4133,20 +4133,10 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"genericInformation",
+		"name":"jobInfo",
 		"comment":null,
 		"fullComment":null,
-		"typeValue":{
-			"type":"map",
-			"typeKey":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-			"typeValue":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-		},
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobInfoData_in"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -4162,10 +4152,20 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"jobInfo",
+		"name":"genericInformation",
 		"comment":null,
 		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobInfoData_in"],
+		"typeValue":{
+			"type":"map",
+			"typeKey":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+			"typeValue":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+		},
 		"deprecated":false,
 		"required":false,
 	},
@@ -4222,6 +4222,17 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
+		"name":"projectName",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"genericInformation",
 		"comment":null,
 		"fullComment":null,
@@ -4235,17 +4246,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 				"type":"simple",
 				"typeValue":"string",
 			},
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"projectName",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -4334,12 +4334,12 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletInputStream_out"].orde
 com.qmino.miredot.restApiSource.tos["javax_servlet_ServletInputStream_out"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_studio_Workflow_in"].content = [
 	{
-		"name":"xml",
+		"name":"id",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"string",
+			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
@@ -4356,12 +4356,12 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_studio_
 		"required":false,
 	},
 	{
-		"name":"id",
+		"name":"xml",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"number",
+			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -4393,7 +4393,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_studio_
 		"required":false,
 	},
 	{
-		"name":"metadata",
+		"name":"xml",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -4404,7 +4404,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_studio_
 		"required":false,
 	},
 	{
-		"name":"xml",
+		"name":"metadata",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -4438,7 +4438,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"numberOfFinishedTasks",
+		"name":"inErrorTime",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -4449,70 +4449,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"numberOfPendingTasks",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"numberOfRunningTasks",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"jobId",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobIdData_in"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"startTime",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"jobOwner",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"removedTime",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"submittedTime",
+		"name":"finishedTime",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -4545,40 +4482,103 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"numberOfFailedTasks",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"inErrorTime",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"finishedTime",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"numberOfInErrorTasks",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"jobOwner",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"jobId",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobIdData_in"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"startTime",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"removedTime",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"submittedTime",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfPendingTasks",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfRunningTasks",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfFinishedTasks",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfFailedTasks",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -4620,50 +4620,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"toBeRemoved",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"jobOwner",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"numberOfRunningTasks",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"numberOfFinishedTasks",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"finishedTime",
 		"comment":null,
 		"fullComment":null,
@@ -4675,18 +4631,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"numberOfPendingTasks",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"numberOfFailedTasks",
+		"name":"totalNumberOfTasks",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -4730,12 +4675,12 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"totalNumberOfTasks",
+		"name":"toBeRemoved",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"number",
+			"typeValue":"boolean",
 		},
 		"deprecated":false,
 		"required":false,
@@ -4758,6 +4703,61 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfPendingTasks",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfRunningTasks",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfFinishedTasks",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfFailedTasks",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"jobOwner",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -4910,6 +4910,17 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_AsyncContext_in"].ordered = f
 com.qmino.miredot.restApiSource.tos["javax_servlet_AsyncContext_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["javax_servlet_AsyncContext_out"].content = [
 	{
+		"name":"timeout",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"response",
 		"comment":null,
 		"fullComment":null,
@@ -4922,17 +4933,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_AsyncContext_out"].content = 
 		"comment":null,
 		"fullComment":null,
 		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"timeout",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
 		"deprecated":false,
 		"required":false,
 	},
@@ -4956,6 +4956,28 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_in"].
 com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"].content = [
 	{
+		"name":"localPort",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"contentLength",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"contentLengthLong",
 		"comment":null,
 		"fullComment":null,
@@ -4978,34 +5000,12 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 		"required":false,
 	},
 	{
-		"name":"localPort",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"localName",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"contentLength",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
@@ -5022,23 +5022,61 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 		"required":false,
 	},
 	{
+		"name":"parameterNames",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"java.util.Enumeration<java.lang.String>",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"asyncStarted",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"asyncSupported",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"asyncContext",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_AsyncContext_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"dispatcherType",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.enums["javax_servlet_DispatcherType"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"reader",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"java.io.BufferedReader",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"serverName",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -5121,55 +5159,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 		"required":false,
 	},
 	{
-		"name":"asyncStarted",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"asyncSupported",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"asyncContext",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_AsyncContext_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"dispatcherType",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.enums["javax_servlet_DispatcherType"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"attributeNames",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.util.Enumeration<java.lang.String>",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"characterEncoding",
 		"comment":null,
 		"fullComment":null,
@@ -5181,21 +5170,24 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 		"required":false,
 	},
 	{
-		"name":"parameterNames",
+		"name":"serverName",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"attributeNames",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"java.util.Enumeration<java.lang.String>",
 		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"servletContext",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_ServletContext_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -5217,6 +5209,14 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 				},
 			},
 		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"servletContext",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_ServletContext_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -5251,6 +5251,28 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 		"required":false,
 	},
 	{
+		"name":"requestURI",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"authType",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"queryString",
 		"comment":null,
 		"fullComment":null,
@@ -5262,12 +5284,75 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 		"required":false,
 	},
 	{
+		"name":"cookies",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"collection",
+			"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_http_Cookie_out"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"requestedSessionIdFromURL",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"requestedSessionIdFromUrl",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"parts",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"collection",
 			"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_http_Part_out"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"session",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpSession_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"requestedSessionId",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"servletPath",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -5295,23 +5380,23 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 		"required":false,
 	},
 	{
-		"name":"requestedSessionIdFromURL",
+		"name":"userPrincipal",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"boolean",
+			"typeValue":"java.security.Principal",
 		},
 		"deprecated":false,
 		"required":false,
 	},
 	{
-		"name":"requestedSessionIdFromUrl",
+		"name":"requestURL",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"boolean",
+			"typeValue":"java.lang.StringBuffer",
 		},
 		"deprecated":false,
 		"required":false,
@@ -5357,91 +5442,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpServletRequest_out"]
 			"type":"simple",
 			"typeValue":"string",
 		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"userPrincipal",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.security.Principal",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"requestedSessionId",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"requestURI",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"requestURL",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.lang.StringBuffer",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"servletPath",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"authType",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"cookies",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"collection",
-			"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_http_Cookie_out"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"session",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_http_HttpSession_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -5717,6 +5717,17 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_Cookie_in"].ordered = fa
 com.qmino.miredot.restApiSource.tos["javax_servlet_http_Cookie_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["javax_servlet_http_Cookie_out"].content = [
 	{
+		"name":"httpOnly",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"version",
 		"comment":null,
 		"fullComment":null,
@@ -5756,17 +5767,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_Cookie_out"].content = [
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"httpOnly",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
 		},
 		"deprecated":false,
 		"required":false,
@@ -5895,6 +5895,28 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_in"].ordered =
 com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_out"].content = [
 	{
+		"name":"localPort",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"contentLength",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"contentLengthLong",
 		"comment":null,
 		"fullComment":null,
@@ -5917,34 +5939,12 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_out"].content 
 		"required":false,
 	},
 	{
-		"name":"localPort",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"localName",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"contentLength",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
@@ -5961,23 +5961,61 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_out"].content 
 		"required":false,
 	},
 	{
+		"name":"parameterNames",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"java.util.Enumeration<java.lang.String>",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"asyncStarted",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"asyncSupported",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"boolean",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"asyncContext",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_AsyncContext_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"dispatcherType",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.enums["javax_servlet_DispatcherType"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"reader",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"java.io.BufferedReader",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"serverName",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -6060,55 +6098,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_out"].content 
 		"required":false,
 	},
 	{
-		"name":"asyncStarted",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"asyncSupported",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"boolean",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"asyncContext",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_AsyncContext_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"dispatcherType",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.enums["javax_servlet_DispatcherType"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"attributeNames",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.util.Enumeration<java.lang.String>",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"characterEncoding",
 		"comment":null,
 		"fullComment":null,
@@ -6120,21 +6109,24 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_out"].content 
 		"required":false,
 	},
 	{
-		"name":"parameterNames",
+		"name":"serverName",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"attributeNames",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"java.util.Enumeration<java.lang.String>",
 		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"servletContext",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_ServletContext_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -6156,6 +6148,14 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRequest_out"].content 
 				},
 			},
 		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"servletContext",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_ServletContext_out"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -6368,14 +6368,48 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_UserJobData_out"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskResultData_in"].content = [
 	{
-		"name":"serializedException",
+		"name":"id",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskIdData_in"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"output",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskLogsData_in"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"exceptionMessage",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
-			"type":"collection",
-			"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"propagatedVariables",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"map",
+			"typeKey":{
 				"type":"simple",
-				"typeValue":"byte",
+				"typeValue":"string",
+			},
+			"typeValue":{
+				"type":"collection",
+				"typeValue":{
+					"type":"simple",
+					"typeValue":"byte",
+				},
 			},
 		},
 		"deprecated":false,
@@ -6414,49 +6448,15 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"id",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskIdData_in"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"output",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskLogsData_in"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"propagatedVariables",
+		"name":"serializedException",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
-			"type":"map",
-			"typeKey":{
-				"type":"simple",
-				"typeValue":"string",
-			},
+			"type":"collection",
 			"typeValue":{
-				"type":"collection",
-				"typeValue":{
-					"type":"simple",
-					"typeValue":"byte",
-				},
+				"type":"simple",
+				"typeValue":"byte",
 			},
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"exceptionMessage",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -6465,24 +6465,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskResultData_in"].ordered = false;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskResultData_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskResultData_out"].content = [
-	{
-		"name":"metadata",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"map",
-			"typeKey":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-			"typeValue":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-		},
-		"deprecated":false,
-		"required":false,
-	},
 	{
 		"name":"output",
 		"comment":null,
@@ -6507,6 +6489,24 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 					"type":"simple",
 					"typeValue":"byte",
 				},
+			},
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"metadata",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"map",
+			"typeKey":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+			"typeValue":{
+				"type":"simple",
+				"typeValue":"string",
 			},
 		},
 		"deprecated":false,
@@ -6660,6 +6660,17 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobValidationData_out"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_SchedulerUserData_in"].content = [
 	{
+		"name":"username",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"connectionTime",
 		"comment":null,
 		"fullComment":null,
@@ -6671,12 +6682,12 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"username",
+		"name":"submitNumber",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"string",
+			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
@@ -6703,21 +6714,21 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"deprecated":false,
 		"required":false,
 	},
-	{
-		"name":"submitNumber",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
 ];
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_SchedulerUserData_in"].ordered = false;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_SchedulerUserData_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_SchedulerUserData_out"].content = [
+	{
+		"name":"username",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
 	{
 		"name":"connectionTime",
 		"comment":null,
@@ -6747,17 +6758,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"username",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -6786,6 +6786,44 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
+		"name":"jobInfo",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobInfoData_in"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"preciousResults",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"map",
+			"typeKey":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+			"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskResultData_in"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"exceptionResults",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"map",
+			"typeKey":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+			"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskResultData_in"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"allResults",
 		"comment":null,
 		"fullComment":null,
@@ -6800,50 +6838,12 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"deprecated":false,
 		"required":false,
 	},
-	{
-		"name":"preciousResults",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"map",
-			"typeKey":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-			"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskResultData_in"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"exceptionResults",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"map",
-			"typeKey":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-			"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskResultData_in"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"jobInfo",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobInfoData_in"],
-		"deprecated":false,
-		"required":false,
-	},
 ];
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobResultData_in"].ordered = false;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobResultData_in"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_JobResultData_out"].content = [
 	{
-		"name":"exceptionResults",
+		"name":"preciousResults",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -6858,7 +6858,7 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"preciousResults",
+		"name":"exceptionResults",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -6919,28 +6919,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"taskId",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"taskStartTime",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"taskFinishedTime",
 		"comment":null,
 		"fullComment":null,
@@ -6969,6 +6947,28 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"taskStartTime",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"taskId",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -6989,12 +6989,23 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"taskId",
+		"name":"taskExecutionDuration",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"string",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"taskNodeNumber",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
@@ -7022,23 +7033,12 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"taskExecutionDuration",
+		"name":"taskId",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"taskNodeNumber",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
+			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -7125,14 +7125,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_http_Part_out"].ordered = fal
 com.qmino.miredot.restApiSource.tos["javax_servlet_http_Part_out"].comment = null;
 com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_eventing_EventNotification_in"].content = [
 	{
-		"name":"action",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_grid_cloud_portal_scheduler_dto_eventing_EventNotification$Action"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"data",
 		"comment":null,
 		"fullComment":null,
@@ -7140,6 +7132,14 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 			"type":"simple",
 			"typeValue":"object",
 		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"action",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.enums["org_ow2_proactive_grid_cloud_portal_scheduler_dto_eventing_EventNotification$Action"],
 		"deprecated":false,
 		"required":false,
 	},
@@ -7290,23 +7290,23 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletContext_out"].content 
 		"required":false,
 	},
 	{
-		"name":"attributeNames",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.util.Enumeration<java.lang.String>",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"minorVersion",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"attributeNames",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"java.util.Enumeration<java.lang.String>",
 		},
 		"deprecated":false,
 		"required":false,
@@ -7333,70 +7333,6 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletContext_out"].content 
 				"typeValue":"string",
 			},
 			"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_ServletRegistration_out"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"filterRegistrations",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"map",
-			"typeKey":{
-				"type":"simple",
-				"typeValue":"string",
-			},
-			"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_FilterRegistration_out"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"sessionCookieConfig",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_SessionCookieConfig_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"defaultSessionTrackingModes",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"collection",
-			"typeValue":com.qmino.miredot.restApiSource.enums["javax_servlet_SessionTrackingMode"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"effectiveSessionTrackingModes",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"collection",
-			"typeValue":com.qmino.miredot.restApiSource.enums["javax_servlet_SessionTrackingMode"],
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"jspConfigDescriptor",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_descriptor_JspConfigDescriptor_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"virtualServerName",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -7479,6 +7415,70 @@ com.qmino.miredot.restApiSource.tos["javax_servlet_ServletContext_out"].content 
 		"required":false,
 	},
 	{
+		"name":"filterRegistrations",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"map",
+			"typeKey":{
+				"type":"simple",
+				"typeValue":"string",
+			},
+			"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_FilterRegistration_out"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"sessionCookieConfig",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_SessionCookieConfig_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"defaultSessionTrackingModes",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"collection",
+			"typeValue":com.qmino.miredot.restApiSource.enums["javax_servlet_SessionTrackingMode"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"effectiveSessionTrackingModes",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"collection",
+			"typeValue":com.qmino.miredot.restApiSource.enums["javax_servlet_SessionTrackingMode"],
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"jspConfigDescriptor",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["javax_servlet_descriptor_JspConfigDescriptor_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"virtualServerName",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
 		"name":"classLoader",
 		"comment":null,
 		"fullComment":null,
@@ -7516,23 +7516,23 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_common_
 		"required":false,
 	},
 	{
-		"name":"sshKey",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"credential",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"java.io.InputStream",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"sshKey",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -7553,23 +7553,23 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_common_
 		"required":false,
 	},
 	{
-		"name":"credential",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"java.io.InputStream",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
 		"name":"password",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"credential",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"java.io.InputStream",
 		},
 		"deprecated":false,
 		"required":false,
@@ -7714,18 +7714,18 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"tag",
+		"name":"maxNumberOfExecution",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
-			"typeValue":"string",
+			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
 	},
 	{
-		"name":"iterationIndex",
+		"name":"maxNumberOfExecutionOnFailure",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -7744,12 +7744,42 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"maxNumberOfExecution",
+		"name":"parallelEnvironment",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_ParallelEnvironmentData_in"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"iterationIndex",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
 			"type":"simple",
 			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"replicationIndex",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"tag",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
 		},
 		"deprecated":false,
 		"required":false,
@@ -7768,36 +7798,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 				"type":"simple",
 				"typeValue":"string",
 			},
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"maxNumberOfExecutionOnFailure",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"parallelEnvironment",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_ParallelEnvironmentData_in"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"replicationIndex",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
@@ -7829,7 +7829,18 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"replicationIndex",
+		"name":"tag",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"string",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"maxNumberOfExecution",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -7851,7 +7862,45 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 		"required":false,
 	},
 	{
-		"name":"maxNumberOfExecution",
+		"name":"parallelEnvironment",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_ParallelEnvironmentData_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"replicationIndex",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"taskInfo",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskInfoData_out"],
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"iterationIndex",
+		"comment":null,
+		"fullComment":null,
+		"typeValue":{
+			"type":"simple",
+			"typeValue":"number",
+		},
+		"deprecated":false,
+		"required":false,
+	},
+	{
+		"name":"numberOfNodesNeeded",
 		"comment":null,
 		"fullComment":null,
 		"typeValue":{
@@ -7875,55 +7924,6 @@ com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_schedul
 				"type":"simple",
 				"typeValue":"string",
 			},
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"tag",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"string",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"parallelEnvironment",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_ParallelEnvironmentData_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"taskInfo",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":com.qmino.miredot.restApiSource.tos["org_ow2_proactive_grid_cloud_portal_scheduler_dto_TaskInfoData_out"],
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"numberOfNodesNeeded",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
-		},
-		"deprecated":false,
-		"required":false,
-	},
-	{
-		"name":"iterationIndex",
-		"comment":null,
-		"fullComment":null,
-		"typeValue":{
-			"type":"simple",
-			"typeValue":"number",
 		},
 		"deprecated":false,
 		"required":false,
@@ -20461,7 +20461,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"2137712494",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"finishInErrorTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -20470,7 +20470,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"2137712494",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"finishInErrorTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -20506,7 +20506,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"2137712494",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"finishInErrorTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -20515,7 +20515,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"2137712494",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"finishInErrorTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -20794,7 +20794,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1002493901",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submitFromUrl",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -20803,7 +20803,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1002493901",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submitFromUrl",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -20857,7 +20857,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1002493901",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submitFromUrl",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -20866,7 +20866,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1002493901",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submitFromUrl",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_SUMMARY",
@@ -21253,7 +21253,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1028025430",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"releaseNode",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"org.objectweb.proactive.core.node.NodeException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -21262,7 +21262,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1028025430",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"releaseNode",
-		"entity":"org.objectweb.proactive.core.node.NodeException",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -21280,7 +21280,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1028025430",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"releaseNode",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"org.objectweb.proactive.core.node.NodeException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -21289,7 +21289,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1028025430",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"releaseNode",
-		"entity":"org.objectweb.proactive.core.node.NodeException",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_SUMMARY",
@@ -21415,7 +21415,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-680886403",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"schedulerChangeJobPriorityByName",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -21424,7 +21424,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-680886403",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"schedulerChangeJobPriorityByName",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -21460,7 +21460,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-680886403",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"schedulerChangeJobPriorityByName",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -21469,7 +21469,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-680886403",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"schedulerChangeJobPriorityByName",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -21496,25 +21496,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"552652009",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanInfo",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"552652009",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanInfo",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"552652009",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanInfo",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"552652009",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanInfo",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -21532,7 +21523,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"552652009",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanInfo",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -21541,7 +21532,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"552652009",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanInfo",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.MalformedObjectNameException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -21551,6 +21542,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanInfo",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"552652009",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanInfo",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -21568,25 +21568,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"552652009",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanInfo",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"552652009",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanInfo",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"552652009",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanInfo",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"552652009",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanInfo",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -21604,7 +21595,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"552652009",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanInfo",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -21613,7 +21604,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"552652009",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanInfo",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.MalformedObjectNameException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -21623,6 +21614,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanInfo",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"552652009",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanInfo",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_SUMMARY",
@@ -21802,7 +21802,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1966986784",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submitFlat",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -21811,7 +21811,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1966986784",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submitFlat",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -21856,7 +21856,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1966986784",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submitFlat",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -21865,7 +21865,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1966986784",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submitFlat",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_PARAMETER_DOCUMENTATION",
@@ -22108,7 +22108,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-679252057",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskResult",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -22117,7 +22117,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-679252057",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskResult",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -22153,7 +22153,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-679252057",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskResult",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -22162,7 +22162,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-679252057",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskResult",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -22207,24 +22207,6 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1881814800",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"rmConnect",
-		"entity":"javax.security.auth.login.LoginException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-1881814800",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"rmConnect",
-		"entity":"java.security.KeyException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-1881814800",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"rmConnect",
 		"entity":"org.ow2.proactive.resourcemanager.exception.RMException",
 	},
 	{
@@ -22234,7 +22216,25 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1881814800",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"rmConnect",
+		"entity":"javax.security.auth.login.LoginException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-1881814800",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"rmConnect",
 		"entity":"org.objectweb.proactive.core.node.NodeException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-1881814800",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"rmConnect",
+		"entity":"java.security.KeyException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -22261,25 +22261,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1881814800",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"rmConnect",
-		"entity":"javax.security.auth.login.LoginException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-1881814800",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"rmConnect",
-		"entity":"java.security.KeyException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-1881814800",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"rmConnect",
 		"entity":"org.ow2.proactive.resourcemanager.exception.RMException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-1881814800",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"rmConnect",
+		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -22291,6 +22282,15 @@ com.qmino.miredot.projectWarnings = [
 		"entity":"org.objectweb.proactive.core.node.NodeException",
 	},
 	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-1881814800",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"rmConnect",
+		"entity":"java.security.KeyException",
+	},
+	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
 		"description":"Exception thrown by method has no comment",
 		"failedBuild":"false",
@@ -22378,7 +22378,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-623872520",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLog",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -22387,7 +22387,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-623872520",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLog",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -22423,7 +22423,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-623872520",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLog",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -22432,7 +22432,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-623872520",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLog",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -22585,7 +22585,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-380028051",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"preemptTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -22594,7 +22594,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-380028051",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"preemptTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -22630,7 +22630,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-380028051",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"preemptTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -22639,7 +22639,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-380028051",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"preemptTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -23098,25 +23098,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-241153123",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getStatHistory",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-241153123",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getStatHistory",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-241153123",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getStatHistory",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-241153123",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getStatHistory",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -23134,7 +23125,25 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-241153123",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getStatHistory",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-241153123",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getStatHistory",
+		"entity":"javax.management.MalformedObjectNameException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-241153123",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getStatHistory",
+		"entity":"javax.management.InstanceNotFoundException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -23153,15 +23162,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getStatHistory",
 		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-241153123",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getStatHistory",
-		"entity":"javax.management.InstanceNotFoundException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -23179,25 +23179,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-241153123",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getStatHistory",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-241153123",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getStatHistory",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-241153123",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getStatHistory",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-241153123",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getStatHistory",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -23215,7 +23206,25 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-241153123",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getStatHistory",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-241153123",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getStatHistory",
+		"entity":"javax.management.MalformedObjectNameException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-241153123",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getStatHistory",
+		"entity":"javax.management.InstanceNotFoundException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -23234,15 +23243,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getStatHistory",
 		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-241153123",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getStatHistory",
-		"entity":"javax.management.InstanceNotFoundException",
 	},
 	{
 		"category":"JAVADOC_MISSING_PARAMETER_DOCUMENTATION",
@@ -23278,7 +23278,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"407665165",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskFullLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -23287,7 +23287,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"407665165",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskFullLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -23332,7 +23332,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"407665165",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskFullLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -23341,7 +23341,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"407665165",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskFullLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -23404,6 +23404,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"2085422094",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"loginOrRenewSession",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"2085422094",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"loginOrRenewSession",
 		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
@@ -23414,15 +23423,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"loginOrRenewSession",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"2085422094",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"loginOrRenewSession",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -23440,6 +23440,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"2085422094",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"loginOrRenewSession",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"2085422094",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"loginOrRenewSession",
 		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
@@ -23450,15 +23459,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"loginOrRenewSession",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"2085422094",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"loginOrRenewSession",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_SUMMARY",
@@ -23503,7 +23503,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-892045424",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"loginWithCredential",
-		"entity":"javax.security.auth.login.LoginException",
+		"entity":"org.ow2.proactive.resourcemanager.exception.RMException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -23521,7 +23521,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-892045424",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"loginWithCredential",
-		"entity":"java.security.KeyException",
+		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -23539,7 +23539,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-892045424",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"loginWithCredential",
-		"entity":"org.ow2.proactive.resourcemanager.exception.RMException",
+		"entity":"java.security.KeyException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -23566,7 +23566,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-892045424",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"loginWithCredential",
-		"entity":"javax.security.auth.login.LoginException",
+		"entity":"org.ow2.proactive.resourcemanager.exception.RMException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -23584,7 +23584,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-892045424",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"loginWithCredential",
-		"entity":"java.security.KeyException",
+		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -23602,7 +23602,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-892045424",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"loginWithCredential",
-		"entity":"org.ow2.proactive.resourcemanager.exception.RMException",
+		"entity":"java.security.KeyException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -24979,7 +24979,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1632702002",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobResult",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -24988,7 +24988,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1632702002",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobResult",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -25015,7 +25015,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1632702002",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobResult",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -25024,7 +25024,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1632702002",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobResult",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_INTERFACEDOCUMENTATION",
@@ -25060,6 +25060,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1334365929",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"loginOrRenewSession",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"1334365929",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"loginOrRenewSession",
 		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
@@ -25070,15 +25079,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"loginOrRenewSession",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"1334365929",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"loginOrRenewSession",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -25105,6 +25105,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1334365929",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"loginOrRenewSession",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"1334365929",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"loginOrRenewSession",
 		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
@@ -25115,15 +25124,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"loginOrRenewSession",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"1334365929",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"loginOrRenewSession",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -25465,25 +25465,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1907769280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansInfo",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"1907769280",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansInfo",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"1907769280",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansInfo",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"1907769280",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansInfo",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -25501,7 +25492,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1907769280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansInfo",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -25510,7 +25501,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1907769280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansInfo",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.MalformedObjectNameException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -25520,6 +25511,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansInfo",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"1907769280",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansInfo",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -25537,25 +25537,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1907769280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansInfo",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"1907769280",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansInfo",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"1907769280",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansInfo",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"1907769280",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansInfo",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -25573,7 +25564,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1907769280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansInfo",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -25582,7 +25573,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1907769280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansInfo",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.MalformedObjectNameException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -25592,6 +25583,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansInfo",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"1907769280",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansInfo",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -25780,7 +25780,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"169959000",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getMBeanInfo",
-		"entity":"javax.management.IntrospectionException",
+		"entity":"java.io.IOException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -25798,16 +25798,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"169959000",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getMBeanInfo",
-		"entity":"java.io.IOException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"169959000",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getMBeanInfo",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -25817,6 +25808,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getMBeanInfo",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"169959000",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getMBeanInfo",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -25834,7 +25834,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"169959000",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getMBeanInfo",
-		"entity":"javax.management.IntrospectionException",
+		"entity":"java.io.IOException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -25852,16 +25852,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"169959000",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getMBeanInfo",
-		"entity":"java.io.IOException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"169959000",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getMBeanInfo",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -25871,6 +25862,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getMBeanInfo",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"169959000",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getMBeanInfo",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_SUMMARY",
@@ -26338,7 +26338,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"799061280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -26347,7 +26347,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"799061280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -26383,7 +26383,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"799061280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -26392,7 +26392,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"799061280",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -26671,7 +26671,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1575750761",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobResultValue",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -26680,7 +26680,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1575750761",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobResultValue",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -26707,7 +26707,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1575750761",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobResultValue",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -26716,7 +26716,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1575750761",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobResultValue",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_SUMMARY",
@@ -26914,6 +26914,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-541579459",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"schedulerChangeJobPriorityByValue",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-541579459",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"schedulerChangeJobPriorityByValue",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException",
 	},
 	{
@@ -26924,15 +26933,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"schedulerChangeJobPriorityByValue",
 		"entity":"java.lang.NumberFormatException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-541579459",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"schedulerChangeJobPriorityByValue",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -26968,6 +26968,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-541579459",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"schedulerChangeJobPriorityByValue",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-541579459",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"schedulerChangeJobPriorityByValue",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException",
 	},
 	{
@@ -26978,15 +26987,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"schedulerChangeJobPriorityByValue",
 		"entity":"java.lang.NumberFormatException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-541579459",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"schedulerChangeJobPriorityByValue",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -27382,7 +27382,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"931895327",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobInfo",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -27391,7 +27391,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"931895327",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobInfo",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -27418,7 +27418,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"931895327",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobInfo",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -27427,7 +27427,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"931895327",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobInfo",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -27481,6 +27481,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1298757885",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"getLoginFromSessionId",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-1298757885",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"getLoginFromSessionId",
 		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
@@ -27491,15 +27500,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"getLoginFromSessionId",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-1298757885",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"getLoginFromSessionId",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -27517,6 +27517,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1298757885",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"getLoginFromSessionId",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-1298757885",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"getLoginFromSessionId",
 		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
@@ -27527,15 +27536,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"getLoginFromSessionId",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-1298757885",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"getLoginFromSessionId",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_SUMMARY",
@@ -28039,7 +28039,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"750175016",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"killTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28048,7 +28048,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"750175016",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"killTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28084,7 +28084,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"750175016",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"killTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28093,7 +28093,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"750175016",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"killTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28156,6 +28156,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-352203874",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"putThirdPartyCredential",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-352203874",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"putThirdPartyCredential",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException",
 	},
 	{
@@ -28165,15 +28174,6 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-352203874",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"putThirdPartyCredential",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-352203874",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"putThirdPartyCredential",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
@@ -28184,6 +28184,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"putThirdPartyCredential",
 		"entity":null,
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-352203874",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"putThirdPartyCredential",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28201,15 +28210,6 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-352203874",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"putThirdPartyCredential",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-352203874",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"putThirdPartyCredential",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
@@ -28273,7 +28273,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1616354805",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskServerLog",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28282,7 +28282,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1616354805",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskServerLog",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28318,7 +28318,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1616354805",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskServerLog",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28327,7 +28327,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1616354805",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskServerLog",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28354,7 +28354,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-2101981420",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLogout",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28363,7 +28363,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-2101981420",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLogout",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28399,7 +28399,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-2101981420",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLogout",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28408,7 +28408,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-2101981420",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLogout",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28498,34 +28498,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1337474847",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansHistory",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-1337474847",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansHistory",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-1337474847",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-1337474847",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"javax.management.MBeanException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-1337474847",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28543,7 +28525,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1337474847",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28552,7 +28534,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1337474847",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.MBeanException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-1337474847",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansHistory",
+		"entity":"javax.management.MalformedObjectNameException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -28562,6 +28553,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansHistory",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-1337474847",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansHistory",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -28579,34 +28579,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1337474847",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansHistory",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-1337474847",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansHistory",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-1337474847",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-1337474847",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"javax.management.MBeanException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-1337474847",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28624,7 +28606,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1337474847",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28633,7 +28615,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1337474847",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansHistory",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.MBeanException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-1337474847",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansHistory",
+		"entity":"javax.management.MalformedObjectNameException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -28643,6 +28634,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeansHistory",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-1337474847",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeansHistory",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -29326,15 +29326,6 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1333094599",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"copyAndResubmitWithGeneralInfo",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"-1333094599",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"copyAndResubmitWithGeneralInfo",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
@@ -29345,6 +29336,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"copyAndResubmitWithGeneralInfo",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"-1333094599",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"copyAndResubmitWithGeneralInfo",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -29380,15 +29380,6 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1333094599",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"copyAndResubmitWithGeneralInfo",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"-1333094599",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"copyAndResubmitWithGeneralInfo",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
@@ -29399,6 +29390,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"copyAndResubmitWithGeneralInfo",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"-1333094599",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"copyAndResubmitWithGeneralInfo",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_SUMMARY",
@@ -29479,7 +29479,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1416757964",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobFullLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -29488,7 +29488,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1416757964",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobFullLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -29533,7 +29533,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1416757964",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobFullLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -29542,7 +29542,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1416757964",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobFullLogs",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -29641,6 +29641,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"2061555547",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobTask",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"2061555547",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"jobTask",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
@@ -29651,15 +29660,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobTask",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"2061555547",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"jobTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -29686,6 +29686,15 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"2061555547",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobTask",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"2061555547",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
+		"implementationMethod":"jobTask",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
@@ -29696,15 +29705,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"jobTask",
 		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"2061555547",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
-		"implementationMethod":"jobTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30074,6 +30074,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
 		"implementationMethod":"loginWithCredential",
 		"entity":null,
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"840751824",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
+		"implementationMethod":"loginWithCredential",
+		"entity":"java.io.IOException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30083,15 +30092,6 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
 		"implementationMethod":"loginWithCredential",
 		"entity":"javax.security.auth.login.LoginException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"840751824",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
-		"implementationMethod":"loginWithCredential",
-		"entity":"java.io.IOException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30127,7 +30127,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"840751824",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
 		"implementationMethod":"loginWithCredential",
-		"entity":"javax.security.auth.login.LoginException",
+		"entity":"java.io.IOException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -30136,7 +30136,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"840751824",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
 		"implementationMethod":"loginWithCredential",
-		"entity":"java.io.IOException",
+		"entity":"javax.security.auth.login.LoginException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -30262,7 +30262,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1493441995",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submit",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30271,7 +30271,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1493441995",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submit",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -30316,7 +30316,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1493441995",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submit",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -30325,7 +30325,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1493441995",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"submit",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30442,7 +30442,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"103431928",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
 		"implementationMethod":"submit",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30451,7 +30451,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"103431928",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
 		"implementationMethod":"submit",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -30496,7 +30496,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"103431928",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
 		"implementationMethod":"submit",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -30505,7 +30505,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"103431928",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.studio.StudioRest",
 		"implementationMethod":"submit",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_PARAMETER_DOCUMENTATION",
@@ -30541,34 +30541,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1858824472",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanHistory",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"1858824472",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanHistory",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"1858824472",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"1858824472",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"javax.management.MBeanException",
-	},
-	{
-		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
-		"description":"Exception thrown by method has no comment",
-		"failedBuild":"false",
-		"interface":"1858824472",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30586,7 +30568,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1858824472",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30595,7 +30577,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1858824472",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.MBeanException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"1858824472",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanHistory",
+		"entity":"javax.management.MalformedObjectNameException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -30605,6 +30596,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanHistory",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
+		"description":"Exception thrown by method has no comment",
+		"failedBuild":"false",
+		"interface":"1858824472",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanHistory",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_AUTHORS",
@@ -30622,34 +30622,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1858824472",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanHistory",
+		"entity":"java.io.IOException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"1858824472",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanHistory",
 		"entity":"java.lang.NullPointerException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"1858824472",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"javax.management.MalformedObjectNameException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"1858824472",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"javax.management.MBeanException",
-	},
-	{
-		"category":"REST_UNMAPPED_EXCEPTION",
-		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
-		"failedBuild":"false",
-		"interface":"1858824472",
-		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
-		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -30667,7 +30649,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1858824472",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"java.io.IOException",
+		"entity":"javax.management.IntrospectionException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -30676,7 +30658,16 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1858824472",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanHistory",
-		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
+		"entity":"javax.management.MBeanException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"1858824472",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanHistory",
+		"entity":"javax.management.MalformedObjectNameException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -30686,6 +30677,15 @@ com.qmino.miredot.projectWarnings = [
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
 		"implementationMethod":"getNodeMBeanHistory",
 		"entity":"javax.management.InstanceNotFoundException",
+	},
+	{
+		"category":"REST_UNMAPPED_EXCEPTION",
+		"description":"Exception is thrown by interface specification, but is not mapped in the MireDot configuration. As such, the return errorcode can not be documented properly.",
+		"failedBuild":"false",
+		"interface":"1858824472",
+		"implementationClass":"org.ow2.proactive_grid_cloud_portal.rm.RMRest",
+		"implementationMethod":"getNodeMBeanHistory",
+		"entity":"org.ow2.proactive.scheduler.common.exception.NotConnectedException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -31072,7 +31072,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1714206965",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLogErr",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -31081,7 +31081,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1714206965",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLogErr",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -31117,7 +31117,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1714206965",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLogErr",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -31126,7 +31126,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"-1714206965",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"taskLogErr",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -31504,7 +31504,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1174043678",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"restartInErrorTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -31513,7 +31513,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1174043678",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"restartInErrorTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -31549,7 +31549,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1174043678",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"restartInErrorTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -31558,7 +31558,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1174043678",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"restartInErrorTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -31729,7 +31729,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1195704237",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"restartTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -31738,7 +31738,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1195704237",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"restartTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"JAVADOC_MISSING_EXCEPTION_DOCUMENTATION",
@@ -31774,7 +31774,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1195704237",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"restartTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",
@@ -31783,7 +31783,7 @@ com.qmino.miredot.projectWarnings = [
 		"interface":"1195704237",
 		"implementationClass":"org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest",
 		"implementationMethod":"restartTask",
-		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException",
+		"entity":"org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException",
 	},
 	{
 		"category":"REST_UNMAPPED_EXCEPTION",

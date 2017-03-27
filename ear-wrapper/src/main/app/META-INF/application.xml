@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC "-//Sun Microsystems, Inc.//DTD J2EE Application 1.2//EN" "http://java.sun.com/j2ee/dtds/application_1_2.dtd">
+<application id="Proactive">
+    <display-name>Proactive</display-name>
+    <description>Proactive with all components</description>
+ <!--   <initialize-in-order>true</initialize-in-order> -->
+    <module>
+        <web>
+            <web-uri>proactive-server-7.26.0-SNAPSHOT.war</web-uri>
+            <context-root>/proactiveServer</context-root>
+        </web>
+    </module>
+</application>

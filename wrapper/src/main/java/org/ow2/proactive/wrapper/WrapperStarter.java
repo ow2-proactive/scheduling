@@ -99,26 +99,30 @@ public class WrapperStarter {
 
     public static void launchProactiveServer() {
 
-        String[] args = new String[] {};
+        System.out.println("Proactive is running");
 
-        configureSchedulerAndRMAndPAHomes();
-        configureSecurityManager();
-        configureLogging();
-        configureDerby();
-
-        args = JVMPropertiesPreloader.overrideJVMProperties(args);
-        System.out.println(ArrayUtils.toString(args));
-
-        Options options = getOptions();
-
-        try {
-            start(getCommandLine(args, options));
-
-        } catch (Exception e) {
-            logger.error("Error when starting the scheduler", e);
-            displayHelp(options);
-            System.exit(6);
-        }
+        /*
+         * String[] args = new String[] { "-ln", "0", "--no-rest", "--rm-only" };
+         * 
+         * configureSchedulerAndRMAndPAHomes();
+         * configureSecurityManager();
+         * configureLogging();
+         * configureDerby();
+         * 
+         * args = JVMPropertiesPreloader.overrideJVMProperties(args);
+         * System.out.println("JVM args: " + ArrayUtils.toString(args));
+         * 
+         * Options options = getOptions();
+         * 
+         * try {
+         * start(getCommandLine(args, options));
+         * 
+         * } catch (Exception e) {
+         * logger.error("Error when starting the scheduler", e);
+         * displayHelp(options);
+         * System.exit(6);
+         * }
+         */
 
     }
 
@@ -148,6 +152,8 @@ public class WrapperStarter {
         }
 
         SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
+
+        System.out.println(commandLine.hasOption("no-rest"));
 
         if (!commandLine.hasOption("no-rest")) {
             List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL()));
