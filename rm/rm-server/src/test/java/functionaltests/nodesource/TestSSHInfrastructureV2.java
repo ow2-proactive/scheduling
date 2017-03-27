@@ -179,7 +179,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         RMTHelper.log("Final checks on the scheduler state");
         s = resourceManager.getState();
         assertEquals(NB_NODES, s.getTotalNodesNumber());
-        assertEquals(NB_NODES, s.getFreeNodesNumber());
+        assertEquals(NB_NODES, s.getTotalAliveNodesNumber()); // check amount of all nodes that are not down
     }
 
     @After
