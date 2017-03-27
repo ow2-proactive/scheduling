@@ -180,9 +180,10 @@ public interface StudioInterface {
      * @return the result of job validation
      */
     @POST
-    @Path("validate")
+    @Path("{path:validate}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    JobValidationData validate(MultipartFormDataInput multipart);
+    @Produces("application/json")
+    JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart);
 
     /**
      * Submits a job to the scheduler
