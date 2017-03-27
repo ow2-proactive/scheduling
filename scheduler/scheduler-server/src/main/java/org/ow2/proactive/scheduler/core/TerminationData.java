@@ -76,6 +76,10 @@ final class TerminationData {
             this.internalJob = internalJob;
         }
 
+        public boolean terminatedWhileRunning() {
+            return taskData.getLauncher() != null;
+        }
+
     }
 
     static class TaskRestartData {
@@ -151,41 +155,8 @@ final class TerminationData {
     void handleTermination(final SchedulingService service) throws IOException, ClassNotFoundException {
         for (TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
             RunningTaskData taskData = taskToTerminate.taskData;
-            Map<String, String> genericInformation = new HashMap<>();
-            VariablesMap variables = null;
-            if (taskToTerminate.internalJob != null) {
-                genericInformation = taskData.getTask().getRuntimeGenericInformation();
-            }
-            try {
-                variables = getStringSerializableMap(service, taskToTerminate);
-            } catch (Exception e) {
-                logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
-            }
-            try {
-                if (!taskToTerminate.normalTermination) {
-                    taskData.getLauncher().kill();
-                }
-            } catch (Throwable t) {
-                logger.info("Cannot terminate task launcher for task '" + taskData.getTask().getId() + "'", t);
-                try {
-                    logger.info("Task launcher that cannot be terminated is identified by " +
-                                taskData.getLauncher().toString());
-                } catch (Throwable ignore) {
-                    logger.info("Getting information about Task launcher failed (remote object not accessible?)");
-                }
-            }
-
-            try {
-                logger.debug("Releasing nodes for task '" + taskData.getTask().getId() + "'");
-                RMProxiesManager proxiesManager = service.getInfrastructure().getRMProxiesManager();
-                proxiesManager.getUserRMProxy(taskData.getUser(), taskData.getCredentials())
-                              .releaseNodes(taskData.getNodes(),
-                                            taskData.getTask().getCleaningScript(),
-                                            variables,
-                                            genericInformation,
-                                            taskToTerminate.taskData.getTask().getId());
-            } catch (Throwable t) {
-                logger.info("Failed to release nodes for task '" + taskData.getTask().getId() + "'", t);
+            if (taskToTerminate.terminatedWhileRunning()) {
+                terminateRunningTask(service, taskToTerminate, taskData);
             }
         }
 
@@ -202,6 +173,46 @@ final class TerminationData {
         }
     }
 
+    private void terminateRunningTask(SchedulingService service, TaskTerminationData taskToTerminate,
+            RunningTaskData taskData) {
+        Map<String, String> genericInformation = new HashMap<>();
+        VariablesMap variables = null;
+        if (taskToTerminate.internalJob != null) {
+            genericInformation = taskData.getTask().getRuntimeGenericInformation();
+        }
+        try {
+            variables = getStringSerializableMap(service, taskToTerminate);
+        } catch (Exception e) {
+            logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
+        }
+        try {
+            if (!taskToTerminate.normalTermination) {
+                taskData.getLauncher().kill();
+            }
+        } catch (Throwable t) {
+            logger.info("Cannot terminate task launcher for task '" + taskData.getTask().getId() + "'", t);
+            try {
+                logger.info("Task launcher that cannot be terminated is identified by " +
+                            taskData.getLauncher().toString());
+            } catch (Throwable ignore) {
+                logger.info("Getting information about Task launcher failed (remote object not accessible?)");
+            }
+        }
+
+        try {
+            logger.debug("Releasing nodes for task '" + taskData.getTask().getId() + "'");
+            RMProxiesManager proxiesManager = service.getInfrastructure().getRMProxiesManager();
+            proxiesManager.getUserRMProxy(taskData.getUser(), taskData.getCredentials())
+                          .releaseNodes(taskData.getNodes(),
+                                        taskData.getTask().getCleaningScript(),
+                                        variables,
+                                        genericInformation,
+                                        taskToTerminate.taskData.getTask().getId());
+        } catch (Throwable t) {
+            logger.info("Failed to release nodes for task '" + taskData.getTask().getId() + "'", t);
+        }
+    }
+
     public VariablesMap getStringSerializableMap(SchedulingService service, TaskTerminationData taskToTerminate)
             throws Exception {
         VariablesMap variablesMap = new VariablesMap();
@@ -215,7 +226,11 @@ final class TerminationData {
         if (!taskToTerminate.normalTermination || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();
             if (iDependences != null) {
-                Set<TaskId> parentIds = internalTaskParentFinder.getFirstNotSkippedParentTaskIds(taskData.getTask());
+                Set<TaskId> parentIds = new HashSet<>(iDependences.size());
+                for (InternalTask parentTask : iDependences) {
+                    parentIds.addAll(InternalTaskParentFinder.getInstance()
+                                                             .getFirstNotSkippedParentTaskIds(parentTask));
+                }
 
                 Map<TaskId, TaskResult> taskResults = service.getInfrastructure()
                                                              .getDBManager()

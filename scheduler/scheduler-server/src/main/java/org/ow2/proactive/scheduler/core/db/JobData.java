@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -221,7 +222,17 @@ public class JobData implements Serializable {
             jobInfo.setToBeRemoved();
         }
         jobInfo.setGenericInformation(getGenericInformation());
+        jobInfo.setVariables(createVariablesStringMap());
         return jobInfo;
+    }
+
+    private Map<String, String> createVariablesStringMap() {
+        Map<String, JobVariable> jobDataVariablesMap = getVariables();
+        Map<String, String> stringVariablesMap = new HashMap<>(jobDataVariablesMap.size());
+        for (JobVariable variable : getVariables().values()) {
+            stringVariablesMap.put(variable.getName(), variable.getValue());
+        }
+        return stringVariablesMap;
     }
 
     JobInfo toJobInfo() {

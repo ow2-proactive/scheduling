@@ -3477,4 +3477,20 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return null;
     }
 
+    @GET
+    @Override
+    @Path("configuration/portal")
+    @Produces("application/json")
+    public Map<Object, Object> getPortalConfiguration(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
+        try {
+            final Scheduler s = checkAccess(sessionId, "GET configuration/portal");
+            return s.getPortalConfiguration();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
 }
