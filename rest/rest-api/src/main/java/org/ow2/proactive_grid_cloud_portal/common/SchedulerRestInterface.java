@@ -1802,6 +1802,29 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart);
 
+    /**
+     * Validates a workflow taken from a given URL
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param url
+     *            url to the workflow content
+     * @param pathSegment
+     *            variables of the workflow
+     * @return the result of job validation
+     * @throws NotConnectedRestException
+     * @throws IOException
+     * @throws JobCreationRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     */
+    @POST
+    @Path("{path:validateurl}")
+    @Produces("application/json")
+    public JobValidationData validateFromUrl(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("link") String url, @PathParam("path") PathSegment pathSegment)
+            throws NotConnectedRestException;
+
     @POST
     @Path("/credentials/{key}")
     void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") String key,
