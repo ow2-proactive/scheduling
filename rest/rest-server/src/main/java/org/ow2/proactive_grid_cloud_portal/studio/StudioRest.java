@@ -301,8 +301,8 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobValidationData validate(MultipartFormDataInput multipart) {
-        return scheduler().validate(multipart);
+    public JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart) {
+        return scheduler().validate(pathSegment, multipart);
     }
 
     @Override

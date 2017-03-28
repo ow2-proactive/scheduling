@@ -1797,10 +1797,10 @@ public interface SchedulerRestInterface {
      * @return the result of job validation
      */
     @POST
-    @Path("validate")
+    @Path("{path:validate}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    JobValidationData validate(MultipartFormDataInput multipart);
+    JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart);
 
     @POST
     @Path("/credentials/{key}")

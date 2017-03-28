@@ -67,6 +67,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -85,15 +86,15 @@ public class ValidationUtil {
     private ValidationUtil() {
     }
 
-    public static JobValidationData validateJobDescriptor(File jobDescFile) {
-        return validateJob(jobDescFile.getAbsolutePath());
+    public static JobValidationData validateJobDescriptor(File jobDescFile, Map<String, String> jobVariables) {
+        return validateJob(jobDescFile.getAbsolutePath(), jobVariables);
     }
 
-    private static JobValidationData validateJob(String jobFilePath) {
+    private static JobValidationData validateJob(String jobFilePath, Map<String, String> jobVariables) {
         JobValidationData data = new JobValidationData();
         try {
             JobFactory factory = JobFactory.getFactory();
-            Job job = factory.createJob(jobFilePath);
+            Job job = factory.createJob(jobFilePath, jobVariables);
 
             if (job instanceof TaskFlowJob) {
                 validateJob((TaskFlowJob) job, data);
