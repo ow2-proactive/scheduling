@@ -35,6 +35,7 @@ import java.security.Principal;
 import java.security.ProtectionDomain;
 import java.security.UnresolvedPermission;
 import java.util.Enumeration;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.MBeanPermission;
 import javax.security.auth.AuthPermission;
@@ -64,6 +65,12 @@ public class ClientsPolicy extends Policy {
     // to avoid recursive permission check
     private boolean debug = false;
 
+    private static ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+
+    private static ReentrantReadWriteLock.ReadLock readLock = rwLock.readLock();
+
+    private static ReentrantReadWriteLock.WriteLock writeLock = rwLock.writeLock();
+
     private Policy original;
 
     private ClientsPolicy(Policy original) {
@@ -91,58 +98,64 @@ public class ClientsPolicy extends Policy {
 
     @Override
     public PermissionCollection getPermissions(final ProtectionDomain domain) {
-        PermissionCollection permissions = new Permissions();
-        // Look up permissions
-        Principal[] principals = domain.getPrincipals();
-        boolean identityPrincipal = false;
+        try {
+            readLock.lock();
+            PermissionCollection permissions = new Permissions();
 
-        if (principals != null) {
-            for (Principal principal : principals) {
-                if (principal instanceof IdentityPrincipal) {
-                    identityPrincipal = true;
-                    PermissionCollection pc = original.getPermissions(domain);
-                    if (pc != null) {
-                        Permission permission = new PrincipalPermission((IdentityPrincipal) principal);
-                        // always adding identity permission
-                        permissions.add(permission);
-                        if (debug) {
-                            // WARNING cannot use log4j as it may lead to recursive permission check
-                            System.out.println(principal + " has " + permission);
-                        }
+            // Look up permissions
+            Principal[] principals = domain.getPrincipals();
+            boolean identityPrincipal = false;
 
-                        for (Enumeration<Permission> en = pc.elements(); en.hasMoreElements();) {
-                            permission = en.nextElement();
-
-                            // all "non standard" permissions like ClientPermissions are not presented in
-                            // boot class path, so they were not correctly resolved at JVM start up time
-                            if (permission instanceof UnresolvedPermission) {
-                                permission = resolvePermission((UnresolvedPermission) permission);
-                                if (permission == null)
-                                    continue;
+            if (principals != null) {
+                for (Principal principal : principals) {
+                    if (principal instanceof IdentityPrincipal) {
+                        identityPrincipal = true;
+                        PermissionCollection pc = original.getPermissions(domain);
+                        if (pc != null) {
+                            Permission permission = new PrincipalPermission((IdentityPrincipal) principal);
+                            // always adding identity permission
+                            permissions.add(permission);
+                            if (debug) {
+                                // WARNING cannot use log4j as it may lead to recursive permission check
+                                System.out.println(principal + " has " + permission);
                             }
 
-                            // we grant java.security.AllPermissions to everyone in the security.java.policy
-                            // here we exclude it from IdentityPrincipal
-                            //
-                            // For IdentityPrincipal org.ow2.proactive.permissions.AllPermissions must be used
-                            if (!permission.getClass().isAssignableFrom(AllPermission.class)) {
-                                if (debug) {
-                                    // WARNING cannot use log4j as it may lead to recursive permission check
-                                    System.out.println(principal + " has " + permission);
+                            for (Enumeration<Permission> en = pc.elements(); en.hasMoreElements();) {
+                                permission = en.nextElement();
+
+                                // all "non standard" permissions like ClientPermissions are not presented in
+                                // boot class path, so they were not correctly resolved at JVM start up time
+                                if (permission instanceof UnresolvedPermission) {
+                                    permission = resolvePermission((UnresolvedPermission) permission);
+                                    if (permission == null)
+                                        continue;
                                 }
-                                permissions.add(permission);
+
+                                // we grant java.security.AllPermissions to everyone in the security.java.policy
+                                // here we exclude it from IdentityPrincipal
+                                //
+                                // For IdentityPrincipal org.ow2.proactive.permissions.AllPermissions must be used
+                                if (!permission.getClass().isAssignableFrom(AllPermission.class)) {
+                                    if (debug) {
+                                        // WARNING cannot use log4j as it may lead to recursive permission check
+                                        System.out.println(principal + " has " + permission);
+                                    }
+                                    permissions.add(permission);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        if (!identityPrincipal) {
-            return original.getPermissions(domain);
-        }
+            if (!identityPrincipal) {
+                return original.getPermissions(domain);
+            }
 
-        return permissions;
+            return permissions;
+        } finally {
+            readLock.unlock();
+        }
     }
 
     /**
@@ -179,23 +192,34 @@ public class ClientsPolicy extends Policy {
 
     @Override
     public void refresh() {
-        //original.refresh();
-        if (debug) {
-            System.out.println("Reloading policy file " + System.getProperty("java.security.policy"));
+        try {
+            writeLock.lock();
+            //original.refresh();
+            if (debug) {
+                System.out.println("Reloading policy file " + System.getProperty("java.security.policy"));
+            }
+            Policy.setPolicy(null);
+            // force file reloading
+            original = Policy.getPolicy();
+            Policy.setPolicy(this);
+        } finally {
+            writeLock.unlock();
         }
-        Policy.setPolicy(null);
-        // force file reloading
-        original = Policy.getPolicy();
-        Policy.setPolicy(this);
     }
 
     /**
      * Initialize the policy in the system
      */
     public static void init() {
-        if (instance == null) {
-            instance = new ClientsPolicy(Policy.getPolicy());
-            Policy.setPolicy(instance);
+        try {
+            writeLock.lock();
+            if (instance == null) {
+                instance = new ClientsPolicy(Policy.getPolicy());
+                Policy.setPolicy(instance);
+            }
+        } finally {
+            writeLock.unlock();
         }
+
     }
 }

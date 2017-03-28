@@ -135,6 +135,7 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
 
@@ -158,7 +159,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() *
                                                             1000;
 
-    private static final Logger logger = Logger.getLogger(SchedulingService.class);
+    private static final Logger logger = Logger.getLogger(SchedulerFrontend.class);
 
     private static final JobLogger jlogger = JobLogger.getInstance();
 
@@ -191,6 +192,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerSpacesSupport spacesSupport;
 
     private PublicKey corePublicKey;
+
+    private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
 
     /*
      * ######################################################################### ##################
@@ -1311,6 +1314,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             job.addGenericInformation(entry.getKey(), entry.getValue());
         }
         return submit(job);
+    }
+
+    @Override
+    public Map<Object, Object> getPortalConfiguration() {
+        return schedulerPortalConfiguration.getProperties();
     }
 
 }

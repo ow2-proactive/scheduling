@@ -459,11 +459,9 @@ public class LiveJobsTest {
 
         assertThat(taskInfoImpl.getNumberOfExecutionLeft(), is(1));
 
-        assertThat(taskInfoImpl.getInErrorTime(), is((taskInfoImpl.getStartTime() + 330)));
+        assertThat(taskInfoImpl.getStatus(), is(TaskStatus.WAITING_ON_ERROR));
 
-        assertThat(taskInfoImpl.getStatus(), is(TaskStatus.IN_ERROR));
-
-        assertThat(job.getStatus(), is(JobStatus.IN_ERROR));
+        assertThat(job.getStatus(), is(JobStatus.STALLED));
 
     }
 
@@ -499,9 +497,9 @@ public class LiveJobsTest {
 
         assertThat(taskInfoImpl.getNumberOfExecutionLeft(), is(-1));
 
-        assertThat(taskInfoImpl.getStatus(), is(TaskStatus.FAULTY));
+        assertThat(taskInfoImpl.getStatus(), is(TaskStatus.IN_ERROR));
 
-        assertThat(job.getStatus(), is(JobStatus.STALLED));
+        assertThat(job.getStatus(), is(JobStatus.IN_ERROR));
 
     }
 
@@ -548,13 +546,13 @@ public class LiveJobsTest {
 
         assertThat(taskInfoImpl.getNumberOfExecutionLeft(), is(9));
 
-        assertThat(taskInfoImpl.getStatus(), is(TaskStatus.IN_ERROR));
+        assertThat(taskInfoImpl.getStatus(), is(TaskStatus.WAITING_ON_ERROR));
 
         assertThat(taskInfoImpl2.getNumberOfExecutionLeft(), is(10));
 
-        assertThat(taskInfoImpl2.getStatus(), is(TaskStatus.PAUSED));
+        assertThat(taskInfoImpl2.getStatus(), is(TaskStatus.PENDING));
 
-        assertThat(job.getStatus(), is(JobStatus.PAUSED));
+        assertThat(job.getStatus(), is(JobStatus.STALLED));
 
     }
 

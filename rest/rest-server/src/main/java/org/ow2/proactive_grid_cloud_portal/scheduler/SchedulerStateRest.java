@@ -3118,7 +3118,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public JobValidationData validate(MultipartFormDataInput multipart) {
+    public JobValidationData validate(PathSegment pathSegment, MultipartFormDataInput multipart) {
         File tmpFile = null;
         try {
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
@@ -3131,7 +3131,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             tmpFile = File.createTempFile("valid-job", "d");
             IOUtils.copy(is, new FileOutputStream(tmpFile));
 
-            return validateJobDescriptor(tmpFile);
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            return validateJobDescriptor(tmpFile, jobVariables);
         } catch (IOException e) {
             JobValidationData validation = new JobValidationData();
             validation.setErrorMessage("Cannot read from the job validation request.");
@@ -3475,6 +3477,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new JobCreationRestException(e);
         }
         return null;
+    }
+
+    @GET
+    @Override
+    @Path("configuration/portal")
+    @Produces("application/json")
+    public Map<Object, Object> getPortalConfiguration(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
+        try {
+            final Scheduler s = checkAccess(sessionId, "GET configuration/portal");
+            return s.getPortalConfiguration();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
     }
 
 }

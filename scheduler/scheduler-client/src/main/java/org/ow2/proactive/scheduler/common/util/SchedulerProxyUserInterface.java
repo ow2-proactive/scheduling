@@ -637,4 +637,9 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
     }
 
+    @Override
+    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+        return uischeduler.getPortalConfiguration();
+    }
+
 }
