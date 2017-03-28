@@ -27,7 +27,6 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
 import java.io.*;
 import java.net.URI;
@@ -140,6 +139,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private HttpServletRequest httpServletRequest;
 
     private final WorkflowVariablesTransformer workflowVariablesTransformer = new WorkflowVariablesTransformer();
+
+    private final ValidationUtil jobValidator = new ValidationUtil();
 
     /**
      * Returns the ids of the current jobs under a list of string.
@@ -3133,7 +3134,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-            return validateJobDescriptor(tmpFile, jobVariables);
+            return jobValidator.validateJobDescriptor(tmpFile, jobVariables);
         } catch (IOException e) {
             JobValidationData validation = new JobValidationData();
             validation.setErrorMessage("Cannot read from the job validation request.");
@@ -3143,6 +3144,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if (tmpFile != null) {
                 tmpFile.delete();
             }
+        }
+    }
+
+    @Override
+    public JobValidationData validateFromUrl(String sessionId, String url, PathSegment pathSegment)
+            throws NotConnectedRestException {
+
+        File tmpWorkflowFile = null;
+        try {
+            checkAccess(sessionId);
+            String jobXml = downloadWorkflowContent(sessionId, url);
+            tmpWorkflowFile = File.createTempFile("job", "d");
+            IOUtils.write(jobXml, new FileOutputStream(tmpWorkflowFile));
+
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            return jobValidator.validateJobDescriptor(tmpWorkflowFile, jobVariables);
+
+        } catch (JobCreationRestException | IOException e) {
+            JobValidationData validation = new JobValidationData();
+            validation.setErrorMessage("Error while reading workflow at url: " + url);
+            validation.setStackTrace(getStackTrace(e));
+            return validation;
+        } finally {
+            FileUtils.deleteQuietly(tmpWorkflowFile);
         }
     }
 
