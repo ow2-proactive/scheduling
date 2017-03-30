@@ -5,9 +5,10 @@
      xsi:schemaLocation="urn:proactive:jobdescriptor:3.8 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.8/schedulerjob.xsd"
     name="StartEvery2Minutes" 
     priority="normal"
-    onTaskError="suspendTask">
+    onTaskError="suspendTask"
+>
   <genericInformation>
-    <info name="EXECUTION_CALENDARS" value="{&quot;cron&quot;:&quot;0 2 * * *&quot;} "/>
+    <info name="EXECUTION_CALENDARS" value="{&quot;name&quot;:&quot;StartEvery2Minutes&quot;,&quot;cron&quot;: &quot;0 0/2 * * * ?&quot;} "/>
   </genericInformation>
   <taskFlow>
     <task name="Javascript_Task">
