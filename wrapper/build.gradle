@@ -19,108 +19,31 @@ task copyConfigFiles(type: Copy) {
     into 'src/main/resources/config'
 }
 
-task deleteDistFiles(type: Delete){
+/*task deleteDistFiles(type: Delete){
     delete 'src/main/resources/dist'
 }
 
 task copyDistFiles(type: Copy) {
     from project(':').files('dist/war', '*')
     into 'src/main/resources/dist/war'
-}
+}*/
 
 copyConfigFiles.dependsOn deleteConfigFiles
 
-copyDistFiles.dependsOn deleteDistFiles
+//copyDistFiles.dependsOn deleteDistFiles
 
-war.dependsOn copyConfigFiles, copyDistFiles
+war.dependsOn copyConfigFiles//, copyDistFiles
 
 dependencies {
-    // The following dependencies will be the ear modules and
-    // will be placed in the ear root
-    // deploy project(':war')
 
-    // The following dependencies will become ear libs and will
-    // be placed in a dir configured via the libDirName property
-    // earlib group: 'log4j', name: 'log4j'
+    compileOnly project(':scheduler:scheduler-server')
 
-    compile project(':scheduler:scheduler-server')
-
-    //earlib project(':scheduler:scheduler-server')
-
-    compile group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
-
-    //earlib group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
-
-    //deploy files(war)
-
-    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
-    //earlib group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.1'
+    compileOnly group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
 }
 
 war {
-    //archiveName "proactive-server-${schedulingVersion}.war"
     archiveName "proactive-server.war"
 }
-
-/*ear {
-    appDirName 'src/main/app'  // use application metadata found in this folder
-    // put dependent libraries into APP-INF/lib inside the generated EAR
-    //libDirName 'APP-INF/lib'
-    deploymentDescriptor {  // custom entries for application.xml:
-//      fileName = "application.xml"  // same as the default value
-//      version = "6"  // same as the default value
-//      applicationName = "customear"
-        initializeInOrder = true
-        archiveName "proactive-${schedulingVersion}.ear"
-        //displayName = "Custom Ear"  // defaults to project.name
-        // defaults to project.description if not set
-//      description = "My customized EAR for the Gradle documentation"
-//      libraryDirectory = "APP-INF/lib"  // not needed, above libDirName setting does this
-//      module("proactive-wrapper.jar", "java")  // won't deploy as my.jar isn't deploy dependency
-        webModule("proactive-server-${schedulingVersion}.war", "/proactiveServer")  // won't deploy as my.war isn't deploy dependency
-//      securityRole "admin"
-//      securityRole "superadmin"
-    }
-
-    //metaInf {
-      //  from 'src/main/webapp/META-INF'
-    //}
-
-    rootSpec.exclude("org")
-    rootSpec.exclude("dist")
-    rootSpec.exclude("config")
-
-}*/
-
-/*liberty {
-    installDir = '/home/nebil/devworkspace/IBM/wlp'
-    serverName = 'activeeonWASLiberty'
-    userDir = "${installDir}/usr"
-    outputDir = "${installDir}/usr/servers/${serverName}"
-    clean = true
-    timeout = "10000"
-
-    //libertyDebug
-    libertyRun
-
-    deploy {
-        file = '/home/nebil/devworkspace/projects/scheduling/wrapper/build/libs/proactive-server-${schedulingVersion}.war'
-    }
-}*/
-
-
-/*jar {
-    archiveName "proactive-server-${schedulingVersion}.jar"
-    manifest {
-        attributes 'Implementation-Title': 'Proactive Server Jar',
-                'Implementation-Version': "${schedulingVersion}",
-                'Main-Class': 'org.ow2.proactive.wrapper.WrapperStarter',
-                'Class-Path': 'lib/*'
-        //'commons-cli-1.3.1.jar  common-client-7.25.0-SNAPSHOT.jar  rm-server-7.25.0-SNAPSHOT.jar  scheduler-server-7.25.0-SNAPSHOT.jar'
-        // configurations.compile.collect { it.getName() }.join(' '))
-        //'lib/commons-cli-1.3.1.jar  lib/common-client-7.25.0-SNAPSHOT.jar  lib/rm-server-7.25.0-SNAPSHOT.jar  lib/scheduler-server-7.25.0-SNAPSHOT.jar')
-    }
-}*/
