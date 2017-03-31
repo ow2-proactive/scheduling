@@ -120,10 +120,11 @@ public abstract class AbstractRestFuncTestCase {
         assertEquals(STATUS_OK, getStatusCode(response));
     }
 
-    protected void assertContentNotEmpty(HttpResponse response) throws Exception {
+    protected String assertContentNotEmpty(HttpResponse response) throws Exception {
         String content = getContent(response);
         assertNotNull(content);
         assertTrue(content.length() != 0);
+        return content;
     }
 
     protected int getStatusCode(HttpResponse response) {

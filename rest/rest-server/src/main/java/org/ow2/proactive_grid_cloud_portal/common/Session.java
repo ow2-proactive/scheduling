@@ -84,12 +84,14 @@ public class Session {
             throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
         this.credentials = credentials;
+        setUserName(scheduler.getCurrentUser());
     }
 
     public void connectToScheduler(CredData credData)
             throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credData);
         this.credData = credData;
+        setUserName(credData.getLogin());
     }
 
     public SchedulerProxyUserInterface getScheduler() {
@@ -113,12 +115,14 @@ public class Session {
             throws LoginException, ActiveObjectCreationException, KeyException, NodeException, RMException {
         rm = schedulerRMProxyFactory.connectToRM(credentials);
         this.credentials = credentials;
+        setUserName(rm.getCurrentUser().getStringValue());
     }
 
     public void connectToRM(CredData credData)
             throws LoginException, ActiveObjectCreationException, KeyException, NodeException, RMException {
         rm = schedulerRMProxyFactory.connectToRM(credData);
         this.credData = credData;
+        setUserName(credData.getLogin());
     }
 
     public RMProxyUserInterface getRM() {

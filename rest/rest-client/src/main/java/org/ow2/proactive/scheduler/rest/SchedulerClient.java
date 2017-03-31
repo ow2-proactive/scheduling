@@ -1161,4 +1161,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         }
     }
 
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+
+        String connectedUser = restApi().getLoginFromSessionId(sid);
+        if ("".equals(connectedUser)) {
+            throw new NotConnectedException("Session " + sid + " is not connected");
+        }
+        return connectedUser;
+    }
+
 }

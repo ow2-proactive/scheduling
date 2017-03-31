@@ -1396,4 +1396,10 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException;
 
+    /**
+     * Returns the user currently connected
+     * @return user name
+     */
+    String getCurrentUser() throws NotConnectedException;
+
 }
