@@ -83,6 +83,10 @@ public interface StudioInterface {
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
 
     @GET
+    @Path("currentuser")
+    String currentUser(@HeaderParam("sessionid") String sessionId);
+
+    @GET
     @Path("workflows")
     List<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedRestException, IOException;
