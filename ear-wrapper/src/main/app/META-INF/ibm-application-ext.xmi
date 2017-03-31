@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applicationext:ApplicationExtension xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:applicationext="applicationext.xmi" xmlns:application="application.xmi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmi:id="Application_ID_Ext" sharedSessionContext="false">
+
+  <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_Server" altRoot="ALT-INF/proactive-server.war">
+    <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_Server"/>
+  </moduleExtensions>
+
+  <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_GetStarted" altRoot="ALT-INF/proactive-getstarted.war">
+      <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_GetStarted"/>
+  </moduleExtensions>
+
+  <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_Rest" altRoot="ALT-INF/proactive-rest.war">
+    <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_Rest"/>
+  </moduleExtensions>
+
+
+  <application href="META-INF/application.xml#Proactive"/>
+</applicationext:ApplicationExtension>

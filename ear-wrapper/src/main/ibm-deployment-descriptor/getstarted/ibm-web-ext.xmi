@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<webappext:WebAppExtension xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:webappext="webappext.xmi" xmlns:webapplication="webapplication.xmi" xmlns:commonext.localtran="commonext.localtran.xmi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmi:id="WebApp_ID_Ext" reloadInterval="3" reloadingEnabled="true" fileServingEnabled="false" directoryBrowsingEnabled="false" serveServletsByClassnameEnabled="true" preCompileJSPs="false" autoRequestEncoding="false" autoResponseEncoding="false">
+
+  <additionalClassPath xsi:nil="true"/>
+  
+</webappext:WebAppExtension>

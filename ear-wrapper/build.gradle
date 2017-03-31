@@ -1,29 +1,63 @@
 apply plugin: 'ear'
 
+configurations.compile.transitive = true
+
+configurations {
+    all*.exclude group: 'com.zaxxer', module: 'HikariCP-java6'
+}
+
+task getStartedWarTask(type: War) {
+    from project(':').files('dist/war/getstarted', '*')
+    archiveName "proactive-getstarted.war"
+}
+
+task restWarTask(type: War) {
+
+    from (project(':').files('dist/war/rest', '*')){
+        exclude '**/WEB-INF/web.xml'
+    }
+
+    webInf { from 'src/main/ibm-deployment-descriptor/rest' }
+
+    archiveName "proactive-rest.war"
+}
+
+ear.dependsOn getStartedWarTask, restWarTask
+
 dependencies {
     // The following dependencies will be the ear modules and
     // will be placed in the ear root
     // deploy project(':war')
 
+    earlib project(':scheduler:scheduler-server')
+    earlib group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
+
     deploy project(path: ':wrapper', configuration: 'archives')
+    deploy files(getStartedWarTask)
+    deploy files(restWarTask)
 
     // The following dependencies will become ear libs and will
     // be placed in a dir configured via the libDirName property
-    // earlib group: 'log4j', name: 'log4j'
+    //earlib group: 'log4j', name: 'log4j'
     //testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
 ear {
+
     appDirName 'src/main/app'  // use application metadata found in this folder
     // put dependent libraries into APP-INF/lib inside the generated EAR
-    //libDirName 'APP-INF/lib'
+
+    if (project.findProperty('target-server')=='IBM-WAS') {
+        libDirName ''
+    } else libDirName 'lib'
+
     deploymentDescriptor {  // custom entries for application.xml:
 
         archiveName "proactive-${schedulingVersion}.ear"
 //      fileName = "application.xml"  // same as the default value
 //      version = "6"  // same as the default value
 //      applicationName = "customear"
-        initializeInOrder = true
+        //initializeInOrder = true
 //      displayName = "Custom Ear"  // defaults to project.name
         // defaults to project.description if not set
 //      description = "My customized EAR for the Gradle documentation"
@@ -33,4 +67,8 @@ ear {
 //      securityRole "admin"
 //      securityRole "superadmin"
     }
+
+    //archiveName "proactive-${schedulingVersion}.ear"
+    //exclude 'application.xml'
+    //rootSpec.exclude("META-INF/application.xml")
 }

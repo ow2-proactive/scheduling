@@ -1,4 +1,3 @@
-//apply plugin: 'ear'
 apply plugin: 'war'
 
 repositories {
@@ -35,8 +34,6 @@ copyDistFiles.dependsOn deleteDistFiles
 
 war.dependsOn copyConfigFiles, copyDistFiles
 
-//ear.dependsOn war
-
 dependencies {
     // The following dependencies will be the ear modules and
     // will be placed in the ear root
@@ -47,9 +44,11 @@ dependencies {
     // earlib group: 'log4j', name: 'log4j'
 
     compile project(':scheduler:scheduler-server')
+
     //earlib project(':scheduler:scheduler-server')
 
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
+
     //earlib group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
 
     //deploy files(war)
@@ -62,7 +61,8 @@ dependencies {
 }
 
 war {
-    archiveName "proactive-server-${schedulingVersion}.war"
+    //archiveName "proactive-server-${schedulingVersion}.war"
+    archiveName "proactive-server.war"
 }
 
 /*ear {

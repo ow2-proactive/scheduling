@@ -34,7 +34,7 @@ import javax.servlet.annotation.WebListener;
 public class WrapperContextListener implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        System.out.println("ProActive starting up!");
+        System.out.println("ProActive is starting up!");
 
         try {
 

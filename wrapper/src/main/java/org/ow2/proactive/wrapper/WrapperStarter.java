@@ -94,35 +94,36 @@ public class WrapperStarter {
     public static void main(String[] args) {
 
         launchProactiveServer();
+        System.out.println(WrapperWebConfiguration.getRestApplicationUrl());
 
     }
 
     public static void launchProactiveServer() {
 
-        System.out.println("Proactive is running");
+        //String[] args = new String[] { "-ln", "0", "--no-rest", "--rm-only" };
+        //String[] args = new String[] { "-ln", "1" };
+        //String[] args = new String[] { "--no-rest" };
 
-        /*
-         * String[] args = new String[] { "-ln", "0", "--no-rest", "--rm-only" };
-         * 
-         * configureSchedulerAndRMAndPAHomes();
-         * configureSecurityManager();
-         * configureLogging();
-         * configureDerby();
-         * 
-         * args = JVMPropertiesPreloader.overrideJVMProperties(args);
-         * System.out.println("JVM args: " + ArrayUtils.toString(args));
-         * 
-         * Options options = getOptions();
-         * 
-         * try {
-         * start(getCommandLine(args, options));
-         * 
-         * } catch (Exception e) {
-         * logger.error("Error when starting the scheduler", e);
-         * displayHelp(options);
-         * System.exit(6);
-         * }
-         */
+        String[] args = new String[] {};
+
+        configureSchedulerAndRMAndPAHomes();
+        configureSecurityManager();
+        configureLogging();
+        configureDerby();
+
+        args = JVMPropertiesPreloader.overrideJVMProperties(args);
+        System.out.println("JVM args: " + ArrayUtils.toString(args));
+
+        Options options = getOptions();
+
+        try {
+            start(getCommandLine(args, options));
+
+        } catch (Exception e) {
+            logger.error("Error when starting the scheduler", e);
+            displayHelp(options);
+            System.exit(6);
+        }
 
     }
 
@@ -153,20 +154,25 @@ public class WrapperStarter {
 
         SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
 
-        System.out.println(commandLine.hasOption("no-rest"));
+        setPropIfNotAlreadySet("rm.url", rmUrl);
+        setPropIfNotAlreadySet("scheduler.url", sai.getHostURL());
+        PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(WrapperWebConfiguration.getRestApplicationUrl());
 
-        if (!commandLine.hasOption("no-rest")) {
-            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL()));
-            if (applicationUrls != null) {
-                for (String applicationUrl : applicationUrls) {
-                    if (applicationUrl.endsWith("/rest")) {
-                        if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-                            PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
-                        }
-                    }
-                }
-            }
-        }
+        /*
+         * if (!commandLine.hasOption("no-rest")) {
+         * List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl,
+         * sai.getHostURL()));
+         * if (applicationUrls != null) {
+         * for (String applicationUrl : applicationUrls) {
+         * if (applicationUrl.endsWith("/rest")) {
+         * if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+         * PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
+         * }
+         * }
+         * }
+         * }
+         * }
+         */
 
         addShutdownMessageHook();
     }
