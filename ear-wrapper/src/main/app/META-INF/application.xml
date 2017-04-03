@@ -11,16 +11,18 @@
             <context-root>/proactive</context-root>
         </web>
     </module>
+
    <module id="Proactive_GetStarted">
         <web>
             <web-uri>proactive-getstarted.war</web-uri>
-            <context-root>/proactive/getstarted</context-root>
+            <context-root>/</context-root>
         </web>
     </module>
+
     <module id="Proactive_Rest">
         <web>
             <web-uri>proactive-rest.war</web-uri>
-            <context-root>/proactive/rest</context-root>
+            <context-root>/rest</context-root>
         </web>
     </module>
 

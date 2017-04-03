@@ -9,10 +9,9 @@
       <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_GetStarted"/>
   </moduleExtensions>
 
-  <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_Rest" altRoot="ALT-INF/proactive-rest.war">
-    <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_Rest"/>
-  </moduleExtensions>
-
+   <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_Rest" altRoot="ALT-INF/proactive-rest.war">
+      <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_Rest"/>
+   </moduleExtensions>
 
   <application href="META-INF/application.xml#Proactive"/>
 </applicationext:ApplicationExtension>

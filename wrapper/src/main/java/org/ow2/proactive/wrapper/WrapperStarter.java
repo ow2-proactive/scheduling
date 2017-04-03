@@ -38,8 +38,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.*;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -59,6 +58,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -77,34 +77,36 @@ import org.ow2.proactive.utils.Tools;
  */
 public class WrapperStarter {
 
+    // While logger is not configured and it not set with sys properties, use Console logger
+    static {
+        if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
+            Logger.getRootLogger().getLoggerRepository().resetConfiguration();
+            BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%m%n")));
+            Logger.getRootLogger().setLevel(Level.INFO);
+        }
+    }
+
+    private static Logger logger = Logger.getLogger(WrapperStarter.class);
+
     private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
 
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
-
-    private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
     private static BroadcastDiscovery discoveryService;
 
     private static SchedulerHsqldbStarter hsqldbServer;
 
-    /**
-     * Start the scheduler creation process.
-     */
-
     public static void main(String[] args) {
 
         launchProactiveServer();
-        System.out.println(WrapperWebConfiguration.getRestApplicationUrl());
-
     }
 
     public static void launchProactiveServer() {
 
         //String[] args = new String[] { "-ln", "0", "--no-rest", "--rm-only" };
         //String[] args = new String[] { "-ln", "1" };
-        //String[] args = new String[] { "--no-rest" };
 
-        String[] args = new String[] {};
+        String[] args = new String[] { "--no-rest" };
 
         configureSchedulerAndRMAndPAHomes();
         configureSecurityManager();
@@ -112,7 +114,7 @@ public class WrapperStarter {
         configureDerby();
 
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
-        System.out.println("JVM args: " + ArrayUtils.toString(args));
+        logger.info("JVM args: " + ArrayUtils.toString(args));
 
         Options options = getOptions();
 
@@ -154,25 +156,27 @@ public class WrapperStarter {
 
         SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
 
+        if (!commandLine.hasOption("no-rest")) {
+            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL()));
+            if (applicationUrls != null) {
+                for (String applicationUrl : applicationUrls) {
+                    if (applicationUrl.endsWith("/rest")) {
+                        if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+                            PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
+                        }
+                    }
+                }
+            }
+        }
+
         setPropIfNotAlreadySet("rm.url", rmUrl);
         setPropIfNotAlreadySet("scheduler.url", sai.getHostURL());
         PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(WrapperWebConfiguration.getRestApplicationUrl());
 
-        /*
-         * if (!commandLine.hasOption("no-rest")) {
-         * List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl,
-         * sai.getHostURL()));
-         * if (applicationUrls != null) {
-         * for (String applicationUrl : applicationUrls) {
-         * if (applicationUrl.endsWith("/rest")) {
-         * if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-         * PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
-         * }
-         * }
-         * }
-         * }
-         * }
-         */
+        logger.info("rm.url: " + rmUrl);
+        logger.info("scheduler.url: " + sai.getHostURL());
+        logger.info("PASchedulerProperties.SCHEDULER_REST_URL: " +
+                    PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString());
 
         addShutdownMessageHook();
     }

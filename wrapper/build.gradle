@@ -19,20 +19,19 @@ task copyConfigFiles(type: Copy) {
     into 'src/main/resources/config'
 }
 
-/*task deleteDistFiles(type: Delete){
+task deleteDistFiles(type: Delete){
     delete 'src/main/resources/dist'
 }
-
 task copyDistFiles(type: Copy) {
-    from project(':').files('dist/war', '*')
-    into 'src/main/resources/dist/war'
-}*/
+    from project(':').files('dist/lib', '*')
+    into 'src/main/resources/dist/lib'
+}
 
 copyConfigFiles.dependsOn deleteConfigFiles
 
-//copyDistFiles.dependsOn deleteDistFiles
+copyDistFiles.dependsOn deleteDistFiles
 
-war.dependsOn copyConfigFiles//, copyDistFiles
+war.dependsOn copyConfigFiles, copyDistFiles
 
 dependencies {
 
@@ -46,4 +45,11 @@ dependencies {
 
 war {
     archiveName "proactive-server.war"
+    doFirst {
+        manifest {
+            attributes 'Implementation-Title': 'Proactive Server Web App',
+                    'Implementation-Version': "${schedulingVersion}",
+                    'Class-Path': configurations.compileOnly.collect() { if (it.getName().endsWith('.jar')) return ('lib/'.concat(it.getName())) else return ''}.join(' ')
+        }
+    }
 }

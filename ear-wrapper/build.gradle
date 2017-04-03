@@ -19,10 +19,18 @@ task restWarTask(type: War) {
 
     webInf { from 'src/main/ibm-deployment-descriptor/rest' }
 
+    doFirst {
+        manifest {
+            attributes 'Implementation-Title': 'Proactive REST-API Web App',
+                    'Implementation-Version': "${schedulingVersion}",
+                    'Class-Path': configurations.earlib.collect() { if (it.getName().endsWith('.jar')) return ('lib/'.concat(it.getName())) else return ''}.join(' ')
+        }
+    }
+
     archiveName "proactive-rest.war"
 }
 
-ear.dependsOn getStartedWarTask, restWarTask
+ear.dependsOn getStartedWarTask//, restWarTask
 
 dependencies {
     // The following dependencies will be the ear modules and
@@ -48,7 +56,7 @@ ear {
     // put dependent libraries into APP-INF/lib inside the generated EAR
 
     if (project.findProperty('target-server')=='IBM-WAS') {
-        libDirName ''
+        libDirName 'lib'
     } else libDirName 'lib'
 
     deploymentDescriptor {  // custom entries for application.xml:
