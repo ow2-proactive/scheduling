@@ -57,7 +57,9 @@
         </init-param>
         <init-param>
             <param-name>org.atmosphere.cpr.asyncSupport</param-name>
-            <param-value>org.atmosphere.container.Jetty9AsyncSupportWithWebSocket</param-value>
+            <!-- Using the JSR async support instead of the one provided by Jetty-->
+            <!--   <param-value>org.atmosphere.container.Jetty9AsyncSupportWithWebSocket</param-value> -->
+            <param-value>org.atmosphere.container.JSR356AsyncSupport</param-value>
         </init-param>
         <init-param>
             <!-- https://github.com/Atmosphere/atmosphere/wiki/Understanding-BroadcasterCache -->

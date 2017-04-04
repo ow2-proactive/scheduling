@@ -6,18 +6,23 @@ configurations {
     all*.exclude group: 'com.zaxxer', module: 'HikariCP-java6'
 }
 
+
+//**************************************Generating the getstarted war archive**********************************
 task getStartedWarTask(type: War) {
     from project(':').files('dist/war/getstarted', '*')
     archiveName "proactive-getstarted.war"
 }
+//*************************************************************************************************************
 
+
+//**************************************Generating the rest war archive****************************************
 task restWarTask(type: War) {
 
     from (project(':').files('dist/war/rest', '*')){
         exclude '**/WEB-INF/web.xml'
     }
 
-    webInf { from 'src/main/ibm-deployment-descriptor/rest' }
+    webInf { from 'src/main/ibm-deployment-descriptors/rest' }
 
     doFirst {
         manifest {
@@ -29,8 +34,108 @@ task restWarTask(type: War) {
 
     archiveName "proactive-rest.war"
 }
+//***********************************************************************************************************
 
-ear.dependsOn getStartedWarTask//, restWarTask
+
+//**************************************Generating the rm war archive****************************************
+task rmWarTask(type: War) {
+
+    def rmFolder = new File('dist/war/rm')
+    if( rmFolder.exists() ) {
+        from(project(':').files(rmFolder, '*')) {
+            exclude '**/WEB-INF/web.xml'
+            exclude 'rm.conf'
+        }
+
+        from 'src/main/ibm-deployment-descriptors/rm/rm.conf'
+
+        webInf {
+            from 'src/main/ibm-deployment-descriptors/rm'
+            exclude 'rm.conf'
+        }
+
+        archiveName "proactive-rm.war"
+    }
+}
+//********************************************************************************************************
+
+
+//**************************************Generating the scheduler war archive******************************
+task schedulerWarTask(type: War) {
+
+    def schedulerFolder = new File('dist/war/scheduler')
+    if( schedulerFolder.exists() ) {
+        from(project(':').files(schedulerFolder, '*')) {
+            exclude '**/WEB-INF/web.xml'
+            exclude 'scheduler.conf'
+        }
+
+        from 'src/main/ibm-deployment-descriptors/scheduler/scheduler.conf'
+
+        webInf {
+            from 'src/main/ibm-deployment-descriptors/scheduler'
+            exclude 'scheduler.conf'
+        }
+
+        archiveName "proactive-scheduler.war"
+    }
+}
+//********************************************************************************************************
+
+
+//**************************************Generating the studio war archive*********************************
+task studioWarTask(type: War) {
+
+    def studioFolder = new File('dist/war/studio')
+    if( studioFolder.exists() ) {
+        from project(':').files(studioFolder, '*')
+        archiveName "proactive-studio.war"
+    }
+}
+//********************************************************************************************************
+
+
+//**************************************Generating the workflow-catalog war archive************************
+task workflowCatalogWarTask(type: War) {
+
+    def workflowCatalogFolder = new File('dist/war/workflow-catalog')
+    if( workflowCatalogFolder.exists() ) {
+
+        from  (project(':').files(workflowCatalogFolder, '*')){
+            exclude '**/WEB-INF/web.xml'
+        }
+
+        webInf {
+            from 'src/main/ibm-deployment-descriptors/workflow-catalog'
+        }
+
+        archiveName "proactive-workflow-catalog.war"
+    }
+}
+//********************************************************************************************************
+
+
+//**************************************Generating the scheduling-api war archive************************
+task schedulingAPIWarTask(type: War) {
+
+    def schedulingAPIFolder = new File('dist/war/scheduling-api')
+    if( schedulingAPIFolder.exists() ) {
+
+        from (project(':').files(schedulingAPIFolder, '*')){
+            exclude '**/WEB-INF/web.xml'
+        }
+
+        webInf {
+            from 'src/main/ibm-deployment-descriptors/scheduling-api'
+        }
+
+        archiveName "proactive-scheduling-api.war"
+    }
+}
+//********************************************************************************************************
+
+
+ear.dependsOn getStartedWarTask, restWarTask, rmWarTask, schedulerWarTask, studioWarTask, workflowCatalogWarTask, schedulingAPIWarTask
 
 dependencies {
     // The following dependencies will be the ear modules and
@@ -41,8 +146,17 @@ dependencies {
     earlib group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
 
     deploy project(path: ':wrapper', configuration: 'archives')
+
     deploy files(getStartedWarTask)
     deploy files(restWarTask)
+
+    deploy files(rmWarTask)
+    deploy files(schedulerWarTask)
+    deploy files(studioWarTask)
+
+    deploy files(workflowCatalogWarTask)
+    deploy files(schedulingAPIWarTask)
+
 
     // The following dependencies will become ear libs and will
     // be placed in a dir configured via the libDirName property
@@ -55,9 +169,8 @@ ear {
     appDirName 'src/main/app'  // use application metadata found in this folder
     // put dependent libraries into APP-INF/lib inside the generated EAR
 
-    if (project.findProperty('target-server')=='IBM-WAS') {
-        libDirName 'lib'
-    } else libDirName 'lib'
+    libDirName 'lib'
+
 
     deploymentDescriptor {  // custom entries for application.xml:
 

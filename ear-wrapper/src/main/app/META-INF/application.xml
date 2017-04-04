@@ -26,5 +26,40 @@
         </web>
     </module>
 
+    <module id="Proactive_RM">
+        <web>
+            <web-uri>proactive-rm.war</web-uri>
+            <context-root>/rm</context-root>
+        </web>
+    </module>
+
+    <module id="Proactive_Scheduler">
+        <web>
+            <web-uri>proactive-scheduler.war</web-uri>
+            <context-root>/scheduler</context-root>
+        </web>
+    </module>
+
+    <module id="Proactive_Studio">
+        <web>
+            <web-uri>proactive-studio.war</web-uri>
+            <context-root>/studio</context-root>
+        </web>
+    </module>
+
+    <module id="Proactive_Workflow_Catalog">
+        <web>
+            <web-uri>proactive-workflow-catalog.war</web-uri>
+            <context-root>/workflow-catalog</context-root>
+        </web>
+    </module>
+
+    <module id="Proactive_Scheduling_API">
+        <web>
+            <web-uri>proactive-scheduling-api.war</web-uri>
+            <context-root>/scheduling-api</context-root>
+        </web>
+    </module>
+
 </application>
 
