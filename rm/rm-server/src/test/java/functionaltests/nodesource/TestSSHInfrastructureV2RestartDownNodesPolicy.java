@@ -110,7 +110,8 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
         if (resourceManager.getNodes(new Criteria(NB_NODES)).size() != NB_NODES) {
             RMTHelper.log(
                     "Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
-            return;
+            throw new RuntimeException(
+                "Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
         }
 
         for (Node n : resourceManager.getNodes(new Criteria(NB_NODES))) {
