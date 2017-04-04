@@ -41,6 +41,7 @@ import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -318,6 +319,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets) {
         return this.target.executeScript(script, scriptEngine, targetType, targets);
+    }
+
+    @Override
+    public StringWrapper getCurrentUser() {
+        return this.target.getCurrentUser();
     }
 
 }

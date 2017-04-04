@@ -880,10 +880,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Dispatch the job state updated event
      * 
-     * @param owner
-     *            the owner of this job
-     * @param notification
-     *            the data to send to every client
+     * @param job
+     *            the job state
      */
     private void dispatchJobUpdatedFullData(JobState job) {
         try {
@@ -1128,6 +1126,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                             notification.getEventType());
         }
+    }
+
+    public String getCurrentUser() throws NotConnectedException {
+        UniqueID id = checkAccess();
+
+        UserIdentificationImpl ident = identifications.get(id).getUser();
+        // renew session for this user
+        renewUserSession(id, ident);
+        return ident.getUsername();
     }
 
     synchronized List<SchedulerUserInfo> getUsers() {

@@ -694,4 +694,10 @@ public class SchedulerNodeClient implements ISchedulerClient {
         renewSession();
         return client.getPortalConfiguration();
     }
+
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+        renewSession();
+        return client.getCurrentUser();
+    }
 }

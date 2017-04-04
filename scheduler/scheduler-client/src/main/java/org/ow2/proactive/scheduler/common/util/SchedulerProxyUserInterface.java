@@ -642,4 +642,9 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getPortalConfiguration();
     }
 
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+        return uischeduler.getCurrentUser();
+    }
+
 }

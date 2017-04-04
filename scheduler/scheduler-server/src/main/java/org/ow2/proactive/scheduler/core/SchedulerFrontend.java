@@ -1321,4 +1321,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return schedulerPortalConfiguration.getProperties();
     }
 
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+        return frontendState.getCurrentUser();
+    }
+
 }
