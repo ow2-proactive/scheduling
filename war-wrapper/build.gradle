@@ -1,0 +1,69 @@
+apply plugin: 'war'
+
+repositories {
+    mavenCentral()
+}
+
+configurations.compile.transitive = true
+
+configurations {
+    all*.exclude group: 'com.zaxxer', module: 'HikariCP-java6'
+}
+
+task deleteConfigFiles(type: Delete){
+    delete 'src/main/resources/config'
+}
+
+task copyConfigFiles(type: Copy) {
+    from project(':').files('config', '*')
+    into 'src/main/resources/config'
+}
+
+task deleteDistFiles(type: Delete){
+    delete 'src/main/resources/dist'
+}
+task copyDistFiles(type: Copy) {
+    from project(':').files('dist/lib', '*')
+    into 'src/main/resources/dist/lib'
+}
+
+copyConfigFiles.dependsOn deleteConfigFiles
+
+copyDistFiles.dependsOn deleteDistFiles
+
+war.dependsOn copyConfigFiles, copyDistFiles
+
+dependencies {
+
+    compileOnly project(':scheduler:scheduler-server')
+    compileOnly group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
+
+    testCompile project(':scheduler:scheduler-server')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+
+
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.21'
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0RC4'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0RC4'
+
+    //testCompile group: 'org.mockito', name: 'mockito-all', version: '2.0.2-beta'
+
+    //testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.21'
+    //testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.6.6'
+    //testCompile group: 'org.powermock', name: 'powermock-api-mockito', version: '1.6.6'
+    //testCompile group: 'org.powermock', name: 'powermock-api-easymock', version: '1.6.6'
+    //testCompile group: 'cglib', name: 'cglib', version: '3.2.5'
+
+}
+
+war {
+    archiveName "proactive-server.war"
+    doFirst {
+        manifest {
+            attributes 'Implementation-Title': 'Proactive Server Web App',
+                    'Implementation-Version': "${schedulingVersion}",
+                    'Class-Path': configurations.compileOnly.collect() { if (it.getName().endsWith('.jar')) return ('lib/'.concat(it.getName())) else return ''}.join(' ')
+        }
+    }
+}
