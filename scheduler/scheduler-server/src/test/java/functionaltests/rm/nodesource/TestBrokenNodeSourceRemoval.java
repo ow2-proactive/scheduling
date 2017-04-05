@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.monitor.RMMonitorEventReceiver;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;

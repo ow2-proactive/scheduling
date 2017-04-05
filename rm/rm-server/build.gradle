@@ -40,7 +40,7 @@ dependencies {
     runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
 }
 
-task('functionalTest', type: Test).configure rootProject.schedulingFunctionalTestConfiguration
+task('rmFunctionalTest', type: Test).configure rootProject.schedulingRMFunctionalTestConfiguration
 
 task stub(type: StubTask) {
     classes = [
@@ -80,7 +80,7 @@ artifacts {
     archives testJar
 }
 
-functionalTest.dependsOn rootProject.dist, dist
+rmFunctionalTest.dependsOn rootProject.dist, dist
 clean.dependsOn rootProject.cleanDist
 
 //This task limits the maximum number of nodes by replacing the maximumNumberOfNodes variable

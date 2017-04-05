@@ -55,8 +55,8 @@ import org.ow2.proactive.scheduler.core.rmproxies.SingleConnectionRMProxiesManag
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.utils.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.monitor.RMMonitorsHandler;
 import functionaltests.utils.*;
 
 

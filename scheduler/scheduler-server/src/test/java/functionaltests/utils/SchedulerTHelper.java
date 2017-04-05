@@ -58,8 +58,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.monitor.SchedulerMonitorsHandler;
+import functionaltests.utils.monitor.RMMonitorsHandler;
 
 
 /**

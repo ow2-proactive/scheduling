@@ -124,6 +124,7 @@ configure(javaSubprojects) {
 
     test {
         exclude 'functionaltests/**'
+	exclude 'rmfunctionaltests/**'		
         exclude 'unittests/**'
         exclude 'unitTests/**'
 
@@ -163,6 +164,93 @@ task wrapper(type: Wrapper) {
 ext.schedulingFunctionalTestConfiguration = {
 
     include 'functionaltests/**'
+
+    if(!project.hasProperty('regression')){
+        def regression_tests = new File(project.rootDir, "/regression_tests.txt")
+        regression_tests.readLines().each { exclude '**/'+it+'.class' }
+    }
+
+    systemProperties << ['pa.rm.home': rootDir.absolutePath]
+    systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+    systemProperties << ['proactive.communication.protocol': 'pnp']
+    systemProperties << ['proactive.test.timeout': 600000]
+    systemProperties << ['java.awt.headless': 'true']
+    systemProperties << ['java.library.path': project.nativeLibsDir]
+    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['file.encoding': 'UTF-8']
+
+    if (project.hasProperty('runasme.user')) {
+        systemProperties << ['runasme.user': project.property('runasme.user')]
+    }
+    if (project.hasProperty('runasme.pwd')) {
+        systemProperties << ['runasme.pwd': project.property('runasme.pwd')]
+    }
+    if (project.hasProperty('runasme.key.path')) {
+        systemProperties << ['runasme.key.path': project.property('runasme.key.path')]
+    }
+    if (project.hasProperty('runasme.shared.dir')) {
+        systemProperties << ['runasme.shared.dir': project.property('runasme.shared.dir')]
+    }
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    beforeTest { descriptor ->
+        logger.lifecycle("Running: " + descriptor)
+    }
+
+    def createRunAsMeUser = {
+        if (project.hasProperty('runasme.user') && project.hasProperty('runasme.pwd')) {
+            def extension = isWindows ? ".bat" : ""
+            def pb = new java.lang.ProcessBuilder()
+            pb.inheritIO()
+            pb.command(new File(project.rootDir.getAbsoluteFile(), "tools/proactive-users" + extension).getAbsolutePath(), "-C", "-l", project.property('runasme.user'), "-p", project.property('runasme.pwd'), "-g", "user")
+            def process = pb.start()
+            process.waitFor();
+        }
+    }
+
+    def copySchedulingToSharedDirOnWindows = {
+        if (System.properties['os.name'].toLowerCase().contains('windows') && project.hasProperty('runasme.shared.dir')) {
+            project.copy {
+                from project.rootDir
+                into project.property('runasme.shared.dir')
+                include "dist/lib/*"
+                include "dist/script/**"
+                include "config/**"
+            }
+        }
+    }
+
+    def clean = {
+        println project.nativeLibsDir
+
+        if (project.hasProperty('runasme.user')) {
+            def extension = isWindows ? ".bat" : ""
+            def pb = new java.lang.ProcessBuilder()
+            pb.inheritIO()
+            pb.command(new File(project.rootDir.getAbsoluteFile(), "tools/proactive-users" + extension).getAbsolutePath(), "-D", "-l", project.property('runasme.user'))
+            def process = pb.start()
+            process.waitFor();
+        }
+
+        project.javaexec {
+            main = "org.ow2.tests.ProcessCleaner"
+            classpath = fileTree(project.nativeLibsDir).include("*.jar")
+            systemProperty "java.library.path", project.nativeLibsDir
+        }
+    }
+
+    finalizedBy project.task(project.name + '-clean', { doLast clean })
+    dependsOn project.task(project.name + '-beforetests') << {
+        clean(); createRunAsMeUser(); copySchedulingToSharedDirOnWindows()
+    }
+
+}
+
+ext.schedulingRMFunctionalTestConfiguration = {
+
+    include 'rmfunctionaltests/**'
 
     if(!project.hasProperty('regression')){
         def regression_tests = new File(project.rootDir, "/regression_tests.txt")
@@ -353,6 +441,7 @@ createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-route
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn dist
+    tasks.withType(Test).matching { it.name == 'rmFunctionalTest' }*.dependsOn dist	
 }
 
 apply plugin: 'distribution'

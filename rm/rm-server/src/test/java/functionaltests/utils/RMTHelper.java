@@ -56,8 +56,8 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.tests.ProActiveSetup;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.utils.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.monitor.RMMonitorsHandler;
 
 
 /**
@@ -268,7 +268,7 @@ public class RMTHelper {
         return nodes;
     }
 
-    static int findFreePort() throws IOException {
+    public static int findFreePort() throws IOException {
         ServerSocket server = new ServerSocket(0);
         int port = server.getLocalPort();
         server.close();
