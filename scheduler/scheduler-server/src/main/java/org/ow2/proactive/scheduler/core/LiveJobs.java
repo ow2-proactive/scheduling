@@ -576,17 +576,18 @@ class LiveJobs {
                 } else if (numberOfExecutionLeft > 0) {
                     tlogger.info(taskId, "number of execution left is " + numberOfExecutionLeft);
 
-                    if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
-                        suspendTaskOnError(jobData, task, result.getTaskDuration());
+                    if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task) || requiresPauseJobOnError) {
 
-                        tlogger.info(taskId, "task is paused on error");
+                        long waitTime = jobData.job.getNextWaitingTime(task.getMaxNumberOfExecution() -
+                                                                       numberOfExecutionLeft);
+                        restartTaskOnError(jobData,
+                                           task,
+                                           TaskStatus.WAITING_ON_ERROR,
+                                           result,
+                                           waitTime,
+                                           terminationData);
 
-                        return terminationData;
-                    } else if (requiresPauseJobOnError) {
-                        suspendTaskOnError(jobData, task, result.getTaskDuration());
-                        pauseJob(task.getJobId());
-
-                        jlogger.info(taskId.getJobId(), "job is paused on error");
+                        tlogger.info(taskId, "new restart is scheduled");
 
                         return terminationData;
                     } else {
@@ -606,7 +607,21 @@ class LiveJobs {
                         return terminationData;
                     }
                 } else if (numberOfExecutionLeft <= 0) {
-                    jobData.job.increaseNumberOfFaultyTasks(taskId);
+                    if (!onErrorPolicyInterpreter.requiresPauseTaskOnError(task) &&
+                        !onErrorPolicyInterpreter.requiresPauseJobOnError(task) &&
+                        !onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
+                        jobData.job.increaseNumberOfFaultyTasks(taskId);
+                    } else if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
+                        suspendTaskOnError(jobData, task, result.getTaskDuration());
+                        tlogger.info(taskId,
+                                     "Task always contains errors after automatic restart, so it stays in In_Error state");
+                        return terminationData;
+                    } else if (requiresPauseJobOnError) {
+                        suspendTaskOnError(jobData, task, result.getTaskDuration());
+                        pauseJob(task.getJobId());
+                        logger.info("Task always contains errors after automatic restart, so Job is always paused on error");
+                        return terminationData;
+                    }
 
                     if (requiresPauseJobOnError) {
                         pauseJob(task.getJobId());
