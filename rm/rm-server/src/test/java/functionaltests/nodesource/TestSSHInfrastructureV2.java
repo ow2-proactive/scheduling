@@ -97,8 +97,11 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         RMTHelper.log("Test - Create SSH infrastructure on ssh://localhost on port " + this.port);
 
-        resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
-                StaticPolicy.class.getName(), policyParameters);
+        resourceManager.createNodeSource(nsname,
+                                         SSHInfrastructureV2.class.getName(),
+                                         infraParams,
+                                         StaticPolicy.class.getName(),
+                                         policyParameters);
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
 
         RMTHelper.log("Checking scheduler state after node source creation");
@@ -128,11 +131,12 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         if (OsUtils.isUNIX()) {
             sshd.setShellFactory(new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" },
-                EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr)));
+                                                         EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr)));
         } else {
             sshd.setShellFactory(new ProcessShellFactory(new String[] { "cmd.exe " },
-                EnumSet.of(ProcessShellFactory.TtyOptions.Echo, ProcessShellFactory.TtyOptions.ICrNl,
-                        ProcessShellFactory.TtyOptions.ONlCr)));
+                                                         EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
+                                                                    ProcessShellFactory.TtyOptions.ICrNl,
+                                                                    ProcessShellFactory.TtyOptions.ONlCr)));
         }
 
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
@@ -154,7 +158,8 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr);
                 } else {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
-                            ProcessShellFactory.TtyOptions.ICrNl, ProcessShellFactory.TtyOptions.ONlCr);
+                                            ProcessShellFactory.TtyOptions.ICrNl,
+                                            ProcessShellFactory.TtyOptions.ONlCr);
                 }
                 return new ProcessShellFactory(splitCommand(command), ttyOptions).create();
             }
@@ -165,21 +170,21 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         port = sshd.getPort();
 
         javaExePath = System.getProperty("java.home") + File.separator + "bin" + File.separator +
-            (OsUtils.isWin32() ? "java.exe" : "java");
+                      (OsUtils.isWin32() ? "java.exe" : "java");
         javaExePath = "\"" + javaExePath + "\"";
 
         infraParams = new Object[] { ("localhost " + NB_NODES + "\n").getBytes(), //hosts
-                60000, //timeout
-                0, //attempts
-                10, //wait between failures
-                port, //ssh server port
-                "toto", //ssh username
-                "toto", //ssh password
-                new byte[0], // optional ssh private key
-                new byte[0], // optional ssh options file
-                javaExePath, //java path on the remote machines
-                PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
-                OperatingSystem.getOperatingSystem(), "" }; // extra java options
+                                     60000, //timeout
+                                     0, //attempts
+                                     10, //wait between failures
+                                     port, //ssh server port
+                                     "toto", //ssh username
+                                     "toto", //ssh password
+                                     new byte[0], // optional ssh private key
+                                     new byte[0], // optional ssh options file
+                                     javaExePath, //java path on the remote machines
+                                     PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
+                                     OperatingSystem.getOperatingSystem(), "" }; // extra java options
 
         policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString(), "20000" };
 

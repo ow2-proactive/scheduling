@@ -62,6 +62,7 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastruc
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.utils.Criteria;
+import org.ow2.proactive.utils.NodeSet;
 
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.utils.RMFunctionalTest;
@@ -93,12 +94,14 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
 
         resourceManager = this.rmHelper.getResourceManager();
 
-        RMTHelper
-                .log("Test - Create SSH infrastructure with RestartDownNodes policy on ssh://localhost on port " +
-                    this.port);
+        RMTHelper.log("Test - Create SSH infrastructure with RestartDownNodes policy on ssh://localhost on port " +
+                      this.port);
 
-        resourceManager.createNodeSource(nsname, SSHInfrastructureV2.class.getName(), infraParams,
-                RestartDownNodesPolicy.class.getName(), policyParameters);
+        resourceManager.createNodeSource(nsname,
+                                         SSHInfrastructureV2.class.getName(),
+                                         infraParams,
+                                         RestartDownNodesPolicy.class.getName(),
+                                         policyParameters);
         RMMonitorsHandler monitorsHandler = this.rmHelper.getMonitorsHandler();
 
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, monitorsHandler);
@@ -107,35 +110,42 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
         assertEquals(NB_NODES, s.getTotalNodesNumber());
         assertEquals(NB_NODES, s.getFreeNodesNumber());
 
-        if (resourceManager.getNodes(new Criteria(NB_NODES)).size() != NB_NODES) {
-            RMTHelper.log(
-                    "Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
-            throw new RuntimeException(
-                "Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
+        NodeSet nodeset = resourceManager.getNodes(new Criteria(NB_NODES));
+
+        if (nodeset.size() != NB_NODES) {
+            RMTHelper.log("Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
+            throw new RuntimeException("Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
         }
 
-        for (Node n : resourceManager.getNodes(new Criteria(NB_NODES))) {
-            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, n.getNodeInformation().getURL(), 60000,
-                    monitorsHandler);
+        for (Node n : nodeset) {
+            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                      n.getNodeInformation().getURL(),
+                                      60000,
+                                      monitorsHandler);
         }
 
-        String nodeUrl = resourceManager.getNodes(new Criteria(NB_NODES)).get(0).getNodeInformation()
-                .getURL();
+        String nodeUrl = nodeset.get(0).getNodeInformation().getURL();
         RMTHelper.log("Killing nodes");
         // Nodes will be redeployed only if we kill the whole runtime
         rmHelper.killRuntime(nodeUrl);
 
         RMTHelper.log("Wait for down nodes detection by the rm");
-        for (Node n : resourceManager.getNodes(new Criteria(NB_NODES))) {
+        for (Node n : nodeset) {
             RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                    n.getNodeInformation().getURL(), 120000, monitorsHandler);
+                                                       n.getNodeInformation().getURL(),
+                                                       120000,
+                                                       monitorsHandler);
             assertEquals(NodeState.DOWN, ev.getNodeState());
         }
 
-        for (Node n : resourceManager.getNodes(new Criteria(NB_NODES))) {
-            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED, n.getNodeInformation().getURL(), 120000,
-                    monitorsHandler);
+        for (Node n : nodeset) {
+            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED,
+                                      n.getNodeInformation().getURL(),
+                                      120000,
+                                      monitorsHandler);
         }
+
+        nodeset = resourceManager.getNodes(new Criteria(NB_NODES));
 
         RMTHelper.log("Wait for nodes restart by the policy");
         rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES);
@@ -148,7 +158,7 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
         RMTHelper.log("Final checks on the scheduler state");
         s = resourceManager.getState();
 
-        for (Node n : resourceManager.getNodes(new Criteria(NB_NODES))) {
+        for (Node n : nodeset) {
             System.out.println("NODE::" + n.getNodeInformation().getURL());
         }
 
@@ -177,11 +187,12 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
 
         if (OsUtils.isUNIX()) {
             sshd.setShellFactory(new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" },
-                EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr)));
+                                                         EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr)));
         } else {
             sshd.setShellFactory(new ProcessShellFactory(new String[] { "cmd.exe " },
-                EnumSet.of(ProcessShellFactory.TtyOptions.Echo, ProcessShellFactory.TtyOptions.ICrNl,
-                        ProcessShellFactory.TtyOptions.ONlCr)));
+                                                         EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
+                                                                    ProcessShellFactory.TtyOptions.ICrNl,
+                                                                    ProcessShellFactory.TtyOptions.ONlCr)));
         }
 
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
@@ -203,7 +214,8 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr);
                 } else {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
-                            ProcessShellFactory.TtyOptions.ICrNl, ProcessShellFactory.TtyOptions.ONlCr);
+                                            ProcessShellFactory.TtyOptions.ICrNl,
+                                            ProcessShellFactory.TtyOptions.ONlCr);
                 }
                 return new ProcessShellFactory(splitCommand(command), ttyOptions).create();
             }
@@ -214,21 +226,21 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
         port = sshd.getPort();
 
         javaExePath = System.getProperty("java.home") + File.separator + "bin" + File.separator +
-            (OsUtils.isWin32() ? "java.exe" : "java");
+                      (OsUtils.isWin32() ? "java.exe" : "java");
         javaExePath = "\"" + javaExePath + "\"";
 
         infraParams = new Object[] { ("localhost " + NB_NODES + "\n").getBytes(), //hosts
-                60000, //timeout
-                0, //attempts
-                10, //wait between failures
-                port, //ssh server port
-                "toto", //ssh username
-                "toto", //ssh password
-                new byte[0], // optional ssh private key
-                new byte[0], // optional ssh options file
-                javaExePath, //java path on the remote machines
-                PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
-                OperatingSystem.getOperatingSystem(), "" }; // extra java options
+                                     60000, //timeout
+                                     0, //attempts
+                                     10, //wait between failures
+                                     port, //ssh server port
+                                     "toto", //ssh username
+                                     "toto", //ssh password
+                                     new byte[0], // optional ssh private key
+                                     new byte[0], // optional ssh options file
+                                     javaExePath, //java path on the remote machines
+                                     PAResourceManagerProperties.RM_HOME.getValueAsString(), //Scheduling path on remote machines
+                                     OperatingSystem.getOperatingSystem(), "" }; // extra java options
 
         policyParameters = new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString(), "20000" };
 
