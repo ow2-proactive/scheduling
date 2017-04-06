@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
@@ -141,6 +142,16 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     }
 
     @Test
+    public void testWhenValidatingAValidTemplateWithoutVariablesThenTheDefaultJobVariableIsUsed() throws Exception {
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
+
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+
+        Assert.assertEquals(1, response.getUpdatedVariables().size());
+        Assert.assertEquals("defaultvalue", response.getUpdatedVariables().get("var1"));
+    }
+
+    @Test
     public void testWhenSubmittingAValidTemplateWithVariablesThenTheProvidedJobVariableIsUsed() throws Exception {
         when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(99L, "job"));
         ArgumentCaptor<Job> argumentCaptor = ArgumentCaptor.forClass(Job.class);
@@ -161,10 +172,30 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         Assert.assertEquals("job", response.getReadableName());
     }
 
+    @Test
+    public void testWhenValidatingAValidTemplateWithVariablesThenTheProvidedJobVariableIsUsed() throws Exception {
+
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
+
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId,
+                                                                   workflowUrl,
+                                                                   getOneVariablePathSegment("var1", "value1"));
+
+        Assert.assertEquals(1, response.getUpdatedVariables().size());
+        Assert.assertEquals("value1", response.getUpdatedVariables().get("var1"));
+    }
+
     @Test(expected = JobCreationRestException.class)
     public void testWhenSubmittingACorruptWorkflowThenThrowException() throws Exception {
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/corrupt";
         schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+    }
+
+    @Test
+    public void testWhenValidatingACorruptWorkflowThenValidationContainsException() throws Exception {
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/corrupt";
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+        checkInvalidResponse(response);
     }
 
     @Test(expected = IOException.class)
@@ -173,16 +204,42 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
     }
 
+    @Test
+    public void testWhenValidatingUsingAnInvalidWorkflowUrlThenValidationContainsException() throws Exception {
+        String workflowUrl = getBaseUriTestWorkflowsServer() + "/nonexistent";
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+        checkInvalidResponse(response);
+    }
+
+    private void checkInvalidResponse(JobValidationData response) {
+        Assert.assertFalse(response.isValid());
+        Assert.assertNotNull(response.getErrorMessage());
+        Assert.assertNotNull(response.getStackTrace());
+    }
+
     @Test(expected = JobCreationRestException.class)
     public void testWhenSubmittingUsingANullWorkflowUrlThenThrowException() throws Exception {
         String workflowUrl = null;
         schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
     }
 
+    @Test
+    public void testWhenValidatingUsingANullWorkflowUrlThenValidationContainsException() throws Exception {
+        String workflowUrl = null;
+        JobValidationData response = schedulerRest.validateFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+        checkInvalidResponse(response);
+    }
+
     @Test(expected = NotConnectedRestException.class)
     public void testWhenExceptionSubmittingATemplateWithoutValidSessionIdThenThrowException() throws Exception {
         String sessionId = "invalidSessionId";
         schedulerRest.submitFromUrl(sessionId, null, getEmptyPathSegment());
+    }
+
+    @Test(expected = NotConnectedRestException.class)
+    public void testWhenValidatingATemplateWithoutValidSessionIdThenThrowException() throws Exception {
+        String sessionId = "invalidSessionId";
+        schedulerRest.validateFromUrl(sessionId, null, getEmptyPathSegment());
     }
 
     private String getBaseUriTestWorkflowsServer() {

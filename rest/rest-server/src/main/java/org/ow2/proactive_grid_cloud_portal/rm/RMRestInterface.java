@@ -43,6 +43,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -84,6 +85,20 @@ public interface RMRestInterface {
     @Produces("application/json")
     String loginWithCredential(@MultipartForm LoginForm multipart)
             throws ActiveObjectCreationException, NodeException, KeyException, IOException, LoginException, RMException;
+
+    /**
+     * Get the login string associated to the {@code sessionId} if it exists
+     *
+     * In case that the given sessionId doesn't have an associated login (session id expired, or invalid),
+     * this endpoint will return an empty string
+     *
+     * @param sessionId with which the endpoint is going to look for the login value
+     * @return the associated login value or an empty string
+     */
+    @GET
+    @Path("logins/sessionid/{sessionId}")
+    @Produces("application/json")
+    String getLoginFromSessionId(@PathParam("sessionId") String sessionId);
 
     @GET
     @Path("state")

@@ -33,6 +33,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -426,4 +427,10 @@ public interface ResourceManager {
      */
     List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets);
+
+    /**
+     * Returns the user currently connected
+     * @return user name
+     */
+    StringWrapper getCurrentUser();
 }

@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package rmfunctionaltests.nodesource;
+package functionaltests.nodesource;
 
 import static org.junit.Assert.assertEquals;
 
@@ -61,7 +61,6 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -70,7 +69,7 @@ import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
 
-public class TestSSHInfrastructureV2 extends RMFunctionalTest {
+public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalTest {
 
     private static int port;
 
@@ -89,25 +88,82 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
     private ResourceManager resourceManager;
 
     @Test
-    public void testSSHInfrastructureV2() throws Exception {
+    public void testSSHInfrastructureV2WithRestartDownNodes() throws Exception {
 
-        nsname = "testSSHInfra";
+        nsname = "testSSHInfraRestart";
 
         resourceManager = this.rmHelper.getResourceManager();
 
-        RMTHelper.log("Test - Create SSH infrastructure on ssh://localhost on port " + this.port);
+        RMTHelper.log("Test - Create SSH infrastructure with RestartDownNodes policy on ssh://localhost on port " +
+                      this.port);
 
         resourceManager.createNodeSource(nsname,
                                          SSHInfrastructureV2.class.getName(),
                                          infraParams,
-                                         StaticPolicy.class.getName(),
+                                         RestartDownNodesPolicy.class.getName(),
                                          policyParameters);
-        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
+        RMMonitorsHandler monitorsHandler = this.rmHelper.getMonitorsHandler();
 
-        RMTHelper.log("Checking scheduler state after node source creation");
+        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, monitorsHandler);
+
         RMState s = resourceManager.getState();
         assertEquals(NB_NODES, s.getTotalNodesNumber());
         assertEquals(NB_NODES, s.getFreeNodesNumber());
+
+        NodeSet nodeset = resourceManager.getNodes(new Criteria(NB_NODES));
+
+        if (nodeset.size() != NB_NODES) {
+            RMTHelper.log("Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
+            throw new RuntimeException("Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
+        }
+
+        for (Node n : nodeset) {
+            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                      n.getNodeInformation().getURL(),
+                                      60000,
+                                      monitorsHandler);
+        }
+
+        String nodeUrl = nodeset.get(0).getNodeInformation().getURL();
+        RMTHelper.log("Killing nodes");
+        // Nodes will be redeployed only if we kill the whole runtime
+        rmHelper.killRuntime(nodeUrl);
+
+        RMTHelper.log("Wait for down nodes detection by the rm");
+        for (Node n : nodeset) {
+            RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                       n.getNodeInformation().getURL(),
+                                                       120000,
+                                                       monitorsHandler);
+            assertEquals(NodeState.DOWN, ev.getNodeState());
+        }
+
+        for (Node n : nodeset) {
+            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED,
+                                      n.getNodeInformation().getURL(),
+                                      120000,
+                                      monitorsHandler);
+        }
+
+        nodeset = resourceManager.getNodes(new Criteria(NB_NODES));
+
+        RMTHelper.log("Wait for nodes restart by the policy");
+        rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES);
+        for (int i = 0; i < NB_NODES; i++) {
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
+
+        RMTHelper.log("Final checks on the scheduler state");
+        s = resourceManager.getState();
+
+        for (Node n : nodeset) {
+            System.out.println("NODE::" + n.getNodeInformation().getURL());
+        }
+
+        assertEquals(NB_NODES, s.getTotalNodesNumber());
+        assertEquals(NB_NODES, s.getTotalAliveNodesNumber()); // check amount of all nodes that are not down
     }
 
     @After
