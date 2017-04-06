@@ -817,4 +817,9 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         return schedulerProxy.getPortalConfiguration();
     }
 
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+        return schedulerProxy.getCurrentUser();
+    }
+
 }
