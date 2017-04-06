@@ -83,14 +83,14 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 
 public class ValidationUtil {
 
-    private ValidationUtil() {
+    public ValidationUtil() {
     }
 
-    public static JobValidationData validateJobDescriptor(File jobDescFile, Map<String, String> jobVariables) {
+    public JobValidationData validateJobDescriptor(File jobDescFile, Map<String, String> jobVariables) {
         return validateJob(jobDescFile.getAbsolutePath(), jobVariables);
     }
 
-    private static JobValidationData validateJob(String jobFilePath, Map<String, String> jobVariables) {
+    public JobValidationData validateJob(String jobFilePath, Map<String, String> jobVariables) {
         JobValidationData data = new JobValidationData();
         try {
             JobFactory factory = JobFactory.getFactory();
@@ -111,7 +111,7 @@ public class ValidationUtil {
 
     }
 
-    private static void fillUpdatedVariables(TaskFlowJob job, JobValidationData data) {
+    private void fillUpdatedVariables(TaskFlowJob job, JobValidationData data) {
         HashMap<String, String> updatedVariables = new HashMap<>();
         for (JobVariable jobVariable : job.getVariables().values()) {
             updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
@@ -124,7 +124,7 @@ public class ValidationUtil {
         data.setUpdatedVariables(updatedVariables);
     }
 
-    private static void validateJob(TaskFlowJob job, JobValidationData data) {
+    private void validateJob(TaskFlowJob job, JobValidationData data) {
         ArrayList<Task> tasks = job.getTasks();
         if (tasks.isEmpty()) {
             data.setErrorMessage(String.format("%s must contain at least one task.", job.getName()));
