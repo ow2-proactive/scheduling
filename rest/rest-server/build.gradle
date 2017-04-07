@@ -71,9 +71,12 @@ test {
     exclude 'functionaltests/**'
 }
 
-task('functionalTest', type: Test).configure functionalTestConfiguration
+task('restServerFunctionalTest', type: Test){
+    include 'restserverfunctionaltests/**'
+    configure functionalTestConfiguration
+}
+restServerFunctionalTest.dependsOn rootProject.dist
 
-functionalTest.dependsOn rootProject.dist
 clean.dependsOn rootProject.cleanDist
 
 task proActiveWar(type: Sync, dependsOn: [classes, stub, tasks.miredot]) {

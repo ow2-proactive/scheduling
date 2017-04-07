@@ -40,7 +40,10 @@ dependencies {
     runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
 }
 
-task('rmFunctionalTest', type: Test).configure rootProject.schedulingRMFunctionalTestConfiguration
+task('rmFunctionalTest', type: Test){
+			 include 'rmfunctionaltests/**'	
+			 configure rootProject.schedulingFunctionalTestConfiguration
+}
 
 task stub(type: StubTask) {
     classes = [

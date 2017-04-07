@@ -10,10 +10,10 @@
 	</variables>
 	<taskFlow>
 		<task name="task1" preciousResult="true">
-			<javaExecutable class="functionaltests.executables.Working" />
+			<javaExecutable class="schedulerserverfunctionaltests.executables.Working" />
 		</task>
 		<task name="task2" maxNumberOfExecution="2">
-			<javaExecutable class="functionaltests.executables.WorkingAt3rd" >
+			<javaExecutable class="schedulerserverfunctionaltests.executables.WorkingAt3rd" >
 				<parameters>
 					<parameter name="prefix" value="WorkingAt3rdT2_"/>
 					<parameter name="suffix" value="13031984"/>
@@ -21,7 +21,7 @@
 			</javaExecutable>
 		</task>
 		<task name="task3" maxNumberOfExecution="4">
-			<javaExecutable class="functionaltests.executables.WorkingAt3rd" >
+			<javaExecutable class="schedulerserverfunctionaltests.executables.WorkingAt3rd" >
 				<parameters>
 					<parameter name="prefix" value="WorkingAt3rdT3_"/>
 					<parameter name="suffix" value="13031984"/>
@@ -29,10 +29,10 @@
 			</javaExecutable>
 		</task>
 		<task name="task4">
-			<javaExecutable class="functionaltests.executables.Throwing" />
+			<javaExecutable class="schedulerserverfunctionaltests.executables.Throwing" />
 		</task>
 		<task name="task5" maxNumberOfExecution="3" restartTaskOnError="elsewhere">
-			<javaExecutable class="functionaltests.executables.Throwing" />
+			<javaExecutable class="schedulerserverfunctionaltests.executables.Throwing" />
 		</task>
 		<task name="task6" preciousResult="true">
 			<nativeExecutable>
