@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app id="Proactive_RM" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <display-name>Proactive RM Portal</display-name>
+
+    <!-- Common -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>org.ow2.proactive_grid_cloud_portal.common.server.LoginServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>CredentialsServlet</servlet-name>
+        <servlet-class>org.ow2.proactive_grid_cloud_portal.common.server.CredentialsServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>MotdServlet</servlet-name>
+        <servlet-class>org.ow2.proactive_grid_cloud_portal.common.server.MotdServlet</servlet-class>
+    </servlet>
+
+    <!-- RM -->
+    <servlet>
+        <servlet-name>RMService</servlet-name>
+        <servlet-class>org.ow2.proactive_grid_cloud_portal.rm.server.RMServiceImpl</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>NSCreationServlet</servlet-name>
+        <servlet-class>org.ow2.proactive_grid_cloud_portal.rm.server.NSCreationServlet</servlet-class>
+    </servlet>
+
+    <!-- common -->
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/portal/login</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>CredentialsServlet</servlet-name>
+        <url-pattern>/portal/createcredential</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>MotdServlet</servlet-name>
+        <url-pattern>/portal/motd</url-pattern>
+    </servlet-mapping>
+
+    <!-- RM -->
+    <servlet-mapping>
+        <servlet-name>RMService</servlet-name>
+        <url-pattern>/portal/rm</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>NSCreationServlet</servlet-name>
+        <url-pattern>/portal/createnodesource</url-pattern>
+    </servlet-mapping>
+
+
+
+
+    <mime-mapping>
+        <extension>gif</extension>
+        <mime-type>image/gif</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>png</extension>
+        <mime-type>image/png</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>ico</extension>
+        <mime-type>image/x-icon</mime-type>
+    </mime-mapping>
+
+    <welcome-file-list>
+        <welcome-file>portal.html</welcome-file>
+    </welcome-file-list>
+
+</web-app>

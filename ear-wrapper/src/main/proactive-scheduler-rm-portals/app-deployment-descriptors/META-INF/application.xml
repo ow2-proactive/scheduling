@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC "-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN" "http://java.sun.com/dtd/application_1_3.dtd">
+
+<application id="Proactive_Scheduler_RM_Portals">
+    <display-name>Proactive_Scheduler_RM_Portals</display-name>
+    <description>Proactive Scheduler and RM Portals</description>
+
+    <module id="Proactive_RM">
+        <web>
+            <web-uri>proactive-rm.war</web-uri>
+            <context-root>/rm</context-root>
+        </web>
+    </module>
+
+    <module id="Proactive_Scheduler">
+        <web>
+            <web-uri>proactive-scheduler.war</web-uri>
+            <context-root>/scheduler</context-root>
+        </web>
+    </module>
+
+    <module id="Proactive_Scheduling_API">
+        <web>
+            <web-uri>proactive-scheduling-api.war</web-uri>
+            <context-root>/scheduling-api</context-root>
+        </web>
+    </module>
+
+</application>
+

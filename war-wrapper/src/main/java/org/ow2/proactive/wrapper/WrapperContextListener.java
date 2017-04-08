@@ -29,17 +29,18 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.ow2.proactive.scheduler.util.WarWrapper;
+
 
 @WebListener
 public class WrapperContextListener implements ServletContextListener {
-
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         BootstrapLogger.logger.info("ProActive is starting up!");
 
         try {
 
-            WrapperStarter ws = WrapperSingleton.getInstance();
+            WarWrapper ws = WrapperSingleton.getInstance();
             ws.launchProactiveServer();
 
         } catch (Exception e) {

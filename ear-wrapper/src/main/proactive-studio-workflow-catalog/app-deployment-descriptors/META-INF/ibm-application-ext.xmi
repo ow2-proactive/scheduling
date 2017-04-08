@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applicationext:ApplicationExtension xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:applicationext="applicationext.xmi" xmlns:application="application.xmi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmi:id="Application_ID_Ext" sharedSessionContext="false">
+
+   <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_Studio" altRoot="ALT-INF/proactive-studio.war">
+        <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_Studio"/>
+   </moduleExtensions>
+
+   <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_Workflow_Catalog" altRoot="ALT-INF/proactive-workflow-catalog.war">
+        <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_Workflow_Catalog"/>
+   </moduleExtensions>
+
+  <application href="META-INF/application.xml#Proactive_Studio_Workflow_Catalog"/>
+</applicationext:ApplicationExtension>

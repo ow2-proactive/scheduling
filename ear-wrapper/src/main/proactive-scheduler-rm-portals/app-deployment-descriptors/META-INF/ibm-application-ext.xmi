@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<applicationext:ApplicationExtension xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:applicationext="applicationext.xmi" xmlns:application="application.xmi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmi:id="Application_ID_Ext" sharedSessionContext="false">
+
+   <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_RM" altRoot="ALT-INF/proactive-rm.war">
+        <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_RM"/>
+   </moduleExtensions>
+
+   <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_Scheduler" altRoot="ALT-INF/proactive-scheduler.war">
+        <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_Scheduler"/>
+   </moduleExtensions>
+
+   <moduleExtensions xmi:type="applicationext:WebModuleExtension" xmi:id="Proactive_Scheduling_API" altRoot="ALT-INF/proactive-scheduling-api.war">
+        <module xmi:type="application:WebModule" href="META-INF/application.xml#Proactive_Scheduling_API"/>
+   </moduleExtensions>
+
+  <application href="META-INF/application.xml#Proactive_Scheduler_RM_Portals"/>
+</applicationext:ApplicationExtension>

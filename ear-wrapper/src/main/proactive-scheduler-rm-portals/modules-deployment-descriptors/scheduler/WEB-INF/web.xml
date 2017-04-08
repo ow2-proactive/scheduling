@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app id="Proactive_Scheduler" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+        <display-name>Proactive Scheduler Portal</display-name>
+
+
+        <!-- Common -->
+        <servlet>
+            <servlet-name>LoginServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.common.server.LoginServlet</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>CredentialsServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.common.server.CredentialsServlet</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>MotdServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.common.server.MotdServlet</servlet-class>
+        </servlet>
+
+        <!-- scheduler -->
+        <servlet>
+            <servlet-name>SchedulerService</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.scheduler.server.SchedulerServiceImpl</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>UploadServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.scheduler.server.UploadServlet</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>ExportUsageServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.scheduler.server.ExportUsageServlet</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>FlatJobServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.scheduler.server.FlatJobServlet</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>SubmitEditServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.scheduler.server.SubmitEditServlet</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>DownloadServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.scheduler.server.DownloadTaskResultServlet</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>RemoteVisuServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.scheduler.server.RemoteVisuServlet</servlet-class>
+        </servlet>
+
+        <servlet>
+            <servlet-name>DataServersServlet</servlet-name>
+            <servlet-class>org.ow2.proactive_grid_cloud_portal.scheduler.server.DataServersServlet</servlet-class>
+        </servlet>
+
+        <!-- common -->
+        <servlet-mapping>
+            <servlet-name>LoginServlet</servlet-name>
+            <url-pattern>/portal/login</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>CredentialsServlet</servlet-name>
+            <url-pattern>/portal/createcredential</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>MotdServlet</servlet-name>
+            <url-pattern>/portal/motd</url-pattern>
+        </servlet-mapping>
+
+        <!-- Scheduler -->
+        <servlet-mapping>
+            <servlet-name>SchedulerService</servlet-name>
+            <url-pattern>/portal/scheduler</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>UploadServlet</servlet-name>
+            <url-pattern>/portal/uploader</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>ExportUsageServlet</servlet-name>
+            <url-pattern>/portal/usageexporter</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>FlatJobServlet</servlet-name>
+            <url-pattern>/portal/flatsubmit</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>SubmitEditServlet</servlet-name>
+            <url-pattern>/portal/submitedit</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>DownloadServlet</servlet-name>
+            <url-pattern>/portal/downloader</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>RemoteVisuServlet</servlet-name>
+            <url-pattern>/portal/visu</url-pattern>
+        </servlet-mapping>
+
+        <servlet-mapping>
+            <servlet-name>DataServersServlet</servlet-name>
+            <url-pattern>/portal/servers</url-pattern>
+        </servlet-mapping>
+
+
+
+        <mime-mapping>
+            <extension>gif</extension>
+            <mime-type>image/gif</mime-type>
+        </mime-mapping>
+
+        <mime-mapping>
+            <extension>png</extension>
+            <mime-type>image/png</mime-type>
+        </mime-mapping>
+
+        <mime-mapping>
+            <extension>ico</extension>
+            <mime-type>image/x-icon</mime-type>
+        </mime-mapping>
+
+        <welcome-file-list>
+            <welcome-file>portal.html</welcome-file>
+        </welcome-file-list>
+
+</web-app>

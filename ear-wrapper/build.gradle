@@ -1,11 +1,16 @@
 apply plugin: 'ear'
 
+def rmFolder = new File('dist/war/rm')
+def schedulerFolder = new File('dist/war/scheduler')
+def studioFolder = new File('dist/war/studio')
+def workflowCatalogFolder = new File('dist/war/workflow-catalog')
+def schedulingAPIFolder = new File('dist/war/scheduling-api')
+
 configurations.compile.transitive = true
 
 configurations {
     all*.exclude group: 'com.zaxxer', module: 'HikariCP-java6'
 }
-
 
 //**************************************Generating the getstarted war archive**********************************
 task getStartedWarTask(type: War) {
@@ -22,7 +27,7 @@ task restWarTask(type: War) {
         exclude '**/WEB-INF/web.xml'
     }
 
-    webInf { from 'src/main/ibm-deployment-descriptors/rest' }
+    webInf { from 'src/main/proactive-ear/modules-deployment-descriptors/rest' }
 
     doFirst {
         manifest {
@@ -40,18 +45,16 @@ task restWarTask(type: War) {
 //**************************************Generating the rm war archive****************************************
 task rmWarTask(type: War) {
 
-    def rmFolder = new File('dist/war/rm')
     if( rmFolder.exists() ) {
         from(project(':').files(rmFolder, '*')) {
             exclude '**/WEB-INF/web.xml'
             exclude 'rm.conf'
         }
 
-        from 'src/main/ibm-deployment-descriptors/rm/rm.conf'
+        from 'src/main/proactive-portals-ear/modules-deployment-descriptors/rm/rm.conf'
 
         webInf {
-            from 'src/main/ibm-deployment-descriptors/rm'
-            exclude 'rm.conf'
+            from 'src/main/proactive-portals-ear/modules-deployment-descriptors/rm/WEB-INF'
         }
 
         archiveName "proactive-rm.war"
@@ -63,18 +66,16 @@ task rmWarTask(type: War) {
 //**************************************Generating the scheduler war archive******************************
 task schedulerWarTask(type: War) {
 
-    def schedulerFolder = new File('dist/war/scheduler')
     if( schedulerFolder.exists() ) {
         from(project(':').files(schedulerFolder, '*')) {
             exclude '**/WEB-INF/web.xml'
             exclude 'scheduler.conf'
         }
 
-        from 'src/main/ibm-deployment-descriptors/scheduler/scheduler.conf'
+        from 'src/main/proactive-portals-ear/modules-deployment-descriptors/scheduler/scheduler.conf'
 
         webInf {
-            from 'src/main/ibm-deployment-descriptors/scheduler'
-            exclude 'scheduler.conf'
+            from 'src/main/ibm-deployment-descriptors/scheduler/WEB-INF'
         }
 
         archiveName "proactive-scheduler.war"
@@ -86,7 +87,6 @@ task schedulerWarTask(type: War) {
 //**************************************Generating the studio war archive*********************************
 task studioWarTask(type: War) {
 
-    def studioFolder = new File('dist/war/studio')
     if( studioFolder.exists() ) {
         from project(':').files(studioFolder, '*')
         archiveName "proactive-studio.war"
@@ -98,7 +98,6 @@ task studioWarTask(type: War) {
 //**************************************Generating the workflow-catalog war archive************************
 task workflowCatalogWarTask(type: War) {
 
-    def workflowCatalogFolder = new File('dist/war/workflow-catalog')
     if( workflowCatalogFolder.exists() ) {
 
         from  (project(':').files(workflowCatalogFolder, '*')){
@@ -106,7 +105,7 @@ task workflowCatalogWarTask(type: War) {
         }
 
         webInf {
-            from 'src/main/ibm-deployment-descriptors/workflow-catalog'
+            from 'src/main/proactive-portals-ear/modules-deployment-descriptors/workflow-catalog'
         }
 
         archiveName "proactive-workflow-catalog.war"
@@ -118,7 +117,6 @@ task workflowCatalogWarTask(type: War) {
 //**************************************Generating the scheduling-api war archive************************
 task schedulingAPIWarTask(type: War) {
 
-    def schedulingAPIFolder = new File('dist/war/scheduling-api')
     if( schedulingAPIFolder.exists() ) {
 
         from (project(':').files(schedulingAPIFolder, '*')){
@@ -126,7 +124,7 @@ task schedulingAPIWarTask(type: War) {
         }
 
         webInf {
-            from 'src/main/ibm-deployment-descriptors/scheduling-api'
+            from 'src/main/proactive-portals-ear/modules-deployment-descriptors/scheduling-api'
         }
 
         archiveName "proactive-scheduling-api.war"
@@ -135,61 +133,63 @@ task schedulingAPIWarTask(type: War) {
 //********************************************************************************************************
 
 
-ear.dependsOn getStartedWarTask, restWarTask, rmWarTask, schedulerWarTask, studioWarTask, workflowCatalogWarTask, schedulingAPIWarTask
+task Scheduler_RM_Portals_EAR(type: Ear){
 
-dependencies {
-    // The following dependencies will be the ear modules and
-    // will be placed in the ear root
-    // deploy project(':war')
+    if( schedulerFolder.exists() && schedulingAPIFolder.exists() &&  rmFolder.exists()  ) {
 
-    earlib project(':scheduler:scheduler-server')
-    earlib group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
+        from 'src/main/proactive-scheduler-rm-portals/app-deployment-descriptors'
 
-    deploy project(path: ':wrapper', configuration: 'archives')
+        from rmWarTask.archivePath
+        from schedulerWarTask.archivePath
+        from schedulingAPIWarTask.archivePath
 
-    deploy files(getStartedWarTask)
-    deploy files(restWarTask)
-
-    deploy files(rmWarTask)
-    deploy files(schedulerWarTask)
-    deploy files(studioWarTask)
-
-    deploy files(workflowCatalogWarTask)
-    deploy files(schedulingAPIWarTask)
-
-
-    // The following dependencies will become ear libs and will
-    // be placed in a dir configured via the libDirName property
-    //earlib group: 'log4j', name: 'log4j'
-    //testCompile group: 'junit', name: 'junit', version: '4.11'
+        deploymentDescriptor {
+            archiveName "proactive-scheduler-rm-portals-${schedulingVersion}.ear"
+        }
+    }
 }
 
-ear {
+task Studio_Workflow_Catalog_EAR(type: Ear) {
 
-    appDirName 'src/main/app'  // use application metadata found in this folder
-    // put dependent libraries into APP-INF/lib inside the generated EAR
+    if (studioFolder.exists() && workflowCatalogFolder.exists()) {
 
-    libDirName 'lib'
+        from 'src/main/proactive-studio-workflow-catalog/app-deployment-descriptors'
 
+        from studioWarTask.archivePath
+        from workflowCatalogWarTask.archivePath
 
-    deploymentDescriptor {  // custom entries for application.xml:
+        deploymentDescriptor {
+            archiveName "proactive-studio-workflow-catalog-${schedulingVersion}.ear"
+        }
+    }
+}
 
-        archiveName "proactive-${schedulingVersion}.ear"
-//      fileName = "application.xml"  // same as the default value
-//      version = "6"  // same as the default value
-//      applicationName = "customear"
-        //initializeInOrder = true
-//      displayName = "Custom Ear"  // defaults to project.name
-        // defaults to project.description if not set
-//      description = "My customized EAR for the Gradle documentation"
-//      libraryDirectory = "APP-INF/lib"  // not needed, above libDirName setting does this
-//      module("my.jar", "java")  // won't deploy as my.jar isn't deploy dependency
-//      webModule("my.war", "/")  // won't deploy as my.war isn't deploy dependency
-//      securityRole "admin"
-//      securityRole "superadmin"
+//Scheduler_RM_Portals_EAR.dependsOn rmWarTask, schedulerWarTask, schedulingAPIWarTask
+
+//Studio_Workflow_Catalog_EAR.dependsOn  studioWarTask, workflowCatalogWarTask
+
+ear.dependsOn getStartedWarTask, restWarTask//, Scheduler_RM_Portals_EAR, Studio_Workflow_Catalog_EAR
+
+ear{
+
+    appDirName 'src/main/proactive/app-deployment-descriptors'
+
+    libDirName 'lib/'
+
+    dependencies {
+
+        earlib project(':scheduler:scheduler-server')
+        earlib group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
+
+        deploy project(path: ':war-wrapper', configuration: 'archives')
+
+        deploy files(getStartedWarTask)
+        deploy files(restWarTask)
+
     }
 
-    //archiveName "proactive-${schedulingVersion}.ear"
-    //exclude 'application.xml'
-    //rootSpec.exclude("META-INF/application.xml")
+    deploymentDescriptor {
+        archiveName "proactive-${schedulingVersion}.ear"
+    }
+
 }

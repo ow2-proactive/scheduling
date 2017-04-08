@@ -25,15 +25,18 @@
  */
 package org.ow2.proactive.wrapper;
 
+import org.ow2.proactive.scheduler.util.WarWrapper;
+
+
 public class WrapperSingleton {
 
-    public static WrapperStarter getInstance() {
+    public static WarWrapper getInstance() {
         return SingletonHolder.instance;
     }
 
     private static class SingletonHolder {
 
-        private final static WrapperStarter instance = new WrapperStarter();
+        private final static WarWrapper instance = new WarWrapper();
 
     }
 

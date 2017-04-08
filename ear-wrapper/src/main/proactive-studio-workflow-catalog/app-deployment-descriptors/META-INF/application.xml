@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC "-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN" "http://java.sun.com/dtd/application_1_3.dtd">
+
+<application id="Proactive_Studio_Workflow_Catalog">
+    <display-name>Proactive-Studio-And-Workflow-Catalog</display-name>
+    <description>Proactive Studio and Workflow Catalog</description>
+
+
+    <module id="Proactive_Studio">
+        <web>
+            <web-uri>proactive-studio.war</web-uri>
+            <context-root>/studio</context-root>
+        </web>
+    </module>
+
+    <module id="Proactive_Workflow_Catalog">
+        <web>
+            <web-uri>proactive-workflow-catalog.war</web-uri>
+            <context-root>/workflow-catalog</context-root>
+        </web>
+    </module>
+
+</application>
+

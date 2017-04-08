@@ -44,31 +44,36 @@ public class WrapperWebConfiguration {
 
     private static final Logger logger = Logger.getLogger(WrapperWebConfiguration.class);
 
-    public static String getRestApplicationUrl() {
+    public static String getStartedUrl() {
 
-        String paHost = ProActiveInet.getInstance().getHostname();
+        try {
 
-        Properties properties = readWebDeploymentProperties();
+            String paHost = ProActiveInet.getInstance().getHostname();
 
-        int httpPort = Integer.parseInt(properties.getProperty("ear.wrapper.target.server.http.port", "9080"));
-        int httpsPort = Integer.parseInt(properties.getProperty("ear.wrapper.target.server.https.port", "9443"));
+            Properties properties = readWebDeploymentProperties();
 
-        boolean httpsEnabled = isHttpsEnabled(properties);
+            int httpPort = Integer.parseInt(properties.getProperty("ear.wrapper.target.server.http.port", "9080"));
+            int httpsPort = Integer.parseInt(properties.getProperty("ear.wrapper.target.server.https.port", "9443"));
 
-        int restPort = httpPort;
+            boolean httpsEnabled = isHttpsEnabled(properties);
 
-        String httpProtocol;
+            int restPort = httpPort;
 
-        if (httpsEnabled) {
-            httpProtocol = "https";
-            restPort = httpsPort;
-        } else {
-            httpProtocol = "http";
+            String httpProtocol;
+
+            if (httpsEnabled) {
+                httpProtocol = "https";
+                restPort = httpsPort;
+            } else {
+                httpProtocol = "http";
+            }
+
+            return httpProtocol + "://" + paHost + ":" + restPort;
+
+        } catch (Exception e) {
+            logger.warn("Could not find the getStarted URL", e);
+            return null;
         }
-
-        String restContext = properties.getProperty("ear.wrapper.rest.webapp.context", "/rest");
-
-        return httpProtocol + "://" + paHost + ":" + restPort + restContext;
     }
 
     private static boolean isHttpsEnabled(Properties properties) {
