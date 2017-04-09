@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
@@ -41,8 +42,10 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB;
 
 import java.security.KeyException;
+import java.util.Properties;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -54,9 +57,11 @@ import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
+import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 
 
 public class SchedulerFrontendTest {
@@ -75,7 +80,16 @@ public class SchedulerFrontendTest {
     @Mock
     private JobState jobstate;
 
+    @Mock
+    private SchedulerPortalConfiguration schedulerPortalConfiguration;
+
     private JobId jobId;
+
+    @BeforeClass
+    public static void setup() {
+        String path = SchedulerFrontendTest.class.getResource("/config/scheduler-portal-display.conf").getPath();
+        PASchedulerProperties.SCHEDULER_PORTAL_CONFIGURATION.updateProperty(path);
+    }
 
     @Before
     public void init() {
@@ -83,7 +97,6 @@ public class SchedulerFrontendTest {
         this.schedulerFrontend = new SchedulerFrontend(frontendState, spacesSupport);
 
         this.jobId = new JobIdImpl(123L, "readableName");
-
     }
 
     /**
@@ -413,5 +426,11 @@ public class SchedulerFrontendTest {
                .checkPermissions("getTaskServerLogsByTag",
                                  ij,
                                  YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB);
+    }
+
+    @Test
+    public void testGetPortalConfiguration() {
+        Properties properties = SchedulerPortalConfiguration.getConfiguration().getProperties();
+        assertEquals("[properties]", properties.getProperty("execution-list-extra-columns"));
     }
 }

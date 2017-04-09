@@ -110,78 +110,6 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         assertEquals(NB_NODES, s.getFreeNodesNumber());
     }
 
-    @Test
-    public void testSSHInfrastructureV2WithRestartDownNodes() throws Exception {
-
-        nsname = "testSSHInfraRestart";
-
-        resourceManager = this.rmHelper.getResourceManager();
-
-        RMTHelper.log("Test - Create SSH infrastructure with RestartDownNodes policy on ssh://localhost on port " +
-                      this.port);
-
-        resourceManager.createNodeSource(nsname,
-                                         SSHInfrastructureV2.class.getName(),
-                                         infraParams,
-                                         RestartDownNodesPolicy.class.getName(),
-                                         policyParameters);
-        RMMonitorsHandler monitorsHandler = this.rmHelper.getMonitorsHandler();
-
-        this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, monitorsHandler);
-
-        RMState s = resourceManager.getState();
-        assertEquals(NB_NODES, s.getTotalNodesNumber());
-        assertEquals(NB_NODES, s.getFreeNodesNumber());
-
-        NodeSet ns = resourceManager.getNodes(new Criteria(NB_NODES));
-
-        if (ns.size() != NB_NODES) {
-            RMTHelper.log("Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
-            return;
-        }
-
-        for (Node n : ns) {
-            rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                                      n.getNodeInformation().getURL(),
-                                      60000,
-                                      monitorsHandler);
-        }
-
-        String nodeUrl = ns.get(0).getNodeInformation().getURL();
-        RMTHelper.log("Killing nodes");
-        // Nodes will be redeployed only if we kill the whole runtime
-        rmHelper.killRuntime(nodeUrl);
-
-        RMTHelper.log("Wait for down nodes detection by the rm");
-        for (Node n : ns) {
-            RMNodeEvent ev = rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                                                       n.getNodeInformation().getURL(),
-                                                       120000,
-                                                       monitorsHandler);
-            assertEquals(NodeState.DOWN, ev.getNodeState());
-        }
-
-        for (Node n : ns) {
-            rmHelper.waitForNodeEvent(RMEventType.NODE_REMOVED,
-                                      n.getNodeInformation().getURL(),
-                                      120000,
-                                      monitorsHandler);
-        }
-
-        RMTHelper.log("Wait for nodes restart by the policy");
-        rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES);
-        for (int i = 0; i < NB_NODES; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-
-        RMTHelper.log("Final checks on the scheduler state");
-        s = resourceManager.getState();
-        assertEquals(NB_NODES, s.getTotalNodesNumber());
-        assertEquals(NB_NODES, s.getFreeNodesNumber());
-    }
-
     @After
     public void removeNS() throws Exception {
         RMTHelper.log("Removing node source");
@@ -247,7 +175,8 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         infraParams = new Object[] { ("localhost " + NB_NODES + "\n").getBytes(), //hosts
                                      60000, //timeout
-                                     1, //attempts
+                                     0, //attempts
+                                     10, //wait between failures
                                      port, //ssh server port
                                      "toto", //ssh username
                                      "toto", //ssh password

@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
@@ -42,6 +44,7 @@ import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -52,15 +55,18 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
-import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
+
+import it.sauronsoftware.cron4j.Scheduler;
 
 
 public class SchedulingService {
@@ -77,11 +83,11 @@ public class SchedulingService {
     static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() *
                                                     1000;
 
-    final SchedulingInfrastructure infrastructure;
+    private final SchedulingInfrastructure infrastructure;
 
-    final LiveJobs jobs;
+    private final LiveJobs jobs;
 
-    final SchedulerStateUpdate listener;
+    private final SchedulerStateUpdate listener;
 
     private final ListenJobLogsSupport listenJobLogsSupport;
 
@@ -92,6 +98,8 @@ public class SchedulingService {
     private final SchedulingThread schedulingThread;
 
     private Thread pinger;
+
+    private Scheduler houseKeepingScheduler;
 
     /**
      * Url used to store the last url of the RM (used to try to reconnect to the rm when it is down)
@@ -128,10 +136,32 @@ public class SchedulingService {
 
         pinger = new NodePingThread(this);
         pinger.start();
+
+        if (PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_DELAY.getValueAsInt() > 0) {
+            startHouseKeeping();
+        }
+    }
+
+    public void startHouseKeeping() {
+        houseKeepingScheduler = new Scheduler();
+        String cronExpr = "* * * * *";
+        if (PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR.isSet()) {
+            cronExpr = PASchedulerProperties.SCHEDULER_AUTOMATIC_REMOVED_JOB_CRON_EXPR.getValueAsString();
+        }
+        houseKeepingScheduler.schedule(cronExpr, new HousekeepingRunner());
+        houseKeepingScheduler.start();
     }
 
     public Policy getPolicy() {
         return policy;
+    }
+
+    public LiveJobs getJobs() {
+        return jobs;
+    }
+
+    public SchedulerStateUpdate getListener() {
+        return listener;
     }
 
     public boolean isSubmitPossible() {
@@ -283,7 +313,7 @@ public class SchedulingService {
             if (!newPolicy.reloadConfig()) {
                 return false;
             }
-            //if success, change current policy 
+            //if success, change current policy
             policy = newPolicy;
             listener.schedulerStateUpdated(SchedulerEvent.POLICY_CHANGED);
             logger.info("Policy changed ! new policy name : " + newPolicyClassName);
@@ -457,8 +487,13 @@ public class SchedulingService {
         }
     }
 
-    public void scheduleJobRemove(JobId jobId, long delay) {
-        infrastructure.scheduleHousekeeping(new JobRemoveHandler(this, jobId), delay);
+    public void scheduleJobRemove(JobId jobId, long at) {
+        InternalJob job = infrastructure.getDBManager().loadJobWithTasksIfNotRemoved(jobId);
+        boolean shouldRemoveFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
+
+        if (job != null) {
+            infrastructure.getDBManager().scheduleJobForRemoval(job.getJobInfo().getJobId(), at, shouldRemoveFromDb);
+        }
     }
 
     public void restartTaskOnNodeFailure(final InternalTask task) {
@@ -841,7 +876,8 @@ public class SchedulingService {
 
             // auto remove
             if (SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
-                scheduleJobRemove(jobId, SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY);
+                long timeToRemove = System.currentTimeMillis() + SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY;
+                scheduleJobRemove(jobId, timeToRemove);
             }
         } catch (Throwable t) {
             logger.warn("", t);
@@ -878,7 +914,7 @@ public class SchedulingService {
                     toWait = SCHEDULER_AUTO_REMOVED_JOB_DELAY;
                 }
                 if (toWait > 0) {
-                    scheduleJobRemove(job.getId(), toWait);
+                    scheduleJobRemove(job.getId(), System.currentTimeMillis() + toWait);
                     jlogger.debug(job.getId(), "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
                 }
             }
@@ -939,7 +975,7 @@ public class SchedulingService {
         }
     }
 
-    void pingTaskNode(RunningTaskData taskData) {
+    void getProgressAndPingTaskNode(RunningTaskData taskData) {
         if (!jobs.canPingTask(taskData)) {
             return;
         }
@@ -955,34 +991,36 @@ public class SchedulingService {
                                           new NotificationData<TaskInfo>(SchedulerEvent.TASK_PROGRESS,
                                                                          new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             }
-        } catch (NullPointerException e) {
-            //should not happened, but avoid restart if execInfo or launcher is null
-            //nothing to do
-            if (tlogger.isDebugEnabled()) {
-                tlogger.debug(task.getId(), "getProgress failed", e);
-            }
-        } catch (IllegalArgumentException e) {
-            //thrown by (1)
-            //avoid setting bad value, no event if bad
-            if (tlogger.isDebugEnabled()) {
-                tlogger.debug(task.getId(), "getProgress failed", e);
-            }
-        } catch (ForkedJvmProcessException e) {
-            //thrown by when user has overridden getProgress method and the method throws an exception
-            // * if forked JVM process is dead
-            //nothing to do in any case
-            if (tlogger.isTraceEnabled()) {
-                tlogger.trace(task.getId(), "getProgress failed", e);
-            }
         } catch (Throwable t) {
-            RunningTaskData runningTask = jobs.getRunningTask(task.getId());
-            if (runningTask != null) {
+            tlogger.debug(task.getId(), "TaskLauncher is not accessible, checking if the node can be reached.", t);
+            pingTaskNodeAndInitiateRestart(task);
+        }
+    }
+
+    private void pingTaskNodeAndInitiateRestart(InternalTask task) {
+
+        RunningTaskData runningTask = jobs.getRunningTask(task.getId());
+        if (runningTask != null) {
+            // We try to ping the node where the task is running to make sure the exception raised is due to a node failure.
+            // We don't consider here other nodes reserved for the task,
+            // as it is the responsibility of the task itself to manage extra nodes lifecycle
+            // in case of complex multinodes task deployment.
+            Node nodeUsedToExecuteTask = runningTask.getNodeExecutor();
+
+            try {
+                nodeUsedToExecuteTask.getNumberOfActiveObjects();
+
+            } catch (Exception e) {
                 int attempts = runningTask.increaseAndGetPingAttempts();
+                String nodeUrl = nodeUsedToExecuteTask.getNodeInformation().getURL();
                 if (attempts > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
-                    tlogger.info(task.getId(), "node failed", t);
+                    tlogger.error(task.getId(), "node failed " + nodeUrl + ", initiate task restart.", e);
                     restartTaskOnNodeFailure(task);
                 } else {
-                    tlogger.debug(task.getId(), "node failed - waiting while it comes back");
+                    tlogger.warn(task.getId(),
+                                 "cannot contact node " + nodeUrl + " - waiting while it comes back, attempt " +
+                                               attempts,
+                                 e);
                 }
             }
         }
@@ -994,6 +1032,59 @@ public class SchedulingService {
 
     protected void wakeUpSchedulingThread() {
         schedulingThread.wakeUpSchedulingThread();
+    }
+
+    /**
+     * This Runnable handles the Housekeeping
+     */
+    public class HousekeepingRunner implements Runnable {
+
+        private List<Long> removeFromContext(List<JobId> jobIdList) {
+            List<Long> longList = new ArrayList<>(jobIdList.size());
+            for (JobId jobId : jobIdList) {
+                TerminationData terminationData = jobs.removeJob(jobId);
+                submitTerminationDataHandler(terminationData);
+                InternalJob job = getInfrastructure().getDBManager().loadJobWithTasksIfNotRemoved(jobId);
+                if (job != null) {
+                    job.setRemovedTime(System.currentTimeMillis());
+                    ServerJobAndTaskLogs.remove(jobId);
+                    getListener().jobStateUpdated(job.getOwner(),
+                                                  new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
+                                                                                new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+                    wakeUpSchedulingThread();
+                }
+                longList.add(jobId.longValue());
+            }
+            return longList;
+        }
+
+        private void removeFromDB(List<Long> longJobIdList) {
+            if (!longJobIdList.isEmpty()) {
+                getInfrastructure().getDBManager()
+                                   .executeHousekeepingInDB(longJobIdList,
+                                                            PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean());
+            }
+        }
+
+        @Override
+        public void run() {
+            long timeNow = System.currentTimeMillis();
+            List<JobId> jobIdList = getInfrastructure().getDBManager().getJobsToRemove(timeNow);
+
+            // remove from the memory context
+            long inMemoryTimeStart = System.currentTimeMillis();
+            List<Long> longJobIdList = removeFromContext(jobIdList);
+            long inMemoryTimeStop = System.currentTimeMillis();
+
+            // set the removedTime and also remove if required by the JOB_REMOVE_FROM_DB setting
+            long dbTimeStart = System.currentTimeMillis();
+            removeFromDB(longJobIdList);
+            long dbTimeStop = System.currentTimeMillis();
+
+            logger.info("HOUSEKEEPING of jobs " + longJobIdList + " performed (Hibernate context removal took " +
+                        (inMemoryTimeStop - inMemoryTimeStart) + " ms" + " and db removal took " +
+                        (dbTimeStop - dbTimeStart) + " ms)");
+        }
     }
 
 }

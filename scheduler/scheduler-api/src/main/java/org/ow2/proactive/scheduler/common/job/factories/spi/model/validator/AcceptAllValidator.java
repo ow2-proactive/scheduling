@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
@@ -35,7 +36,7 @@ public class AcceptAllValidator<T> implements Validator<T> {
     }
 
     @Override
-    public T validate(T parameterValue) throws ValidationException {
+    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
         // accept all values
         return parameterValue;
     }

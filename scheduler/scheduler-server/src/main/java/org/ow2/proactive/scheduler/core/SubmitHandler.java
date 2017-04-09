@@ -48,7 +48,7 @@ class SubmitHandler implements Runnable {
             logger.debug("Submitting a new job '" + job.getName() + "'");
         }
 
-        service.jobs.jobSubmitted(job);
+        service.getJobs().jobSubmitted(job);
 
         service.wakeUpSchedulingThread();
     }

@@ -83,6 +83,10 @@ public interface StudioInterface {
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
 
     @GET
+    @Path("currentuser")
+    String currentUser(@HeaderParam("sessionid") String sessionId);
+
+    @GET
     @Path("workflows")
     List<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedRestException, IOException;
@@ -180,9 +184,10 @@ public interface StudioInterface {
      * @return the result of job validation
      */
     @POST
-    @Path("validate")
+    @Path("{path:validate}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    JobValidationData validate(MultipartFormDataInput multipart);
+    @Produces("application/json")
+    JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart);
 
     /**
      * Submits a job to the scheduler

@@ -592,4 +592,14 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
         return ((ISchedulerClient) _getScheduler()).copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
     }
 
+    @Override
+    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+        return _getScheduler().getPortalConfiguration();
+    }
+
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+        return ((ISchedulerClient) _getScheduler()).getCurrentUser();
+    }
+
 }

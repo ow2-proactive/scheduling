@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -82,6 +83,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
+import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -100,7 +102,10 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
+import it.sauronsoftware.cron4j.Scheduler;
 
+
+@SuppressWarnings("JpaQueryApiInspection")
 public class SchedulerDBManager {
 
     private static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
@@ -144,6 +149,8 @@ public class SchedulerDBManager {
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
+
+    private Scheduler tableSizeMonitorScheduler;
 
     public static SchedulerDBManager createUsingProperties() {
         if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
@@ -201,9 +208,20 @@ public class SchedulerDBManager {
                                                                                   .build();
             sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             transactionHelper = new TransactionHelper(sessionFactory);
+
+            setupTableSizeMonitoring();
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed", ex);
+        }
+    }
+
+    public void setupTableSizeMonitoring() {
+        if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.isSet()) {
+            tableSizeMonitorScheduler = new Scheduler();
+            tableSizeMonitorScheduler.schedule(PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.getValueAsString(),
+                                               new TableSizeMonitorRunner(transactionHelper));
+            tableSizeMonitorScheduler.start();
         }
     }
 
@@ -729,6 +747,44 @@ public class SchedulerDBManager {
         session.getNamedQuery("deleteSelectorData").setParameter("jobId", jobId).executeUpdate();
     }
 
+    public void scheduleJobForRemoval(final JobId jobId, final long timeForRemoval, final boolean shouldRemoveFromDb) {
+        // scheduleJobForRemoval
+        executeReadWriteTransaction(new SessionWork<Void>() {
+            @Override
+            public Void doInTransaction(Session session) {
+                session.getNamedQuery("setJobForRemoval")
+                       .setParameter("timeForRemoval", timeForRemoval)
+                       .setParameter("toBeRemoved", shouldRemoveFromDb)
+                       .setParameter("jobId", jobId.longValue())
+                       .executeUpdate();
+                return null;
+            }
+        });
+    }
+
+    public List<JobId> getJobsToRemove(final long time) {
+        List<JobId> jobIdsList = executeReadOnlyTransaction(new SessionWork<List<JobId>>() {
+            @Override
+            public List<JobId> doInTransaction(Session session) {
+                List<JobId> jobsToRemove = new ArrayList<JobId>();
+                Query query = session.createSQLQuery("select ID from JOB_DATA where " +
+                                                     "SCHEDULED_TIME_FOR_REMOVAL <> 0 and " +
+                                                     "SCHEDULED_TIME_FOR_REMOVAL < :timeLimit")
+                                     .setParameter("timeLimit", time);
+                Iterator jobIdIterator = query.list().iterator();
+                while (jobIdIterator.hasNext()) {
+                    jobsToRemove.add(JobIdImpl.makeJobId((jobIdIterator.next()).toString()));
+                }
+                return jobsToRemove;
+            }
+        });
+        return jobIdsList;
+    }
+
+    public void executeHousekeepingInDB(final List<Long> jobIdList, final boolean shouldRemoveFromDb) {
+        executeReadWriteTransaction(new HousekeepingSessionWork(jobIdList, shouldRemoveFromDb));
+    }
+
     public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
@@ -756,7 +812,6 @@ public class SchedulerDBManager {
                            .setParameter("jobId", id)
                            .executeUpdate();
                 }
-
                 return null;
             }
 

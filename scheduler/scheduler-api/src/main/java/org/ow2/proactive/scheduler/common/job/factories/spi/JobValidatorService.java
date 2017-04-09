@@ -45,9 +45,10 @@ public interface JobValidatorService {
      * Example of use: xml schema validation.
      *
      * @param jobFile xml job file to validate
+     * @return if the validator eventually made some modifications to the job, return a new version
      * @throws JobValidationException if the job is not valid
      */
-    void validateJob(File jobFile) throws JobValidationException;
+    File validateJob(File jobFile) throws JobValidationException;
 
     /**
      * Validate a job object after the job has been parsed by the scheduler.
@@ -55,8 +56,9 @@ public interface JobValidatorService {
      * Example of use: variable model validation.
      *
      * @param job job object to validate
+     * @return if the validator eventually made some modifications to the job, return a new version
      * @throws JobValidationException if the job is not valid
      */
-    void validateJob(TaskFlowJob job) throws JobValidationException;
+    TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException;
 
 }

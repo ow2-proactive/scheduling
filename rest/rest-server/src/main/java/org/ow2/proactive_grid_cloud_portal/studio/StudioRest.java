@@ -121,6 +121,15 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
+    public String currentUser(@HeaderParam("sessionid") String sessionId) {
+        try {
+            return getUserName(sessionId);
+        } catch (NotConnectedRestException e) {
+            return null;
+        }
+    }
+
+    @Override
     public List<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
@@ -301,8 +310,8 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobValidationData validate(MultipartFormDataInput multipart) {
-        return scheduler().validate(multipart);
+    public JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart) {
+        return scheduler().validate(pathSegment, multipart);
     }
 
     @Override

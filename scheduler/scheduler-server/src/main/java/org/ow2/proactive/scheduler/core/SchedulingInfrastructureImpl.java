@@ -45,6 +45,8 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
 
     private final ExecutorService internalExecutorService;
 
+    private final ExecutorService taskPingerService;
+
     private final ScheduledExecutorService scheduledExecutorService;
 
     private final RMProxiesManager rmProxiesManager;
@@ -62,13 +64,15 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
 
     public SchedulingInfrastructureImpl(SchedulerDBManager dbManager, RMProxiesManager rmProxiesManager,
             DataSpaceServiceStarter dsStarter, ExecutorService clientExecutorService,
-            ExecutorService internalExecutorService, ScheduledExecutorService scheduledExecutorService) {
+            ExecutorService internalExecutorService, ExecutorService taskPingerService,
+            ScheduledExecutorService scheduledExecutorService) {
         this.dbManager = dbManager;
         this.rmProxiesManager = rmProxiesManager;
         this.dsStarter = dsStarter;
         this.clientExecutorService = clientExecutorService;
         this.internalExecutorService = internalExecutorService;
         this.scheduledExecutorService = scheduledExecutorService;
+        this.taskPingerService = taskPingerService;
         this.spacesSupport = new SchedulerSpacesSupport();
     }
 
@@ -93,6 +97,11 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
     }
 
     @Override
+    public ExecutorService getTaskPingerThreadPool() {
+        return taskPingerService;
+    }
+
+    @Override
     public void schedule(final Runnable runnable, long delay) {
         scheduledExecutorService.schedule(new Runnable() {
             public void run() {
@@ -111,11 +120,6 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
     }
 
     @Override
-    public void scheduleHousekeeping(JobRemoveHandler jobRemoveHandler, long delay) {
-        HousekeepingScheduledExecutorLazyHolder.INSTANCE.schedule(jobRemoveHandler, delay, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
     public DataSpaceServiceStarter getDataSpaceServiceStarter() {
         return dsStarter;
     }
@@ -128,6 +132,7 @@ public class SchedulingInfrastructureImpl implements SchedulingInfrastructure {
     @Override
     public void shutdown() {
         clientExecutorService.shutdownNow();
+        taskPingerService.shutdownNow();
         internalExecutorService.shutdownNow();
         scheduledExecutorService.shutdownNow();
 

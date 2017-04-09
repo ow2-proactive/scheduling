@@ -1389,4 +1389,17 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo) throws NotConnectedException,
             UnknownJobException, PermissionException, SubmissionClosedException, JobCreationException;
 
+    /**
+     * @return
+     * @throws PermissionException 
+     * @throws NotConnectedException 
+     */
+    Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException;
+
+    /**
+     * Returns the user currently connected
+     * @return user name
+     */
+    String getCurrentUser() throws NotConnectedException;
+
 }

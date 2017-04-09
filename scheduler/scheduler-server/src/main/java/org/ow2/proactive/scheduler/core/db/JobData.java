@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +74,11 @@ import com.google.common.collect.Lists;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "checkJobExistence", query = "select id from JobData where id = :id"),
+@NamedQueries({ @NamedQuery(name = "setJobForRemoval", query = "update JobData set scheduledTimeForRemoval = :timeForRemoval, toBeRemoved = :toBeRemoved where id = :jobId"),
+                @NamedQuery(name = "deleteJobDataInBulk", query = "delete from JobData where id in (:jobIdList)"),
+                @NamedQuery(name = "checkJobExistence", query = "select id from JobData where id = :id"),
+                @NamedQuery(name = "countJobDataFinished", query = "select count (*) from JobData where status = 3"),
+                @NamedQuery(name = "countJobData", query = "select count (*) from JobData"),
                 @NamedQuery(name = "deleteJobData", query = "delete from JobData where id = :jobId"),
                 @NamedQuery(name = "findUsersWithJobs", query = "select owner, count(owner), max(submittedTime) from JobData group by owner"),
                 @NamedQuery(name = "getJobsNumberWithStatus", query = "select count(*) from JobData where status in (:status) and removedTime = -1"),
@@ -93,6 +98,7 @@ import com.google.common.collect.Lists;
                                                                      "numberOfInErrorTasks = :numberOfInErrorTasks, inErrorTime = :inErrorTime, lastUpdatedTime = :lastUpdatedTime " +
                                                                      "where id = :jobId"),
                 @NamedQuery(name = "updateJobDataRemovedTime", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                @NamedQuery(name = "updateJobDataRemovedTimeInBulk", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id in :jobIdList"),
                 @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterTaskFinished", query = "update JobData set status = :status, " +
@@ -145,6 +151,8 @@ public class JobData implements Serializable {
     private long finishedTime;
 
     private long removedTime;
+
+    private long scheduledTimeForRemoval;
 
     private int totalNumberOfTasks;
 
@@ -213,7 +221,18 @@ public class JobData implements Serializable {
         if (isToBeRemoved()) {
             jobInfo.setToBeRemoved();
         }
+        jobInfo.setGenericInformation(getGenericInformation());
+        jobInfo.setVariables(createVariablesStringMap());
         return jobInfo;
+    }
+
+    private Map<String, String> createVariablesStringMap() {
+        Map<String, JobVariable> jobDataVariablesMap = getVariables();
+        Map<String, String> stringVariablesMap = new HashMap<>(jobDataVariablesMap.size());
+        for (JobVariable variable : getVariables().values()) {
+            stringVariablesMap.put(variable.getName(), variable.getValue());
+        }
+        return stringVariablesMap;
     }
 
     JobInfo toJobInfo() {
@@ -241,7 +260,7 @@ public class JobData implements Serializable {
         internalJob.setUserSpace(getGlobalSpace());
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
-
+        internalJob.setScheduledTimeForRemoval(getScheduledTimeForRemoval());
         return internalJob;
     }
 
@@ -255,6 +274,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setInErrorTime(job.getInErrorTime());
         jobRuntimeData.setFinishedTime(job.getFinishedTime());
         jobRuntimeData.setRemovedTime(job.getRemovedTime());
+        jobRuntimeData.setScheduledTimeForRemoval(job.getScheduledTimeForRemoval());
         jobRuntimeData.setJobName(job.getName());
         jobRuntimeData.setDescription(job.getDescription());
         jobRuntimeData.setProjectName(job.getProjectName());
@@ -451,6 +471,15 @@ public class JobData implements Serializable {
 
     public void setRemovedTime(long removedTime) {
         this.removedTime = removedTime;
+    }
+
+    @Column(name = "SCHEDULED_TIME_FOR_REMOVAL", nullable = false)
+    public long getScheduledTimeForRemoval() {
+        return scheduledTimeForRemoval;
+    }
+
+    public void setScheduledTimeForRemoval(long scheduledTimeForRemoval) {
+        this.scheduledTimeForRemoval = scheduledTimeForRemoval;
     }
 
     @Column(name = "TOTAL_TASKS")

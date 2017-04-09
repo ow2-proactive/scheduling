@@ -6,6 +6,7 @@ dependencies {
     compile 'msv:isorelax:20050913'
     compile 'msv:msv:20050913'
     compile 'commons-io:commons-io:2.5'
+    compile group: 'org.springframework', name: 'spring-expression', version: '4.2.5.RELEASE'
 
     compile project(':common:common-api')
 

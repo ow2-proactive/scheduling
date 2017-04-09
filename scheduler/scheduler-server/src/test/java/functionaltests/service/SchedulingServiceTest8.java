@@ -96,6 +96,7 @@ public class SchedulingServiceTest8 extends BaseServiceTest {
                               SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                               SchedulerEvent.JOB_UPDATED);
         infrastructure.assertRequests(1);
+        service.removeJob(jobDesc.getJobId());
 
         try {
             service.preemptTask(jobDesc.getJobId(), "javaTask", 100);

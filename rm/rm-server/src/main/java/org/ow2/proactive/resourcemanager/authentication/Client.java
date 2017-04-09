@@ -244,7 +244,7 @@ public class Client implements Serializable {
                 }
             }, null);
         } catch (SecurityException ex) {
-            throw new SecurityException(errorMessage);
+            throw new SecurityException(errorMessage, ex);
         }
 
         return true;

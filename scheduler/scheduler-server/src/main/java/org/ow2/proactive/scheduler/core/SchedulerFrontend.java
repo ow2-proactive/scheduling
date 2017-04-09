@@ -135,6 +135,7 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.Tools;
 
@@ -158,7 +159,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() *
                                                             1000;
 
-    private static final Logger logger = Logger.getLogger(SchedulingService.class);
+    private static final Logger logger = Logger.getLogger(SchedulerFrontend.class);
 
     private static final JobLogger jlogger = JobLogger.getInstance();
 
@@ -191,6 +192,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerSpacesSupport spacesSupport;
 
     private PublicKey corePublicKey;
+
+    private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
 
     /*
      * ######################################################################### ##################
@@ -269,6 +272,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             ExecutorService internalThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
                                                                               new NamedThreadFactory("InternalOperationsThreadPool"));
 
+            ExecutorService taskPingerThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_TASK_PINGER_POOL_NBTHREAD.getValueAsInt(),
+                                                                                new NamedThreadFactory("TaskPingerThreadPool"));
+
             ScheduledExecutorService scheduledThreadPool = new ScheduledThreadPoolExecutor(PASchedulerProperties.SCHEDULER_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
                                                                                            new NamedThreadFactory("SchedulingServiceTimerThread"));
 
@@ -301,6 +307,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                                                                        dsServiceStarter,
                                                                                        clientThreadPool,
                                                                                        internalThreadPool,
+                                                                                       taskPingerThreadPool,
                                                                                        scheduledThreadPool);
 
             this.spacesSupport = infrastructure.getSpacesSupport();
@@ -434,7 +441,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         if (!result.getJobInfo().isToBeRemoved() && SCHEDULER_REMOVED_JOB_DELAY > 0) {
             // remember that this job is to be removed
             dbManager.jobSetToBeRemoved(jobId);
-            schedulingService.scheduleJobRemove(jobId, SCHEDULER_REMOVED_JOB_DELAY);
+            schedulingService.scheduleJobRemove(jobId, System.currentTimeMillis() + SCHEDULER_REMOVED_JOB_DELAY);
             jlogger.info(jobId, "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
         }
 
@@ -1307,6 +1314,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             job.addGenericInformation(entry.getKey(), entry.getValue());
         }
         return submit(job);
+    }
+
+    @Override
+    public Map<Object, Object> getPortalConfiguration() {
+        return schedulerPortalConfiguration.getProperties();
+    }
+
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+        return frontendState.getCurrentUser();
     }
 
 }

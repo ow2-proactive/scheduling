@@ -52,7 +52,7 @@ public class URLParserValidatorTest {
     }
 
     @Test(expected = ModelSyntaxException.class)
-    public void testURIParserValidatorInvalidModel()
+    public void testURLParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
         new URLParserValidator("URLL").parseAndValidate("blabla");
     }

@@ -32,6 +32,7 @@ import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -52,6 +53,11 @@ public class JobRemoveHandler implements Callable<Boolean> {
         this.jobId = jobId;
     }
 
+    private boolean isInFinishedState(InternalJob job) {
+        JobStatus status = job.getStatus();
+        return status == JobStatus.CANCELED || status == JobStatus.FAILED || status == JobStatus.KILLED;
+    }
+
     @Override
     public Boolean call() {
         long start = 0;
@@ -61,12 +67,25 @@ public class JobRemoveHandler implements Callable<Boolean> {
             logger.info("Removing job " + jobId);
         }
 
-        SchedulerDBManager dbManager = service.infrastructure.getDBManager();
+        SchedulerDBManager dbManager = service.getInfrastructure().getDBManager();
 
-        TerminationData terminationData = service.jobs.killJob(jobId);
-        service.submitTerminationDataHandler(terminationData);
         InternalJob job = dbManager.loadJobWithTasksIfNotRemoved(jobId);
+        TerminationData terminationData;
 
+        // if the context is not in sync with the database
+        if (job == null) {
+            terminationData = service.getJobs().removeJob(jobId);
+        } else {
+            // if the job was already finished we just remove it from the context
+            if (isInFinishedState(job)) {
+                terminationData = service.getJobs().removeJob(jobId);
+            } else {
+                terminationData = service.getJobs().killJob(jobId);
+            }
+        }
+        service.submitTerminationDataHandler(terminationData);
+
+        // if the job doesn't exist in the DB anymore we can stop here
         if (job == null) {
             return false;
         }
@@ -74,6 +93,7 @@ public class JobRemoveHandler implements Callable<Boolean> {
         job.setRemovedTime(System.currentTimeMillis());
 
         boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
+
         dbManager.removeJob(jobId, job.getRemovedTime(), removeFromDb);
 
         if (logger.isInfoEnabled()) {
@@ -83,9 +103,10 @@ public class JobRemoveHandler implements Callable<Boolean> {
         ServerJobAndTaskLogs.remove(jobId);
 
         // send event to front-end
-        service.listener.jobStateUpdated(job.getOwner(),
-                                         new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
-                                                                       new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+        service.getListener()
+               .jobStateUpdated(job.getOwner(),
+                                new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
+                                                              new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
 
         service.wakeUpSchedulingThread();
 

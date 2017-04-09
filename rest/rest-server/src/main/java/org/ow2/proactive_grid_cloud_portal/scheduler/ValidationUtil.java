@@ -66,34 +66,39 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.FlowChecker;
 import org.ow2.proactive.scheduler.common.job.factories.FlowError;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 
 
 public class ValidationUtil {
 
-    private ValidationUtil() {
+    public ValidationUtil() {
     }
 
-    public static JobValidationData validateJobDescriptor(File jobDescFile) {
-        return validateJob(jobDescFile.getAbsolutePath());
+    public JobValidationData validateJobDescriptor(File jobDescFile, Map<String, String> jobVariables) {
+        return validateJob(jobDescFile.getAbsolutePath(), jobVariables);
     }
 
-    private static JobValidationData validateJob(String jobFilePath) {
+    public JobValidationData validateJob(String jobFilePath, Map<String, String> jobVariables) {
         JobValidationData data = new JobValidationData();
         try {
             JobFactory factory = JobFactory.getFactory();
-            Job job = factory.createJob(jobFilePath);
+            Job job = factory.createJob(jobFilePath, jobVariables);
 
             if (job instanceof TaskFlowJob) {
                 validateJob((TaskFlowJob) job, data);
+                fillUpdatedVariables((TaskFlowJob) job, data);
             } else {
                 data.setValid(true);
             }
@@ -106,7 +111,20 @@ public class ValidationUtil {
 
     }
 
-    private static void validateJob(TaskFlowJob job, JobValidationData data) {
+    private void fillUpdatedVariables(TaskFlowJob job, JobValidationData data) {
+        HashMap<String, String> updatedVariables = new HashMap<>();
+        for (JobVariable jobVariable : job.getVariables().values()) {
+            updatedVariables.put(jobVariable.getName(), jobVariable.getValue());
+        }
+        for (Task task : job.getTasks()) {
+            for (TaskVariable taskVariable : task.getVariables().values()) {
+                updatedVariables.put(task.getName() + ":" + taskVariable.getName(), taskVariable.getValue());
+            }
+        }
+        data.setUpdatedVariables(updatedVariables);
+    }
+
+    private void validateJob(TaskFlowJob job, JobValidationData data) {
         ArrayList<Task> tasks = job.getTasks();
         if (tasks.isEmpty()) {
             data.setErrorMessage(String.format("%s must contain at least one task.", job.getName()));

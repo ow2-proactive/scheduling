@@ -53,6 +53,18 @@ public class TaskLogger {
         return PREFIX + id + " (" + id.getReadableName() + ") " + message;
     }
 
+    public void warn(TaskId id, String message) {
+        updateMdcWithTaskLogFilename(id);
+        logger.warn(format(id, message));
+        MDC.remove(FileAppender.FILE_NAME);
+    }
+
+    public void warn(TaskId id, String message, Throwable th) {
+        updateMdcWithTaskLogFilename(id);
+        logger.warn(format(id, message), th);
+        MDC.remove(FileAppender.FILE_NAME);
+    }
+
     public void info(TaskId id, String message) {
         updateMdcWithTaskLogFilename(id);
         logger.info(format(id, message));

@@ -90,7 +90,7 @@ public class TerminateReplicateTaskHandlerTest {
 
     private FlowAction action;
 
-    private Map<TaskId, InternalTask> tasks = genearteTaks();
+    private Map<TaskId, InternalTask> tasks = generateTasks();
 
     @Before
     public void init() {
@@ -105,7 +105,7 @@ public class TerminateReplicateTaskHandlerTest {
 
     @Test
     public void testTerminateReplicateTaskSkipOneTask() {
-        tasks = genearteTaks();
+        tasks = generateTasks();
         when(internalJob.getIHMTasks()).thenReturn(tasks);
         initiator = generateInitiatorTask();
         boolean result = terminateReplicateTaskHandler.terminateReplicateTask(action,
@@ -122,7 +122,7 @@ public class TerminateReplicateTaskHandlerTest {
 
     @Test
     public void testTerminateReplicateTaskSkipBlockOfTasks() {
-        tasks = genearteTaksWithBlock();
+        tasks = generateTasksWithBlock();
         when(internalJob.getIHMTasks()).thenReturn(tasks);
 
         initiator = generateInitiatorTask();
@@ -143,7 +143,7 @@ public class TerminateReplicateTaskHandlerTest {
 
     }
 
-    private Map<TaskId, InternalTask> genearteTaks() {
+    private Map<TaskId, InternalTask> generateTasks() {
         Map<TaskId, InternalTask> tempTasks = Maps.newHashMap();
         InternalTask internalTask = generateInternalTask(555L);
         tempTasks.put(internalTask.getId(), internalTask);
@@ -156,7 +156,7 @@ public class TerminateReplicateTaskHandlerTest {
         return tempTasks;
     }
 
-    private Map<TaskId, InternalTask> genearteTaksWithBlock() {
+    private Map<TaskId, InternalTask> generateTasksWithBlock() {
         Map<TaskId, InternalTask> tempTasks = Maps.newHashMap();
         InternalTask startTask = generateInternalTask(555L);
         startTask.setFlowBlock(FlowBlock.START);

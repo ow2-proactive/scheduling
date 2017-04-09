@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -48,7 +49,11 @@ class RunningTaskData {
     RunningTaskData(InternalTask task, String user, Credentials credentials, TaskLauncher launcher) {
         this.task = task;
         // keep track of nodes that executed the task, can change in case of restarts
-        this.nodes = task.getExecuterInformation().getNodes();
+        if (task.getExecuterInformation() != null) {
+            this.nodes = task.getExecuterInformation().getNodes();
+        } else {
+            this.nodes = new NodeSet();
+        }
         this.user = user;
         this.credentials = credentials;
         this.launcher = launcher;
@@ -83,5 +88,9 @@ class RunningTaskData {
      */
     public NodeSet getNodes() {
         return nodes;
+    }
+
+    public Node getNodeExecutor() {
+        return nodes.get(0);
     }
 }

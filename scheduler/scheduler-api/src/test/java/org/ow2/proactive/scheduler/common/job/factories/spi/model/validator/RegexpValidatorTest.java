@@ -38,14 +38,14 @@ public class RegexpValidatorTest {
     public void testRegexpOK() throws ValidationException {
         RegexpValidator validator = new RegexpValidator("[a-zA-Z]+");
         String value = "MyString";
-        Assert.assertEquals(value, validator.validate(value));
+        Assert.assertEquals(value, validator.validate(value, null));
     }
 
     @Test(expected = ValidationException.class)
     public void testRegexpKO() throws ValidationException {
         RegexpValidator validator = new RegexpValidator("[a-zA-Z]+");
         String value = "MyString123";
-        validator.validate(value);
+        validator.validate(value, null);
     }
 
     @Test(expected = PatternSyntaxException.class)

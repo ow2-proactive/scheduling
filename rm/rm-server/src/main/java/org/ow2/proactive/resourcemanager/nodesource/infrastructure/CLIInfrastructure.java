@@ -30,7 +30,6 @@ import static com.google.common.base.Throwables.getStackTraceAsString;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -77,18 +76,18 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
      * Configures the Infrastructure
      *
      * @param parameters
-     *            parameters[3] : An interpreter that launch the script
-     *            parameters[4] : A script that deploys nodes on a single host
-     *            parameters[5] : A script that removes a node
+     *            parameters[4] : An interpreter that launch the script
+     *            parameters[5] : A script that deploys nodes on a single host
+     *            parameters[6] : A script that removes a node
      * @throws IllegalArgumentException
      *             configuration failed
      */
     @Override
     protected void configure(Object... parameters) {
         super.configure(parameters);
-        int index = 3;
+        int index = 4;
         // TODO super admin rights check
-        if (parameters != null && parameters.length >= 6) {
+        if (parameters != null && parameters.length >= 7) {
             this.interpreter = parameters[index++].toString();
 
             try {
@@ -119,18 +118,18 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using a custom script, register it
      * manually in the nodesource.
      *
-     * @param host
-     *            hostname of the node on which a node should be started
+     * @param host The host on which one the node will be started
+     * @param nbNodes number of nodes to deploy
+     * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
 
         final String nodeName = "SCR-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         final String commandLine = interpreter + " " + deploymentScript.getAbsolutePath() + " " + host.getHostName() +
                                    " " + nodeName + " " + this.nodeSource.getName() + " " + rmUrl + " " + nbNodes;
 
-        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      commandLine,

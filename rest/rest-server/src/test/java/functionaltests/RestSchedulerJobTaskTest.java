@@ -42,12 +42,15 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -60,10 +63,14 @@ import functionaltests.utils.RestFuncTUtils;
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
         init();
 
+        cleanScheduler();
+    }
+
+    private static void cleanScheduler() throws NotConnectedException, PermissionException, UnknownJobException {
         Scheduler scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();
 
@@ -78,8 +85,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         }
     }
 
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
 
@@ -112,7 +119,15 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         httpPost.setEntity(multipartEntityBuilder.build());
         HttpResponse response = executeUriRequest(httpPost);
         assertHttpStatusOK(response);
-        assertContentNotEmpty(response);
+        String sessionId = assertContentNotEmpty(response);
+
+        String currentUserUrl = getResourceUrl("logins/sessionid/" + sessionId);
+
+        HttpGet httpGet = new HttpGet(currentUserUrl);
+        response = executeUriRequest(httpGet);
+        assertHttpStatusOK(response);
+        String userName = assertContentNotEmpty(response);
+        Assert.assertEquals(config.getLogin(), userName);
     }
 
     @Test
@@ -183,6 +198,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testGetNoJob() throws Exception {
+        cleanScheduler();
         String resourceUrl = getResourceUrl("jobs");
         HttpGet httpGet = new HttpGet(resourceUrl);
         setSessionHeader(httpGet);

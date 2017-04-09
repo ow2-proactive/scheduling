@@ -83,7 +83,7 @@ public class ScriptExecutor implements Callable<Node> {
             for (SelectionScript script : selectionScriptList) {
                 if (manager.isPassed(script, rmnode)) {
                     // already executed static script
-                    logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " skipping script execution");
+                    logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " skipping script execution");
                     continue;
                 }
 
