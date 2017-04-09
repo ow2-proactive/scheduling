@@ -1,11 +1,5 @@
 apply plugin: 'ear'
 
-def rmFolder = new File('dist/war/rm')
-def schedulerFolder = new File('dist/war/scheduler')
-def studioFolder = new File('dist/war/studio')
-def workflowCatalogFolder = new File('dist/war/workflow-catalog')
-def schedulingAPIFolder = new File('dist/war/scheduling-api')
-
 configurations.compile.transitive = true
 
 configurations {
@@ -27,7 +21,7 @@ task restWarTask(type: War) {
         exclude '**/WEB-INF/web.xml'
     }
 
-    webInf { from 'src/main/proactive-ear/modules-deployment-descriptors/rest' }
+    webInf { from 'src/main/proactive/modules-deployment-descriptors/rest' }
 
     doFirst {
         manifest {
@@ -42,133 +36,7 @@ task restWarTask(type: War) {
 //***********************************************************************************************************
 
 
-//**************************************Generating the rm war archive****************************************
-task rmWarTask(type: War) {
-
-    if( rmFolder.exists() ) {
-        from(project(':').files(rmFolder, '*')) {
-            exclude '**/WEB-INF/web.xml'
-            exclude 'rm.conf'
-        }
-
-        from 'src/main/proactive-portals-ear/modules-deployment-descriptors/rm/rm.conf'
-
-        webInf {
-            from 'src/main/proactive-portals-ear/modules-deployment-descriptors/rm/WEB-INF'
-        }
-
-        archiveName "proactive-rm.war"
-    }
-}
-//********************************************************************************************************
-
-
-//**************************************Generating the scheduler war archive******************************
-task schedulerWarTask(type: War) {
-
-    if( schedulerFolder.exists() ) {
-        from(project(':').files(schedulerFolder, '*')) {
-            exclude '**/WEB-INF/web.xml'
-            exclude 'scheduler.conf'
-        }
-
-        from 'src/main/proactive-portals-ear/modules-deployment-descriptors/scheduler/scheduler.conf'
-
-        webInf {
-            from 'src/main/ibm-deployment-descriptors/scheduler/WEB-INF'
-        }
-
-        archiveName "proactive-scheduler.war"
-    }
-}
-//********************************************************************************************************
-
-
-//**************************************Generating the studio war archive*********************************
-task studioWarTask(type: War) {
-
-    if( studioFolder.exists() ) {
-        from project(':').files(studioFolder, '*')
-        archiveName "proactive-studio.war"
-    }
-}
-//********************************************************************************************************
-
-
-//**************************************Generating the workflow-catalog war archive************************
-task workflowCatalogWarTask(type: War) {
-
-    if( workflowCatalogFolder.exists() ) {
-
-        from  (project(':').files(workflowCatalogFolder, '*')){
-            exclude '**/WEB-INF/web.xml'
-        }
-
-        webInf {
-            from 'src/main/proactive-portals-ear/modules-deployment-descriptors/workflow-catalog'
-        }
-
-        archiveName "proactive-workflow-catalog.war"
-    }
-}
-//********************************************************************************************************
-
-
-//**************************************Generating the scheduling-api war archive************************
-task schedulingAPIWarTask(type: War) {
-
-    if( schedulingAPIFolder.exists() ) {
-
-        from (project(':').files(schedulingAPIFolder, '*')){
-            exclude '**/WEB-INF/web.xml'
-        }
-
-        webInf {
-            from 'src/main/proactive-portals-ear/modules-deployment-descriptors/scheduling-api'
-        }
-
-        archiveName "proactive-scheduling-api.war"
-    }
-}
-//********************************************************************************************************
-
-
-task Scheduler_RM_Portals_EAR(type: Ear){
-
-    if( schedulerFolder.exists() && schedulingAPIFolder.exists() &&  rmFolder.exists()  ) {
-
-        from 'src/main/proactive-scheduler-rm-portals/app-deployment-descriptors'
-
-        from rmWarTask.archivePath
-        from schedulerWarTask.archivePath
-        from schedulingAPIWarTask.archivePath
-
-        deploymentDescriptor {
-            archiveName "proactive-scheduler-rm-portals-${schedulingVersion}.ear"
-        }
-    }
-}
-
-task Studio_Workflow_Catalog_EAR(type: Ear) {
-
-    if (studioFolder.exists() && workflowCatalogFolder.exists()) {
-
-        from 'src/main/proactive-studio-workflow-catalog/app-deployment-descriptors'
-
-        from studioWarTask.archivePath
-        from workflowCatalogWarTask.archivePath
-
-        deploymentDescriptor {
-            archiveName "proactive-studio-workflow-catalog-${schedulingVersion}.ear"
-        }
-    }
-}
-
-//Scheduler_RM_Portals_EAR.dependsOn rmWarTask, schedulerWarTask, schedulingAPIWarTask
-
-//Studio_Workflow_Catalog_EAR.dependsOn  studioWarTask, workflowCatalogWarTask
-
-ear.dependsOn getStartedWarTask, restWarTask//, Scheduler_RM_Portals_EAR, Studio_Workflow_Catalog_EAR
+ear.dependsOn getStartedWarTask, restWarTask
 
 ear{
 
