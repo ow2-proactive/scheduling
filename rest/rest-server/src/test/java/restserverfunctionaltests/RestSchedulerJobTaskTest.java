@@ -58,7 +58,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 import com.google.common.collect.Iterables;
 
-import functionaltests.utils.AbstractRestFuncTestCase;
+import functionaltests.utils.*;
 
 
 public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
@@ -106,7 +106,7 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     @Test
     public void testLoginWithCredentials() throws Exception {
         RestFuncTestConfig config = RestFuncTestConfig.getInstance();
-        Credentials credentials = restserverfunctionaltests.utils.RestFuncTUtils.createCredentials(config.getLogin(),
+        Credentials credentials = functionaltests.utils.RestFuncTUtils.createCredentials(config.getLogin(),
                                                                    config.getPassword(),
                                                                    RestFuncTHelper.getSchedulerPublicKey());
         String schedulerUrl = getResourceUrl("login");

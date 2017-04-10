@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive_grid_cloud_portal.scheduler.WorkflowSubmitter;
 
 import functionaltests.utils.AbstractRestFuncTestCase;
+import functionaltests.utils.RestFuncTHelper;
 
 
 /**

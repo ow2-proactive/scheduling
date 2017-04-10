@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 import functionaltests.utils.AbstractRestFuncTestCase;
+import functionaltests.utils.RestFuncTHelper;
 import restserverfunctionaltests.jobs.NonTerminatingJob;
 
 

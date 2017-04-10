@@ -57,6 +57,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 
 import functionaltests.utils.AbstractRestFuncTestCase;
+import functionaltests.utils.RestFuncTHelper;
 
 
 /**

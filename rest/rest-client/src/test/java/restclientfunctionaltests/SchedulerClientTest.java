@@ -25,7 +25,7 @@
  */
 package restclientfunctionaltests;
 
-import static restserverfunctionaltests.RestFuncTHelper.getRestServerUrl;
+import static functionaltests.utils.RestFuncTHelper.getRestServerUrl;
 import static restserverfunctionaltests.jobs.SimpleJob.TEST_JOB;
 
 import java.io.File;

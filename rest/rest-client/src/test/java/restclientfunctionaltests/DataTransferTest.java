@@ -25,7 +25,7 @@
  */
 package restclientfunctionaltests;
 
-import static restserverfunctionaltests.RestFuncTHelper.getRestServerUrl;
+import static functionaltests.utils.RestFuncTHelper.getRestServerUrl;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;

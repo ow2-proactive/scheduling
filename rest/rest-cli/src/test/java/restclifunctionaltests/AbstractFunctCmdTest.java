@@ -44,7 +44,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive_grid_cloud_portal.scheduler.WorkflowSubmitter;
 
 import functionaltests.utils.AbstractRestFuncTestCase;
-import restserverfunctionaltests.RestFuncTHelper;
+import functionaltests.utils.RestFuncTHelper;
 import jline.WindowsTerminal;
 
 

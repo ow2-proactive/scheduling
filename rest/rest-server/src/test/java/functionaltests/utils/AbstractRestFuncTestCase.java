@@ -54,11 +54,8 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 
-import restserverfunctionaltests.RestFuncTHelper;
-import restserverfunctionaltests.RestFuncTestConfig;
 import restserverfunctionaltests.jobs.NonTerminatingJob;
 import restserverfunctionaltests.jobs.SimpleJob;
-import restserverfunctionaltests.utils.RestFuncTUtils;
 
 
 public abstract class AbstractRestFuncTestCase {

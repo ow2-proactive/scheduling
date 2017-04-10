@@ -33,6 +33,7 @@ import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 
 import functionaltests.utils.AbstractRestFuncTestCase;
+import functionaltests.utils.RestFuncTHelper;
 
 
 public class RestfulSchedulerFreezeTest extends AbstractRestFuncTestCase {

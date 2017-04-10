@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package restserverfunctionaltests;
+package functionaltests.utils;
 
 import static com.jayway.awaitility.Awaitility.await;
 
@@ -63,10 +63,6 @@ import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 
 import com.jayway.awaitility.Duration;
-
-import functionaltests.utils.AbstractRestFuncTestCase;
-import restserverfunctionaltests.utils.ProcessStreamReader;
-import restserverfunctionaltests.utils.RestFuncTUtils;
 
 
 public class RestFuncTHelper {

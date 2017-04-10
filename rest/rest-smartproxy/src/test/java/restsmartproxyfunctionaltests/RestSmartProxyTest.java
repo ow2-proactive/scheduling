@@ -26,7 +26,7 @@
 package restsmartproxyfunctionaltests;
 
 import static com.google.common.truth.Truth.assertThat;
-import static restserverfunctionaltests.RestFuncTHelper.getRestServerUrl;
+import static functionaltests.utils.RestFuncTHelper.getRestServerUrl;
 
 import java.io.File;
 import java.io.FileWriter;
