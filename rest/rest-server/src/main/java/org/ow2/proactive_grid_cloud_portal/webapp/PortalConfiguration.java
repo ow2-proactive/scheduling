@@ -72,7 +72,9 @@ public enum PortalConfiguration implements PACommonProperties {
 
     NOVNC_PASSWORD("novnc.password", PropertyType.STRING, "password"),
 
-    NOVNC_KEYPASSWORD("novnc.keypassword", PropertyType.STRING, "password");
+    NOVNC_KEYPASSWORD("novnc.keypassword", PropertyType.STRING, "password"),
+
+    JOBPLANNER_URL("jp.url", PropertyType.STRING, "http://localhost:8080/job-planner/planned_jobs");
 
     public static final String PA_WEB_PROPERTIES_FILEPATH = "pa.web.properties.filepath";
 

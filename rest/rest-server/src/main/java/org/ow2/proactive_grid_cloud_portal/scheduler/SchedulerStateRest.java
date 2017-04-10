@@ -100,7 +100,6 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.jobplanner.rest.client.JobPlannerRestClient;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
@@ -138,6 +137,7 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.jobplanner.rest.client.JobPlannerRestClient;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
@@ -2340,7 +2340,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @POST
     @Path("{path:plannings}")
     @Produces("application/json")
-    @Override
     public boolean submitPlannings(@HeaderParam("sessionid") String sessionId,
             @PathParam("path") PathSegment pathSegment, String jobContentXmlString) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
@@ -2349,8 +2348,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-        JobPlannerRestClient client = new JobPlannerRestClient(PortalConfiguration.getProperties()
-                                                                                  .getProperty(PortalConfiguration.JOBPLANNER_URL));
+        JobPlannerRestClient client = new JobPlannerRestClient(PortalConfiguration.JOBPLANNER_URL.getValueAsString);
 
         return client.submitScheduledWorkflow(sessionId, jobVariables, jobContentXmlString);
 
