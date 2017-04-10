@@ -202,6 +202,25 @@ public interface StudioInterface {
             MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
 
+    /**
+     * Submit a job to job planner
+     * @param sessionId a valid session id
+     * @param pathSegment variables string
+     * @param jobContentXmlString job content in xml string
+     * @return true if the job is submitted successfully, false otherwise
+     * @throws JobCreationRestException
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     * @throws IOException
+     */
+    @POST
+    @Path("{path:plannings}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    boolean submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+                     String jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
+            PermissionRestException, SubmissionClosedRestException, IOException;
+
     @GET
     @Path("visualizations/{id}")
     String getVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId)

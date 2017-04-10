@@ -46,14 +46,14 @@ public class SchedulerRMProxyFactory {
     public RMProxyUserInterface connectToRM(CredData credData)
             throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
         RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
-        rm.init(getUrl(PortalConfiguration.rm_url), credData);
+        rm.init(getUrl(PortalConfiguration.RM_URL), credData);
         return rm;
     }
 
     public RMProxyUserInterface connectToRM(Credentials credentials)
             throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
         RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
-        rm.init(getUrl(PortalConfiguration.rm_url), credentials);
+        rm.init(getUrl(PortalConfiguration.RM_URL), credentials);
         return rm;
     }
 
@@ -61,7 +61,7 @@ public class SchedulerRMProxyFactory {
             throws LoginException, SchedulerException, ActiveObjectCreationException, NodeException {
         SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
                                                                          new Object[] {});
-        scheduler.init(getUrl(PortalConfiguration.scheduler_url), credentials);
+        scheduler.init(getUrl(PortalConfiguration.SCHEDULER_URL), credentials);
         return scheduler;
     }
 
@@ -69,7 +69,7 @@ public class SchedulerRMProxyFactory {
             throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException {
         SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
                                                                          new Object[] {});
-        scheduler.init(getUrl(PortalConfiguration.scheduler_url), credData);
+        scheduler.init(getUrl(PortalConfiguration.SCHEDULER_URL), credData);
         return scheduler;
     }
 

@@ -49,15 +49,15 @@ public class NoVncBootstrap implements ServletContextListener, HttpSessionListen
     }
 
     public void contextInitialized(ServletContextEvent sce) {
-        if (Boolean.parseBoolean(PortalConfiguration.getProperties().getProperty(PortalConfiguration.novnc_enabled))) {
+        if (Boolean.parseBoolean(PortalConfiguration.getProperties().getProperty(PortalConfiguration.NOVNC_ENABLED))) {
 
             int port = Integer.parseInt(PortalConfiguration.getProperties()
-                                                           .getProperty(PortalConfiguration.novnc_port));
+                                                           .getProperty(PortalConfiguration.NOVNC_PORT));
             WebsockifyServer.SSLSetting sslSetting = WebsockifyServer.SSLSetting.valueOf(PortalConfiguration.getProperties()
-                                                                                                            .getProperty(PortalConfiguration.novnc_secured));
-            String keystorePath = PortalConfiguration.getProperties().getProperty(PortalConfiguration.novnc_keystore);
-            String password = PortalConfiguration.getProperties().getProperty(PortalConfiguration.novnc_password);
-            String keyPassword = PortalConfiguration.getProperties().getProperty(PortalConfiguration.novnc_keypassword);
+                                                                                                            .getProperty(PortalConfiguration.NOVNC_SECURED));
+            String keystorePath = PortalConfiguration.getProperties().getProperty(PortalConfiguration.NOVNC_KEYSTORE);
+            String password = PortalConfiguration.getProperties().getProperty(PortalConfiguration.NOVNC_PASSWORD);
+            String keyPassword = PortalConfiguration.getProperties().getProperty(PortalConfiguration.NOVNC_KEYPASSWORD);
 
             websocketProxy = new WebsockifyServer();
             websocketProxy.connect(port,

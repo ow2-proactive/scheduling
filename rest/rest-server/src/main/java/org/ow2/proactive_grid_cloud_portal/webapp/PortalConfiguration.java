@@ -33,37 +33,39 @@ import java.util.Properties;
 
 public class PortalConfiguration {
 
-    public static String scheduler_url = "scheduler.url";
+    public static String SCHEDULER_URL = "scheduler.url";
 
-    public static String scheduler_cache_login = "scheduler.cache.login";
+    public static String SCHEDULER_CACHE_LOGIN = "scheduler.cache.login";
 
-    public static String scheduler_cache_password = "scheduler.cache.password";
+    public static String SCHEDULER_CACHE_PASSWORD = "scheduler.cache.password";
 
-    public static String scheduler_cache_credential = "scheduler.cache.credential";
+    public static String SCHEDULER_CACHE_CREDENTIAL = "scheduler.cache.credential";
 
-    public static String scheduler_logforwardingservice_provider = "scheduler.logforwardingservice.provider";
+    public static String SCHEDULER_LOGFORWARDINGSERVICE_PROVIDER = "scheduler.logforwardingservice.provider";
 
-    public static String rm_url = "rm.url";
+    public static String RM_URL = "rm.url";
 
-    public static String rm_cache_login = "rm.cache.login";
+    public static String RM_CACHE_LOGIN = "rm.cache.login";
 
-    public static String rm_cache_password = "rm.cache.password";
+    public static String RM_CACHE_PASSWORD = "rm.cache.password";
 
-    public static String rm_cache_credential = "rm.cache.credential";
+    public static String RM_CACHE_CREDENTIAL = "rm.cache.credential";
 
-    public static String rm_cache_refreshrate = "rm.cache.refreshrate";
+    public static String RM_CACHE_REFRESHRATE = "rm.cache.refreshrate";
 
-    public static String novnc_enabled = "novnc.enabled";
+    public static String NOVNC_ENABLED = "novnc.enabled";
 
-    public static String novnc_port = "novnc.port";
+    public static String NOVNC_PORT = "novnc.port";
 
-    public static String novnc_secured = "novnc.secured";
+    public static String NOVNC_SECURED = "novnc.secured";
 
-    public static String novnc_keystore = "novnc.keystore";
+    public static String NOVNC_KEYSTORE = "novnc.keystore";
 
-    public static String novnc_password = "novnc.password";
+    public static String NOVNC_PASSWORD = "novnc.password";
 
-    public static String novnc_keypassword = "novnc.keypassword";
+    public static String NOVNC_KEYPASSWORD = "novnc.keypassword";
+
+    public static String JOBPLANNER_URL = "jp.url";
 
     private static Properties properties;
 

@@ -103,7 +103,7 @@ public class JobsOutputController {
     private LogForwardingService getLogForwardingService() {
         if (logForwardingService == null) {
             logForwardingService = new LogForwardingService(PortalConfiguration.getProperties()
-                                                                               .getProperty(PortalConfiguration.scheduler_logforwardingservice_provider));
+                                                                               .getProperty(PortalConfiguration.SCHEDULER_LOGFORWARDINGSERVICE_PROVIDER));
             try {
                 logForwardingService.initialize();
             } catch (LogForwardingException e) {

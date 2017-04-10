@@ -48,7 +48,7 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
  * Use this class to start a thread that will periodically get this object
  * using a watcher account, making the cached version available to any client instantly.
  * <p>
- * Refresh rate can be configured using {@link PortalConfiguration#rm_cache_refreshrate}
+ * Refresh rate can be configured using {@link PortalConfiguration#RM_CACHE_REFRESHRATE}
  */
 public class RMStateCaching {
 
@@ -67,7 +67,7 @@ public class RMStateCaching {
     /**
      * Start a thread that will periodically fetch {@link RMProxyUserInterface#getMonitoring()}.
      * <p>
-     * Thread frequency can be customized using {@link PortalConfiguration#rm_cache_refreshrate}.
+     * Thread frequency can be customized using {@link PortalConfiguration#RM_CACHE_REFRESHRATE}.
      * <p>
      * Cached object can be retrieved using {@link #getRMInitialState()}.
      * <p>
@@ -86,11 +86,11 @@ public class RMStateCaching {
 
     private static void init_() {
         refreshInterval = Integer.parseInt(PortalConfiguration.getProperties()
-                                                              .getProperty(PortalConfiguration.rm_cache_refreshrate));
+                                                              .getProperty(PortalConfiguration.RM_CACHE_REFRESHRATE));
 
         while (rm == null) {
-            String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_url);
-            String cred_path = PortalConfiguration.getProperties().getProperty(PortalConfiguration.rm_cache_credential);
+            String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.RM_URL);
+            String cred_path = PortalConfiguration.getProperties().getProperty(PortalConfiguration.RM_CACHE_CREDENTIAL);
 
             try {
                 if (rm == null) {
@@ -100,9 +100,9 @@ public class RMStateCaching {
                         rm.init(url, cred);
                     } else {
                         String login = PortalConfiguration.getProperties()
-                                                          .getProperty(PortalConfiguration.rm_cache_login);
+                                                          .getProperty(PortalConfiguration.RM_CACHE_LOGIN);
                         String password = PortalConfiguration.getProperties()
-                                                             .getProperty(PortalConfiguration.rm_cache_password);
+                                                             .getProperty(PortalConfiguration.RM_CACHE_PASSWORD);
                         rm.init(url, new CredData(login, password));
                     }
                 }

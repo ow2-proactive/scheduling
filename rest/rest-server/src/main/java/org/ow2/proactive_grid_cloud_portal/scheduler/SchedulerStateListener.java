@@ -110,9 +110,9 @@ public class SchedulerStateListener {
     }
 
     private void connect() throws InterruptedException {
-        String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
+        String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.SCHEDULER_URL);
         String cred_path = PortalConfiguration.getProperties()
-                                              .getProperty(PortalConfiguration.scheduler_cache_credential);
+                                              .getProperty(PortalConfiguration.SCHEDULER_CACHE_CREDENTIAL);
         File credFile = new File(cred_path);
 
         while (scheduler == null && !killed) {
@@ -126,9 +126,9 @@ public class SchedulerStateListener {
                     scheduler.init(url, credential);
                 } else {
                     String login = PortalConfiguration.getProperties()
-                                                      .getProperty(PortalConfiguration.scheduler_cache_login);
+                                                      .getProperty(PortalConfiguration.SCHEDULER_CACHE_LOGIN);
                     String password = PortalConfiguration.getProperties()
-                                                         .getProperty(PortalConfiguration.scheduler_cache_password);
+                                                         .getProperty(PortalConfiguration.SCHEDULER_CACHE_PASSWORD);
                     scheduler.init(url, login, password);
                 }
 
