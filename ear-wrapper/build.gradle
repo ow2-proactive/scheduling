@@ -1,0 +1,63 @@
+apply plugin: 'ear'
+
+configurations.compile.transitive = true
+
+configurations {
+    all*.exclude group: 'com.zaxxer', module: 'HikariCP-java6'
+}
+
+//**************************************Generating the getstarted war archive**********************************
+task getStartedWarTask(type: War) {
+    from project(':').files('dist/war/getstarted', '*')
+    archiveName "proactive-getstarted.war"
+}
+//*************************************************************************************************************
+
+
+//**************************************Generating the rest war archive****************************************
+task restWarTask(type: War) {
+
+    from (project(':').files('dist/war/rest', '*')){
+        exclude '**/WEB-INF/web.xml'
+    }
+
+    webInf { from 'src/main/proactive/modules-deployment-descriptors/rest' }
+
+    doFirst {
+        manifest {
+            attributes 'Implementation-Title': 'Proactive REST-API Web App',
+                    'Implementation-Version': "${schedulingVersion}",
+                    'Class-Path': configurations.earlib.collect() { if (it.getName().endsWith('.jar')) return ('lib/'.concat(it.getName())) else return ''}.join(' ')
+        }
+    }
+
+    archiveName "proactive-rest.war"
+}
+//***********************************************************************************************************
+
+
+ear.dependsOn getStartedWarTask, restWarTask
+
+ear{
+
+    appDirName 'src/main/proactive/app-deployment-descriptors'
+
+    libDirName 'lib/'
+
+    dependencies {
+
+        earlib project(':scheduler:scheduler-server')
+        earlib group: 'com.zaxxer', name: 'HikariCP', version: '2.6.0'
+
+        deploy project(path: ':war-wrapper', configuration: 'archives')
+
+        deploy files(getStartedWarTask)
+        deploy files(restWarTask)
+
+    }
+
+    deploymentDescriptor {
+        archiveName "proactive-${schedulingVersion}.ear"
+    }
+
+}

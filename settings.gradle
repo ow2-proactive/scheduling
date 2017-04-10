@@ -26,3 +26,4 @@ include 'rest:rest-client'
 include 'rest:rest-smartproxy'
 
 include 'war-wrapper'
+include 'ear-wrapper'
