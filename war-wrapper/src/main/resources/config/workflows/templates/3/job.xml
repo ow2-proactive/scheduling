@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.5"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+        name="Variables Propagation" projectName="1. Basic Workflows"
+        priority="normal"
+        onTaskError="continueJobExecution">
+  <variables>
+    <variable name="numberOfLights" value="1"/>
+    <variable name="minRequiredAngle" value="120"/>
+    <variable name="coveredAnglePerLight" value="90"/>
+    <variable name="currentCoverage" value="0"/>
+  </variables>
+  <description>
+    <![CDATA[ Demonstrate how variables can be read/written to in different script tasks. ]]>
+  </description>
+  <taskFlow>
+    <task name="DisplayContext">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <depends>
+        <task ref="Start"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println "This workflow will calculate the maximum angular coverage according to the number of lights and their"
+println "covering angle defined in the Job Variables."
+
+Integer coveredAnglePerLight=variables.get("coveredAnglePerLight").toInteger()
+Integer numberOfLights=variables.get("numberOfLights").toInteger()
+Integer minRequiredAngle=variables.get("minRequiredAngle").toInteger()
+
+println " "
+println "You chose to use: "+numberOfLights+ " light(s)."
+println "Each light might cover: "+coveredAnglePerLight+" degrees."
+println "You want to cover an angle of: "+minRequiredAngle+" degrees."
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="start"></controlFlow>
+    </task>
+    <task name="Condition">
+      <depends>
+        <task ref="ComputeNewCoverage"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+print ""
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow >
+        <if target="If"
+        else="Else"
+        continuation="Continuation">
+          <script>
+            <code language="groovy">
+              <![CDATA[
+Integer currentCoverage=variables.get("currentCoverage").toInteger()
+Integer coveredAnglePerLight=variables.get("coveredAnglePerLight").toInteger()
+Integer numberOfLights=variables.get("numberOfLights").toInteger()
+Integer minRequiredAngle=variables.get("minRequiredAngle").toInteger()
+Integer i=(numberOfLights * coveredAnglePerLight)
+
+println " "
+
+
+if(currentCoverage <= minRequiredAngle)
+{
+    branch = "if";
+} else {
+    branch = "else";
+}
+]]>
+            </code>
+          </script>
+        </if>
+      </controlFlow>
+    </task>
+    <task name="If">
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println "You haven't enough lights!"
+
+Integer numberOfLights=variables.get("numberOfLights").toInteger()
+numberOfLights++
+variables.put("numberOfLights", numberOfLights)
+
+println " "
+println "Adding one more light..."
+println "We will now try with "+numberOfLights+" lights!"
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="Else">
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println "You have enough lights!"
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="Continuation">
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+Integer currentCoverage=variables.get("currentCoverage").toInteger()
+Integer coveredAnglePerLight=variables.get("coveredAnglePerLight").toInteger()
+Integer numberOfLights=variables.get("numberOfLights").toInteger()
+Integer minRequiredAngle=variables.get("minRequiredAngle").toInteger()
+
+println " "
+println "With "+numberOfLights+ " lights, you can cover "+currentCoverage+" degrees maximum."
+println "You wanted to cover "+minRequiredAngle+" degrees."
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="ComputeNewCoverage">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <depends>
+        <task ref="DisplayContext"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+Integer currentCoverage=variables.get("currentCoverage").toInteger()
+Integer coveredAnglePerLight=variables.get("coveredAnglePerLight").toInteger()
+Integer numberOfLights=variables.get("numberOfLights").toInteger()
+Integer minRequiredAngle=variables.get("minRequiredAngle").toInteger()
+
+println "Calculation in progress..."
+
+Integer i=(numberOfLights * coveredAnglePerLight)
+variables.put("currentCoverage", i)
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="Start">
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println "Hello!"
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+    <task name="Loop">
+      <depends>
+        <task ref="Continuation"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println "Loop in progress..."
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow  block="end">
+        <loop target="DisplayContext">
+          <script>
+            <code language="groovy">
+              <![CDATA[
+Integer currentCoverage=variables.get("currentCoverage").toInteger()
+Integer minRequiredAngle=variables.get("minRequiredAngle").toInteger()
+
+if(currentCoverage < minRequiredAngle) {
+    loop = true;
+} else {
+    loop = false;
+}
+]]>
+            </code>
+          </script>
+        </loop>
+      </controlFlow>
+    </task>
+    <task name="Groovy_Task3">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <depends>
+        <task ref="Loop"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+Integer currentCoverage=variables.get("currentCoverage").toInteger()
+Integer coveredAnglePerLight=variables.get("coveredAnglePerLight").toInteger()
+Integer numberOfLights=variables.get("numberOfLights").toInteger()
+Integer minRequiredAngle=variables.get("minRequiredAngle").toInteger()
+
+println " "
+println "With "+numberOfLights+" lights, you have enough lights to cover "+minRequiredAngle+" degrees."
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow block="none"></controlFlow>
+    </task>
+  </taskFlow>
+</job>

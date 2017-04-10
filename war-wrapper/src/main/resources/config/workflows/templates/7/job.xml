@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.5"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.5 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.5/schedulerjob.xsd"
+        name="MPI Job" projectName="2. Advanced Workflows"
+        priority="normal"
+        onTaskError="continueJobExecution">
+  <description>
+    <![CDATA[ A multinode task will reserve several nodes and expose them to the task.        It is often used to run MPI jobs or task that use the ProActive Java API. ]]>
+  </description>
+  <taskFlow>
+    <task name="MPI_task">
+      <parallel numberOfNodes="4"></parallel>
+      <nativeExecutable>
+        <staticCommand value="mpirun" >
+          <arguments>
+            <argument value="-hostfile"/>
+            <argument value="$NODESFILE"/>
+            <argument value="hostname"/>
+          </arguments>
+        </staticCommand>
+      </nativeExecutable>
+    </task>
+  </taskFlow>
+</job>

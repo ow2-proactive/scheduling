@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.7"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.7 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.7/schedulerjob.xsd"
+    name="ResultMetadata Worflow" 
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2"
+>
+  <taskFlow>
+    <task name="Download_Image_Task">
+      <description>
+        <![CDATA[ Download an image and retrieve its content. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+// The image will be available through the 'Preview' tab in the scheduler.
+// You can download it or save it.
+import com.google.common.net.MediaType
+
+def url = 'https://www.activeeon.com/img/ae-title.png'  
+def file = new File('ae-title.png').newOutputStream()  
+file << new URL(url).openStream()  
+file.close()  
+
+file = new File("ae-title.png")
+result = file.getBytes()
+resultMetadata.put("file.extension", ".png")
+resultMetadata.put("content.type", MediaType.PNG.toString())
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="Download_Pdf_Task">
+      <description>
+        <![CDATA[ Download a pdf file and retrieve its content. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+// The pdf will be available through the 'Preview' tab in the scheduler.
+// You can download it or save it.
+import com.google.common.net.MediaType
+
+def url = 'http://www.activeeon.com/resources/activeeon-datasheet-proactive-workflows-scheduling-en.pdf'  
+def file = new File('activeeon-datasheet-proactive-workflows-scheduling-en.pdf').newOutputStream()  
+file << new URL(url).openStream()  
+file.close()  
+
+file = new File("activeeon-datasheet-proactive-workflows-scheduling-en.pdf")
+result = file.getBytes()
+resultMetadata.put("file.name", "activeeon-datasheet-proactive-workflows-scheduling-en.pdf")
+resultMetadata.put("content.type", MediaType.PDF.toString())
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>

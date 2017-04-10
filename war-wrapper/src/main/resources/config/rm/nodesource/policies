@@ -1,0 +1,26 @@
+# Static nodes acquisition
+org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy
+
+# Static nodes acquisition but tries to restart down nodes
+org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy
+
+# Nodes acquisition for particular time slot
+org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy
+
+# Releases all nodes when scheduler is idle for some time
+org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle
+
+# Acquire nodes according to the scheduler loading
+org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
+
+# Acquire nodes on Amazon EC2 according to the scheduler loading
+org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
+
+# Allocated nodes for given time slot in cron syntax
+org.ow2.proactive.resourcemanager.nodesource.policy.CronPolicy
+
+# Police triggers new nodes acquisition when scheduler is overloaded within a time slot defined in crontab syntax.
+org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.CronLoadBasedPolicy
+
+# Police keeps all nodes up and running within specified time slot and acquires node on demand when scheduler is overloaded at another time.
+org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.CronSlotLoadBasedPolicy
