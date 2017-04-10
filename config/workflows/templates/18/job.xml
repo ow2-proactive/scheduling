@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.8"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.8 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.8/schedulerjob.xsd"
+    name="StartEvery2Minutes" projectName="1. Basic Workflows"
+    priority="normal"
+    onTaskError="suspendTask"
+>
+  <genericInformation>
+    <info name="EXECUTION_CALENDARS" value="{&quot;name&quot;:&quot;StartEvery2Minutes&quot;,&quot;cron&quot;: &quot;0 0/2 * * * ?&quot;} "/>
+  </genericInformation>
+  <taskFlow>
+    <task name="Javascript_Task">
+      <description>
+        <![CDATA[ The simplest task, ran by a javascript engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="javascript">
+            <![CDATA[
+print("Hello Scheduler Execution task!")
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>
