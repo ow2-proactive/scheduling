@@ -109,6 +109,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     public final static String OUTPUT_FILE_EXT = ".out";
 
+    public final static String inerrorTaskName = "inerror_task";
+
     protected RestSmartProxyImpl restSmartProxy;
 
     @Rule
@@ -165,7 +167,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         printJobXmlRepresentation(job);
 
         final MutableBoolean taskHasBeenInError = new MutableBoolean(false);
-        final MutableBoolean restartedFromErrorEventReceived = new MutableBoolean(false);
+        final MutableBoolean taskMarkedAsFinished = new MutableBoolean(false);
 
         SchedulerEventListenerExtended listener = new SchedulerEventListenerExtended() {
 
@@ -186,10 +188,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
                 System.out.println("RestSmartProxyTest.jobStateUpdatedEvent, eventType=" + notification.getEventType() +
                                    ", jobStatus=" + status);
 
-                if (notification.getEventType() == SchedulerEvent.JOB_RESTARTED_FROM_ERROR) {
-                    restartedFromErrorEventReceived.setTrue();
-                }
-
                 if (status == JobStatus.IN_ERROR) {
                     semaphore.release();
                 }
@@ -202,6 +200,10 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
                 if (status == TaskStatus.WAITING_ON_ERROR || status == TaskStatus.IN_ERROR) { // IN_ERROR previously
                     taskHasBeenInError.setTrue();
+                }
+
+                if (status == TaskStatus.FINISHED && taskHasBeenInError.isTrue()) {
+                    taskMarkedAsFinished.setTrue();
                 }
             }
 
@@ -244,11 +246,13 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         String jobIdAsString = jobId.value();
 
-        System.out.println("Restarting all In-Error tasks");
-        restSmartProxy.restartAllInErrorTasks(jobIdAsString);
+        System.out.println("Finish in-error task");
+        restSmartProxy.finishInErrorTask(jobIdAsString, inerrorTaskName);
 
-        assertThat(restartedFromErrorEventReceived.booleanValue()).isTrue();
+        waitForJobFinishState(jobIdAsString);
+
         assertThat(taskHasBeenInError.booleanValue()).isTrue();
+        assertThat(taskMarkedAsFinished.booleanValue()).isTrue();
 
     }
 
@@ -279,7 +283,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         job.setName("JobWithInErrorTask");
 
         ScriptTask scriptTask = new ScriptTask();
-        scriptTask.setName("task");
+        scriptTask.setName(inerrorTaskName);
         scriptTask.setScript(new TaskScript(new SimpleScript("syntax error", "python")));
         scriptTask.setOnTaskError(OnTaskError.PAUSE_TASK);
         scriptTask.setMaxNumberOfExecution(2);
