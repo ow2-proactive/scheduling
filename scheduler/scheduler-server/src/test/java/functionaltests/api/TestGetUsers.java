@@ -32,14 +32,12 @@ import java.util.List;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
 import functionaltests.executables.EmptyExecutable;
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.utils.TestUsers;
 
 
@@ -47,7 +45,7 @@ import functionaltests.utils.TestUsers;
  * Sanity test against method 'Scheduler.getUsers' and 'Scheduler.getUsersWithJobs'.
  *
  */
-public class TestGetUsers extends SchedulerFunctionalTestNoRestart {
+public class TestGetUsers extends SchedulerFunctionalTestWithRestart {
 
     long testStartTime = System.currentTimeMillis();
 
