@@ -144,6 +144,8 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
                                       120000,
                                       monitorsHandler);
         }
+        RMTHelper.log("Dumping events not consumed yet");
+        monitorsHandler.dumpEvents();
 
         RMTHelper.log("Wait for nodes restart by the policy");
         rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES, monitorsHandler);
