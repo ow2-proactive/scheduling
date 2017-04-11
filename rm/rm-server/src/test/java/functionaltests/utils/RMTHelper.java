@@ -295,17 +295,28 @@ public class RMTHelper {
     private static TestNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions,
             int pnpPort) throws IOException, NodeException, InterruptedException {
 
-        if (pnpPort <= 0) {
-            pnpPort = findFreePort();
-        }
-        String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
-        vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
-        JVMProcessImpl nodeProcess = createJvmProcess(StartNode.class.getName(),
-                                                      Collections.singletonList(nodeName),
-                                                      vmParameters,
-                                                      vmOptions);
-        return createNode(nodeName, nodeUrl, nodeProcess);
-
+        boolean exceptionOccurredWhileCreatingNode = false;
+        NodeException lastException = null;
+        int numberOfAttempts = 0;
+        do {
+            try {
+                if (pnpPort <= 0) {
+                    pnpPort = findFreePort();
+                }
+                String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
+                vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
+                JVMProcessImpl nodeProcess = createJvmProcess(StartNode.class.getName(),
+                                                              Collections.singletonList(nodeName),
+                                                              vmParameters,
+                                                              vmOptions);
+                return createNode(nodeName, nodeUrl, nodeProcess);
+            } catch (NodeException e) {
+                exceptionOccurredWhileCreatingNode = true;
+                lastException = e;
+                numberOfAttempts++;
+            }
+        } while (exceptionOccurredWhileCreatingNode && numberOfAttempts < 20);
+        throw lastException;
     }
 
     public static TestNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
