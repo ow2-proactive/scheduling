@@ -35,8 +35,9 @@ import org.ow2.proactive.scheduler.util.WarWrapper;
 @WebListener
 public class WrapperContextListener implements ServletContextListener {
 
+    @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        BootstrapLogger.logger.info("ProActive is starting up!");
+        BootstrapLogger.getLogger().info("ProActive is starting up!");
 
         try {
 
@@ -44,11 +45,12 @@ public class WrapperContextListener implements ServletContextListener {
             ws.launchProactiveServer();
 
         } catch (Exception e) {
-            BootstrapLogger.logger.error(e.getMessage(), e);
+            BootstrapLogger.getLogger().error(e.getMessage(), e);
         }
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        BootstrapLogger.logger.info("ProActive shutting down!");
+        BootstrapLogger.getLogger().info("ProActive shutting down!");
     }
 }

@@ -30,11 +30,17 @@ import org.ow2.proactive.scheduler.util.WarWrapper;
 
 public class WrapperSingleton {
 
+    private WrapperSingleton() {
+    }
+
     public static WarWrapper getInstance() {
         return SingletonHolder.instance;
     }
 
     private static class SingletonHolder {
+
+        private SingletonHolder() {
+        }
 
         private final static WarWrapper instance = new WarWrapper();
 

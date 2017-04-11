@@ -44,6 +44,10 @@ public class WrapperWebConfiguration {
 
     private static final Logger logger = Logger.getLogger(WrapperWebConfiguration.class);
 
+    protected WrapperWebConfiguration() {
+
+    }
+
     public static String getStartedUrl() {
 
         try {
@@ -77,7 +81,7 @@ public class WrapperWebConfiguration {
     }
 
     private static boolean isHttpsEnabled(Properties properties) {
-        return properties.getProperty("ear.wrapper.https.enabled", "false").equalsIgnoreCase("true");
+        return "true".equalsIgnoreCase(properties.getProperty("ear.wrapper.https.enabled", "false"));
     }
 
     private static String getSchedulerHome() {

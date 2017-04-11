@@ -34,15 +34,21 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
  */
 public class BootstrapLogger {
 
-    public static Logger logger;
+    private static final Logger logger = Logger.getRootLogger();
+
+    private BootstrapLogger() {
+    }
 
     // While logger is not configured and it not set with sys properties, use Console logger
     static {
         if (System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null) {
-            logger = Logger.getRootLogger();
             logger.getLoggerRepository().resetConfiguration();
             BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%m%n")));
             logger.setLevel(Level.INFO);
         }
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 }

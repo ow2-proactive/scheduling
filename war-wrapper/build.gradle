@@ -4,24 +4,11 @@ repositories {
     mavenCentral()
 }
 
-configurations.compile.transitive = true
+configurations.providedCompile.transitive = true
 
 configurations {
     all*.exclude group: 'com.zaxxer', module: 'HikariCP-java6'
 }
-
-task deleteConfigFiles(type: Delete){
-    delete 'src/main/resources/config'
-}
-
-task copyConfigFiles(type: Copy) {
-    from project(':').files('config', '*')
-    into 'src/main/resources/config'
-}
-
-copyConfigFiles.dependsOn deleteConfigFiles
-
-war.dependsOn copyConfigFiles
 
 dependencies {
 
@@ -35,13 +22,20 @@ dependencies {
 
 }
 
-sourceSets.main.runtimeClasspath += configurations.providedCompile
-sourceSets.test.compileClasspath += configurations.providedCompile
-sourceSets.test.runtimeClasspath += configurations.providedCompile
+sourceSets {
+    main.compileClasspath += configurations.providedCompile
+    main.runtimeClasspath += configurations.providedCompile
+    test.compileClasspath += configurations.providedCompile
+    test.runtimeClasspath += configurations.providedCompile
+}
 
 war {
 
     doFirst {
+
+        into ('WEB-INF/classes/config'){
+            from project(':').files('config', '*')
+        }
 
         into('WEB-INF/classes/dist/lib') {
             from { configurations.providedCompile}

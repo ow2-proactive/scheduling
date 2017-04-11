@@ -25,18 +25,11 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
-
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.wrapper.WrapperWebConfiguration;
 
