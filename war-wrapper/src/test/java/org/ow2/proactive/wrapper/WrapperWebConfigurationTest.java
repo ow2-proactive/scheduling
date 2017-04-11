@@ -40,8 +40,6 @@ public class WrapperWebConfigurationTest {
 
     private String paHost;
 
-    private String configFile = "config/web/settings.ini";
-
     private WrapperWebConfiguration wrapperWebConfiguration;
 
     @Before
@@ -50,24 +48,18 @@ public class WrapperWebConfigurationTest {
         wrapperWebConfiguration = new WrapperWebConfiguration();
         paHost = ProActiveInet.getInstance().getHostname();
 
-        //setting PA Home if not set
-        if (!PASchedulerProperties.SCHEDULER_HOME.isSet()) {
-
-            String path = wrapperWebConfiguration.getClass().getClassLoader().getResource(configFile).getPath();
-
-            if (path.endsWith(configFile)) {
-                PASchedulerProperties.SCHEDULER_HOME.updateProperty(path.replace(configFile, ""));
-            }
-        }
     }
 
     @Test
     public void testgetStartedUrl() {
 
-        String expected = "http://" + paHost + ":9080";
+        if (PASchedulerProperties.SCHEDULER_HOME.isSet()) {
 
-        String actual = wrapperWebConfiguration.getStartedUrl();
+            String expected = "http://" + paHost + ":9080";
 
-        assertThat(actual).isEqualTo(expected);
+            String actual = wrapperWebConfiguration.getStartedUrl();
+
+            assertThat(actual).isEqualTo(expected);
+        }
     }
 }

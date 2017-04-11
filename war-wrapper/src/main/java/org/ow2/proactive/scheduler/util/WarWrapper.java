@@ -39,7 +39,7 @@ import org.ow2.proactive.wrapper.WrapperWebConfiguration;
  */
 public class WarWrapper extends SchedulerStarter {
 
-    private static Logger logger = Logger.getLogger(WarWrapper.class);
+    private static final Logger logger = Logger.getLogger(WarWrapper.class);
 
     public static void main(String[] args) {
         new WarWrapper().launchProactiveServer();

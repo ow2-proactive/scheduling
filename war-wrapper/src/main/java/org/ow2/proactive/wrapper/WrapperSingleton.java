@@ -39,11 +39,10 @@ public class WrapperSingleton {
 
     private static class SingletonHolder {
 
+        private static final WarWrapper instance = new WarWrapper();
+
         private SingletonHolder() {
         }
-
-        private final static WarWrapper instance = new WarWrapper();
-
     }
 
 }
