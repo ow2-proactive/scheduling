@@ -97,8 +97,9 @@ public abstract class SelectionManager {
 
     public SelectionManager(RMCore rmcore) {
         this.rmcore = rmcore;
-        this.scriptExecutorThreadPool = Executors.newFixedThreadPool(PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt(),
-                                                                     new NamedThreadFactory("Selection manager threadpool"));
+        this.scriptExecutorThreadPool = Executors.newFixedThreadPool(
+                PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt(),
+                new NamedThreadFactory("Selection manager threadpool"));
         this.inProgress = Collections.synchronizedSet(new HashSet<String>());
 
         String policyClassName = PAResourceManagerProperties.RM_SELECTION_POLICY.getValueAsString();
@@ -157,7 +158,8 @@ public abstract class SelectionManager {
     private long getConfiguredAuthorizedScriptLoadPeriod() {
         long configuredAuthorizedScriptLoadPeriod = DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD;
         if (PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.isSet()) {
-            configuredAuthorizedScriptLoadPeriod = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsInt();
+            configuredAuthorizedScriptLoadPeriod = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD
+                    .getValueAsInt();
         }
         return configuredAuthorizedScriptLoadPeriod;
     }
@@ -221,7 +223,8 @@ public abstract class SelectionManager {
         boolean hasScripts = criteria.getScripts() != null && criteria.getScripts().size() > 0;
         boolean loggerIsDebugEnabled = logger.isDebugEnabled();
         if (loggerIsDebugEnabled) {
-            logger.debug(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
+            logger.debug(
+                    client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
             if (hasScripts) {
                 logger.debug("Selection scripts:");
                 for (SelectionScript s : criteria.getScripts()) {
@@ -254,7 +257,8 @@ public abstract class SelectionManager {
 
         // arranging nodes according to the selection policy
         // if could be shuffling or node source priorities
-        List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(criteria.getSize(), filteredNodes, client);
+        List<RMNode> afterPolicyNodes = selectionPolicy.arrangeNodes(criteria.getSize(), filteredNodes,
+                client);
 
         List<Node> matchedNodes;
         if (hasScripts) {
@@ -262,7 +266,8 @@ public abstract class SelectionManager {
             checkAuthorizedScripts(criteria.getScripts());
 
             // arranging nodes for script execution
-            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
+            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes,
+                    criteria.getScripts());
 
             if (criteria.getTopology().isTopologyBased()) {
                 // run scripts on all available nodes
@@ -274,19 +279,20 @@ public abstract class SelectionManager {
                 while (matchedNodes.size() < criteria.getSize()) {
                     int numberOfNodesForScriptExecution = criteria.getSize() - matchedNodes.size();
 
-                    if (numberOfNodesForScriptExecution < PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()) {
+                    if (numberOfNodesForScriptExecution < PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER
+                            .getValueAsInt()) {
                         // we can run "PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()" scripts in parallel
                         // in case when we need less nodes it still useful to
                         // the full capacity of the thread pool to find nodes quicker
 
                         // it is not important if we find more nodes than needed
                         // subset will be selected later (topology handlers)
-                        numberOfNodesForScriptExecution = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt();
+                        numberOfNodesForScriptExecution = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER
+                                .getValueAsInt();
                     }
 
                     List<RMNode> subset = arrangedNodes.subList(0,
-                                                                Math.min(numberOfNodesForScriptExecution,
-                                                                         arrangedNodes.size()));
+                            Math.min(numberOfNodesForScriptExecution, arrangedNodes.size()));
                     matchedNodes.addAll(runScripts(subset, criteria));
                     // removing subset of arrangedNodes
                     subset.clear();
@@ -348,13 +354,11 @@ public abstract class SelectionManager {
         }
 
         if (logger.isInfoEnabled()) {
-            String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0
-                                                                                                                  ? "and " +
-                                                                                                                    selectedNodes.getExtraNodes()
-                                                                                                                                 .size() +
-                                                                                                                    " extra nodes"
-                                                                                                                  : "";
-            logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+            String extraNodes = selectedNodes.getExtraNodes() != null &&
+                selectedNodes.getExtraNodes().size() > 0
+                        ? "and " + selectedNodes.getExtraNodes().size() + " extra nodes" : "";
+            logger.info(client + " requested " + criteria.getSize() + " nodes with " +
+                criteria.getTopology() + " and will get " + selectedNodes.size() + " nodes " + extraNodes);
         }
 
         if (loggerIsDebugEnabled) {
@@ -378,7 +382,7 @@ public abstract class SelectionManager {
             if (!authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()))) {
                 // unauthorized selection script
                 throw new SecurityException("Cannot execute unauthorized script: " +
-                                            System.getProperty("line.separator") + script.getScript());
+                    System.getProperty("line.separator") + script.getScript());
             }
         }
     }
@@ -420,8 +424,8 @@ public abstract class SelectionManager {
         try {
             // launching
             Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
-                                                                                       PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt(),
-                                                                                       TimeUnit.MILLISECONDS);
+                    PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt(),
+                    TimeUnit.MILLISECONDS);
             int index = 0;
 
             // waiting for the results
@@ -443,7 +447,8 @@ public abstract class SelectionManager {
                     // no script result was obtained
                     logger.warn("Timeout on " + scriptExecutors.get(index));
                     // in this case scriptExecutionFinished may not be called
-                    scriptExecutionFinished(((ScriptExecutor) scriptExecutors.get(index)).getRMNode().getNodeURL());
+                    scriptExecutionFinished(
+                            ((ScriptExecutor) scriptExecutors.get(index)).getRMNode().getNodeURL());
                 }
                 index++;
             }
@@ -464,7 +469,7 @@ public abstract class SelectionManager {
         Set<String> inclusion = criteria.getAcceptableNodesUrls();
 
         boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
-                                         criteria.getNodeAccessToken().length() > 0;
+            criteria.getNodeAccessToken().length() > 0;
 
         TokenPrincipal tokenPrincipal = null;
         if (nodeWithTokenRequested) {
@@ -481,8 +486,8 @@ public abstract class SelectionManager {
             try {
                 if (!clientPermissions.contains(node.getUserPermission())) {
                     client.checkPermission(node.getUserPermission(),
-                                           client + " is not authorized to get the node " + node.getNodeURL() +
-                                                                     " from " + node.getNodeSource().getName());
+                            client + " is not authorized to get the node " + node.getNodeURL() + " from " +
+                                node.getNodeSource().getName());
                     clientPermissions.add(node.getUserPermission());
                 }
             } catch (SecurityException e) {
@@ -504,14 +509,15 @@ public abstract class SelectionManager {
                 // checking explicitly that node has this token identity
                 if (!perm.hasPrincipal(tokenPrincipal)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(client + " does not have required token to get the node " + node.getNodeURL() +
-                                     " from " + node.getNodeSource().getName());
+                        logger.debug(client + " does not have required token to get the node " +
+                            node.getNodeURL() + " from " + node.getNodeSource().getName());
                     }
                     continue;
                 }
             }
 
-            if (!contains(exclusion, node) && ((inclusion != null) ? inclusion.contains(node.getNodeURL()) : true)) {
+            if (!contains(exclusion, node) &&
+                ((inclusion != null) ? inclusion.contains(node.getNodeURL()) : true)) {
                 filteredList.add(node);
             }
         }
@@ -558,7 +564,8 @@ public abstract class SelectionManager {
         // Invoke all Callables and get the list of futures
         List<Future<ScriptResult<T>>> futures = null;
         try {
-            futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors, timeout, TimeUnit.MILLISECONDS);
+            futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors, timeout,
+                    TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             logger.warn("Interrupted while waiting, unable to execute all scripts", e);
             Thread.currentThread().interrupt();
@@ -574,15 +581,16 @@ public abstract class SelectionManager {
             try {
                 result = future.get();
             } catch (CancellationException e) {
-                result = new ScriptResult<>(new ScriptException("Cancelled due to timeout expiration when " +
-                                                                description, e));
+                result = new ScriptResult<>(
+                    new ScriptException("Cancelled due to timeout expiration when " + description, e));
             } catch (InterruptedException e) {
-                result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " + description));
+                result = new ScriptResult<>(
+                    new ScriptException("Cancelled due to interruption when " + description));
             } catch (ExecutionException e) {
                 // Unwrap the root exception 
                 Throwable rex = e.getCause();
-                result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description,
-                                                                rex));
+                result = new ScriptResult<>(
+                    new ScriptException("Exception occured in script call when " + description, rex));
             }
             results.add(result);
         }
