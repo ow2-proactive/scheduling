@@ -61,18 +61,18 @@ public class WrapperWebConfiguration {
 
             boolean httpsEnabled = isHttpsEnabled(properties);
 
-            int restPort = httpPort;
+            int port = httpPort;
 
             String httpProtocol;
 
             if (httpsEnabled) {
                 httpProtocol = "https";
-                restPort = httpsPort;
+                port = httpsPort;
             } else {
                 httpProtocol = "http";
             }
 
-            return httpProtocol + "://" + paHost + ":" + restPort;
+            return httpProtocol + "://" + paHost + ":" + port;
 
         } catch (Exception e) {
             logger.warn("Could not find the getStarted URL", e);
