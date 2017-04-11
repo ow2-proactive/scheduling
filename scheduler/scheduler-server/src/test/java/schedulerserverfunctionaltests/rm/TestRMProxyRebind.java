@@ -25,7 +25,6 @@
  */
 package schedulerserverfunctionaltests.rm;
 
-import static schedulerserverfunctionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
