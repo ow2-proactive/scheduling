@@ -423,3 +423,6 @@ task alljavadocZip(type: Zip, dependsOn: alljavadoc) {
     archiveName project.archivesBaseName + '-' + project.version + '-javadoc.zip'
     destinationDir file("${buildDir}/distributions")
 }
+
+task ('functionalTest', dependsOn: ['rest:rest-cli:restCliFunctionalTest','rest:rest-client:restClientFunctionalTest','rest:rest-server:restServerFunctionalTest','rest:rest-smartproxy:restSmartProxyFunctionalTest','rm:rm-server:rmFunctionalTest','scheduler:scheduler-node:schedulerNodeFunctionalTest','scheduler:scheduler-server:schedulerServerFunctionalTest'])
+
