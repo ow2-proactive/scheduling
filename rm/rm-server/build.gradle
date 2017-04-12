@@ -103,3 +103,7 @@ task limitTheMaximumNumberOfNodes(type: maxNodes.ReplaceMaxNumberOfNodesTask, de
     }
 }
 build.dependsOn limitTheMaximumNumberOfNodes
+
+task maeltest << {
+     println 'pull request test in rm-server 1'
+}
