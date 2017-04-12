@@ -37,15 +37,16 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
 import schedulerserverfunctionaltests.executables.EmptyExecutable;
-import schedulerserverfunctionaltests.utils.SchedulerFunctionalTestNoRestart;
+
 import functionaltests.utils.TestUsers;
+import schedulerserverfunctionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
  * Sanity test against method 'Scheduler.getUsers' and 'Scheduler.getUsersWithJobs'.
  *
  */
-public class TestGetUsers extends SchedulerFunctionalTestNoRestart {
+public class TestGetUsers extends SchedulerFunctionalTestWithRestart {
 
     long testStartTime = System.currentTimeMillis();
 

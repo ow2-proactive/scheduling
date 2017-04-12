@@ -144,23 +144,25 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
                                       120000,
                                       monitorsHandler);
         }
-
-        nodeset = resourceManager.getNodes(new Criteria(NB_NODES));
+        RMTHelper.log("Dumping events not consumed yet");
+        monitorsHandler.dumpEvents();
 
         RMTHelper.log("Wait for nodes restart by the policy");
-        rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES);
+        rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES, monitorsHandler);
         for (int i = 0; i < NB_NODES; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED, monitorsHandler);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED, monitorsHandler);
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitorsHandler);
         }
 
         RMTHelper.log("Final checks on the scheduler state");
-        s = resourceManager.getState();
+        nodeset = resourceManager.getNodes(new Criteria(NB_NODES));
 
         for (Node n : nodeset) {
             System.out.println("NODE::" + n.getNodeInformation().getURL());
         }
+
+        s = resourceManager.getState();
 
         assertEquals(NB_NODES, s.getTotalNodesNumber());
         assertEquals(NB_NODES, s.getTotalAliveNodesNumber()); // check amount of all nodes that are not down
