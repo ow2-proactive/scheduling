@@ -700,7 +700,7 @@ public class NodeSource implements InitActive, RunActive {
             return;
         }
 
-        logger.info("[" + name + "] Detected down node: " + nodeUrl);
+        logger.warn("[" + name + "] Detected down node: " + nodeUrl);
         Node downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
             downNodes.put(nodeUrl, downNode);
@@ -748,6 +748,7 @@ public class NodeSource implements InitActive, RunActive {
                         logger.debug("Node " + nodeUrl + " is alive");
                     }
                 } catch (Throwable t) {
+                    logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
                     stub.detectedPingedDownNode(nodeUrl);
                 }
             }
