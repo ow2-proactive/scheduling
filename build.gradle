@@ -124,6 +124,7 @@ configure(javaSubprojects) {
 
     test {
         exclude 'functionaltests/**'
+	exclude 'rmfunctionaltests/**'		
         exclude 'unittests/**'
         exclude 'unitTests/**'
 
@@ -162,7 +163,7 @@ task wrapper(type: Wrapper) {
 
 ext.schedulingFunctionalTestConfiguration = {
 
-    include 'functionaltests/**'
+    include 'functionaltests/**'	
 
     if(!project.hasProperty('regression')){
         def regression_tests = new File(project.rootDir, "/regression_tests.txt")
@@ -246,6 +247,7 @@ ext.schedulingFunctionalTestConfiguration = {
     }
 
 }
+
 
 dependencies {
     distLib(project(':scheduler:scheduler-server')) {
@@ -353,6 +355,7 @@ createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-route
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn dist
+    tasks.withType(Test).matching { it.name == 'rmFunctionalTest' }*.dependsOn dist	
 }
 
 apply plugin: 'distribution'
@@ -420,3 +423,6 @@ task alljavadocZip(type: Zip, dependsOn: alljavadoc) {
     archiveName project.archivesBaseName + '-' + project.version + '-javadoc.zip'
     destinationDir file("${buildDir}/distributions")
 }
+
+task ('functionalTest', dependsOn: ['rest:rest-cli:restCliFunctionalTest','rest:rest-client:restClientFunctionalTest','rest:rest-server:restServerFunctionalTest','rest:rest-smartproxy:restSmartProxyFunctionalTest','rm:rm-server:rmFunctionalTest','scheduler:scheduler-node:schedulerNodeFunctionalTest','scheduler:scheduler-server:schedulerServerFunctionalTest'])
+

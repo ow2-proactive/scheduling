@@ -22,8 +22,10 @@ dependencies {
     testCompile 'org.eclipse.jetty:jetty-server:9.2.14.v20151106'
 }
 
-task('functionalTest', type: Test).configure functionalTestConfiguration
+task('restCliFunctionalTest', type: Test){
+    include 'restclifunctionaltests/**'
+    configure functionalTestConfiguration
+}
+restCliFunctionalTest.dependsOn rootProject.dist
 
-
-functionalTest.dependsOn rootProject.dist
 clean.dependsOn rootProject.cleanDist

@@ -61,7 +61,11 @@ dependencies {
     runtime project(':rest:rest-server')
 }
 
-task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration
+
+task('schedulerServerFunctionalTest', type: Test) {
+    include 'schedulerserverfunctionaltests/**'
+    configure schedulingFunctionalTestConfiguration
+}
 
 task testJar(type: Jar) {
     classifier = 'tests'
@@ -91,5 +95,5 @@ artifacts {
     archives testJar
 }
 
-functionalTest.dependsOn rootProject.dist, dist
+schedulerServerFunctionalTest.dependsOn rootProject.dist, dist
 clean.dependsOn rootProject.cleanDist

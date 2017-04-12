@@ -1,0 +1,1 @@
+bad java script code !!

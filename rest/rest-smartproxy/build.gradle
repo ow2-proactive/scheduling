@@ -29,7 +29,10 @@ task dist(type: Copy) {
     into file("$rootDir/dist/lib")
 }
 
-task('functionalTest', type:Test).configure functionalTestConfiguration
+task('restSmartProxyFunctionalTest', type:Test){
+    include 'restsmartproxyfunctionaltests/**'
+    configure functionalTestConfiguration
+}
 
-functionalTest.dependsOn rootProject.dist, dist
+restSmartProxyFunctionalTest.dependsOn rootProject.dist, dist
 clean.dependsOn rootProject.cleanDist

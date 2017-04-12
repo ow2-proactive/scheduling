@@ -24,7 +24,11 @@ test {
     exclude 'functionaltests/**'
 }
 
-task('functionalTest', type: Test).configure functionalTestConfiguration
+task('restClientFunctionalTest', type: Test){
+    include 'restclientfunctionaltests/**'
+    configure functionalTestConfiguration
+}
+restClientFunctionalTest.dependsOn rootProject.dist
 
-functionalTest.dependsOn rootProject.dist
 clean.dependsOn rootProject.cleanDist
+

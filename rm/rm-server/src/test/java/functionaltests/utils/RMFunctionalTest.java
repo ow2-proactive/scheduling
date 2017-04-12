@@ -45,7 +45,7 @@ import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.tests.ProActiveTest;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.monitor.RMMonitorEventReceiver;
 
 
 public class RMFunctionalTest extends ProActiveTest {

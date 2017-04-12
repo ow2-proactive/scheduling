@@ -37,9 +37,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
-import functionaltests.AbstractRestFuncTestCase;
+import functionaltests.utils.AbstractRestFuncTestCase;
 
 
 @Path("/wsh")

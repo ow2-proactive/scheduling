@@ -37,8 +37,8 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.utils.monitor.RMMonitorEventReceiver;
+import functionaltests.utils.monitor.RMMonitorsHandler;
 
 
 public class RMTestUser {

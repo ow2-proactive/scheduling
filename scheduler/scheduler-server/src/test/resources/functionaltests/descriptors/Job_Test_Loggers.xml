@@ -4,7 +4,7 @@
 	name="job_Test_Logger">
 	<taskFlow>
 		<task name="task1">
-			<javaExecutable class="functionaltests.executables.Logging">
+			<javaExecutable class="schedulerserverfunctionaltests.executables.Logging">
 				<parameters>
 					<parameter name="lines" value="2" />
 					<parameter name="sleep" value="1000" />

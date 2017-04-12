@@ -18,7 +18,7 @@
                     </code>
                 </script>
             </pre>
-            <javaExecutable class="functionaltests.executables.ModifyPropagatedVariablesExec">
+            <javaExecutable class="schedulerserverfunctionaltests.executables.ModifyPropagatedVariablesExec">
             </javaExecutable>
             <post>
                 <script>

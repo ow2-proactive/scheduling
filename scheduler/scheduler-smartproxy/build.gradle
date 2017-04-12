@@ -11,4 +11,8 @@ task stub(type: StubTask) {
 }
 serialver.dependsOn stub
 
-task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration
+task('schedulerSmartProxyFunctionalTest', type: Test){
+    include 'schedulerSmartProxyFunctionaltests/**'
+    configure schedulingFunctionalTestConfiguration
+}
+
