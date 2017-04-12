@@ -1,0 +1,32 @@
+// WebSphere Application Server Security Policy for the Default Application
+
+//
+// Dynamic Policy - Enterprise Application Templates
+//
+// J2EE 1.4 Specification
+//
+// NOTE: Syntax errors in the policy files will cause the enterprise application FAIL to start.
+//       Extreme care should be taken when editing these policy files. It is advised to use
+//       the policytool provided by the JDK for editing the policy files
+//       (WAS_HOME/java/jre/bin/policytool).
+//
+
+grant codeBase "file:${application}" {
+  permission java.security.AllPermission;
+};
+
+grant codeBase "file:${jars}" {
+  permission java.security.AllPermission;
+};
+
+grant codeBase "file:${connectorComponent}" {
+  permission java.security.AllPermission;
+};
+
+grant codeBase "file:${webComponent}" {
+  permission java.security.AllPermission;
+};
+
+grant codeBase "file:${ejbComponent}" {
+  permission java.security.AllPermission;
+};
