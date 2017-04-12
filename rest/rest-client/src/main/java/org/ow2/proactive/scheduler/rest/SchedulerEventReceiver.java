@@ -94,7 +94,7 @@ public class SchedulerEventReceiver {
     private void openAndReceive(final SchedulerEventListener eventListener, boolean myEventsOnly,
             SchedulerEvent... events) throws IOException {
         Client client = ClientFactory.getDefault().newClient();
-        socket = client.create();
+        socket = client.create(client.newOptionsBuilder().reconnect(false).build());
         EventNotificationHandler notificationHandler = new EventNotificationHandler(eventListener);
         socket.on(Event.MESSAGE, notificationHandler);
         socket.on(Event.CLOSE, new Function() {
