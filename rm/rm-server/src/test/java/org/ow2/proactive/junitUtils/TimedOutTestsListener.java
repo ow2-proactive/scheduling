@@ -50,7 +50,7 @@ public class TimedOutTestsListener extends RunListener {
 
     static final String TEST_TIMED_OUT_PREFIX = "test timed out after";
 
-    private static String INDENT = "    ";
+    private final static String INDENT = "    ";
 
     private final PrintWriter output;
 
