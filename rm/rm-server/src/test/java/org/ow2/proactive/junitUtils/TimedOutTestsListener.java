@@ -26,7 +26,6 @@
 package org.ow2.proactive.junitUtils;
 
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
@@ -48,7 +47,7 @@ import org.junit.runner.notification.RunListener;
  */
 public class TimedOutTestsListener extends RunListener {
 
-    static final String TEST_TIMED_OUT_PREFIX = "test timed out after";
+    private final String TEST_TIMED_OUT_PREFIX = "test timed out after";
 
     private final static String INDENT = "    ";
 
@@ -73,25 +72,28 @@ public class TimedOutTestsListener extends RunListener {
     }
 
     public static String buildThreadDiagnosticString() {
-        StringWriter sw = new StringWriter();
-        PrintWriter output = new PrintWriter(sw);
+        StringBuilder sb = new StringBuilder();
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS");
-        output.println(String.format("Timestamp: %s", dateFormat.format(new Date())));
-        output.println();
-        output.println(buildThreadsDump());
+        sb.append(String.format("Timestamp: %s", dateFormat.format(new Date())));
+        sb.append(System.getProperty("line.separator"));
+        sb.append(System.getProperty("line.separator"));
+        sb.append(System.getProperty("line.separator"));
+        sb.append(buildThreadsDump());
 
         String deadlocksInfo = buildDeadlockInfo();
         if (deadlocksInfo != null) {
-            output.println("====> DEADLOCKS DETECTED <====");
-            output.println();
-            output.println(deadlocksInfo);
+            sb.append("====> DEADLOCKS DETECTED <====");
+            sb.append(System.getProperty("line.separator"));
+            sb.append(System.getProperty("line.separator"));
+            sb.append(deadlocksInfo);
+            sb.append(System.getProperty("line.separator"));
         }
 
-        return sw.toString();
+        return sb.toString();
     }
 
-    static String buildThreadsDump() {
+    private static String buildThreadsDump() {
         StringBuilder dump = new StringBuilder();
         Map<Thread, StackTraceElement[]> stackTraces = Thread.getAllStackTraces();
         for (Map.Entry<Thread, StackTraceElement[]> e : stackTraces.entrySet()) {
@@ -122,69 +124,90 @@ public class TimedOutTestsListener extends RunListener {
                                                                             : thread.getState());
     }
 
-    static String buildDeadlockInfo() {
+    private static String buildDeadlockInfo() {
         ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
         long[] threadIds = threadBean.findMonitorDeadlockedThreads();
         if (threadIds != null && threadIds.length > 0) {
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter out = new PrintWriter(stringWriter);
+            StringBuilder sb = new StringBuilder();
 
             ThreadInfo[] infos = threadBean.getThreadInfo(threadIds, true, true);
             for (ThreadInfo ti : infos) {
-                printThreadInfo(ti, out);
-                printLockInfo(ti.getLockedSynchronizers(), out);
-                out.println();
+                printThreadInfo(ti, sb);
+                printLockInfo(ti.getLockedSynchronizers(), sb);
+                sb.append(System.getProperty("line.separator"));
             }
-
-            out.close();
-            return stringWriter.toString();
+            return sb.toString();
         } else {
             return null;
         }
     }
 
-    private static void printThreadInfo(ThreadInfo ti, PrintWriter out) {
+    private static void printThreadInfo(ThreadInfo ti, StringBuilder sb) {
         // print thread information
-        printThread(ti, out);
+        printThread(ti, sb);
 
         // print stack trace with locks
         StackTraceElement[] stacktrace = ti.getStackTrace();
         MonitorInfo[] monitors = ti.getLockedMonitors();
         for (int i = 0; i < stacktrace.length; i++) {
             StackTraceElement ste = stacktrace[i];
-            out.println(INDENT + "at " + ste.toString());
+            sb.append(INDENT);
+            sb.append("at ");
+            sb.append(ste.toString());
+            sb.append(System.getProperty("line.separator"));
             for (MonitorInfo mi : monitors) {
                 if (mi.getLockedStackDepth() == i) {
-                    out.println(INDENT + "  - locked " + mi);
+                    sb.append(INDENT);
+                    sb.append("  - locked ");
+                    sb.append(mi);
+                    sb.append(System.getProperty("line.separator"));
                 }
             }
         }
-        out.println();
+        sb.append(System.getProperty("line.separator"));
     }
 
-    private static void printThread(ThreadInfo ti, PrintWriter out) {
-        out.print("\"" + ti.getThreadName() + "\"" + " Id=" + ti.getThreadId() + " in " + ti.getThreadState());
+    private static void printThread(ThreadInfo ti, StringBuilder sb) {
+        sb.append("\"");
+        sb.append(ti.getThreadName());
+        sb.append("\"");
+        sb.append(" Id=");
+        sb.append(ti.getThreadId());
+        sb.append(" in ");
+        sb.append(ti.getThreadState());
         if (ti.getLockName() != null) {
-            out.print(" on lock=" + ti.getLockName());
+            sb.append(" on lock=");
+            sb.append(ti.getLockName());
         }
         if (ti.isSuspended()) {
-            out.print(" (suspended)");
+            sb.append(" (suspended)");
         }
         if (ti.isInNative()) {
-            out.print(" (running in native)");
+            sb.append(" (running in native)");
         }
-        out.println();
+        sb.append(System.getProperty("line.separator"));
         if (ti.getLockOwnerName() != null) {
-            out.println(INDENT + " owned by " + ti.getLockOwnerName() + " Id=" + ti.getLockOwnerId());
+            sb.append(INDENT);
+            sb.append(" owned by ");
+            sb.append(ti.getLockOwnerName());
+            sb.append(" Id=");
+            sb.append(ti.getLockOwnerId());
+            sb.append(System.getProperty("line.separator"));
         }
     }
 
-    private static void printLockInfo(LockInfo[] locks, PrintWriter out) {
-        out.println(INDENT + "Locked synchronizers: count = " + locks.length);
+    private static void printLockInfo(LockInfo[] locks, StringBuilder sb) {
+        sb.append(INDENT);
+        sb.append("Locked synchronizers: count = ");
+        sb.append(locks.length);
+        sb.append(System.getProperty("line.separator"));
         for (LockInfo li : locks) {
-            out.println(INDENT + "  - " + li);
+            sb.append(INDENT);
+            sb.append("  - ");
+            sb.append(li);
+            sb.append(System.getProperty("line.separator"));
         }
-        out.println();
+        sb.append(System.getProperty("line.separator"));
     }
 
 }
