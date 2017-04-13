@@ -35,17 +35,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.runner.RunWith;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.junitUtils.TimedOutTestsRunner;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DistanceFunction;
-
 
 /**
  * Class which holds the tests that read their input from a a visual description of a grid (a string)
  * @author Zsolt Istvan
  *
  */
+
+@RunWith(TimedOutTestsRunner.class)
 public class MatrixBasedTests {
 
     protected static HashMap<Node, HashMap<Node, Long>> distances = new HashMap<>();
