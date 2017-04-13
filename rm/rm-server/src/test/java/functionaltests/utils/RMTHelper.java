@@ -382,6 +382,7 @@ public class RMTHelper {
             jvmParameters.addAll(vmOptions);
         }
         jvmParameters.addAll(setup.getJvmParametersAsList());
+        jvmParameters.add("-Xmx256m");
         nodeProcess.setJvmOptions(jvmParameters);
         nodeProcess.setParameters(parameters);
         nodeProcess.startProcess();
