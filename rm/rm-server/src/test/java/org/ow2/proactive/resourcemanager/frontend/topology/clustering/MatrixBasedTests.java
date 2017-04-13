@@ -42,6 +42,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DistanceFunction;
 
+
 /**
  * Class which holds the tests that read their input from a a visual description of a grid (a string)
  * @author Zsolt Istvan

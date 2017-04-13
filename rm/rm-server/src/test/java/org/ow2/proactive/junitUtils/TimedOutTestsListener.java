@@ -23,8 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.frontend.topology.clustering;
-
+package org.ow2.proactive.junitUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,8 +36,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
+
 
 /**
  * JUnit run listener which prints full thread dump into System.err
@@ -63,8 +64,7 @@ public class TimedOutTestsListener extends RunListener {
 
     @Override
     public void testFailure(Failure failure) throws Exception {
-        if (failure != null && failure.getMessage() != null
-                && failure.getMessage().startsWith(TEST_TIMED_OUT_PREFIX)) {
+        if (failure != null && failure.getMessage() != null && failure.getMessage().startsWith(TEST_TIMED_OUT_PREFIX)) {
             output.println("====> TEST TIMED OUT. PRINTING THREAD DUMP. <====");
             output.println();
             output.print(buildThreadDiagnosticString());
@@ -79,7 +79,7 @@ public class TimedOutTestsListener extends RunListener {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss,SSS");
         output.println(String.format("Timestamp: %s", dateFormat.format(new Date())));
         output.println();
-        output.println(buildThreadDump());
+        output.println(buildThreadsDump());
 
         String deadlocksInfo = buildDeadlockInfo();
         if (deadlocksInfo != null) {
@@ -91,22 +91,12 @@ public class TimedOutTestsListener extends RunListener {
         return sw.toString();
     }
 
-    static String buildThreadDump() {
+    static String buildThreadsDump() {
         StringBuilder dump = new StringBuilder();
         Map<Thread, StackTraceElement[]> stackTraces = Thread.getAllStackTraces();
         for (Map.Entry<Thread, StackTraceElement[]> e : stackTraces.entrySet()) {
             Thread thread = e.getKey();
-            dump.append(String.format(
-                    "\"%s\" %s prio=%d tid=%d %s\njava.lang.Thread.State: %s",
-                    thread.getName(),
-                    thread.isDaemon() ? "daemon" : "",
-                    thread.getPriority(),
-                    thread.getId(),
-                    Thread.State.WAITING.equals(thread.getState()) ?
-                            "in Object.wait()" :
-                            (thread.getState().name() == null? "" : thread.getState().name().toLowerCase()),
-                    Thread.State.WAITING.equals(thread.getState()) ?
-                            "WAITING (on object monitor)" : thread.getState()));
+            dump.append(formatThreadDump(thread));
             for (StackTraceElement stackTraceElement : e.getValue()) {
                 dump.append("\n        at ");
                 dump.append(stackTraceElement);
@@ -114,6 +104,22 @@ public class TimedOutTestsListener extends RunListener {
             dump.append("\n");
         }
         return dump.toString();
+    }
+
+    private static String formatThreadDump(Thread thread) {
+        return String.format("\"%s\" %s prio=%d tid=%d %s\njava.lang.Thread.State: %s",
+                             thread.getName(),
+                             thread.isDaemon() ? "daemon" : "",
+                             thread.getPriority(),
+                             thread.getId(),
+                             Thread.State.WAITING.equals(thread.getState()) ? "in Object.wait()"
+                                                                            : (thread.getState()
+                                                                                     .name() == null ? ""
+                                                                                                     : thread.getState()
+                                                                                                             .name()
+                                                                                                             .toLowerCase()),
+                             Thread.State.WAITING.equals(thread.getState()) ? "WAITING (on object monitor)"
+                                                                            : thread.getState());
     }
 
     static String buildDeadlockInfo() {
@@ -157,8 +163,7 @@ public class TimedOutTestsListener extends RunListener {
     }
 
     private static void printThread(ThreadInfo ti, PrintWriter out) {
-        out.print("\"" + ti.getThreadName() + "\"" + " Id="
-                + ti.getThreadId() + " in " + ti.getThreadState());
+        out.print("\"" + ti.getThreadName() + "\"" + " Id=" + ti.getThreadId() + " in " + ti.getThreadState());
         if (ti.getLockName() != null) {
             out.print(" on lock=" + ti.getLockName());
         }
@@ -170,8 +175,7 @@ public class TimedOutTestsListener extends RunListener {
         }
         out.println();
         if (ti.getLockOwnerName() != null) {
-            out.println(INDENT + " owned by " + ti.getLockOwnerName() + " Id="
-                    + ti.getLockOwnerId());
+            out.println(INDENT + " owned by " + ti.getLockOwnerName() + " Id=" + ti.getLockOwnerId());
         }
     }
 

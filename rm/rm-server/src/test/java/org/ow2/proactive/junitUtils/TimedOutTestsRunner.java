@@ -25,10 +25,10 @@
  */
 package org.ow2.proactive.junitUtils;
 
-
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
+
 
 /**
  * JUnit custom runner which use TimedOutTestsListener to print full thread dump into System.err
@@ -36,14 +36,15 @@ import org.junit.runners.model.InitializationError;
  * @author ActiveEon Team
  * @since 4/12/17
  */
-public class TimedOutTestsRunner  extends BlockJUnit4ClassRunner {
+public class TimedOutTestsRunner extends BlockJUnit4ClassRunner {
 
     public TimedOutTestsRunner(Class<?> _class) throws InitializationError {
         super(_class);
     }
 
-    @Override public void run(RunNotifier notifier){
-        notifier.addListener(new org.ow2.proactive.resourcemanager.frontend.topology.clustering.TimedOutTestsListener());
+    @Override
+    public void run(RunNotifier notifier) {
+        notifier.addListener(new TimedOutTestsListener());
         super.run(notifier);
     }
 }
