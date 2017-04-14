@@ -85,12 +85,11 @@ public class RMStateCaching {
     }
 
     private static void init_() {
-        refreshInterval = Integer.parseInt(PortalConfiguration.getProperties()
-                                                              .getProperty(PortalConfiguration.RM_CACHE_REFRESHRATE));
+        refreshInterval = PortalConfiguration.RM_CACHE_REFRESHRATE.getValueAsInt();
 
         while (rm == null) {
-            String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.RM_URL);
-            String cred_path = PortalConfiguration.getProperties().getProperty(PortalConfiguration.RM_CACHE_CREDENTIAL);
+            String url = PortalConfiguration.RM_URL.getValueAsString();
+            String cred_path = PortalConfiguration.RM_CACHE_CREDENTIALS.getValueAsString();
 
             try {
                 if (rm == null) {
@@ -99,10 +98,8 @@ public class RMStateCaching {
                         Credentials cred = Credentials.getCredentials(cred_path);
                         rm.init(url, cred);
                     } else {
-                        String login = PortalConfiguration.getProperties()
-                                                          .getProperty(PortalConfiguration.RM_CACHE_LOGIN);
-                        String password = PortalConfiguration.getProperties()
-                                                             .getProperty(PortalConfiguration.RM_CACHE_PASSWORD);
+                        String login = PortalConfiguration.RM_CACHE_LOGIN.getValueAsString();
+                        String password = PortalConfiguration.RM_CACHE_PASSWORD.getValueAsString();
                         rm.init(url, new CredData(login, password));
                     }
                 }

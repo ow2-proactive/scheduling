@@ -23,23 +23,11 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.webapp;
+package org.ow2.proactive.core.properties;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.ByteArrayInputStream;
-
-import org.junit.Test;
-
-
-public class PortalConfigurationTest {
-
-    @Test
-    public void testFileProperty_Overrode_BySystemProperty() throws Exception {
-        System.setProperty("propSys", "eulav");
-        PortalConfiguration.load(new ByteArrayInputStream("prop=value\npropSys=value".getBytes()));
-
-        assertEquals("value", PortalConfiguration.getProperties().getProperty("prop"));
-        assertEquals("eulav", PortalConfiguration.getProperties().getProperty("propSys"));
-    }
+public enum PropertyType {
+    STRING,
+    BOOLEAN,
+    INTEGER,
+    LIST
 }

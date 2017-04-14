@@ -25,17 +25,12 @@
  */
 package org.ow2.proactive.scheduler.core.properties;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.regex.Pattern;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
+import org.ow2.proactive.core.properties.PropertyType;
 import org.ow2.proactive.utils.PAProperties;
 import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
@@ -361,6 +356,8 @@ public enum PASchedulerProperties {
                                                                                         PA_SCHEDULER_PROPERTIES_FILEPATH,
                                                                                         PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
 
+    private static PACommonPropertiesHelper propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
+
     /** Key of the specific instance. */
     private String key;
 
@@ -393,7 +390,7 @@ public enum PASchedulerProperties {
      * @param value the new value to set.
      */
     public void updateProperty(String value) {
-        propertiesLoader.getProperties().setProperty(key, value);
+        propertiesHelper.updateProperty(key, value);
     }
 
     /**
@@ -407,6 +404,7 @@ public enum PASchedulerProperties {
                                                       PA_SCHEDULER_PROPERTIES_FILEPATH,
                                                       PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH,
                                                       filename);
+        propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
     }
 
     /**
@@ -416,17 +414,7 @@ public enum PASchedulerProperties {
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
-        Properties prop = propertiesLoader.getProperties();
-        Properties ptmp = new Properties();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename)))) {
-            ptmp.load(reader);
-            for (Object o : ptmp.keySet()) {
-                prop.setProperty((String) o, (String) ptmp.get(o));
-            }
-            PAPropertiesLazyLoader.updateWithSystemProperties(prop);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        propertiesHelper.updateProperties(filename);
     }
 
     /**
@@ -435,7 +423,7 @@ public enum PASchedulerProperties {
      * @return true if this property is set, false otherwise.
      */
     public boolean isSet() {
-        return propertiesLoader.getProperties().containsKey(key);
+        return propertiesHelper.isSet(key);
     }
 
     /**
@@ -443,7 +431,7 @@ public enum PASchedulerProperties {
      *
      */
     public void unSet() {
-        propertiesLoader.getProperties().remove(key);
+        propertiesHelper.unSet(key);
     }
 
     /**
@@ -454,7 +442,7 @@ public enum PASchedulerProperties {
      * @return the string to be passed on the command line
      */
     public String getCmdLine() {
-        return "-D" + key + '=';
+        return propertiesHelper.getCmdLine(key);
     }
 
     /**
@@ -464,17 +452,7 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public int getValueAsInt() {
-        if (propertiesLoader.getProperties().containsKey(key)) {
-            String valueS = getValueAsString();
-            try {
-                return Integer.parseInt(valueS);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(key +
-                                                   " is not an integer property. getValueAsInt cannot be called on this property");
-            }
-        } else {
-            return 0;
-        }
+        return propertiesHelper.getValueAsInt(key);
     }
 
     /**
@@ -483,12 +461,7 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
-        Properties prop = propertiesLoader.getProperties();
-        if (prop.containsKey(key)) {
-            return prop.getProperty(key);
-        } else {
-            return "";
-        }
+        return propertiesHelper.getValueAsString(key);
     }
 
     /**
@@ -499,18 +472,7 @@ public enum PASchedulerProperties {
      * @return the list of values of this property.
      */
     public List<String> getValueAsList(String separator) {
-        Properties prop = propertiesLoader.getProperties();
-        ArrayList<String> valueList = new ArrayList<>();
-        if (prop.containsKey(key)) {
-            String value = prop.getProperty(key);
-            for (String val : value.split(Pattern.quote(separator))) {
-                val = val.trim();
-                if (val.length() > 0) {
-                    valueList.add(val);
-                }
-            }
-        }
-        return valueList;
+        return propertiesHelper.getValueAsList(key, separator);
     }
 
     /**
@@ -520,16 +482,7 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public String getValueAsStringOrNull() {
-        Properties prop = propertiesLoader.getProperties();
-        if (prop.containsKey(key)) {
-            String ret = prop.getProperty(key);
-            if ("".equals(ret)) {
-                return null;
-            }
-            return ret;
-        } else {
-            return null;
-        }
+        return propertiesHelper.getValueAsStringOrNull(key);
     }
 
     /**
@@ -540,11 +493,7 @@ public enum PASchedulerProperties {
      * @return the value of this property.
      */
     public boolean getValueAsBoolean() {
-        if (propertiesLoader.getProperties().containsKey(key)) {
-            return Boolean.parseBoolean(getValueAsString());
-        } else {
-            return false;
-        }
+        return propertiesHelper.getValueAsBoolean(key);
     }
 
     /**
@@ -579,16 +528,6 @@ public enum PASchedulerProperties {
         } else {
             return PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + File.separator + userPath;
         }
-    }
-
-    /**
-     * Supported types for PASchedulerProperties
-     */
-    public enum PropertyType {
-        STRING,
-        BOOLEAN,
-        INTEGER,
-        LIST
     }
 
 }

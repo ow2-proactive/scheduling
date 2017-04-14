@@ -26,11 +26,10 @@
 package org.ow2.proactive.resourcemanager.core.properties;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
+import org.ow2.proactive.core.properties.PropertyType;
 import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
@@ -231,6 +230,8 @@ public enum PAResourceManagerProperties {
                                                                                         PA_RM_PROPERTIES_FILEPATH,
                                                                                         PA_RM_PROPERTIES_RELATIVE_FILEPATH);
 
+    private static PACommonPropertiesHelper propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
+
     /** Key of the specific instance. */
     private String key;
 
@@ -259,6 +260,7 @@ public enum PAResourceManagerProperties {
                                                       PA_RM_PROPERTIES_FILEPATH,
                                                       PA_RM_PROPERTIES_RELATIVE_FILEPATH,
                                                       filename);
+        propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
     }
 
     /**
@@ -268,19 +270,7 @@ public enum PAResourceManagerProperties {
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
-        Properties prop = propertiesLoader.getProperties();
-        Properties ptmp = new Properties();
-        try {
-            FileInputStream stream = new FileInputStream(filename);
-            ptmp.load(stream);
-            stream.close();
-            for (Object o : ptmp.keySet()) {
-                prop.setProperty((String) o, (String) ptmp.get(o));
-            }
-            PAPropertiesLazyLoader.updateWithSystemProperties(prop);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        propertiesHelper.updateProperties(filename);
     }
 
     /**
@@ -314,7 +304,7 @@ public enum PAResourceManagerProperties {
      * @param value the new value to set.
      */
     public void updateProperty(String value) {
-        propertiesLoader.getProperties().setProperty(key, value);
+        propertiesHelper.updateProperty(key, value);
     }
 
     /**
@@ -323,7 +313,14 @@ public enum PAResourceManagerProperties {
      * @return true if this property is set, false otherwise.
      */
     public boolean isSet() {
-        return propertiesLoader.getProperties().containsKey(key);
+        return propertiesHelper.isSet(key);
+    }
+
+    /**
+     * Unset this property
+     */
+    public void unSet() {
+        propertiesHelper.unSet(key);
     }
 
     /**
@@ -334,7 +331,7 @@ public enum PAResourceManagerProperties {
      * @return the string to be passed on the command line
      */
     public String getCmdLine() {
-        return "-D" + key + '=';
+        return propertiesHelper.getCmdLine(key);
     }
 
     /**
@@ -344,17 +341,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public int getValueAsInt() {
-        if (propertiesLoader.getProperties().containsKey(key)) {
-            String valueS = getValueAsString();
-            try {
-                return Integer.parseInt(valueS);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(key +
-                                                   " is not an integer property. getValueAsInt cannot be called on this property");
-            }
-        } else {
-            return 0;
-        }
+        return propertiesHelper.getValueAsInt(key);
     }
 
     /**
@@ -363,12 +350,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public String getValueAsString() {
-        Properties prop = propertiesLoader.getProperties();
-        if (prop.containsKey(key)) {
-            return prop.getProperty(key);
-        } else {
-            return "";
-        }
+        return propertiesHelper.getValueAsString(key);
     }
 
     /**
@@ -378,16 +360,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public String getValueAsStringOrNull() {
-        Properties prop = propertiesLoader.getProperties();
-        if (prop.containsKey(key)) {
-            String ret = prop.getProperty(key);
-            if ("".equals(ret)) {
-                return null;
-            }
-            return ret;
-        } else {
-            return null;
-        }
+        return propertiesHelper.getValueAsStringOrNull(key);
     }
 
     /**
@@ -398,12 +371,7 @@ public enum PAResourceManagerProperties {
      * @return the value of this property.
      */
     public boolean getValueAsBoolean() {
-        Properties prop = propertiesLoader.getProperties();
-        if (prop.containsKey(key)) {
-            return Boolean.parseBoolean(getValueAsString());
-        } else {
-            return false;
-        }
+        return propertiesHelper.getValueAsBoolean(key);
     }
 
     /**
@@ -421,15 +389,6 @@ public enum PAResourceManagerProperties {
     @Override
     public String toString() {
         return getValueAsString();
-    }
-
-    /**
-     * Supported types for PAResourceManagerProperties
-     */
-    public enum PropertyType {
-        STRING,
-        BOOLEAN,
-        INTEGER
     }
 
 }

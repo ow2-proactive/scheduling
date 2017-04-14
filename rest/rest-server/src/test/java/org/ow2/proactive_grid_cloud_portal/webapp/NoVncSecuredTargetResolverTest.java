@@ -30,7 +30,6 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 
@@ -59,9 +58,7 @@ public class NoVncSecuredTargetResolverTest {
 
     @Before
     public void loadPortalConfiguration() throws Exception {
-        PortalConfiguration.load(new ByteArrayInputStream((PortalConfiguration.SCHEDULER_LOGFORWARDINGSERVICE_PROVIDER +
-                                                           "=" +
-                                                           SocketBasedForwardingProvider.class.getName()).getBytes()));
+        PortalConfiguration.SCHEDULER_LOGINFORWARDINGSERVICE_PROVIDER.updateProperty(SocketBasedForwardingProvider.class.getName());
     }
 
     @Before

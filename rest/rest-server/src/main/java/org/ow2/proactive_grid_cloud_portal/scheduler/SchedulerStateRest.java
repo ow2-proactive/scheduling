@@ -3124,7 +3124,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public byte[] getCreateCredential(@MultipartForm LoginForm multipart)
             throws LoginException, SchedulerRestException {
         try {
-            String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.SCHEDULER_URL);
+            String url = PortalConfiguration.SCHEDULER_URL.getValueAsString();
 
             SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
             PublicKey pubKey = auth.getPublicKey();
@@ -3404,7 +3404,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws JobCreationRestException, IOException {
         if (StringUtils.isBlank(workflowUrl))
             throw new JobCreationRestException("Cannot create workflow without url");
-        HttpResourceDownloader httpResourceDownloader = new HttpResourceDownloader();
+        HttpResourceDownloader httpResourceDownloader = HttpResourceDownloader.getInstance();
         return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
     }
 

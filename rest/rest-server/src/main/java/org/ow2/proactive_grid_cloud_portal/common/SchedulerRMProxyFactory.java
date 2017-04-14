@@ -46,14 +46,14 @@ public class SchedulerRMProxyFactory {
     public RMProxyUserInterface connectToRM(CredData credData)
             throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
         RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
-        rm.init(getUrl(PortalConfiguration.RM_URL), credData);
+        rm.init(PortalConfiguration.RM_URL.getValueAsString(), credData);
         return rm;
     }
 
     public RMProxyUserInterface connectToRM(Credentials credentials)
             throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
         RMProxyUserInterface rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
-        rm.init(getUrl(PortalConfiguration.RM_URL), credentials);
+        rm.init(PortalConfiguration.RM_URL.getValueAsString(), credentials);
         return rm;
     }
 
@@ -61,7 +61,7 @@ public class SchedulerRMProxyFactory {
             throws LoginException, SchedulerException, ActiveObjectCreationException, NodeException {
         SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
                                                                          new Object[] {});
-        scheduler.init(getUrl(PortalConfiguration.SCHEDULER_URL), credentials);
+        scheduler.init(PortalConfiguration.SCHEDULER_URL.getValueAsString(), credentials);
         return scheduler;
     }
 
@@ -69,11 +69,8 @@ public class SchedulerRMProxyFactory {
             throws ActiveObjectCreationException, NodeException, LoginException, SchedulerException {
         SchedulerProxyUserInterface scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class,
                                                                          new Object[] {});
-        scheduler.init(getUrl(PortalConfiguration.SCHEDULER_URL), credData);
+        scheduler.init(PortalConfiguration.SCHEDULER_URL.getValueAsString(), credData);
         return scheduler;
     }
 
-    private String getUrl(String urlKey) {
-        return PortalConfiguration.getProperties().getProperty(urlKey);
-    }
 }
