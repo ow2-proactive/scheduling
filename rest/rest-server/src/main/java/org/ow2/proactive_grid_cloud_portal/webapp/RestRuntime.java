@@ -27,7 +27,6 @@ package org.ow2.proactive_grid_cloud_portal.webapp;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -57,7 +56,7 @@ public class RestRuntime {
 
     private boolean needToKillProActiveRuntime;
 
-    public void start(ResteasyProviderFactory dispatcher, File configurationFile, File log4jConfig, File paConfig) {
+    public void start(ResteasyProviderFactory dispatcher, File log4jConfig, File paConfig) {
 
         needToKillProActiveRuntime = !PALifeCycle.IsProActiveStarted();
 
@@ -67,7 +66,6 @@ public class RestRuntime {
         dispatcher.registerProvider(IntWrapperConverter.class);
         dispatcher.registerProvider(JacksonProvider.class);
 
-        loadProperties(configurationFile);
         configureLogger(log4jConfig);
 
         if (paConfig != null && paConfig.exists()) {
@@ -114,24 +112,6 @@ public class RestRuntime {
 
     private boolean loggerNotConfigured() {
         return System.getProperty(CentralPAPropertyRepository.LOG4J.getName()) == null;
-    }
-
-    private void loadProperties(File configurationFile) {
-        FileInputStream propertyFile = null;
-        try {
-            propertyFile = new FileInputStream(configurationFile);
-            PortalConfiguration.load(propertyFile);
-        } catch (Exception e) {
-            throw new IllegalStateException("Invalid configuration file " + configurationFile, e);
-        } finally {
-            if (propertyFile != null) {
-                try {
-                    propertyFile.close();
-                } catch (IOException e) {
-                    LOGGER.error("Failed to close portal configuration file", e);
-                }
-            }
-        }
     }
 
     void addExceptionMappers(ResteasyProviderFactory dispatcher) {

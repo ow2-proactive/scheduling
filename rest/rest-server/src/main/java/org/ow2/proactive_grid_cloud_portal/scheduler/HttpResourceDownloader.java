@@ -25,30 +25,85 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.security.KeyStore;
 
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.ow2.proactive.http.HttpClientBuilder;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.web.WebProperties;
 
 
 public class HttpResourceDownloader {
+
+    private static final Logger logger = Logger.getLogger(HttpResourceDownloader.class);
 
     private static final Integer CONNECTION_POOL_SIZE = 5;
 
     private static ResteasyClient client;
 
-    static {
+    private static HttpResourceDownloader instance = null;
+
+    public static HttpResourceDownloader getInstance() {
+        if (instance == null) {
+            instance = new HttpResourceDownloader();
+        }
+        return instance;
+    }
+
+    private HttpResourceDownloader() {
         ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(new HttpClientBuilder().maxConnections(CONNECTION_POOL_SIZE)
                                                                                             .useSystemProperties()
                                                                                             .build());
 
-        client = new ResteasyClientBuilder().httpEngine(engine).build();
+        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().httpEngine(engine);
+
+        if (WebProperties.WEB_HTTPS_TRUSTSTORE.isSet() && WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.isSet()) {
+            String trustStorePath = null;
+            try {
+                trustStorePath = PASchedulerProperties.getAbsolutePath(WebProperties.WEB_HTTPS_TRUSTSTORE.getValueAsString());
+                KeyStore keyStore = KeyStore.getInstance("PKCS12");
+
+                File f = new File(trustStorePath);
+                try (FileInputStream fis = new FileInputStream(f)) {
+                    char[] password = WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.getValueAsString().toCharArray();
+                    keyStore.load(fis, password);
+                    clientBuilder = clientBuilder.trustStore(keyStore);
+                }
+            } catch (Exception e) {
+                logger.error("Error why loading keystore " + trustStorePath, e);
+            }
+        }
+
+        if (WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME.getValueAsBoolean() &&
+            WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE.getValueAsBoolean()) {
+            clientBuilder = clientBuilder.disableTrustManager();
+        } else if (WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME.getValueAsBoolean()) {
+            clientBuilder = clientBuilder.hostnameVerification(ResteasyClientBuilder.HostnameVerificationPolicy.ANY);
+        }
+
+        if (WebProperties.RESOURCE_DOWNLOADER_PROXY.isSet() && WebProperties.RESOURCE_DOWNLOADER_PROXY_PORT.isSet() &&
+            WebProperties.RESOURCE_DOWNLOADER_PROXY_SCHEME.isSet()) {
+            try {
+                String proxyAddress = WebProperties.RESOURCE_DOWNLOADER_PROXY.getValueAsString();
+                int proxyPort = WebProperties.RESOURCE_DOWNLOADER_PROXY_PORT.getValueAsInt();
+                String scheme = WebProperties.RESOURCE_DOWNLOADER_PROXY_SCHEME.getValueAsString();
+                clientBuilder = clientBuilder.defaultProxy(proxyAddress, proxyPort, scheme);
+            } catch (Exception e) {
+                logger.error("Error while initializing Resource Downloader Proxy", e);
+            }
+        }
+
+        client = clientBuilder.build();
     }
 
     public <T> T getResource(String sessionId, String url, Class<T> clazz) throws IOException {
