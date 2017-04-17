@@ -8,7 +8,7 @@ configurations {
 
 //**************************************Generating the getstarted war archive**********************************
 task getStartedWarTask(type: War) {
-    from project(':').files('dist/war/getstarted', '*')
+    from project(':').files('dist/war/getstarted')
     archiveName "proactive-getstarted.war"
 }
 //*************************************************************************************************************
@@ -17,7 +17,7 @@ task getStartedWarTask(type: War) {
 //**************************************Generating the rest war archive****************************************
 task restWarTask(type: War) {
 
-    from (project(':').files('dist/war/rest', '*')){
+    from (project(':').files('dist/war/rest')){
         exclude '**/WEB-INF/web.xml'
     }
 
