@@ -157,13 +157,14 @@ public class SchedulerStarter {
             return;
         }
 
-        SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
+        SchedulerAuthenticationInterface schedulerAuthenticationInterface = startScheduler(commandLine, rmUrl);
 
-        schedAuthInter = sai;
+        schedAuthInter = schedulerAuthenticationInterface;
         rmURL = rmUrl;
 
         if (!commandLine.hasOption("no-rest")) {
-            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL()));
+            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl,
+                                                                                     schedulerAuthenticationInterface.getHostURL()));
             if (applicationUrls != null) {
                 for (String applicationUrl : applicationUrls) {
                     if (applicationUrl.endsWith("/rest")) {
