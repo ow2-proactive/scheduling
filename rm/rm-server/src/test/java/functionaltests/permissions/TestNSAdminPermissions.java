@@ -62,7 +62,7 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
 
     @Test
     public void action() throws Exception {
-        String nsName = "ns";
+        String nsName = "TestNSAdminPermissions";
         ResourceManager adminRMAccess = rmHelper.getResourceManager(TestUsers.ADMIN);
 
         RMTHelper.log("Test1 - node source removal");
@@ -141,6 +141,7 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
 
         adminRMAccess = rmHelper.getResourceManager(TestUsers.ADMIN);
         adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Success");
     }

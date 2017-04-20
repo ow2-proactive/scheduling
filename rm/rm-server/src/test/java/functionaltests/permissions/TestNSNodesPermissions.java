@@ -67,7 +67,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
     @Test
     public void action() throws Exception {
 
-        String nsName = "ns";
+        String nsName = "TestNSNodesPermissions";
         RMTHelper.log("Test1 - node users = ME");
 
         ResourceManager nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
