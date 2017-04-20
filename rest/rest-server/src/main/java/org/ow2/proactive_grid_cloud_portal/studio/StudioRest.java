@@ -322,7 +322,9 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public boolean submitPlannings(String sessionId, PathSegment pathSegment, String jobContentXmlString) throws JobCreationRestException, NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
+    public boolean submitPlannings(String sessionId, PathSegment pathSegment, String jobContentXmlString)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
         return scheduler().submitPlannings(sessionId, pathSegment, jobContentXmlString);
     }
 

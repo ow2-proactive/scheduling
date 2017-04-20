@@ -1216,6 +1216,7 @@ public interface SchedulerRestInterface {
      */
     @POST
     @Path("{path:plannings}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/json")
     boolean submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             String jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,

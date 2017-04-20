@@ -218,7 +218,7 @@ public interface StudioInterface {
     @Path("{path:plannings}")
     @Consumes(MediaType.APPLICATION_JSON)
     boolean submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
-                     String jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
+            String jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
 
     @GET

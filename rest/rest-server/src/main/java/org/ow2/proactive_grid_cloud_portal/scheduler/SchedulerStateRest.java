@@ -100,6 +100,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.jobplanner.rest.client.JobPlannerRestClient;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
@@ -137,7 +138,6 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive.jobplanner.rest.client.JobPlannerRestClient;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
@@ -2348,7 +2348,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-        JobPlannerRestClient client = new JobPlannerRestClient(PortalConfiguration.getProperties().getProperty(PortalConfiguration.JOBPLANNER_URL));
+        JobPlannerRestClient client = new JobPlannerRestClient(PortalConfiguration.getProperties()
+                                                                                  .getProperty(PortalConfiguration.JOBPLANNER_URL));
 
         return client.submitScheduledWorkflow(sessionId, jobVariables, jobContentXmlString);
 
