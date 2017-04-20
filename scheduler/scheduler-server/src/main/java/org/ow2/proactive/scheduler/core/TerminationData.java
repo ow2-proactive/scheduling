@@ -34,6 +34,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -68,8 +71,7 @@ final class TerminationData {
 
         private final InternalJob internalJob;
 
-        TaskTerminationData(InternalJob internalJob, RunningTaskData taskData, boolean normalTermination,
-                TaskResultImpl taskResult) {
+        TaskTerminationData(InternalJob internalJob, RunningTaskData taskData, boolean normalTermination, TaskResultImpl taskResult) {
             this.taskData = taskData;
             this.normalTermination = normalTermination;
             this.taskResult = taskResult;
@@ -108,13 +110,10 @@ final class TerminationData {
                                                              Collections.<TaskIdWrapper, TaskRestartData> emptyMap());
 
     static TerminationData newTerminationData() {
-        return new TerminationData(new HashSet<JobId>(),
-                                   new HashMap<TaskIdWrapper, TaskTerminationData>(),
-                                   new HashMap<TaskIdWrapper, TaskRestartData>());
+        return new TerminationData(new HashSet<JobId>(), new HashMap<TaskIdWrapper, TaskTerminationData>(), new HashMap<TaskIdWrapper, TaskRestartData>());
     }
 
-    private TerminationData(Set<JobId> jobsToTerminate, Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate,
-            Map<TaskIdWrapper, TaskRestartData> tasksToRestart) {
+    private TerminationData(Set<JobId> jobsToTerminate, Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate, Map<TaskIdWrapper, TaskRestartData> tasksToRestart) {
         this.jobsToTerminate = jobsToTerminate;
         this.tasksToTerminate = tasksToTerminate;
         this.tasksToRestart = tasksToRestart;
@@ -125,10 +124,8 @@ final class TerminationData {
         jobsToTerminate.add(jobId);
     }
 
-    void addTaskData(InternalJob jobData, RunningTaskData taskData, boolean normalTermination,
-            TaskResultImpl taskResult) {
-        tasksToTerminate.put(TaskIdWrapper.wrap(taskData.getTask().getId()),
-                             new TaskTerminationData(jobData, taskData, normalTermination, taskResult));
+    void addTaskData(InternalJob jobData, RunningTaskData taskData, boolean normalTermination, TaskResultImpl taskResult) {
+        tasksToTerminate.put(TaskIdWrapper.wrap(taskData.getTask().getId()), new TaskTerminationData(jobData, taskData, normalTermination, taskResult));
     }
 
     void addRestartData(TaskId taskId, long waitTime) {
@@ -153,13 +150,21 @@ final class TerminationData {
     }
 
     void handleTermination(final SchedulingService service) throws IOException, ClassNotFoundException {
-        for (TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
-            RunningTaskData taskData = taskToTerminate.taskData;
-            if (taskToTerminate.terminatedWhileRunning()) {
-                terminateRunningTask(service, taskToTerminate, taskData);
-            }
-        }
 
+        terminateTasks(service);
+
+        restartWaitingTasks(service);
+
+        terminateJobs(service);
+    }
+
+    private void terminateJobs(final SchedulingService service) {
+        for (JobId jobId : jobsToTerminate) {
+            service.terminateJobHandling(jobId);
+        }
+    }
+
+    private void restartWaitingTasks(final SchedulingService service) {
         for (final TaskRestartData restartData : tasksToRestart.values()) {
             service.getInfrastructure().schedule(new Runnable() {
                 public void run() {
@@ -167,14 +172,44 @@ final class TerminationData {
                 }
             }, restartData.waitTime);
         }
+    }
 
-        for (JobId jobId : jobsToTerminate) {
-            service.terminateJobHandling(jobId);
+    private void terminateTasks(final SchedulingService service) {
+
+        if (tasksToTerminate.values().isEmpty()) {
+            return;
+        }
+
+        ExecutorService parallelTerminationService = Executors.newFixedThreadPool(tasksToTerminate.values().size());
+
+        try {
+            List<Callable<Void>> callables = new ArrayList<>(tasksToTerminate.values().size());
+
+            for (final TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
+
+                callables.add(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        try {
+                            RunningTaskData taskData = taskToTerminate.taskData;
+                            if (taskToTerminate.terminatedWhileRunning()) {
+                                terminateRunningTask(service, taskToTerminate, taskData);
+                            }
+                        } catch (Throwable e) {
+                            logger.error("Failed to terminate task " + taskToTerminate.taskData.getTask().getName(), e);
+                            throw new RuntimeException(e);
+                        }
+                        return null;
+                    }
+                });
+            }
+            parallelTerminationService.invokeAll(callables);
+        } catch (Exception e) {
+            logger.error("Failed to terminate tasks ", e);
         }
     }
 
-    private void terminateRunningTask(SchedulingService service, TaskTerminationData taskToTerminate,
-            RunningTaskData taskData) {
+    private void terminateRunningTask(SchedulingService service, TaskTerminationData taskToTerminate, RunningTaskData taskData) {
         Map<String, String> genericInformation = new HashMap<>();
         VariablesMap variables = null;
         if (taskToTerminate.internalJob != null) {
@@ -192,8 +227,7 @@ final class TerminationData {
         } catch (Throwable t) {
             logger.info("Cannot terminate task launcher for task '" + taskData.getTask().getId() + "'", t);
             try {
-                logger.info("Task launcher that cannot be terminated is identified by " +
-                            taskData.getLauncher().toString());
+                logger.info("Task launcher that cannot be terminated is identified by " + taskData.getLauncher().toString());
             } catch (Throwable ignore) {
                 logger.info("Getting information about Task launcher failed (remote object not accessible?)");
             }
@@ -203,18 +237,13 @@ final class TerminationData {
             logger.debug("Releasing nodes for task '" + taskData.getTask().getId() + "'");
             RMProxiesManager proxiesManager = service.getInfrastructure().getRMProxiesManager();
             proxiesManager.getUserRMProxy(taskData.getUser(), taskData.getCredentials())
-                          .releaseNodes(taskData.getNodes(),
-                                        taskData.getTask().getCleaningScript(),
-                                        variables,
-                                        genericInformation,
-                                        taskToTerminate.taskData.getTask().getId());
+                          .releaseNodes(taskData.getNodes(), taskData.getTask().getCleaningScript(), variables, genericInformation, taskToTerminate.taskData.getTask().getId());
         } catch (Throwable t) {
             logger.info("Failed to release nodes for task '" + taskData.getTask().getId() + "'", t);
         }
     }
 
-    public VariablesMap getStringSerializableMap(SchedulingService service, TaskTerminationData taskToTerminate)
-            throws Exception {
+    public VariablesMap getStringSerializableMap(SchedulingService service, TaskTerminationData taskToTerminate) throws Exception {
         VariablesMap variablesMap = new VariablesMap();
 
         RunningTaskData taskData = taskToTerminate.taskData;
@@ -228,14 +257,10 @@ final class TerminationData {
             if (iDependences != null) {
                 Set<TaskId> parentIds = new HashSet<>(iDependences.size());
                 for (InternalTask parentTask : iDependences) {
-                    parentIds.addAll(InternalTaskParentFinder.getInstance()
-                                                             .getFirstNotSkippedParentTaskIds(parentTask));
+                    parentIds.addAll(InternalTaskParentFinder.getInstance().getFirstNotSkippedParentTaskIds(parentTask));
                 }
 
-                Map<TaskId, TaskResult> taskResults = service.getInfrastructure()
-                                                             .getDBManager()
-                                                             .loadTasksResults(taskData.getTask().getJobId(),
-                                                                               new ArrayList(parentIds));
+                Map<TaskId, TaskResult> taskResults = service.getInfrastructure().getDBManager().loadTasksResults(taskData.getTask().getJobId(), new ArrayList(parentIds));
                 getResultsFromListOfTaskResults(variablesMap.getInheritedMap(), taskResults);
             } else {
                 if (internalJob != null)
@@ -251,16 +276,14 @@ final class TerminationData {
         return variablesMap;
     }
 
-    private Map<String, Serializable> fillMapWithTaskResult(TaskResultImpl taskResult, boolean normalTermination)
-            throws IOException, ClassNotFoundException {
+    private Map<String, Serializable> fillMapWithTaskResult(TaskResultImpl taskResult, boolean normalTermination) throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables;
         variables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
         variables.put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(normalTermination));
         return variables;
     }
 
-    private void getResultsFromListOfTaskResults(Map<String, Serializable> variables,
-            Map<TaskId, TaskResult> taskResults) throws IOException, ClassNotFoundException {
+    private void getResultsFromListOfTaskResults(Map<String, Serializable> variables, Map<TaskId, TaskResult> taskResults) throws IOException, ClassNotFoundException {
         for (TaskResult currentTaskResult : taskResults.values()) {
             if (currentTaskResult.getPropagatedVariables() != null) {
                 variables.putAll(SerializationUtil.deserializeVariableMap(currentTaskResult.getPropagatedVariables()));
