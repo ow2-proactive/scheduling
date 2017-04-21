@@ -103,7 +103,7 @@ public class Probability {
             // and scheduling the timer
             probability = calcProbability(--step);
             timer.schedule(new RestoreProbabilityTask(probability),
-                           PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.getValueAsInt());
+                           PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.getValueAsLong());
         }
 
         probability = 0;

@@ -61,8 +61,8 @@ public class PACommonPropertiesHelper {
      *
      * @return true if this property is set, false otherwise.
      */
-    public synchronized boolean isSet(String key) {
-        return propertiesLoader.getProperties().containsKey(key);
+    public synchronized boolean isSet(String key, String defaultValue) {
+        return defaultValue != null || propertiesLoader.getProperties().containsKey(key);
     }
 
     /**
@@ -110,17 +110,48 @@ public class PACommonPropertiesHelper {
      *
      * @return the value of this property.
      */
-    public synchronized int getValueAsInt(String key) {
-        if (propertiesLoader.getProperties().containsKey(key)) {
-            String valueS = getValueAsString(key);
+    public synchronized int getValueAsInt(String key, PropertyType type, String defaultValue) {
+        if (type != PropertyType.INTEGER) {
+            throw new IllegalArgumentException("Property " + key + " is not a " + PropertyType.INTEGER);
+        }
+
+        String valueString = getValueAsString(key, defaultValue);
+
+        if (valueString != null) {
             try {
-                return Integer.parseInt(valueS);
+                return Integer.parseInt(valueString);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(key +
                                                    " is not an integer property. getValueAsInt cannot be called on this property");
             }
         } else {
-            return 0;
+            throw new IllegalArgumentException("Property " + key +
+                                               " is undefined and does not declare a default value.");
+        }
+    }
+
+    /**
+     * Returns the value of this property as an integer.
+     * If value is not an integer, an exception will be thrown.
+     *
+     * @return the value of this property.
+     */
+    public synchronized long getValueAsLong(String key, PropertyType type, String defaultValue) {
+        if (type != PropertyType.INTEGER) {
+            throw new IllegalArgumentException("Property " + key + " is not a " + PropertyType.INTEGER);
+        }
+        String valueString = getValueAsString(key, defaultValue);
+
+        if (valueString != null) {
+            try {
+                return Long.parseLong(valueString);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(key +
+                                                   " is not an integer property. getValueAsInt cannot be called on this property");
+            }
+        } else {
+            throw new IllegalArgumentException("Property " + key +
+                                               " is undefined and does not declare a default value.");
         }
     }
 
@@ -129,12 +160,12 @@ public class PACommonPropertiesHelper {
      *
      * @return the value of this property.
      */
-    public synchronized String getValueAsString(String key) {
+    public synchronized String getValueAsString(String key, String defaultValue) {
         Properties prop = propertiesLoader.getProperties();
         if (prop.containsKey(key)) {
             return prop.getProperty(key);
         } else {
-            return "";
+            return defaultValue;
         }
     }
 
@@ -145,17 +176,23 @@ public class PACommonPropertiesHelper {
      *
      * @return the list of values of this property.
      */
-    public synchronized List<String> getValueAsList(String key, String separator) {
-        Properties prop = propertiesLoader.getProperties();
+    public synchronized List<String> getValueAsList(String key, PropertyType type, String separator,
+            String defaultValue) {
+        if (type != PropertyType.LIST) {
+            throw new IllegalArgumentException("Property " + key + " is not a " + PropertyType.LIST);
+        }
+        String valueString = getValueAsString(key, defaultValue);
         ArrayList<String> valueList = new ArrayList<>();
-        if (prop.containsKey(key)) {
-            String value = prop.getProperty(key);
-            for (String val : value.split(Pattern.quote(separator))) {
+        if (valueString != null) {
+            for (String val : valueString.split(Pattern.quote(separator))) {
                 val = val.trim();
                 if (val.length() > 0) {
                     valueList.add(val);
                 }
             }
+        } else {
+            throw new IllegalArgumentException("Property " + key +
+                                               " is undefined and does not declare a default value.");
         }
         return valueList;
     }
@@ -186,9 +223,13 @@ public class PACommonPropertiesHelper {
      *
      * @return the value of this property.
      */
-    public synchronized boolean getValueAsBoolean(String key) {
-        if (propertiesLoader.getProperties().containsKey(key)) {
-            return Boolean.parseBoolean(getValueAsString(key));
+    public synchronized boolean getValueAsBoolean(String key, PropertyType type, String defaultValue) {
+        if (type != PropertyType.BOOLEAN) {
+            throw new IllegalArgumentException("Property " + key + " is not a " + PropertyType.BOOLEAN);
+        }
+        String valueString = getValueAsString(key, defaultValue);
+        if (valueString != null) {
+            return Boolean.parseBoolean(valueString);
         } else {
             return false;
         }

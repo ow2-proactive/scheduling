@@ -111,16 +111,14 @@ public class SchedulerStateListener {
 
     private void connect() throws InterruptedException {
         String url = PortalConfiguration.SCHEDULER_URL.getValueAsString();
-        String cred_path = PortalConfiguration.SCHEDULER_CACHE_CREDENTIALS.getValueAsString();
-        File credFile = new File(cred_path);
+        String cred_path = PortalConfiguration.SCHEDULER_CACHE_CREDENTIALS.getValueAsStringOrNull();
 
         while (scheduler == null && !killed) {
             try {
                 scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class, new Object[] {});
 
-                // check is we use a credential file 
-
-                if (credFile.exists()) {
+                // check is we use a credential file
+                if (cred_path != null && (new File(cred_path)).exists()) {
                     Credentials credential = Credentials.getCredentials(cred_path);
                     scheduler.init(url, credential);
                 } else {

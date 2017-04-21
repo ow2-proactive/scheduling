@@ -89,7 +89,7 @@ public class RMStateCaching {
 
         while (rm == null) {
             String url = PortalConfiguration.RM_URL.getValueAsString();
-            String cred_path = PortalConfiguration.RM_CACHE_CREDENTIALS.getValueAsString();
+            String cred_path = PortalConfiguration.RM_CACHE_CREDENTIALS.getValueAsStringOrNull();
 
             try {
                 if (rm == null) {
