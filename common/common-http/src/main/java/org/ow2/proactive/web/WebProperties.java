@@ -26,7 +26,9 @@
 package org.ow2.proactive.web;
 
 import java.io.File;
+import java.util.List;
 
+import org.ow2.proactive.core.properties.PACommonProperties;
 import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
 import org.ow2.proactive.core.properties.PropertyType;
 import org.ow2.proactive.utils.PAPropertiesLazyLoader;
@@ -38,37 +40,34 @@ import org.ow2.proactive.utils.PAPropertiesLazyLoader;
  *
  * @author ActiveEon Team
  */
-public enum WebProperties {
+public enum WebProperties implements PACommonProperties {
 
     /** Rest server home directory */
     REST_HOME("pa.rest.home", PropertyType.STRING),
 
-    WEB_DEPLOY("web.deploy", PropertyType.BOOLEAN),
+    WEB_DEPLOY("web.deploy", PropertyType.BOOLEAN, "true"),
 
-    WEB_HTTP_PORT("web.http.port", PropertyType.INTEGER),
+    WEB_HTTP_PORT("web.http.port", PropertyType.INTEGER, "8080"),
 
-    WEB_HTTPS("web.https", PropertyType.BOOLEAN),
+    WEB_HTTPS("web.https", PropertyType.BOOLEAN, "false"),
 
-    WEB_HTTPS_ALLOW_ANY_CERTIFICATE("web.https.allow_any_certificate", PropertyType.BOOLEAN),
+    WEB_HTTPS_ALLOW_ANY_CERTIFICATE("web.https.allow_any_certificate", PropertyType.BOOLEAN, "false"),
 
-    WEB_HTTPS_ALLOW_ANY_HOSTNAME("web.https.allow_any_hostname", PropertyType.BOOLEAN),
+    WEB_HTTPS_ALLOW_ANY_HOSTNAME("web.https.allow_any_hostname", PropertyType.BOOLEAN, "false"),
 
-    WEB_HTTPS_KEYSTORE("web.https.keystore", PropertyType.STRING),
+    WEB_HTTPS_KEYSTORE("web.https.keystore", PropertyType.STRING, "config/web/keystore"),
 
-    WEB_HTTPS_KEYSTORE_PASSWORD("web.https.keystore.password", PropertyType.STRING),
+    WEB_HTTPS_KEYSTORE_PASSWORD("web.https.keystore.password", PropertyType.STRING, "activeeon"),
 
     WEB_HTTPS_TRUSTSTORE("web.https.truststore", PropertyType.STRING),
 
     WEB_HTTPS_TRUSTSTORE_PASSWORD("web.https.truststore.password", PropertyType.STRING),
 
-    WEB_HTTPS_PORT("web.https.port", PropertyType.INTEGER),
+    WEB_HTTPS_PORT("web.https.port", PropertyType.INTEGER, "8443"),
 
-    WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER),
+    WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER, "100"),
 
-    @Deprecated
-    WEB_PORT("web.port", PropertyType.INTEGER),
-
-    WEB_REDIRECT_HTTP_TO_HTTPS("web.redirect_http_to_https", PropertyType.BOOLEAN),
+    WEB_REDIRECT_HTTP_TO_HTTPS("web.redirect_http_to_https", PropertyType.BOOLEAN, "false"),
 
     METADATA_CONTENT_TYPE("content.type", PropertyType.STRING),
 
@@ -82,7 +81,7 @@ public enum WebProperties {
 
     RESOURCE_DOWNLOADER_PROXY_SCHEME("resource.downloader.proxy.scheme", PropertyType.STRING);
 
-    public static final String PA_WEB_PROPERTIES_FILEPATH = "pa.portal.configuration.filepath";
+    public static final String PA_WEB_PROPERTIES_FILEPATH_PROPERTY_NAME = "pa.portal.configuration.filepath";
 
     public static final String PA_WEB_PROPERTIES_RELATIVE_FILEPATH = "config/web/settings.ini";
 
@@ -92,7 +91,7 @@ public enum WebProperties {
     private static PACommonPropertiesHelper propertiesHelper;
 
     static {
-        reload();
+        load();
     }
 
     /** Key of the specific instance. */
@@ -101,13 +100,17 @@ public enum WebProperties {
     /** value of the specific instance. */
     private PropertyType type;
 
-    WebProperties(String str, PropertyType type) {
+    /** default value to use if the property is not defined **/
+    private String defaultValue;
+
+    WebProperties(String str, PropertyType type, String defaultValue) {
         this.key = str;
         this.type = type;
+        this.defaultValue = defaultValue;
     }
 
-    public static synchronized void storeInSystemProperties() {
-        System.setProperties(propertiesLoader.getProperties());
+    WebProperties(String str, PropertyType type) {
+        this(str, type, null);
     }
 
     /**
@@ -118,7 +121,7 @@ public enum WebProperties {
      */
     protected static void loadProperties(String filename) {
         propertiesLoader = new PAPropertiesLazyLoader(REST_HOME.key,
-                                                      PA_WEB_PROPERTIES_FILEPATH,
+                                                      PA_WEB_PROPERTIES_FILEPATH_PROPERTY_NAME,
                                                       PA_WEB_PROPERTIES_RELATIVE_FILEPATH,
                                                       filename);
         propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
@@ -134,11 +137,18 @@ public enum WebProperties {
         propertiesHelper.updateProperties(filename);
     }
 
-    public static synchronized void reload() {
+    /**
+     * Load or reload the configuration, using the default settings and the current value of the REST_HOME system property
+     */
+    public static synchronized void load() {
         propertiesLoader = new PAPropertiesLazyLoader(REST_HOME.key,
-                                                      PA_WEB_PROPERTIES_FILEPATH,
+                                                      PA_WEB_PROPERTIES_FILEPATH_PROPERTY_NAME,
                                                       PA_WEB_PROPERTIES_RELATIVE_FILEPATH);
         propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
+    }
+
+    public static synchronized void storeInSystemProperties() {
+        System.setProperties(propertiesLoader.getProperties());
     }
 
     /**
@@ -157,96 +167,62 @@ public enum WebProperties {
         }
     }
 
-    /**
-     * Get the key.
-     *
-     * @return the key.
-     */
+    @Override
     public String getKey() {
         return key;
     }
 
-    /**
-     * Set the value of this property to the given one.
-     *
-     * @param value the new value to set.
-     */
+    @Override
     public void updateProperty(String value) {
         propertiesHelper.updateProperty(key, value);
     }
 
-    /**
-     * Return true if this property is set, false otherwise.
-     *
-     * @return true if this property is set, false otherwise.
-     */
+    @Override
     public boolean isSet() {
-        return propertiesHelper.isSet(key);
+        return propertiesHelper.isSet(key, defaultValue);
     }
 
-    /**
-     * Unset this property
-     */
+    @Override
     public void unSet() {
         propertiesHelper.unSet(key);
     }
 
-    /**
-     * Returns the string to be passed on the command line
-     *
-     * The property surrounded by '-D' and '='
-     *
-     * @return the string to be passed on the command line
-     */
+    @Override
     public String getCmdLine() {
         return propertiesHelper.getCmdLine(key);
     }
 
-    /**
-     * Returns the value of this property as an integer.
-     * If value is not an integer, an exception will be thrown.
-     *
-     * @return the value of this property.
-     */
+    @Override
     public int getValueAsInt() {
-        return propertiesHelper.getValueAsInt(key);
+        return propertiesHelper.getValueAsInt(key, type, defaultValue);
     }
 
-    /**
-     * Returns the value of this property as a string.
-     *
-     * @return the value of this property.
-     */
+    @Override
+    public long getValueAsLong() {
+        return propertiesHelper.getValueAsLong(key, type, defaultValue);
+    }
+
+    @Override
     public String getValueAsString() {
-        return propertiesHelper.getValueAsString(key);
+        return propertiesHelper.getValueAsString(key, defaultValue);
     }
 
-    /**
-     * Returns the value of this property as a string.
-     * If the property is not defined, then null is returned
-     *
-     * @return the value of this property.
-     */
+    @Override
     public String getValueAsStringOrNull() {
         return propertiesHelper.getValueAsStringOrNull(key);
     }
 
-    /**
-     * Returns the value of this property as a boolean.
-     * If value is not a boolean, an exception will be thrown.<br>
-     * The behavior of this method is the same as the {@link java.lang.Boolean#parseBoolean(String s)}.
-     *
-     * @return the value of this property.
-     */
+    @Override
     public boolean getValueAsBoolean() {
-        return propertiesHelper.getValueAsBoolean(key);
+        return propertiesHelper.getValueAsBoolean(key, type, defaultValue);
     }
 
-    /**
-     * Return the type of the given properties.
-     *
-     * @return the type of the given properties.
-     */
+    @Override
+    public List<String> getValueAsList(String separator) {
+        return propertiesHelper.getValueAsList(key, type, separator, defaultValue);
+    }
+
+    @Override
     public PropertyType getType() {
         return type;
     }
@@ -257,6 +233,26 @@ public enum WebProperties {
     @Override
     public String toString() {
         return getValueAsString();
+    }
+
+    @Override
+    public String getConfigurationFilePathPropertyName() {
+        return PA_WEB_PROPERTIES_FILEPATH_PROPERTY_NAME;
+    }
+
+    @Override
+    public String getConfigurationDefaultRelativeFilePath() {
+        return PA_WEB_PROPERTIES_RELATIVE_FILEPATH;
+    }
+
+    @Override
+    public void loadPropertiesFromFile(String filename) {
+        loadProperties(filename);
+    }
+
+    @Override
+    public void reloadConfiguration() {
+        load();
     }
 
 }

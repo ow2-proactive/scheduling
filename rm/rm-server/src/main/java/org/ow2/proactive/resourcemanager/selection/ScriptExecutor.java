@@ -106,7 +106,7 @@ public class ScriptExecutor implements Callable<Node> {
 
                         try {
                             PAFuture.waitFor(scriptResult,
-                                             PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt());
+                                             PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsLong());
                         } catch (ProActiveTimeoutException e) {
                             // do not produce an exception here
                             nodeMatch = false;

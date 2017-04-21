@@ -107,13 +107,11 @@ public class HttpClientBuilder {
         if (useSystemProperties) {
             internalHttpClientBuilder.useSystemProperties();
 
-            if (WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE.isSet() &&
-                WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE.getValueAsBoolean()) {
+            if (WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE.getValueAsBoolean()) {
                 acceptAnyCertificate = true;
             }
 
-            if (WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME.isSet() &&
-                WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME.getValueAsBoolean()) {
+            if (WebProperties.WEB_HTTPS_ALLOW_ANY_HOSTNAME.getValueAsBoolean()) {
                 acceptAnyHostname = true;
             }
         }

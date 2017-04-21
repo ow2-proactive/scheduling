@@ -138,10 +138,6 @@ public class JettyStarter {
             return WebProperties.WEB_HTTP_PORT.getValueAsInt();
         }
 
-        if (WebProperties.WEB_PORT.isSet()) {
-            return WebProperties.WEB_PORT.getValueAsInt();
-        }
-
         return 8080;
     }
 
@@ -372,8 +368,11 @@ public class JettyStarter {
     }
 
     private void initializeRestProperties() {
-        WebProperties.REST_HOME.updateProperty(getSchedulerHome());
-        WebProperties.reload();
+        System.setProperty(WebProperties.REST_HOME.getKey(), getSchedulerHome());
+        WebProperties.load();
+        if (!getSchedulerHome().equals(WebProperties.REST_HOME.getValueAsString())) {
+            throw new IllegalStateException("Rest home directory could not be initialized");
+        }
     }
 
     private String getSchedulerHome() {

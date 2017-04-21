@@ -160,7 +160,7 @@ public class RMDBManager {
                 recover(lastAliveTimeResult.getTime());
             }
 
-            int periodInMilliseconds = PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsInt();
+            long periodInMilliseconds = PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.getValueAsLong();
 
             timer = new Timer("Periodic RM live event saver");
             timer.schedule(new TimerTask() {

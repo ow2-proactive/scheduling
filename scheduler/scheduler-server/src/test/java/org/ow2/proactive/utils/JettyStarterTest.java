@@ -115,17 +115,6 @@ public class JettyStarterTest {
     }
 
     @Test
-    public void testGetJettyHttpPortUsingWebPortProperty() {
-        WebProperties.WEB_PORT.updateProperty("42");
-
-        int jettyHttpPort = jettyStarter.getJettyHttpPort();
-
-        assertThat(jettyHttpPort).isEqualTo(42);
-
-        WebProperties.WEB_PORT.unSet();
-    }
-
-    @Test
     public void testGetJettyHttpPortUsingWebHttpPortProperty() {
         WebProperties.WEB_HTTP_PORT.updateProperty("42");
 
@@ -133,19 +122,6 @@ public class JettyStarterTest {
 
         assertThat(jettyHttpPort).isEqualTo(42);
 
-        WebProperties.WEB_HTTP_PORT.unSet();
-    }
-
-    @Test
-    public void testGetJettyHttpPortUsingWebPortAndWebHttpPortProperties() {
-        WebProperties.WEB_PORT.updateProperty("42");
-        WebProperties.WEB_HTTP_PORT.updateProperty("43");
-
-        int jettyHttpPort = jettyStarter.getJettyHttpPort();
-
-        assertThat(jettyHttpPort).isEqualTo(43);
-
-        WebProperties.WEB_PORT.unSet();
         WebProperties.WEB_HTTP_PORT.unSet();
     }
 
