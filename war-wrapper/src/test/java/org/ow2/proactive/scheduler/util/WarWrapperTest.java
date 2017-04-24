@@ -26,8 +26,15 @@
 package org.ow2.proactive.scheduler.util;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.KeyException;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.wrapper.WrapperSingleton;
 
@@ -38,15 +45,29 @@ import org.ow2.proactive.wrapper.WrapperSingleton;
 
 public class WarWrapperTest {
 
-    @Test
-    public void configureSchedulerAndRMAndPAHomes() throws Exception {
+    private static Credentials credentials;
 
-        String expected = WarWrapper.class.getProtectionDomain()
-                                          .getCodeSource()
-                                          .getLocation()
-                                          .toString()
-                                          .replace("file:", "") +
-                          ".";
+    private static WarWrapper warWrapper;
+
+    private static String PA_HOME = null;
+
+    @BeforeClass
+    public static void setup() throws KeyException, IOException {
+
+        findPAHome();
+
+        if (null != PA_HOME)
+            System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
+
+        warWrapper = WrapperSingleton.getInstance();
+        warWrapper.launchProactiveServer();
+        credentials = warWrapper.getCredentials();
+    }
+
+    @Test
+    public void testConfigureSchedulerAndRMAndPAHomes() throws Exception {
+
+        String expected = PA_HOME;
 
         WrapperSingleton.getInstance().configureSchedulerAndRMAndPAHomes();
 
@@ -56,4 +77,37 @@ public class WarWrapperTest {
 
     }
 
+    @Test
+    public void testStopRM() throws Exception {
+
+        boolean expected = true;
+
+        boolean actual = warWrapper.stopRM(credentials);
+
+        assertThat(actual).isEqualTo(expected);
+
+    }
+
+    @Test
+    public void testStopScheduler() throws Exception {
+
+        boolean expected = true;
+
+        boolean actual = warWrapper.stopScheduler(credentials);
+
+        assertThat(actual).isEqualTo(expected);
+
+    }
+
+    private static void findPAHome() {
+
+        File currentFile = new File(WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+
+        while (currentFile.getParentFile() != null) {
+            if (currentFile.getParentFile().getName().equals("scheduling")) {
+                PA_HOME = currentFile.getParentFile().getPath();
+            }
+            currentFile = currentFile.getParentFile();
+        }
+    }
 }

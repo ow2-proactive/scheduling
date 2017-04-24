@@ -209,6 +209,8 @@ public enum PAResourceManagerProperties {
 
     RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER),
 
+    RM_SHUTDOWN_KILL_RUNTIME("pa.rm.shutdown.kill.rt", PropertyType.BOOLEAN),
+
     /**
      * Defines if the lock restoration feature is enabled on RM startup.
      * <p>

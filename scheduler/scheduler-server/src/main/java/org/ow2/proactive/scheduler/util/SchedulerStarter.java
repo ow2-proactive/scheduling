@@ -105,6 +105,8 @@ public class SchedulerStarter {
 
     protected static String rmURL;
 
+    protected static byte[] credentials;
+
     /**
      * Start the scheduler creation process.
      */
@@ -475,6 +477,8 @@ public class SchedulerStarter {
                               new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
                               RestartDownNodesPolicy.class.getName(),
                               new Object[] { "ALL", "ALL", "10000" });
+
+        credentials = creds;
     }
 
     private static String getLocalAdress() throws ProActiveException {

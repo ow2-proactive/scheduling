@@ -25,7 +25,11 @@
  */
 package org.ow2.proactive.wrapper;
 
-import org.apache.log4j.*;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 

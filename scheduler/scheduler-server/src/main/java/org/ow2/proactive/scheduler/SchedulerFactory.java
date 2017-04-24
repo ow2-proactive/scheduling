@@ -71,7 +71,7 @@ public class SchedulerFactory {
 
     private static boolean allowNullInit = false;
 
-    private static boolean schedulerStarted = false;
+    public static boolean schedulerStarted = false;
 
     /**
      * Try to join Resource Manager at given URI.

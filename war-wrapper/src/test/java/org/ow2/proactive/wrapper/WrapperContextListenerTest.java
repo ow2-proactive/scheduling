@@ -30,7 +30,8 @@ import javax.servlet.ServletContextEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.ow2.proactive.scheduler.util.WarWrapper;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -57,10 +58,8 @@ public class WrapperContextListenerTest extends Mockito {
 
     @Before
     public void setup() throws Exception {
-        // preparing the data by making the mock
         PowerMockito.mockStatic(WrapperSingleton.class);
         PowerMockito.when(WrapperSingleton.getInstance()).thenReturn(mockStarter);
-
     }
 
     @Test
@@ -69,5 +68,13 @@ public class WrapperContextListenerTest extends Mockito {
         new WrapperContextListener().contextInitialized(mockEvent);
 
         verify(mockStarter, times(1)).launchProactiveServer();
+    }
+
+    @Test
+    public void testcontextDestroyed() throws Exception {
+
+        new WrapperContextListener().contextDestroyed(mockEvent);
+
+        verify(mockStarter, times(1)).shutdownProactive();
     }
 }

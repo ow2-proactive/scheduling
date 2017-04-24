@@ -25,11 +25,23 @@
  */
 package org.ow2.proactive.scheduler.util;
 
-import org.apache.commons.cli.*;
-import org.apache.log4j.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyException;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.scheduler.SchedulerFactory;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.wrapper.WrapperWebConfiguration;
 
@@ -41,10 +53,29 @@ public class WarWrapper extends SchedulerStarter {
 
     private static final Logger logger = Logger.getLogger(WarWrapper.class);
 
+    private static final String SCHEDULER_RM_DEFAULT_HOME = ".";
+
+    private static String schedulerUri;
+
+    private static CommandLine cmd = null;
+
     public static void main(String[] args) {
-        new WarWrapper().launchProactiveServer();
+        try {
+
+            WarWrapper warWrapper = new WarWrapper();
+            warWrapper.launchProactiveServer();
+
+            Thread.sleep(5000);
+
+            warWrapper.shutdownProactive();
+            logger.info("Proactive stopped");
+
+        } catch (InterruptedException e) {
+            logger.error("Error while stopping Proactive " + e.getMessage());
+        }
     }
 
+    //********************************************Launching Proactive *************************************************
     public void launchProactiveServer() {
 
         String[] args = { "--no-rest" };
@@ -59,7 +90,7 @@ public class WarWrapper extends SchedulerStarter {
         Options options = getOptions();
 
         try {
-            CommandLine cmd = getCommandLine(args, options);
+            cmd = getCommandLine(args, options);
 
             start(cmd);
 
@@ -69,9 +100,10 @@ public class WarWrapper extends SchedulerStarter {
             else
                 logger.warn("System property 'rm.url' not set: ");
 
-            if (null != schedAuthInter)
-                setPropIfNotAlreadySet("scheduler.url", schedAuthInter.getHostURL());
-            else
+            if (null != schedAuthInter) {
+                schedulerUri = schedAuthInter.getHostURL();
+                setPropIfNotAlreadySet("scheduler.url", schedulerUri);
+            } else
                 logger.warn("System property 'scheduler.url' not set");
 
             String getStartedUrl = WrapperWebConfiguration.getStartedUrl();
@@ -89,7 +121,8 @@ public class WarWrapper extends SchedulerStarter {
 
     protected void configureSchedulerAndRMAndPAHomes() {
 
-        String schedHome = getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + ".";
+        String schedHome = getClass().getProtectionDomain().getCodeSource().getLocation().getPath() +
+                           SCHEDULER_RM_DEFAULT_HOME;
 
         setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
         schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
@@ -100,4 +133,85 @@ public class WarWrapper extends SchedulerStarter {
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
                                schedHome + "/config/network/server.ini");
     }
+
+    //**************************************Shutting down proactive ***************************************************
+    public void shutdownProactive() {
+
+        try {
+
+            Credentials credentials = getCredentials();
+
+            if (stopScheduler(credentials))
+                logger.info("Scheduler on " + schedulerUri + " correctly stopped");
+            else
+                logger.warn("Scheduler on " + schedulerUri + " is not stopped");
+
+            if (stopRM(credentials))
+                logger.info("RM on " + rmURL + " correctly stopped");
+            else
+                logger.warn("RM on " + rmURL + " is not stopped");
+
+        } catch (KeyException e) {
+            logger.error("ERROR while stopping ProActive: Cannot  acquire credentials");
+        } catch (Exception e) {
+            logger.error("ERROR while stopping ProActive: " + e.getMessage());
+        }
+    }
+
+    protected boolean stopRM(Credentials credentials) {
+
+        boolean rmStopped = false;
+
+        try {
+            RMAuthentication rmAuthentication = connectToRM();
+            ResourceManager rm = rmAuthentication.login(credentials);
+
+            //Do not kill Runtime when stopping RM
+            PAResourceManagerProperties.RM_SHUTDOWN_KILL_RUNTIME.updateProperty("false");
+
+            BooleanWrapper booleanWrapper = rm.shutdown(true);
+            rmStopped = booleanWrapper.getBooleanValue();
+
+        } catch (Exception e) {
+            logger.error("ERROR while stopping RM on " + rmURL + ": " + e.getMessage());
+        }
+
+        return rmStopped;
+    }
+
+    protected boolean stopScheduler(Credentials credentials) {
+
+        boolean schedulerStopped = false;
+
+        try {
+
+            Scheduler scheduler = schedAuthInter.login(credentials);
+            schedulerStopped = scheduler.shutdown();
+
+            if (schedulerStopped && scheduler.getStatus().isDown())
+                SchedulerFactory.schedulerStarted = false;
+
+        } catch (Exception e) {
+            logger.error("ERROR while stopping to the scheduler on " + schedulerUri + ": " + e.getMessage());
+        }
+
+        return schedulerStopped;
+    }
+
+    private static RMAuthentication connectToRM() throws URISyntaxException, RMException {
+
+        RMAuthentication rmAuthentication = null;
+
+        if (rmURL != null) {
+
+            rmAuthentication = SchedulerFactory.waitAndJoinRM(new URI(rmURL));
+        }
+
+        return rmAuthentication;
+    }
+
+    protected Credentials getCredentials() throws KeyException {
+        return Credentials.getCredentialsBase64(credentials);
+    }
+
 }

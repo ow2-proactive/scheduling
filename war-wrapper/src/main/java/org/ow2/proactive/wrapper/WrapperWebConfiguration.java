@@ -40,6 +40,8 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  */
 public class WrapperWebConfiguration {
 
+    private static final String SCHEDULER_RM_DEFAULT_HOME = ".";
+
     protected static final String REST_CONFIG_PATH = "/config/web/settings.ini";
 
     private static final Logger logger = Logger.getLogger(WrapperWebConfiguration.class);
@@ -59,13 +61,11 @@ public class WrapperWebConfiguration {
             int httpPort = Integer.parseInt(properties.getProperty("ear.wrapper.target.server.http.port", "9080"));
             int httpsPort = Integer.parseInt(properties.getProperty("ear.wrapper.target.server.https.port", "9443"));
 
-            boolean httpsEnabled = isHttpsEnabled(properties);
-
             int port = httpPort;
 
             String httpProtocol;
 
-            if (httpsEnabled) {
+            if (isHttpsEnabled(properties)) {
                 httpProtocol = "https";
                 port = httpsPort;
             } else {
@@ -88,7 +88,7 @@ public class WrapperWebConfiguration {
         if (PASchedulerProperties.SCHEDULER_HOME.isSet()) {
             return PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
         } else {
-            return ".";
+            return SCHEDULER_RM_DEFAULT_HOME;
         }
     }
 
