@@ -1,4 +1,6 @@
 dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
+    compile project(':common:common-api')
     testCompile "org.powermock:powermock-mockito-release-full:1.6.4"
+    testCompile project (':common:common-api').sourceSets.test.output
 }

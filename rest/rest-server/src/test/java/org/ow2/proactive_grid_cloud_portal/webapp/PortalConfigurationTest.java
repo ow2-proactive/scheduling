@@ -25,21 +25,69 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.ByteArrayInputStream;
-
+import org.junit.Before;
 import org.junit.Test;
+import org.ow2.proactive.core.properties.PACommonPropertiesTestHelper;
 
 
-public class PortalConfigurationTest {
+public class PortalConfigurationTest extends PACommonPropertiesTestHelper {
+
+    public static final String CACHE_LOGIN = "mylogin";
+
+    @Before
+    public void clear() {
+        super.clear(PortalConfiguration.REST_HOME);
+    }
 
     @Test
-    public void testFileProperty_Overrode_BySystemProperty() throws Exception {
-        System.setProperty("propSys", "eulav");
-        PortalConfiguration.load(new ByteArrayInputStream("prop=value\npropSys=value".getBytes()));
+    public void testLoadProperties_NoFile_EmptyProperties() throws Exception {
+        super.testLoadProperties_NoFile_EmptyProperties(PortalConfiguration.SCHEDULER_URL);
+    }
 
-        assertEquals("value", PortalConfiguration.getProperties().getProperty("prop"));
-        assertEquals("eulav", PortalConfiguration.getProperties().getProperty("propSys"));
+    @Test
+    public void testLoadProperties_NoFile_UseDefault() throws Exception {
+        super.testLoadProperties_NoFile_UseDefault(PortalConfiguration.SCHEDULER_CACHE_LOGIN, "watcher");
+    }
+
+    @Test
+    public void testLoadProperties_RelativeFileManuallySet() throws Exception {
+        super.testLoadProperties_RelativeFileManuallySet(PortalConfiguration.SCHEDULER_CACHE_LOGIN,
+                                                         CACHE_LOGIN,
+                                                         PortalConfiguration.REST_HOME);
+    }
+
+    @Test
+    public void testLoadProperties_PropertySet_NoFile() throws Exception {
+        super.testLoadProperties_PropertySet_NoFile(PortalConfiguration.SCHEDULER_CACHE_LOGIN,
+                                                    CACHE_LOGIN,
+                                                    PortalConfiguration.REST_HOME);
+    }
+
+    @Test
+    public void testLoadProperties_PropertySet_NoFile_AndReload() throws Exception {
+        super.testLoadProperties_PropertySet_NoFile_AndReload(PortalConfiguration.SCHEDULER_CACHE_LOGIN,
+                                                              CACHE_LOGIN,
+                                                              PortalConfiguration.REST_HOME);
+    }
+
+    @Test
+    public void testLoadProperties_FileManuallySet() throws Exception {
+        super.testLoadProperties_FileManuallySet(PortalConfiguration.SCHEDULER_CACHE_LOGIN,
+                                                 CACHE_LOGIN,
+                                                 PortalConfiguration.REST_HOME);
+    }
+
+    @Test
+    public void testLoadProperties_FileSetWithSystemProperty() throws Exception {
+        super.testLoadProperties_FileSetWithSystemProperty(PortalConfiguration.SCHEDULER_CACHE_LOGIN,
+                                                           CACHE_LOGIN,
+                                                           PortalConfiguration.REST_HOME);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testLoadProperties_FileSetWithSystemProperty_NonExistingFile() throws Exception {
+        super.testLoadProperties_FileSetWithSystemProperty_NonExistingFile(PortalConfiguration.SCHEDULER_URL,
+                                                                           "an_url",
+                                                                           PortalConfiguration.REST_HOME);
     }
 }
