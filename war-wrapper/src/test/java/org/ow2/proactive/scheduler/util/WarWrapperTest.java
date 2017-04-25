@@ -31,6 +31,7 @@ import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyException;
+import java.util.Arrays;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -64,8 +65,12 @@ public class WarWrapperTest {
         credentials = warWrapper.getCredentials();
     }
 
+
     @Test
     public void testConfigureSchedulerAndRMAndPAHomes() throws Exception {
+
+        PA_HOME = WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
 
         String expected = PA_HOME;
 
@@ -103,10 +108,19 @@ public class WarWrapperTest {
 
         File currentFile = new File(WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
-        while (currentFile.getParentFile() != null) {
-            if (currentFile.getParentFile().getName().equals("scheduling")) {
-                PA_HOME = currentFile.getParentFile().getPath();
+        boolean continueLoop = true;
+
+        while (currentFile.getParentFile() != null && continueLoop) {
+
+            for (String subDirectory: currentFile.getParentFile().list()){
+
+                if (subDirectory.equals("config"))  {
+                    PA_HOME = currentFile.getParentFile().getPath();
+                    continueLoop = false;
+                    break;
+                }
             }
+
             currentFile = currentFile.getParentFile();
         }
     }

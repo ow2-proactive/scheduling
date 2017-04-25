@@ -75,7 +75,7 @@ public class WarWrapper extends SchedulerStarter {
         }
     }
 
-    //********************************************Launching Proactive *************************************************
+    //********************************************Launching ProActive *************************************************
     public void launchProactiveServer() {
 
         String[] args = { "--no-rest" };
@@ -134,7 +134,7 @@ public class WarWrapper extends SchedulerStarter {
                                schedHome + "/config/network/server.ini");
     }
 
-    //**************************************Shutting down proactive ***************************************************
+    //**************************************Shutting down ProActive ***************************************************
     public void shutdownProactive() {
 
         try {
