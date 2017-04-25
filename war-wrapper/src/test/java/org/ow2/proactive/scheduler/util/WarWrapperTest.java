@@ -65,7 +65,6 @@ public class WarWrapperTest {
         credentials = warWrapper.getCredentials();
     }
 
-
     @Test
     public void testConfigureSchedulerAndRMAndPAHomes() throws Exception {
 
@@ -112,9 +111,9 @@ public class WarWrapperTest {
 
         while (currentFile.getParentFile() != null && continueLoop) {
 
-            for (String subDirectory: currentFile.getParentFile().list()){
+            for (String subDirectory : currentFile.getParentFile().list()) {
 
-                if (subDirectory.equals("config"))  {
+                if (subDirectory.equals("config")) {
                     PA_HOME = currentFile.getParentFile().getPath();
                     continueLoop = false;
                     break;
