@@ -110,25 +110,20 @@ public class SchedulerStateListener {
     }
 
     private void connect() throws InterruptedException {
-        String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
-        String cred_path = PortalConfiguration.getProperties()
-                                              .getProperty(PortalConfiguration.scheduler_cache_credential);
-        File credFile = new File(cred_path);
+        String url = PortalConfiguration.SCHEDULER_URL.getValueAsString();
+        String cred_path = PortalConfiguration.SCHEDULER_CACHE_CREDENTIALS.getValueAsStringOrNull();
 
         while (scheduler == null && !killed) {
             try {
                 scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class, new Object[] {});
 
-                // check is we use a credential file 
-
-                if (credFile.exists()) {
+                // check is we use a credential file
+                if (cred_path != null && (new File(cred_path)).exists()) {
                     Credentials credential = Credentials.getCredentials(cred_path);
                     scheduler.init(url, credential);
                 } else {
-                    String login = PortalConfiguration.getProperties()
-                                                      .getProperty(PortalConfiguration.scheduler_cache_login);
-                    String password = PortalConfiguration.getProperties()
-                                                         .getProperty(PortalConfiguration.scheduler_cache_password);
+                    String login = PortalConfiguration.SCHEDULER_CACHE_LOGIN.getValueAsString();
+                    String password = PortalConfiguration.SCHEDULER_CACHE_PASSWORD.getValueAsString();
                     scheduler.init(url, login, password);
                 }
 

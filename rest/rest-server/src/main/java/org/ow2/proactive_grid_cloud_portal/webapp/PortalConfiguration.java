@@ -26,55 +26,135 @@
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.List;
+
+import org.ow2.proactive.core.properties.PACommonProperties;
+import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
+import org.ow2.proactive.core.properties.PropertyType;
+import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
-public class PortalConfiguration {
+public enum PortalConfiguration implements PACommonProperties {
 
-    public static String scheduler_url = "scheduler.url";
+    /** Rest server home directory */
+    REST_HOME("pa.rest.home", PropertyType.STRING),
 
-    public static String scheduler_cache_login = "scheduler.cache.login";
+    SCHEDULER_URL("scheduler.url", PropertyType.STRING),
 
-    public static String scheduler_cache_password = "scheduler.cache.password";
+    SCHEDULER_CACHE_LOGIN("scheduler.cache.login", PropertyType.STRING, "watcher"),
 
-    public static String scheduler_cache_credential = "scheduler.cache.credential";
+    SCHEDULER_CACHE_PASSWORD("scheduler.cache.password", PropertyType.STRING, "w_pwd"),
 
-    public static String scheduler_logforwardingservice_provider = "scheduler.logforwardingservice.provider";
+    SCHEDULER_CACHE_CREDENTIALS("scheduler.cache.credential", PropertyType.STRING),
 
-    public static String rm_url = "rm.url";
+    SCHEDULER_LOGINFORWARDINGSERVICE_PROVIDER(
+            "scheduler.logforwardingservice.provider",
+            PropertyType.STRING,
+            "org.ow2.proactive.scheduler.common.util.logforwarder.providers.SocketBasedForwardingProvider"),
 
-    public static String rm_cache_login = "rm.cache.login";
+    RM_URL("rm.url", PropertyType.STRING),
 
-    public static String rm_cache_password = "rm.cache.password";
+    RM_CACHE_LOGIN("rm.cache.login", PropertyType.STRING, "watcher"),
 
-    public static String rm_cache_credential = "rm.cache.credential";
+    RM_CACHE_PASSWORD("rm.cache.password", PropertyType.STRING, "w_pwd"),
 
-    public static String rm_cache_refreshrate = "rm.cache.refreshrate";
+    RM_CACHE_CREDENTIALS("rm.cache.credential", PropertyType.STRING),
 
-    public static String novnc_enabled = "novnc.enabled";
+    RM_CACHE_REFRESHRATE("rm.cache.refreshrate", PropertyType.INTEGER, "3500"),
 
-    public static String novnc_port = "novnc.port";
+    NOVNC_ENABLED("novnc.enabled", PropertyType.BOOLEAN, "false"),
 
-    public static String novnc_secured = "novnc.secured";
+    NOVNC_PORT("novnc.port", PropertyType.INTEGER, "5900"),
 
-    public static String novnc_keystore = "novnc.keystore";
+    NOVNC_SECURED("novnc.secured", PropertyType.STRING, "ON"),
 
-    public static String novnc_password = "novnc.password";
+    NOVNC_KEYSTORE("novnc.keystore", PropertyType.STRING, "keystore.jks"),
 
-    public static String novnc_keypassword = "novnc.keypassword";
+    NOVNC_PASSWORD("novnc.password", PropertyType.STRING, "password"),
 
-    private static Properties properties;
+    NOVNC_KEYPASSWORD("novnc.keypassword", PropertyType.STRING, "password");
 
-    public static void load(InputStream f) throws IOException {
-        properties = new Properties();
-        properties.load(f);
-        properties.putAll(System.getProperties());
+    public static final String PA_WEB_PROPERTIES_FILEPATH = "pa.web.properties.filepath";
+
+    public static final String PA_WEB_PROPERTIES_RELATIVE_FILEPATH = "config/web/settings.ini";
+
+    /** memory entity of the properties file. */
+    private static PAPropertiesLazyLoader propertiesLoader;
+
+    private static PACommonPropertiesHelper propertiesHelper;
+
+    static {
+        load();
     }
 
-    public static Properties getProperties() {
-        return properties;
+    /** Key of the specific instance. */
+    private String key;
+
+    /** value of the specific instance. */
+    private PropertyType type;
+
+    /** default value to use if the property is not defined **/
+    private String defaultValue;
+
+    PortalConfiguration(String str, PropertyType type, String defaultValue) {
+        this.key = str;
+        this.type = type;
+        this.defaultValue = defaultValue;
+    }
+
+    PortalConfiguration(String str, PropertyType type) {
+        this(str, type, null);
+    }
+
+    public static synchronized void storeInSystemProperties() {
+        System.setProperties(propertiesLoader.getProperties());
+    }
+
+    /**
+     * Load the properties from the given file.
+     * This method will clean every loaded properties before.
+     *
+     * @param filename the file containing the properties to be loaded.
+     */
+    protected static void loadProperties(String filename) {
+        propertiesLoader = new PAPropertiesLazyLoader(REST_HOME.key,
+                                                      PA_WEB_PROPERTIES_FILEPATH,
+                                                      PA_WEB_PROPERTIES_RELATIVE_FILEPATH,
+                                                      filename);
+        propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
+    }
+
+    public static synchronized void load() {
+        propertiesLoader = new PAPropertiesLazyLoader(REST_HOME.key,
+                                                      PA_WEB_PROPERTIES_FILEPATH,
+                                                      PA_WEB_PROPERTIES_RELATIVE_FILEPATH);
+        propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
+    }
+
+    /**
+     * Override properties defined in the default configuration file,
+     * by properties defined in another file.
+     * Call this method implies the default properties to be loaded
+     * @param filename path of file containing some properties to override
+     */
+    public static void updateProperties(String filename) {
+        propertiesHelper.updateProperties(filename);
+    }
+
+    /**
+     * Get the absolute path of the given path.<br>
+     * It the path is absolute, then it is returned. If the path is relative, then the RM_home directory is
+     * concatenated in front of the given string.
+     *
+     * @param userPath the path to check transform.
+     * @return the absolute path of the given path.
+     */
+    public static String getAbsolutePath(String userPath) {
+        if (new File(userPath).isAbsolute()) {
+            return userPath;
+        } else {
+            return PortalConfiguration.REST_HOME.getValueAsString() + File.separator + userPath;
+        }
     }
 
     /**
@@ -84,6 +164,94 @@ public class PortalConfiguration {
      */
     public static String jobIdToPath(String jobId) {
         return System.getProperty("java.io.tmpdir") + File.separator + "job_" + jobId + ".zip";
+    }
+
+    @Override
+    public String getConfigurationFilePathPropertyName() {
+        return PA_WEB_PROPERTIES_FILEPATH;
+    }
+
+    @Override
+    public String getConfigurationDefaultRelativeFilePath() {
+        return PA_WEB_PROPERTIES_RELATIVE_FILEPATH;
+    }
+
+    @Override
+    public void loadPropertiesFromFile(String filename) {
+        loadProperties(filename);
+    }
+
+    @Override
+    public void reloadConfiguration() {
+        load();
+    }
+
+    @Override
+    public String getKey() {
+        return key;
+    }
+
+    @Override
+    public void updateProperty(String value) {
+        propertiesHelper.updateProperty(key, value);
+    }
+
+    @Override
+    public boolean isSet() {
+        return propertiesHelper.isSet(key, defaultValue);
+    }
+
+    @Override
+    public void unSet() {
+        propertiesHelper.unSet(key);
+    }
+
+    @Override
+    public String getCmdLine() {
+        return propertiesHelper.getCmdLine(key);
+    }
+
+    @Override
+    public int getValueAsInt() {
+        return propertiesHelper.getValueAsInt(key, type, defaultValue);
+    }
+
+    @Override
+    public String getValueAsString() {
+        return propertiesHelper.getValueAsString(key, defaultValue);
+    }
+
+    @Override
+    public String getValueAsStringOrNull() {
+        return propertiesHelper.getValueAsStringOrNull(key);
+    }
+
+    @Override
+    public boolean getValueAsBoolean() {
+        return propertiesHelper.getValueAsBoolean(key, type, defaultValue);
+    }
+
+    @Override
+    public long getValueAsLong() {
+        return propertiesHelper.getValueAsLong(key, type, defaultValue);
+    }
+
+    @Override
+    public List<String> getValueAsList(String separator) {
+        return propertiesHelper.getValueAsList(key, type, separator, defaultValue);
+    }
+
+    @Override
+    public PropertyType getType() {
+        return type;
+    }
+
+    /**
+     * @see java.lang.Enum#toString()
+     */
+    @Override
+    public String toString() {
+        return getValueAsString();
     }
 
 }
