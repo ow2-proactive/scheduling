@@ -2340,6 +2340,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @POST
     @Path("{path:plannings}")
     @Produces("application/json")
+    @Override
     public boolean submitPlannings(@HeaderParam("sessionid") String sessionId,
             @PathParam("path") PathSegment pathSegment, String jobContentXmlString) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
