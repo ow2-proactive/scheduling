@@ -46,35 +46,36 @@ import org.ow2.proactive.wrapper.WrapperSingleton;
 
 public class WarWrapperTest {
 
+    private static final String DEFAULT_HOME = ".";
+
     private static Credentials credentials;
 
     private static WarWrapper warWrapper;
 
-    private static String PA_HOME = null;
+    private static String PA_HOME = DEFAULT_HOME;
 
     @BeforeClass
     public static void setup() throws KeyException, IOException {
 
         findPAHome();
 
-        if (null != PA_HOME)
+        if (!PA_HOME.equals(DEFAULT_HOME)) {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
 
-        warWrapper = WrapperSingleton.getInstance();
-        warWrapper.launchProactiveServer();
-        credentials = warWrapper.getCredentials();
+            warWrapper = WrapperSingleton.getInstance();
+            warWrapper.launchProactiveServer();
+            credentials = warWrapper.getCredentials();
+        }
     }
 
     @Test
     public void testConfigureSchedulerAndRMAndPAHomes() throws Exception {
 
-        PA_HOME = WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        PA_HOME = WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath() + DEFAULT_HOME;
         System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
-
         String expected = PA_HOME;
 
         WrapperSingleton.getInstance().configureSchedulerAndRMAndPAHomes();
-
         String actual = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
 
         assertThat(actual).isEqualTo(expected);
@@ -84,22 +85,31 @@ public class WarWrapperTest {
     @Test
     public void testStopRM() throws Exception {
 
-        boolean expected = true;
+        if (!PA_HOME.equals(DEFAULT_HOME)) {
 
-        boolean actual = warWrapper.stopRM(credentials);
+            boolean expected = true;
 
-        assertThat(actual).isEqualTo(expected);
+            boolean actual = warWrapper.stopRM(credentials);
 
+            assertThat(actual).isEqualTo(expected);
+
+        } else
+            System.out.println("Method 'StopRM' is not tested because PA_HOME is not set");
     }
 
     @Test
     public void testStopScheduler() throws Exception {
 
-        boolean expected = true;
+        if (!PA_HOME.equals(DEFAULT_HOME)) {
 
-        boolean actual = warWrapper.stopScheduler(credentials);
+            boolean expected = true;
 
-        assertThat(actual).isEqualTo(expected);
+            boolean actual = warWrapper.stopScheduler(credentials);
+
+            assertThat(actual).isEqualTo(expected);
+
+        } else
+            System.out.println("Method 'StopScheduler' is not tested because PA_HOME is not set");
 
     }
 
@@ -107,15 +117,12 @@ public class WarWrapperTest {
 
         File currentFile = new File(WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
-        boolean continueLoop = true;
-
-        while (currentFile.getParentFile() != null && continueLoop) {
+        while (currentFile.getParentFile().exists() && PA_HOME.equals(DEFAULT_HOME)) {
 
             for (String subDirectory : currentFile.getParentFile().list()) {
 
                 if (subDirectory.equals("config")) {
                     PA_HOME = currentFile.getParentFile().getPath();
-                    continueLoop = false;
                     break;
                 }
             }
