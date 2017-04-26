@@ -78,7 +78,8 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
         Node n = selectedNodes.get(0);
         try {
             double freeRam = getFreeRamFromNode(n);
-            logger.debug("Free Ram for node (" + n.getNodeInformation().getName() + ") : " + freeRam + " , neededRam : " + neededRam);
+            logger.debug("Free Ram for node (" + n.getNodeInformation().getName() + ") : " + freeRam +
+                         " , neededRam : " + neededRam);
             if (freeRam >= neededRam) {
                 logger.debug("Task " + task.getInternal().getName() + " can execute on " + n);
                 n.setProperty(RAM_VARIABLE_NAME, "" + neededRam);
