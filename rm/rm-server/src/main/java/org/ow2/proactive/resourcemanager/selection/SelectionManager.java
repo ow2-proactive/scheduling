@@ -118,7 +118,7 @@ public abstract class SelectionManager {
      * Loads authorized selection scripts.
      */
     public void updateAuthorizedScriptsSignatures() {
-        String dirName = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString();
+        String dirName = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsStringOrNull();
         if (dirName != null && dirName.length() > 0) {
             dirName = PAResourceManagerProperties.getAbsolutePath(dirName);
             File folder = new File(dirName);
@@ -157,7 +157,7 @@ public abstract class SelectionManager {
     private long getConfiguredAuthorizedScriptLoadPeriod() {
         long configuredAuthorizedScriptLoadPeriod = DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD;
         if (PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.isSet()) {
-            configuredAuthorizedScriptLoadPeriod = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsInt();
+            configuredAuthorizedScriptLoadPeriod = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsLong();
         }
         return configuredAuthorizedScriptLoadPeriod;
     }
@@ -412,7 +412,7 @@ public abstract class SelectionManager {
         try {
             // launching
             Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
-                                                                                       PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt(),
+                                                                                       PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsLong(),
                                                                                        TimeUnit.MILLISECONDS);
             int index = 0;
 
@@ -509,7 +509,7 @@ public abstract class SelectionManager {
 
     public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes, final Map<String, Serializable> bindings) {
         // TODO: add a specific timeout for script execution
-        final int timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsInt();
+        final long timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
         final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
 
         // Execute the script on each selected node

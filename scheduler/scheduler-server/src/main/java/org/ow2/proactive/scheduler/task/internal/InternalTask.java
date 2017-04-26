@@ -562,7 +562,7 @@ public abstract class InternalTask extends TaskState {
      * Loads authorized selection scripts.
      */
     private static void updateAuthorizedScriptsSignatures(TaskId id) {
-        String dirName = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString();
+        String dirName = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsStringOrNull();
         if (dirName != null && dirName.length() > 0) {
             dirName = PASchedulerProperties.getAbsolutePath(dirName);
             File folder = new File(dirName);
