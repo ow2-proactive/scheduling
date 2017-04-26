@@ -70,7 +70,7 @@ public class ClientPinger implements InitActive, RunActive {
         while (active.get()) {
             synchronized (active) {
                 try {
-                    active.wait(PAResourceManagerProperties.RM_CLIENT_PING_FREQUENCY.getValueAsInt());
+                    active.wait(PAResourceManagerProperties.RM_CLIENT_PING_FREQUENCY.getValueAsLong());
                 } catch (InterruptedException e) {
                 }
             }

@@ -93,7 +93,7 @@ public class PAPropertiesLazyLoader {
             return new FileInputStream(propertiesPath);
         } else {
             if (systemPropertyForFileNameSet) {
-                throw new RuntimeException("RM properties file not found : '" + propertiesPath + "'");
+                throw new RuntimeException("Properties file not found : '" + propertiesPath + "'");
             }
             logger.debug("Loading empty properties");
             return null;
