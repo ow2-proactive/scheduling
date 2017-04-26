@@ -65,8 +65,8 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
             try {
                 return canRunTaskOnNode(selectedNodes, task, Double.parseDouble(allocRam));
             } catch (NumberFormatException nfe) {
-                logger.warn("allocRam : " + allocRam + " is not a number");
-                return true;
+                logger.error("allocRam : " + allocRam + " is not a number");
+                throw new RuntimeException(nfe);
             }
         } else {
             return true;
@@ -78,15 +78,15 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
         Node n = selectedNodes.get(0);
         try {
             double freeRam = getFreeRamFromNode(n);
-            logger.debug("Free Ram for node (" + n.getNodeInformation().getName() + ") : " + freeRam +
-                         " , neededRam : " + neededRam);
+            logger.debug("Free Ram for node (" + n.getNodeInformation().getName() + ") : " + freeRam + " , neededRam : " + neededRam);
             if (freeRam >= neededRam) {
                 logger.debug("Task " + task.getInternal().getName() + " can execute on " + n);
                 n.setProperty(RAM_VARIABLE_NAME, "" + neededRam);
                 return true;
             }
         } catch (Exception e) {
-            logger.warn("Error while setting the property " + RAM_VARIABLE_NAME, e);
+            logger.error("Error while setting the property " + RAM_VARIABLE_NAME);
+            throw new RuntimeException(e);
         }
         return false;
     }
