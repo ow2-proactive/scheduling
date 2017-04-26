@@ -26,12 +26,10 @@
 package org.ow2.proactive.scheduler.util;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyException;
-import java.util.Arrays;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,10 +37,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.wrapper.WrapperSingleton;
 
-
-/**
- * Created by root on 06/04/17.
- */
 
 public class WarWrapperTest {
 
@@ -63,7 +57,7 @@ public class WarWrapperTest {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
 
             warWrapper = WrapperSingleton.getInstance();
-            warWrapper.launchProactiveServer();
+            warWrapper.launchProactive();
             credentials = warWrapper.getCredentials();
         }
     }

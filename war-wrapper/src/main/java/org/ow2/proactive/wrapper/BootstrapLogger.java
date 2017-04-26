@@ -34,8 +34,11 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 
 /**
- * Created by root on 05/04/17.
+ * BootstrapLogger is a class that uses the root logger to log bootstrap events in the system console.
+ * As the logging is properly configured in the class SchedulerStarter, all the code executed
+ * before reaching SchedulerStarter uses BootstrapLogger.
  */
+
 public class BootstrapLogger {
 
     private static final Logger logger = Logger.getRootLogger();

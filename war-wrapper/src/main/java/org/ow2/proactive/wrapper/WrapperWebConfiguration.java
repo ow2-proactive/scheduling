@@ -25,24 +25,18 @@
  */
 package org.ow2.proactive.wrapper;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.web.WebProperties;
 
 
 /**
- * Created by root on 30/03/17.
+ * WrapperWebConfiguration is a class that provides information about the deployment
+ * of ProActive on the target Application Server. It mainly returns the host, port and context root
+ * of ProActive getstarted.
  */
+
 public class WrapperWebConfiguration {
-
-    private static final String SCHEDULER_RM_DEFAULT_HOME = ".";
-
-    protected static final String REST_CONFIG_PATH = "/config/web/settings.ini";
 
     private static final Logger logger = Logger.getLogger(WrapperWebConfiguration.class);
 
@@ -50,57 +44,31 @@ public class WrapperWebConfiguration {
 
     }
 
+    /**
+     * Returns the url of the getstarted web application
+     */
     public static String getStartedUrl() {
 
         try {
 
             String paHost = ProActiveInet.getInstance().getHostname();
-
-            Properties properties = readWebDeploymentProperties();
-
-            int httpPort = Integer.parseInt(properties.getProperty("ear.wrapper.target.server.http.port", "9080"));
-            int httpsPort = Integer.parseInt(properties.getProperty("ear.wrapper.target.server.https.port", "9443"));
-
-            int port = httpPort;
+            int port = WebProperties.WAR_WRAPPER_HTTP_PORT.getValueAsInt();
+            String contextRoot = WebProperties.WAR_WRAPPER_CONTEXT_ROOT.getValueAsString();
 
             String httpProtocol;
 
-            if (isHttpsEnabled(properties)) {
+            if (WebProperties.WAR_WRAPPER_HTTPS_ENABLED.getValueAsBoolean()) {
                 httpProtocol = "https";
-                port = httpsPort;
+                port = WebProperties.WAR_WRAPPER_HTTPS_PORT.getValueAsInt();
             } else {
                 httpProtocol = "http";
             }
 
-            return httpProtocol + "://" + paHost + ":" + port;
+            return httpProtocol + "://" + paHost + ":" + port + contextRoot;
 
         } catch (Exception e) {
             logger.warn("Could not find the getStarted URL", e);
             return null;
         }
-    }
-
-    private static boolean isHttpsEnabled(Properties properties) {
-        return "true".equalsIgnoreCase(properties.getProperty("ear.wrapper.https.enabled", "false"));
-    }
-
-    private static String getSchedulerHome() {
-        if (PASchedulerProperties.SCHEDULER_HOME.isSet()) {
-            return PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
-        } else {
-            return SCHEDULER_RM_DEFAULT_HOME;
-        }
-    }
-
-    private static Properties readWebDeploymentProperties() {
-        File webPropertiesFile = new File(getSchedulerHome() + REST_CONFIG_PATH);
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(webPropertiesFile));
-        } catch (IOException e) {
-            logger.warn("Could not find Web deployment properties" + webPropertiesFile, e);
-        }
-        properties.putAll(System.getProperties());
-        return properties;
     }
 }

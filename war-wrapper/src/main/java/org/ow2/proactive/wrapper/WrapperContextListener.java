@@ -32,6 +32,12 @@ import javax.servlet.annotation.WebListener;
 import org.ow2.proactive.scheduler.util.WarWrapper;
 
 
+/**
+ * WrapperContextListener implements ServletContextListener. It triggers the method launchProactive()
+ * of WarWrapper when the web application context is initialized, and triggers shutdownProactive() when
+ * the web application context is destroyed.
+ **/
+
 @WebListener
 public class WrapperContextListener implements ServletContextListener {
 
@@ -43,7 +49,7 @@ public class WrapperContextListener implements ServletContextListener {
 
         try {
 
-            ws.launchProactiveServer();
+            ws.launchProactive();
 
         } catch (Exception e) {
             BootstrapLogger.getLogger().error(e.getMessage(), e);

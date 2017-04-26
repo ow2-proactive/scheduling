@@ -1508,8 +1508,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 shutedDown = true;
             }
 
-            if (!PAResourceManagerProperties.RM_SHUTDOWN_KILL_RUNTIME.isSet() ||
-                PAResourceManagerProperties.RM_SHUTDOWN_KILL_RUNTIME.getValueAsBoolean())
+            if (PAResourceManagerProperties.RM_SHUTDOWN_KILL_RUNTIME.getValueAsBoolean())
                 this.nodeRM.getProActiveRuntime().killRT(true);
 
         } catch (Exception e) {

@@ -47,8 +47,18 @@ import org.ow2.proactive.wrapper.WrapperWebConfiguration;
 
 
 /**
- * Created by root on 11/03/17.
+ *  WarWrapper is a class that enables running ProActive as a Web Application. It extends SchedulerStarter
+ *  by properly configuring the Scheduler and RM homes inside a Web archive (WAR), and disables running
+ *  the jetty server embedded in ProActive (as the WAR is to be deployed in an application server).
+ *  It further defines methods to shutdown ProActive (by shutting down the Scheduler and RM).
+ *  The methods launchProactive() and shutdownProactive() of WarWrapper are respectively called
+ *  by the WrapperContextListener to run ProActive (when the web application context is initialized)
+ *  and shut it down (when the web application context is destroyed).
+ *
+ * @author The ProActive Team
+ * @since ProActive Scheduling 7.27.0
  */
+
 public class WarWrapper extends SchedulerStarter {
 
     private static final Logger logger = Logger.getLogger(WarWrapper.class);
@@ -59,24 +69,10 @@ public class WarWrapper extends SchedulerStarter {
 
     private static CommandLine cmd = null;
 
-    public static void main(String[] args) {
-        try {
-
-            WarWrapper warWrapper = new WarWrapper();
-            warWrapper.launchProactiveServer();
-
-            Thread.sleep(5000);
-
-            warWrapper.shutdownProactive();
-            logger.info("Proactive stopped");
-
-        } catch (InterruptedException e) {
-            logger.error("Error while stopping Proactive " + e.getMessage());
-        }
-    }
-
-    //********************************************Launching ProActive *************************************************
-    public void launchProactiveServer() {
+    /**
+     * The main method called when ProActive is deployed as a web or enterprise application (WAR/EAR)
+     */
+    public void launchProactive() {
 
         String[] args = { "--no-rest" };
 
@@ -94,24 +90,7 @@ public class WarWrapper extends SchedulerStarter {
 
             start(cmd);
 
-            // the variable set by Jetty Starter
-            if (null != rmURL)
-                setPropIfNotAlreadySet("rm.url", rmURL);
-            else
-                logger.warn("System property 'rm.url' not set: ");
-
-            if (null != schedAuthInter) {
-                schedulerUri = schedAuthInter.getHostURL();
-                setPropIfNotAlreadySet("scheduler.url", schedulerUri);
-            } else
-                logger.warn("System property 'scheduler.url' not set");
-
-            String getStartedUrl = WrapperWebConfiguration.getStartedUrl();
-            if (null != getStartedUrl) {
-                PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(getStartedUrl);
-                logger.info("*** Get started at: " + getStartedUrl + " ***");
-            } else
-                logger.warn("PA property 'SCHEDULER_REST_URL' not set");
+            configureURLs();
 
         } catch (Exception e) {
             logger.error("Error when starting the scheduler", e);
@@ -119,6 +98,9 @@ public class WarWrapper extends SchedulerStarter {
 
     }
 
+    /**
+     * Configures the Scheduler and RM homes inside a Web archive (WAR)
+     */
     protected void configureSchedulerAndRMAndPAHomes() {
 
         String schedHome = getClass().getProtectionDomain().getCodeSource().getLocation().getPath() +
@@ -134,22 +116,54 @@ public class WarWrapper extends SchedulerStarter {
                                schedHome + "/config/network/server.ini");
     }
 
-    //**************************************Shutting down ProActive ***************************************************
+    /**
+     * Configures the variables that are traditionally set by Jetty Starter
+     */
+    private void configureURLs() {
+        //
+        if (null != rmURL) {
+            setPropIfNotAlreadySet("rm.url", rmURL);
+        } else {
+            logger.warn("System property 'rm.url' not set: ");
+        }
+
+        if (null != schedAuthInter) {
+            schedulerUri = schedAuthInter.getHostURL();
+            setPropIfNotAlreadySet("scheduler.url", schedulerUri);
+        } else {
+            logger.warn("System property 'scheduler.url' not set");
+        }
+
+        String getStartedUrl = WrapperWebConfiguration.getStartedUrl();
+        if (null != getStartedUrl) {
+            PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(getStartedUrl);
+            logger.info("*** Get started at: " + getStartedUrl + " ***");
+        } else {
+            logger.warn("PA property 'SCHEDULER_REST_URL' not set");
+        }
+
+    }
+
+    /**
+     * The main method called when stopping or removing ProActive
+     */
     public void shutdownProactive() {
 
         try {
 
             Credentials credentials = getCredentials();
 
-            if (stopScheduler(credentials))
+            if (stopScheduler(credentials)) {
                 logger.info("Scheduler on " + schedulerUri + " correctly stopped");
-            else
+            } else {
                 logger.warn("Scheduler on " + schedulerUri + " is not stopped");
+            }
 
-            if (stopRM(credentials))
+            if (stopRM(credentials)) {
                 logger.info("RM on " + rmURL + " correctly stopped");
-            else
+            } else {
                 logger.warn("RM on " + rmURL + " is not stopped");
+            }
 
         } catch (KeyException e) {
             logger.error("ERROR while stopping ProActive: Cannot  acquire credentials");
@@ -188,8 +202,9 @@ public class WarWrapper extends SchedulerStarter {
             Scheduler scheduler = schedAuthInter.login(credentials);
             schedulerStopped = scheduler.shutdown();
 
-            if (schedulerStopped && scheduler.getStatus().isDown())
-                SchedulerFactory.schedulerStarted = false;
+            if (schedulerStopped && scheduler.getStatus().isDown()) {
+                SchedulerFactory.setSchedulerStarted(false);
+            }
 
         } catch (Exception e) {
             logger.error("ERROR while stopping to the scheduler on " + schedulerUri + ": " + e.getMessage());
@@ -203,7 +218,6 @@ public class WarWrapper extends SchedulerStarter {
         RMAuthentication rmAuthentication = null;
 
         if (rmURL != null) {
-
             rmAuthentication = SchedulerFactory.waitAndJoinRM(new URI(rmURL));
         }
 

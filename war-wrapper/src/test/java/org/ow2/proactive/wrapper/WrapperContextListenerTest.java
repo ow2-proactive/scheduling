@@ -38,10 +38,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 
-/**
- * Created by root on 05/04/17.
- */
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ WrapperSingleton.class, WarWrapper.class, WrapperContextListener.class })
 
@@ -67,7 +63,7 @@ public class WrapperContextListenerTest extends Mockito {
 
         new WrapperContextListener().contextInitialized(mockEvent);
 
-        verify(mockStarter, times(1)).launchProactiveServer();
+        verify(mockStarter, times(1)).launchProactive();
     }
 
     @Test

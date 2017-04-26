@@ -33,9 +33,6 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
-/**
- * Created by root on 05/04/17.
- */
 public class WrapperWebConfigurationTest {
 
     private String paHost;
@@ -55,7 +52,7 @@ public class WrapperWebConfigurationTest {
 
         if (PASchedulerProperties.SCHEDULER_HOME.isSet()) {
 
-            String expected = "http://" + paHost + ":9080";
+            String expected = "http://" + paHost + ":9080/";
 
             String actual = wrapperWebConfiguration.getStartedUrl();
 
