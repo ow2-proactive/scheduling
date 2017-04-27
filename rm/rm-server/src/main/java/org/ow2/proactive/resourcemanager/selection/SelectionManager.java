@@ -170,7 +170,8 @@ public abstract class SelectionManager {
      * @param scripts - set of selection scripts
      * @return collection of arranged nodes
      */
-    public abstract List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes, List<SelectionScript> scripts);
+    public abstract List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes,
+            List<SelectionScript> scripts);
 
     /**
      * Predicts script execution result. Allows to avoid duplicate script execution 
@@ -191,7 +192,8 @@ public abstract class SelectionManager {
      * @param rmnode - node on which script has been executed
      * @return whether node is selected
      */
-    public abstract boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult, RMNode rmnode);
+    public abstract boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
+            RMNode rmnode);
 
     public NodeSet selectNodes(Criteria criteria, Client client) {
 
@@ -282,7 +284,9 @@ public abstract class SelectionManager {
                         numberOfNodesForScriptExecution = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt();
                     }
 
-                    List<RMNode> subset = arrangedNodes.subList(0, Math.min(numberOfNodesForScriptExecution, arrangedNodes.size()));
+                    List<RMNode> subset = arrangedNodes.subList(0,
+                                                                Math.min(numberOfNodesForScriptExecution,
+                                                                         arrangedNodes.size()));
                     matchedNodes.addAll(runScripts(subset, criteria));
                     // removing subset of arrangedNodes
                     subset.clear();
@@ -344,11 +348,18 @@ public abstract class SelectionManager {
         }
 
         if (logger.isInfoEnabled()) {
-            String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0 ? " and " + selectedNodes.getExtraNodes().size() + " extra nodes"
+            String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0
+                                                                                                                  ? " and " +
+                                                                                                                    selectedNodes.getExtraNodes()
+                                                                                                                                 .size() +
+                                                                                                                    " extra nodes"
                                                                                                                   : "";
-            logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology() + " and will get " + selectedNodes.size() + " nodes " + extraNodes +
-                        " [freeNodes:" + freeNodes.size() + ";filteredNodes:" + filteredNodes.size() + ";reordered after policy:" + afterPolicyNodes.size() +
-                        ";selection script present:" + hasScripts + ";nodes filtered by selection script:" + matchedNodes.size() + ";selectedNodes:" + selectedNodes.size() + "]");
+            logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology() +
+                        " and will get " + selectedNodes.size() + " nodes " + extraNodes + " [freeNodes:" +
+                        freeNodes.size() + ";filteredNodes:" + filteredNodes.size() + ";reordered after policy:" +
+                        afterPolicyNodes.size() + ";selection script present:" + hasScripts +
+                        ";nodes filtered by selection script:" + matchedNodes.size() + ";selectedNodes:" +
+                        selectedNodes.size() + "]");
         }
 
         if (loggerIsDebugEnabled) {
@@ -371,7 +382,8 @@ public abstract class SelectionManager {
         for (SelectionScript script : scripts) {
             if (!authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()))) {
                 // unauthorized selection script
-                throw new SecurityException("Cannot execute unauthorized script: " + System.getProperty("line.separator") + script.getScript());
+                throw new SecurityException("Cannot execute unauthorized script: " +
+                                            System.getProperty("line.separator") + script.getScript());
             }
         }
     }
@@ -456,7 +468,8 @@ public abstract class SelectionManager {
 
         Set<String> inclusion = criteria.getAcceptableNodesUrls();
 
-        boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null && criteria.getNodeAccessToken().length() > 0;
+        boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
+                                         criteria.getNodeAccessToken().length() > 0;
 
         TokenPrincipal tokenPrincipal = null;
         if (nodeWithTokenRequested) {
@@ -473,7 +486,8 @@ public abstract class SelectionManager {
             try {
                 if (!clientPermissions.contains(node.getUserPermission())) {
                     client.checkPermission(node.getUserPermission(),
-                                           client + " is not authorized to get the node " + node.getNodeURL() + " from " + node.getNodeSource().getName());
+                                           client + " is not authorized to get the node " + node.getNodeURL() +
+                                                                     " from " + node.getNodeSource().getName());
                     clientPermissions.add(node.getUserPermission());
                 }
             } catch (SecurityException e) {
@@ -495,7 +509,8 @@ public abstract class SelectionManager {
                 // checking explicitly that node has this token identity
                 if (!perm.hasPrincipal(tokenPrincipal)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(client + " does not have required token to get the node " + node.getNodeURL() + " from " + node.getNodeSource().getName());
+                        logger.debug(client + " does not have required token to get the node " + node.getNodeURL() +
+                                     " from " + node.getNodeSource().getName());
                     }
                     continue;
                 }
@@ -508,7 +523,8 @@ public abstract class SelectionManager {
         return filteredList;
     }
 
-    public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes, final Map<String, Serializable> bindings) {
+    public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes,
+            final Map<String, Serializable> bindings) {
         // TODO: add a specific timeout for script execution
         final long timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
         final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
@@ -563,13 +579,15 @@ public abstract class SelectionManager {
             try {
                 result = future.get();
             } catch (CancellationException e) {
-                result = new ScriptResult<>(new ScriptException("Cancelled due to timeout expiration when " + description, e));
+                result = new ScriptResult<>(new ScriptException("Cancelled due to timeout expiration when " +
+                                                                description, e));
             } catch (InterruptedException e) {
                 result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " + description));
             } catch (ExecutionException e) {
                 // Unwrap the root exception 
                 Throwable rex = e.getCause();
-                result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description, rex));
+                result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description,
+                                                                rex));
             }
             results.add(result);
         }
