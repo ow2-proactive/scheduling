@@ -2349,7 +2349,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-        JobPlannerRestClient client = new JobPlannerRestClient(PortalConfiguration.JOBPLANNER_URL.getValueAsString);
+        JobPlannerRestClient client = new JobPlannerRestClient(PortalConfiguration.JOBPLANNER_URL.getValueAsString());
 
         return client.submitScheduledWorkflow(sessionId, jobVariables, jobContentXmlString);
 
@@ -3364,7 +3364,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 @Override
                 public void onDisconnect(@SuppressWarnings("rawtypes") WebSocketEvent event) {
                     try {
-                        logger.info("#### websocket disconnected，remove listener ####");
+                        logger.info("#### websocket disconnected remove listener ####");
                         scheduler.removeEventListener();
                     } catch (Exception e) {
                         logger.error(e);
