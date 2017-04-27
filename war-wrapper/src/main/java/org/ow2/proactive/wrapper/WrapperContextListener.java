@@ -41,7 +41,7 @@ import org.ow2.proactive.scheduler.util.WarWrapper;
 @WebListener
 public class WrapperContextListener implements ServletContextListener {
 
-    private WarWrapper ws = WrapperSingleton.getInstance();
+    private WarWrapper ws = WarWrapper.INSTANCE;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {

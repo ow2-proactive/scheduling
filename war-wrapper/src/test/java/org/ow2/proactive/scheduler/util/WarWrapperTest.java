@@ -35,7 +35,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.wrapper.WrapperSingleton;
 
 
 public class WarWrapperTest {
@@ -56,7 +55,7 @@ public class WarWrapperTest {
         if (!PA_HOME.equals(DEFAULT_HOME)) {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
 
-            warWrapper = WrapperSingleton.getInstance();
+            warWrapper = WarWrapper.INSTANCE;
             warWrapper.launchProactive();
             credentials = warWrapper.getCredentials();
         }
@@ -69,7 +68,7 @@ public class WarWrapperTest {
         System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
         String expected = PA_HOME;
 
-        WrapperSingleton.getInstance().configureSchedulerAndRMAndPAHomes();
+        WarWrapper.INSTANCE.configureSchedulerAndRMAndPAHomes();
         String actual = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
 
         assertThat(actual).isEqualTo(expected);
@@ -87,8 +86,9 @@ public class WarWrapperTest {
 
             assertThat(actual).isEqualTo(expected);
 
-        } else
+        } else {
             System.out.println("Method 'StopRM' is not tested because PA_HOME is not set");
+        }
     }
 
     @Test
@@ -102,8 +102,9 @@ public class WarWrapperTest {
 
             assertThat(actual).isEqualTo(expected);
 
-        } else
+        } else {
             System.out.println("Method 'StopScheduler' is not tested because PA_HOME is not set");
+        }
 
     }
 

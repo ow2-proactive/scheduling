@@ -27,7 +27,7 @@ package org.ow2.proactive.wrapper;
 
 import javax.servlet.ServletContextEvent;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -36,11 +36,11 @@ import org.ow2.proactive.scheduler.util.WarWrapper;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ WrapperSingleton.class, WarWrapper.class, WrapperContextListener.class })
-
+@PrepareForTest({ WarWrapper.class, WrapperContextListener.class })
 public class WrapperContextListenerTest extends Mockito {
 
     public WrapperContextListenerTest() {
@@ -49,13 +49,12 @@ public class WrapperContextListenerTest extends Mockito {
     @Mock
     ServletContextEvent mockEvent;
 
-    @Mock
-    private WarWrapper mockStarter;
+    private static WarWrapper mockStarter;
 
-    @Before
-    public void setup() throws Exception {
-        PowerMockito.mockStatic(WrapperSingleton.class);
-        PowerMockito.when(WrapperSingleton.getInstance()).thenReturn(mockStarter);
+    @BeforeClass
+    public static void setup() throws Exception {
+        mockStarter = PowerMockito.mock(WarWrapper.class);
+        Whitebox.setInternalState(WarWrapper.class, "INSTANCE", mockStarter);
     }
 
     @Test
