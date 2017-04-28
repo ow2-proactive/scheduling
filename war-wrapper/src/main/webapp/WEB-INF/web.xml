@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app id="Proactive_Server" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+		 version="3.1">
+
+	<display-name>Proactive Server</display-name>
+	<description> Webapp of Proactive Server (including the scheduler and resource manager).</description>
+
+	<listener id="Proactive_Server_Listener">
+		<listener-class>
+			org.ow2.proactive.wrapper.WrapperContextListener
+		</listener-class>
+	</listener>
+
+	<welcome-file-list id="Proactive_Server_WelcomeFileList">
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+</web-app>
+
