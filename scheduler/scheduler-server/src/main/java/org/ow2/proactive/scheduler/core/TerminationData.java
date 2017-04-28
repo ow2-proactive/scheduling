@@ -34,6 +34,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -153,13 +156,21 @@ final class TerminationData {
     }
 
     void handleTermination(final SchedulingService service) throws IOException, ClassNotFoundException {
-        for (TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
-            RunningTaskData taskData = taskToTerminate.taskData;
-            if (taskToTerminate.terminatedWhileRunning()) {
-                terminateRunningTask(service, taskToTerminate, taskData);
-            }
-        }
 
+        terminateTasks(service);
+
+        restartWaitingTasks(service);
+
+        terminateJobs(service);
+    }
+
+    private void terminateJobs(final SchedulingService service) {
+        for (JobId jobId : jobsToTerminate) {
+            service.terminateJobHandling(jobId);
+        }
+    }
+
+    private void restartWaitingTasks(final SchedulingService service) {
         for (final TaskRestartData restartData : tasksToRestart.values()) {
             service.getInfrastructure().schedule(new Runnable() {
                 public void run() {
@@ -167,9 +178,42 @@ final class TerminationData {
                 }
             }, restartData.waitTime);
         }
+    }
 
-        for (JobId jobId : jobsToTerminate) {
-            service.terminateJobHandling(jobId);
+    private void terminateTasks(final SchedulingService service) {
+
+        if (tasksToTerminate.values().isEmpty()) {
+            return;
+        }
+
+        ExecutorService parallelTerminationService = Executors.newFixedThreadPool(tasksToTerminate.values().size());
+
+        try {
+            List<Callable<Void>> callables = new ArrayList<>(tasksToTerminate.values().size());
+
+            for (final TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
+
+                callables.add(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        try {
+                            RunningTaskData taskData = taskToTerminate.taskData;
+                            if (taskToTerminate.terminatedWhileRunning()) {
+                                terminateRunningTask(service, taskToTerminate, taskData);
+                            }
+                        } catch (Throwable e) {
+                            logger.error("Failed to terminate task " + taskToTerminate.taskData.getTask().getName(), e);
+                            throw new RuntimeException(e);
+                        }
+                        return null;
+                    }
+                });
+            }
+            parallelTerminationService.invokeAll(callables);
+        } catch (Exception e) {
+            logger.error("Failed to terminate tasks ", e);
+        } finally {
+            parallelTerminationService.shutdown();
         }
     }
 
