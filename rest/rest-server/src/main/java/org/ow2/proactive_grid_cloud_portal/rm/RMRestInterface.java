@@ -106,7 +106,6 @@ public interface RMRestInterface {
     RMState getState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @GET
-    @GZIP
     @Path("monitoring")
     @Produces("application/json")
     RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
@@ -129,7 +128,6 @@ public interface RMRestInterface {
             throws NotConnectedException;
 
     @GET
-    @GZIP
     @Path("nodesource")
     @Produces("application/json")
     List<RMNodeSourceEvent> getExistingNodeSources(@HeaderParam("sessionid") String sessionId)
@@ -183,7 +181,6 @@ public interface RMRestInterface {
             throws NotConnectedException;
 
     @GET
-    @GZIP
     @Produces("application/json")
     @Path("node/mbean")
     Object getNodeMBeanInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
@@ -192,7 +189,6 @@ public interface RMRestInterface {
             NotConnectedException, MalformedObjectNameException, NullPointerException;
 
     @GET
-    @GZIP
     @Produces("application/json")
     @Path("node/mbean/history")
     Object getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
@@ -232,21 +228,18 @@ public interface RMRestInterface {
     Topology getTopology(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @GET
-    @GZIP
     @Path("infrastructures")
     @Produces("application/json")
     Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException;
 
     @GET
-    @GZIP
     @Path("policies")
     @Produces("application/json")
     Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException;
 
     @GET
-    @GZIP
     @Path("info/{name}")
     @Produces("application/json")
     Object getMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
@@ -254,7 +247,6 @@ public interface RMRestInterface {
             ReflectionException, IOException, NotConnectedException;
 
     @GET
-    @GZIP
     @Path("stathistory")
     @Produces("application/json")
     String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range)
@@ -266,7 +258,6 @@ public interface RMRestInterface {
     String getVersion();
 
     @POST
-    @GZIP
     @Path("node/script")
     @Produces("application/json")
     ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid") String sessionId,
@@ -274,7 +265,6 @@ public interface RMRestInterface {
             @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
     @POST
-    @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
     List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
@@ -282,7 +272,6 @@ public interface RMRestInterface {
             @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
     @POST
-    @GZIP
     @Path("host/script")
     @Produces("application/json")
     List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid") String sessionId,
