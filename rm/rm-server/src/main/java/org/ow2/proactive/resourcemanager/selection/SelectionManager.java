@@ -349,13 +349,17 @@ public abstract class SelectionManager {
 
         if (logger.isInfoEnabled()) {
             String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0
-                                                                                                                  ? "and " +
+                                                                                                                  ? " and " +
                                                                                                                     selectedNodes.getExtraNodes()
                                                                                                                                  .size() +
                                                                                                                     " extra nodes"
                                                                                                                   : "";
             logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology() +
-                        " and will get " + selectedNodes.size() + " nodes " + extraNodes);
+                        " and will get " + selectedNodes.size() + " nodes " + extraNodes + " [freeNodes:" +
+                        freeNodes.size() + ";filteredNodes:" + filteredNodes.size() + ";reordered after policy:" +
+                        afterPolicyNodes.size() + ";selection script present:" + hasScripts +
+                        ";nodes filtered by selection script:" + matchedNodes.size() + ";selectedNodes:" +
+                        selectedNodes.size() + "]");
         }
 
         if (loggerIsDebugEnabled) {
