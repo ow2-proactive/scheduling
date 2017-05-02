@@ -62,7 +62,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAFuture;
@@ -228,7 +227,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Path("monitoring")
     @Produces("application/json")
     public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
@@ -307,7 +305,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Path("nodesource")
     @Produces("application/json")
     public List<RMNodeSourceEvent> getExistingNodeSources(@HeaderParam("sessionid") String sessionId)
@@ -530,7 +527,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Produces("application/json")
     @Path("node/mbean")
     public Object getNodeMBeanInfo(@HeaderParam("sessionid") String sessionId,
@@ -570,7 +566,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Produces("application/json")
     @Path("node/mbean/history")
     public String getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId,
@@ -596,7 +591,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Produces("application/json")
     @Path("node/mbeans")
     public Object getNodeMBeansInfo(@HeaderParam("sessionid") String sessionId,
@@ -612,7 +606,6 @@ public class RMRest implements RMRestInterface {
 
     @Override
     @GET
-    @GZIP
     @Produces("application/json")
     @Path("node/mbeans/history")
     public Object getNodeMBeansHistory(@HeaderParam("sessionid") String sessionId,
@@ -664,7 +657,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Path("infrastructures")
     @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
@@ -682,7 +674,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Path("policies")
     @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
@@ -706,7 +697,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Path("info/{name}")
     @Produces("application/json")
     public Object getMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
@@ -759,7 +749,6 @@ public class RMRest implements RMRestInterface {
      */
     @Override
     @GET
-    @GZIP
     @Path("stathistory")
     @Produces("application/json")
     public String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range)
@@ -891,7 +880,6 @@ public class RMRest implements RMRestInterface {
 
     @Override
     @POST
-    @GZIP
     @Path("node/script")
     @Produces("application/json")
     public ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid") String sessionId,
@@ -914,7 +902,6 @@ public class RMRest implements RMRestInterface {
 
     @Override
     @POST
-    @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
     public List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
@@ -931,7 +918,6 @@ public class RMRest implements RMRestInterface {
 
     @Override
     @POST
-    @GZIP
     @Path("host/script")
     @Produces("application/json")
     public List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid") String sessionId,
