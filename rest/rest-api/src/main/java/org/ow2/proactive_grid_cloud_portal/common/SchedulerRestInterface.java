@@ -1202,6 +1202,27 @@ public interface SchedulerRestInterface {
             PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
+     * submit a planned workflow
+     *
+     * @param sessionId user's session in the header
+     * @param pathSegment path param going to be transferred to the variables
+     * @param jobContentXmlString job content in xml string
+     * @return true if the submission is done sucessfully, false otherwise
+     * @throws JobCreationRestException
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     * @throws IOException
+     */
+    @POST
+    @Path("{path:plannings}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/json")
+    boolean submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            String jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
+            PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
      * Submits a workflow to the scheduler from a workflow URL, creating hence a
      * new job resource.
      *
