@@ -322,6 +322,13 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
+    public boolean submitPlannings(String sessionId, PathSegment pathSegment, String jobContentXmlString)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
+        return scheduler().submitPlannings(sessionId, pathSegment, jobContentXmlString);
+    }
+
+    @Override
     public String getVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId)
             throws NotConnectedRestException, IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
