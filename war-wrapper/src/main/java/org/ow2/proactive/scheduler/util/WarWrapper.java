@@ -59,12 +59,10 @@ import org.ow2.proactive.wrapper.WrapperWebConfiguration;
  * @since ProActive Scheduling 7.27.0
  */
 
-public enum WarWrapper {
+public enum WarWrapper{
 
     //singleton instance of WarWrapper
     INSTANCE;
-
-    private static SchedulerStarter schedulerStarter = new SchedulerStarter();
 
     private static final Logger logger = Logger.getLogger(WarWrapper.class);
 
@@ -82,18 +80,18 @@ public enum WarWrapper {
         String[] args = { "--no-rest" };
 
         configureSchedulerAndRMAndPAHomes();
-        schedulerStarter.configureSecurityManager();
-        schedulerStarter.configureLogging();
-        schedulerStarter.configureDerby();
+        SchedulerStarter.configureSecurityManager();
+        SchedulerStarter.configureLogging();
+        SchedulerStarter.configureDerby();
 
         args = JVMPropertiesPreloader.overrideJVMProperties(args);
 
-        Options options = schedulerStarter.getOptions();
+        Options options = SchedulerStarter.getOptions();
 
         try {
-            cmd = schedulerStarter.getCommandLine(args, options);
+            cmd = SchedulerStarter.getCommandLine(args, options);
 
-            schedulerStarter.start(cmd);
+            SchedulerStarter.start(cmd);
 
             configureURLs();
 
@@ -111,13 +109,13 @@ public enum WarWrapper {
         String schedHome = getClass().getProtectionDomain().getCodeSource().getLocation().getPath() +
                            SCHEDULER_RM_DEFAULT_HOME;
 
-        schedulerStarter.setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
+        SchedulerStarter.setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
         schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
 
-        schedulerStarter.setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
-        schedulerStarter.setPropIfNotAlreadySet(PAResourceManagerProperties.RM_HOME.getKey(), schedHome);
-        schedulerStarter.setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
-        schedulerStarter.setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
+        SchedulerStarter.setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
+        SchedulerStarter.setPropIfNotAlreadySet(PAResourceManagerProperties.RM_HOME.getKey(), schedHome);
+        SchedulerStarter.setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
+        SchedulerStarter.setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
                                                 schedHome + "/config/network/server.ini");
     }
 
@@ -126,15 +124,15 @@ public enum WarWrapper {
      */
     private void configureURLs() {
         //
-        if (null != schedulerStarter.rmURL) {
-            schedulerStarter.setPropIfNotAlreadySet("rm.url", schedulerStarter.rmURL);
+        if (null != SchedulerStarter.rmURL) {
+            SchedulerStarter.setPropIfNotAlreadySet("rm.url", SchedulerStarter.rmURL);
         } else {
             logger.warn("System property 'rm.url' not set: ");
         }
 
-        if (null != schedulerStarter.schedAuthInter) {
-            schedulerUri = schedulerStarter.schedAuthInter.getHostURL();
-            schedulerStarter.setPropIfNotAlreadySet("scheduler.url", schedulerUri);
+        if (null != SchedulerStarter.schedAuthInter) {
+            schedulerUri = SchedulerStarter.schedAuthInter.getHostURL();
+            SchedulerStarter.setPropIfNotAlreadySet("scheduler.url", schedulerUri);
         } else {
             logger.warn("System property 'scheduler.url' not set");
         }
@@ -165,15 +163,15 @@ public enum WarWrapper {
             }
 
             if (stopRM(credentials)) {
-                logger.info("RM on " + schedulerStarter.rmURL + " correctly stopped");
+                logger.info("RM on " + SchedulerStarter.rmURL + " correctly stopped");
             } else {
-                logger.warn("RM on " + schedulerStarter.rmURL + " is not stopped");
+                logger.warn("RM on " + SchedulerStarter.rmURL + " is not stopped");
             }
 
         } catch (KeyException e) {
-            logger.error("ERROR while stopping ProActive: Cannot  acquire credentials");
+            logger.error("ERROR while stopping ProActive: Cannot  acquire credentials" + e);
         } catch (Exception e) {
-            logger.error("ERROR while stopping ProActive: " + e.getMessage());
+            logger.error("ERROR while stopping ProActive: " + e);
         }
     }
 
@@ -192,7 +190,7 @@ public enum WarWrapper {
             rmStopped = booleanWrapper.getBooleanValue();
 
         } catch (Exception e) {
-            logger.error("ERROR while stopping RM on " + schedulerStarter.rmURL + ": " + e.getMessage());
+            logger.error("ERROR while stopping RM on " + SchedulerStarter.rmURL + ": " + e);
         }
 
         return rmStopped;
@@ -204,7 +202,7 @@ public enum WarWrapper {
 
         try {
 
-            Scheduler scheduler = schedulerStarter.schedAuthInter.login(credentials);
+            Scheduler scheduler = SchedulerStarter.schedAuthInter.login(credentials);
             schedulerStopped = scheduler.shutdown();
 
             if (schedulerStopped && scheduler.getStatus().isDown()) {
@@ -212,7 +210,7 @@ public enum WarWrapper {
             }
 
         } catch (Exception e) {
-            logger.error("ERROR while stopping to the scheduler on " + schedulerUri + ": " + e.getMessage());
+            logger.error("ERROR while stopping to the scheduler on " + schedulerUri + ": " + e);
         }
 
         return schedulerStopped;
@@ -222,15 +220,15 @@ public enum WarWrapper {
 
         RMAuthentication rmAuthentication = null;
 
-        if (schedulerStarter.rmURL != null) {
-            rmAuthentication = SchedulerFactory.waitAndJoinRM(new URI(schedulerStarter.rmURL));
+        if (SchedulerStarter.rmURL != null) {
+            rmAuthentication = SchedulerFactory.waitAndJoinRM(new URI(SchedulerStarter.rmURL));
         }
 
         return rmAuthentication;
     }
 
     protected Credentials getCredentials() throws KeyException {
-        return Credentials.getCredentialsBase64(schedulerStarter.credentials);
+        return Credentials.getCredentialsBase64(SchedulerStarter.credentials);
     }
 
 }
