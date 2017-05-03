@@ -30,7 +30,9 @@ import static com.google.common.truth.Truth.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyException;
+import java.util.Objects;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -52,7 +54,7 @@ public class WarWrapperTest {
 
         findPAHome();
 
-        if (!PA_HOME.equals(DEFAULT_HOME)) {
+        if (PA_HOME != DEFAULT_HOME) {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
 
             warWrapper = WarWrapper.INSTANCE;
@@ -62,23 +64,9 @@ public class WarWrapperTest {
     }
 
     @Test
-    public void testConfigureSchedulerAndRMAndPAHomes() throws Exception {
-
-        PA_HOME = WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath() + DEFAULT_HOME;
-        System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), PA_HOME);
-        String expected = PA_HOME;
-
-        WarWrapper.INSTANCE.configureSchedulerAndRMAndPAHomes();
-        String actual = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
-
-        assertThat(actual).isEqualTo(expected);
-
-    }
-
-    @Test
     public void testStopRM() throws Exception {
 
-        if (!PA_HOME.equals(DEFAULT_HOME)) {
+        if (PA_HOME != DEFAULT_HOME) {
 
             boolean expected = true;
 
@@ -87,14 +75,14 @@ public class WarWrapperTest {
             assertThat(actual).isEqualTo(expected);
 
         } else {
-            System.out.println("Method 'StopRM' is not tested because PA_HOME is not set");
+            System.out.println("Method 'StopRM' is not tested because PA_HOME is not correctly set");
         }
     }
 
     @Test
     public void testStopScheduler() throws Exception {
 
-        if (!PA_HOME.equals(DEFAULT_HOME)) {
+        if (PA_HOME != DEFAULT_HOME) {
 
             boolean expected = true;
 
@@ -103,7 +91,7 @@ public class WarWrapperTest {
             assertThat(actual).isEqualTo(expected);
 
         } else {
-            System.out.println("Method 'StopScheduler' is not tested because PA_HOME is not set");
+            System.out.println("Method 'StopScheduler' is not tested because PA_HOME is not correctly set");
         }
 
     }
@@ -112,17 +100,30 @@ public class WarWrapperTest {
 
         File currentFile = new File(WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
-        while (currentFile.getParentFile().exists() && PA_HOME.equals(DEFAULT_HOME)) {
+        while (!Objects.equals(currentFile, null) && PA_HOME == DEFAULT_HOME) {
 
-            for (String subDirectory : currentFile.getParentFile().list()) {
+            if (!Objects.equals(currentFile.getParentFile(), null)) {
 
-                if (subDirectory.equals("config")) {
-                    PA_HOME = currentFile.getParentFile().getPath();
-                    break;
+                for (String subDirectory : currentFile.getParentFile().list()) {
+
+                    if (subDirectory.equals("config")) {
+
+                        if (!Objects.equals(currentFile.getParentFile().getPath(), null)) {
+                            PA_HOME = currentFile.getParentFile().getPath();
+                        }
+                        break;
+                    }
                 }
             }
 
             currentFile = currentFile.getParentFile();
         }
+    }
+
+    @AfterClass
+    public static void cleanup() {
+
+        System.clearProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
+
     }
 }
