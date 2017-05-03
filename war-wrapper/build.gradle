@@ -10,6 +10,18 @@ configurations {
     all*.exclude group: 'com.zaxxer', module: 'HikariCP-java6'
 }
 
+task deleteConfigFiles(type: Delete){
+    delete 'build/classes/main/config'
+}
+
+task copyConfigFiles(type: Copy) {
+    from project(':').files('config')
+    into 'build/classes/main/config'
+}
+
+copyConfigFiles.dependsOn deleteConfigFiles
+test.dependsOn copyConfigFiles
+
 dependencies {
 
     providedCompile project(':scheduler:scheduler-server')

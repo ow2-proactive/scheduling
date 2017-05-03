@@ -37,14 +37,10 @@ public class WarWrapperPAHomeTest {
 
     private static final String DEFAULT_HOME = ".";
 
-    private static String PA_HOME = DEFAULT_HOME;
-
     @Test
     public void testConfigureSchedulerAndRMAndPAHomes() throws Exception {
 
-        PA_HOME = WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath() + DEFAULT_HOME;
-
-        String expected = PA_HOME;
+        String expected = WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath() + DEFAULT_HOME;
 
         WarWrapper.INSTANCE.configureSchedulerAndRMAndPAHomes();
         String actual = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
