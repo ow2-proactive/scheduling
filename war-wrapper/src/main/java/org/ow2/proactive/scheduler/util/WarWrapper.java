@@ -59,7 +59,7 @@ import org.ow2.proactive.wrapper.WrapperWebConfiguration;
  * @since ProActive Scheduling 7.27.0
  */
 
-public enum WarWrapper{
+public enum WarWrapper {
 
     //singleton instance of WarWrapper
     INSTANCE;
