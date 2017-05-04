@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.util;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.io.File;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,12 +37,13 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public class WarWrapperPAHomeTest {
 
-    private static final String DEFAULT_HOME = ".";
-
     @Test
     public void testConfigureSchedulerAndRMAndPAHomes() throws Exception {
 
-        String expected = WarWrapper.class.getProtectionDomain().getCodeSource().getLocation().getPath() + DEFAULT_HOME;
+        String expected = new File(WarWrapper.class.getProtectionDomain()
+                                                   .getCodeSource()
+                                                   .getLocation()
+                                                   .getPath()).getAbsolutePath();
 
         WarWrapper.INSTANCE.configureSchedulerAndRMAndPAHomes();
         String actual = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());

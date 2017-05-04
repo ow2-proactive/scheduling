@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
@@ -66,8 +67,6 @@ public enum WarWrapper {
 
     private static final Logger logger = Logger.getLogger(WarWrapper.class);
 
-    private static final String SCHEDULER_RM_DEFAULT_HOME = ".";
-
     private static String schedulerUri;
 
     private static CommandLine cmd = null;
@@ -106,8 +105,10 @@ public enum WarWrapper {
      */
     protected void configureSchedulerAndRMAndPAHomes() {
 
-        String schedHome = getClass().getProtectionDomain().getCodeSource().getLocation().getPath() +
-                           SCHEDULER_RM_DEFAULT_HOME;
+        String schedHome = new File(getClass().getProtectionDomain()
+                                              .getCodeSource()
+                                              .getLocation()
+                                              .getPath()).getAbsolutePath();
 
         SchedulerStarter.setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
         schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
