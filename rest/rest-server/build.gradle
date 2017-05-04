@@ -63,6 +63,8 @@ dependencies {
     runtime 'org.eclipse.jetty:jetty-webapp:9.2.14.v20151106'
 
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
+
+    compile "org.ow2.proactive:job-planner-rest-client:${schedulingVersion}"
 }
 
 task stub(type: StubTask) {
