@@ -106,7 +106,7 @@ public class RMNodeSourceEvent extends RMEvent {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof RMNodeSourceEvent))
             return false;
         RMNodeSourceEvent other = (RMNodeSourceEvent) obj;
         if (nodeSourceName == null) {

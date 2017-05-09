@@ -244,7 +244,7 @@ public class UserIdentificationImpl extends UserIdentification {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof UserIdentificationImpl))
             return false;
         UserIdentificationImpl other = (UserIdentificationImpl) obj;
         if (connectionTime != other.connectionTime)

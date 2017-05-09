@@ -80,7 +80,7 @@ public class IntegerWrapper implements Serializable {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof IntegerWrapper))
             return false;
         IntegerWrapper other = (IntegerWrapper) obj;
         if (value == null) {

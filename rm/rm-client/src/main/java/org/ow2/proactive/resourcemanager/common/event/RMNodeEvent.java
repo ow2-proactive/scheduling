@@ -189,7 +189,7 @@ public final class RMNodeEvent extends RMEvent {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof RMNodeEvent))
             return false;
         RMNodeEvent other = (RMNodeEvent) obj;
         if (nodeUrl == null) {

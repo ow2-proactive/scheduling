@@ -1202,7 +1202,7 @@ public abstract class InternalJob extends JobState {
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof InternalJob))
             return false;
         InternalJob other = (InternalJob) obj;
         if (!getId().equals(other.getId()))

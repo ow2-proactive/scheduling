@@ -80,7 +80,7 @@ public class BooleanWrapper implements Serializable {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof BooleanWrapper))
             return false;
         BooleanWrapper other = (BooleanWrapper) obj;
         if (booleanValue != other.booleanValue)

@@ -584,7 +584,7 @@ public class TopologyManager {
                     return true;
                 if (obj == null)
                     return false;
-                if (getClass() != obj.getClass())
+                if (!(obj instanceof Host))
                     return false;
                 Host other = (Host) obj;
                 if (address == null) {

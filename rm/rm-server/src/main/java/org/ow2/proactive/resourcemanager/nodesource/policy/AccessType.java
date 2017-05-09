@@ -206,7 +206,7 @@ public class AccessType implements Serializable {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof AccessType))
             return false;
         AccessType other = (AccessType) obj;
         if (type == null) {
