@@ -99,9 +99,9 @@ public class RestDataspaceImpl {
     public Response store(@HeaderParam("sessionid") String sessionId, @HeaderParam("Content-Encoding") String encoding,
             @PathParam("dataspace") String dataspace, @PathParam("path-name") String pathname, InputStream is)
             throws NotConnectedRestException, PermissionRestException {
-        checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
+            checkPathParams(dataspace, pathname);
             logger.debug(String.format("Storing %s in %s", pathname, dataspace));
             writeFile(is, resolveFile(session, dataspace, pathname), encoding);
         } catch (Throwable error) {
@@ -158,9 +158,9 @@ public class RestDataspaceImpl {
             @PathParam("path-name") String pathname, @QueryParam("comp") String component,
             @QueryParam("includes") List<String> includes, @QueryParam("excludes") List<String> excludes)
             throws NotConnectedRestException, PermissionRestException {
-        checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
+            checkPathParams(dataspace, pathname);
             FileObject fo = resolveFile(session, dataspace, pathname);
 
             if (!fo.exists()) {
@@ -225,10 +225,10 @@ public class RestDataspaceImpl {
     public Response delete(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspace,
             @PathParam("path-name") String pathname, @QueryParam("includes") List<String> includes,
             @QueryParam("excludes") List<String> excludes) throws NotConnectedRestException, PermissionRestException {
-        checkPathParams(dataspace, pathname);
         Session session = checkSessionValidity(sessionId);
 
         try {
+            checkPathParams(dataspace, pathname);
             FileObject fo = resolveFile(session, dataspace, pathname);
 
             if (!fo.exists()) {
@@ -262,9 +262,9 @@ public class RestDataspaceImpl {
     @Path("/{dataspace}/{path-name:.*}")
     public Response metadata(@HeaderParam("sessionid") String sessionId, @PathParam("dataspace") String dataspacePath,
             @PathParam("path-name") String pathname) throws NotConnectedRestException, PermissionRestException {
-        checkPathParams(dataspacePath, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
+            checkPathParams(dataspacePath, pathname);
             FileObject fo = resolveFile(session, dataspacePath, pathname);
             if (!fo.exists()) {
                 return notFoundRes();
@@ -284,9 +284,9 @@ public class RestDataspaceImpl {
             @PathParam("path-name") String pathname, @FormParam("mimetype") String mimeType)
             throws NotConnectedRestException, PermissionRestException {
 
-        checkPathParams(dataspacePath, pathname);
         Session session = checkSessionValidity(sessionId);
         try {
+            checkPathParams(dataspacePath, pathname);
             FileObject fileObject = resolveFile(session, dataspacePath, pathname);
 
             if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FOLDER.getMimeType())) {

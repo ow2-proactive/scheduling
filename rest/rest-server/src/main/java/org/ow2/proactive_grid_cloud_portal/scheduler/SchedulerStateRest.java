@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.SequenceInputStream;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -67,6 +68,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
@@ -88,6 +90,9 @@ import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -100,7 +105,6 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.jobplanner.rest.client.JobPlannerRestClient;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
@@ -2337,21 +2341,47 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return filePath;
     }
 
+    @Consumes(MediaType.APPLICATION_JSON)
     @POST
     @Path("{path:plannings}")
     @Produces("application/json")
     @Override
-    public boolean submitPlannings(@HeaderParam("sessionid") String sessionId,
-            @PathParam("path") PathSegment pathSegment, String jobContentXmlString) throws JobCreationRestException,
-            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
+    public String submitPlannings(@HeaderParam("sessionid") String sessionId,
+            @PathParam("path") PathSegment pathSegment, Map<String, String> jobContentXmlString)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
 
         checkAccess(sessionId, "plannings");
 
         Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-        JobPlannerRestClient client = new JobPlannerRestClient(PortalConfiguration.JOBPLANNER_URL.getValueAsString());
+        if (jobContentXmlString == null || jobContentXmlString.size() != 1) {
+            throw new JobCreationRestException("Cannot find job body: code " + HttpURLConnection.HTTP_BAD_REQUEST);
+        }
 
-        return client.submitScheduledWorkflow(sessionId, jobVariables, jobContentXmlString);
+        Map<String, Object> requestBody = new HashMap<>(2);
+        requestBody.put("variables", jobVariables);
+        requestBody.put("xmlContentString", jobContentXmlString.entrySet().iterator().next().getValue());
+
+        Response response = null;
+        try {
+            ResteasyClient client = new ResteasyClientBuilder().build();
+            ResteasyWebTarget target = client.target(PortalConfiguration.JOBPLANNER_URL.getValueAsString());
+            response = target.request()
+                             .header("sessionid", sessionId)
+                             .post(Entity.entity(requestBody, "application/json"));
+
+            if (HttpURLConnection.HTTP_OK != response.getStatus()) {
+                throw new IOException(String.format("Cannot access resource %s: code %d",
+                                                    PortalConfiguration.JOBPLANNER_URL.getValueAsString(),
+                                                    response.getStatus()));
+            }
+            return response.readEntity(String.class);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
 
     }
 

@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -217,8 +218,9 @@ public interface StudioInterface {
     @POST
     @Path("{path:plannings}")
     @Consumes(MediaType.APPLICATION_JSON)
-    boolean submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
-            String jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
+    @Produces(MediaType.APPLICATION_JSON)
+    String submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            Map<String, String> jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
 
     @GET
