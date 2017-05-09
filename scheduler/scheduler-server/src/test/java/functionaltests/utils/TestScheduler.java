@@ -29,8 +29,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URISyntaxException;
 import java.security.KeyException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.security.auth.login.LoginException;
 
@@ -198,7 +197,48 @@ public class TestScheduler {
     }
 
     public static String testClasspath() {
-        return System.getProperty("java.class.path");
+        return (getRmHome() + File.separator + "dist" + File.separator + "lib" + File.separator + "*") +
+               File.pathSeparatorChar + getRmHome() + File.separator + "addons" + File.separator + "*" +
+               filterClassPath(System.getProperty("java.class.path"));
+    }
+
+    private static String getRmHome() {
+        return PAResourceManagerProperties.RM_HOME.getValueAsString();
+    }
+
+    private static String filterClassPath(String classPath) {
+        Set<String> distLibJars = findJarsNamesInPath(getRmHome() + File.separator + "dist" + File.separator + "lib");
+        Set<String> addonsJars = findJarsNamesInPath(getRmHome() + File.separator + "addons");
+        List<String> pathList = Arrays.asList(classPath.split("" + File.pathSeparatorChar));
+        StringBuilder builder = new StringBuilder();
+        for (String pathElement : pathList) {
+            if (pathElement.endsWith(".so") || pathElement.endsWith(".dll") || pathElement.endsWith(".lib") ||
+                pathElement.endsWith(".dylib")) {
+                continue;
+            } else if (distLibJars.contains(new File(pathElement).getName())) {
+                continue;
+            } else if (addonsJars.contains(new File(pathElement).getName())) {
+                continue;
+            } else {
+                builder.append(File.pathSeparatorChar);
+                builder.append(pathElement);
+            }
+        }
+        return builder.toString();
+    }
+
+    private static Set<String> findJarsNamesInPath(String path) {
+        File[] jarArray = new File(path).listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".jar");
+            }
+        });
+        HashSet<String> jarNames = new HashSet<>();
+        for (File jar : jarArray) {
+            jarNames.add(jar.getName());
+        }
+        return jarNames;
     }
 
     /* convenience method to clean TMP from dataspace when executing test */

@@ -34,7 +34,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.io.ByteArrayInputStream;
 import java.net.URI;
 
 import org.apache.log4j.Appender;
@@ -45,7 +44,6 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -79,9 +77,8 @@ public class SchedulerStateRestLiveLogsTest extends RestTestServer {
     @Before
     public void setUp() throws Exception {
         client = ProxyFactory.create(SchedulerRestInterface.class, "http://localhost:" + port + "/");
-        PortalConfiguration.load(new ByteArrayInputStream((PortalConfiguration.scheduler_logforwardingservice_provider +
-                                                           "=" +
-                                                           SynchronousLocalLogForwardingProvider.class.getName()).getBytes()));
+        PortalConfiguration.SCHEDULER_LOGINFORWARDINGSERVICE_PROVIDER.updateProperty(SynchronousLocalLogForwardingProvider.class.getName());
+
         scheduler = mock(SchedulerProxyUserInterface.class);
         sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
     }
