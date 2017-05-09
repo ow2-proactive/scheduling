@@ -429,7 +429,7 @@ public abstract class Script<E> implements Serializable {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof Script))
             return false;
         Script<E> other = (Script<E>) obj;
         if (this.getId() == null) {
