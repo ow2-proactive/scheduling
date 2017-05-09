@@ -123,7 +123,9 @@ public class HostsFileBasedInfrastructureManagerTest {
             hostsFileBasedInfrastructureManager.waitBetweenDeploymentFailures = 0;
             try {
                 int nbnodes = 1;
-                hostsFileBasedInfrastructureManager.startNodeImplWithRetries(InetAddress.getLocalHost(), nbnodes, retries);
+                hostsFileBasedInfrastructureManager.startNodeImplWithRetries(InetAddress.getLocalHost(),
+                                                                             nbnodes,
+                                                                             retries);
             } catch (Exception e) {
             }
             return retries;
