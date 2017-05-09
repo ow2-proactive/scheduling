@@ -1202,6 +1202,27 @@ public interface SchedulerRestInterface {
             PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
+     * submit a planned workflow
+     *
+     * @param sessionId user's session in the header
+     * @param pathSegment path param going to be transferred to the variables
+     * @param jobContentXmlString job content in xml string
+     * @return true if the submission is done sucessfully, false otherwise
+     * @throws JobCreationRestException
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     * @throws IOException
+     */
+    @Consumes(MediaType.APPLICATION_JSON)
+    @POST
+    @Path("{path:plannings}")
+    @Produces("application/json")
+    String submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            Map<String, String> jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
+            PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
      * Submits a workflow to the scheduler from a workflow URL, creating hence a
      * new job resource.
      *
@@ -1221,7 +1242,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("jobs")
     @Produces("application/json")
-    public JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
+    JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
             @PathParam("path") PathSegment pathSegment) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
 
