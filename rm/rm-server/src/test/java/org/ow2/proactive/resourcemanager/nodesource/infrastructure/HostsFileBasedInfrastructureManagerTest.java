@@ -26,7 +26,6 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
 import java.net.InetAddress;
@@ -66,7 +65,7 @@ public class HostsFileBasedInfrastructureManagerTest {
     @Test
     public void testRetryOverMaximumStack() throws Exception {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        int retries = 15000;
+        int retries = 5;
         executor.invokeAll(Arrays.asList(new StartNodeThread(retries)));
         executor.shutdown();
 
@@ -82,22 +81,6 @@ public class HostsFileBasedInfrastructureManagerTest {
         executor.shutdown();
 
         assertThat(retryCounter, is(retries + 1));
-    }
-
-    @Test
-    public void testInfiniteRetry() throws Exception {
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new StartNodeThread(-1).call();
-            }
-        });
-        thread.start();
-
-        semaphore.acquire();
-
-        assertThat(retryCounter, greaterThan(3));
     }
 
     private HostsFileBasedInfrastructureManager createTestClass() {
@@ -140,9 +123,7 @@ public class HostsFileBasedInfrastructureManagerTest {
             hostsFileBasedInfrastructureManager.waitBetweenDeploymentFailures = 0;
             try {
                 int nbnodes = 1;
-                hostsFileBasedInfrastructureManager.startNodeImplWithRetries(InetAddress.getLocalHost(),
-                                                                             nbnodes,
-                                                                             retries);
+                hostsFileBasedInfrastructureManager.startNodeImplWithRetries(InetAddress.getLocalHost(), nbnodes, retries);
             } catch (Exception e) {
             }
             return retries;
