@@ -1145,9 +1145,6 @@ public abstract class InternalTask extends TaskState {
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-
         if (InternalTask.class.isAssignableFrom(obj.getClass())) {
             return ((InternalTask) obj).getId().equals(getId());
         } else {

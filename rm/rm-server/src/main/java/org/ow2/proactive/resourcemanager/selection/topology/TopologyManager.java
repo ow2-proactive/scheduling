@@ -574,7 +574,6 @@ public class TopologyManager {
             public int hashCode() {
                 final int prime = 31;
                 int result = 1;
-                result = prime * result + getOuterType().hashCode();
                 result = prime * result + ((address == null) ? 0 : address.hashCode());
                 return result;
             }
@@ -588,8 +587,6 @@ public class TopologyManager {
                 if (getClass() != obj.getClass())
                     return false;
                 Host other = (Host) obj;
-                if (!getOuterType().equals(other.getOuterType()))
-                    return false;
                 if (address == null) {
                     if (other.address != null)
                         return false;
@@ -615,9 +612,6 @@ public class TopologyManager {
                 }
             }
 
-            private MultipleHostsExclusiveHandler getOuterType() {
-                return MultipleHostsExclusiveHandler.this;
-            }
         }
     }
 
