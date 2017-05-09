@@ -25,7 +25,16 @@
  */
 package org.ow2.proactive.scripting;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Serializable;
+import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -406,19 +415,29 @@ public abstract class Script<E> implements Serializable {
         return scriptEngineLookup;
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof Script) {
-            Script<E> new_name = (Script<E>) o;
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
 
-            return this.getId().equals(new_name.getId());
-        }
-
-        return false;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Script<E> other = (Script<E>) obj;
+        if (this.getId() == null) {
+            if (other.getId() != null)
+                return false;
+        } else if (!this.getId().equals(other.getId()))
+            return false;
+        return true;
     }
 
     /**

@@ -223,22 +223,43 @@ public class UserIdentificationImpl extends UserIdentification {
         this.session = session;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (connectionTime ^ (connectionTime >>> 32));
+        result = prime * result + ((hostName == null) ? 0 : hostName.hashCode());
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      *
      * @return true if the two users seems exactly equals.
      */
     @Override
-    public boolean equals(Object object) {
-        if (object instanceof UserIdentificationImpl) {
-            boolean toReturn = true;
-            UserIdentificationImpl id = (UserIdentificationImpl) object;
-            toReturn = toReturn && getUsername().equals(id.getUsername());
-            toReturn = toReturn && getHostName().equals(id.getHostName());
-            toReturn = toReturn && (getConnectionTime() == id.getConnectionTime());
-            return toReturn;
-        }
-        return false;
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        UserIdentificationImpl other = (UserIdentificationImpl) obj;
+        if (connectionTime != other.connectionTime)
+            return false;
+        if (hostName == null) {
+            if (other.hostName != null)
+                return false;
+        } else if (!hostName.equals(other.hostName))
+            return false;
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        return true;
     }
 
     /**

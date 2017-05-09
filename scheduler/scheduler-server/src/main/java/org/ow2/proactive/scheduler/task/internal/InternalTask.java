@@ -1131,19 +1131,29 @@ public abstract class InternalTask extends TaskState {
         return tli;
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        return result;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
             return false;
-        }
+        if (getClass() != obj.getClass())
+            return false;
+
         if (InternalTask.class.isAssignableFrom(obj.getClass())) {
             return ((InternalTask) obj).getId().equals(getId());
+        } else {
+            return false;
         }
 
-        return false;
     }
 
     /**

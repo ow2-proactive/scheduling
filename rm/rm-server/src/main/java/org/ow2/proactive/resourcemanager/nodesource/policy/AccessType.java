@@ -189,17 +189,32 @@ public class AccessType implements Serializable {
         return identities;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
     /**
      * Compares two AccessType objects
      */
+    @Override
     public boolean equals(Object obj) {
-        if (obj instanceof AccessType) {
-            if (this.type == null) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        AccessType other = (AccessType) obj;
+        if (type == null) {
+            if (other.type != null)
                 return false;
-            } else {
-                return this.type.equals(((AccessType) obj).type);
-            }
-        }
-        return false;
+        } else if (!type.equals(other.type))
+            return false;
+        return true;
     }
+
 }
