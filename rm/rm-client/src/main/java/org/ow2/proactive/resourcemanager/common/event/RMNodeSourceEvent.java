@@ -87,6 +87,14 @@ public class RMNodeSourceEvent extends RMEvent {
         this.nodeSourceAdmin = nodeSourceAdmin;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((nodeSourceName == null) ? 0 : nodeSourceName.hashCode());
+        return result;
+    }
+
     /**
      * Compare two RMNodeSourceEvent objects.
      * @param obj RMNodeSourceEvent object to compare.
@@ -94,10 +102,19 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof RMNodeSourceEvent) {
-            return ((RMNodeSourceEvent) obj).nodeSourceName.equals(this.nodeSourceName);
-        }
-        return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof RMNodeSourceEvent))
+            return false;
+        RMNodeSourceEvent other = (RMNodeSourceEvent) obj;
+        if (nodeSourceName == null) {
+            if (other.nodeSourceName != null)
+                return false;
+        } else if (!nodeSourceName.equals(other.nodeSourceName))
+            return false;
+        return true;
     }
 
     /**
