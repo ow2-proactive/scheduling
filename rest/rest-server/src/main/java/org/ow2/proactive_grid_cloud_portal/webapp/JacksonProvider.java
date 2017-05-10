@@ -25,12 +25,15 @@
  */
 package org.ow2.proactive_grid_cloud_portal.webapp;
 
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 
 
@@ -41,14 +44,20 @@ import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
  */
 
 @Provider
+@Produces(MediaType.APPLICATION_JSON)
 public class JacksonProvider implements ContextResolver<ObjectMapper> {
 
-    public ObjectMapper getContext(Class<?> arg0) {
-        ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    public JacksonProvider() {
         AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
-        mapper.getDeserializationConfig().setAnnotationIntrospector(introspector);
-        mapper.getSerializationConfig().setAnnotationIntrospector(introspector);
-        mapper.getSerializationConfig().disable(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
+        AnnotationIntrospector secondary = new JacksonAnnotationIntrospector();
+        mapper.setAnnotationIntrospector(new AnnotationIntrospector.Pair(introspector, secondary));
+        mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
+    }
+
+    @Override
+    public ObjectMapper getContext(Class<?> arg0) {
         return mapper;
     }
 
