@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.common;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 
@@ -134,12 +135,7 @@ public class SchedulerConnection extends Connection<SchedulerAuthenticationInter
      *          the given URL with SCHEDULER_NAME appended if URL does not end with SCHEDULER_NAME
      */
     private static String normalizeScheduler(String url) {
-        url = Connection.normalize(url);
-        String SCHEDULER_DEFAULT_NAME = SchedulerConstants.SCHEDULER_DEFAULT_NAME;
-        if (!url.endsWith(SCHEDULER_DEFAULT_NAME)) {
-            url += SCHEDULER_DEFAULT_NAME;
-        }
-        return url;
+        return URIBuilder.buildURI(Connection.normalize(url), SchedulerConstants.SCHEDULER_DEFAULT_NAME).toString();
     }
 
 }

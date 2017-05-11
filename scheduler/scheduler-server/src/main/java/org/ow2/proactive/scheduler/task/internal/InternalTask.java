@@ -562,7 +562,7 @@ public abstract class InternalTask extends TaskState {
      * Loads authorized selection scripts.
      */
     private static void updateAuthorizedScriptsSignatures(TaskId id) {
-        String dirName = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString();
+        String dirName = PASchedulerProperties.EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsStringOrNull();
         if (dirName != null && dirName.length() > 0) {
             dirName = PASchedulerProperties.getAbsolutePath(dirName);
             File folder = new File(dirName);
@@ -1131,19 +1131,26 @@ public abstract class InternalTask extends TaskState {
         return tli;
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        return result;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
             return false;
-        }
         if (InternalTask.class.isAssignableFrom(obj.getClass())) {
             return ((InternalTask) obj).getId().equals(getId());
+        } else {
+            return false;
         }
 
-        return false;
     }
 
     /**

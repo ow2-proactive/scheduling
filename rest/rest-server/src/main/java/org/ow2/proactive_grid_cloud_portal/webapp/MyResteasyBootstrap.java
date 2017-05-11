@@ -53,14 +53,22 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
         restRuntime = new RestRuntime();
 
+        initPortalConfiguration(event);
+
         restRuntime.start(dispatcher,
-                          findConfigurationFile(event.getServletContext(),
-                                                File.separator + "config" + File.separator + "web" + File.separator +
-                                                                           "settings.ini"),
                           findConfigurationFile(event.getServletContext(), "log4j.properties"),
                           findConfigurationFile(event.getServletContext(),
                                                 File.separator + "config" + File.separator + "network" +
                                                                            File.separator + "server.ini"));
+    }
+
+    private void initPortalConfiguration(ServletContextEvent event) {
+        File portalConfigurationFile = findConfigurationFile(event.getServletContext(),
+                                                             File.separator + "config" + File.separator + "web" +
+                                                                                        File.separator +
+                                                                                        "settings.ini");
+        System.setProperty(PortalConfiguration.PA_WEB_PROPERTIES_FILEPATH, portalConfigurationFile.getAbsolutePath());
+        PortalConfiguration.loadProperties(PortalConfiguration.PA_WEB_PROPERTIES_FILEPATH);
     }
 
     private File findConfigurationFile(ServletContext servletContext, String configurationFileName) {

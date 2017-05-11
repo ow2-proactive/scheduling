@@ -26,19 +26,23 @@
 package org.ow2.proactive.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
@@ -59,8 +63,6 @@ public class JettyStarter {
 
     protected static final String HTTPS_CONNECTOR_NAME = "https";
 
-    protected static final String REST_CONFIG_PATH = "/config/web/settings.ini";
-
     private static final Logger logger = Logger.getLogger(JettyStarter.class);
 
     /**
@@ -75,19 +77,22 @@ public class JettyStarter {
     }
 
     public List<String> deployWebApplications(String rmUrl, String schedulerUrl) {
-        Properties properties = readRestProperties();
+        initializeRestProperties();
 
         setSystemPropertyIfNotDefined("rm.url", rmUrl);
         setSystemPropertyIfNotDefined("scheduler.url", schedulerUrl);
 
-        if ("true".equalsIgnoreCase(properties.getProperty(WebProperties.WEB_DEPLOY, "true"))) {
+        if (WebProperties.WEB_DEPLOY.getValueAsBoolean()) {
             logger.info("Starting the web applications...");
 
-            int httpPort = getJettyHttpPort(properties);
-            int httpsPort = Integer.parseInt(properties.getProperty(WebProperties.WEB_HTTPS_PORT, "443"));
+            int httpPort = getJettyHttpPort();
+            int httpsPort = 443;
+            if (WebProperties.WEB_HTTPS_PORT.isSet()) {
+                httpsPort = WebProperties.WEB_HTTPS_PORT.getValueAsInt();
+            }
 
-            boolean httpsEnabled = isHttpsEnabled(properties);
-            boolean redirectHttpToHttps = isHttpToHttpsRedirectionEnabled(properties);
+            boolean httpsEnabled = WebProperties.WEB_HTTPS.getValueAsBoolean();
+            boolean redirectHttpToHttps = WebProperties.WEB_REDIRECT_HTTP_TO_HTTPS.getValueAsBoolean();
 
             int restPort = httpPort;
 
@@ -104,7 +109,7 @@ public class JettyStarter {
                 httpProtocol = "http";
             }
 
-            Server server = createHttpServer(properties, httpPort, httpsPort, httpsEnabled, redirectHttpToHttps);
+            Server server = createHttpServer(httpPort, httpsPort, httpsEnabled, redirectHttpToHttps);
 
             server.setStopAtShutdown(true);
 
@@ -127,34 +132,21 @@ public class JettyStarter {
         return new ArrayList<>();
     }
 
-    protected int getJettyHttpPort(Properties properties) {
-        int result = 8080;
+    protected int getJettyHttpPort() {
 
-        String property = properties.getProperty(WebProperties.WEB_HTTP_PORT);
-
-        if (property == null) {
-            property = properties.getProperty(WebProperties.WEB_PORT);
+        if (WebProperties.WEB_HTTP_PORT.isSet()) {
+            return WebProperties.WEB_HTTP_PORT.getValueAsInt();
         }
 
-        if (property != null) {
-            result = Integer.parseInt(property);
+        return 8080;
+    }
+
+    protected Server createHttpServer(int httpPort, int httpsPort, boolean httpsEnabled, boolean redirectHttpToHttps) {
+
+        int maxThreads = 100;
+        if (WebProperties.WEB_MAX_THREADS.isSet()) {
+            maxThreads = WebProperties.WEB_MAX_THREADS.getValueAsInt();
         }
-
-        return result;
-    }
-
-    private boolean isHttpToHttpsRedirectionEnabled(Properties properties) {
-        return properties.getProperty(WebProperties.WEB_REDIRECT_HTTP_TO_HTTPS, "true").equalsIgnoreCase("true");
-    }
-
-    private boolean isHttpsEnabled(Properties properties) {
-        return properties.getProperty(WebProperties.WEB_HTTPS, "false").equalsIgnoreCase("true");
-    }
-
-    protected Server createHttpServer(Properties properties, int httpPort, int httpsPort, boolean httpsEnabled,
-            boolean redirectHttpToHttps) {
-
-        int maxThreads = Integer.parseInt(properties.getProperty(WebProperties.WEB_MAX_THREADS, "100"));
 
         QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads);
         Server server = new Server(threadPool);
@@ -168,14 +160,21 @@ public class JettyStarter {
         if (httpsEnabled) {
             SslContextFactory sslContextFactory = new SslContextFactory();
 
-            String httpsKeystore = properties.getProperty(WebProperties.WEB_HTTPS_KEYSTORE);
-            String httpsKeystorePassword = properties.getProperty(WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD);
+            String httpsKeystore = WebProperties.WEB_HTTPS_KEYSTORE.getValueAsStringOrNull();
+            String httpsKeystorePassword = WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD.getValueAsStringOrNull();
 
-            checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE, httpsKeystore);
-            checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD, httpsKeystorePassword);
+            checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE.getKey(), httpsKeystore);
+            checkPropertyNotNull(WebProperties.WEB_HTTPS_KEYSTORE_PASSWORD.getKey(), httpsKeystorePassword);
 
             sslContextFactory.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(httpsKeystore));
             sslContextFactory.setKeyStorePassword(httpsKeystorePassword);
+
+            if (WebProperties.WEB_HTTPS_TRUSTSTORE.isSet() && WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.isSet()) {
+                String httpsTrustStore = WebProperties.WEB_HTTPS_TRUSTSTORE.getValueAsString();
+                String httpsTrustStorePassword = WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.getValueAsString();
+                sslContextFactory.setTrustStorePath(httpsTrustStore);
+                sslContextFactory.setTrustStorePassword(httpsTrustStorePassword);
+            }
 
             HttpConfiguration secureHttpConfiguration = new HttpConfiguration(httpConfiguration);
             secureHttpConfiguration.addCustomizer(new SecureRequestCustomizer());
@@ -368,16 +367,12 @@ public class JettyStarter {
         return file.isDirectory();
     }
 
-    private Properties readRestProperties() {
-        File restPropertiesFile = new File(getSchedulerHome() + REST_CONFIG_PATH);
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(restPropertiesFile));
-        } catch (IOException e) {
-            logger.warn("Could not find REST properties" + restPropertiesFile, e);
+    private void initializeRestProperties() {
+        System.setProperty(WebProperties.REST_HOME.getKey(), getSchedulerHome());
+        WebProperties.load();
+        if (!getSchedulerHome().equals(WebProperties.REST_HOME.getValueAsString())) {
+            throw new IllegalStateException("Rest home directory could not be initialized");
         }
-        properties.putAll(System.getProperties());
-        return properties;
     }
 
     private String getSchedulerHome() {

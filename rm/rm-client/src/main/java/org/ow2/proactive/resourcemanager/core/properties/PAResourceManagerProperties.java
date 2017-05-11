@@ -26,11 +26,12 @@
 package org.ow2.proactive.resourcemanager.core.properties;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.core.properties.PACommonProperties;
+import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
+import org.ow2.proactive.core.properties.PropertyType;
 import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
@@ -45,39 +46,39 @@ import org.ow2.proactive.utils.PAPropertiesLazyLoader;
  * $Id$
  */
 @PublicAPI
-public enum PAResourceManagerProperties {
+public enum PAResourceManagerProperties implements PACommonProperties {
 
     /* ***************************************************************** */
     /* ********************** RMCORE PROPERTIES ********************* */
     /* ***************************************************************** */
 
     /** Name of the ProActive Node containing RM's active objects */
-    RM_NODE_NAME("pa.rm.node.name", PropertyType.STRING),
+    RM_NODE_NAME("pa.rm.node.name", PropertyType.STRING, "RM_NODE"),
 
     /** Ping frequency in ms used by node source for keeping a watch on handled nodes */
-    RM_NODE_SOURCE_PING_FREQUENCY("pa.rm.node.source.ping.frequency", PropertyType.INTEGER),
+    RM_NODE_SOURCE_PING_FREQUENCY("pa.rm.node.source.ping.frequency", PropertyType.INTEGER, "45000"),
 
     /** Ping frequency used by resource manager to ping connected clients (in ms) */
-    RM_CLIENT_PING_FREQUENCY("pa.rm.client.ping.frequency", PropertyType.INTEGER),
+    RM_CLIENT_PING_FREQUENCY("pa.rm.client.ping.frequency", PropertyType.INTEGER, "45000"),
 
     /** Timeout in ms for selection script execution */
-    RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PropertyType.INTEGER),
+    RM_SELECT_SCRIPT_TIMEOUT("pa.rm.select.script.timeout", PropertyType.INTEGER, "30000"),
 
     /** The number of selection script digests stored in the cache to predict the execution results */
-    RM_SELECT_SCRIPT_CACHE_SIZE("pa.rm.select.script.cache", PropertyType.INTEGER),
+    RM_SELECT_SCRIPT_CACHE_SIZE("pa.rm.select.script.cache", PropertyType.INTEGER, "10000"),
 
     /**
      * The time period when a node has the same dynamic characteristics (in ms).
      * Default is 5 mins, which means that if any dynamic selection scripts returns
      * false on a node it won't be executed there at least for this time.
      */
-    RM_SELECT_SCRIPT_NODE_DYNAMICITY("pa.rm.select.node.dynamicity", PropertyType.INTEGER),
+    RM_SELECT_SCRIPT_NODE_DYNAMICITY("pa.rm.select.node.dynamicity", PropertyType.INTEGER, "300000"),
 
     /**
      * Timeout in ms for remote script execution using
      * {@code SelectionManager#executeScript(org.ow2.proactive.scripting.Script, java.util.HashMap)}
      */
-    RM_EXECUTE_SCRIPT_TIMEOUT("pa.rm.execute.script.timeout", PropertyType.INTEGER),
+    RM_EXECUTE_SCRIPT_TIMEOUT("pa.rm.execute.script.timeout", PropertyType.INTEGER, "180000"),
 
     /**
      * If set to non-null value the resource manager executes only selection scripts from
@@ -88,126 +89,129 @@ public enum PAResourceManagerProperties {
     /**
      * The pa.rm.select.script.authorized.dir is browsed every refreshperiod time to load authorized scripts.
      */
-    RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD("pa.rm.select.script.authorized.dir.refreshperiod", PropertyType.INTEGER),
+    RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD("pa.rm.select.script.authorized.dir.refreshperiod", PropertyType.INTEGER, "60000"),
 
     /** Timeout in ms for node lookup */
-    RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER),
+    RM_NODELOOKUP_TIMEOUT("pa.rm.nodelookup.timeout", PropertyType.INTEGER, "60000"),
 
     /** GCM application template file path, used to perform GCM deployments */
     @Deprecated
-    RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PropertyType.STRING),
+    RM_GCM_TEMPLATE_APPLICATION_FILE("pa.rm.gcm.template.application.file", PropertyType.STRING, "config/rm/deployment/GCMNodeSourceApplication.xml"),
 
     /**
      * Name of a string contained in in the GCM Application (GCMA) XML file, that must mandatory appear
      * as a place of a GCM deployment file.
      */
     @Deprecated
-    RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PropertyType.STRING),
+    RM_GCMD_PATH_PROPERTY_NAME("pa.rm.gcmd.path.property.name", PropertyType.STRING, "gcmd.file"),
 
     /** Path to the Amazon EC2 account credentials properties file,
      *  mandatory when using the EC2 Infrastructure */
-    RM_EC2_PATH_PROPERTY_NAME("pa.rm.ec2.properties", PropertyType.STRING),
+    RM_EC2_PATH_PROPERTY_NAME("pa.rm.ec2.properties", PropertyType.STRING, "config/rm/deployment/ec2.properties"),
 
     /** Resource Manager home directory */
-    RM_HOME("pa.rm.home", PropertyType.STRING),
+    RM_HOME("pa.rm.home", PropertyType.STRING, "."),
 
     /** Path to the Jaas configuration file which defines what modules are available for
      * internal authentication */
-    RM_AUTH_JAAS_PATH("pa.rm.auth.jaas.path", PropertyType.STRING),
+    RM_AUTH_JAAS_PATH("pa.rm.auth.jaas.path", PropertyType.STRING, "config/authentication/jaas.config"),
 
     /** Path to the private key file which is used to decrypt credentials passed to the jaas module */
-    RM_AUTH_PRIVKEY_PATH("pa.rm.auth.privkey.path", PropertyType.STRING),
+    RM_AUTH_PRIVKEY_PATH("pa.rm.auth.privkey.path", PropertyType.STRING, "config/authentication/keys/priv.key"),
 
     /** Path to the public key file which is used to encrypt credentials for authentication */
-    RM_AUTH_PUBKEY_PATH("pa.rm.auth.pubkey.path", PropertyType.STRING),
+    RM_AUTH_PUBKEY_PATH("pa.rm.auth.pubkey.path", PropertyType.STRING, "config/authentication/keys/pub.key"),
 
     /** Resource Manager authentication method */
-    RM_LOGIN_METHOD("pa.rm.authentication.loginMethod", PropertyType.STRING),
+    RM_LOGIN_METHOD("pa.rm.authentication.loginMethod", PropertyType.STRING, "RMFileLoginMethod"),
 
     /** Resource Manager ldap configuration file */
-    RM_LDAP_CONFIG("pa.rm.ldap.config.path", PropertyType.STRING),
+    RM_LDAP_CONFIG("pa.rm.ldap.config.path", PropertyType.STRING, "config/authentication/ldap.cfg"),
 
     /** Resource Manager login file name */
-    RM_LOGIN_FILE("pa.rm.defaultloginfilename", PropertyType.STRING),
+    RM_LOGIN_FILE("pa.rm.defaultloginfilename", PropertyType.STRING, "config/authentication/login.cfg"),
 
     /** Resource Manager group file name */
-    RM_GROUP_FILE("pa.rm.defaultgroupfilename", PropertyType.STRING),
+    RM_GROUP_FILE("pa.rm.defaultgroupfilename", PropertyType.STRING, "config/authentication/group.cfg"),
 
     /** Name of the JMX MBean for the RM */
-    RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PropertyType.STRING),
+    RM_JMX_CONNECTOR_NAME("pa.rm.jmx.connectorname", PropertyType.STRING, "JMXRMAgent"),
 
     /** Port of the JMX service. Random if not set */
-    RM_JMX_PORT("pa.rm.jmx.port", PropertyType.INTEGER),
+    RM_JMX_PORT("pa.rm.jmx.port", PropertyType.INTEGER, "5822"),
 
     /** RRD data base with statistic history */
-    RM_RRD_DATABASE_NAME("pa.rm.jmx.rrd.name", PropertyType.STRING),
+    RM_RRD_DATABASE_NAME("pa.rm.jmx.rrd.name", PropertyType.STRING, "data/rm_statistics.rrd"),
 
     /** RRD data base step in seconds */
-    RM_RRD_STEP("pa.rm.jmx.rrd.step", PropertyType.INTEGER),
+    RM_RRD_STEP("pa.rm.jmx.rrd.step", PropertyType.INTEGER, "4"),
 
     /** Resource Manager node source infrastructures file*/
-    RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PropertyType.STRING),
+    RM_NODESOURCE_INFRASTRUCTURE_FILE("pa.rm.nodesource.infrastructures", PropertyType.STRING, "config/rm/nodesource/infrastructures"),
 
     /** Resource Manager node source policies file*/
-    RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PropertyType.STRING),
+    RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PropertyType.STRING, "config/rm/nodesource/policies"),
 
     /** Max number of threads in node source for parallel task execution */
-    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PropertyType.INTEGER),
+    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PropertyType.INTEGER, "50"),
 
     /** The full class name of the policy selected nodes */
-    RM_SELECTION_POLICY("pa.rm.selection.policy", PropertyType.STRING),
+    RM_SELECTION_POLICY("pa.rm.selection.policy", PropertyType.STRING, "org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy"),
 
     /** Max number of threads in node source for parallel task execution */
-    RM_SELECTION_MAX_THREAD_NUMBER("pa.rm.selection.maxthreadnumber", PropertyType.INTEGER),
+    RM_SELECTION_MAX_THREAD_NUMBER("pa.rm.selection.maxthreadnumber", PropertyType.INTEGER, "50"),
 
     /** Max number of threads in node source for parallel task execution */
-    RM_MONITORING_MAX_THREAD_NUMBER("pa.rm.monitoring.maxthreadnumber", PropertyType.INTEGER),
+    RM_MONITORING_MAX_THREAD_NUMBER("pa.rm.monitoring.maxthreadnumber", PropertyType.INTEGER, "5"),
 
     /** Max number of threads in the core for cleaning nodes after computations */
-    RM_CLEANING_MAX_THREAD_NUMBER("pa.rm.cleaning.maxthreadnumber", PropertyType.INTEGER),
+    RM_CLEANING_MAX_THREAD_NUMBER("pa.rm.cleaning.maxthreadnumber", PropertyType.INTEGER, "5"),
 
     /** Path to the Resource Manager credentials for adding local nodes */
-    RM_CREDS("pa.rm.credentials", PropertyType.STRING),
+    RM_CREDS("pa.rm.credentials", PropertyType.STRING, "config/authentication/rm.cred"),
 
     /** Resource Manager hibernate configuration file*/
-    RM_DB_HIBERNATE_CONFIG("pa.rm.db.hibernate.configuration", PropertyType.STRING),
+    RM_DB_HIBERNATE_CONFIG("pa.rm.db.hibernate.configuration", PropertyType.STRING, "config/rm/database.properties"),
 
     /**
      * Drop database before creating a new one
      * If this value is true, the database will be dropped and then re-created
      * If this value is false, database will be updated from the existing one.
      */
-    RM_DB_HIBERNATE_DROPDB("pa.rm.db.hibernate.dropdb", PropertyType.BOOLEAN),
+    RM_DB_HIBERNATE_DROPDB("pa.rm.db.hibernate.dropdb", PropertyType.BOOLEAN, "false"),
 
     /**
      * Drop only node sources from the database.
      */
-    RM_DB_HIBERNATE_DROPDB_NODESOURCES("pa.rm.db.hibernate.dropdb.nodesources", PropertyType.BOOLEAN),
+    RM_DB_HIBERNATE_DROPDB_NODESOURCES("pa.rm.db.hibernate.dropdb.nodesources", PropertyType.BOOLEAN, "false"),
 
     /**
      * The period of sending "alive" event to resource manager's listeners.
      */
-    RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PropertyType.INTEGER),
+    RM_ALIVE_EVENT_FREQUENCY("pa.rm.aliveevent.frequency", PropertyType.INTEGER, "300000"),
 
     /** Accounting refresh rate from the database in seconds */
-    RM_ACCOUNT_REFRESH_RATE("pa.rm.account.refreshrate", PropertyType.INTEGER),
+    RM_ACCOUNT_REFRESH_RATE("pa.rm.account.refreshrate", PropertyType.INTEGER, "180"),
 
     /** Topology feature enable option */
-    RM_TOPOLOGY_ENABLED("pa.rm.topology.enabled", PropertyType.BOOLEAN),
+    RM_TOPOLOGY_ENABLED("pa.rm.topology.enabled", PropertyType.BOOLEAN, "true"),
 
     /**
      * If this is true, the topology mechanism will compute distances between hosts using ping
      **/
-    RM_TOPOLOGY_DISTANCE_ENABLED("pa.rm.topology.distance.enabled", PropertyType.BOOLEAN),
+    RM_TOPOLOGY_DISTANCE_ENABLED("pa.rm.topology.distance.enabled", PropertyType.BOOLEAN, "false"),
 
-    RM_TOPOLOGY_PINGER("pa.rm.topology.pinger.class", PropertyType.STRING),
+    RM_TOPOLOGY_PINGER(
+            "pa.rm.topology.pinger.class",
+            PropertyType.STRING,
+            "org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger"),
 
     /** Resource Manager selection process logs*/
-    RM_SELECTION_LOGS_LOCATION("pa.rm.logs.selection.location", PropertyType.STRING),
+    RM_SELECTION_LOGS_LOCATION("pa.rm.logs.selection.location", PropertyType.STRING, "logs/jobs/"),
 
-    RM_SELECTION_LOGS_MAX_SIZE("pa.rm.logs.selection.max.size", PropertyType.STRING),
+    RM_SELECTION_LOGS_MAX_SIZE("pa.rm.logs.selection.max.size", PropertyType.STRING, "10000"),
 
-    RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER),
+    RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER, "-1"),
 
     /**
      * Defines if the lock restoration feature is enabled on RM startup.
@@ -218,7 +222,7 @@ public enum PAResourceManagerProperties {
      * The approach is best effort and Node hostname is not considered.
      * As a result, Nodes are not necessarily locked on the same host.
      */
-    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN);
+    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
@@ -227,9 +231,13 @@ public enum PAResourceManagerProperties {
     public static final String PA_RM_PROPERTIES_RELATIVE_FILEPATH = "config/rm/settings.ini";
 
     /** memory entity of the properties file. */
-    private static PAPropertiesLazyLoader propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key,
-                                                                                        PA_RM_PROPERTIES_FILEPATH,
-                                                                                        PA_RM_PROPERTIES_RELATIVE_FILEPATH);
+    private static PAPropertiesLazyLoader propertiesLoader;
+
+    private static PACommonPropertiesHelper propertiesHelper;
+
+    static {
+        reload();
+    }
 
     /** Key of the specific instance. */
     private String key;
@@ -237,15 +245,24 @@ public enum PAResourceManagerProperties {
     /** value of the specific instance. */
     private PropertyType type;
 
+    /** default value to use if the property is not defined **/
+    private String defaultValue;
+
     /**
      * Create a new instance of PAResourceManagerProperties
      *
      * @param str the key of the instance.
      * @param type the real java type of this instance.
+     * @param defaultValue value to use if the property is not defined
      */
-    PAResourceManagerProperties(String str, PropertyType type) {
+    PAResourceManagerProperties(String str, PropertyType type, String defaultValue) {
         this.key = str;
         this.type = type;
+        this.defaultValue = defaultValue;
+    }
+
+    PAResourceManagerProperties(String str, PropertyType type) {
+        this(str, type, null);
     }
 
     /**
@@ -259,6 +276,15 @@ public enum PAResourceManagerProperties {
                                                       PA_RM_PROPERTIES_FILEPATH,
                                                       PA_RM_PROPERTIES_RELATIVE_FILEPATH,
                                                       filename);
+        propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
+    }
+
+    public static synchronized void reload() {
+        propertiesLoader = new PAPropertiesLazyLoader(RM_HOME.key,
+                                                      PA_RM_PROPERTIES_FILEPATH,
+                                                      PA_RM_PROPERTIES_RELATIVE_FILEPATH);
+
+        propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
     }
 
     /**
@@ -268,19 +294,7 @@ public enum PAResourceManagerProperties {
      * @param filename path of file containing some properties to override
      */
     public static void updateProperties(String filename) {
-        Properties prop = propertiesLoader.getProperties();
-        Properties ptmp = new Properties();
-        try {
-            FileInputStream stream = new FileInputStream(filename);
-            ptmp.load(stream);
-            stream.close();
-            for (Object o : ptmp.keySet()) {
-                prop.setProperty((String) o, (String) ptmp.get(o));
-            }
-            PAPropertiesLazyLoader.updateWithSystemProperties(prop);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        propertiesHelper.updateProperties(filename);
     }
 
     /**
@@ -299,118 +313,82 @@ public enum PAResourceManagerProperties {
         }
     }
 
-    /**
-     * Get the key.
-     *
-     * @return the key.
-     */
+    @Override
+    public String getConfigurationFilePathPropertyName() {
+        return PA_RM_PROPERTIES_FILEPATH;
+    }
+
+    @Override
+    public String getConfigurationDefaultRelativeFilePath() {
+        return PA_RM_PROPERTIES_RELATIVE_FILEPATH;
+    }
+
+    @Override
+    public void loadPropertiesFromFile(String filename) {
+        loadProperties(filename);
+    }
+
+    @Override
+    public void reloadConfiguration() {
+        reload();
+    }
+
+    @Override
     public String getKey() {
         return key;
     }
 
-    /**
-     * Set the value of this property to the given one.
-     *
-     * @param value the new value to set.
-     */
+    @Override
     public void updateProperty(String value) {
-        propertiesLoader.getProperties().setProperty(key, value);
+        propertiesHelper.updateProperty(key, value);
     }
 
-    /**
-     * Return true if this property is set, false otherwise.
-     *
-     * @return true if this property is set, false otherwise.
-     */
+    @Override
     public boolean isSet() {
-        return propertiesLoader.getProperties().containsKey(key);
+        return propertiesHelper.isSet(key, defaultValue);
     }
 
-    /**
-     * Returns the string to be passed on the command line
-     *
-     * The property surrounded by '-D' and '='
-     *
-     * @return the string to be passed on the command line
-     */
+    @Override
+    public void unSet() {
+        propertiesHelper.unSet(key);
+    }
+
+    @Override
     public String getCmdLine() {
-        return "-D" + key + '=';
+        return propertiesHelper.getCmdLine(key);
     }
 
-    /**
-     * Returns the value of this property as an integer.
-     * If value is not an integer, an exception will be thrown.
-     *
-     * @return the value of this property.
-     */
+    @Override
     public int getValueAsInt() {
-        if (propertiesLoader.getProperties().containsKey(key)) {
-            String valueS = getValueAsString();
-            try {
-                return Integer.parseInt(valueS);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(key +
-                                                   " is not an integer property. getValueAsInt cannot be called on this property");
-            }
-        } else {
-            return 0;
-        }
+        return propertiesHelper.getValueAsInt(key, type, defaultValue);
     }
 
-    /**
-     * Returns the value of this property as a string.
-     *
-     * @return the value of this property.
-     */
+    @Override
+    public long getValueAsLong() {
+        return propertiesHelper.getValueAsLong(key, type, defaultValue);
+    }
+
+    @Override
     public String getValueAsString() {
-        Properties prop = propertiesLoader.getProperties();
-        if (prop.containsKey(key)) {
-            return prop.getProperty(key);
-        } else {
-            return "";
-        }
+        return propertiesHelper.getValueAsString(key, defaultValue);
     }
 
-    /**
-     * Returns the value of this property as a string.
-     * If the property is not defined, then null is returned
-     *
-     * @return the value of this property.
-     */
+    @Override
     public String getValueAsStringOrNull() {
-        Properties prop = propertiesLoader.getProperties();
-        if (prop.containsKey(key)) {
-            String ret = prop.getProperty(key);
-            if ("".equals(ret)) {
-                return null;
-            }
-            return ret;
-        } else {
-            return null;
-        }
+        return propertiesHelper.getValueAsStringOrNull(key);
     }
 
-    /**
-     * Returns the value of this property as a boolean.
-     * If value is not a boolean, an exception will be thrown.<br>
-     * The behavior of this method is the same as the {@link java.lang.Boolean#parseBoolean(String s)}.
-     *
-     * @return the value of this property.
-     */
+    @Override
     public boolean getValueAsBoolean() {
-        Properties prop = propertiesLoader.getProperties();
-        if (prop.containsKey(key)) {
-            return Boolean.parseBoolean(getValueAsString());
-        } else {
-            return false;
-        }
+        return propertiesHelper.getValueAsBoolean(key, type, defaultValue);
     }
 
-    /**
-     * Return the type of the given properties.
-     *
-     * @return the type of the given properties.
-     */
+    @Override
+    public List<String> getValueAsList(String separator) {
+        return propertiesHelper.getValueAsList(key, type, separator, defaultValue);
+    }
+
+    @Override
     public PropertyType getType() {
         return type;
     }
@@ -421,15 +399,6 @@ public enum PAResourceManagerProperties {
     @Override
     public String toString() {
         return getValueAsString();
-    }
-
-    /**
-     * Supported types for PAResourceManagerProperties
-     */
-    public enum PropertyType {
-        STRING,
-        BOOLEAN,
-        INTEGER
     }
 
 }

@@ -44,6 +44,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
@@ -260,8 +261,8 @@ public abstract class AbstractJMXHelper {
         }
         // The asked address of the new connector server. The actual address can be different due to
         // JMX specification. See {@link JMXConnectorServerFactory} documentation.
-        final String jmxConnectorServerURL = "service:jmx:" + JMXProviderUtils.RO_PROTOCOL + ":///jndi/" + baseURI +
-                                             connectorServerName;
+        final String jmxConnectorServerURL = "service:jmx:" + JMXProviderUtils.RO_PROTOCOL + ":///jndi/" +
+                                             URIBuilder.buildURI(baseURI, connectorServerName);
         JMXServiceURL jmxUrl = null;
         try {
             jmxUrl = new JMXServiceURL(jmxConnectorServerURL);

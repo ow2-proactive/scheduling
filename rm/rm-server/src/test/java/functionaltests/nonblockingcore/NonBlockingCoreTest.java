@@ -74,14 +74,14 @@ public class NonBlockingCoreTest extends RMFunctionalTest {
         ResourceManager resourceManager = rmHelper.getResourceManager();
         int initialNodeNumber = 2;
         rmHelper.createNodeSource("NonBlockingCoreTest1", initialNodeNumber);
-        int coreScriptExecutionTimeout = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt();
-        int scriptSleepingTime = coreScriptExecutionTimeout * 2;
+        long coreScriptExecutionTimeout = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsLong();
+        long scriptSleepingTime = coreScriptExecutionTimeout * 2;
 
         log("Selecting node with timeout script");
 
         // create the static selection script object
         final SelectionScript sScript = new SelectionScript(new File(selectionScriptWithtimeOutPath.toURI()),
-                                                            new String[] { Integer.toString(scriptSleepingTime) },
+                                                            new String[] { Long.toString(scriptSleepingTime) },
                                                             false);
 
         // mandatory to use RMUser AO, otherwise, getAtMostNode we be send in
