@@ -67,8 +67,25 @@ public class BooleanWrapper implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (booleanValue ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        return (obj instanceof BooleanWrapper) ? booleanValue == ((BooleanWrapper) obj).booleanValue : false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof BooleanWrapper))
+            return false;
+        BooleanWrapper other = (BooleanWrapper) obj;
+        if (booleanValue != other.booleanValue)
+            return false;
+        return true;
     }
 
 }

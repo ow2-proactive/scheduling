@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.ow2.proactive.authentication.Connection;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
@@ -111,11 +112,7 @@ public class RMConnection extends Connection<RMAuthentication> {
      * 			the given URL with RM_NAME appended if URL does not end with RM_NAME
      */
     private static String normalizeRM(String url) {
-        url = Connection.normalize(url);
-        String NAME_ACTIVE_OBJECT_RMAUTHENTICATION = RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
-        if (!url.endsWith(NAME_ACTIVE_OBJECT_RMAUTHENTICATION)) {
-            url += NAME_ACTIVE_OBJECT_RMAUTHENTICATION;
-        }
-        return url;
+        return URIBuilder.buildURI(Connection.normalize(url), RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION)
+                         .toString();
     }
 }

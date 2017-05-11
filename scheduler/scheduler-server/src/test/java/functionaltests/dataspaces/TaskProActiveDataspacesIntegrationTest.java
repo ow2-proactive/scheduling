@@ -59,6 +59,8 @@ import org.ow2.proactive.scheduler.task.data.TaskProActiveDataspaces;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import functionaltests.utils.RMTHelper;
+
 
 /**
  * Test the integration of {@link TaskProActiveDataspaces} with
@@ -139,7 +141,7 @@ public class TaskProActiveDataspacesIntegrationTest {
     }
 
     private Process spawnNewJvm(Class<?> clazz, String... params) throws Exception {
-        String classpath = System.getProperty("java.class.path");
+        String classpath = RMTHelper.testClasspath();
         String className = clazz.getCanonicalName();
 
         String javaHome = System.getProperty("java.home");

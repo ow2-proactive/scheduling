@@ -41,6 +41,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.utils.SecurityManagerConfigurator;
 import org.ow2.proactive.authentication.AuthenticationImpl;
 import org.ow2.proactive.authentication.Connection;
@@ -209,12 +210,12 @@ public class CreateCredentials {
             acc++;
         }
         if (scheduler != null) {
-            url = Connection.normalize(scheduler) + "SCHEDULER";
+            url = URIBuilder.buildURI(Connection.normalize(scheduler), "SCHEDULER").toString();
             acc++;
 
         }
         if (rm != null) {
-            url = Connection.normalize(rm) + "RMAUTHENTICATION";
+            url = URIBuilder.buildURI(Connection.normalize(rm), "RMAUTHENTICATION").toString();
             acc++;
         }
         if (acc > 1) {

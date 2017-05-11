@@ -1214,12 +1214,12 @@ public interface SchedulerRestInterface {
      * @throws SubmissionClosedRestException
      * @throws IOException
      */
+    @Consumes(MediaType.APPLICATION_JSON)
     @POST
     @Path("{path:plannings}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/json")
-    boolean submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
-            String jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
+    String submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            Map<String, String> jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
@@ -1242,7 +1242,7 @@ public interface SchedulerRestInterface {
     @POST
     @Path("jobs")
     @Produces("application/json")
-    public JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
+    JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
             @PathParam("path") PathSegment pathSegment) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
 

@@ -30,7 +30,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -322,7 +325,7 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public boolean submitPlannings(String sessionId, PathSegment pathSegment, String jobContentXmlString)
+    public String submitPlannings(String sessionId, PathSegment pathSegment, Map<String, String> jobContentXmlString)
             throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
             SubmissionClosedRestException, IOException {
         return scheduler().submitPlannings(sessionId, pathSegment, jobContentXmlString);
