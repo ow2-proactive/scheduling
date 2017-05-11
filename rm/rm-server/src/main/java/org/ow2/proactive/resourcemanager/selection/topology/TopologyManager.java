@@ -570,16 +570,29 @@ public class TopologyManager {
                 this.nodesNumber = nodesNumber;
             }
 
+            @Override
+            public int hashCode() {
+                final int prime = 31;
+                int result = 1;
+                result = prime * result + ((address == null) ? 0 : address.hashCode());
+                return result;
+            }
+
+            @Override
             public boolean equals(Object obj) {
-                if (obj instanceof Host) {
-                    Host host = (Host) obj;
-                    if (address == null && host.address == null) {
-                        return true;
-                    } else if (address != null && host.address != null) {
-                        return address.equals(host.address);
-                    }
-                }
-                return false;
+                if (this == obj)
+                    return true;
+                if (obj == null)
+                    return false;
+                if (!(obj instanceof Host))
+                    return false;
+                Host other = (Host) obj;
+                if (address == null) {
+                    if (other.address != null)
+                        return false;
+                } else if (!address.equals(other.address))
+                    return false;
+                return true;
             }
 
             public int compareTo(Host host) {
@@ -598,6 +611,7 @@ public class TopologyManager {
                     return nodesDiff;
                 }
             }
+
         }
     }
 
