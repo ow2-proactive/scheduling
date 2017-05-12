@@ -27,10 +27,7 @@ package org.ow2.proactive_grid_cloud_portal.dataspace.dto;
 
 import java.util.List;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_EMPTY)
 public class ListFile {
     private List<String> directoryListing;
 
