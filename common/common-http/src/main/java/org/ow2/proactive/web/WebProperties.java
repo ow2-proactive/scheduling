@@ -79,7 +79,15 @@ public enum WebProperties implements PACommonProperties {
 
     RESOURCE_DOWNLOADER_PROXY_PORT("resource.downloader.proxy.port", PropertyType.INTEGER),
 
-    RESOURCE_DOWNLOADER_PROXY_SCHEME("resource.downloader.proxy.scheme", PropertyType.STRING);
+    RESOURCE_DOWNLOADER_PROXY_SCHEME("resource.downloader.proxy.scheme", PropertyType.STRING),
+
+    WAR_WRAPPER_HTTP_PORT("war.wrapper.target.server.http.port", PropertyType.INTEGER, "9080"),
+
+    WAR_WRAPPER_HTTPS_PORT("war.wrapper.target.server.https.port", PropertyType.INTEGER, "9443"),
+
+    WAR_WRAPPER_HTTPS_ENABLED("war.wrapper.https.enabled", PropertyType.BOOLEAN, "false"),
+
+    WAR_WRAPPER_CONTEXT_ROOT("war.wrapper.context.root", PropertyType.STRING, "/");
 
     public static final String PA_WEB_PROPERTIES_FILEPATH_PROPERTY_NAME = "pa.portal.configuration.filepath";
 

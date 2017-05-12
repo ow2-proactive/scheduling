@@ -213,6 +213,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
 
     RM_NB_LOCAL_NODES("pa.rm.local.nodes.number", PropertyType.INTEGER, "-1"),
 
+    /**Kill Runtime when shutting down the Resource Manager.
+     * Default value is true, the JVM Runtime is always killed when shutting down the Resource Manager.
+     * Setting this parameter to false is useful when, e.g., deploying ProActive as a web or enterprise application (WAR/EAR)
+     * */
+    RM_SHUTDOWN_KILL_RUNTIME("pa.rm.shutdown.kill.rt", PropertyType.BOOLEAN, "true"),
+
     /**
      * Defines if the lock restoration feature is enabled on RM startup.
      * <p>
