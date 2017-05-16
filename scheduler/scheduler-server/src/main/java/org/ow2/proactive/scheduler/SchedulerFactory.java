@@ -71,7 +71,7 @@ public class SchedulerFactory {
 
     private static boolean allowNullInit = false;
 
-    private static boolean schedulerStarted = false;
+    private static volatile boolean schedulerStarted = false;
 
     /**
      * Try to join Resource Manager at given URI.
@@ -262,6 +262,15 @@ public class SchedulerFactory {
         createScheduler(rmURL, policyFullClassName);
         SchedulerAuthenticationInterface auth = SchedulerConnection.waitAndJoin(null);
         return auth.login(creds);
+    }
+
+    /**
+     * Updates the starting status of the Scheduler.
+     * Useful, e.g., when the Scheduler is down and to be restared again.
+     * @param schedulerStarted status of the Scheduler.
+     */
+    public static void setSchedulerStarted(boolean schedulerStarted) {
+        SchedulerFactory.schedulerStarted = schedulerStarted;
     }
 
 }

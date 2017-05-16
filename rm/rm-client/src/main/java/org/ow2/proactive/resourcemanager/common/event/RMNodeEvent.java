@@ -169,6 +169,14 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeLocker = rmNode.getLockedBy();
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((nodeUrl == null) ? 0 : nodeUrl.hashCode());
+        return result;
+    }
+
     /**
      * Compare two RMNodeEvent objects.
      *
@@ -177,10 +185,19 @@ public final class RMNodeEvent extends RMEvent {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof RMNodeEvent) {
-            return ((RMNodeEvent) obj).nodeUrl.equals(this.nodeUrl);
-        }
-        return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof RMNodeEvent))
+            return false;
+        RMNodeEvent other = (RMNodeEvent) obj;
+        if (nodeUrl == null) {
+            if (other.nodeUrl != null)
+                return false;
+        } else if (!nodeUrl.equals(other.nodeUrl))
+            return false;
+        return true;
     }
 
     /**
