@@ -57,9 +57,9 @@ public class JobsMemoryMonitorRunner implements Runnable {
         long fetchCount = stats.getEntityFetchCount();
         long loadCount = stats.getEntityLoadCount();
         long flushCount = stats.getFlushCount();
-        logger.debug("[HibernateStats] deleteCount: " + deleteCount + ", updateCount: " +
-                updateCount + ", insertCount: " + insertCount + ", fetchCount: " + fetchCount + ", loadCount:" +
-                loadCount + ", flushCount:" + flushCount);
+        logger.debug("[HibernateStats] deleteCount: " + deleteCount + ", updateCount: " + updateCount +
+                     ", insertCount: " + insertCount + ", fetchCount: " + fetchCount + ", loadCount:" + loadCount +
+                     ", flushCount:" + flushCount);
     }
 
     private void printSchedulerState() {
@@ -69,8 +69,8 @@ public class JobsMemoryMonitorRunner implements Runnable {
         int allJobsActual = schedulerState.getTotalNbJobs();
         int allJobsComputed = nbPendingJobs + nbRunningJobs + nbFinishedJobs;
         logger.debug("[SchedulerState] pendingJobs:" + nbPendingJobs + ", runningJobs:" + nbRunningJobs +
-                    ", finishedJobs:" + nbFinishedJobs + ", allJobsActual:" + allJobsActual + ", allJobsComputed:" +
-                    allJobsComputed);
+                     ", finishedJobs:" + nbFinishedJobs + ", allJobsActual:" + allJobsActual + ", allJobsComputed:" +
+                     allJobsComputed);
     }
 
     @Override
