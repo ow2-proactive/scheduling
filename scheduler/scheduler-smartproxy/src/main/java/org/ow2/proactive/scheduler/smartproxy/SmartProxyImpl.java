@@ -496,8 +496,9 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
                 throw e;
             } finally {
                 jobTracker.setTaskTransferring(jobId, t_name, false);
-                jobTracker.removeAwaitedTask(jobId, t_name);
             }
+            // task is removed from the job tracker only if the transfer is successful
+            jobTracker.removeAwaitedTask(jobId, t_name);
 
             log.debug("Finished copying files from " + sourceUrl + " to " + destUrl);
             // ok we can remove the task
