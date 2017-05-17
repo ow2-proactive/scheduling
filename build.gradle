@@ -235,7 +235,9 @@ ext.schedulingFunctionalTestConfiguration = {
 
         project.javaexec {
             main = "org.ow2.tests.ProcessCleaner"
-            classpath = fileTree(project.nativeLibsDir).include("*.jar")
+
+            classpath = fileTree(project.nativeLibsDir).include("*.jar") + project(':rm:rm-server').sourceSets.test.output
+
             systemProperty "java.library.path", project.nativeLibsDir
         }
     }
