@@ -58,8 +58,8 @@ public class JobsMemoryMonitorRunner implements Runnable {
         long loadCount = stats.getEntityLoadCount();
         long flushCount = stats.getFlushCount();
         logger.debug("[HibernateStats] deleteCount: " + deleteCount + ", updateCount: " + updateCount +
-                     ", insertCount: " + insertCount + ", fetchCount: " + fetchCount + ", loadCount:" + loadCount +
-                     ", flushCount:" + flushCount);
+                     ", insertCount: " + insertCount + ", fetchCount: " + fetchCount + ", loadCount: " + loadCount +
+                     ", flushCount: " + flushCount);
     }
 
     private void printSchedulerState() {
