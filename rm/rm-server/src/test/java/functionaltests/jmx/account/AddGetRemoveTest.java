@@ -25,13 +25,20 @@
  */
 package functionaltests.jmx.account;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
+import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
 import java.security.PublicKey;
 import java.util.HashMap;
 
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -48,6 +55,8 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.core.jmx.mbean.ManagementMBean;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.utils.Criteria;
+import org.ow2.proactive.utils.NodeSet;
 
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.TestUsers;
@@ -93,8 +102,6 @@ public final class AddGetRemoveTest extends RMFunctionalTest {
         final JMXConnector jmxConnector = JMXConnectorFactory.connect(jmxRmiServiceURL, env);
         final MBeanServerConnection conn = jmxConnector.getMBeanServerConnection();
 
-        long usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
-
         // ADD, GET, RELEASE
         // 1) ADD
         testNode = rmHelper.createNode("test");
@@ -107,21 +114,36 @@ public final class AddGetRemoveTest extends RMFunctionalTest {
 
         // 2) GET
         final long beforeGetTime = System.currentTimeMillis();
-        rm.getAtMostNodes(1, null).get(0);
+
+        long originalUsedNodeTime = getUsedNodeTime(myAccountMBeanName, managementMBeanName, conn);
+
+        NodeSet nodes = rm.getNodes(new Criteria(1));
+
+        rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeURL);
 
         // Sleep a certain amount of time that will be the minimum amount of the GET->RELEASE duration 
         Thread.sleep(GR_DURATION);
+
+        rm.releaseNodes(nodes);
+
+        rmHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED, nodeURL);
+
+        // Check account values validity
+        long usedNodeTime = getUsedNodeTime(myAccountMBeanName, managementMBeanName, conn) - originalUsedNodeTime;
 
         // 3) REMOVE  
         rm.removeNode(nodeURL, true).getBooleanValue();
         final long getRemoveMaxDuration = System.currentTimeMillis() - beforeGetTime;
 
+        assertThat("Invalid value of the usedNodeTime attribute", usedNodeTime, greaterThan(GR_DURATION));
+        assertThat("Invalid value of the usedNodeTime attribute", usedNodeTime, lessThan(getRemoveMaxDuration));
+    }
+
+    private long getUsedNodeTime(ObjectName myAccountMBeanName, ObjectName managementMBeanName,
+            MBeanServerConnection conn) throws InstanceNotFoundException, MBeanException, ReflectionException,
+            IOException, AttributeNotFoundException {
         // Refresh the account manager
         conn.invoke(managementMBeanName, "clearAccoutingCache", null, null);
-
-        // Check account values validity
-        usedNodeTime = (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime") - usedNodeTime;
-        assertTrue("Invalid value of the usedNodeTime attribute", usedNodeTime >= GR_DURATION);
-        assertTrue("Invalid value of the usedNodeTime attribute", usedNodeTime <= getRemoveMaxDuration);
+        return (long) (Long) conn.getAttribute(myAccountMBeanName, "UsedNodeTime");
     }
 }
