@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.core.helpers;
 import org.apache.log4j.Logger;
 import org.hibernate.stat.Statistics;
 import org.ow2.proactive.scheduler.common.SchedulerState;
-import org.ow2.proactive.scheduler.core.SchedulerFrontend;
 
 
 /**
@@ -63,8 +62,8 @@ public class JobsMemoryMonitorRunner implements Runnable {
         int allJobsActual = schedulerState.getTotalNbJobs();
         int allJobsComputed = nbPendingJobs + nbRunningJobs + nbFinishedJobs;
         logger.info("[SchedulerState] pendingJobs:" + nbPendingJobs + ", runningJobs:" + nbRunningJobs +
-                     ", finishedJobs:" + nbFinishedJobs + ", allJobsActual:" + allJobsActual + ", allJobsComputed:" +
-                     allJobsComputed);
+                    ", finishedJobs:" + nbFinishedJobs + ", allJobsActual:" + allJobsActual + ", allJobsComputed:" +
+                    allJobsComputed);
     }
 
     @Override

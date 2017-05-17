@@ -343,9 +343,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             // TODO don't forget to load this on demand only
             metricsMonitorScheduler = new it.sauronsoftware.cron4j.Scheduler();
             String cronExpr = "* * * * *";
-//            if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.isSet()) {
-//                cronExpr = PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.getValueAsString();
-//            }
+            //            if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.isSet()) {
+            //                cronExpr = PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.getValueAsString();
+            //            }
 
             metricsMonitorScheduler.schedule(cronExpr, new TableSizeMonitorRunner(dbManager.getTransactionHelper()));
             metricsMonitorScheduler.schedule(cronExpr,
