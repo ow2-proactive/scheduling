@@ -129,6 +129,8 @@ import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
+import org.ow2.proactive.scheduler.core.helpers.JobsMemoryMonitorRunner;
+import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
@@ -200,6 +202,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private PublicKey corePublicKey;
 
     private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
+
+    private it.sauronsoftware.cron4j.Scheduler metricsMonitorScheduler;
 
     /*
      * #########################################################################
@@ -335,6 +339,19 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             authentication.setActivated(true);
 
             Tools.logAvailableScriptEngines(logger);
+
+            // TODO don't forget to load this on demand only
+            metricsMonitorScheduler = new it.sauronsoftware.cron4j.Scheduler();
+            String cronExpr = "* * * * *";
+//            if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.isSet()) {
+//                cronExpr = PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.getValueAsString();
+//            }
+
+            metricsMonitorScheduler.schedule(cronExpr, new TableSizeMonitorRunner(dbManager.getTransactionHelper()));
+            metricsMonitorScheduler.schedule(cronExpr,
+                                             new JobsMemoryMonitorRunner(dbManager.getSessionFactory().getStatistics(),
+                                                                         frontendState.getStateInternally()));
+            metricsMonitorScheduler.start();
 
             // run !!
         } catch (Exception e) {

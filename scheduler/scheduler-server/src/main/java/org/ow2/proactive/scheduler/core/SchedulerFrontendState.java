@@ -344,6 +344,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return getState(false);
     }
 
+    synchronized SchedulerState getStateInternally() {
+        return sState;
+    }
+
     synchronized SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         // checking permissions
         checkPermission("getState", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE);

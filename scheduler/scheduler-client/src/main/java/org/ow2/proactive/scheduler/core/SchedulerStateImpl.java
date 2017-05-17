@@ -37,6 +37,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -74,6 +75,8 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
 
     /** List of connected user. */
     private SchedulerUsers sUsers = new SchedulerUsers();
+
+    private static final Logger logger = Logger.getLogger(SchedulerStateImpl.class);
 
     /**
      * keep a map of all jobs (pending, running finished) to facilitate
