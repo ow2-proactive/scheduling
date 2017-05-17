@@ -317,8 +317,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl> i
                 throw e;
             } finally {
                 jobTracker.setTaskTransferring(jobId, taskName, false);
-                jobTracker.removeAwaitedTask(jobId, taskName);
             }
+            // task is removed from the job tracker only if the transfer is successful
+            jobTracker.removeAwaitedTask(jobId, taskName);
         }
 
     }
