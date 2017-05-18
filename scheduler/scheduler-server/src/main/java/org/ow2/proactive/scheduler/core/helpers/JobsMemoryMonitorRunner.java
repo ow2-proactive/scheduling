@@ -68,8 +68,8 @@ public class JobsMemoryMonitorRunner implements Runnable {
         int nbFinishedJobs = schedulerState.getFinishedJobs().size();
         int allJobsActual = schedulerState.getTotalNbJobs();
         int allJobsComputed = nbPendingJobs + nbRunningJobs + nbFinishedJobs;
-        logger.debug("[SchedulerState] pendingJobs:" + nbPendingJobs + ", runningJobs:" + nbRunningJobs +
-                     ", finishedJobs:" + nbFinishedJobs + ", allJobsActual:" + allJobsActual + ", allJobsComputed:" +
+        logger.debug("[SchedulerState] pendingJobs: " + nbPendingJobs + ", runningJobs: " + nbRunningJobs +
+                     ", finishedJobs: " + nbFinishedJobs + ", allJobsActual: " + allJobsActual + ", allJobsComputed: " +
                      allJobsComputed);
     }
 
