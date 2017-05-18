@@ -757,14 +757,8 @@ public class SchedulerTHelper {
             System.err.println("Job is already finished - do not wait for the 'job finished' event");
             return jobState.getJobInfo();
         } else {
-            try {
-                System.err.println("Waiting for the job finished event");
-                return getSchedulerMonitorsHandler().waitForEventJob(jobEvent, id, timeout);
-            } catch (ProActiveTimeoutException e) {
-                //unreachable block, 0 means infinite, no timeout
-                //log something ?
-                return null;
-            }
+            System.err.println("Waiting for the job finished event");
+            return getSchedulerMonitorsHandler().waitForEventJob(jobEvent, id, timeout);
         }
     }
 
@@ -1021,7 +1015,7 @@ public class SchedulerTHelper {
         return scheduler.getUrl();
     }
 
-    private RMMonitorsHandler getRMMonitorsHandler() throws Exception {
+    public RMMonitorsHandler getRMMonitorsHandler() throws Exception {
         return RMTestUser.getInstance().getMonitorsHandler();
     }
 

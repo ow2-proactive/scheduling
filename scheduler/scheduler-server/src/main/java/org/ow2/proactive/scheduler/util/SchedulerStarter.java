@@ -101,6 +101,12 @@ public class SchedulerStarter {
 
     private static SchedulerHsqldbStarter hsqldbServer;
 
+    protected static SchedulerAuthenticationInterface schedAuthInter;
+
+    protected static String rmURL;
+
+    protected static byte[] credentials;
+
     /**
      * Start the scheduler creation process.
      */
@@ -128,12 +134,12 @@ public class SchedulerStarter {
         }
     }
 
-    private static CommandLine getCommandLine(String[] args, Options options) throws ParseException {
+    protected static CommandLine getCommandLine(String[] args, Options options) throws ParseException {
         CommandLineParser parser = new DefaultParser();
         return parser.parse(options, args);
     }
 
-    private static void start(CommandLine commandLine) throws Exception {
+    protected static void start(CommandLine commandLine) throws Exception {
         ProActiveConfiguration.load(); // force properties loading to find out if PAMR router should be started
 
         if (!commandLine.hasOption("no-router")) {
@@ -153,10 +159,14 @@ public class SchedulerStarter {
             return;
         }
 
-        SchedulerAuthenticationInterface sai = startScheduler(commandLine, rmUrl);
+        SchedulerAuthenticationInterface schedulerAuthenticationInterface = startScheduler(commandLine, rmUrl);
+
+        schedAuthInter = schedulerAuthenticationInterface;
+        rmURL = rmUrl;
 
         if (!commandLine.hasOption("no-rest")) {
-            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, sai.getHostURL()));
+            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl,
+                                                                                     schedulerAuthenticationInterface.getHostURL()));
             if (applicationUrls != null) {
                 for (String applicationUrl : applicationUrls) {
                     if (applicationUrl.endsWith("/rest")) {
@@ -338,7 +348,7 @@ public class SchedulerStarter {
         hf.printHelp("proactive-server" + Tools.shellExtension(), options, true);
     }
 
-    private static Options getOptions() {
+    protected static Options getOptions() {
         Options options = new Options();
 
         Option help = new Option("h", "help", false, "to display this help");
@@ -467,6 +477,8 @@ public class SchedulerStarter {
                               new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
                               RestartDownNodesPolicy.class.getName(),
                               new Object[] { "ALL", "ALL", "10000" });
+
+        credentials = creds;
     }
 
     private static String getLocalAdress() throws ProActiveException {
@@ -483,12 +495,12 @@ public class SchedulerStarter {
                                schedHome + "/config/network/server.ini");
     }
 
-    private static void configureSecurityManager() {
+    protected static void configureSecurityManager() {
         SecurityManagerConfigurator.configureSecurityManager(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
                                                              "/config/security.java.policy-server");
     }
 
-    private static void configureLogging() {
+    protected static void configureLogging() {
         String schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
         String defaultLog4jConfig = schedHome + "/config/log/server.properties";
         if (setPropIfNotAlreadySet(CentralPAPropertyRepository.LOG4J.getName(), defaultLog4jConfig))
@@ -497,11 +509,11 @@ public class SchedulerStarter {
         setPropIfNotAlreadySet("derby.stream.error.file", schedHome + "/logs/Database.log");
     }
 
-    private static void configureDerby() {
+    protected static void configureDerby() {
         setPropIfNotAlreadySet("derby.locks.deadlockTimeout", "1");
     }
 
-    private static boolean setPropIfNotAlreadySet(String name, Object value) {
+    protected static boolean setPropIfNotAlreadySet(String name, Object value) {
         boolean notSet = System.getProperty(name) == null;
         if (notSet)
             System.setProperty(name, value.toString());

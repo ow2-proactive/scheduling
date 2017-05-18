@@ -1270,16 +1270,20 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // exception to throw in case of problems
         RuntimeException exception = null;
 
+        NodeSet nodesReleased = new NodeSet();
+        NodeSet nodesFailedToRelease = new NodeSet();
+
         for (Node node : nodes) {
             String nodeURL = null;
             try {
                 nodeURL = node.getNodeInformation().getURL();
                 logger.debug("Releasing node " + nodeURL);
             } catch (RuntimeException e) {
-                logger.debug("A Runtime exception occured while obtaining information on the node," +
+                logger.debug("A Runtime exception occurred while obtaining information on the node," +
                              "the node must be down (it will be detected later)", e);
                 // node is down, will be detected by pinger
                 exception = new IllegalStateException(e.getMessage(), e);
+                nodesFailedToRelease.add(node);
             }
 
             // verify whether the node has not been removed from the RM
@@ -1290,8 +1294,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 // free
                 if (rmnode.isFree()) {
                     logger.warn("Client " + caller + " tries to release the already free node " + nodeURL);
+                    nodesFailedToRelease.add(node);
                 } else if (rmnode.isDown()) {
                     logger.warn("Node was down, it cannot be released");
+                    nodesFailedToRelease.add(node);
                 } else {
                     Set<? extends IdentityPrincipal> userPrincipal = rmnode.getOwner()
                                                                            .getSubject()
@@ -1304,18 +1310,27 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
                         if (rmnode.isToRemove()) {
                             removeNodeFromCoreAndSource(rmnode, caller);
+                            nodesReleased.add(node);
                         } else {
                             internalSetFree(rmnode);
+                            nodesReleased.add(node);
                         }
                     } catch (SecurityException ex) {
                         logger.error(ex.getMessage(), ex);
+                        nodesFailedToRelease.add(node);
                         exception = ex;
                     }
                 }
             } else {
                 logger.warn("Cannot release unknown node " + nodeURL);
+                nodesFailedToRelease.add(node);
                 exception = new IllegalArgumentException("Cannot release unknown node " + nodeURL);
             }
+        }
+
+        logger.info("Nodes released : " + nodesReleased);
+        if (!nodesFailedToRelease.isEmpty()) {
+            logger.warn("Nodes failed to release : " + nodesFailedToRelease);
         }
 
         if (exception != null) {
@@ -1508,7 +1523,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 shutedDown = true;
             }
 
-            this.nodeRM.getProActiveRuntime().killRT(true);
+            if (PAResourceManagerProperties.RM_SHUTDOWN_KILL_RUNTIME.getValueAsBoolean())
+                this.nodeRM.getProActiveRuntime().killRT(true);
+
         } catch (Exception e) {
             logger.debug("", e);
         }

@@ -136,4 +136,9 @@ public class NodeSet extends ArrayList<Node> {
             nodesUrls.add(node.getNodeInformation().getURL());
         }
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + (extraNodes != null ? ", extraNodes=" + extraNodes.toString() : "");
+    }
 }
