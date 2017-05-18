@@ -102,6 +102,9 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
 
     private void addJobToPerUserMap(JobState jobState, Map<String, Set<JobState>> perUserJobMap) {
         String userName = jobState.getOwner();
+        if (userName == null) {
+            throw new IllegalArgumentException("Job " + jobState.toString() + " does not have a owner.");
+        }
         Set<JobState> perUserStoredSet = perUserJobMap.get(userName);
         if (perUserStoredSet == null) {
             perUserStoredSet = Collections.synchronizedSet(new LinkedHashSet<JobState>());
