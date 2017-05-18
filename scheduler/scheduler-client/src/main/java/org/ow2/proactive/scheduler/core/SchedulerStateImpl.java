@@ -204,6 +204,11 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
         return sUsers;
     }
 
+    @Override
+    public int getTotalNbJobs() {
+        return jobs.size();
+    }
+
     /**
      * Sets the list of connected users to the given users value.
      *
@@ -309,6 +314,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
                 break;
             case JOB_REMOVE_FINISHED:
                 removeFinished(js);
+                logger.info("HOUSEKEEPING SchedulerStateImpl removed " + js.getId());
                 break;
             case JOB_PENDING_TO_RUNNING:
                 pendingToRunning(js);
