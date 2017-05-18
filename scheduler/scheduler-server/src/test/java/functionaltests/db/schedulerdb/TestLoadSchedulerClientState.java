@@ -260,7 +260,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         Assert.assertEquals("Unexpected dependencies", dependenciesSet, actualDependenciesSet);
     }
 
-    private JobState checkJobData(Vector<JobState> jobList, JobId id, TaskFlowJob job, int tasksNumber) {
+    private JobState checkJobData(Set<JobState> jobList, JobId id, TaskFlowJob job, int tasksNumber) {
         for (JobState state : jobList) {
             if (state.getJobInfo().getJobId().equals(id)) {
                 Assert.assertEquals(job.getName(), state.getId().getReadableName());

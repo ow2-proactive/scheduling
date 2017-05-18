@@ -381,7 +381,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      *            generic information of the job. In order to have the
      *            authorisation, this generic information need to contains the
      *            keys-values specified in the security file.
-     * 
+     *
      * @param ui
      *            the user identification
      * @throws PermissionException
@@ -776,7 +776,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /*
-     * ######################################################################### ##################
+     * ###########################################################################################
      */
     /*                                                                                             */
     /*
@@ -784,7 +784,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     /*                                                                                             */
     /*
-     * ######################################################################### ##################
+     * ###########################################################################################
      */
 
     /**

@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -947,9 +948,9 @@ public class SchedulingService {
     }
 
     private void recover(RecoveredSchedulerState recoveredState) {
-        Vector<InternalJob> finishedJobs = recoveredState.getFinishedJobs();
-        Vector<InternalJob> pendingJobs = recoveredState.getPendingJobs();
-        Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
+        List<InternalJob> finishedJobs = recoveredState.getFinishedJobs();
+        List<InternalJob> pendingJobs = recoveredState.getPendingJobs();
+        List<InternalJob> runningJobs = recoveredState.getRunningJobs();
 
         jobsRecovered(pendingJobs);
         jobsRecovered(runningJobs);
@@ -987,7 +988,7 @@ public class SchedulingService {
         }
     }
 
-    private void recoverTasksState(Vector<InternalJob> jobs, boolean restoreInErrorTasks) {
+    private void recoverTasksState(List<InternalJob> jobs, boolean restoreInErrorTasks) {
         Iterator<InternalJob> iterJob = jobs.iterator();
         while (iterJob.hasNext()) {
             InternalJob job = iterJob.next();

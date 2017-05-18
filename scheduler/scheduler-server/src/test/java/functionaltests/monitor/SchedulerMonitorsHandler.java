@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -114,7 +115,7 @@ public class SchedulerMonitorsHandler {
      */
     public void init(SchedulerState state) {
         synchronized (this) {
-            for (JobState j : (Vector<JobState>) state.getFinishedJobs()) {
+            for (JobState j : state.getFinishedJobs()) {
                 this.finishedJobs.add(j.getId());
             }
         }
