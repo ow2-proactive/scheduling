@@ -1051,6 +1051,7 @@ public class SchedulingService {
                     getListener().jobStateUpdated(job.getOwner(),
                                                   new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
                                                                                 new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+                    getListener().jobUpdatedFullData(job);
                     wakeUpSchedulingThread();
                 }
                 longList.add(jobId.longValue());
