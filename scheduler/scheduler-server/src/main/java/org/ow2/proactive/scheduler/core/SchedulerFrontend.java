@@ -340,18 +340,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             Tools.logAvailableScriptEngines(logger);
 
-            // TODO don't forget to load this on demand only
-            metricsMonitorScheduler = new it.sauronsoftware.cron4j.Scheduler();
-            String cronExpr = "* * * * *";
-            //            if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.isSet()) {
-            //                cronExpr = PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.getValueAsString();
-            //            }
-
-            metricsMonitorScheduler.schedule(cronExpr, new TableSizeMonitorRunner(dbManager.getTransactionHelper()));
-            metricsMonitorScheduler.schedule(cronExpr,
-                                             new JobsMemoryMonitorRunner(dbManager.getSessionFactory().getStatistics(),
-                                                                         frontendState.getStateInternally()));
-            metricsMonitorScheduler.start();
+            if (PASchedulerProperties.SCHEDULER_MEM_MONITORING_FREQ.isSet()) {
+                logger.debug("Starting the memory monitoring process...");
+                metricsMonitorScheduler = new it.sauronsoftware.cron4j.Scheduler();
+                String cronExpr = PASchedulerProperties.SCHEDULER_MEM_MONITORING_FREQ.getValueAsString();
+                metricsMonitorScheduler.schedule(cronExpr,
+                                                 new TableSizeMonitorRunner(dbManager.getTransactionHelper()));
+                metricsMonitorScheduler.schedule(cronExpr,
+                                                 new JobsMemoryMonitorRunner(dbManager.getSessionFactory()
+                                                                                      .getStatistics(),
+                                                                             frontendState.getStateInternally()));
+                metricsMonitorScheduler.start();
+            }
 
             // run !!
         } catch (Exception e) {
