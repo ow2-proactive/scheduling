@@ -25,8 +25,11 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -55,13 +58,13 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 public final class SchedulerStateImpl implements SchedulerState {
 
     /** Pending jobs */
-    private Vector<JobState> pendingJobs = new Vector<>();
+    private Set<JobState> pendingJobs = Collections.synchronizedSet(new LinkedHashSet<JobState>());
 
     /** Running jobs */
-    private Vector<JobState> runningJobs = new Vector<>();
+    private Set<JobState> runningJobs = Collections.synchronizedSet(new LinkedHashSet<JobState>());
 
     /** Finished jobs */
-    private Vector<JobState> finishedJobs = new Vector<>();
+    private Set<JobState> finishedJobs = Collections.synchronizedSet(new LinkedHashSet<JobState>());
 
     /** Scheduler status */
     private SchedulerStatus status = SchedulerStatus.STARTED;
@@ -94,7 +97,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * @return the finishedJobs
      */
     public Vector<JobState> getFinishedJobs() {
-        return finishedJobs;
+        return new Vector(finishedJobs);
     }
 
     /**
@@ -103,7 +106,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * @param finishedJobs the finishedJobs to set
      */
     public void setFinishedJobs(Vector<JobState> finishedJobs) {
-        this.finishedJobs = finishedJobs;
+        this.finishedJobs = Collections.synchronizedSet(new LinkedHashSet<>(finishedJobs));
     }
 
     /**
@@ -112,7 +115,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * @return the pendingJobs
      */
     public Vector<JobState> getPendingJobs() {
-        return pendingJobs;
+        return new Vector(pendingJobs);
     }
 
     /**
@@ -121,7 +124,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * @param pendingJobs the pendingJobs to set
      */
     public void setPendingJobs(Vector<JobState> pendingJobs) {
-        this.pendingJobs = pendingJobs;
+        this.pendingJobs = Collections.synchronizedSet(new LinkedHashSet<>(pendingJobs));
     }
 
     /**
@@ -130,7 +133,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * @return the runningJobs
      */
     public Vector<JobState> getRunningJobs() {
-        return runningJobs;
+        return new Vector(runningJobs);
     }
 
     /**
@@ -139,7 +142,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * @param runningJobs the runningJobs to set
      */
     public void setRunningJobs(Vector<JobState> runningJobs) {
-        this.runningJobs = runningJobs;
+        this.runningJobs = Collections.synchronizedSet(new LinkedHashSet<>(runningJobs));
     }
 
     /**
@@ -267,19 +270,16 @@ public final class SchedulerStateImpl implements SchedulerState {
         js.update(notification.getData());
         switch (notification.getEventType()) {
             case JOB_PENDING_TO_FINISHED:
-                pendingJobs.remove(js);
-                finishedJobs.add(js);
+                pendingToFinished(js);
                 break;
             case JOB_REMOVE_FINISHED:
-                finishedJobs.remove(js);
+                removeFinished(js);
                 break;
             case JOB_PENDING_TO_RUNNING:
-                pendingJobs.remove(js);
-                runningJobs.add(js);
+                pendingToRunning(js);
                 break;
             case JOB_RUNNING_TO_FINISHED:
-                runningJobs.remove(js);
-                finishedJobs.add(js);
+                runningToFinished(js);
                 break;
         }
     }
@@ -322,7 +322,6 @@ public final class SchedulerStateImpl implements SchedulerState {
                 break;
             case JOB_REMOVE_FINISHED:
                 updateJobInfo((NotificationData<JobInfo>) notification);
-                jobs.remove(((NotificationData<JobInfo>) notification).getData().getJobId());
                 break;
             case TASK_PENDING_TO_RUNNING:
             case TASK_RUNNING_TO_FINISHED:
@@ -341,6 +340,26 @@ public final class SchedulerStateImpl implements SchedulerState {
     public synchronized void update(JobState js) {
         pendingJobs.add(js);
         this.jobs.put(js.getId(), js);
+    }
+
+    public synchronized void pendingToRunning(JobState js) {
+        pendingJobs.remove(js);
+        runningJobs.add(js);
+    }
+
+    public synchronized void pendingToFinished(JobState js) {
+        pendingJobs.remove(js);
+        finishedJobs.add(js);
+    }
+
+    public synchronized void runningToFinished(JobState js) {
+        runningJobs.remove(js);
+        finishedJobs.add(js);
+    }
+
+    public synchronized void removeFinished(JobState js) {
+        finishedJobs.remove(js);
+        jobs.remove(js.getId());
     }
 
 }

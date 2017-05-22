@@ -31,9 +31,11 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
@@ -54,48 +56,61 @@ public class TestJobRemoved extends SchedulerFunctionalTestWithRestart {
     @Test
     public void testJobRemoved() throws Throwable {
 
-        SchedulerState state = schedulerHelper.getSchedulerInterface().getState();
-        int jobsNumber = state.getFinishedJobs().size() + state.getPendingJobs().size() + state.getRunningJobs().size();
+        int initialJobsNumber = refreshAndGetTotalJobCount();
 
         JobId id = schedulerHelper.submitJob(new File(pendingJob.toURI()).getAbsolutePath());
         log("Job submitted, id " + id.toString());
         schedulerHelper.waitForEventJobSubmitted(id);
 
+        Assert.assertEquals(refreshAndGetTotalJobCount(), initialJobsNumber + 1);
+
         // removing pending job
         schedulerHelper.removeJob(id);
 
-        int jobsDelta = state.getFinishedJobs().size() + state.getPendingJobs().size() + state.getRunningJobs().size() -
-                        jobsNumber;
-
-        assertEquals(0, jobsDelta);
         schedulerHelper.waitForEventJobRemoved(id, EVENT_TIMEOUT);
+
+        assertEquals(initialJobsNumber, refreshAndGetTotalJobCount());
 
         id = schedulerHelper.submitJob(new File(runningJob.toURI()).getAbsolutePath());
         log("Job submitted, id " + id.toString());
         schedulerHelper.waitForEventJobRunning(id);
+
+        Assert.assertEquals(refreshAndGetTotalJobCount(), initialJobsNumber + 1);
 
         // removing running job
         schedulerHelper.removeJob(id);
         // it should kill the job
         schedulerHelper.waitForEventJobFinished(id);
 
-        jobsDelta = state.getFinishedJobs().size() + state.getPendingJobs().size() + state.getRunningJobs().size() -
-                    jobsNumber;
+        schedulerHelper.waitForEventJobRemoved(id, EVENT_TIMEOUT);
 
-        assertEquals(0, jobsDelta);
+        assertEquals(initialJobsNumber, refreshAndGetTotalJobCount());
 
         id = schedulerHelper.submitJob(new File(simpleJob.toURI()).getAbsolutePath());
         log("Job submitted, id " + id.toString());
         schedulerHelper.waitForEventJobFinished(id);
 
+        Assert.assertEquals(refreshAndGetTotalJobCount(), initialJobsNumber + 1);
+
         // removing finished job
         schedulerHelper.removeJob(id);
 
-        jobsDelta = state.getFinishedJobs().size() + state.getPendingJobs().size() + state.getRunningJobs().size() -
-                    jobsNumber;
+        schedulerHelper.waitForEventJobRemoved(id, EVENT_TIMEOUT);
 
-        assertEquals(0, jobsDelta);
+        assertEquals(initialJobsNumber, refreshAndGetTotalJobCount());
 
         schedulerHelper.checkNodesAreClean();
+    }
+
+    private int refreshAndGetTotalJobCount() throws Exception {
+        return getTotalJobsCount(refreshState());
+    }
+
+    private int getTotalJobsCount(SchedulerState state) {
+        return state.getFinishedJobs().size() + state.getPendingJobs().size() + state.getRunningJobs().size();
+    }
+
+    private SchedulerState refreshState() throws Exception {
+        return schedulerHelper.getSchedulerInterface().getState();
     }
 }
