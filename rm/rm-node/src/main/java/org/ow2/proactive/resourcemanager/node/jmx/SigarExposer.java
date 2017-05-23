@@ -82,6 +82,9 @@ public class SigarExposer extends AbstractJMXHelper {
                 mbs.registerMBean(processes, name);
             }
 
+            new SigarFileEventsExposer().registerMBeans(mbs);
+            new SigarDatabaseEventsExposer().registerMBeans(mbs);
+
         } catch (Exception e) {
             LOGGER.error("Unable to register SigarRegistry mbean", e);
         }
